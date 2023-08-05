@@ -189,6 +189,8 @@
 #include "peripherals.h"
 #include "common.h"
 
+#include "check_defines.h"
+
 #ifdef USE_LED_STRIP
 #include "WS2812.h"
 #endif
@@ -633,12 +635,12 @@ void loadEEpromSettings(){
 		   if(eepromBuffer[24] < 12 && eepromBuffer[24] > 7){
 			   TIMER1_MAX_ARR = map (eepromBuffer[24], 7, 16, TIM1_AUTORELOAD *3 ,TIM1_AUTORELOAD/2*3);
 		   }
-		   setAutoReloadPWM(TIMER1_MAX_ARR);
+		   SET_AUTO_RELOAD_PWM(TIMER1_MAX_ARR);
 		   throttle_max_at_high_rpm = TIMER1_MAX_ARR;
 		   duty_cycle_maximum = TIMER1_MAX_ARR;
 	    }else{
 	    	tim1_arr = TIM1_AUTORELOAD;
-	    	setAutoReloadPWM(tim1_arr);
+	    	SET_AUTO_RELOAD_PWM(tim1_arr);
 	    }
 
 	   if(eepromBuffer[25] < 151 && eepromBuffer[25] > 49){
@@ -920,7 +922,7 @@ if(average_interval > 2000 && (stall_protection || RC_CAR_REVERSE)){
 }
 
 void PeriodElapsedCallback(){           
-		    disableComTimerInt();// disable interrupt
+		    DISABLE_COM_TIMER_INT();// disable interrupt
 			commutation_interval = (( 3*commutation_interval) + thiszctime)>>2;
 			commutate();
 			advance = (commutation_interval>>3) * advance_level;   // 60 divde 8 7.5 degree increments
@@ -937,10 +939,10 @@ void PeriodElapsedCallback(){
 
 void interruptRoutine(){
 	if (average_interval > 125){
-if ((getintervaTimerCount() < 125) && (duty_cycle < 600) && (zero_crosses < 500)){    //should be impossible, desync?exit anyway
+if ((INTERVAL_TIMER_COUNT < 125) && (duty_cycle < 600) && (zero_crosses < 500)){    //should be impossible, desync?exit anyway
 	return;
 }
-if (getintervaTimerCount() < (commutation_interval >> 1)){
+if (INTERVAL_TIMER_COUNT < (commutation_interval >> 1)){
 	return;
 }
 stuckcounter++;             // stuck at 100 interrupts before the main loop happens again.
@@ -950,7 +952,7 @@ if (stuckcounter > 100){
 	return;
 }
 	}
-thiszctime = getintervaTimerCount();
+thiszctime = INTERVAL_TIMER_COUNT;
 			if (rising){
 			for (int i = 0; i < filter_level; i++){
 #ifdef MCU_F031
@@ -973,16 +975,16 @@ thiszctime = getintervaTimerCount();
 				}
 			}
 			maskPhaseInterrupts();
-			setintervaTimerCount(0);
+			SET_INTERVAL_TIMER_COUNT(0);
 		    waitTime = waitTime >> fast_accel;
-            setAndEnableComInt(waitTime);        //enable COM_TIMER interrupt
+            SET_AND_ENABLE_COM_INT(waitTime);        //enable COM_TIMER interrupt
 }
 
 void startMotor() {
 	if (running == 0){
 	commutate();
 	commutation_interval = 10000;
-	setintervaTimerCount(5000);
+	SET_INTERVAL_TIMER_COUNT(5000);
 	running = 1;
 	}
 	enableCompInterrupts();
@@ -1228,7 +1230,7 @@ if(!armed && (cell_count == 0)){
 				  			  for (int i = 0 ; i < cell_count; i++){
 				  			  playInputTune();
 				  			  delayMillis(100);
-				  			 reloadWatchDogCounter();
+				  				RELOAD_WATCHDOG_COUNTER();
 				  			  }
 				  			  }else{
 				  			  playInputTune();
@@ -1453,8 +1455,8 @@ if(!prop_brake_active){
 				}
 	    }
 		last_duty_cycle = duty_cycle;
-	setAutoReloadPWM(tim1_arr);
-    setDutyCycleAll(adjusted_duty_cycle);
+	SET_AUTO_RELOAD_PWM(tim1_arr);
+    SET_DUTY_CYCLE_ALL(adjusted_duty_cycle);
 	}
 
 
@@ -1480,7 +1482,7 @@ if(!prop_brake_active){
 				input = 0;
 				inputSet = 0;
 				zero_input_count = 0;
-			    setDutyCycleAll(0);
+			    SET_DUTY_CYCLE_ALL(0);
 				resetInputCaptureTimer();
 				for(int i = 0; i < 64; i++){
 					dma_buffer[i] = 0;
@@ -1494,7 +1496,7 @@ if(!prop_brake_active){
 			input = 0;
 			inputSet = 0;
 			zero_input_count = 0;
-			setDutyCycleAll(0);
+			SET_DUTY_CYCLE_ALL(0);
 			resetInputCaptureTimer();
 			for(int i = 0; i < 64; i++){
 				dma_buffer[i] = 0;
@@ -1548,12 +1550,12 @@ if (!forward){
 
 
 void zcfoundroutine(){   // only used in polling mode, blocking routine.
-	thiszctime = getintervaTimerCount();
-	setintervaTimerCount(0);
+	thiszctime = INTERVAL_TIMER_COUNT;
+	SET_INTERVAL_TIMER_COUNT(0);
 	commutation_interval = (thiszctime + (3*commutation_interval)) / 4;
 	advance = commutation_interval / advancedivisor;
 	waitTime = commutation_interval /2  - advance;
-    while ((getintervaTimerCount()) < (waitTime)){    
+    while ((INTERVAL_TIMER_COUNT) < (waitTime)){    
     if(zero_crosses < 10){
     	break;
     }
@@ -1617,13 +1619,13 @@ void runBrushedLoop(){
 			 }
 	  }
 if((brushed_duty_cycle > 0) && armed){
-        setDutyCycleAll(brushed_duty_cycle);
+        SET_DUTY_CYCLE_ALL(brushed_duty_cycle);
 //	  	TIM1->CCR1 = brushed_duty_cycle;
 //		TIM1->CCR2 = brushed_duty_cycle;
 //		TIM1->CCR3 = brushed_duty_cycle;
 		
 	}else{
-        setDutyCycleAll(0);
+        SET_DUTY_CYCLE_ALL(0);
 //		TIM1->CCR1 = 0;												//
 //		TIM1->CCR2 = 0;
 //		TIM1->CCR3 = 0;
@@ -1699,7 +1701,7 @@ if(use_sin_start){
 #else
 #if defined(FIXED_DUTY_MODE) || defined(FIXED_SPEED_MODE)
  MX_IWDG_Init();
- reloadWatchDogCounter();
+ RELOAD_WATCHDOG_COUNTER();
  inputSet = 1;
  armed = 1;
  adjusted_input = 48;
@@ -1723,7 +1725,7 @@ if(use_sin_start){
 #endif
 	   zero_input_count = 0;
 	   MX_IWDG_Init();
-	   reloadWatchDogCounter();
+	   RELOAD_WATCHDOG_COUNTER();
 #ifdef GIMBAL_MODE
 	bi_direction = 1;
 	use_sin_start = 1;
@@ -1760,7 +1762,7 @@ if(use_sin_start){
 
  while (1)
    {
- reloadWatchDogCounter();
+ RELOAD_WATCHDOG_COUNTER();
 
 
 	#ifndef BRUSHED_MODE
@@ -2147,7 +2149,7 @@ if (old_routine && running){
 	 		  }
 	 	  }
 }
-	 	  if (getintervaTimerCount() > 45000 && running == 1){
+	 	  if (INTERVAL_TIMER_COUNT > 45000 && running == 1){
               bemf_timeout_happened ++;
 
 	 		  maskPhaseInterrupts();
@@ -2198,9 +2200,9 @@ if(input > 48 && armed){
 
 	   	 	if(do_once_sinemode){
 				  // disable commutation interrupt in case set
-				disableComTimerInt();
+				DISABLE_COM_TIMER_INT();
 	   	 		maskPhaseInterrupts();
-				setDutyCycleAll(0);
+				SET_DUTY_CYCLE_ALL(0);
 	   	 		allpwm();
 	   	 		do_once_sinemode = 0;
 	   	 	}
@@ -2225,7 +2227,7 @@ if(input > 48 && armed){
 		 		  commutation_interval = 9000;
 		 		  average_interval = 9000;
 				  last_average_interval = average_interval;
-		 		  setintervaTimerCount(9000);
+		 		  SET_INTERVAL_TIMER_COUNT(9000);
 				  zero_crosses = 10;
 				  prop_brake_active = 0;
 	 			  step = changeover_step;                    
@@ -2245,13 +2247,13 @@ if(input > 48 && armed){
 	duty_cycle = (TIMER1_MAX_ARR-19) + drag_brake_strength*2;
 	adjusted_duty_cycle = TIMER1_MAX_ARR - ((duty_cycle * tim1_arr)/TIMER1_MAX_ARR)+1;
 proportionalBrake();
-	setDutyCycleAll(adjusted_duty_cycle);
+	SET_DUTY_CYCLE_ALL(adjusted_duty_cycle);
 	prop_brake_active = 1;
 #else
 		// todo add braking for PWM /enable style bridges.
 #endif
 	}else{
-	setDutyCycleAll(0);
+	SET_DUTY_CYCLE_ALL(0);
 	allOff();
 	}
 }

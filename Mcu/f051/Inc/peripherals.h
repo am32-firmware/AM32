@@ -14,6 +14,16 @@
 
 #include "main.h"
 
+#define INTERVAL_TIMER_COUNT                    (INTERVAL_TIMER->CNT)
+#define RELOAD_WATCHDOG_COUNTER()               (LL_IWDG_ReloadCounter(IWDG))
+#define DISABLE_COM_TIMER_INT()                 (COM_TIMER->DIER &= ~((0x1UL << (0U))))
+#define ENABLE_COM_TIMER_INT()                  (COM_TIMER->DIER |= (0x1UL << (0U)))
+#define SET_AND_ENABLE_COM_INT(time)            (COM_TIMER->CNT = 0,COM_TIMER->ARR = time,COM_TIMER->SR = 0x00,COM_TIMER->DIER |= (0x1UL << (0U)))
+#define SET_INTERVAL_TIMER_COUNT(intertime)     (INTERVAL_TIMER->CNT = 0)
+#define SET_PRESCALER_PWM(presc)                (TIM1->PSC = presc)
+#define SET_AUTO_RELOAD_PWM(relval)             (TIM1->ARR = relval)
+#define SET_DUTY_CYCLE_ALL(newdc)               (TIM1->CCR1 = newdc,TIM1->CCR2 = newdc,TIM1->CCR3 = newdc)
+
 
 void initAfterJump(void);
 void initCorePeripherals(void);
@@ -30,19 +40,11 @@ void MX_TIM14_Init(void);
 void MX_TIM6_Init(void);
 void MX_TIM17_Init(void);
 //static void MX_USART1_UART_Init(void);
-void disableComTimerInt(void);
-void enableComTimerInt(void);
-void setAndEnableComInt(uint16_t time);
-uint16_t getintervaTimerCount();
-void setintervaTimerCount(uint16_t intertime);
-void setAutoReloadPWM(uint16_t relval);
-void setDutyCycleAll(uint16_t newdc);
 void resetInputCaptureTimer();
 void setPWMCompare1(uint16_t compareone);
 void setPWMCompare2(uint16_t comparetwo);
 void setPWMCompare3(uint16_t comparethree);
 void enableCorePeripherals(void);
-void reloadWatchDogCounter(void);
 void generatePwmTimerEvent(void);
 void UN_TIM_Init(void);
 void LED_GPIO_init(void);

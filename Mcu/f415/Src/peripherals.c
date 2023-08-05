@@ -174,17 +174,7 @@ void MX_IWDG_Init(void)
   WDT->div = WDT_CLK_DIV_64;
 	WDT->rld = 4000;
 	WDT->cmd = WDT_CMD_RELOAD;
-	
-	
-	
-	
-	
-//	IWDG_Enable();
-//	IWDG_KeyRegWrite(IWDG_KeyRegWrite_Enable);
-//	IWDG_SetPrescaler(IWDG_Psc_32);
-//	IWDG_SetReload(4000);
-//	IWDG_ReloadCounter();
-	
+
 }
 
 void TIM1_Init(void){

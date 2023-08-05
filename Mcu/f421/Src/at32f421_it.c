@@ -166,6 +166,7 @@ void DMA1_Channel5_4_IRQHandler(void)
       DMA1->clr = DMA1_GL5_FLAG;
 			INPUT_DMA_CHANNEL->ctrl_bit.chen = FALSE;
 		  transfercomplete();
+		  TMR14->cval = TMR14->pr -2;
 
 		  }
 		   if(dma_flag_get(DMA1_DTERR5_FLAG) == SET)
@@ -189,6 +190,7 @@ void DMA1_Channel5_4_IRQHandler(void)
    	//	INPUT_DMA_CHANNEL->c &= (uint16_t)(~DMA_CHCTRL1_CHEN);
 			INPUT_DMA_CHANNEL->ctrl_bit.chen = FALSE;
 		  transfercomplete();
+		  TMR14->cval = TMR14->pr -2;
 
 		  }
 		   if(dma_flag_get(DMA1_DTERR4_FLAG) == SET)

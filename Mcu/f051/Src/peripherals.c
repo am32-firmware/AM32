@@ -314,7 +314,7 @@ void MX_TIM6_Init(void)
   NVIC_SetPriority(TIM6_DAC_IRQn, 2);
   NVIC_EnableIRQ(TIM6_DAC_IRQn);
 TIM6->PSC = 47;
-TIM6->ARR = 50;
+TIM6->ARR = 100;
 }
 
 
@@ -550,21 +550,21 @@ void setDutyCycleAll(uint16_t newdc){
   TIM1->CCR3 = newdc;
 }
 
-void setPWMCompare1(uint16_t compareone){
+void inline setPWMCompare1(uint16_t compareone){
   TIM1->CCR1 = compareone;
 }
-void setPWMCompare2(uint16_t comparetwo){
+void inline setPWMCompare2(uint16_t comparetwo){
   TIM1->CCR2 = comparetwo;
 }
-void setPWMCompare3(uint16_t comparethree){
+void inline setPWMCompare3(uint16_t comparethree){
   TIM1->CCR3 = comparethree;
 }
 
-void generatePwmTimerEvent(){
+void inline generatePwmTimerEvent(){
   LL_TIM_GenerateEvent_UPDATE(TIM1);
 }
 
-void resetInputCaptureTimer(){
+void inline resetInputCaptureTimer(){
 			IC_TIMER_REGISTER->PSC = 0;
 			IC_TIMER_REGISTER->CNT = 0;
 }

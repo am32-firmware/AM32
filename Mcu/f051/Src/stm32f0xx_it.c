@@ -243,6 +243,7 @@ void DMA1_Channel4_5_IRQHandler(void)
 		    LL_DMA_ClearFlag_GI4(DMA1);
 		    LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_4);
 		    transfercomplete();
+		    TIM6->CNT = TIM6->ARR - 2;
 
 		  }
 		  else if(LL_DMA_IsActiveFlag_TE4(DMA1) == 1)

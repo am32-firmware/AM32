@@ -40,3 +40,15 @@
 #ifndef SET_DUTY_CYCLE_ALL
 #error "SET_DUTY_CYCLE_ALL missing for mcu"
 #endif
+
+#ifndef RESET_INPUT_CAPTURE_TIMER
+#error "RESET_INPUT_CAPTURE_TIMER missing for mcu"
+#endif
+
+#ifndef SET_PWM_COMPARE
+#error "SET_PWM_COMPARE missing for mcu"
+#endif
+
+#ifndef GENERATE_PWM_TIMER_EVENT
+#error "GENERATE_PWM_TIMER_EVENT missing for mcu"
+#endif

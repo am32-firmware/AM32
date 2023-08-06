@@ -43,8 +43,8 @@ ROOT := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 # Search source files
 SRC_COMMON := $(foreach dir,$(SRC_DIRS_COMMON),$(wildcard $(dir)/*.[cs]))
 
-VERSION_MAJOR := $(shell grep " VERSION_MAJOR" $(MAIN_SRC_DIR)/main.c | awk '{print $$3}' )
-VERSION_MINOR := $(shell grep " VERSION_MINOR" $(MAIN_SRC_DIR)/main.c | awk '{print $$3}' )
+VERSION_MAJOR := $(shell grep "#define VERSION_MAJOR" $(MAIN_SRC_DIR)/main.c | awk '{print $$3}' )
+VERSION_MINOR := $(shell grep "#define VERSION_MINOR" $(MAIN_SRC_DIR)/main.c | awk '{print $$3}' )
 
 FIRMWARE_VERSION := $(VERSION_MAJOR).$(VERSION_MINOR)
 

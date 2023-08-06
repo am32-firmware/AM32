@@ -24,6 +24,11 @@
 #define SET_AUTO_RELOAD_PWM(relval)             (TIM1->ARR = relval)
 #define SET_DUTY_CYCLE_ALL(newdc)               (TIM1->CCR1 = newdc,TIM1->CCR2 = newdc,TIM1->CCR3 = newdc)
 
+#define RESET_INPUT_CAPTURE_TIMER()             (IC_TIMER_REGISTER->PSC = 0,IC_TIMER_REGISTER->CNT = 0)
+
+#define SET_PWM_COMPARE(NUM, value)             (TIM1->CCR ## NUM = value)
+
+#define GENERATE_PWM_TIMER_EVENT()              (LL_TIM_GenerateEvent_UPDATE(TIM1))
 
 void initAfterJump(void);
 void initCorePeripherals(void);
@@ -40,12 +45,8 @@ void MX_TIM14_Init(void);
 void MX_TIM6_Init(void);
 void MX_TIM17_Init(void);
 //static void MX_USART1_UART_Init(void);
-void resetInputCaptureTimer();
-void setPWMCompare1(uint16_t compareone);
-void setPWMCompare2(uint16_t comparetwo);
-void setPWMCompare3(uint16_t comparethree);
+
 void enableCorePeripherals(void);
-void generatePwmTimerEvent(void);
 void UN_TIM_Init(void);
 void LED_GPIO_init(void);
 void setPrescalerPWM(uint16_t presc);

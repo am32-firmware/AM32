@@ -23,6 +23,7 @@
 
 void initCorePeripherals(void){
   system_clock_config();
+ 
 	MX_GPIO_Init();
   MX_DMA_Init();
 	TIM1_Init();

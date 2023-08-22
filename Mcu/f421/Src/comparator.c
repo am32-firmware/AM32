@@ -13,23 +13,13 @@ uint8_t getCompOutputLevel(){
 }
 
 void maskPhaseInterrupts(){
-//	EXTI->IMR &= (0 << 21);
-//	LL_EXTI_ClearFlag_0_31(EXTI_LINE);
-	
-//	EXTI_INTEN &= ~(uint32_t)EXTI_LINE;
-	 EXINT->inten &= ~EXTI_LINE;
-	
-//	EXTI_PD = (uint32_t)EXTI_LINE;
+	EXINT->inten &= ~EXTI_LINE;
 	EXINT->intsts = EXTI_LINE;
 }
 
 void enableCompInterrupts(){
-  //  EXTI->IMR |= (1 << 21);
-//	EXTI_INTEN |= (uint32_t)EXTI_LINE;
 	EXINT->inten |= EXTI_LINE;
-	//EXTI->PND = EXTI_LINE;
 }
-
 
 void changeCompInput()
 {

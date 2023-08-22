@@ -15,7 +15,7 @@
 //#define AIKONSINGLE
 //#define FLYCOLOR
 //#define HKMICRO
-#define AM32REF_F051
+//#define AM32REF_F051
 //#define BLPWR
 //#define HVFLYCOLOR
 //#define AM32REF_F051
@@ -183,7 +183,7 @@
 #define FILE_NAME                "TEKKO32_F421"
 #define DEAD_TIME               80
 #define HARDWARE_GROUP_AT_B
-#define HARDWARE_GROUP_AT_450
+#define HARDWARE_GROUP_AT_045
 #define USE_SERIAL_TELEMETRY
 #endif
 
@@ -1634,8 +1634,8 @@
 
 #define MCU_AT421
 #define USE_TIMER_15_CHANNEL_1
-#define USE_PA14_TELEMETRY
-#define USE_PA6_TEMP
+//#define USE_PA14_TELEMETRY
+//#define USE_PA6_TEMP
 #define INPUT_PIN               GPIO_PINS_2
 #define INPUT_PIN_SOURCE        GPIO_PINS_SOURCE2
 #define INPUT_PIN_PORT          GPIOA
@@ -1802,9 +1802,18 @@
 #define TIM1_AUTORELOAD    5000
 #define APPLICATION_ADDRESS 0x08001000
 #define EXTI_LINE   EXINT_LINE_21
-#define TARGET_MIN_BEMF_COUNTS 12
+#define TARGET_MIN_BEMF_COUNTS 6
 #define COMPARATOR_IRQ  ADC1_CMP_IRQn
 #define USE_ADC
+#ifndef ADC_CHANNEL_CURRENT
+#define ADC_CHANNEL_CURRENT  ADC_CHANNEL_6
+#endif
+#ifndef ADC_CHANNEL_VOLTAGE
+#define ADC_CHANNEL_VOLTAGE  ADC_CHANNEL_3
+#endif
+#ifndef ADC_CHANNEL_TEMP
+#define ADC_CHANNEL_TEMP     ADC_CHANNEL_16
+#endif
 #endif
 
 #ifdef MCU_AT415
@@ -1818,7 +1827,7 @@
 #define TIM1_AUTORELOAD    6000
 #define APPLICATION_ADDRESS 0x08001000
 #define EXTI_LINE   EXINT_LINE_19
-#define TARGET_MIN_BEMF_COUNTS 16
+#define TARGET_MIN_BEMF_COUNTS 8
 #define USE_ADC
 #define COMPARATOR_IRQ   CMP1_IRQn
 #define DSHOT_PRE            95

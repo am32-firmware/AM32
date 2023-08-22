@@ -115,10 +115,10 @@ void transfercomplete(){
 	    if(out_put){
      	receiveDshotDma();
         compute_dshot_flag = 2;
-    // 	make_dshot_package();
+     //	make_dshot_package();
 	   	return;
 	    }else{
-         sendDshotDma();
+        sendDshotDma();
          compute_dshot_flag = 1;
 	//	 computeDshotDMA();
 	    return;

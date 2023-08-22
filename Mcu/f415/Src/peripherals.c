@@ -178,83 +178,43 @@ void MX_IWDG_Init(void)
 }
 
 void TIM1_Init(void){
-  //RCC_APB2PeriphClockCmd(RCC_APB2PERIPH_TMR1, ENABLE);
 	crm_periph_clock_enable(CRM_IOMUX_PERIPH_CLOCK, TRUE);
 	crm_periph_clock_enable(CRM_TMR1_PERIPH_CLOCK, TRUE);
-	//GPIO_PinsRemapConfig(GPIO_PartialRemap_TMR1, ENABLE);
+
 	gpio_pin_remap_config(TMR1_GMUX_0001, TRUE);
 	
-	TMR1->pr = 6000;
+	
+	TMR1->pr = 3000;
 	TMR1->div = 0;
 	
 	TMR1->cm1 = 0x6868;   // Channel 1 and 2 in PWM output mode
 	TMR1->cm2 = 0x68;     // channel 3 in PWM output mode
-	
 
-	
-//	TMR_OCStructInit(&TMR_OCInitStruct);
-//	
-//	TMR_OCInitStruct.TMR_OCMode = TMR_OCMode_PWM1;
-//  TMR_OCInitStruct.TMR_OutputState = TMR_OutputState_Disable;
-//  TMR_OCInitStruct.TMR_OutputNState = TMR_OutputNState_Disable;
-//  TMR_OCInitStruct.TMR_Pulse = 0x0000;
-//  TMR_OCInitStruct.TMR_OCPolarity = TMR_OCPolarity_High;
-//  TMR_OCInitStruct.TMR_OCNPolarity = TMR_OCPolarity_High;
-//  TMR_OCInitStruct.TMR_OCIdleState = TMR_OCIdleState_Reset;
-//  TMR_OCInitStruct.TMR_OCNIdleState = TMR_OCNIdleState_Reset;
-//	
-//	
-//	TMR_OC1Init(TMR1, &TMR_OCInitStruct);
-//	TMR_OC2Init(TMR1, &TMR_OCInitStruct);
-//	TMR_OC3Init(TMR1, &TMR_OCInitStruct);
-	
-//	TMR_OC1PreloadConfig(TMR1, TMR_OCPreload_Enable);
-//	TMR_OC2PreloadConfig(TMR1, TMR_OCPreload_Enable);
-//	TMR_OC3PreloadConfig(TMR1, TMR_OCPreload_Enable);
-	
 	tmr_output_channel_buffer_enable(TMR1,TMR_SELECT_CHANNEL_1, TRUE);
 	tmr_output_channel_buffer_enable(TMR1,TMR_SELECT_CHANNEL_2, TRUE);
 	tmr_output_channel_buffer_enable(TMR1,TMR_SELECT_CHANNEL_3, TRUE);
 	
-	//TMR_ARPreloadConfig(TMR1, ENABLE);
 	tmr_period_buffer_enable(TMR1, TRUE);
 	
-//	TMR_BRKDTStructInit(&TMR_BDTRInitStruct);
-
-//  /* Set the default configuration */
-//  TMR_BDTRInitStruct.TMR_OSIMRState = TMR_OSIMRState_Disable;
-//  TMR_BDTRInitStruct.TMR_OSIMIState = TMR_OSIMIState_Disable;
-//  TMR_BDTRInitStruct.TMR_LOCKgrade = TMR_LOCKgrade_OFF;
-//  TMR_BDTRInitStruct.TMR_DeadTime = DEAD_TIME;
-//  TMR_BDTRInitStruct.TMR_Break = TMR_Break_Disable;
-//  TMR_BDTRInitStruct.TMR_BreakPolarity = TMR_BreakPolarity_Low;
-//  TMR_BDTRInitStruct.TMR_AutomaticOutput = TMR_AutomaticOutput_Disable;
-//	TMR_BRKDTConfig(TMR1, &TMR_BDTRInitStruct);
-	
-//	TMR1->brk |= DEAD_TIME;
 	TMR1->brk_bit.dtc = DEAD_TIME;
-	
-	//RCC_AHBPeriphClockCmd(RCC_AHBPERIPH_GPIOA,ENABLE);
-	//RCC_AHBPeriphClockCmd(RCC_AHBPERIPH_GPIOB,ENABLE);
 	crm_periph_clock_enable(CRM_GPIOA_PERIPH_CLOCK, TRUE);
 	crm_periph_clock_enable(CRM_GPIOB_PERIPH_CLOCK, TRUE);
 	
 	    /*configure PA8/PA9/PA10(TIMER0/CH0/CH1/CH2) as alternate function*/
     gpio_mode_QUICK(PHASE_A_GPIO_PORT_LOW, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_A_GPIO_LOW);
-  //  gpio_output_options_set(PHASE_A_GPIO_PORT_LOW, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ,PHASE_A_GPIO_LOW);
+
 
     gpio_mode_QUICK(PHASE_B_GPIO_PORT_LOW, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_B_GPIO_LOW);
-//    gpio_output_options_set(PHASE_B_GPIO_PORT_LOW, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ,PHASE_B_GPIO_LOW);
+
 
     gpio_mode_QUICK(PHASE_C_GPIO_PORT_LOW, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_C_GPIO_LOW);
- //   gpio_output_options_set(PHASE_C_GPIO_PORT_LOW, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ,PHASE_C_GPIO_LOW);
 
     /*configure PB13/PB14/PB15(TIMER0/CH0N/CH1N/CH2N) as alternate function*/
     gpio_mode_QUICK(PHASE_A_GPIO_PORT_HIGH, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_A_GPIO_HIGH);
-  //  gpio_output_options_set(GPIOB, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ,PHASE_A_GPIO_HIGH);
+
 
     gpio_mode_QUICK(PHASE_B_GPIO_PORT_HIGH, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_B_GPIO_HIGH);
- //   gpio_output_options_set(GPIOB, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ,PHASE_B_GPIO_HIGH);
+
 
     gpio_mode_QUICK(PHASE_C_GPIO_PORT_HIGH, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_C_GPIO_HIGH);
 }

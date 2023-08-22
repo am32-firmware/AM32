@@ -95,7 +95,7 @@ gpio_periph->cfgr = (((((gpio_periph->cfgr))) & (~(((pin * pin) * (0x3UL << (0U)
 }
 #endif
 #ifdef MCU_AT415
-void gpio_mode_QUICK(gpio_type* gpio_periph, uint16_t mode, uint16_t pull_up_down, uint32_t pin)
+void gpio_mode_QUICK(gpio_type* gpio_periph, uint32_t mode, uint32_t pull_up_down, uint32_t pin)
 {
 	__disable_irq();
 	gpio_init_type gpio_init_struct;

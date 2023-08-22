@@ -127,7 +127,9 @@ void DMA1_Channel1_IRQHandler(void){
     if(dma_flag_get(DMA1_FDT1_FLAG) == SET)		
 		{
 	    DMA1->clr = DMA1_GL1_FLAG;
+#ifdef USE_ADC
 	    ADC_DMA_Callback();
+#endif
 		   if(dma_flag_get(DMA1_DTERR1_FLAG) == SET)
 		  {
 				DMA1->clr = DMA1_GL1_FLAG;

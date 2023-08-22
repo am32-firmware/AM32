@@ -63,6 +63,7 @@ unsigned int system_core_clock           = HICK_VALUE; /*!< system clock frequen
   */
 void SystemInit (void)
 {
+
   /* reset the crm clock configuration to the default reset state(for debug purpose) */
   /* set hicken bit */
   CRM->ctrl_bit.hicken = TRUE;

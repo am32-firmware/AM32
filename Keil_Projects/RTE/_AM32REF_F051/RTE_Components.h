@@ -3,7 +3,7 @@
  * Auto generated Run-Time-Environment Configuration File
  *      *** Do not modify ! ***
  *
- * Project: 'Am32F031' 
+ * Project: 'Am32F051' 
  * Target:  'AM32REF_F051' 
  */
 

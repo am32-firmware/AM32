@@ -8,6 +8,19 @@
   <WorkspaceName>WorkSpace</WorkspaceName>
 
   <project>
+    <PathAndName>.\Am32e230.uvprojx</PathAndName>
+    <NodeIsActive>1</NodeIsActive>
+  </project>
+
+  <project>
+    <PathAndName>.\Am32F031.uvprojx</PathAndName>
+  </project>
+
+  <project>
+    <PathAndName>.\Am32F051.uvprojx</PathAndName>
+  </project>
+
+  <project>
     <PathAndName>.\Am32F415.uvprojx</PathAndName>
   </project>
 
@@ -16,16 +29,8 @@
   </project>
 
   <project>
-    <PathAndName>.\Am32e230.uvprojx</PathAndName>
-    <NodeIsActive>1</NodeIsActive>
-  </project>
-
-  <project>
     <PathAndName>.\Am32G071.uvprojx</PathAndName>
-  </project>
-
-  <project>
-    <PathAndName>.\F051ProjectProject.uvprojx</PathAndName>
+    <NodeIsActive>1</NodeIsActive>
   </project>
 
 </ProjectWorkspace>

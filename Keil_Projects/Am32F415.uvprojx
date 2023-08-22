@@ -369,7 +369,7 @@
             <TextAddressRange>0x08001000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\Objects\Am32.sct</ScatterFile>
+            <ScatterFile>..\Mcu\f415\Am32.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -663,7 +663,7 @@
             <nStopA1X>0</nStopA1X>
             <nStopA2X>0</nStopA2X>
           </AfterMake>
-          <SelectedForBatchBuild>0</SelectedForBatchBuild>
+          <SelectedForBatchBuild>1</SelectedForBatchBuild>
           <SVCSIdString></SVCSIdString>
         </TargetCommonOption>
         <CommonProperty>
@@ -913,7 +913,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F415K8U7,USE_STDPERIPH_DRIVER, TEKKO32_F415</Define>
               <Undefine></Undefine>
-              <IncludePath>.\mcu\F415\CMSIS\CM4\CoreSupport;.\mcu\F415\CMSIS\CM4\DeviceSupport;.\mcu\F415\AT32F415_StdPeriph_Driver\inc;.\Inc;.\mcu\F415\mcuinc</IncludePath>
+              <IncludePath>..\Inc;..\mcu\F415\Inc;..\Mcu\f415\Drivers\drivers\inc;..\Mcu\f415\Drivers\CMSIS\cm4\core_support;..\Mcu\f415\Drivers\CMSIS\cm4\device_support</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -944,7 +944,7 @@
             <TextAddressRange>0x08001000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\Objects\Am32.sct</ScatterFile>
+            <ScatterFile>..\Mcu\f415\Am32.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -1813,7 +1813,7 @@
             <nStopA1X>0</nStopA1X>
             <nStopA2X>0</nStopA2X>
           </AfterMake>
-          <SelectedForBatchBuild>0</SelectedForBatchBuild>
+          <SelectedForBatchBuild>1</SelectedForBatchBuild>
           <SVCSIdString></SVCSIdString>
         </TargetCommonOption>
         <CommonProperty>
@@ -2063,7 +2063,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F415K8U7,USE_STDPERIPH_DRIVER, DAKEFPV_35A_F415</Define>
               <Undefine></Undefine>
-              <IncludePath>.\mcu\F415\CMSIS\CM4\CoreSupport;.\mcu\F415\CMSIS\CM4\DeviceSupport;.\mcu\F415\AT32F415_StdPeriph_Driver\inc;.\Inc;.\mcu\F415\mcuinc</IncludePath>
+              <IncludePath>..\Inc;..\mcu\F415\Inc;..\Mcu\f415\Drivers\drivers\inc;..\Mcu\f415\Drivers\CMSIS\cm4\core_support;..\Mcu\f415\Drivers\CMSIS\cm4\device_support</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2094,7 +2094,7 @@
             <TextAddressRange>0x08001000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\Objects\Am32.sct</ScatterFile>
+            <ScatterFile>..\Mcu\f415\Am32.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>

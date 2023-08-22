@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F421K8U7,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>.\mcu\F421\CMSIS\CM4\CoreSupport;.\mcu\F421\CMSIS\CM4\DeviceSupport;.\mcu\F421\AT32F421_StdPeriph_Driver\inc;.\Inc;.\mcu\F421\mcuinc</IncludePath>
+               <IncludePath>..\Inc;..\mcu\f421\Inc;..\Mcu\f421\Drivers\drivers\inc;..\Mcu\f421\Drivers\CMSIS\cm4\device_support;..\Mcu\f421\Drivers\CMSIS\cm4\core_support</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -369,7 +369,7 @@
             <TextAddressRange>0x08001000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\Objects\Am32.sct</ScatterFile>
+            <ScatterFile>..\Mcu\f421\Am32.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -906,7 +906,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F421K8U7,USE_STDPERIPH_DRIVER, AT32DEV_F421</Define>
               <Undefine></Undefine>
-              <IncludePath>..\Inc;..\mcu\F421\Inc;..\Mcu\f421\Drivers\drivers\inc;..\Mcu\f421\Drivers\CMSIS\cm4\device_support;..\Mcu\f421\Drivers\CMSIS\cm4\core_support</IncludePath>
+              <IncludePath>..\Inc;..\mcu\f421\Inc;..\Mcu\f421\Drivers\drivers\inc;..\Mcu\f421\Drivers\CMSIS\cm4\device_support;..\Mcu\f421\Drivers\CMSIS\cm4\core_support</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -937,7 +937,7 @@
             <TextAddressRange>0x08001000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>..\Mcu\e230\Am32.sct</ScatterFile>
+            <ScatterFile>..\Mcu\f421\Am32.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -1474,7 +1474,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F421K8U7,USE_STDPERIPH_DRIVER, TEKKO32_F421</Define>
               <Undefine></Undefine>
-              <IncludePath>.\mcu\F421\CMSIS\CM4\CoreSupport;.\mcu\F421\CMSIS\CM4\DeviceSupport;.\mcu\F421\AT32F421_StdPeriph_Driver\inc;.\Inc;.\mcu\F421\mcuinc</IncludePath>
+               <IncludePath>..\Inc;..\mcu\f421\Inc;..\Mcu\f421\Drivers\drivers\inc;..\Mcu\f421\Drivers\CMSIS\cm4\device_support;..\Mcu\f421\Drivers\CMSIS\cm4\core_support</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1505,7 +1505,7 @@
             <TextAddressRange>0x08001000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\Objects\Am32.sct</ScatterFile>
+            <ScatterFile>..\Mcu\f421\Am32.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -2042,7 +2042,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F421K8U7,USE_STDPERIPH_DRIVER, AIKON_SINGLE_F421</Define>
               <Undefine></Undefine>
-              <IncludePath>.\mcu\F421\CMSIS\CM4\CoreSupport;.\mcu\F421\CMSIS\CM4\DeviceSupport;.\mcu\F421\AT32F421_StdPeriph_Driver\inc;.\Inc;.\mcu\F421\mcuinc</IncludePath>
+               <IncludePath>..\Inc;..\mcu\f421\Inc;..\Mcu\f421\Drivers\drivers\inc;..\Mcu\f421\Drivers\CMSIS\cm4\device_support;..\Mcu\f421\Drivers\CMSIS\cm4\core_support</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2073,7 +2073,7 @@
             <TextAddressRange>0x08001000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\Objects\Am32.sct</ScatterFile>
+            <ScatterFile>..\Mcu\f421\Am32.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -2610,7 +2610,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F421K8U7,USE_STDPERIPH_DRIVER, FOXEER_F421</Define>
               <Undefine></Undefine>
-              <IncludePath>.\mcu\F421\CMSIS\CM4\CoreSupport;.\mcu\F421\CMSIS\CM4\DeviceSupport;.\mcu\F421\AT32F421_StdPeriph_Driver\inc;.\Inc;.\mcu\F421\mcuinc</IncludePath>
+               <IncludePath>..\Inc;..\mcu\f421\Inc;..\Mcu\f421\Drivers\drivers\inc;..\Mcu\f421\Drivers\CMSIS\cm4\device_support;..\Mcu\f421\Drivers\CMSIS\cm4\core_support</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2641,7 +2641,7 @@
             <TextAddressRange>0x08001000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\Objects\Am32.sct</ScatterFile>
+            <ScatterFile>..\Mcu\f421\Am32.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -3178,7 +3178,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F421K8U7,USE_STDPERIPH_DRIVER, AIKON_55A_F421</Define>
               <Undefine></Undefine>
-              <IncludePath>.\mcu\F421\CMSIS\CM4\CoreSupport;.\mcu\F421\CMSIS\CM4\DeviceSupport;.\mcu\F421\AT32F421_StdPeriph_Driver\inc;.\Inc;.\mcu\F421\mcuinc</IncludePath>
+               <IncludePath>..\Inc;..\mcu\f421\Inc;..\Mcu\f421\Drivers\drivers\inc;..\Mcu\f421\Drivers\CMSIS\cm4\device_support;..\Mcu\f421\Drivers\CMSIS\cm4\core_support</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -3209,7 +3209,7 @@
             <TextAddressRange>0x08001000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\Objects\Am32.sct</ScatterFile>
+            <ScatterFile>..\Mcu\f421\Am32.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -3746,7 +3746,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F421K8U7,USE_STDPERIPH_DRIVER, WRAITH32_F421</Define>
               <Undefine></Undefine>
-              <IncludePath>.\mcu\F421\CMSIS\CM4\CoreSupport;.\mcu\F421\CMSIS\CM4\DeviceSupport;.\mcu\F421\AT32F421_StdPeriph_Driver\inc;.\Inc;.\mcu\F421\mcuinc</IncludePath>
+               <IncludePath>..\Inc;..\mcu\f421\Inc;..\Mcu\f421\Drivers\drivers\inc;..\Mcu\f421\Drivers\CMSIS\cm4\device_support;..\Mcu\f421\Drivers\CMSIS\cm4\core_support</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -3777,7 +3777,7 @@
             <TextAddressRange>0x08001000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\Objects\Am32.sct</ScatterFile>
+            <ScatterFile>..\Mcu\f421\Am32.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -4314,7 +4314,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F421K8U7,USE_STDPERIPH_DRIVER, HAKRC_K_F421</Define>
               <Undefine></Undefine>
-              <IncludePath>.\mcu\F421\CMSIS\CM4\CoreSupport;.\mcu\F421\CMSIS\CM4\DeviceSupport;.\mcu\F421\AT32F421_StdPeriph_Driver\inc;.\Inc;.\mcu\F421\mcuinc</IncludePath>
+               <IncludePath>..\Inc;..\mcu\f421\Inc;..\Mcu\f421\Drivers\drivers\inc;..\Mcu\f421\Drivers\CMSIS\cm4\device_support;..\Mcu\f421\Drivers\CMSIS\cm4\core_support</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -4345,7 +4345,7 @@
             <TextAddressRange>0x08001000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\Objects\Am32.sct</ScatterFile>
+            <ScatterFile>..\Mcu\f421\Am32.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -4882,7 +4882,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F421K8U7,USE_STDPERIPH_DRIVER, HAKRC_G_F421</Define>
               <Undefine></Undefine>
-              <IncludePath>.\mcu\F421\CMSIS\CM4\CoreSupport;.\mcu\F421\CMSIS\CM4\DeviceSupport;.\mcu\F421\AT32F421_StdPeriph_Driver\inc;.\Inc;.\mcu\F421\mcuinc</IncludePath>
+               <IncludePath>..\Inc;..\mcu\f421\Inc;..\Mcu\f421\Drivers\drivers\inc;..\Mcu\f421\Drivers\CMSIS\cm4\device_support;..\Mcu\f421\Drivers\CMSIS\cm4\core_support</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -4913,7 +4913,7 @@
             <TextAddressRange>0x08001000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\Objects\Am32.sct</ScatterFile>
+            <ScatterFile>..\Mcu\f421\Am32.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -5450,7 +5450,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F421K8U7,USE_STDPERIPH_DRIVER, SWAP_PB0_PA7_F421</Define>
               <Undefine></Undefine>
-              <IncludePath>.\mcu\F421\CMSIS\CM4\CoreSupport;.\mcu\F421\CMSIS\CM4\DeviceSupport;.\mcu\F421\AT32F421_StdPeriph_Driver\inc;.\Inc;.\mcu\F421\mcuinc</IncludePath>
+               <IncludePath>..\Inc;..\mcu\f421\Inc;..\Mcu\f421\Drivers\drivers\inc;..\Mcu\f421\Drivers\CMSIS\cm4\device_support;..\Mcu\f421\Drivers\CMSIS\cm4\core_support</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -5481,7 +5481,7 @@
             <TextAddressRange>0x08001000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\Objects\Am32.sct</ScatterFile>
+            <ScatterFile>..\Mcu\f421\Am32.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -6018,7 +6018,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F421K8U7,USE_STDPERIPH_DRIVER, AT32F421_PB4_054</Define>
               <Undefine></Undefine>
-              <IncludePath>.\mcu\F421\CMSIS\CM4\CoreSupport;.\mcu\F421\CMSIS\CM4\DeviceSupport;.\mcu\F421\AT32F421_StdPeriph_Driver\inc;.\Inc;.\mcu\F421\mcuinc</IncludePath>
+               <IncludePath>..\Inc;..\mcu\f421\Inc;..\Mcu\f421\Drivers\drivers\inc;..\Mcu\f421\Drivers\CMSIS\cm4\device_support;..\Mcu\f421\Drivers\CMSIS\cm4\core_support</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -6049,7 +6049,7 @@
             <TextAddressRange>0x08001000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\Objects\Am32.sct</ScatterFile>
+            <ScatterFile>..\Mcu\f421\Am32.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -6586,7 +6586,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F421K8U7,USE_STDPERIPH_DRIVER, AT32F421_PB4_405</Define>
               <Undefine></Undefine>
-              <IncludePath>.\mcu\F421\CMSIS\CM4\CoreSupport;.\mcu\F421\CMSIS\CM4\DeviceSupport;.\mcu\F421\AT32F421_StdPeriph_Driver\inc;.\Inc;.\mcu\F421\mcuinc</IncludePath>
+               <IncludePath>..\Inc;..\mcu\f421\Inc;..\Mcu\f421\Drivers\drivers\inc;..\Mcu\f421\Drivers\CMSIS\cm4\device_support;..\Mcu\f421\Drivers\CMSIS\cm4\core_support</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -6617,7 +6617,7 @@
             <TextAddressRange>0x08001000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\Objects\Am32.sct</ScatterFile>
+            <ScatterFile>..\Mcu\f421\Am32.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -7154,7 +7154,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F421K8U7,USE_STDPERIPH_DRIVER, AT32F421_PB4_540</Define>
               <Undefine></Undefine>
-              <IncludePath>.\mcu\F421\CMSIS\CM4\CoreSupport;.\mcu\F421\CMSIS\CM4\DeviceSupport;.\mcu\F421\AT32F421_StdPeriph_Driver\inc;.\Inc;.\mcu\F421\mcuinc</IncludePath>
+               <IncludePath>..\Inc;..\mcu\f421\Inc;..\Mcu\f421\Drivers\drivers\inc;..\Mcu\f421\Drivers\CMSIS\cm4\device_support;..\Mcu\f421\Drivers\CMSIS\cm4\core_support</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -7185,7 +7185,7 @@
             <TextAddressRange>0x08001000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\Objects\Am32.sct</ScatterFile>
+            <ScatterFile>..\Mcu\f421\Am32.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -7722,7 +7722,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F421K8U7,USE_STDPERIPH_DRIVER, F4A_AIO_F421</Define>
               <Undefine></Undefine>
-              <IncludePath>.\mcu\F421\CMSIS\CM4\CoreSupport;.\mcu\F421\CMSIS\CM4\DeviceSupport;.\mcu\F421\AT32F421_StdPeriph_Driver\inc;.\Inc;.\mcu\F421\mcuinc</IncludePath>
+               <IncludePath>..\Inc;..\mcu\f421\Inc;..\Mcu\f421\Drivers\drivers\inc;..\Mcu\f421\Drivers\CMSIS\cm4\device_support;..\Mcu\f421\Drivers\CMSIS\cm4\core_support</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -7753,7 +7753,7 @@
             <TextAddressRange>0x08001000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\Objects\Am32.sct</ScatterFile>
+            <ScatterFile>..\Mcu\f421\Am32.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -8290,7 +8290,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F421K8U7,USE_STDPERIPH_DRIVER, F4A_4IN1_F421</Define>
               <Undefine></Undefine>
-              <IncludePath>.\mcu\F421\CMSIS\CM4\CoreSupport;.\mcu\F421\CMSIS\CM4\DeviceSupport;.\mcu\F421\AT32F421_StdPeriph_Driver\inc;.\Inc;.\mcu\F421\mcuinc</IncludePath>
+               <IncludePath>..\Inc;..\mcu\f421\Inc;..\Mcu\f421\Drivers\drivers\inc;..\Mcu\f421\Drivers\CMSIS\cm4\device_support;..\Mcu\f421\Drivers\CMSIS\cm4\core_support</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -8321,7 +8321,7 @@
             <TextAddressRange>0x08001000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\Objects\Am32.sct</ScatterFile>
+            <ScatterFile>..\Mcu\f421\Am32.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -8858,7 +8858,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F421K8U7,USE_STDPERIPH_DRIVER, AT32SLOTCAR_F421</Define>
               <Undefine></Undefine>
-              <IncludePath>.\mcu\F421\CMSIS\CM4\CoreSupport;.\mcu\F421\CMSIS\CM4\DeviceSupport;.\mcu\F421\AT32F421_StdPeriph_Driver\inc;.\Inc;.\mcu\F421\mcuinc</IncludePath>
+               <IncludePath>..\Inc;..\mcu\f421\Inc;..\Mcu\f421\Drivers\drivers\inc;..\Mcu\f421\Drivers\CMSIS\cm4\device_support;..\Mcu\f421\Drivers\CMSIS\cm4\core_support</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -8889,7 +8889,7 @@
             <TextAddressRange>0x08001000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\Objects\Am32.sct</ScatterFile>
+            <ScatterFile>..\Mcu\f421\Am32.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -9426,7 +9426,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F421K8U7,USE_STDPERIPH_DRIVER, F4A_EXTCOMP_F421</Define>
               <Undefine></Undefine>
-              <IncludePath>.\mcu\F421\CMSIS\CM4\CoreSupport;.\mcu\F421\CMSIS\CM4\DeviceSupport;.\mcu\F421\AT32F421_StdPeriph_Driver\inc;.\Inc;.\mcu\F421\mcuinc</IncludePath>
+               <IncludePath>..\Inc;..\mcu\f421\Inc;..\Mcu\f421\Drivers\drivers\inc;..\Mcu\f421\Drivers\CMSIS\cm4\device_support;..\Mcu\f421\Drivers\CMSIS\cm4\core_support</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -9457,7 +9457,7 @@
             <TextAddressRange>0x08001000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\Objects\Am32.sct</ScatterFile>
+            <ScatterFile>..\Mcu\f421\Am32.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -9994,7 +9994,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F421K8U7,USE_STDPERIPH_DRIVER, HAKRC_G23_F421</Define>
               <Undefine></Undefine>
-              <IncludePath>.\mcu\F421\CMSIS\CM4\CoreSupport;.\mcu\F421\CMSIS\CM4\DeviceSupport;.\mcu\F421\AT32F421_StdPeriph_Driver\inc;.\Inc;.\mcu\F421\mcuinc</IncludePath>
+               <IncludePath>..\Inc;..\mcu\f421\Inc;..\Mcu\f421\Drivers\drivers\inc;..\Mcu\f421\Drivers\CMSIS\cm4\device_support;..\Mcu\f421\Drivers\CMSIS\cm4\core_support</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -10025,7 +10025,7 @@
             <TextAddressRange>0x08001000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\Objects\Am32.sct</ScatterFile>
+            <ScatterFile>..\Mcu\f421\Am32.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -10562,7 +10562,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F421K8U7,USE_STDPERIPH_DRIVER, NEUTRON_MINIAIO_F421</Define>
               <Undefine></Undefine>
-              <IncludePath>.\mcu\F421\CMSIS\CM4\CoreSupport;.\mcu\F421\CMSIS\CM4\DeviceSupport;.\mcu\F421\AT32F421_StdPeriph_Driver\inc;.\Inc;.\mcu\F421\mcuinc</IncludePath>
+               <IncludePath>..\Inc;..\mcu\f421\Inc;..\Mcu\f421\Drivers\drivers\inc;..\Mcu\f421\Drivers\CMSIS\cm4\device_support;..\Mcu\f421\Drivers\CMSIS\cm4\core_support</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -10593,7 +10593,7 @@
             <TextAddressRange>0x08001000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\Objects\Am32.sct</ScatterFile>
+            <ScatterFile>..\Mcu\f421\Am32.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -11130,7 +11130,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F421K8U7,USE_STDPERIPH_DRIVER, NEUTRON_F421</Define>
               <Undefine></Undefine>
-              <IncludePath>.\mcu\F421\CMSIS\CM4\CoreSupport;.\mcu\F421\CMSIS\CM4\DeviceSupport;.\mcu\F421\AT32F421_StdPeriph_Driver\inc;.\Inc;.\mcu\F421\mcuinc</IncludePath>
+               <IncludePath>..\Inc;..\mcu\f421\Inc;..\Mcu\f421\Drivers\drivers\inc;..\Mcu\f421\Drivers\CMSIS\cm4\device_support;..\Mcu\f421\Drivers\CMSIS\cm4\core_support</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -11161,7 +11161,7 @@
             <TextAddressRange>0x08001000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\Objects\Am32.sct</ScatterFile>
+            <ScatterFile>..\Mcu\f421\Am32.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>

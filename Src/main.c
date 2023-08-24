@@ -299,6 +299,7 @@ uint16_t low_cell_volt_cutoff = 330;	// 3.3volts per cell
 
 //=========================== END EEPROM Defaults ===========================
 
+#ifdef USE_MAKE
 typedef struct __attribute__((packed)) {
   uint8_t version_major;
   uint8_t version_minor;
@@ -310,7 +311,7 @@ firmware_info_s __attribute__ ((section(".firmware_info"))) firmware_info = {
   version_minor: VERSION_MINOR,
   device_name: FIRMWARE_NAME
 };
-
+#endif
 const char filename[30] __attribute__((section(".file_name"))) = FILE_NAME;
 
 char firmware_name[12] = FIRMWARE_NAME;
@@ -936,6 +937,7 @@ void PeriodElapsedCallback(){
 
 
 void interruptRoutine(){
+	uint8_t badzccount;
 	if (average_interval > 125){
 if ((getintervaTimerCount() < 125) && (duty_cycle < 600) && (zero_crosses < 500)){    //should be impossible, desync?exit anyway
 	return;
@@ -951,6 +953,12 @@ if (stuckcounter > 100){
 }
 	}
 thiszctime = getintervaTimerCount();
+	
+//	for (int i = 0; i < filter_level; i++){
+//		if(getCompOutputLevel() == rising){
+//			return;
+//		}
+//	}
 			if (rising){
 			for (int i = 0; i < filter_level; i++){
 #ifdef MCU_F031
@@ -972,10 +980,12 @@ thiszctime = getintervaTimerCount();
 			    }
 				}
 			}
+       
+      
 			maskPhaseInterrupts();
 			setintervaTimerCount(0);
-		    waitTime = waitTime >> fast_accel;
-            setAndEnableComInt(waitTime);        //enable COM_TIMER interrupt
+		  waitTime = waitTime >> fast_accel;
+      setAndEnableComInt(waitTime);        //enable COM_TIMER interrupt
 }
 
 void startMotor() {
@@ -1041,7 +1051,7 @@ void tenKhzRoutine(){  // 20khz as of 2.00 to be renamed
 		 	  			  }else{
 		 	  				  if (newinput > (1000 + (servo_dead_band<<1))) {
 		 	  					  if (forward == dir_reversed) {
-		 	  						  if((commutation_interval > reverse_speed_threshold )|| stepper_sine){
+		 	  						  if(((commutation_interval > reverse_speed_threshold) && (duty_cycle < 200)) || stepper_sine){
 		 	  							  forward = 1 - dir_reversed;
 		 	  							  zero_crosses = 0;
 		 	  							  old_routine = 1;
@@ -1055,7 +1065,7 @@ void tenKhzRoutine(){  // 20khz as of 2.00 to be renamed
 		 	  				  }
 		 	  				  if (newinput < (1000 -(servo_dead_band<<1))) {
 		 	  					  if (forward == (1 - dir_reversed)) {
-		 	  						  if((commutation_interval > reverse_speed_threshold) || stepper_sine){
+		 	  						  if(((commutation_interval > reverse_speed_threshold) && (duty_cycle < 200)) || stepper_sine){
 		 	  							  zero_crosses = 0;
 		 	  							  old_routine = 1;
 		 	  							  forward = dir_reversed;
@@ -1080,7 +1090,7 @@ void tenKhzRoutine(){  // 20khz as of 2.00 to be renamed
 		 	  			  if (newinput > 1047) {
 
 		 	  				  if (forward == dir_reversed) {
-		 	  					  if(commutation_interval > reverse_speed_threshold || stepper_sine){
+		 	  					  if(((commutation_interval > reverse_speed_threshold) && (duty_cycle < 200)) || stepper_sine){
 		 	  						  forward = 1 - dir_reversed;
 		 	  						  zero_crosses = 0;
 		 	  						  old_routine = 1;
@@ -1098,7 +1108,7 @@ void tenKhzRoutine(){  // 20khz as of 2.00 to be renamed
 		 	  				  //	startcount++;
 
 		 	  				  if (forward == (1 - dir_reversed)) {
-		 	  					  if(commutation_interval > reverse_speed_threshold || stepper_sine){
+		 	  					  if(((commutation_interval > reverse_speed_threshold) && (duty_cycle < 200)) || stepper_sine){
 		 	  						  zero_crosses = 0;
 		 	  						  old_routine = 1;
 		 	  						  forward = dir_reversed;
@@ -1180,10 +1190,6 @@ void tenKhzRoutine(){  // 20khz as of 2.00 to be renamed
 		 	  				}
 		 	#endif
 		 		 	  }
-
-
-
-
 		 	if(tenkhzcounter > 20000){      // 1s sample interval 10000
 		consumed_current = (float)actual_current/360 + consumed_current;
 					switch (dshot_extended_telemetry){
@@ -1281,8 +1287,7 @@ if(!armed && (cell_count == 0)){
 			}
 
 	  }
-
-		  	 if(stall_protection && running ){  // this boosts throttle as the rpm gets lower, for crawlers and rc cars only, do not use for multirotors.
+	  	 if(stall_protection && running ){  // this boosts throttle as the rpm gets lower, for crawlers and rc cars only, do not use for multirotors.
 		  		 stall_protection_adjust += (doPidCalculations(&stallPid, commutation_interval, stall_protect_target_interval))/10000;
 		  					 if(stall_protection_adjust > 150){
 		  						stall_protection_adjust = 150;
@@ -1308,84 +1313,11 @@ if(!armed && (cell_count == 0)){
 		  prop_brake_active = 0;
 	  }
 	  }
-	  if (input < 47 + (80*use_sin_start)){
-		if(play_tone_flag != 0){
-			if(play_tone_flag == 1){
-				playDefaultTone();
-
-			}if(play_tone_flag == 2){
-				playChangedTone();
-			}
-			play_tone_flag = 0;
-		}
-
-		  if(!comp_pwm){
-			duty_cycle = 0;
-			if(!running){
-				old_routine = 1;
-				zero_crosses = 0;
-				  if(brake_on_stop){
-					  fullBrake();
-				  }else{
-					  if(!prop_brake_active){
-					  allOff();
-					  }
-				  }
-			}
-			if (RC_CAR_REVERSE && prop_brake_active) {
-#ifndef PWM_ENABLE_BRIDGE
-					duty_cycle = getAbsDif(1000, newinput) + 1000;
-					if(duty_cycle == 2000){
-						fullBrake();
-					}else{
-						proportionalBrake();
-					}
-#endif
-					}
-		  }else{
-		  if (!running){
-			  duty_cycle = 0;
-			  old_routine = 1;
-			  zero_crosses = 0;
-			  bad_count = 0;
-			  	  if(brake_on_stop){
-			  		  if(!use_sin_start){
-#ifndef PWM_ENABLE_BRIDGE				
-			  			  duty_cycle = (TIMER1_MAX_ARR-19) + drag_brake_strength*2;
-			  			  proportionalBrake();
-			  			  prop_brake_active = 1;
-#else
-	//todo add proportional braking for pwm/enable style bridge.
-#endif
-			  		  }
-			  	  }else{
-			  		  allOff();
-			  		  duty_cycle = 0;
-			  	  }
-		  }
-
-		  	  phase_A_position = ((step-1) * 60) + enter_sine_angle;
-		  	  if(phase_A_position > 359){
-		  		  phase_A_position -= 360;
-		  	  }
-		  	  phase_B_position = phase_A_position +  119;
-		  	  if(phase_B_position > 359){
-		  		  phase_B_position -= 360;
-		  	  }
-		  	  phase_C_position = phase_A_position + 239;
-		  	 if(phase_C_position > 359){
-		  	 phase_C_position -= 360;
-		  	 }
-
-		 	  if(use_sin_start == 1){
-		    	 stepper_sine = 1;
-		 	  }
-		  }
-		  }
-if(!prop_brake_active){
+		
+		if(!prop_brake_active){
  if (zero_crosses < (20 >> stall_protection)){
 	   if (duty_cycle < min_startup_duty){
-	   duty_cycle = min_startup_duty;
+	   duty_cycle = min_startup_duty*running;
 
 	   }
 	   if (duty_cycle > startup_max_duty_cycle){
@@ -1439,6 +1371,84 @@ if(!prop_brake_active){
 	}
 		}
 	}
+			
+	  if (input < 47 + (80*use_sin_start)){
+		if(play_tone_flag != 0){
+			if(play_tone_flag == 1){
+				playDefaultTone();
+
+			}if(play_tone_flag == 2){
+				playChangedTone();
+			}
+			play_tone_flag = 0;
+		}
+
+		  if(!comp_pwm){
+			duty_cycle = 0;
+			if(!running){
+				old_routine = 1;
+				zero_crosses = 0;
+				  if(brake_on_stop){
+					  fullBrake();
+				  }else{
+					  if(!prop_brake_active){
+					  allOff();
+					  }
+				  }
+			}
+			if (RC_CAR_REVERSE && prop_brake_active) {
+#ifndef PWM_ENABLE_BRIDGE
+					duty_cycle = getAbsDif(1000, newinput) + 1000;
+					if(duty_cycle == 2000){
+						fullBrake();
+					}else{
+						proportionalBrake();
+					}
+#endif
+					}
+		  }else{
+		  if (!running){
+			  
+			  old_routine = 1;
+			  zero_crosses = 0;
+			  bad_count = 0;
+			  	  if(brake_on_stop){
+			  		  if(!use_sin_start){
+#ifndef PWM_ENABLE_BRIDGE				
+			  			  duty_cycle = (TIMER1_MAX_ARR-19) + drag_brake_strength*2;
+			  			  proportionalBrake();
+			  			  prop_brake_active = 1;
+#else
+	//todo add proportional braking for pwm/enable style bridge.
+#endif
+			  		  }
+			  	  }else{
+			  		  allOff();
+			  		  
+			  	  }
+						duty_cycle = 0;
+		  }
+
+		  	  phase_A_position = ((step-1) * 60) + enter_sine_angle;
+		  	  if(phase_A_position > 359){
+		  		  phase_A_position -= 360;
+		  	  }
+		  	  phase_B_position = phase_A_position +  119;
+		  	  if(phase_B_position > 359){
+		  		  phase_B_position -= 360;
+		  	  }
+		  	  phase_C_position = phase_A_position + 239;
+		  	 if(phase_C_position > 359){
+		  	 phase_C_position -= 360;
+		  	 }
+
+		 	  if(use_sin_start == 1){
+		    	 stepper_sine = 1;
+		 	  }
+				duty_cycle = 0;
+		  }
+		  }
+
 		if ((armed && running) && input > 47){
 			if(VARIABLE_PWM){
 				tim1_arr = map(commutation_interval, 96, 200, TIMER1_MAX_ARR/2, TIMER1_MAX_ARR);
@@ -1448,11 +1458,12 @@ if(!prop_brake_active){
 				if(prop_brake_active){
 					adjusted_duty_cycle = TIMER1_MAX_ARR - ((duty_cycle * tim1_arr)/TIMER1_MAX_ARR)+1;
 				}else{
-				adjusted_duty_cycle = DEAD_TIME * running;
+				adjusted_duty_cycle = ((duty_cycle * tim1_arr)/TIMER1_MAX_ARR)+1;
+				//	adjusted_duty_cycle = 0;
 				}
 	    }
 		last_duty_cycle = duty_cycle;
-	setAutoReloadPWM(tim1_arr);
+	  setAutoReloadPWM(tim1_arr);
     setDutyCycleAll(adjusted_duty_cycle);
 	}
 
@@ -1643,6 +1654,7 @@ enableCorePeripherals();
 loadEEpromSettings();
 
  EEPROM_VERSION = *(uint8_t*)(0x08000FFC);
+	#ifdef USE_MAKE
   if(firmware_info.version_major != eepromBuffer[3] || firmware_info.version_minor != eepromBuffer[4]){
 	  eepromBuffer[3] = firmware_info.version_major;
 	  eepromBuffer[4] = firmware_info.version_minor;
@@ -1651,7 +1663,17 @@ loadEEpromSettings();
 	  }
 	  saveEEpromSettings();
   }
-
+#else
+  if(VERSION_MAJOR != eepromBuffer[3] || VERSION_MINOR != eepromBuffer[4]){
+	  eepromBuffer[3] = VERSION_MAJOR;
+	  eepromBuffer[4] = VERSION_MINOR;
+	  for(int i = 0; i < 12 ; i ++){
+		  eepromBuffer[5+i] = (uint8_t)FIRMWARE_NAME[i];
+	  }
+	  saveEEpromSettings();
+  }
+#endif
+	
   
 if(use_sin_start){
   min_startup_duty = sin_mode_min_s_d;
@@ -1792,7 +1814,9 @@ if(use_sin_start){
  		if((getAbsDif(last_average_interval,average_interval) > average_interval>>1) && (average_interval < 2000)){ //throttle resitricted before zc 20.
  		zero_crosses = 0;
  		desync_happened ++;
+if(!bi_direction){
  running = 0;
+}
  old_routine = 1;
  if(zero_crosses > 100){
  average_interval = 5000;
@@ -1850,7 +1874,7 @@ if(commutation_interval > 150){
 
 		//  ADC_raw_temp = ADC_raw_temp - (temperature_offset);
 		  
-		  degrees_celsius =((7 * degrees_celsius) + converted_degrees) >> 3;
+		  degrees_celsius = converted_degrees;
 
           battery_voltage = ((7 * battery_voltage) + ((ADC_raw_volts * 3300 / 4095 * VOLTAGE_DIVIDER)/100)) >> 3;
           smoothed_raw_current = ((63*smoothed_raw_current + (ADC_raw_current) )>>6);
@@ -2156,7 +2180,8 @@ if (old_routine && running){
 	 		  maskPhaseInterrupts();
 	 		  old_routine = 1;
 	 		  if(input < 48){
-	 		   running = 0;
+	 		  running = 0;
+				commutation_interval = 5000;
 	 		  }
 	 		   zero_crosses = 0;
 	 		   zcfoundroutine();

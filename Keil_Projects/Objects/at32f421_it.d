@@ -1,5 +1,5 @@
 ./objects/at32f421_it.o: ..\Mcu\f421\Src\at32f421_it.c \
-  ..\mcu\F421\Inc\at32f421_it.h \
+  ..\mcu\f421\Inc\at32f421_it.h \
   ..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h \
   ..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdint.h \
@@ -9,9 +9,9 @@
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\arm_compat.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\arm_acle.h \
   ..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h \
-  ..\mcu\F421\Inc\system_at32f421.h \
+  ..\mcu\f421\Inc\system_at32f421.h \
   ..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h \
-  ..\mcu\F421\Inc\at32f421_conf.h \
+  ..\mcu\f421\Inc\at32f421_conf.h \
   ..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h \
   ..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h \
   ..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h \
@@ -30,6 +30,6 @@
   ..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h \
   ..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h \
   ..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h \
-  ..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h ..\mcu\F421\Inc\main.h \
-  ..\mcu\F421\Inc\at32f421_conf.h ..\Inc\targets.h ..\mcu\F421\Inc\adc.h \
-  ..\mcu\F421\Inc\main.h
+  ..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h ..\mcu\f421\Inc\main.h \
+  ..\mcu\f421\Inc\at32f421_conf.h ..\Inc\targets.h ..\mcu\f421\Inc\adc.h \
+  ..\mcu\f421\Inc\main.h

@@ -29,13 +29,13 @@ void ADC_DMA_Callback(){  // read dma buffer and set extern variables
 
 #else
 ADC_raw_temp =    ADCDataDMA[2];
-#ifdef PA6_VOLTAGE
+if(VOLTAGE_ADC_PIN > CURRENT_ADC_PIN){
 ADC_raw_volts  = ADCDataDMA[1];
 ADC_raw_current =ADCDataDMA[0];
-#else
+}else{
 ADC_raw_volts  = ADCDataDMA[0];
 ADC_raw_current =ADCDataDMA[1];
-#endif
+}
 #endif
 }
 
@@ -94,22 +94,12 @@ void activateADC(){          // called right after enable regular conversions ar
 	    {
 
 	    }
-
-	    /* Delay between ADC end of calibration and ADC enable.                   */
-	    /* Note: Variable divided by 2 to compensate partially                    */
-	    /*       CPU processing cycles (depends on compilation optimization).     */
 	    wait_loop_index = (LL_ADC_DELAY_CALIB_ENABLE_ADC_CYCLES >> 1);
 	    while(wait_loop_index != 0)
 	    {
 	      wait_loop_index--;
 	    }
-
-	    /* Enable ADC */
 	    LL_ADC_Enable(ADC1);
-
-	    /* Poll for ADC ready to convert */
-
-
 	    while (LL_ADC_IsActiveFlag_ADRDY(ADC1) == 0)
 	    {
 
@@ -143,12 +133,12 @@ void ADC_Init(void)
 #endif
 
 
-  GPIO_InitStruct.Pin = LL_GPIO_PIN_3;
+  GPIO_InitStruct.Pin = CURRENT_ADC_PIN;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
   LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  GPIO_InitStruct.Pin = LL_GPIO_PIN_6;
+  GPIO_InitStruct.Pin = VOLTAGE_ADC_PIN;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
   LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
@@ -173,10 +163,10 @@ void ADC_Init(void)
   LL_ADC_REG_SetSequencerChAdd(ADC1, LL_ADC_CHANNEL_2);
 #endif
 
-  LL_ADC_REG_SetSequencerChAdd(ADC1, LL_ADC_CHANNEL_3);
+  LL_ADC_REG_SetSequencerChAdd(ADC1, VOLTAGE_ADC_CHANNEL);
   /** Configure Regular Channel
   */
-  LL_ADC_REG_SetSequencerChAdd(ADC1, LL_ADC_CHANNEL_6);
+  LL_ADC_REG_SetSequencerChAdd(ADC1, CURRENT_ADC_CHANNEL);
   /** Configure Regular Channel
   */
   LL_ADC_REG_SetSequencerChAdd(ADC1, LL_ADC_CHANNEL_TEMPSENSOR);
@@ -203,3 +193,4 @@ void ADC_Init(void)
   LL_ADC_DisableIT_EOS(ADC1);
 
 }
+

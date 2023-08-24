@@ -19,6 +19,9 @@
 #include "common.h"
 #include "functions.h"
 #include "ADC.h"
+#ifdef USE_LED_STRIP
+#include "WS2812.h"
+#endif
 
 
 void initCorePeripherals(void){
@@ -37,6 +40,9 @@ void initCorePeripherals(void){
   #ifdef USE_SERIAL_TELEMETRY
     telem_UART_Init();
   #endif
+	#ifdef USE_LED_STRIP
+	WS2812_Init();
+	#endif
 }
 
 

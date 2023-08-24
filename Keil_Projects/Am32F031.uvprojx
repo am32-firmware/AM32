@@ -89,7 +89,7 @@
             <nStopA1X>0</nStopA1X>
             <nStopA2X>0</nStopA2X>
           </AfterMake>
-          <SelectedForBatchBuild>0</SelectedForBatchBuild>
+          <SelectedForBatchBuild>1</SelectedForBatchBuild>
           <SVCSIdString></SVCSIdString>
         </TargetCommonOption>
         <CommonProperty>
@@ -417,6 +417,11 @@
               <FileName>sounds.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\sounds.c</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
           </Files>
         </Group>

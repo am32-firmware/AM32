@@ -1,0 +1,1135 @@
+Dependencies for Project 'Am32F421', Target 'HAKRC_G23': (DO NOT MODIFY !)
+CompilerVersion: 6160000::V6.16::ARMCLANG
+F (..\Src\dshot.c)(0x64CD8289)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/dshot.o -MD)
+I (..\Inc\functions.h)(0x63C813E5)
+I (..\mcu\f421\Inc\main.h)(0x6379454F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+I (..\Inc\targets.h)(0x64E26E5D)
+I (..\Inc\dshot.h)(0x61D1E64B)
+I (..\Inc\common.h)(0x64CE6370)
+I (..\mcu\f421\Inc\IO.h)(0x64CD4E32)
+I (..\Inc\sounds.h)(0x61BDD535)
+F (..\Src\functions.c)(0x64E39CF2)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/functions.o -MD)
+I (..\Inc\functions.h)(0x63C813E5)
+I (..\mcu\f421\Inc\main.h)(0x6379454F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+I (..\Inc\targets.h)(0x64E26E5D)
+F (..\Src\main.c)(0x64CFC16D)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/main.o -MD)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\mcu\f421\Inc\main.h)(0x6379454F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+I (..\Inc\targets.h)(0x64E26E5D)
+I (..\Inc\signal.h)(0x64CD0F81)
+I (..\Inc\dshot.h)(0x61D1E64B)
+I (..\mcu\f421\Inc\phaseouts.h)(0x637942AA)
+I (..\mcu\f421\Inc\eeprom.h)(0x62194F80)
+I (..\Inc\sounds.h)(0x61BDD535)
+I (..\mcu\f421\Inc\ADC.h)(0x63CC1EE9)
+I (..\mcu\f421\Inc\serial_telemetry.h)(0x61036A3C)
+I (..\mcu\f421\Inc\IO.h)(0x64CD4E32)
+I (..\mcu\f421\Inc\comparator.h)(0x63790526)
+I (..\Inc\functions.h)(0x63C813E5)
+I (..\mcu\f421\Inc\peripherals.h)(0x63CC7A1B)
+I (..\Inc\common.h)(0x64CE6370)
+F (..\Src\signal.c)(0x64CFAD42)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/signal.o -MD)
+I (..\Inc\targets.h)(0x64E26E5D)
+I (..\Inc\signal.h)(0x64CD0F81)
+I (..\mcu\f421\Inc\main.h)(0x6379454F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+I (..\mcu\f421\Inc\IO.h)(0x64CD4E32)
+I (..\Inc\dshot.h)(0x61D1E64B)
+I (..\mcu\f421\Inc\serial_telemetry.h)(0x61036A3C)
+I (..\Inc\functions.h)(0x63C813E5)
+I (..\Inc\sounds.h)(0x61BDD535)
+I (..\Inc\common.h)(0x64CE6370)
+F (..\Src\sounds.c)(0x63CC7D74)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/sounds.o -MD)
+I (..\Inc\sounds.h)(0x61BDD535)
+I (..\mcu\f421\Inc\main.h)(0x6379454F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+I (..\mcu\f421\Inc\phaseouts.h)(0x637942AA)
+I (..\Inc\functions.h)(0x63C813E5)
+I (..\Inc\targets.h)(0x64E26E5D)
+I (..\mcu\f421\Inc\eeprom.h)(0x62194F80)
+I (..\Inc\common.h)(0x64CE6370)
+I (..\mcu\f421\Inc\peripherals.h)(0x63CC7A1B)
+F (C:\2_92_EXPERIMENTAL\AM32_PUBLIC\Src\firmwareversion.c)(0x63F3CBB1)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/firmwareversion.o -MD)
+F (..\Mcu\f421\Drivers\drivers\src\at32f421_adc.c)(0x62FEFD78)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/at32f421_adc.o -MD)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+F (..\Mcu\f421\Drivers\drivers\src\at32f421_cmp.c)(0x62FEFD78)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/at32f421_cmp.o -MD)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+F (..\Mcu\f421\Drivers\drivers\src\at32f421_crc.c)(0x62FEFD79)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/at32f421_crc.o -MD)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+F (..\Mcu\f421\Drivers\drivers\src\at32f421_crm.c)(0x62FEFD79)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/at32f421_crm.o -MD)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+F (..\Mcu\f421\Drivers\drivers\src\at32f421_debug.c)(0x62FEFD79)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/at32f421_debug.o -MD)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+F (..\Mcu\f421\Drivers\drivers\src\at32f421_dma.c)(0x62FEFD7A)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/at32f421_dma.o -MD)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+F (..\Mcu\f421\Drivers\drivers\src\at32f421_ertc.c)(0x62FEFD7A)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/at32f421_ertc.o -MD)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+F (..\Mcu\f421\Drivers\drivers\src\at32f421_exint.c)(0x62FEFD7B)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/at32f421_exint.o -MD)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+F (..\Mcu\f421\Drivers\drivers\src\at32f421_flash.c)(0x62FEFD7B)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/at32f421_flash.o -MD)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+F (..\Mcu\f421\Drivers\drivers\src\at32f421_gpio.c)(0x62FEFD7C)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/at32f421_gpio.o -MD)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+F (..\Mcu\f421\Drivers\drivers\src\at32f421_i2c.c)(0x62FEFD7C)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/at32f421_i2c.o -MD)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+F (..\Mcu\f421\Drivers\drivers\src\at32f421_misc.c)(0x62FEFD7D)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/at32f421_misc.o -MD)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+F (..\Mcu\f421\Drivers\drivers\src\at32f421_pwc.c)(0x62FEFD7D)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/at32f421_pwc.o -MD)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+F (..\Mcu\f421\Drivers\drivers\src\at32f421_scfg.c)(0x62FEFD7E)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/at32f421_scfg.o -MD)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+F (..\Mcu\f421\Drivers\drivers\src\at32f421_spi.c)(0x62FEFD7E)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/at32f421_spi.o -MD)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+F (..\Mcu\f421\Drivers\drivers\src\at32f421_tmr.c)(0x62FEFD7F)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/at32f421_tmr.o -MD)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+F (..\Mcu\f421\Drivers\drivers\src\at32f421_usart.c)(0x62FEFD7F)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/at32f421_usart.o -MD)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+F (..\Mcu\f421\Drivers\drivers\src\at32f421_wdt.c)(0x62FEFD80)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/at32f421_wdt.o -MD)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+F (..\Mcu\f421\Drivers\drivers\src\at32f421_wwdt.c)(0x62FEFD80)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/at32f421_wwdt.o -MD)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+F (..\Mcu\f421\Src\ADC.c)(0x64CFB920)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/adc.o -MD)
+I (..\mcu\f421\Inc\ADC.h)(0x63CC1EE9)
+I (..\mcu\f421\Inc\main.h)(0x6379454F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+I (..\Inc\targets.h)(0x64E26E5D)
+I (..\Inc\functions.h)(0x63C813E5)
+F (..\Mcu\f421\Src\at32f421_it.c)(0x64CFBB31)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/at32f421_it.o -MD)
+I (..\mcu\f421\Inc\at32f421_it.h)(0x6378B505)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+I (..\mcu\f421\Inc\main.h)(0x6379454F)
+I (..\Inc\targets.h)(0x64E26E5D)
+I (..\mcu\f421\Inc\adc.h)(0x63CC1EE9)
+F (..\Mcu\f421\Src\comparator.c)(0x64CF9FB9)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/comparator.o -MD)
+I (..\mcu\f421\Inc\comparator.h)(0x63790526)
+I (..\mcu\f421\Inc\main.h)(0x6379454F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+I (..\Inc\targets.h)(0x64E26E5D)
+F (..\Mcu\f421\Src\eeprom.c)(0x63CC7479)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/eeprom.o -MD)
+I (..\mcu\f421\Inc\eeprom.h)(0x62194F80)
+I (..\mcu\f421\Inc\main.h)(0x6379454F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+I (C:\Keil_v5\ARM\ARMCLANG\include\string.h)(0x6035B090)
+F (..\Mcu\f421\Src\IO.c)(0x64CE607D)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/io.o -MD)
+I (..\Inc\targets.h)(0x64E26E5D)
+I (..\mcu\f421\Inc\IO.h)(0x64CD4E32)
+I (..\mcu\f421\Inc\main.h)(0x6379454F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+I (..\Inc\dshot.h)(0x61D1E64B)
+I (..\mcu\f421\Inc\serial_telemetry.h)(0x61036A3C)
+I (..\Inc\functions.h)(0x63C813E5)
+I (..\Inc\common.h)(0x64CE6370)
+F (..\Mcu\f421\Src\peripherals.c)(0x64D38815)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/peripherals.o -MD)
+I (..\mcu\f421\Inc\peripherals.h)(0x63CC7A1B)
+I (..\mcu\f421\Inc\main.h)(0x6379454F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+I (..\Inc\targets.h)(0x64E26E5D)
+I (..\mcu\f421\Inc\serial_telemetry.h)(0x61036A3C)
+I (..\Inc\common.h)(0x64CE6370)
+I (..\Inc\functions.h)(0x63C813E5)
+I (..\mcu\f421\Inc\ADC.h)(0x63CC1EE9)
+F (..\Mcu\f421\Src\phaseouts.c)(0x64CE7405)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/phaseouts.o -MD)
+I (..\mcu\f421\Inc\phaseouts.h)(0x637942AA)
+I (..\mcu\f421\Inc\main.h)(0x6379454F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+I (..\Inc\targets.h)(0x64E26E5D)
+I (..\Inc\functions.h)(0x63C813E5)
+F (..\Mcu\f421\Src\serial_telemetry.c)(0x6378D0A4)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/serial_telemetry.o -MD)
+I (..\mcu\f421\Inc\serial_telemetry.h)(0x61036A3C)
+I (..\mcu\f421\Inc\main.h)(0x6379454F)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+F (..\Mcu\f421\Src\system_at32f421.c)(0x64D37805)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Inc -I ../mcu/f421/Inc -I ../Mcu/f421/Drivers/drivers/inc -I ../Mcu/f421/Drivers/CMSIS/cm4/device_support -I ../Mcu/f421/Drivers/CMSIS/cm4/core_support-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-D__UVISION_VERSION="536" -DAT32F421K8U7 -DAT32F421K8U7 -DUSE_STDPERIPH_DRIVER -DHAKRC_G23_F421-o ./objects/system_at32f421.o -MD)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\device_support\at32f421.h)(0x62FEFD6A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\core_cm4.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6035B090)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_version.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_compiler.h)(0x62FEFD5A)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\cmsis_armclang.h)(0x62FEFD5A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h)(0x602AE43E)
+I (C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h)(0x6035B084)
+I (..\Mcu\f421\Drivers\CMSIS\cm4\core_support\mpu_armv7.h)(0x62FEFD5A)
+I (..\mcu\f421\Inc\system_at32f421.h)(0x62FEFD6B)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_def.h)(0x62FEFD70)
+I (..\mcu\f421\Inc\at32f421_conf.h)(0x637939A9)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crm.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_cmp.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_tmr.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_ertc.h)(0x62FEFD71)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_gpio.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_i2c.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_usart.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_pwc.h)(0x62FEFD74)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_adc.h)(0x62FEFD6E)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_spi.h)(0x62FEFD75)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_dma.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_debug.h)(0x62FEFD70)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_flash.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_crc.h)(0x62FEFD6F)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wwdt.h)(0x62FEFD77)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_wdt.h)(0x62FEFD76)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h)(0x62FEFD72)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h)(0x62FEFD73)
+I (..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h)(0x62FEFD74)
+F (..\Mcu\f421\Startup\mdk\startup_at32f421.s)(0x62FF01C3)(--target=armv7em-arm-none-eabi -mcpu=cortex-m4 -mfpu=none -mfloat-abi=soft -masm=auto -c-Wa,armasm,--pd,"__EVAL SETA 1"-IC:/Users/alkaz/AppData/Local/Arm/Packs/ArteryTek/AT32F421_DFP/2.0.5/Device/Include-Wa,armasm,--pd,"__UVISION_VERSION SETA 536" -Wa,armasm,--pd,"AT32F421K8U7 SETA 1"-o ./objects/startup_at32f421.o)

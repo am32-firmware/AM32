@@ -232,7 +232,7 @@ void TIM4_Init(void)
 void TIM9_Init(void)
 {
 	crm_periph_clock_enable(CRM_TMR9_PERIPH_CLOCK, TRUE);
-	TMR9->pr = 50;
+	TMR9->pr = 1000000/LOOP_FREQUENCY_HZ;
 	TMR9->div = 143;
 	NVIC_SetPriority(TMR1_BRK_TMR9_IRQn, 2);
   NVIC_EnableIRQ(TMR1_BRK_TMR9_IRQn);

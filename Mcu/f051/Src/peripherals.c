@@ -314,7 +314,7 @@ void MX_TIM6_Init(void)
   NVIC_SetPriority(TIM6_DAC_IRQn, 2);
   NVIC_EnableIRQ(TIM6_DAC_IRQn);
 TIM6->PSC = 47;
-TIM6->ARR = 100;
+TIM6->ARR = 1000000/LOOP_FREQUENCY_HZ;
 }
 
 

@@ -201,7 +201,7 @@ void TIMER5_Init(void)
 void TIMER13_Init(void)
 {
   rcu_periph_clock_enable(RCU_TIMER13);
-  TIMER_CAR(TIMER13) = 50;
+  TIMER_CAR(TIMER13) = 1000000/LOOP_FREQUENCY_HZ;
   TIMER_PSC(TIMER13) = 71; 
 	NVIC_SetPriority(TIMER13_IRQn, 2);
   NVIC_EnableIRQ(TIMER13_IRQn);

@@ -72,7 +72,7 @@ void ADC_Init(void){
     /* enable DMA channel */
     dma_channel_enable(DMA_CH0);
 	
-	  adc_special_function_config(ADC_CONTINUOUS_MODE, ENABLE);
+	  adc_special_function_config(ADC_CONTINUOUS_MODE, DISABLE);
     /* ADC scan function enable */
     adc_special_function_config(ADC_SCAN_MODE, ENABLE);
     /* ADC data alignment config */

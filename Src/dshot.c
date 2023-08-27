@@ -175,16 +175,19 @@ for (int i = 0; i < 16; i++){
 					switch (dshotcommand){                   // todo
 
 					case 1:
-						playInputTune();
+						play_tone_flag = 1;
 					break;
 					case 2:
-						playInputTune2();
-     			    break;
+						play_tone_flag = 2;
+     			break;
 					case 3:
-						playBeaconTune3();
+						play_tone_flag = 3;
+					break;
+					case 4:
+						play_tone_flag = 4;
 					break;
 					case 5:
-						playStartupTune();
+						play_tone_flag = 5;
 					break;
 					case 7:
 						dir_reversed = 0;

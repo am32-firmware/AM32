@@ -165,7 +165,7 @@ void TIM6_Init(void)
 void TIM14_Init(void)
 {
 	crm_periph_clock_enable(CRM_TMR14_PERIPH_CLOCK, TRUE);
-	TMR14->pr = 50;
+	TMR14->pr = 1000000/LOOP_FREQUENCY_HZ;
 	TMR14->div = 119;
 	
 	

@@ -813,10 +813,22 @@
 #define TARGET_STALL_PROTECTION_INTERVAL 6500
 #endif
 
-#ifndef RAMP_SPEED_LOW_RPM
-#define RAMP_SPEED_LOW_RPM 10
+#ifndef RAMP_SPEED_STARTUP
+#define RAMP_SPEED_STARTUP 2
 #endif
 
+#ifndef RAMP_SPEED_LOW_RPM          // below commutation interval of 250us
+#define RAMP_SPEED_LOW_RPM 8
+#endif
+
+#ifndef RAMP_SPEED_HIGH_RPM
+#define RAMP_SPEED_HIGH_RPM 24
+#endif
+
+#ifndef LOOP_FREQUENCY_HZ
+#define LOOP_FREQUENCY_HZ 20000
+#define PID_LOOP_DIVIDER (LOOP_FREQUENCY_HZ/1000)
+#endif
 
 
 /************************************ F051 Hardware Groups ****************************/

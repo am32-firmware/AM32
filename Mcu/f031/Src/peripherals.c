@@ -334,7 +334,7 @@ void TEN_KHZ_Timer_Init(){
 	  /* Peripheral clock enable */
 	  TIM_InitStruct.Prescaler = 47;
 	  TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
-	  TIM_InitStruct.Autoreload = 50;
+	  TIM_InitStruct.Autoreload = 1000000/LOOP_FREQUENCY_HZ;
 	  TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
 	  TIM_InitStruct.RepetitionCounter = 0;
 	  LL_TIM_Init(TIM2, &TIM_InitStruct);
@@ -347,7 +347,7 @@ void TEN_KHZ_Timer_Init(){
 	  LL_APB1_GRP2_EnableClock(LL_APB1_GRP2_PERIPH_TIM16);
 	  TIM_InitStruct.Prescaler = 47;
 	  TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
-	  TIM_InitStruct.Autoreload = 50;
+	  TIM_InitStruct.Autoreload = 1000000/LOOP_FREQUENCY_HZ;
 	  TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
 	  TIM_InitStruct.RepetitionCounter = 0;
 	  LL_TIM_Init(TIM16, &TIM_InitStruct);

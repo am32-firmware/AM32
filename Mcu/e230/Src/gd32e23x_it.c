@@ -15,6 +15,7 @@ extern char servoPwm;
 #include "gd32e23x_it.h"
 #include "main.h"
 #include "systick.h"
+#include "targets.h"
 
 /*!
     \brief      this function handles NMI exception
@@ -109,7 +110,8 @@ void DMA_Channel3_4_IRQHandler(void)
         dma_channel_disable(DMA_CH3);
 				
 		    transfercomplete();
-
+		//		TIMER_CAR(TEN_KHZ_TIMER) = TIMER_CNT(TEN_KHZ_TIMER)+ 2;
+    //   TIMER_CNT(TEN_KHZ_TIMER) = TIMER_CAR(TEN_KHZ_TIMER) - 2;
 		  }
 		  else if(dma_interrupt_flag_get(DMA_CH3, DMA_INT_FLAG_ERR) == 1)
 		  {

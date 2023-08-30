@@ -22,13 +22,4 @@ void playChangedTone(void);
 void saveEEpromSettings(void);
 void setVolume(uint8_t volume);
 
-
-
-
-
-
 #endif /* SOUNDS_H_ */
-
-
-
-

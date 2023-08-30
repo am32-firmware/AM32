@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * File   : Templates/at32f4xx_it.h 
+  * File   : Templates/at32f4xx_it.h
   * Version: V1.3.0
   * Date   : 2021-03-18
   * Brief  : Main Interrupt Service Routines.

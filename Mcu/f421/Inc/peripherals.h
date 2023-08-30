@@ -8,12 +8,7 @@
 #ifndef PERIPHERALS_H_
 #define PERIPHERALS_H_
 
-
-
-#endif /* PERIPHERALS_H_ */
-
 #include "main.h"
-
 
 void initAfterJump(void);
 void initCorePeripherals(void);
@@ -48,3 +43,4 @@ void UN_TIM_Init(void);
 void setPrescalerPWM(uint16_t presc);
 void LED_GPIO_init(void);
 
+#endif /* PERIPHERALS_H_ */

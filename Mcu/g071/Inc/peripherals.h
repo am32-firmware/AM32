@@ -8,10 +8,6 @@
 #ifndef PERIPHERALS_H_
 #define PERIPHERALS_H_
 
-
-
-#endif /* PERIPHERALS_H_ */
-
 #include "main.h"
 #include "ADC.h"
 
@@ -47,3 +43,5 @@ void enableCorePeripherals(void);
 void reloadWatchDogCounter(void);
 void generatePwmTimerEvent(void);
 void setPrescalerPWM(uint16_t presc);
+
+#endif /* PERIPHERALS_H_ */

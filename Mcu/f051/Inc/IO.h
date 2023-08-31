@@ -8,16 +8,12 @@
 #ifndef IO_H_
 #define IO_H_
 
-#endif /* IO_H_ */
-
-
 #include "main.h"
 
 void changeToOutput();
 void changeToInput();
 void receiveDshotDma();
 void sendDshotDma();
-
 
 uint8_t getInputPinState();
 void setInputPolarityRising();
@@ -37,5 +33,4 @@ extern uint16_t servo_high_threshold;  // anything above this point considered 2
 extern uint16_t servo_neutral;
 extern uint8_t servo_dead_band;
 
-
-
+#endif /* IO_H_ */

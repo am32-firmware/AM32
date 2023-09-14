@@ -6,12 +6,14 @@ extern void tenKhzRoutine();
 extern void sendDshotDma();
 extern void receiveDshotDma();
 extern void signalEdgeRoutine();
-
+extern void processDshot();
 extern char send_telemetry;
 extern char telemetry_done;
 extern char servoPwm;
-
+extern char dshot;
 int recieved_ints = 0;
+
+
 
 /* Includes ------------------------------------------------------------------*/
 #include "at32f415_it.h"
@@ -43,7 +45,8 @@ void NMI_Handler(void)
 void HardFault_Handler(void)
 {
     /* Go to infinite loop when Hard Fault exception occurs */
-    while (1) {
+    while (1)
+    {
     }
 }
 
@@ -55,7 +58,8 @@ void HardFault_Handler(void)
 void MemManage_Handler(void)
 {
     /* Go to infinite loop when Memory Manage exception occurs */
-    while (1) {
+    while (1)
+    {
     }
 }
 
@@ -67,7 +71,8 @@ void MemManage_Handler(void)
 void BusFault_Handler(void)
 {
     /* Go to infinite loop when Bus Fault exception occurs */
-    while (1) {
+    while (1)
+    {
     }
 }
 
@@ -79,7 +84,8 @@ void BusFault_Handler(void)
 void UsageFault_Handler(void)
 {
     /* Go to infinite loop when Usage Fault exception occurs */
-    while (1) {
+    while (1)
+    {
     }
 }
 
@@ -119,77 +125,67 @@ void SysTick_Handler(void)
 {
 }
 
-void DMA1_Channel1_IRQHandler(void)
-{
-    if (dma_flag_get(DMA1_FDT1_FLAG) == SET) {
-        DMA1->clr = DMA1_GL1_FLAG;
-#ifdef USE_ADC
-        ADC_DMA_Callback();
+void DMA1_Channel1_IRQHandler(void){
+    if(dma_flag_get(DMA1_FDT1_FLAG) == SET)		
+		{
+	    DMA1->clr = DMA1_GL1_FLAG;
+#ifdef USE_ADC      
+	    ADC_DMA_Callback();
 #endif
-        if (dma_flag_get(DMA1_DTERR1_FLAG) == SET) {
-            DMA1->clr = DMA1_GL1_FLAG;
-        }
-    }
+		   if(dma_flag_get(DMA1_DTERR1_FLAG) == SET)
+		  {
+				DMA1->clr = DMA1_GL1_FLAG;
+			}
+}
 }
 
 void DMA1_Channel4_IRQHandler(void)
 {
-    if (dma_flag_get(DMA1_FDT4_FLAG) == SET) {
-        DMA1->clr = DMA1_GL4_FLAG;
-        DMA1_CHANNEL4->ctrl_bit.chen = FALSE;
-        //  USART1->ctrl1_bit.ren = TRUE;
-        //  USART1->ctrl1_bit.ten = FALSE;
-    }
-    if (dma_flag_get(DMA1_DTERR2_FLAG) == SET) {
-        DMA1->clr = DMA1_GL4_FLAG;
-        DMA1_CHANNEL4->ctrl_bit.chen = FALSE;
-    }
+	  if(dma_flag_get(DMA1_FDT4_FLAG) == SET)
+	  {
+	    DMA1->clr = DMA1_GL4_FLAG;
+			DMA1_CHANNEL4->ctrl_bit.chen = FALSE;   
+		//	USART1->ctrl1_bit.ren = TRUE;
+		//	USART1->ctrl1_bit.ten = FALSE;
+	  }
+	  if(dma_flag_get(DMA1_DTERR2_FLAG) == SET)
+	  {
+		  DMA1->clr = DMA1_GL4_FLAG;
+		  DMA1_CHANNEL4->ctrl_bit.chen = FALSE;
+	  }
 }
+
+
 
 void DMA1_Channel6_IRQHandler(void)
 {
-#ifdef USE_TIMER_15_CHANNEL_1
-    if (DMA_GetFlagStatus(DMA1_FLAG_HT5) == SET) {
-        if (servoPwm) {
-            IC_TIMER_REGISTER->CTRL2 |= TMR_ICPolarity_Rising;
-            DMA1->ICLR = DMA1_FLAG_HT5;
-        }
-    }
-
-    if (DMA_GetFlagStatus(DMA1_FLAG_TC5) == SET) {
-        DMA1->ICLR = DMA1_FLAG_GL5;
-        INPUT_DMA_CHANNEL->CHCTRL &= (uint16_t)(~DMA_CHCTRL1_CHEN);
-        transfercomplete();
-
-    }
-    else if (DMA_GetFlagStatus(DMA1_FLAG_ERR5) == SET) {
-        DMA1->ICLR = DMA1_FLAG_GL5;
-    }
-#endif
 #ifdef USE_TIMER_3_CHANNEL_1
-    //if(DMA_GetFlagStatus(DMA1_FLAG_HT4) == SET){
-    if (dma_flag_get(DMA1_HDT6_FLAG) == SET) {
-        if (servoPwm) {
-            IC_TIMER_REGISTER->cctrl_bit.c1p = TMR_INPUT_FALLING_EDGE;
-            //  IC_TIMER_REGISTER->CTRL2 |= TMR_ICPolarity_Rising;
-            DMA1->clr = DMA1_HDT6_FLAG;
-        }
-    }
+	//if(DMA_GetFlagStatus(DMA1_FLAG_HT4) == SET){
+		if(dma_flag_get(DMA1_HDT6_FLAG) == SET){ 
+			if(servoPwm){
+			IC_TIMER_REGISTER->cctrl_bit.c1p = TMR_INPUT_FALLING_EDGE;
+		//	IC_TIMER_REGISTER->CTRL2 |= TMR_ICPolarity_Rising;	
+			DMA1->clr = DMA1_HDT6_FLAG;
+			}
+		}
 
-    if (dma_flag_get(DMA1_FDT6_FLAG) == SET) {
-        //      dma_reset(INPUT_DMA_CHANNEL);
+    if(dma_flag_get(DMA1_FDT6_FLAG) == SET)		
+		{
+	//		dma_reset(INPUT_DMA_CHANNEL);
+			
+      DMA1->clr = DMA1_GL6_FLAG;
+			INPUT_DMA_CHANNEL->ctrl_bit.chen = FALSE;
+		  transfercomplete();
+			EXINT->swtrg = EXINT_LINE_15;
 
-        DMA1->clr = DMA1_GL6_FLAG;
-        INPUT_DMA_CHANNEL->ctrl_bit.chen = FALSE;
-        transfercomplete();
-
-    }
-    if (dma_flag_get(DMA1_DTERR6_FLAG) == SET) {
-        //dma_reset(INPUT_DMA_CHANNEL);
-        DMA1->clr = DMA1_GL6_FLAG;
-        INPUT_DMA_CHANNEL->ctrl_bit.chen = FALSE;
-        transfercomplete();
-    }
+		  }
+		   if(dma_flag_get(DMA1_DTERR6_FLAG) == SET)
+		  {
+			//dma_reset(INPUT_DMA_CHANNEL);	
+			DMA1->clr = DMA1_GL6_FLAG;
+			INPUT_DMA_CHANNEL->ctrl_bit.chen = FALSE;
+		  transfercomplete();
+			}
 #endif
 }
 
@@ -198,11 +194,15 @@ void DMA1_Channel6_IRQHandler(void)
   */
 void CMP1_IRQHandler(void)
 {
-    if ((EXINT->intsts & EXTI_LINE) != (uint32_t)RESET) {
-        //  EXTI->PND = EXTI_LINE;
-        EXINT->intsts = EXTI_LINE;
-        interruptRoutine();
-    }
+
+
+	  if((EXINT->intsts & EXTI_LINE) != (uint32_t)RESET)
+	  {
+			
+		//	EXTI->PND = EXTI_LINE;
+			EXINT->intsts = EXTI_LINE;
+	    interruptRoutine();
+	  }
 }
 
 /**
@@ -210,18 +210,20 @@ void CMP1_IRQHandler(void)
   */
 void TMR1_BRK_TMR9_IRQHandler(void)
 {
-    /* USER CODE BEGIN TIM6_DAC_IRQn 0 */
-    //TIM6->DIER &= ~(0x1UL << (0U));
-    TMR9->ists = (uint16_t)~TMR_OVF_FLAG;
-    TMR1->ists = 0x00;
-    //      timer_interrupt_flag_clear(TIMER13, TIMER_INT_FLAG_UP);
-    tenKhzRoutine();
+  /* USER CODE BEGIN TIM6_DAC_IRQn 0 */
+	//TIM6->DIER &= ~(0x1UL << (0U));
+  TMR9->ists = (uint16_t)~TMR_OVF_FLAG;
+	TMR1->ists = 0x00;
+	//		timer_interrupt_flag_clear(TIMER13, TIMER_INT_FLAG_UP);
+	tenKhzRoutine();
 
-    /* USER CODE END TIM6_DAC_IRQn 0 */
+	  
 
-    /* USER CODE BEGIN TIM6_DAC_IRQn 1 */
+  /* USER CODE END TIM6_DAC_IRQn 0 */
+  
+  /* USER CODE BEGIN TIM6_DAC_IRQn 1 */
 
-    /* USER CODE END TIM6_DAC_IRQn 1 */
+  /* USER CODE END TIM6_DAC_IRQn 1 */
 }
 
 /**
@@ -229,82 +231,91 @@ void TMR1_BRK_TMR9_IRQHandler(void)
   */
 void TMR1_TRG_HALL_TMR11_IRQHandler(void)
 {
-    /* USER CODE BEGIN TIM14_IRQn 0 */
-    //    if(LL_TIM_IsActiveFlag_UPDATE(TIM14) == 1)
-    //    {
-    //  timer_interrupt_flag_clear(TIMER15, TIMER_INT_FLAG_UP);
+  /* USER CODE BEGIN TIM14_IRQn 0 */
+//	  if(LL_TIM_IsActiveFlag_UPDATE(TIM14) == 1)
+//	  {
+	//  timer_interrupt_flag_clear(TIMER15, TIMER_INT_FLAG_UP);
+    
+	  
+	  TMR11->ists = 0x00;
+	  TMR1->ists = 0x00;
+		PeriodElapsedCallback();
 
-    TMR11->ists = 0x00;
-    TMR1->ists = 0x00;
-    PeriodElapsedCallback();
+//	  }
 
-    //    }
+  /* USER CODE END TIM14_IRQn 0 */
+  /* USER CODE BEGIN TIM14_IRQn 1 */
 
-    /* USER CODE END TIM14_IRQn 0 */
-    /* USER CODE BEGIN TIM14_IRQn 1 */
-
-    /* USER CODE END TIM14_IRQn 1 */
+  /* USER CODE END TIM14_IRQn 1 */
 }
 
 void TMR1_OVF_TMR10_IRQHandler(void)
 {
-    TMR10->ists = (uint16_t)~TMR_OVF_FLAG;
-    TMR10->ists = (uint16_t)~TMR_C1_FLAG;
+	TMR10->ists = (uint16_t)~TMR_OVF_FLAG;
+	TMR10->ists = (uint16_t)~TMR_C1_FLAG;
+
 }
+
+
 
 /**
   * @brief This function handles USART1 global interrupt / USART1 wake-up interrupt through EXTI line 25.
   */
 void USART1_IRQHandler(void)
 {
-    /* USER CODE BEGIN USART1_IRQn 0 */
+  /* USER CODE BEGIN USART1_IRQn 0 */
 
-    /* USER CODE END USART1_IRQn 0 */
-    /* USER CODE BEGIN USART1_IRQn 1 */
 
-    /* USER CODE END USART1_IRQn 1 */
+
+  /* USER CODE END USART1_IRQn 0 */
+  /* USER CODE BEGIN USART1_IRQn 1 */
+
+  /* USER CODE END USART1_IRQn 1 */
 }
 
 void TMR3_GLOBAL_IRQHandler(void)
 {
-    if ((TMR3->ists & TMR_C1_FLAG) != (uint16_t)RESET) {
-        TMR3->ists = (uint16_t)~TMR_C1_FLAG;
-    }
-    if ((TMR3->ists & TMR_OVF_FLAG) != (uint16_t)RESET) {
-        TMR3->ists = (uint16_t)~TMR_OVF_FLAG;
-    }
+			if((TMR3->ists & TMR_C1_FLAG) != (uint16_t)RESET)
+	  {
+			TMR3->ists = (uint16_t)~TMR_C1_FLAG;
+	  }
+		if((TMR3->ists & TMR_OVF_FLAG) != (uint16_t)RESET)
+	  {
+			TMR3->ists = (uint16_t)~TMR_OVF_FLAG;
+	  }  
 }
 
-#if 0
-void DMA_Channel0_IRQHandler(void)         // ADC
-{
-    if (LL_DMA_IsActiveFlag_TC1(DMA1) == 1) {
-        /* Clear flag DMA global interrupt */
-        /* (global interrupt flag: half transfer and transfer complete flags) */
-        LL_DMA_ClearFlag_GI1(DMA1);
-        ADC_DMA_Callback();
-        /* Call interruption treatment function */
-        //   AdcDmaTransferComplete_Callback();
-    }
+//void DMA_Channel0_IRQHandler(void)         // ADC
+//{
+//	  if(LL_DMA_IsActiveFlag_TC1(DMA1) == 1)
+//	  {
+//	    /* Clear flag DMA global interrupt */
+//	    /* (global interrupt flag: half transfer and transfer complete flags) */
+//	    LL_DMA_ClearFlag_GI1(DMA1);
+//	    ADC_DMA_Callback();
+//	    /* Call interruption treatment function */
+//	 //   AdcDmaTransferComplete_Callback();
+//	  }
 
-    /* Check whether DMA transfer error caused the DMA interruption */
-    if (LL_DMA_IsActiveFlag_TE1(DMA1) == 1) {
-        /* Clear flag DMA transfer error */
-        LL_DMA_ClearFlag_TE1(DMA1);
+//	  /* Check whether DMA transfer error caused the DMA interruption */
+//	  if(LL_DMA_IsActiveFlag_TE1(DMA1) == 1)
+//	  {
+//	    /* Clear flag DMA transfer error */
+//	    LL_DMA_ClearFlag_TE1(DMA1);
 
-        /* Call interruption treatment function */
-    }
+//	    /* Call interruption treatment function */
+//	  }
+//}
+
+
+void EXINT15_10_IRQHandler(void){
+  if((EXINT->intsts & EXINT_LINE_15) != (uint32_t)RESET){
+		EXINT->intsts = EXINT_LINE_15;
+		processDshot();
+	}
+
 }
-#endif
 
-void EXTI4_15_IRQHandler(void)
-{
-    //    if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_6) != RESET) {
-    //      LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_6);
-
-    //      signalEdgeRoutine();
-    //    }
-}
 
 /******************************************************************************/
 /*                 AT32F4xx Peripherals Interrupt Handlers                   */

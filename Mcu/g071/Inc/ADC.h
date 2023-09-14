@@ -5,11 +5,14 @@
  *      Author: Alka
  */
 
+#include "main.h"
+#include "targets.h"
+
+
 #ifndef ADC_H_
 #define ADC_H_
 
-#include "main.h"
-#include "targets.h"
+
 
 void ADC_DMA_Callback();
 void enableADC_DMA();
@@ -21,5 +24,6 @@ void Configure_DMA();
 void Configure_ADC();
 
 void Activate_ADC();
+
 
 #endif /* ADC_H_ */

@@ -10,8 +10,9 @@
 
 #include "main.h"
 
+
 void allOff();
-void comStep(int newStep);
+void comStep (int newStep);
 void fullBrake();
 void allpwm();
 void proportionalBrake();

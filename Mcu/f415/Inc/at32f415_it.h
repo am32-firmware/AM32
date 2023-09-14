@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * File   : Templates/at32f4xx_it.h
+  * File   : Templates/at32f4xx_it.h 
   * Version: V1.3.0
   * Date   : 2021-03-18
   * Brief  : Main Interrupt Service Routines.
@@ -35,6 +35,7 @@ void TMR4_GLOBAL_IRQHandler(void);
 void TMR1_TRG_HALL_TMR11_IRQHandler(void);
 void TMR1_BRK_TMR9_IRQHandler(void);
 void TMR1_OVF_TMR10_IRQHandler(void);
+void EXINT15_10_IRQHandler(void);
 void TMR3_GLOBAL_IRQHandler(void);
 void DMA1_Channel4_IRQHandler(void);
 void DMA1_Channel6_IRQHandler(void);

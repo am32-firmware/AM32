@@ -372,14 +372,14 @@ ARM Macro Assembler    Page 6
   250 00000014                 END
               00000000 
               00000000 
-Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M0+ --depend=.\o
-bjects\startup_stm32g071xx.d -o.\objects\startup_stm32g071xx.o -I.\RTE\_GEN_64K
-_G071 -IC:\Users\alkaz\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Inclu
-de -IC:\Users\alkaz\AppData\Local\Arm\Packs\Keil\STM32G0xx_DFP\1.4.0\Drivers\CM
-SIS\Device\ST\STM32G0xx\Include --predefine="__EVAL SETA 1" --predefine="__MICR
-OLIB SETA 1" --predefine="__UVISION_VERSION SETA 536" --predefine="_RTE_ SETA 1
-" --predefine="STM32G071xx SETA 1" --predefine="_RTE_ SETA 1" --list=startup_st
-m32g071xx.lst ..\Mcu\g071\Startup\mdk\startup_stm32g071xx.s
+Command Line: --debug --xref --diag_suppress=9931,A1950W --cpu=Cortex-M0+ --dep
+end=.\objects\startup_stm32g071xx.d -o.\objects\startup_stm32g071xx.o -I.\RTE\_
+HAKRC_2023_G071 -IC:\KeilPacks\ARM\CMSIS\5.9.0\CMSIS\Core\Include -IC:\KeilPack
+s\Keil\STM32G0xx_DFP\1.4.0\Drivers\CMSIS\Device\ST\STM32G0xx\Include --predefin
+e="__EVAL SETA 1" --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSIO
+N SETA 538" --predefine="_RTE_ SETA 1" --predefine="STM32G071xx SETA 1" --prede
+fine="_RTE_ SETA 1" --list=startup_stm32g071xx.lst ..\Mcu\g071\Startup\mdk\star
+tup_stm32g071xx.s
 
 
 

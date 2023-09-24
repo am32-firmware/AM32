@@ -27,7 +27,10 @@ uint16_t last_input = 0;
 char output_timer_prescaler;
 uint8_t buffersize = 32;
 uint32_t average_signal_pulse;
-uint32_t transfer = 0;
+uint8_t average_count;
+uint32_t average_packet_length;
+uint16_t dshot_frametime_high;
+uint16_t dshot_frametime_low;
 
 void computeMSInput(){
 
@@ -143,9 +146,6 @@ if(dshot_telemetry){
 
 		if (dshot == 1){
 			computeDshotDMA();
-			if(send_telemetry){
-            // done in 10khz routine
-			}
 			receiveDshotDma();
 		}
 		if  (servoPwm == 1){
@@ -158,6 +158,15 @@ if(dshot_telemetry){
 
 	}
 if(!armed){
+ if(dshot && (average_count<8)){
+	 average_count++;
+	 dshot_frametime_high = (dma_buffer[31] - dma_buffer[0]) * 2;
+	 average_packet_length = average_packet_length + (dma_buffer[31] - dma_buffer[0]);
+	 if(average_count == 8){
+		 dshot_frametime_high = (average_packet_length>>3) + (average_packet_length>>7);
+		 dshot_frametime_low =  (average_packet_length>>3) - (average_packet_length>>7);
+	 }
+ }
 	if (adjusted_input < 0){
 		adjusted_input = 0;
 		}
@@ -195,7 +204,7 @@ if(!armed){
 	    }
 	//	dshot_runout_timer = 1000;
 		dshot = 1;
-		buffer_padding = 12;
+		buffer_padding = 14;
 		buffersize = 32;
 		inputSet = 1;
 	}
@@ -207,8 +216,6 @@ if(!armed){
 		}else{
 		output_timer_prescaler=1;
 	    }
-    //    dshot_runout_timer = 800;
-	//	TIMER_CNT(IC_TIMER_REGISTER) = 0xffff;
 		buffer_padding = 7;
 		buffersize = 32;
 		inputSet = 1;

@@ -45,9 +45,10 @@ ADC_raw_current =ADCDataDMA[1];
 void ADC_Init(void)
 {
   gpio_mode_QUICK(GPIOA, GPIO_MODE_ANALOG, GPIO_PULL_NONE, GPIO_PINS_6);
+	gpio_mode_QUICK(GPIOA, GPIO_MODE_ANALOG, GPIO_PULL_NONE, GPIO_PINS_3);
   dma_init_type dma_init_struct;
   crm_periph_clock_enable(CRM_DMA1_PERIPH_CLOCK, TRUE);
-  nvic_irq_enable(DMA1_Channel1_IRQn, 3, 0);
+ // nvic_irq_enable(DMA1_Channel1_IRQn, 3, 0);
   dma_reset(DMA1_CHANNEL1);
   dma_default_para_init(&dma_init_struct);
 #ifdef PA6_NTC_ONLY
@@ -59,19 +60,19 @@ void ADC_Init(void)
   dma_init_struct.memory_base_addr = (uint32_t)&ADCDataDMA;
   dma_init_struct.memory_data_width = DMA_MEMORY_DATA_WIDTH_HALFWORD;
   dma_init_struct.memory_inc_enable = TRUE;
-  dma_init_struct.peripheral_base_addr = (uint32_t)&(ADC1->odt);
+  dma_init_struct.peripheral_base_addr = (uint32_t)&ADC1->odt;
   dma_init_struct.peripheral_data_width = DMA_PERIPHERAL_DATA_WIDTH_HALFWORD;
   dma_init_struct.peripheral_inc_enable = FALSE;
   dma_init_struct.priority = DMA_PRIORITY_HIGH;
   dma_init_struct.loop_mode_enable = TRUE;
   dma_init(DMA1_CHANNEL1, &dma_init_struct);
 
-  dma_interrupt_enable(DMA1_CHANNEL1, DMA_FDT_INT, TRUE);
+  //dma_interrupt_enable(DMA1_CHANNEL1, DMA_FDT_INT, TRUE);
   dma_channel_enable(DMA1_CHANNEL1, TRUE);
 
   adc_base_config_type adc_base_struct;
   crm_periph_clock_enable(CRM_ADC1_PERIPH_CLOCK, TRUE);
-  crm_adc_clock_div_set(CRM_ADC_DIV_6);
+  crm_adc_clock_div_set(CRM_ADC_DIV_16);
 
   adc_base_default_para_init(&adc_base_struct);
   adc_base_struct.sequence_mode = TRUE;
@@ -102,7 +103,7 @@ adc_base_struct.ordinary_channel_length = 3;
 
 
 int16_t getConvertedDegrees(uint16_t adcrawtemp){
-return (12600 - (int32_t)adcrawtemp * 33000 / 4096) / -42 + 5;
+return (12600 - (int32_t)adcrawtemp * 33000 / 4096) / -42 + 15;
 }
 
 

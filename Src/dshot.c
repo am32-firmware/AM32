@@ -58,55 +58,11 @@ void computeDshotDMA(){
 int j = 0;
 dshot_frametime = dma_buffer[31]- dma_buffer[0];
 halfpulsetime = dshot_frametime >> 5;
-
+if((dshot_frametime > dshot_frametime_low ) && (dshot_frametime < dshot_frametime_high)){
 for (int i = 0; i < 16; i++){
 	dpulse[i] = ((dma_buffer[j + (i<<1) +1] - dma_buffer[j + (i<<1)]) > (halfpulsetime)) ;
 }
-
-//#if defined(MCU_F051) || defined(MCU_F031)
-////	         if((dshot_frametime < 200) &&(dshot_frametime > 150)){
-////	        	 halfpulsetime = dshot_frametime >> 5;
-////
-////				for (int i = 0; i < 16; i++){
-////					dpulse[i] = ((dma_buffer[j + (i<<1) +1] - dma_buffer[j + (i<<1)]) > (halfpulsetime)) ;
-////				}
-//
-//#endif
-//
-// processtime	= UTILITY_TIMER->CNT - processtime;
-//#if defined(MCU_G071)
-//				if((dshot_frametime < 1690)&&(dshot_frametime > 1600)){
-//				for (int i = 0; i < 16; i++){
-//					dpulse[i] = ((dma_buffer[j + (i<<1) +1] - dma_buffer[j + (i<<1)])>>6) ;
-//				}
-//#endif
-//#if defined(MCU_GDE23)
-//				if((dshot_frametime < 1920)&&(dshot_frametime > 1700)){
-//
-//				for (int i = 0; i < 16; i++){
-//					dpulse[i] = ((dma_buffer[j + (i<<1) +1] - dma_buffer[j + (i<<1)])>>6) ;
-//				}
-//#endif
-//#if defined MCU_AT421
-//
-//				if((dshot_frametime < 3500)&&(dshot_frametime > 2800)){
-//
-//				for (int i = 0; i < 16; i++){
-//					dpulse[i] = ((dma_buffer[j + (i<<1) +1] - dma_buffer[j + (i<<1)]) / 100) ;
-//
-//				}
-//#endif
-//#if defined MCU_AT415
-//
-//				if((dshot_frametime < 5000)&&(dshot_frametime > 3000)){
-//
-//				for (int i = 0; i < 16; i++){
-//					dpulse[i] = ((dma_buffer[j + (i<<1) +1] - dma_buffer[j + (i<<1)]) / 120) ;
-//
-//				}
-//#endif
-
-				uint8_t calcCRC = ((dpulse[0]^dpulse[4]^dpulse[8])<<3
+        uint8_t calcCRC = ((dpulse[0]^dpulse[4]^dpulse[8])<<3
 						|(dpulse[1]^dpulse[5]^dpulse[9])<<2
 						|(dpulse[2]^dpulse[6]^dpulse[10])<<1
 						|(dpulse[3]^dpulse[7]^dpulse[11])
@@ -191,12 +147,12 @@ for (int i = 0; i < 16; i++){
 					case 7:
 						dir_reversed = 0;
 						forward = 1 - dir_reversed;
-						play_tone_flag = 1;
+					//	play_tone_flag = 1;
 				    break;
 				    case 8:
 				    	dir_reversed = 1;
 				    	forward = 1 - dir_reversed;
-				    	play_tone_flag = 2;
+				    //	play_tone_flag = 2;
 				    break;
 					case 9:
 						bi_direction = 0;
@@ -206,7 +162,7 @@ for (int i = 0; i < 16; i++){
 				    break;
 					case 12:
 					saveEEpromSettings();
-					//delayMillis(100);
+					play_tone_flag = 1 + dir_reversed;
 				//	NVIC_SystemReset();
 				    break;
 					case 13:
@@ -237,7 +193,7 @@ for (int i = 0; i < 16; i++){
 					dshot_badcounts++;
 				}
 
-//		}
+		}
 }
 
 
@@ -296,32 +252,4 @@ for (int i = 15; i >= 9 ; i--){
 		  }
           gcr[buffer_padding] = 0;
 #endif
-//#ifdef MCU_G071
-//		  gcr[1+7] = 94;
-//		  for( int i= 19; i >= 0; i--){              // each digit in gcrnumber
-//			  gcr[7+20-i+1] = ((((gcrnumber &  1 << i )) >> i) ^ (gcr[7+20-i]>>6)) *94;        // exclusive ored with number before it multiplied by 64 to match output timer.
-//		  }
-//          gcr[7] = 0;
-//#endif
-//#ifdef MCU_GDE23
-//		  gcr[1+3] = 104;
-//		  for( int i= 19; i >= 0; i--){              // each digit in gcrnumber
-//			  gcr[3+20-i+1] = ((((gcrnumber &  1 << i )) >> i) ^ (gcr[3+20-i]>>6)) *104;        // exclusive ored with number before it multiplied by 64 to match output timer.
-//		  }
-//          gcr[3] = 0;
-//#endif
-//#ifdef MCU_AT421
-//		  gcr[1+3] = 78;
-//		  for( int i= 19; i >= 0; i--){              // each digit in gcrnumber
-//			  gcr[3+20-i+1] = ((((gcrnumber &  1 << i )) >> i) ^ (gcr[3+20-i]>>6)) *78;        // exclusive ored with number before it multiplied by 64 to match output timer.
-//		  }
-//          gcr[3] = 0;
-//#endif
-//#ifdef MCU_AT415
-//		  gcr[1+3] = 97;
-//		  for( int i= 19; i >= 0; i--){              // each digit in gcrnumber
-//			  gcr[3+20-i+1] = ((((gcrnumber &  1 << i )) >> i) ^ (gcr[3+20-i]>>6)) *97;        // exclusive ored with number before it multiplied by 64 to match output timer.
-//		  }
-//          gcr[3] = 0;
-//#endif
 }

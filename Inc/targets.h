@@ -171,6 +171,8 @@
 #define HARDWARE_GROUP_AT_B
 #define HARDWARE_GROUP_AT_045
 #define USE_SERIAL_TELEMETRY
+#define ADC_CHANNEL_CURRENT  ADC_CHANNEL_3
+#define ADC_CHANNEL_VOLTAGE  ADC_CHANNEL_6
 #endif
 
 #ifdef FLASHHOBBY_F421
@@ -328,8 +330,8 @@
 #define USE_SERIAL_TELEMETRY
 #define TARGET_VOLTAGE_DIVIDER  	 74
 #define MILLIVOLT_PER_AMP          45
-#define CURRENT_OFFSET            526          // mv
-#define TARGET_STALL_PROTECTION_INTERVAL 9000
+#define CURRENT_OFFSET            529          // mv
+#define TARGET_STALL_PROTECTION_INTERVAL 7000
 #endif
 
 #ifdef  AIKON_55A_F421
@@ -831,14 +833,20 @@
 
 /********************************** F031 Targets ***********************************/
 
+
 #ifdef 	   REF_F031
 #define    FILE_NAME				"REF_F031"
-#define    FIRMWARE_NAME  			"Yellow DEV  "
+#define    FIRMWARE_NAME  			"F031 Ref ESC"
 #define    DEAD_TIME 				60
 #define    HARDWARE_GROUP_F031_A
 #define    TARGET_STALL_PROTECTION_INTERVAL 8000
 #define    MILLIVOLT_PER_AMP           60
 #define    USE_SERIAL_TELEMETRY
+#define    CURRENT_SENSE_ADC_PIN        LL_GPIO_PIN_5
+#define    VOLTAGE_SENSE_ADC_PIN        LL_GPIO_PIN_7
+
+#define    CURRENT_ADC_CHANNEL         LL_ADC_CHANNEL_5
+#define    VOLTAGE_ADC_CHANNEL         LL_ADC_CHANNEL_7
 #endif
 
 /********************************** defaults if not set ***************************/

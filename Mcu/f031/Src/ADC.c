@@ -39,8 +39,8 @@ ADC_raw_current =ADCDataDMA[0];
 
 void enableADC_DMA(){    // enables channel
 
-	NVIC_SetPriority(DMA1_Channel2_3_IRQn, 3);
-	NVIC_EnableIRQ(DMA1_Channel2_3_IRQn);
+//	NVIC_SetPriority(DMA1_Channel2_3_IRQn, 3);
+//	NVIC_EnableIRQ(DMA1_Channel2_3_IRQn);
 
   LL_DMA_ConfigAddresses(DMA1,
                          LL_DMA_CHANNEL_2,
@@ -60,17 +60,11 @@ void enableADC_DMA(){    // enables channel
 
 #endif
   /* Enable DMA transfer interruption: transfer complete */
-  LL_DMA_EnableIT_TC(DMA1,
-                     LL_DMA_CHANNEL_2);
+ // LL_DMA_EnableIT_TC(DMA1, LL_DMA_CHANNEL_2);
 
   /* Enable DMA transfer interruption: transfer error */
-  LL_DMA_EnableIT_TE(DMA1,
-                     LL_DMA_CHANNEL_2);
-
-  /*## Activation of DMA #####################################################*/
-  /* Enable the DMA transfer */
-  LL_DMA_EnableChannel(DMA1,
-                       LL_DMA_CHANNEL_2);
+//  LL_DMA_EnableIT_TE(DMA1, LL_DMA_CHANNEL_2);
+  LL_DMA_EnableChannel(DMA1,LL_DMA_CHANNEL_2);
 }
 
 
@@ -187,7 +181,7 @@ void ADC_Init(void)
   ADC_InitStruct.DataAlignment = LL_ADC_DATA_ALIGN_RIGHT;
   ADC_InitStruct.LowPowerMode = LL_ADC_LP_MODE_NONE;
   LL_ADC_Init(ADC1, &ADC_InitStruct);
-  ADC_REG_InitStruct.TriggerSource = LL_ADC_REG_TRIG_EXT_TIM1_CH4;
+  ADC_REG_InitStruct.TriggerSource = LL_ADC_REG_TRIG_SOFTWARE;
   ADC_REG_InitStruct.SequencerDiscont = LL_ADC_REG_SEQ_DISCONT_DISABLE;
   ADC_REG_InitStruct.ContinuousMode = LL_ADC_REG_CONV_SINGLE;
   ADC_REG_InitStruct.DMATransfer = LL_ADC_REG_DMA_TRANSFER_LIMITED;
@@ -196,6 +190,5 @@ void ADC_Init(void)
   LL_ADC_REG_SetSequencerScanDirection(ADC1, LL_ADC_REG_SEQ_SCAN_DIR_FORWARD);
   LL_ADC_SetSamplingTimeCommonChannels(ADC1, LL_ADC_SAMPLINGTIME_28CYCLES_5);
   LL_ADC_DisableIT_EOC(ADC1);
-  LL_ADC_DisableIT_EOS(ADC1);
-  LL_ADC_REG_SetTriggerEdge(ADC1, LL_ADC_REG_TRIG_EXT_RISING);
+  //LL_ADC_REG_SetTriggerEdge(ADC1, LL_ADC_REG_TRIG_EXT_RISING);
 }

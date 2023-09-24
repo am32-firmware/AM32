@@ -430,11 +430,11 @@ uint16_t adjusted_input = 0;
 #define TEMP30_CAL_VALUE            ((uint16_t*)((uint32_t)0x1FFFF7B8))
 #define TEMP110_CAL_VALUE           ((uint16_t*)((uint32_t)0x1FFFF7C2))
 
-uint16_t smoothedinput = 0;
-const uint8_t numReadings = 30;     // the readings from the analog input
+uint16_t smoothedcurrent = 0;
+const uint8_t numReadings = 100;     // the readings from the analog input
 uint8_t readIndex = 0;              // the index of the current reading
-int total = 0;
-uint16_t readings[30];
+uint32_t total = 0;
+uint16_t readings[100];
 
 uint8_t bemf_timeout_happened = 0;
 uint8_t changeover_step = 5;
@@ -829,18 +829,16 @@ void saveEEpromSettings(){
 
 
 
-void getSmoothedInput() {
-
+uint16_t getSmoothedCurrent() {
 		total = total - readings[readIndex];
-		readings[readIndex] = commutation_interval;
+		readings[readIndex] = ADC_raw_current;
 		total = total + readings[readIndex];
 		readIndex = readIndex + 1;
 		if (readIndex >= numReadings) {
-			readIndex = 0;
+			 readIndex = 0;
 		}
-		smoothedinput = total / numReadings;
-
-
+		smoothedcurrent = total / numReadings;
+		return smoothedcurrent;
 }
 
 void getBemfState(){
@@ -916,22 +914,18 @@ commutation_intervals[step-1] = thiszctime;        // just used to calulate aver
 }
 
 void PeriodElapsedCallback(){  
-  
-		  DISABLE_COM_TIMER_INT();// disable interrupt
+      
+		  DISABLE_COM_TIMER_INT();// disable interrupt   	
 	 		commutate();
-	    commutation_interval = (( 3*commutation_interval) + thiszctime)>>2;
-	    
+	    commutation_interval = (( 3*commutation_interval) + thiszctime)>>2;   
 			advance = (commutation_interval>>3) * advance_level;   // 60 divde 8 7.5 degree increments
 			waitTime = (commutation_interval >>1)  - advance;
 			if(!old_routine){
-			
-			enableCompInterrupts();     // enable comp interrupt
-			
-			}
+					enableCompInterrupts();     // enable comp interrupt
+					}
 			if(zero_crosses<10000){
 			zero_crosses++;
 			}
-
 }
 
 
@@ -1938,8 +1932,8 @@ if((!bi_direction && (input > 47)) || commutation_interval > 1000){
  #endif
  	}
 	  adc_counter++;
-	  if(adc_counter>100){   // for adc and telemetry
-#if defined(MCU_F051) || defined(MCU_G071)
+	  if(adc_counter>200){   // for adc and telemetry
+#if defined(MCU_F051) || defined(MCU_G071) || defined(MCU_F031)
 			ADC_DMA_Callback();
 		  ADC_CCR = TIM1->CCR3*2/3 + 1;  // sample current at quarter pwm on
 		  if (ADC_CCR > tim1_arr){
@@ -1951,20 +1945,21 @@ if((!bi_direction && (input > 47)) || commutation_interval > 1000){
 		  converted_degrees =__LL_ADC_CALC_TEMPERATURE(3300,  ADC_raw_temp, LL_ADC_RESOLUTION_12B);
 #endif
 #ifdef MCU_GDE23
-			ADC_DMA_Callback();
+		  ADC_DMA_Callback();
           converted_degrees = (1.43 - ADC_raw_temp * 3.3/4096) * 1000 / 4.3 + 25;
 	  	  adc_software_trigger_enable(ADC_REGULAR_CHANNEL);
 #endif
 #ifdef ARTERY
+			ADC_DMA_Callback();
 		  adc_ordinary_software_trigger_enable(ADC1, TRUE);
-		  converted_degrees = (4000 - ADC_raw_temp) / 20;
-		//	converted_degrees = map(ADC_raw_temp, 1600, 4095, 0, 100);
-		//  converted_degrees = getConvertedDegrees(ADC_raw_temp);
+		//  converted_degrees = (4000 - ADC_raw_temp) / 20;
+		  converted_degrees = getConvertedDegrees(ADC_raw_temp);
 #endif
 		  degrees_celsius = converted_degrees;
-			battery_voltage = ((7 * battery_voltage) + ((ADC_raw_volts * 3300 / 4095 * VOLTAGE_DIVIDER)/100)) >> 3;
-          smoothed_raw_current = ((63*smoothed_raw_current + (ADC_raw_current) )>>6);
-          actual_current = ((smoothed_raw_current * 3300/41) - CURRENT_OFFSET) / (MILLIVOLT_PER_AMP)  ;
+		  battery_voltage = ((7 * battery_voltage) + ((ADC_raw_volts * 3300 / 4095 * VOLTAGE_DIVIDER)/100)) >> 3;
+			   smoothed_raw_current = getSmoothedCurrent();
+  //        smoothed_raw_current = ((63*smoothed_raw_current + (ADC_raw_current) )>>6);
+          actual_current = ((smoothed_raw_current * 3300/41) - (CURRENT_OFFSET*100))/ (MILLIVOLT_PER_AMP);
 		  if(actual_current < 0){actual_current = 0;}      
      	  if(LOW_VOLTAGE_CUTOFF){
 			  if(battery_voltage < (cell_count * low_cell_volt_cutoff)){
@@ -2154,6 +2149,7 @@ proportionalBrake();
 	SET_DUTY_CYCLE_ALL(0);
 	allOff();
 	}
+	e_rpm = 0;
 }
 
 #endif      // gimbal mode

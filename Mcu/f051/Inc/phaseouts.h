@@ -11,7 +11,7 @@
 #include "main.h"
 
 void allOff();
-void comStep (char newStep);
+void comStep(char newStep);
 void fullBrake();
 void allpwm();
 void proportionalBrake();

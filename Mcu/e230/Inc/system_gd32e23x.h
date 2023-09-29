@@ -31,7 +31,8 @@
    POSSIBILITY OF SUCH DAMAGE.
    ---------------------------------------------------------------------------*/
 
-/* This file refers the CMSIS standard, some adjustments are made according to GigaDevice chips */
+/* This file refers the CMSIS standard, some adjustments are made according to
+ * GigaDevice chips */
 
 #ifndef SYSTEM_GD32E23X_H
 #define SYSTEM_GD32E23X_H
@@ -47,9 +48,10 @@ extern uint32_t SystemCoreClock;
 
 /* function declarations */
 /* initialize the system and update the SystemCoreClock variable */
-extern void SystemInit (void);
-/* update the SystemCoreClock with current core clock retrieved from cpu registers */
-extern void SystemCoreClockUpdate (void);
+extern void SystemInit(void);
+/* update the SystemCoreClock with current core clock retrieved from cpu
+ * registers */
+extern void SystemCoreClockUpdate(void);
 
 #ifdef __cplusplus
 }

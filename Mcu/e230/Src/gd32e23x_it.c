@@ -17,10 +17,11 @@ extern char armed;
 int interrupt_time = 0;
 
 #include "gd32e23x_it.h"
+
+#include "common.h"
 #include "main.h"
 #include "systick.h"
 #include "targets.h"
-#include "common.h"
 
 /*!
     \brief      this function handles NMI exception
@@ -41,7 +42,7 @@ void NMI_Handler(void)
 void HardFault_Handler(void)
 {
     /* if Hard Fault exception occurs, go to infinite loop */
-    while(1){
+    while (1) {
     }
 }
 
@@ -73,99 +74,94 @@ void PendSV_Handler(void)
 */
 void SysTick_Handler(void)
 {
-     delay_decrement();
+    delay_decrement();
 }
-
 
 void DMA_Channel3_4_IRQHandler(void)
 {
-	 
-	if(dshot_telemetry && armed){
-		DMA_INTC |= DMA_FLAG_ADD(DMA_INT_FLAG_G,DMA_CH3);
-     DMA_CHCTL(DMA_CH3) &= ~DMA_CHXCTL_CHEN;
-      if(out_put){
-     	receiveDshotDma();
-      compute_dshot_flag = 2;
-	    }else{
-      sendDshotDma();
-      compute_dshot_flag = 1;
-	    }
-		EXTI_SWIEV |= (uint32_t)EXTI_15;
-return;
-	}
-	
-  	if(dma_interrupt_flag_get(DMA_CH3, DMA_INT_FLAG_HTF)){
-			if(servoPwm){
-			TIMER_CHCTL2(TIMER2) |= (uint32_t)(TIMER_IC_POLARITY_FALLING);
-			dma_interrupt_flag_clear(DMA_CH3, DMA_INT_FLAG_HTF);
-			}
-		}
-			if(dma_interrupt_flag_get(DMA_CH3, DMA_INT_FLAG_FTF) == 1)
-		  {
-		    dma_interrupt_flag_clear(DMA_CH3, DMA_INT_FLAG_G);
+    if (dshot_telemetry && armed) {
+        DMA_INTC |= DMA_FLAG_ADD(DMA_INT_FLAG_G, DMA_CH3);
+        DMA_CHCTL(DMA_CH3) &= ~DMA_CHXCTL_CHEN;
+        if (out_put) {
+            receiveDshotDma();
+            compute_dshot_flag = 2;
+        } else {
+            sendDshotDma();
+            compute_dshot_flag = 1;
+        }
+        EXTI_SWIEV |= (uint32_t)EXTI_15;
+        return;
+    }
+
+    if (dma_interrupt_flag_get(DMA_CH3, DMA_INT_FLAG_HTF)) {
+        if (servoPwm) {
+            TIMER_CHCTL2(TIMER2) |= (uint32_t)(TIMER_IC_POLARITY_FALLING);
+            dma_interrupt_flag_clear(DMA_CH3, DMA_INT_FLAG_HTF);
+        }
+    }
+    if (dma_interrupt_flag_get(DMA_CH3, DMA_INT_FLAG_FTF) == 1) {
+        dma_interrupt_flag_clear(DMA_CH3, DMA_INT_FLAG_G);
         dma_channel_disable(DMA_CH3);
-		    transfercomplete();
-				EXTI_SWIEV |= (uint32_t)EXTI_15;
-			  }else if(dma_interrupt_flag_get(DMA_CH3, DMA_INT_FLAG_ERR) == 1)
-		  {
-		    dma_interrupt_flag_clear(DMA_CH3, DMA_INT_FLAG_G);
-  	  }		
-				
+        transfercomplete();
+        EXTI_SWIEV |= (uint32_t)EXTI_15;
+    } else if (dma_interrupt_flag_get(DMA_CH3, DMA_INT_FLAG_ERR) == 1) {
+        dma_interrupt_flag_clear(DMA_CH3, DMA_INT_FLAG_G);
+    }
 }
 
 /**
-  * @brief This function handles ADC and COMP interrupts (COMP interrupts through EXTI lines 21 and 22).
-  */
+ * @brief This function handles ADC and COMP interrupts (COMP interrupts
+ * through EXTI lines 21 and 22).
+ */
 void ADC_CMP_IRQHandler(void)
 {
-	  if(exti_interrupt_flag_get(EXTI_21))
-	  {
-	    exti_flag_clear(EXTI_21);
-	    interruptRoutine();
-	  }
+    if (exti_interrupt_flag_get(EXTI_21)) {
+        exti_flag_clear(EXTI_21);
+        interruptRoutine();
+    }
 }
 
 /**
-  * @brief This function handles TIM6 global and DAC underrun error interrupts.
-  */
+ * @brief This function handles TIM6 global and DAC underrun error interrupts.
+ */
 void TIMER13_IRQHandler(void)
 {
-			timer_interrupt_flag_clear(TIMER13, TIMER_INT_FLAG_UP);
-	    tenKhzRoutine();
+    timer_interrupt_flag_clear(TIMER13, TIMER_INT_FLAG_UP);
+    tenKhzRoutine();
 }
 
 /**
-  * @brief This function handles TIM14 global interrupt.
-  */
+ * @brief This function handles TIM14 global interrupt.
+ */
 void TIMER15_IRQHandler(void)
-{ interrupt_time = TIMER_CNT(UTILITY_TIMER);
-	  timer_interrupt_flag_clear(TIMER15, TIMER_INT_FLAG_UP);
-		PeriodElapsedCallback();
-	interrupt_time = TIMER_CNT(UTILITY_TIMER) - interrupt_time;	
+{
+    interrupt_time = TIMER_CNT(UTILITY_TIMER);
+    timer_interrupt_flag_clear(TIMER15, TIMER_INT_FLAG_UP);
+    PeriodElapsedCallback();
+    interrupt_time = TIMER_CNT(UTILITY_TIMER) - interrupt_time;
 }
 
 void TIMER14_IRQHandler(void)
 {
-timer_flag_clear(TIMER14, TIMER_FLAG_UP);
+    timer_flag_clear(TIMER14, TIMER_FLAG_UP);
 }
 
-
-
 /**
-  * @brief This function handles USART1 global interrupt / USART1 wake-up interrupt through EXTI line 25.
-  */
+ * @brief This function handles USART1 global interrupt / USART1 wake-up
+ * interrupt through EXTI line 25.
+ */
 void USART1_IRQHandler(void)
 {
 }
 
 void TIMER2_IRQHandler(void)
 {
-//sendDshotDma();
+    // sendDshotDma();
 }
 
-void EXTI4_15_IRQHandler(void){
-		  exti_flag_clear(EXTI_15);
-	    
-	   
-	processDshot();
+void EXTI4_15_IRQHandler(void)
+{
+    exti_flag_clear(EXTI_15);
+
+    processDshot();
 }

@@ -10,7 +10,6 @@
 
 #endif /* IO_H_ */
 
-
 #include "main.h"
 
 void changeToOutput();

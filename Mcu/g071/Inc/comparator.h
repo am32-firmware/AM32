@@ -8,8 +8,6 @@
 #ifndef COMPARATOR_H_
 #define COMPARATOR_H_
 
-
-
 #endif /* COMPARATOR_H_ */
 
 #include "main.h"

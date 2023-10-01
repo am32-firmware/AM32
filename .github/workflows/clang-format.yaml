@@ -1,0 +1,14 @@
+name: Create draft release on tag
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: clang-format lint
+        uses: DoozyX/clang-format-lint-action@v0.16.2
+        with:
+          style: GNU
+          source: '.'
+          extensions: 'h,c'
+          clangFormatVersion: 16
+          

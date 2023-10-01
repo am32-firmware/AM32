@@ -1,4 +1,4 @@
-name: Create draft release on tag
+name: clang-format check
 on: [push, pull_request]
 jobs:
   formatting-check:

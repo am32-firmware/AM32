@@ -18,3 +18,4 @@ jobs:
           draft: true
           generate_release_notes: true
           files: Release.txt
+          token: ${{ secrets.GITHUB_TOKEN }}

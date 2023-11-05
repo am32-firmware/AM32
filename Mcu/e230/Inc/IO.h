@@ -8,6 +8,8 @@
 #ifndef IO_H_
 #define IO_H_
 
+#endif /* IO_H_ */
+
 #include "main.h"
 
 void changeToOutput();
@@ -31,8 +33,7 @@ extern uint8_t degrees_celsius;
 
 extern uint16_t ADC_raw_volts;
 extern uint16_t servo_low_threshold; // anything below this point considered 0
-extern uint16_t servo_high_threshold;  // anything above this point considered 2000 (max)
+extern uint16_t
+    servo_high_threshold; // anything above this point considered 2000 (max)
 extern uint16_t servo_neutral;
 extern uint8_t servo_dead_band;
-
-#endif /* IO_H_ */

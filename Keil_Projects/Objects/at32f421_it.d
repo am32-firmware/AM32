@@ -31,5 +31,4 @@
   ..\Mcu\f421\Drivers\drivers\inc\at32f421_exint.h \
   ..\Mcu\f421\Drivers\drivers\inc\at32f421_misc.h \
   ..\Mcu\f421\Drivers\drivers\inc\at32f421_scfg.h ..\mcu\f421\Inc\main.h \
-  ..\mcu\f421\Inc\at32f421_conf.h ..\Inc\targets.h ..\mcu\f421\Inc\adc.h \
-  ..\mcu\f421\Inc\main.h
+  ..\Inc\targets.h ..\mcu\f421\Inc\adc.h

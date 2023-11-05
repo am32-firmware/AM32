@@ -7,9 +7,9 @@
 #include "ADC.h"
 
 #ifdef USE_ADC_INPUT
-    uint16_t ADCDataDMA[4];
+uint16_t ADCDataDMA[4];
 #else
-    uint16_t ADCDataDMA[3];
+uint16_t ADCDataDMA[3];
 #endif
 
 extern uint16_t ADC_raw_temp;
@@ -17,65 +17,60 @@ extern uint16_t ADC_raw_volts;
 extern uint16_t ADC_raw_current;
 extern uint16_t ADC_raw_input;
 
-void ADC_DMA_Callback()   // read dma buffer and set extern variables
-{
+void ADC_DMA_Callback()
+{ // read dma buffer and set extern variables
+
 #ifdef USE_ADC_INPUT
-    ADC_raw_temp    = ADCDataDMA[3];
-    ADC_raw_volts   = ADCDataDMA[1] / 2;
+    ADC_raw_temp = ADCDataDMA[3];
+    ADC_raw_volts = ADCDataDMA[1] / 2;
     ADC_raw_current = ADCDataDMA[2];
-    ADC_raw_input   = ADCDataDMA[0];
+    ADC_raw_input = ADCDataDMA[0];
 
 #else
-    ADC_raw_temp    = ADCDataDMA[2];
+    ADC_raw_temp = ADCDataDMA[2];
     if (VOLTAGE_ADC_PIN > CURRENT_ADC_PIN) {
-        ADC_raw_volts   = ADCDataDMA[1];
+        ADC_raw_volts = ADCDataDMA[1];
         ADC_raw_current = ADCDataDMA[0];
-    }
-    else {
-        ADC_raw_volts   = ADCDataDMA[0];
+    } else {
+        ADC_raw_volts = ADCDataDMA[0];
         ADC_raw_current = ADCDataDMA[1];
     }
 #endif
 }
 
-void enableADC_DMA()     // enables channel
-{
-    NVIC_SetPriority(DMA1_Channel1_IRQn, 3);
-    NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+void enableADC_DMA()
+{ // enables channel
 
-    LL_DMA_ConfigAddresses(DMA1,
-                           LL_DMA_CHANNEL_1,
-                           LL_ADC_DMA_GetRegAddr(ADC1, LL_ADC_DMA_REG_REGULAR_DATA),
-                           (uint32_t)&ADCDataDMA,
-                           LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
+    //	NVIC_SetPriority(DMA1_Channel1_IRQn, 3);
+    //	NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+
+    LL_DMA_ConfigAddresses(
+        DMA1, LL_DMA_CHANNEL_1,
+        LL_ADC_DMA_GetRegAddr(ADC1, LL_ADC_DMA_REG_REGULAR_DATA),
+        (uint32_t)&ADCDataDMA, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
 
     /* Set DMA transfer size */
 #ifdef USE_ADC_INPUT
-    LL_DMA_SetDataLength(DMA1,
-                         LL_DMA_CHANNEL_1,
-                         4);
+    LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_1, 4);
 #else
-    LL_DMA_SetDataLength(DMA1,
-                         LL_DMA_CHANNEL_1,
-                         3);
+    LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_1, 3);
 
 #endif
-    /* Enable DMA transfer interruption: transfer complete */
-    LL_DMA_EnableIT_TC(DMA1,
-                       LL_DMA_CHANNEL_1);
+    // LL_DMA_EnableIT_TC(DMA1,LL_DMA_CHANNEL_1);
 
-    /* Enable DMA transfer interruption: transfer error */
-    LL_DMA_EnableIT_TE(DMA1,
-                       LL_DMA_CHANNEL_1);
+    // LL_DMA_EnableIT_TE(DMA1,LL_DMA_CHANNEL_1);
 
-    /*## Activation of DMA #####################################################*/
+    /*## Activation of DMA
+     * #####################################################*/
     /* Enable the DMA transfer */
-    LL_DMA_EnableChannel(DMA1,
-                         LL_DMA_CHANNEL_1);
+    LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_1);
 }
 
-void activateADC()           // called right after enable regular conversions are started by software and DMA interrupt happens at end of transfer
-{
+void activateADC()
+{ // called right after enable regular conversions are
+    // started by software and DMA interrupt happens at end of
+    // transfer
+
     __IO uint32_t wait_loop_index = 0;
 
     LL_ADC_StartCalibration(ADC1);
@@ -95,10 +90,10 @@ void activateADC()           // called right after enable regular conversions ar
 
 void ADC_Init(void)
 {
-    LL_ADC_InitTypeDef ADC_InitStruct = {0};
-    LL_ADC_REG_InitTypeDef ADC_REG_InitStruct = {0};
+    LL_ADC_InitTypeDef ADC_InitStruct = { 0 };
+    LL_ADC_REG_InitTypeDef ADC_REG_InitStruct = { 0 };
 
-    LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
     /* Peripheral clock enable */
     LL_APB1_GRP2_EnableClock(LL_APB1_GRP2_PERIPH_ADC1);
@@ -125,7 +120,8 @@ void ADC_Init(void)
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
     LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_1, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
+    LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_1,
+        LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
 
     LL_DMA_SetChannelPriorityLevel(DMA1, LL_DMA_CHANNEL_1, LL_DMA_PRIORITY_LOW);
 
@@ -145,16 +141,18 @@ void ADC_Init(void)
 
     LL_ADC_REG_SetSequencerChAdd(ADC1, VOLTAGE_ADC_CHANNEL);
     /** Configure Regular Channel
-    */
+     */
     LL_ADC_REG_SetSequencerChAdd(ADC1, CURRENT_ADC_CHANNEL);
     /** Configure Regular Channel
-    */
+     */
     LL_ADC_REG_SetSequencerChAdd(ADC1, LL_ADC_CHANNEL_TEMPSENSOR);
     /** Configure Internal Channel
-    */
-    LL_ADC_SetCommonPathInternalCh(__LL_ADC_COMMON_INSTANCE(ADC1), LL_ADC_PATH_INTERNAL_TEMPSENSOR);
-    /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
-    */
+     */
+    LL_ADC_SetCommonPathInternalCh(__LL_ADC_COMMON_INSTANCE(ADC1),
+        LL_ADC_PATH_INTERNAL_TEMPSENSOR);
+    /** Configure the global features of the ADC (Clock, Resolution, Data
+     * Alignment and number of conversion)
+     */
     ADC_InitStruct.Clock = LL_ADC_CLOCK_SYNC_PCLK_DIV4;
     ADC_InitStruct.Resolution = LL_ADC_RESOLUTION_12B;
     ADC_InitStruct.DataAlignment = LL_ADC_DATA_ALIGN_RIGHT;

@@ -1,25 +1,31 @@
 /**
-  ******************************************************************************
-  * File   : Templates/at32f4xx_it.h
-  * Version: V1.3.0
-  * Date   : 2021-03-18
-  * Brief  : Main Interrupt Service Routines.
-  *          This file provides template for all exceptions handler and peripherals
-  *          interrupt service routine.
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * File   : Templates/at32f4xx_it.h
+ * Version: V1.3.0
+ * Date   : 2021-03-18
+ * Brief  : Main Interrupt Service Routines.
+ *          This file provides template for all exceptions handler and
+ *peripherals interrupt service routine.
+ ******************************************************************************
+ */
 
-/* Define to prevent recursive inclusion -------------------------------------*/
+/* Define to prevent recursive inclusion
+ * -------------------------------------*/
 #ifndef __AT32F421_IT_H
 #define __AT32F421_IT_H
 
-/* Includes ------------------------------------------------------------------*/
+/* Includes
+ * ------------------------------------------------------------------*/
 #include "at32f421.h"
 
-/* Exported types ------------------------------------------------------------*/
-/* Exported constants --------------------------------------------------------*/
-/* Exported macro ------------------------------------------------------------*/
-/* Exported functions ------------------------------------------------------- */
+/* Exported types
+ * ------------------------------------------------------------*/
+/* Exported constants
+ * --------------------------------------------------------*/
+/* Exported macro
+ * ------------------------------------------------------------*/
+/* Exported functions -------------------------------------------------------
+ */
 
 void NMI_Handler(void);
 void HardFault_Handler(void);
@@ -39,4 +45,5 @@ void TMR3_GLOBAL_IRQHandler(void);
 void DMA1_Channel5_4_IRQHandler(void);
 void DMA1_Channel1_IRQHandler(void);
 void DMA1_Channel3_2_IRQHandler(void);
+void EXINT15_4_IRQHandler(void);
 #endif /* __AT32F4XX_IT_H */

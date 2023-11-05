@@ -7,16 +7,16 @@
 
 // PERIPHERAL SETUP
 
-#define KR_KEY_Reload           ((uint16_t)0xAAAA)
-#define KR_KEY_Enable           ((uint16_t)0xCCCC)
+#define KR_KEY_Reload ((uint16_t)0xAAAA)
+#define KR_KEY_Enable ((uint16_t)0xCCCC)
 
 #include "peripherals.h"
 
-#include "targets.h"
-#include "serial_telemetry.h"
+#include "ADC.h"
 #include "common.h"
 #include "functions.h"
-#include "ADC.h"
+#include "serial_telemetry.h"
+#include "targets.h"
 
 void initCorePeripherals(void)
 {
@@ -24,8 +24,8 @@ void initCorePeripherals(void)
     // LL_APB1_GRP2_EnableClock(LL_APB1_GRP2_PERIPH_SYSCFG);
     // LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_PWR);
 
-    //fmc_wscnt_set(2);
-    //fmc_prefetch_enable();
+    // fmc_wscnt_set(2);
+    // fmc_prefetch_enable();
     MX_GPIO_Init();
     MX_DMA_Init();
     TIM1_Init();
@@ -41,8 +41,8 @@ void initCorePeripherals(void)
 #endif
 }
 
-//COMP_InitType  COMP_InitStructure;
-//EXTI_InitType EXTI_InitStructure;
+// COMP_InitType  COMP_InitStructure;
+// EXTI_InitType EXTI_InitStructure;
 
 void initAfterJump(void)
 {
@@ -65,7 +65,7 @@ void system_clock_config(void)
     //  crm_ahb_div_set(CRM_AHB_DIV_1);
     //  crm_apb2_div_set(CRM_APB2_DIV_1);
     //  crm_apb1_div_set(CRM_APB1_DIV_1);
-    //  crm_auto_step_mode_enable(TRUE);
+    //	crm_auto_step_mode_enable(TRUE);
     //  crm_sysclk_switch(CRM_SCLK_PLL);
     //  while(crm_sysclk_switch_status_get() != CRM_SCLK_PLL)
     //  {
@@ -99,12 +99,12 @@ void system_clock_config(void)
 
 void AT_COMP_Init(void)
 {
-    //  COMP_StructInit(&COMP_InitStructure);
+    //	COMP_StructInit(&COMP_InitStructure);
 
     crm_periph_clock_enable(CRM_GPIOA_PERIPH_CLOCK, TRUE);
     crm_periph_clock_enable(CRM_CMP_PERIPH_CLOCK, TRUE);
 
-    //rcu_periph_clock_enable(RCU_GPIOA);
+    // rcu_periph_clock_enable(RCU_GPIOA);
 
     /* configure PA1 as comparator input */
     gpio_mode_QUICK(GPIOA, GPIO_MODE_ANALOG, GPIO_PULL_NONE, GPIO_PINS_1);
@@ -114,28 +114,29 @@ void AT_COMP_Init(void)
     /* configure comparator channel0 */
     //  cmp_mode_init(CMP_HIGHSPEED, CMP_PA5, CMP_HYSTERESIS_NO);
 
-    //      COMP_InitStructure.COMP_INMInput = COMP_INMInput_IN3;
-    //      COMP_InitStructure.COMP_Output = COMP_Output_None;
-    //      COMP_InitStructure.COMP_OutPolarity = COMP_OutPolarity_NonInverted;
-    //      COMP_InitStructure.COMP_Hysteresis = COMP_Hysteresis_No;
-    //      COMP_InitStructure.COMP_Mode = COMP_Mode_Fast;
-    //    COMP_Init(COMP1_Selection, &COMP_InitStructure);
+    //		COMP_InitStructure.COMP_INMInput = COMP_INMInput_IN3;
+    //		COMP_InitStructure.COMP_Output = COMP_Output_None;
+    //		COMP_InitStructure.COMP_OutPolarity =
+    // COMP_OutPolarity_NonInverted;
+    // COMP_InitStructure.COMP_Hysteresis = COMP_Hysteresis_No;
+    // COMP_InitStructure.COMP_Mode = COMP_Mode_Fast;
+    //	  COMP_Init(COMP1_Selection, &COMP_InitStructure);
     //  cmp_enable();
     //  delay_1ms(1);
 
     //   cmp_output_init(CMP_OUTPUT_NONE, CMP_OUTPUT_POLARITY_NOINVERTED);
 
     /* initialize exti line21 */
-    //      EXTI_StructInit(&EXTI_InitStructure);
-    //  EXTI_InitStructure.EXTI_Line = EXTI_LINE;
+    //		EXTI_StructInit(&EXTI_InitStructure);
+    //	EXTI_InitStructure.EXTI_Line = EXTI_LINE;
     //  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
     //  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
     //  EXTI_InitStructure.EXTI_LineEnable = ENABLE;
-    //      EXTI_Init(&EXTI_InitStructure);
-    //      EXTI_ClearFlag(EXTI_LINE);
+    //		EXTI_Init(&EXTI_InitStructure);
+    //		EXTI_ClearFlag(EXTI_LINE);
     /* configure ADC_CMP NVIC */
     //   nvic_irq_enable(ADC_COMP_IRQHandler, 0);
-    //        NVIC_InitType NVIC_InitStructure;
+    //		  NVIC_InitType NVIC_InitStructure;
 
     //  NVIC_InitStructure.NVIC_IRQChannel = ADC_COMP_IRQn;
     //  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
@@ -145,13 +146,13 @@ void AT_COMP_Init(void)
     NVIC_SetPriority(CMP1_IRQn, 0);
     NVIC_EnableIRQ(CMP1_IRQn);
 
-    //  COMP_Cmd(COMP1_Selection, ENABLE);
+    //	COMP_Cmd(COMP1_Selection, ENABLE);
     cmp_enable(CMP1_SELECTION, TRUE);
 }
 
 void MX_IWDG_Init(void)
 {
-    //      fwdgt_config(4000,FWDGT_PSC_DIV16);
+    //		fwdgt_config(4000,FWDGT_PSC_DIV16);
     //    fwdgt_enable();
 
     WDT->cmd = WDT_CMD_UNLOCK;
@@ -171,8 +172,8 @@ void TIM1_Init(void)
     TMR1->pr = 3000;
     TMR1->div = 0;
 
-    TMR1->cm1 = 0x6868;   // Channel 1 and 2 in PWM output mode
-    TMR1->cm2 = 0x68;     // channel 3 in PWM output mode
+    TMR1->cm1 = 0x6868; // Channel 1 and 2 in PWM output mode
+    TMR1->cm2 = 0x68; // channel 3 in PWM output mode
 
     tmr_output_channel_buffer_enable(TMR1, TMR_SELECT_CHANNEL_1, TRUE);
     tmr_output_channel_buffer_enable(TMR1, TMR_SELECT_CHANNEL_2, TRUE);
@@ -185,18 +186,24 @@ void TIM1_Init(void)
     crm_periph_clock_enable(CRM_GPIOB_PERIPH_CLOCK, TRUE);
 
     /*configure PA8/PA9/PA10(TIMER0/CH0/CH1/CH2) as alternate function*/
-    gpio_mode_QUICK(PHASE_A_GPIO_PORT_LOW, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_A_GPIO_LOW);
+    gpio_mode_QUICK(PHASE_A_GPIO_PORT_LOW, GPIO_MODE_MUX, GPIO_PULL_NONE,
+        PHASE_A_GPIO_LOW);
 
-    gpio_mode_QUICK(PHASE_B_GPIO_PORT_LOW, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_B_GPIO_LOW);
+    gpio_mode_QUICK(PHASE_B_GPIO_PORT_LOW, GPIO_MODE_MUX, GPIO_PULL_NONE,
+        PHASE_B_GPIO_LOW);
 
-    gpio_mode_QUICK(PHASE_C_GPIO_PORT_LOW, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_C_GPIO_LOW);
+    gpio_mode_QUICK(PHASE_C_GPIO_PORT_LOW, GPIO_MODE_MUX, GPIO_PULL_NONE,
+        PHASE_C_GPIO_LOW);
 
     /*configure PB13/PB14/PB15(TIMER0/CH0N/CH1N/CH2N) as alternate function*/
-    gpio_mode_QUICK(PHASE_A_GPIO_PORT_HIGH, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_A_GPIO_HIGH);
+    gpio_mode_QUICK(PHASE_A_GPIO_PORT_HIGH, GPIO_MODE_MUX, GPIO_PULL_NONE,
+        PHASE_A_GPIO_HIGH);
 
-    gpio_mode_QUICK(PHASE_B_GPIO_PORT_HIGH, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_B_GPIO_HIGH);
+    gpio_mode_QUICK(PHASE_B_GPIO_PORT_HIGH, GPIO_MODE_MUX, GPIO_PULL_NONE,
+        PHASE_B_GPIO_HIGH);
 
-    gpio_mode_QUICK(PHASE_C_GPIO_PORT_HIGH, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_C_GPIO_HIGH);
+    gpio_mode_QUICK(PHASE_C_GPIO_PORT_HIGH, GPIO_MODE_MUX, GPIO_PULL_NONE,
+        PHASE_C_GPIO_HIGH);
 }
 
 void TIM4_Init(void)
@@ -211,7 +218,7 @@ void TIM9_Init(void)
     crm_periph_clock_enable(CRM_TMR9_PERIPH_CLOCK, TRUE);
     TMR9->pr = 1000000 / LOOP_FREQUENCY_HZ;
     TMR9->div = 143;
-    NVIC_SetPriority(TMR1_BRK_TMR9_IRQn, 2);
+    NVIC_SetPriority(TMR1_BRK_TMR9_IRQn, 3);
     NVIC_EnableIRQ(TMR1_BRK_TMR9_IRQn);
 }
 
@@ -266,57 +273,59 @@ void MX_GPIO_Init(void)
 void UN_TIM_Init(void)
 {
 #ifdef USE_TIMER_3_CHANNEL_1
-    //  RCC_AHBPeriphClockCmd(RCC_AHBPERIPH_GPIOB,ENABLE);
-    //  RCC_APB1PeriphClockCmd(RCC_APB1PERIPH_TMR3, ENABLE);
+    //	RCC_AHBPeriphClockCmd(RCC_AHBPERIPH_GPIOB,ENABLE);
+    //	RCC_APB1PeriphClockCmd(RCC_APB1PERIPH_TMR3, ENABLE);
     crm_periph_clock_enable(CRM_GPIOB_PERIPH_CLOCK, TRUE);
     crm_periph_clock_enable(CRM_TMR3_PERIPH_CLOCK, TRUE);
 #endif
 #ifdef USE_TIMER_15_CHANNEL_1
-    //  RCC_AHBPeriphClockCmd(RCC_AHBPERIPH_GPIOA,ENABLE);
-    //  RCC_APB2PeriphClockCmd(RCC_APB2PERIPH_TMR15, ENABLE);
+    //	RCC_AHBPeriphClockCmd(RCC_AHBPERIPH_GPIOA,ENABLE);
+    //	RCC_APB2PeriphClockCmd(RCC_APB2PERIPH_TMR15, ENABLE);
     crm_periph_clock_enable(CRM_GPIOA_PERIPH_CLOCK, TRUE);
     crm_periph_clock_enable(CRM_TMR15_PERIPH_CLOCK, TRUE);
 #endif
 
     crm_periph_clock_enable(CRM_IOMUX_PERIPH_CLOCK, TRUE);
 
-    //GPIO_PinsRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
+    // GPIO_PinsRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
     gpio_pin_remap_config(SWJTAG_MUX_010, TRUE);
     gpio_pin_remap_config(TMR3_MUX_10, TRUE);
 
-    //GPIO_PinsRemapConfig(GPIO_PartialRemap_TMR3, ENABLE);
+    // GPIO_PinsRemapConfig(GPIO_PartialRemap_TMR3, ENABLE);
 
-    //  RCC_AHBPeriphClockCmd(RCC_AHBPERIPH_DMA1,ENABLE);
+    //	RCC_AHBPeriphClockCmd(RCC_AHBPERIPH_DMA1,ENABLE);
 
     crm_periph_clock_enable(CRM_DMA1_PERIPH_CLOCK, TRUE);
     gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_INPUT, GPIO_PULL_NONE, INPUT_PIN);
 
-    //GPIO_PinAFConfig(INPUT_PIN_PORT, GPIO_PinsSource4, GPIO_AF_1);
-    //  gpio_pin_mux_config(INPUT_PIN_PORT, INPUT_PIN, GPIO_MUX_1);
+    // GPIO_PinAFConfig(INPUT_PIN_PORT, GPIO_PinsSource4, GPIO_AF_1);
+    //	gpio_pin_mux_config(INPUT_PIN_PORT, INPUT_PIN, GPIO_MUX_1);
 
-    //   dma_periph_address_config(INPUT_DMA_CHANNEL, (uint32_t)&TIMER_CH0CV(IC_TIMER_REGISTER));
+    //	 dma_periph_address_config(INPUT_DMA_CHANNEL,
+    //(uint32_t)&TIMER_CH0CV(IC_TIMER_REGISTER));
     //   dma_memory_address_config(INPUT_DMA_CHANNEL, (uint32_t)&dma_buffer);
-    //   INPUT_DMA_CHANNEL->CPBA = (uint32_t)&IC_TIMER_REGISTER->CC1;
-    //   INPUT_DMA_CHANNEL->CMBA = (uint32_t)&dma_buffer;
+    //	 INPUT_DMA_CHANNEL->CPBA = (uint32_t)&IC_TIMER_REGISTER->CC1;
+    //	 INPUT_DMA_CHANNEL->CMBA = (uint32_t)&dma_buffer;
     //   INPUT_DMA_CHANNEL->CHCTRL |= DMA_DIR_PERIPHERALSRC;
 
     //   DMA_Reset(INPUT_DMA_CHANNEL);
     //  DMA_DefaultInitParaConfig(&DMA_InitStructure);
 
-    //  DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&IC_TIMER_REGISTER->CC1;
-    //  DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)&dma_buffer;
-    //  DMA_InitStructure.DMA_Direction = DMA_DIR_PERIPHERALSRC;
-    //  DMA_InitStructure.DMA_BufferSize = 32;
+    //  DMA_InitStructure.DMA_PeripheralBaseAddr =
+    //  (uint32_t)&IC_TIMER_REGISTER->CC1; DMA_InitStructure.DMA_MemoryBaseAddr =
+    //  (uint32_t)&dma_buffer; DMA_InitStructure.DMA_Direction =
+    //  DMA_DIR_PERIPHERALSRC; DMA_InitStructure.DMA_BufferSize = 32;
     //  DMA_InitStructure.DMA_PeripheralInc = DMA_PERIPHERALINC_DISABLE;
     //  DMA_InitStructure.DMA_MemoryInc = DMA_MEMORYINC_ENABLE;
-    //  DMA_InitStructure.DMA_PeripheralDataWidth = DMA_PERIPHERALDATAWIDTH_HALFWORD;
-    //  DMA_InitStructure.DMA_MemoryDataWidth = DMA_MEMORYDATAWIDTH_WORD;
-    //  DMA_InitStructure.DMA_Mode = DMA_MODE_NORMAL;
+    //  DMA_InitStructure.DMA_PeripheralDataWidth =
+    //  DMA_PERIPHERALDATAWIDTH_HALFWORD; DMA_InitStructure.DMA_MemoryDataWidth =
+    //  DMA_MEMORYDATAWIDTH_WORD; DMA_InitStructure.DMA_Mode = DMA_MODE_NORMAL;
     //  DMA_InitStructure.DMA_Priority = DMA_PRIORITY_LOW;
     //  DMA_InitStructure.DMA_MTOM = DMA_MEMTOMEM_DISABLE;
     //  DMA_Init(INPUT_DMA_CHANNEL, &DMA_InitStructure);
 
-    INPUT_DMA_CHANNEL->ctrl = 0X98a; //  PERIPHERAL HALF WORD, MEMROY WORD , MEMORY INC ENABLE , TC AND ERROR INTS
+    INPUT_DMA_CHANNEL->ctrl = 0X98a; //  PERIPHERAL HALF WORD, MEMROY WORD ,
+                                     //  MEMORY INC ENABLE , TC AND ERROR INTS
 
     NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
     NVIC_EnableIRQ(IC_DMA_IRQ_NAME);
@@ -324,20 +333,20 @@ void UN_TIM_Init(void)
     IC_TIMER_REGISTER->pr = 0xFFFF;
     IC_TIMER_REGISTER->div = 16;
 
-    //TMR_ARPreloadConfig(IC_TIMER_REGISTER, ENABLE);
+    // TMR_ARPreloadConfig(IC_TIMER_REGISTER, ENABLE);
     IC_TIMER_REGISTER->ctrl1_bit.prben = TRUE;
 
-    //  NVIC_SetPriority(TMR3_GLOBAL_IRQn, 0);
+    //	NVIC_SetPriority(TMR3_GLOBAL_IRQn, 0);
     //  NVIC_EnableIRQ(TMR3_GLOBAL_IRQn);
     gpio_mode_QUICK(GPIOB, GPIO_MODE_INPUT, GPIO_PULL_NONE, INPUT_PIN);
-    //TMR_Cmd(IC_TIMER_REGISTER, ENABLE);
+    // TMR_Cmd(IC_TIMER_REGISTER, ENABLE);
     IC_TIMER_REGISTER->ctrl1_bit.tmren = TRUE;
 }
 
-#ifdef USE_RGB_LED              // has 3 color led
+#ifdef USE_RGB_LED // has 3 color led
 void LED_GPIO_init()
 {
-    LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
     /* GPIO Ports Clock Enable */
     LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOB);
@@ -393,14 +402,15 @@ void setAndEnableComInt(uint16_t time)
     COM_TIMER->iden |= TMR_OVF_INT;
 }
 
-uint16_t getintervaTimerCount()
+uint16_t
+getintervaTimerCount()
 {
     return INTERVAL_TIMER->cval;
 }
 
 void setintervaTimerCount(uint16_t intertime)
 {
-    INTERVAL_TIMER->cval = 0 ;
+    INTERVAL_TIMER->cval = intertime;
 }
 
 void setPrescalerPWM(uint16_t presc)
@@ -424,12 +434,10 @@ void setPWMCompare1(uint16_t compareone)
 {
     TMR1->c1dt = compareone;
 }
-
 void setPWMCompare2(uint16_t comparetwo)
 {
     TMR1->c2dt = comparetwo;
 }
-
 void setPWMCompare3(uint16_t comparethree)
 {
     TMR1->c3dt = comparethree;
@@ -437,7 +445,8 @@ void setPWMCompare3(uint16_t comparethree)
 
 void generatePwmTimerEvent()
 {
-    TMR1->swevt |= TMR_OVERFLOW_SWTRIG;;
+    TMR1->swevt |= TMR_OVERFLOW_SWTRIG;
+    ;
 }
 
 void resetInputCaptureTimer()
@@ -487,4 +496,8 @@ void enableCorePeripherals()
     tmr_channel_enable(IC_TIMER_REGISTER, IC_TIMER_CHANNEL, TRUE);
     IC_TIMER_REGISTER->ctrl1_bit.tmren = TRUE;
 #endif
+
+    NVIC_SetPriority(EXINT15_10_IRQn, 2);
+    NVIC_EnableIRQ(EXINT15_10_IRQn);
+    EXINT->inten |= EXINT_LINE_15;
 }

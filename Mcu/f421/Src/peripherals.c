@@ -7,17 +7,18 @@
 
 // PERIPHERAL SETUP
 
-#define KR_KEY_Reload           ((uint16_t)0xAAAA)
-#define KR_KEY_Enable           ((uint16_t)0xCCCC)
+#define KR_KEY_Reload ((uint16_t)0xAAAA)
+#define KR_KEY_Enable ((uint16_t)0xCCCC)
 
 #include "peripherals.h"
-#include "targets.h"
-#include "serial_telemetry.h"
+
+#include "ADC.h"
 #include "common.h"
 #include "functions.h"
-#include "ADC.h"
+#include "serial_telemetry.h"
+#include "targets.h"
 #ifdef USE_LED_STRIP
-    #include "WS2812.h"
+#include "WS2812.h"
 #endif
 
 void initCorePeripherals(void)
@@ -95,12 +96,15 @@ void TIM1_Init(void)
     TMR1->pr = 3000;
     TMR1->div = 0;
 
-    TMR1->cm1 = 0x6868;   // Channel 1 and 2 in PWM output mode
-    TMR1->cm2 = 0x68;     // channel 3 in PWM output mode
+    TMR1->cm1 = 0x6868; // Channel 1 and 2 in PWM output mode
+    TMR1->cm2 = 0x68; // channel 3 in PWM output mode
 #ifdef USE_INVERTED_HIGH
-    tmr_output_channel_polarity_set(TMR1, TMR_SELECT_CHANNEL_1, TMR_POLARITY_ACTIVE_LOW);
-    tmr_output_channel_polarity_set(TMR1, TMR_SELECT_CHANNEL_2, TMR_POLARITY_ACTIVE_LOW);
-    tmr_output_channel_polarity_set(TMR1, TMR_SELECT_CHANNEL_3, TMR_POLARITY_ACTIVE_LOW);
+    tmr_output_channel_polarity_set(TMR1, TMR_SELECT_CHANNEL_1,
+        TMR_POLARITY_ACTIVE_LOW);
+    tmr_output_channel_polarity_set(TMR1, TMR_SELECT_CHANNEL_2,
+        TMR_POLARITY_ACTIVE_LOW);
+    tmr_output_channel_polarity_set(TMR1, TMR_SELECT_CHANNEL_3,
+        TMR_POLARITY_ACTIVE_LOW);
 #endif
 
     tmr_output_channel_buffer_enable(TMR1, TMR_SELECT_CHANNEL_1, TRUE);
@@ -113,29 +117,44 @@ void TIM1_Init(void)
     crm_periph_clock_enable(CRM_GPIOB_PERIPH_CLOCK, TRUE);
 
     /*configure PA8/PA9/PA10(TIMER0/CH0/CH1/CH2) as alternate function*/
-    gpio_mode_QUICK(PHASE_A_GPIO_PORT_LOW, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_A_GPIO_LOW);
+    gpio_mode_QUICK(PHASE_A_GPIO_PORT_LOW, GPIO_MODE_MUX, GPIO_PULL_NONE,
+        PHASE_A_GPIO_LOW);
 
-    gpio_mode_QUICK(PHASE_B_GPIO_PORT_LOW, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_B_GPIO_LOW);
+    gpio_mode_QUICK(PHASE_B_GPIO_PORT_LOW, GPIO_MODE_MUX, GPIO_PULL_NONE,
+        PHASE_B_GPIO_LOW);
 
-    gpio_mode_QUICK(PHASE_C_GPIO_PORT_LOW, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_C_GPIO_LOW);
+    gpio_mode_QUICK(PHASE_C_GPIO_PORT_LOW, GPIO_MODE_MUX, GPIO_PULL_NONE,
+        PHASE_C_GPIO_LOW);
 
-    gpio_pin_mux_config(PHASE_A_GPIO_PORT_LOW, PHASE_A_PIN_SOURCE_LOW, GPIO_MUX_2);
-    gpio_pin_mux_config(PHASE_B_GPIO_PORT_LOW, PHASE_B_PIN_SOURCE_LOW, GPIO_MUX_2);
-    gpio_pin_mux_config(PHASE_C_GPIO_PORT_LOW, PHASE_C_PIN_SOURCE_LOW, GPIO_MUX_2);
+    gpio_pin_mux_config(PHASE_A_GPIO_PORT_LOW, PHASE_A_PIN_SOURCE_LOW,
+        GPIO_MUX_2);
+    gpio_pin_mux_config(PHASE_B_GPIO_PORT_LOW, PHASE_B_PIN_SOURCE_LOW,
+        GPIO_MUX_2);
+    gpio_pin_mux_config(PHASE_C_GPIO_PORT_LOW, PHASE_C_PIN_SOURCE_LOW,
+        GPIO_MUX_2);
 
     /*configure PB13/PB14/PB15(TIMER0/CH0N/CH1N/CH2N) as alternate function*/
-    gpio_mode_QUICK(PHASE_A_GPIO_PORT_HIGH, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_A_GPIO_HIGH);
-    //  gpio_output_options_set(GPIOB, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ,PHASE_A_GPIO_HIGH);
+    gpio_mode_QUICK(PHASE_A_GPIO_PORT_HIGH, GPIO_MODE_MUX, GPIO_PULL_NONE,
+        PHASE_A_GPIO_HIGH);
+    //  gpio_output_options_set(GPIOB, GPIO_OTYPE_PP,
+    //  GPIO_OSPEED_50MHZ,PHASE_A_GPIO_HIGH);
 
-    gpio_mode_QUICK(PHASE_B_GPIO_PORT_HIGH, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_B_GPIO_HIGH);
-    //   gpio_output_options_set(GPIOB, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ,PHASE_B_GPIO_HIGH);
+    gpio_mode_QUICK(PHASE_B_GPIO_PORT_HIGH, GPIO_MODE_MUX, GPIO_PULL_NONE,
+        PHASE_B_GPIO_HIGH);
+    //   gpio_output_options_set(GPIOB, GPIO_OTYPE_PP,
+    //   GPIO_OSPEED_50MHZ,PHASE_B_GPIO_HIGH);
 
-    gpio_mode_QUICK(PHASE_C_GPIO_PORT_HIGH, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_C_GPIO_HIGH);
-    //    gpio_output_options_set(GPIOB, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ,PHASE_C_GPIO_HIGH);
+    gpio_mode_QUICK(PHASE_C_GPIO_PORT_HIGH, GPIO_MODE_MUX, GPIO_PULL_NONE,
+        PHASE_C_GPIO_HIGH);
+    //    gpio_output_options_set(GPIOB, GPIO_OTYPE_PP,
+    //    GPIO_OSPEED_50MHZ,PHASE_C_GPIO_HIGH);
 
-    gpio_pin_mux_config(PHASE_A_GPIO_PORT_HIGH, PHASE_A_PIN_SOURCE_HIGH, GPIO_MUX_2);
-    gpio_pin_mux_config(PHASE_B_GPIO_PORT_HIGH, PHASE_B_PIN_SOURCE_HIGH, GPIO_MUX_2);
-    gpio_pin_mux_config(PHASE_C_GPIO_PORT_HIGH, PHASE_C_PIN_SOURCE_HIGH, GPIO_MUX_2);
+    gpio_pin_mux_config(PHASE_A_GPIO_PORT_HIGH, PHASE_A_PIN_SOURCE_HIGH,
+        GPIO_MUX_2);
+    gpio_pin_mux_config(PHASE_B_GPIO_PORT_HIGH, PHASE_B_PIN_SOURCE_HIGH,
+        GPIO_MUX_2);
+    gpio_pin_mux_config(PHASE_C_GPIO_PORT_HIGH, PHASE_C_PIN_SOURCE_HIGH,
+        GPIO_MUX_2);
 }
 
 void TIM6_Init(void)
@@ -151,10 +170,10 @@ void TIM14_Init(void)
     TMR14->pr = 1000000 / LOOP_FREQUENCY_HZ;
     TMR14->div = 119;
 
-    NVIC_SetPriority(TMR14_GLOBAL_IRQn, 2);
+    NVIC_SetPriority(TMR14_GLOBAL_IRQn, 3);
     NVIC_EnableIRQ(TMR14_GLOBAL_IRQn);
 
-    //TMR_Cmd(TMR14, ENABLE);
+    // TMR_Cmd(TMR14, ENABLE);
 }
 
 void TIM16_Init(void)
@@ -174,7 +193,7 @@ void TIM17_Init(void)
     TMR17->div = 59;
     TMR17->ctrl1_bit.prben = TRUE;
 
-    //TMR_Cmd(TMR15, ENABLE);
+    // TMR_Cmd(TMR15, ENABLE);
 }
 
 void MX_DMA_Init(void)
@@ -202,10 +221,11 @@ void UN_TIM_Init(void)
     gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_MUX, GPIO_PULL_NONE, INPUT_PIN);
 #endif
 
-    //  RCC_AHBPeriphClockCmd(RCC_AHBPERIPH_DMA1,ENABLE);
+    //	RCC_AHBPeriphClockCmd(RCC_AHBPERIPH_DMA1,ENABLE);
 
     crm_periph_clock_enable(CRM_DMA1_PERIPH_CLOCK, TRUE);
-    INPUT_DMA_CHANNEL->ctrl = 0X98a; //  PERIPHERAL HALF WORD, MEMROY WORD , MEMORY INC ENABLE , TC AND ERROR INTS
+    INPUT_DMA_CHANNEL->ctrl = 0X98a; //  PERIPHERAL HALF WORD, MEMROY WORD ,
+                                     //  MEMORY INC ENABLE , TC AND ERROR INTS
     NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
     NVIC_EnableIRQ(IC_DMA_IRQ_NAME);
     IC_TIMER_REGISTER->pr = 0xFFFF;
@@ -214,10 +234,10 @@ void UN_TIM_Init(void)
     IC_TIMER_REGISTER->ctrl1_bit.tmren = TRUE;
 }
 
-#ifdef USE_RGB_LED              // has 3 color led
+#ifdef USE_RGB_LED // has 3 color led
 void LED_GPIO_init()
 {
-    LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
     /* GPIO Ports Clock Enable */
     LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOB);
@@ -273,14 +293,15 @@ void setAndEnableComInt(uint16_t time)
     COM_TIMER->iden |= TMR_OVF_INT;
 }
 
-uint16_t getintervaTimerCount()
+uint16_t
+getintervaTimerCount()
 {
     return INTERVAL_TIMER->cval;
 }
 
 void setintervaTimerCount(uint16_t intertime)
 {
-    INTERVAL_TIMER->cval = 0 ;
+    INTERVAL_TIMER->cval = intertime;
 }
 
 void setPrescalerPWM(uint16_t presc)
@@ -304,12 +325,10 @@ void setPWMCompare1(uint16_t compareone)
 {
     TMR1->c1dt = compareone;
 }
-
 void setPWMCompare2(uint16_t comparetwo)
 {
     TMR1->c2dt = comparetwo;
 }
-
 void setPWMCompare3(uint16_t comparethree)
 {
     TMR1->c3dt = comparethree;
@@ -317,7 +336,8 @@ void setPWMCompare3(uint16_t comparethree)
 
 void generatePwmTimerEvent()
 {
-    TMR1->swevt |= TMR_OVERFLOW_SWTRIG;;
+    TMR1->swevt |= TMR_OVERFLOW_SWTRIG;
+    ;
 }
 
 void resetInputCaptureTimer()
@@ -367,4 +387,8 @@ void enableCorePeripherals()
     tmr_channel_enable(IC_TIMER_REGISTER, IC_TIMER_CHANNEL, TRUE);
     IC_TIMER_REGISTER->ctrl1_bit.tmren = TRUE;
 #endif
+
+    NVIC_SetPriority(EXINT15_4_IRQn, 2);
+    NVIC_EnableIRQ(EXINT15_4_IRQn);
+    EXINT->inten |= EXINT_LINE_15;
 }

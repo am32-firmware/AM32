@@ -1,65 +1,34 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file    stm32f0xx_it.c
-  * @brief   Interrupt Service Routines.
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    stm32f0xx_it.c
+ * @brief   Interrupt Service Routines.
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+ * All rights reserved.</center></h2>
+ *
+ * This software component is licensed by ST under BSD 3-Clause license,
+ * the "License"; You may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at:
+ *                        opensource.org/licenses/BSD-3-Clause
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
-/* Includes ------------------------------------------------------------------*/
-#include "main.h"
+/* Includes
+ * ------------------------------------------------------------------*/
 #include "stm32f0xx_it.h"
-/* Private includes ----------------------------------------------------------*/
+
+#include "main.h"
+/* Private includes
+ * ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "targets.h"
 #include "ADC.h"
-/* USER CODE END Includes */
+#include "targets.h"
 
-/* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN TD */
-
-/* USER CODE END TD */
-
-/* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
-
-/* USER CODE END PD */
-
-/* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
-
-/* USER CODE END PM */
-
-/* Private variables ---------------------------------------------------------*/
-/* USER CODE BEGIN PV */
-
-/* USER CODE END PV */
-
-/* Private function prototypes -----------------------------------------------*/
-/* USER CODE BEGIN PFP */
-
-/* USER CODE END PFP */
-
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
-
-/* External variables --------------------------------------------------------*/
-
-/* USER CODE BEGIN EV */
 extern void transfercomplete();
 extern void PeriodElapsedCallback();
 extern void interruptRoutine();
@@ -67,125 +36,103 @@ extern void doPWMChanges();
 extern void tenKhzRoutine();
 extern void sendDshotDma();
 extern void receiveDshotDma();
-
+extern void processDshot();
 extern char send_telemetry;
 extern char telemetry_done;
 extern char servoPwm;
+extern char dshot_telemetry;
+extern char armed;
+extern char out_put;
+extern char compute_dshot_flag;
 /* USER CODE END EV */
 
+int interrupt_time = 0;
 /******************************************************************************/
-/*           Cortex-M0 Processor Interruption and Exception Handlers          */
+/*           Cortex-M0 Processor Interruption and Exception Handlers */
 /******************************************************************************/
 /**
-  * @brief This function handles Non maskable interrupt.
-  */
+ * @brief This function handles Non maskable interrupt.
+ */
 void NMI_Handler(void)
 {
-    /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
-
-    /* USER CODE END NonMaskableInt_IRQn 0 */
-    /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
-
-    /* USER CODE END NonMaskableInt_IRQn 1 */
 }
 
 /**
-  * @brief This function handles Hard fault interrupt.
-  */
+ * @brief This function handles Hard fault interrupt.
+ */
 void HardFault_Handler(void)
 {
-    /* USER CODE BEGIN HardFault_IRQn 0 */
-
-    /* USER CODE END HardFault_IRQn 0 */
     while (1) {
-        /* USER CODE BEGIN W1_HardFault_IRQn 0 */
-        /* USER CODE END W1_HardFault_IRQn 0 */
     }
 }
 
 /**
-  * @brief This function handles System service call via SWI instruction.
-  */
+ * @brief This function handles System service call via SWI instruction.
+ */
 void SVC_Handler(void)
 {
-    /* USER CODE BEGIN SVC_IRQn 0 */
-
-    /* USER CODE END SVC_IRQn 0 */
-    /* USER CODE BEGIN SVC_IRQn 1 */
-
-    /* USER CODE END SVC_IRQn 1 */
 }
 
 /**
-  * @brief This function handles Pendable request for system service.
-  */
+ * @brief This function handles Pendable request for system service.
+ */
 void PendSV_Handler(void)
 {
-    /* USER CODE BEGIN PendSV_IRQn 0 */
-
-    /* USER CODE END PendSV_IRQn 0 */
-    /* USER CODE BEGIN PendSV_IRQn 1 */
-
-    /* USER CODE END PendSV_IRQn 1 */
 }
 
 /**
-  * @brief This function handles System tick timer.
-  */
+ * @brief This function handles System tick timer.
+ */
 void SysTick_Handler(void)
 {
-    /* USER CODE BEGIN SysTick_IRQn 0 */
-
-    /* USER CODE END SysTick_IRQn 0 */
-
-    /* USER CODE BEGIN SysTick_IRQn 1 */
-
-    /* USER CODE END SysTick_IRQn 1 */
 }
 
 /******************************************************************************/
-/* STM32F0xx Peripheral Interrupt Handlers                                    */
-/* Add here the Interrupt Handlers for the used peripherals.                  */
-/* For the available peripheral interrupt handler names,                      */
-/* please refer to the startup file (startup_stm32f0xx.s).                    */
+/* STM32F0xx Peripheral Interrupt Handlers */
+/* Add here the Interrupt Handlers for the used peripherals. */
+/* For the available peripheral interrupt handler names, */
+/* please refer to the startup file (startup_stm32f0xx.s). */
 /******************************************************************************/
 
 /**
-  * @brief This function handles DMA1 channel 2 and 3 interrupts.
-  */
+ * @brief This function handles DMA1 channel 2 and 3 interrupts.
+ */
 void DMA1_Channel2_3_IRQHandler(void)
 {
-    /* USER CODE BEGIN DMA1_Channel2_3_IRQn 0 */
     if (LL_DMA_IsActiveFlag_TC2(DMA1)) {
         LL_DMA_ClearFlag_GI2(DMA1);
         LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);
-        /* Call function Transmission complete Callback */
-
-    }
-    else if (LL_DMA_IsActiveFlag_TE2(DMA1)) {
+    } else if (LL_DMA_IsActiveFlag_TE2(DMA1)) {
         LL_DMA_ClearFlag_GI2(DMA1);
         LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);
-        /* Call Error function */
-        // USART_TransferError_Callback();
     }
-
-    /* USER CODE END DMA1_Channel2_3_IRQn 0 */
-
-    /* USER CODE BEGIN DMA1_Channel2_3_IRQn 1 */
-
-    /* USER CODE END DMA1_Channel2_3_IRQn 1 */
 }
 
 /**
-  * @brief This function handles DMA1 channel 4 and 5 interrupts.
-  */
+ * @brief This function handles DMA1 channel 4 and 5 interrupts.
+ */
 void DMA1_Channel4_5_IRQHandler(void)
 {
     /* USER CODE BEGIN DMA1_Channel4_5_IRQn 0 */
 #ifdef USE_TIMER_15_CHANNEL_1
+    if (armed && dshot_telemetry) {
+        DMA1->IFCR |= DMA_IFCR_CGIF5;
+        DMA1_Channel5->CCR = 0x00;
+        if (out_put) {
+            receiveDshotDma();
+            compute_dshot_flag = 2;
+        } else {
+            sendDshotDma();
+            compute_dshot_flag = 1;
+        }
+        EXTI->SWIER |= LL_EXTI_LINE_15;
+        return;
+    }
+
     if (LL_DMA_IsActiveFlag_HT5(DMA1)) {
         if (servoPwm) {
-            LL_TIM_IC_SetPolarity(IC_TIMER_REGISTER, IC_TIMER_CHANNEL, LL_TIM_IC_POLARITY_FALLING);
+            LL_TIM_IC_SetPolarity(IC_TIMER_REGISTER, IC_TIMER_CHANNEL,
+                LL_TIM_IC_POLARITY_FALLING);
             LL_DMA_ClearFlag_HT5(DMA1);
         }
     }
@@ -193,9 +140,9 @@ void DMA1_Channel4_5_IRQHandler(void)
         LL_DMA_ClearFlag_GI5(DMA1);
         LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_5);
         transfercomplete();
+        EXTI->SWIER |= LL_EXTI_LINE_15;
         return;
-    }
-    else if (LL_DMA_IsActiveFlag_TE5(DMA1) == 1) {
+    } else if (LL_DMA_IsActiveFlag_TE5(DMA1) == 1) {
         LL_DMA_ClearFlag_GI5(DMA1);
     }
 #ifdef USE_PA14_TELEMETRY
@@ -203,9 +150,7 @@ void DMA1_Channel4_5_IRQHandler(void)
         LL_DMA_ClearFlag_GI4(DMA1);
         LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_4);
         /* Call function Transmission complete Callback */
-
-    }
-    else if (LL_DMA_IsActiveFlag_TE4(DMA1)) {
+    } else if (LL_DMA_IsActiveFlag_TE4(DMA1)) {
         LL_DMA_ClearFlag_GI4(DMA1);
         LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_4);
         /* Call Error function */
@@ -219,9 +164,23 @@ void DMA1_Channel4_5_IRQHandler(void)
 
     /* USER CODE BEGIN DMA1_Channel4_5_IRQn 1 */
 #ifdef USE_TIMER_3_CHANNEL_1
+    if (armed && dshot_telemetry) {
+        DMA1->IFCR |= DMA_IFCR_CGIF4;
+        DMA1_Channel4->CCR = 0x00;
+        if (out_put) {
+            receiveDshotDma();
+            compute_dshot_flag = 2;
+        } else {
+            sendDshotDma();
+            compute_dshot_flag = 1;
+        }
+        EXTI->SWIER |= LL_EXTI_LINE_15;
+        return;
+    }
     if (LL_DMA_IsActiveFlag_HT4(DMA1)) {
         if (servoPwm) {
-            LL_TIM_IC_SetPolarity(IC_TIMER_REGISTER, IC_TIMER_CHANNEL, LL_TIM_IC_POLARITY_FALLING);
+            LL_TIM_IC_SetPolarity(IC_TIMER_REGISTER, IC_TIMER_CHANNEL,
+                LL_TIM_IC_POLARITY_FALLING);
             LL_DMA_ClearFlag_HT4(DMA1);
         }
     }
@@ -229,75 +188,49 @@ void DMA1_Channel4_5_IRQHandler(void)
         LL_DMA_ClearFlag_GI4(DMA1);
         LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_4);
         transfercomplete();
-        TIM6->CNT = TIM6->ARR - 2;
-
-    }
-    else if (LL_DMA_IsActiveFlag_TE4(DMA1) == 1) {
+        EXTI->SWIER |= LL_EXTI_LINE_15;
+    } else if (LL_DMA_IsActiveFlag_TE4(DMA1) == 1) {
         LL_DMA_ClearFlag_GI4(DMA1);
     }
 #endif
-    /* USER CODE END DMA1_Channel4_5_IRQn 1 */
 }
 
 /**
-  * @brief This function handles ADC and COMP interrupts (COMP interrupts through EXTI lines 21 and 22).
-  */
+ * @brief This function handles ADC and COMP interrupts (COMP interrupts
+ * through EXTI lines 21 and 22).
+ */
 void ADC1_COMP_IRQHandler(void)
 {
-    //  TIM17->CNT = 0;
-    /* USER CODE BEGIN ADC1_COMP_IRQn 0 */
     if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_21) != RESET) {
-        /* Clear flag of EXTI */
         LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_21);
-
-        /* Call interruption treatment function */
         interruptRoutine();
     }
+    //
 }
 
 /**
-  * @brief This function handles TIM6 global and DAC underrun error interrupts.
-  */
+ * @brief This function handles TIM6 global and DAC underrun error interrupts.
+ */
 void TIM6_DAC_IRQHandler(void)
 {
-    /* USER CODE BEGIN TIM6_DAC_IRQn 0 */
-    //TIM6->DIER &= ~(0x1UL << (0U));
     if (LL_TIM_IsActiveFlag_UPDATE(TIM6) == 1) {
         LL_TIM_ClearFlag_UPDATE(TIM6);
         tenKhzRoutine();
-
     }
-
-    /* USER CODE END TIM6_DAC_IRQn 0 */
-
-    /* USER CODE BEGIN TIM6_DAC_IRQn 1 */
-
-    /* USER CODE END TIM6_DAC_IRQn 1 */
 }
 
 /**
-  * @brief This function handles TIM14 global interrupt.
-  */
+ * @brief This function handles TIM14 global interrupt.
+ */
 void TIM14_IRQHandler(void)
 {
-    /* USER CODE BEGIN TIM14_IRQn 0 */
-    //    if(LL_TIM_IsActiveFlag_UPDATE(TIM14) == 1)
-    //    {
     LL_TIM_ClearFlag_UPDATE(TIM14);
-
     PeriodElapsedCallback();
-
-    //    }
-
-    /* USER CODE END TIM14_IRQn 0 */
-    /* USER CODE BEGIN TIM14_IRQn 1 */
-
-    /* USER CODE END TIM14_IRQn 1 */
 }
 
 /**
-  * @brief This function handles TIM16 global interrupt.
-  */
+ * @brief This function handles TIM16 global interrupt.
+ */
 void TIM16_IRQHandler(void)
 {
     /* USER CODE BEGIN TIM16_IRQn 0 */
@@ -309,8 +242,9 @@ void TIM16_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles USART1 global interrupt / USART1 wake-up interrupt through EXTI line 25.
-  */
+ * @brief This function handles USART1 global interrupt / USART1 wake-up
+ * interrupt through EXTI line 25.
+ */
 void USART1_IRQHandler(void)
 {
     /* USER CODE BEGIN USART1_IRQn 0 */
@@ -331,7 +265,6 @@ void TIM15_IRQHandler(void)
     if (LL_TIM_IsActiveFlag_UPDATE(TIM15) == 1) {
         LL_TIM_ClearFlag_UPDATE(TIM15);
         // update_interupt++;
-
     }
 }
 
@@ -344,11 +277,10 @@ void TIM3_IRQHandler(void)
     if (LL_TIM_IsActiveFlag_UPDATE(TIM3) == 1) {
         LL_TIM_ClearFlag_UPDATE(TIM3);
         // update_interupt++;
-
     }
 }
 
-void DMA1_Channel1_IRQHandler(void)         // ADC
+void DMA1_Channel1_IRQHandler(void) // ADC
 {
     if (LL_DMA_IsActiveFlag_TC1(DMA1) == 1) {
         /* Clear flag DMA global interrupt */
@@ -377,9 +309,15 @@ void TIM1_BRK_UP_TRG_COM_IRQHandler(void)
     if (LL_TIM_IsActiveFlag_UPDATE(TIM1) == 1) {
         LL_TIM_ClearFlag_UPDATE(TIM1);
         //  doPWMChanges();
-
     }
 }
 
+void EXTI4_15_IRQHandler(void)
+{
+    LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_15);
+    processDshot();
+}
+
 /* USER CODE END 1 */
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF
+ * FILE****/

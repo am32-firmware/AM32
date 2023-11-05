@@ -31,55 +31,58 @@
    POSSIBILITY OF SUCH DAMAGE.
    ---------------------------------------------------------------------------*/
 
-/* This file refers the CMSIS standard, some adjustments are made according to GigaDevice chips */
+/* This file refers the CMSIS standard, some adjustments are made according to
+ * GigaDevice chips */
 
 #include "gd32e23x.h"
 
 /* system frequency define */
-#define __IRC8M           (IRC8M_VALUE)            /* internal 8 MHz RC oscillator frequency */
-#define __HXTAL           (HXTAL_VALUE)            /* high speed crystal oscillator frequency */
-#define __SYS_OSC_CLK     (__IRC8M)                /* main oscillator frequency */
+#define __IRC8M (IRC8M_VALUE) /* internal 8 MHz RC oscillator frequency */
+#define __HXTAL (HXTAL_VALUE) /* high speed crystal oscillator frequency */
+#define __SYS_OSC_CLK (__IRC8M) /* main oscillator frequency */
 
-#define VECT_TAB_OFFSET  (uint32_t)0x1000            /* vector table base offset */
+#define VECT_TAB_OFFSET (uint32_t)0x1000 /* vector table base offset */
 
 /* select a system clock by uncommenting the following line */
-//#define __SYSTEM_CLOCK_8M_HXTAL              (__HXTAL)
-//#define __SYSTEM_CLOCK_8M_IRC8M              (__IRC8M)
-//#define __SYSTEM_CLOCK_72M_PLL_HXTAL         (uint32_t)(72000000)
-#define __SYSTEM_CLOCK_72M_PLL_IRC8M_DIV2    (uint32_t)(72000000)
+// #define __SYSTEM_CLOCK_8M_HXTAL              (__HXTAL)
+// #define __SYSTEM_CLOCK_8M_IRC8M              (__IRC8M)
+// #define __SYSTEM_CLOCK_72M_PLL_HXTAL         (uint32_t)(72000000)
+#define __SYSTEM_CLOCK_72M_PLL_IRC8M_DIV2 (uint32_t)(72000000)
 
-#define RCU_MODIFY(__delay)     do{                                     \
+#define RCU_MODIFY(__delay)                 \
+    do {                                    \
         volatile uint32_t i;                \
-        if(0 != __delay){                   \
+        if (0 != __delay) {                 \
             RCU_CFG0 |= RCU_AHB_CKSYS_DIV2; \
-            for(i=0; i<__delay; i++){       \
+            for (i = 0; i < __delay; i++) { \
             }                               \
             RCU_CFG0 |= RCU_AHB_CKSYS_DIV4; \
-            for(i=0; i<__delay; i++){       \
+            for (i = 0; i < __delay; i++) { \
             }                               \
         }                                   \
-    }while(0)
+    } while (0)
 
-#define SEL_IRC8M       0x00
-#define SEL_HXTAL       0x01
-#define SEL_PLL         0x02
+#define SEL_IRC8M 0x00
+#define SEL_HXTAL 0x01
+#define SEL_PLL 0x02
 
-/* set the system clock frequency and declare the system clock configuration function */
+/* set the system clock frequency and declare the system clock configuration
+ * function */
 #ifdef __SYSTEM_CLOCK_8M_HXTAL
-    uint32_t SystemCoreClock = __SYSTEM_CLOCK_8M_HXTAL;
-    static void system_clock_8m_hxtal(void);
+uint32_t SystemCoreClock = __SYSTEM_CLOCK_8M_HXTAL;
+static void system_clock_8m_hxtal(void);
 
-#elif defined (__SYSTEM_CLOCK_72M_PLL_HXTAL)
-    uint32_t SystemCoreClock = __SYSTEM_CLOCK_72M_PLL_HXTAL;
-    static void system_clock_72m_hxtal(void);
+#elif defined(__SYSTEM_CLOCK_72M_PLL_HXTAL)
+uint32_t SystemCoreClock = __SYSTEM_CLOCK_72M_PLL_HXTAL;
+static void system_clock_72m_hxtal(void);
 
-#elif defined (__SYSTEM_CLOCK_72M_PLL_IRC8M_DIV2)
-    uint32_t SystemCoreClock = __SYSTEM_CLOCK_72M_PLL_IRC8M_DIV2;
-    static void system_clock_72m_irc8m(void);
+#elif defined(__SYSTEM_CLOCK_72M_PLL_IRC8M_DIV2)
+uint32_t SystemCoreClock = __SYSTEM_CLOCK_72M_PLL_IRC8M_DIV2;
+static void system_clock_72m_irc8m(void);
 
 #else
-    uint32_t SystemCoreClock = __SYSTEM_CLOCK_8M_IRC8M;
-    static void system_clock_8m_irc8m(void);
+uint32_t SystemCoreClock = __SYSTEM_CLOCK_8M_IRC8M;
+static void system_clock_8m_irc8m(void);
 #endif /* __SYSTEM_CLOCK_8M_HXTAL */
 
 /* configure the system clock */
@@ -100,11 +103,14 @@ void SystemInit(void)
 
     RCU_MODIFY(0x80);
     RCU_CFG0 &= ~RCU_CFG0_SCS;
-    RCU_CTL0 &= ~(RCU_CTL0_HXTALEN | RCU_CTL0_CKMEN | RCU_CTL0_PLLEN | RCU_CTL0_HXTALBPS);
+    RCU_CTL0 &= ~(RCU_CTL0_HXTALEN | RCU_CTL0_CKMEN | RCU_CTL0_PLLEN
+        | RCU_CTL0_HXTALBPS);
     /* reset RCU */
-    RCU_CFG0 &= ~(RCU_CFG0_SCS | RCU_CFG0_AHBPSC | RCU_CFG0_APB1PSC | RCU_CFG0_APB2PSC | \
-                  RCU_CFG0_ADCPSC | RCU_CFG0_CKOUTSEL | RCU_CFG0_CKOUTDIV | RCU_CFG0_PLLDV);
-    RCU_CFG0 &= ~(RCU_CFG0_PLLSEL | RCU_CFG0_PLLMF | RCU_CFG0_PLLMF4 | RCU_CFG0_PLLDV);
+    RCU_CFG0 &= ~(RCU_CFG0_SCS | RCU_CFG0_AHBPSC | RCU_CFG0_APB1PSC
+        | RCU_CFG0_APB2PSC | RCU_CFG0_ADCPSC | RCU_CFG0_CKOUTSEL
+        | RCU_CFG0_CKOUTDIV | RCU_CFG0_PLLDV);
+    RCU_CFG0 &= ~(RCU_CFG0_PLLSEL | RCU_CFG0_PLLMF | RCU_CFG0_PLLMF4
+        | RCU_CFG0_PLLDV);
     RCU_CFG1 &= ~(RCU_CFG1_PREDV);
     RCU_CFG2 &= ~(RCU_CFG2_USART0SEL | RCU_CFG2_ADCSEL);
     RCU_CFG2 &= ~RCU_CFG2_IRC28MDIV;
@@ -128,15 +134,16 @@ void SystemInit(void)
     \param[out] none
     \retval     none
 */
-static void system_clock_config(void)
+static void
+system_clock_config(void)
 {
 #ifdef __SYSTEM_CLOCK_8M_HXTAL
     system_clock_8m_hxtal();
-#elif defined (__SYSTEM_CLOCK_72M_PLL_HXTAL)
+#elif defined(__SYSTEM_CLOCK_72M_PLL_HXTAL)
     system_clock_72m_hxtal();
-#elif defined (__SYSTEM_CLOCK_72M_PLL_IRC8M_DIV2)
+#elif defined(__SYSTEM_CLOCK_72M_PLL_IRC8M_DIV2)
     system_clock_72m_irc8m();
-#elif defined (__SYSTEM_CLOCK_72M_PLL_IRC48M_DIV2)
+#elif defined(__SYSTEM_CLOCK_72M_PLL_IRC48M_DIV2)
     system_clock_72m_irc48m();
 #else
     system_clock_8m_irc8m();
@@ -150,7 +157,8 @@ static void system_clock_config(void)
     \param[out] none
     \retval     none
 */
-static void system_clock_8m_hxtal(void)
+static void
+system_clock_8m_hxtal(void)
 {
     uint32_t timeout = 0U;
     uint32_t stab_flag = 0U;
@@ -158,12 +166,12 @@ static void system_clock_8m_hxtal(void)
     /* enable HXTAL */
     RCU_CTL0 |= RCU_CTL0_HXTALEN;
 
-    /* wait until HXTAL is stable or the startup time is longer than HXTAL_STARTUP_TIMEOUT */
+    /* wait until HXTAL is stable or the startup time is longer than
+     * HXTAL_STARTUP_TIMEOUT */
     do {
         timeout++;
         stab_flag = (RCU_CTL0 & RCU_CTL0_HXTALSTB);
-    }
-    while ((0U == stab_flag) && (HXTAL_STARTUP_TIMEOUT != timeout));
+    } while ((0U == stab_flag) && (HXTAL_STARTUP_TIMEOUT != timeout));
     /* if fail */
     if (0U == (RCU_CTL0 & RCU_CTL0_HXTALSTB)) {
         while (1) {
@@ -187,14 +195,13 @@ static void system_clock_8m_hxtal(void)
     }
 }
 
-#elif defined (__SYSTEM_CLOCK_72M_PLL_HXTAL)
+#elif defined(__SYSTEM_CLOCK_72M_PLL_HXTAL)
 /*!
-    \brief      configure the system clock to 72M by PLL which selects HXTAL as its clock source
-    \param[in]  none
-    \param[out] none
-    \retval     none
+    \brief      configure the system clock to 72M by PLL which selects HXTAL as
+   its clock source \param[in]  none \param[out] none \retval     none
 */
-static void system_clock_72m_hxtal(void)
+static void
+system_clock_72m_hxtal(void)
 {
     uint32_t timeout = 0U;
     uint32_t stab_flag = 0U;
@@ -202,12 +209,12 @@ static void system_clock_72m_hxtal(void)
     /* enable HXTAL */
     RCU_CTL0 |= RCU_CTL0_HXTALEN;
 
-    /* wait until HXTAL is stable or the startup time is longer than HXTAL_STARTUP_TIMEOUT */
+    /* wait until HXTAL is stable or the startup time is longer than
+     * HXTAL_STARTUP_TIMEOUT */
     do {
         timeout++;
         stab_flag = (RCU_CTL0 & RCU_CTL0_HXTALSTB);
-    }
-    while ((0U == stab_flag) && (HXTAL_STARTUP_TIMEOUT != timeout));
+    } while ((0U == stab_flag) && (HXTAL_STARTUP_TIMEOUT != timeout));
     /* if fail */
     if (0U == (RCU_CTL0 & RCU_CTL0_HXTALSTB)) {
         while (1) {
@@ -244,14 +251,13 @@ static void system_clock_72m_hxtal(void)
     }
 }
 
-#elif defined (__SYSTEM_CLOCK_72M_PLL_IRC8M_DIV2)
+#elif defined(__SYSTEM_CLOCK_72M_PLL_IRC8M_DIV2)
 /*!
-    \brief      configure the system clock to 72M by PLL which selects IRC8M/2 as its clock source
-    \param[in]  none
-    \param[out] none
-    \retval     none
+    \brief      configure the system clock to 72M by PLL which selects IRC8M/2
+   as its clock source \param[in]  none \param[out] none \retval     none
 */
-static void system_clock_72m_irc8m(void)
+static void
+system_clock_72m_irc8m(void)
 {
     uint32_t timeout = 0U;
     uint32_t stab_flag = 0U;
@@ -259,12 +265,12 @@ static void system_clock_72m_irc8m(void)
     /* enable IRC8M */
     RCU_CTL0 |= RCU_CTL0_IRC8MEN;
 
-    /* wait until IRC8M is stable or the startup time is longer than IRC8M_STARTUP_TIMEOUT */
+    /* wait until IRC8M is stable or the startup time is longer than
+     * IRC8M_STARTUP_TIMEOUT */
     do {
         timeout++;
         stab_flag = (RCU_CTL0 & RCU_CTL0_IRC8MSTB);
-    }
-    while ((0U == stab_flag) && (IRC8M_STARTUP_TIMEOUT != timeout));
+    } while ((0U == stab_flag) && (IRC8M_STARTUP_TIMEOUT != timeout));
 
     /* if fail */
     if (0U == (RCU_CTL0 & RCU_CTL0_IRC8MSTB)) {
@@ -307,7 +313,8 @@ static void system_clock_72m_irc8m(void)
     \param[out] none
     \retval     none
 */
-static void system_clock_8m_irc8m(void)
+static void
+system_clock_8m_irc8m(void)
 {
     /* AHB = SYSCLK */
     RCU_CFG0 |= RCU_AHB_CKSYS_DIV1;
@@ -327,17 +334,17 @@ static void system_clock_8m_irc8m(void)
 #endif /* __SYSTEM_CLOCK_8M_HXTAL */
 
 /*!
-    \brief      update the SystemCoreClock with current core clock retrieved from cpu registers
-    \param[in]  none
-    \param[out] none
-    \retval     none
+    \brief      update the SystemCoreClock with current core clock retrieved
+   from cpu registers \param[in]  none \param[out] none \retval     none
 */
 void SystemCoreClockUpdate(void)
 {
     uint32_t sws = 0U;
-    uint32_t pllmf = 0U, pllmf4 = 0U, pllsel = 0U, prediv = 0U, idx = 0U, clk_exp = 0U;
+    uint32_t pllmf = 0U, pllmf4 = 0U, pllsel = 0U, prediv = 0U, idx = 0U,
+             clk_exp = 0U;
     /* exponent of AHB clock divider */
-    const uint8_t ahb_exp[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
+    const uint8_t ahb_exp[16]
+        = { 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9 };
 
     sws = GET_BITS(RCU_CFG0, 2, 3);
     switch (sws) {
@@ -357,11 +364,9 @@ void SystemCoreClockUpdate(void)
         /* high 16 bits */
         if (1U == pllmf4) {
             pllmf += 17U;
-        }
-        else if (15U == pllmf) {
+        } else if (15U == pllmf) {
             pllmf = 16U;
-        }
-        else {
+        } else {
             pllmf += 2U;
         }
 
@@ -370,8 +375,7 @@ void SystemCoreClockUpdate(void)
         if (0U != pllsel) {
             prediv = (GET_BITS(RCU_CFG1, 0, 3) + 1U);
             SystemCoreClock = (HXTAL_VALUE / prediv) * pllmf;
-        }
-        else {
+        } else {
             SystemCoreClock = (IRC8M_VALUE >> 1) * pllmf;
         }
         break;

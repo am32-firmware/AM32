@@ -2,7 +2,8 @@
 
 extern uint8_t eepromBuffer[176];
 extern uint16_t TIMER1_MAX_ARR;
-
+extern uint16_t dshot_frametime_high;
+extern uint16_t dshot_frametime_low;
 extern uint32_t gcr[37];
 extern uint8_t buffer_padding;
 extern uint16_t adjusted_input;
@@ -22,36 +23,39 @@ extern uint8_t buffersize;
 extern char output_timer_prescaler;
 extern uint8_t compute_dshot_flag;
 #ifdef STMICRO
-    extern GPIO_TypeDef* current_GPIO_PORT;
-    #ifndef MCU_F031
-        extern COMP_TypeDef* active_COMP;
-    #endif
+extern GPIO_TypeDef* current_GPIO_PORT;
+#ifndef MCU_F031
+extern COMP_TypeDef* active_COMP;
+#endif
+#ifdef MCU_F031
+extern char input_ready;
+#endif
 #endif
 #ifdef GIGADEVICES
-    extern uint32_t current_GPIO_PORT;
+extern uint32_t current_GPIO_PORT;
 #endif
 #ifdef ARTERY
-    extern uint32_t current_GPIO_PORT;
+extern uint32_t current_GPIO_PORT;
 #endif
 extern uint32_t current_EXTI_LINE;
-
+extern int e_com_time;
 extern char dshot_extended_telemetry;
 extern char EDT_ARM_ENABLE;
 extern char EDT_ARMED;
 extern uint16_t send_extended_dshot;
 
-//typedef struct PID{
-//  float error;
-//  float Kp;
-//  float Ki;
-//  float Kd;
-//  float integral;
-//  float derivative;
-//  float last_error;
-//  float pid_output;
-//  int16_t integral_limit;
-//  int16_t output_limit;
-//}PID;
+// typedef struct PID{
+//	float error;
+//	float Kp;
+//	float Ki;
+//	float Kd;
+//	float integral;
+//	float derivative;
+//	float last_error;
+//	float pid_output;
+//	int16_t integral_limit;
+//	int16_t output_limit;
+// }PID;
 
 typedef struct fastPID {
     int32_t error;

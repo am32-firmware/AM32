@@ -8,15 +8,32 @@
 #include "functions.h"
 #include "targets.h"
 
-long map(long x, long in_min, long in_max, long out_min, long out_max)
-{
-    if (x < in_min) {
-        x = in_min;
-    }
-    if (x > in_max) {
-        x = in_max;
-    }
-    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+//long map(long x, long in_min, long in_max, long out_min, long out_max)
+//{
+//    if (x < in_min) {
+//        x = in_min;
+//    }
+//    if (x > in_max) {
+//        x = in_max;
+//    }
+//    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+//}
+
+long map(long x, long in_min, long in_max, long out_min, long out_max) {
+    if(x >= in_max)
+        return out_max;
+    if (in_min > in_max)
+        return map(x, in_max, in_min, out_max, out_min);
+    if (out_min == out_max)
+        return out_min;
+    const long in_mid = (in_min + in_max) >> 1;
+    const long out_mid = (out_min + out_max) >> 1;
+    if (in_min == in_mid)
+        return out_mid;
+    if (x <= in_mid)
+        return map(x, in_min, in_mid, out_min, out_mid);
+    else
+        return map(x, in_mid + 1, in_max, out_mid, out_max);
 }
 
 int getAbsDif(int number1, int number2)
@@ -43,7 +60,7 @@ void delayMillis(uint32_t millis)
     LL_TIM_GenerateEvent_UPDATE(UTILITY_TIMER);
     while (UTILITY_TIMER->CNT < millis) {
     }
-    UTILITY_TIMER->PSC = CPU_FREQUENCY_MHZ;      // back to micros
+    UTILITY_TIMER->PSC = CPU_FREQUENCY_MHZ; // back to micros
     LL_TIM_GenerateEvent_UPDATE(UTILITY_TIMER);
 }
 
@@ -63,7 +80,7 @@ void delayMillis(uint32_t millis)
     timer_prescaler_config(UTILITY_TIMER, 50000, TIMER_PSC_RELOAD_NOW);
     while (TIMER_CNT(UTILITY_TIMER) < (millis * 2)) {
     }
-    TIMER_PSC(UTILITY_TIMER) = CPU_FREQUENCY_MHZ;      // back to micros
+    TIMER_PSC(UTILITY_TIMER) = CPU_FREQUENCY_MHZ; // back to micros
     timer_prescaler_config(UTILITY_TIMER, CPU_FREQUENCY_MHZ, TIMER_PSC_RELOAD_NOW);
 }
 #endif
@@ -93,8 +110,7 @@ void gpio_mode_QUICK(gpio_type* gpio_periph, uint32_t mode, uint32_t pull_up_dow
 {
     gpio_periph->cfgr = (((((gpio_periph->cfgr))) & (~(((pin * pin) * (0x3UL << (0U)))))) | (((pin * pin) * mode)));
 }
-#endif // MCU_AT421
-
+#endif
 #ifdef MCU_AT415
 void gpio_mode_QUICK(gpio_type* gpio_periph, uint32_t mode, uint32_t pull_up_down, uint32_t pin)
 {
@@ -113,6 +129,5 @@ void gpio_mode_QUICK(gpio_type* gpio_periph, uint32_t mode, uint32_t pull_up_dow
 
     __enable_irq();
 }
-#endif // MCU_AT415
-
-#endif // ARTERY
+#endif
+#endif

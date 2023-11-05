@@ -10,33 +10,34 @@
 uint8_t aTxBuffer[10];
 uint8_t nbDataToTransmit = sizeof(aTxBuffer);
 
-void send_telem_DMA()    // set data length and enable channel to start transfer
-{
+void send_telem_DMA()
+{ // set data length and enable channel to start transfer
     DMA1_CHANNEL4->dtcnt = nbDataToTransmit;
     DMA1_CHANNEL4->ctrl_bit.chen = TRUE;
 }
 
-uint8_t update_crc8(uint8_t crc, uint8_t crc_seed)
+uint8_t
+update_crc8(uint8_t crc, uint8_t crc_seed)
 {
     uint8_t crc_u, i;
     crc_u = crc;
     crc_u ^= crc_seed;
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < 8; i++)
         crc_u = (crc_u & 0x80) ? 0x7 ^ (crc_u << 1) : (crc_u << 1);
-    }
     return (crc_u);
 }
 
-uint8_t get_crc8(uint8_t* Buf, uint8_t BufLen)
+uint8_t
+get_crc8(uint8_t* Buf, uint8_t BufLen)
 {
     uint8_t crc = 0, i;
-    for (i = 0; i < BufLen; i++) {
+    for (i = 0; i < BufLen; i++)
         crc = update_crc8(Buf[i], crc);
-    }
     return (crc);
 }
 
-void makeTelemPackage(uint8_t temp, uint16_t voltage, uint16_t current, uint16_t consumption, uint16_t e_rpm)
+void makeTelemPackage(uint8_t temp, uint16_t voltage, uint16_t current,
+    uint16_t consumption, uint16_t e_rpm)
 {
     aTxBuffer[0] = temp; // temperature
 
@@ -65,12 +66,12 @@ void telem_UART_Init(void)
 
     /* configure the usart2 tx pin */
     gpio_init_struct.gpio_drive_strength = GPIO_DRIVE_STRENGTH_STRONGER;
-    gpio_init_struct.gpio_out_type  = GPIO_OUTPUT_PUSH_PULL;
+    gpio_init_struct.gpio_out_type = GPIO_OUTPUT_PUSH_PULL;
     gpio_init_struct.gpio_mode = GPIO_MODE_MUX;
     gpio_init_struct.gpio_pins = GPIO_PINS_6;
     gpio_init_struct.gpio_pull = GPIO_PULL_NONE;
     gpio_init(GPIOB, &gpio_init_struct);
-    //gpio_pin_mux_config(GPIOB, GPIO_PINS_SOURCE6, GPIO_MUX_0);
+    // gpio_pin_mux_config(GPIOB, GPIO_PINS_SOURCE6, GPIO_MUX_0);
 
     dma_reset(DMA1_CHANNEL4);
 

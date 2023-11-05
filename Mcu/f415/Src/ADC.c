@@ -5,12 +5,13 @@
  *      Author: Alka
  */
 #include "ADC.h"
+
 #include "functions.h"
 #ifdef USE_ADC
 #ifdef USE_ADC_INPUT
-    uint16_t ADCDataDMA[4];
+uint16_t ADCDataDMA[4];
 #else
-    uint16_t ADCDataDMA[3];
+uint16_t ADCDataDMA[3];
 #endif
 
 extern uint16_t ADC_raw_temp;
@@ -18,21 +19,22 @@ extern uint16_t ADC_raw_volts;
 extern uint16_t ADC_raw_current;
 extern uint16_t ADC_raw_input;
 
-void ADC_DMA_Callback()   // read dma buffer and set extern variables
-{
+void ADC_DMA_Callback()
+{ // read dma buffer and set extern variables
+
 #ifdef USE_ADC_INPUT
-    ADC_raw_temp    = ADCDataDMA[3];
-    ADC_raw_volts   = ADCDataDMA[1] / 2;
+    ADC_raw_temp = ADCDataDMA[3];
+    ADC_raw_volts = ADCDataDMA[1] / 2;
     ADC_raw_current = ADCDataDMA[2];
-    ADC_raw_input   = ADCDataDMA[0];
+    ADC_raw_input = ADCDataDMA[0];
 
 #else
-    ADC_raw_temp    = ADCDataDMA[2];
+    ADC_raw_temp = ADCDataDMA[2];
 #ifdef PA6_VOLTAGE
-    ADC_raw_volts   = ADCDataDMA[1];
+    ADC_raw_volts = ADCDataDMA[1];
     ADC_raw_current = ADCDataDMA[0];
 #else
-    ADC_raw_volts   = ADCDataDMA[0];
+    ADC_raw_volts = ADCDataDMA[0];
     ADC_raw_current = ADCDataDMA[1];
 #endif
 #endif
@@ -76,25 +78,28 @@ void ADC_Init(void)
     adc_ordinary_channel_set(ADC1, ADC_CHANNEL_16, 3, ADC_SAMPLETIME_28_5);
 
     adc_tempersensor_vintrv_enable(TRUE);
-    adc_ordinary_conversion_trigger_set(ADC1, ADC12_ORDINARY_TRIG_SOFTWARE, TRUE);
+    adc_ordinary_conversion_trigger_set(ADC1, ADC12_ORDINARY_TRIG_SOFTWARE,
+        TRUE);
 
     adc_dma_mode_enable(ADC1, TRUE);
 
     adc_enable(ADC1, TRUE);
     adc_calibration_init(ADC1);
-    while (adc_calibration_init_status_get(ADC1));
+    while (adc_calibration_init_status_get(ADC1))
+        ;
     adc_calibration_start(ADC1);
-    while (adc_calibration_status_get(ADC1));
+    while (adc_calibration_status_get(ADC1))
+        ;
 }
 
 void startADCConversion()
 {
     adc_ordinary_software_trigger_enable(ADC1, TRUE);
 }
-
-int16_t getConvertedDegrees(uint16_t adcrawtemp)
+int16_t
+getConvertedDegrees(uint16_t adcrawtemp)
 {
     return (12600 - (int32_t)adcrawtemp * 33000 / 4096) / -42 + 5;
 }
 
-#endif   // USE_ADC
+#endif // USE_ADC

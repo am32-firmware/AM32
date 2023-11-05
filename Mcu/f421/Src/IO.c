@@ -5,15 +5,16 @@
  *      Author: Alka
  */
 
-#include "targets.h"
 #include "IO.h"
-#include "dshot.h"
-#include "serial_telemetry.h"
-#include "functions.h"
+
 #include "common.h"
+#include "dshot.h"
+#include "functions.h"
+#include "serial_telemetry.h"
+#include "targets.h"
 
 char ic_timer_prescaler = CPU_FREQUENCY_MHZ / 7;
-uint32_t dma_buffer[64] = {0};
+uint32_t dma_buffer[64] = { 0 };
 char out_put = 0;
 uint8_t buffer_padding = 7;
 
@@ -21,8 +22,8 @@ void changeToOutput()
 {
     INPUT_DMA_CHANNEL->ctrl |= DMA_DIR_MEMORY_TO_PERIPHERAL;
     tmr_reset(IC_TIMER_REGISTER);
-    IC_TIMER_REGISTER->cm1 = 0x60;            // oc mode pwm
-    IC_TIMER_REGISTER->cctrl = 0x3;         //
+    IC_TIMER_REGISTER->cm1 = 0x60; // oc mode pwm
+    IC_TIMER_REGISTER->cctrl = 0x3; //
     IC_TIMER_REGISTER->div = output_timer_prescaler;
     IC_TIMER_REGISTER->pr = 76;
 
@@ -41,7 +42,6 @@ void changeToInput()
     IC_TIMER_REGISTER->swevt_bit.ovfswtr = TRUE;
     out_put = 0;
 }
-
 void receiveDshotDma()
 {
     changeToInput();
@@ -68,7 +68,8 @@ void sendDshotDma()
     IC_TIMER_REGISTER->ctrl1_bit.tmren = TRUE;
 }
 
-uint8_t getInputPinState()
+uint8_t
+getInputPinState()
 {
     return (INPUT_PIN_PORT->idt & INPUT_PIN);
 }

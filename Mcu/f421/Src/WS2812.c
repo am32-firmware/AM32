@@ -6,8 +6,9 @@
  */
 
 #include "WS2812.h"
-#include "targets.h"
+
 #include "functions.h"
+#include "targets.h"
 
 #ifdef USE_LED_STRIP
 
@@ -18,24 +19,20 @@ void waitClockCycles(uint16_t cycles)
     }
 }
 
-#if 0
-void sendBit(uint8_t inbit)
-{
-    if (inbit) {
-        GPIOB->scr = GPIO_PINS_7;
-        waitClockCycles(CPU_FREQUENCY_MHZ >> 1);
-        GPIOB->clr = GPIO_PINS_7;
-        waitClockCycles(CPU_FREQUENCY_MHZ >> 2);
-        return;
-    }
-    else {
-        GPIOB->scr = GPIO_PINS_7;
-        waitClockCycles(CPU_FREQUENCY_MHZ >> 2);
-        GPIOB->clr = GPIO_PINS_7;
-        waitClockCycles(CPU_FREQUENCY_MHZ >> 1);
-    }
-}
-#endif
+// void sendBit(uint8_t inbit){
+//  if(inbit){
+//	GPIOB->scr = GPIO_PINS_7;
+//	waitClockCycles(CPU_FREQUENCY_MHZ>>1);
+//	GPIOB->clr = GPIO_PINS_7;
+//	waitClockCycles(CPU_FREQUENCY_MHZ>>2);
+//   return;
+//  }else{
+//	GPIOB->scr = GPIO_PINS_7;
+//	waitClockCycles(CPU_FREQUENCY_MHZ>>2);
+//	GPIOB->clr = GPIO_PINS_7;
+//	waitClockCycles(CPU_FREQUENCY_MHZ>>1);
+//  }
+// }
 
 void sendBit(uint8_t inbit)
 {
@@ -50,8 +47,8 @@ void send_LED_RGB(uint8_t red, uint8_t green, uint8_t blue)
     __disable_irq();
     UTILITY_TIMER->div = 0;
     UTILITY_TIMER->swevt |= TMR_OVERFLOW_SWTRIG;
-    uint32_t twenty_four_bit_color_number = green << 16 | red << 8 | blue ;
-    for (int i = 0; i < 24 ; i ++) {
+    uint32_t twenty_four_bit_color_number = green << 16 | red << 8 | blue;
+    for (int i = 0; i < 24; i++) {
         sendBit((twenty_four_bit_color_number >> (23 - i)) & 1);
     }
     GPIOB->clr = WS2812_PIN;

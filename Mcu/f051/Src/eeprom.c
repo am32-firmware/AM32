@@ -7,11 +7,12 @@
  */
 
 #include "eeprom.h"
+
 #include <string.h>
 
-//#define APP_START (uint32_t)0x08001000
-//#define FLASH_STORAGE 0x08005000  // at the 31kb mark
-#define page_size 0x400                   // 1 kb for f051
+// #define APP_START (uint32_t)0x08001000
+// #define FLASH_STORAGE 0x08005000  // at the 31kb mark
+#define page_size 0x400 // 1 kb for f051
 
 uint32_t FLASH_FKEY1 = 0x45670123;
 uint32_t FLASH_FKEY2 = 0xCDEF89AB;
@@ -20,8 +21,8 @@ void save_flash_nolib(uint8_t* data, int length, uint32_t add)
 {
     uint16_t data_to_FLASH[length / 2];
     memset(data_to_FLASH, 0, length / 2);
-    for (int i = 0; i < length / 2 ; i ++) {
-        data_to_FLASH[i] =  data[i * 2 + 1] << 8 | data[i * 2]; // make 16 bit
+    for (int i = 0; i < length / 2; i++) {
+        data_to_FLASH[i] = data[i * 2 + 1] << 8 | data[i * 2]; // make 16 bit
     }
     volatile uint32_t data_length = length / 2;
 
@@ -45,12 +46,10 @@ void save_flash_nolib(uint8_t* data, int length, uint32_t add)
         }
         if ((FLASH->SR & FLASH_SR_EOP) != 0) {
             FLASH->SR = FLASH_SR_EOP;
-        }
-        else {
+        } else {
             /* error */
         }
         FLASH->CR &= ~FLASH_CR_PER;
-
     }
 
     volatile uint32_t write_cnt = 0, index = 0;
@@ -61,8 +60,7 @@ void save_flash_nolib(uint8_t* data, int length, uint32_t add)
         }
         if ((FLASH->SR & FLASH_SR_EOP) != 0) {
             FLASH->SR = FLASH_SR_EOP;
-        }
-        else {
+        } else {
             /*  error  */
         }
         FLASH->CR &= ~FLASH_CR_PG;
@@ -72,10 +70,10 @@ void save_flash_nolib(uint8_t* data, int length, uint32_t add)
     SET_BIT(FLASH->CR, FLASH_CR_LOCK);
 }
 
-void read_flash_bin(uint8_t*  data, uint32_t add, int out_buff_len)
+void read_flash_bin(uint8_t* data, uint32_t add, int out_buff_len)
 {
-    //volatile uint32_t read_data;
-    for (int i = 0; i < out_buff_len ; i ++) {
+    // volatile uint32_t read_data;
+    for (int i = 0; i < out_buff_len; i++) {
         data[i] = *(uint8_t*)(add + i);
     }
 }

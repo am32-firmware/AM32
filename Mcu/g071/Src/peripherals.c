@@ -8,14 +8,15 @@
 // PERIPHERAL SETUP
 
 #include "peripherals.h"
-#include "targets.h"
+
 #include "serial_telemetry.h"
+#include "targets.h"
 
 #ifdef USE_LED_STRIP
-    #include "WS2812.h"
+#include "WS2812.h"
 #endif
 
-//extern uint16_t DEAD_TIME;
+// extern uint16_t DEAD_TIME;
 
 void initCorePeripherals(void)
 {
@@ -23,7 +24,7 @@ void initCorePeripherals(void)
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_PWR);
     LL_SYSCFG_EnablePinRemap(LL_SYSCFG_PIN_RMP_PA11);
     LL_SYSCFG_EnablePinRemap(LL_SYSCFG_PIN_RMP_PA12);
-    FLASH->ACR |= FLASH_ACR_PRFTEN;   //// prefetch buffer enable
+    FLASH->ACR |= FLASH_ACR_PRFTEN; //// prefetch buffer enable
     SystemClock_Config();
     MX_GPIO_Init();
     MX_DMA_Init();
@@ -72,7 +73,8 @@ void SystemClock_Config(void)
     };
 
     /* Main PLL configuration and activation */
-    LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSI, LL_RCC_PLLM_DIV_1, 8, LL_RCC_PLLR_DIV_2);
+    LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSI, LL_RCC_PLLM_DIV_1, 8,
+        LL_RCC_PLLR_DIV_2);
     LL_RCC_PLL_Enable();
     LL_RCC_PLL_EnableDomain_SYS();
     while (LL_RCC_PLL_IsReady() != 1) {
@@ -90,7 +92,8 @@ void SystemClock_Config(void)
     LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_1);
     LL_Init1msTick(64000000);
     LL_SetSystemCoreClock(64000000);
-    /* Update CMSIS variable (which can be updated also through SystemCoreClockUpdate function) */
+    /* Update CMSIS variable (which can be updated also through
+     * SystemCoreClockUpdate function) */
     LL_SetSystemCoreClock(64000000);
     LL_RCC_SetTIMClockSource(LL_RCC_TIM1_CLKSOURCE_PCLK1);
     LL_RCC_SetADCClockSource(LL_RCC_ADC_CLKSOURCE_SYSCLK);
@@ -102,9 +105,9 @@ void MX_COMP1_Init(void)
 
     /* USER CODE END COMP2_Init 0 */
 
-    LL_COMP_InitTypeDef COMP_InitStruct = {0};
+    LL_COMP_InitTypeDef COMP_InitStruct = { 0 };
 
-    LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
     LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOA);
     LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOB);
@@ -132,13 +135,17 @@ void MX_COMP1_Init(void)
     COMP_InitStruct.OutputBlankingSource = LL_COMP_BLANKINGSRC_TIM1_OC5;
     LL_COMP_Init(COMP1, &COMP_InitStruct);
     LL_COMP_SetPowerMode(COMP1, LL_COMP_POWERMODE_HIGHSPEED);
-    LL_COMP_SetCommonWindowMode(__LL_COMP_COMMON_INSTANCE(COMP1), LL_COMP_WINDOWMODE_DISABLE);
-    LL_COMP_SetCommonWindowOutput(__LL_COMP_COMMON_INSTANCE(COMP1), LL_COMP_WINDOWOUTPUT_EACH_COMP);
+    LL_COMP_SetCommonWindowMode(__LL_COMP_COMMON_INSTANCE(COMP1),
+        LL_COMP_WINDOWMODE_DISABLE);
+    LL_COMP_SetCommonWindowOutput(__LL_COMP_COMMON_INSTANCE(COMP1),
+        LL_COMP_WINDOWOUTPUT_EACH_COMP);
 
     /* Wait loop initialization and execution */
-    /* Note: Variable divided by 2 to compensate partially CPU processing cycles */
+    /* Note: Variable divided by 2 to compensate partially CPU processing cycles
+     */
     __IO uint32_t wait_loop_index = 0;
-    wait_loop_index = (LL_COMP_DELAY_VOLTAGE_SCALER_STAB_US * (SystemCoreClock / (1000000 * 2)));
+    wait_loop_index = (LL_COMP_DELAY_VOLTAGE_SCALER_STAB_US
+        * (SystemCoreClock / (1000000 * 2)));
     while (wait_loop_index != 0) {
         wait_loop_index--;
     }
@@ -157,9 +164,9 @@ void MX_COMP2_Init(void)
 
     /* USER CODE END COMP2_Init 0 */
 
-    LL_COMP_InitTypeDef COMP_InitStruct = {0};
+    LL_COMP_InitTypeDef COMP_InitStruct = { 0 };
 
-    LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
     LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOA);
     LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOB);
@@ -197,13 +204,17 @@ void MX_COMP2_Init(void)
     COMP_InitStruct.OutputBlankingSource = LL_COMP_BLANKINGSRC_TIM1_OC5;
     LL_COMP_Init(COMP2, &COMP_InitStruct);
     LL_COMP_SetPowerMode(COMP2, LL_COMP_POWERMODE_HIGHSPEED);
-    LL_COMP_SetCommonWindowMode(__LL_COMP_COMMON_INSTANCE(COMP2), LL_COMP_WINDOWMODE_DISABLE);
-    LL_COMP_SetCommonWindowOutput(__LL_COMP_COMMON_INSTANCE(COMP2), LL_COMP_WINDOWOUTPUT_EACH_COMP);
+    LL_COMP_SetCommonWindowMode(__LL_COMP_COMMON_INSTANCE(COMP2),
+        LL_COMP_WINDOWMODE_DISABLE);
+    LL_COMP_SetCommonWindowOutput(__LL_COMP_COMMON_INSTANCE(COMP2),
+        LL_COMP_WINDOWOUTPUT_EACH_COMP);
 
     /* Wait loop initialization and execution */
-    /* Note: Variable divided by 2 to compensate partially CPU processing cycles */
+    /* Note: Variable divided by 2 to compensate partially CPU processing cycles
+     */
     __IO uint32_t wait_loop_index = 0;
-    wait_loop_index = (LL_COMP_DELAY_VOLTAGE_SCALER_STAB_US * (SystemCoreClock / (1000000 * 2)));
+    wait_loop_index = (LL_COMP_DELAY_VOLTAGE_SCALER_STAB_US
+        * (SystemCoreClock / (1000000 * 2)));
     while (wait_loop_index != 0) {
         wait_loop_index--;
     }
@@ -217,10 +228,10 @@ void MX_COMP2_Init(void)
 }
 
 /**
-  * @brief IWDG Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief IWDG Initialization Function
+ * @param None
+ * @retval None
+ */
 void MX_IWDG_Init(void)
 {
     /* USER CODE BEGIN IWDG_Init 0 */
@@ -245,21 +256,21 @@ void MX_IWDG_Init(void)
 }
 
 /**
-  * @brief TIM1 Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief TIM1 Initialization Function
+ * @param None
+ * @retval None
+ */
 void MX_TIM1_Init(void)
 {
     /* USER CODE BEGIN TIM1_Init 0 */
 
     /* USER CODE END TIM1_Init 0 */
 
-    LL_TIM_InitTypeDef TIM_InitStruct = {0};
-    LL_TIM_OC_InitTypeDef TIM_OC_InitStruct = {0};
-    LL_TIM_BDTR_InitTypeDef TIM_BDTRInitStruct = {0};
+    LL_TIM_InitTypeDef TIM_InitStruct = { 0 };
+    LL_TIM_OC_InitTypeDef TIM_OC_InitStruct = { 0 };
+    LL_TIM_BDTR_InitTypeDef TIM_BDTRInitStruct = { 0 };
 
-    LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
     /* Peripheral clock enable */
     LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM1);
@@ -414,17 +425,17 @@ void MX_TIM1_Init(void)
 }
 
 /**
-  * @brief TIM2 Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief TIM2 Initialization Function
+ * @param None
+ * @retval None
+ */
 void MX_TIM2_Init(void)
 {
     /* USER CODE BEGIN TIM2_Init 0 */
 
     /* USER CODE END TIM2_Init 0 */
 
-    LL_TIM_InitTypeDef TIM_InitStruct = {0};
+    LL_TIM_InitTypeDef TIM_InitStruct = { 0 };
 
     /* Peripheral clock enable */
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM2);
@@ -447,19 +458,19 @@ void MX_TIM2_Init(void)
 }
 
 /**
-  * @brief TIM3 Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief TIM3 Initialization Function
+ * @param None
+ * @retval None
+ */
 void MX_TIM3_Init(void)
 {
     /* USER CODE BEGIN TIM3_Init 0 */
 
     /* USER CODE END TIM3_Init 0 */
 
-    LL_TIM_InitTypeDef TIM_InitStruct = {0};
+    LL_TIM_InitTypeDef TIM_InitStruct = { 0 };
 
-    LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
     /* Peripheral clock enable */
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM3);
@@ -481,7 +492,8 @@ void MX_TIM3_Init(void)
     /* TIM3_CH1 Init */
     LL_DMA_SetPeriphRequest(DMA1, LL_DMA_CHANNEL_1, LL_DMAMUX_REQ_TIM3_CH1);
 
-    LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_1, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
+    LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_1,
+        LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
 
     LL_DMA_SetChannelPriorityLevel(DMA1, LL_DMA_CHANNEL_1, LL_DMA_PRIORITY_LOW);
 
@@ -510,10 +522,12 @@ void MX_TIM3_Init(void)
     LL_TIM_DisableARRPreload(TIM3);
     LL_TIM_SetTriggerOutput(TIM3, LL_TIM_TRGO_RESET);
     LL_TIM_DisableMasterSlaveMode(TIM3);
-    LL_TIM_IC_SetActiveInput(TIM3, LL_TIM_CHANNEL_CH1, LL_TIM_ACTIVEINPUT_DIRECTTI);
+    LL_TIM_IC_SetActiveInput(TIM3, LL_TIM_CHANNEL_CH1,
+        LL_TIM_ACTIVEINPUT_DIRECTTI);
     LL_TIM_IC_SetPrescaler(TIM3, LL_TIM_CHANNEL_CH1, LL_TIM_ICPSC_DIV1);
     LL_TIM_IC_SetFilter(TIM3, LL_TIM_CHANNEL_CH1, LL_TIM_IC_FILTER_FDIV1);
-    LL_TIM_IC_SetPolarity(TIM3, LL_TIM_CHANNEL_CH1, LL_TIM_IC_POLARITY_BOTHEDGE);
+    LL_TIM_IC_SetPolarity(TIM3, LL_TIM_CHANNEL_CH1,
+        LL_TIM_IC_POLARITY_BOTHEDGE);
     /* USER CODE BEGIN TIM3_Init 2 */
 
     /* USER CODE END TIM3_Init 2 */
@@ -521,9 +535,9 @@ void MX_TIM3_Init(void)
 
 void MX_TIM16_Init(void)
 {
-    LL_TIM_InitTypeDef TIM_InitStruct = {0};
+    LL_TIM_InitTypeDef TIM_InitStruct = { 0 };
 
-    LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
     /* Peripheral clock enable */
     LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM16);
@@ -542,7 +556,8 @@ void MX_TIM16_Init(void)
 
     LL_DMA_SetPeriphRequest(DMA1, LL_DMA_CHANNEL_1, LL_DMAMUX_REQ_TIM16_CH1);
 
-    LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_1, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
+    LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_1,
+        LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
 
     LL_DMA_SetChannelPriorityLevel(DMA1, LL_DMA_CHANNEL_1, LL_DMA_PRIORITY_LOW);
 
@@ -571,27 +586,29 @@ void MX_TIM16_Init(void)
     LL_TIM_DisableARRPreload(TIM16);
     LL_TIM_SetTriggerOutput(TIM16, LL_TIM_TRGO_RESET);
     LL_TIM_DisableMasterSlaveMode(TIM16);
-    LL_TIM_IC_SetActiveInput(TIM16, LL_TIM_CHANNEL_CH1, LL_TIM_ACTIVEINPUT_DIRECTTI);
+    LL_TIM_IC_SetActiveInput(TIM16, LL_TIM_CHANNEL_CH1,
+        LL_TIM_ACTIVEINPUT_DIRECTTI);
     LL_TIM_IC_SetPrescaler(TIM16, LL_TIM_CHANNEL_CH1, LL_TIM_ICPSC_DIV1);
     LL_TIM_IC_SetFilter(TIM16, LL_TIM_CHANNEL_CH1, LL_TIM_IC_FILTER_FDIV1);
-    LL_TIM_IC_SetPolarity(TIM16, LL_TIM_CHANNEL_CH1, LL_TIM_IC_POLARITY_BOTHEDGE);
+    LL_TIM_IC_SetPolarity(TIM16, LL_TIM_CHANNEL_CH1,
+        LL_TIM_IC_POLARITY_BOTHEDGE);
     /* USER CODE BEGIN TIM3_Init 2 */
 
     /* USER CODE END TIM3_Init 2 */
 }
 
 /**
-  * @brief TIM14 Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief TIM14 Initialization Function
+ * @param None
+ * @retval None
+ */
 void MX_TIM14_Init(void)
 {
     /* USER CODE BEGIN TIM14_Init 0 */
 
     /* USER CODE END TIM14_Init 0 */
 
-    LL_TIM_InitTypeDef TIM_InitStruct = {0};
+    LL_TIM_InitTypeDef TIM_InitStruct = { 0 };
 
     /* Peripheral clock enable */
     LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM14);
@@ -615,17 +632,17 @@ void MX_TIM14_Init(void)
 }
 
 /**
-  * @brief TIM17 Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief TIM17 Initialization Function
+ * @param None
+ * @retval None
+ */
 void MX_TIM17_Init(void)
 {
     /* USER CODE BEGIN TIM17_Init 0 */
 
     /* USER CODE END TIM17_Init 0 */
 
-    LL_TIM_InitTypeDef TIM_InitStruct = {0};
+    LL_TIM_InitTypeDef TIM_InitStruct = { 0 };
 
     /* Peripheral clock enable */
     LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM17);
@@ -646,8 +663,8 @@ void MX_TIM17_Init(void)
 }
 
 /**
-  * Enable DMA controller clock
-  */
+ * Enable DMA controller clock
+ */
 void MX_DMA_Init(void)
 {
     /* Init with LL driver */
@@ -665,7 +682,7 @@ void MX_DMA_Init(void)
 
 void MX_TIM6_Init(void)
 {
-    LL_TIM_InitTypeDef TIM_InitStruct = {0};
+    LL_TIM_InitTypeDef TIM_InitStruct = { 0 };
 
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM6);
 
@@ -681,7 +698,6 @@ void MX_TIM6_Init(void)
     LL_TIM_SetTriggerOutput(TIM6, LL_TIM_TRGO_RESET);
     LL_TIM_DisableMasterSlaveMode(TIM6);
 }
-
 void MX_GPIO_Init(void)
 {
     /* GPIO Ports Clock Enable */
@@ -712,14 +728,15 @@ void setAndEnableComInt(uint16_t time)
     COM_TIMER->DIER |= (0x1UL << (0U));
 }
 
-uint16_t getintervaTimerCount()
+uint16_t
+getintervaTimerCount()
 {
     return INTERVAL_TIMER->CNT;
 }
 
 void setintervaTimerCount(uint16_t intertime)
 {
-    INTERVAL_TIMER->CNT = intertime ;
+    INTERVAL_TIMER->CNT = intertime;
 }
 
 void setPrescalerPWM(uint16_t presc)
@@ -743,12 +760,10 @@ void setPWMCompare1(uint16_t compareone)
 {
     TIM1->CCR1 = compareone;
 }
-
 void setPWMCompare2(uint16_t comparetwo)
 {
     TIM1->CCR2 = comparetwo;
 }
-
 void setPWMCompare3(uint16_t comparethree)
 {
     TIM1->CCR3 = comparethree;
@@ -775,10 +790,14 @@ void enableCorePeripherals()
     LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH3N);
 
 #ifdef MCU_G071
-    LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH5);  // timer used for comparator blanking
+    LL_TIM_CC_EnableChannel(
+        TIM1, LL_TIM_CHANNEL_CH5); // timer used for comparator blanking
 #endif
-    LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH4);      // timer used for timing adc read
-    TIM1->CCR4 = 100;  // set in 10khz loop to match pwm cycle timed to end of pwm on
+    LL_TIM_CC_EnableChannel(
+        TIM1,
+        LL_TIM_CHANNEL_CH4); // timer used for timing adc read
+    TIM1->CCR4
+        = 100; // set in 10khz loop to match pwm cycle timed to end of pwm on
 
     /* Enable counter */
     LL_TIM_EnableCounter(TIM1);
@@ -789,12 +808,10 @@ void enableCorePeripherals()
 #ifdef USE_ADC_INPUT
 
 #else
-    LL_TIM_CC_EnableChannel(IC_TIMER_REGISTER, IC_TIMER_CHANNEL);  // input capture and output compare
+    LL_TIM_CC_EnableChannel(
+        IC_TIMER_REGISTER,
+        IC_TIMER_CHANNEL); // input capture and output compare
     LL_TIM_EnableCounter(IC_TIMER_REGISTER);
-#endif
-
-#ifdef USE_LED_STRIP
-    send_LED_RGB(255, 0, 0);
 #endif
 
 #ifdef USE_RGB_LED
@@ -805,10 +822,10 @@ void enableCorePeripherals()
 #endif
 
 #ifndef BRUSHED_MODE
-    LL_TIM_EnableCounter(COM_TIMER);               // commutation_timer priority 0
+    LL_TIM_EnableCounter(COM_TIMER); // commutation_timer priority 0
     LL_TIM_GenerateEvent_UPDATE(COM_TIMER);
     LL_TIM_EnableIT_UPDATE(COM_TIMER);
-    COM_TIMER->DIER &= ~((0x1UL << (0U)));         // disable for now.
+    COM_TIMER->DIER &= ~((0x1UL << (0U))); // disable for now.
 #endif
     LL_TIM_EnableCounter(UTILITY_TIMER);
     LL_TIM_GenerateEvent_UPDATE(UTILITY_TIMER);
@@ -816,10 +833,10 @@ void enableCorePeripherals()
     LL_TIM_EnableCounter(INTERVAL_TIMER);
     LL_TIM_GenerateEvent_UPDATE(INTERVAL_TIMER);
 
-    LL_TIM_EnableCounter(TEN_KHZ_TIMER);                 // 10khz timer
+    LL_TIM_EnableCounter(TEN_KHZ_TIMER); // 10khz timer
     LL_TIM_GenerateEvent_UPDATE(TEN_KHZ_TIMER);
-    TEN_KHZ_TIMER->DIER |= (0x1UL << (0U));  // enable interrupt
-    //RCC->APB2ENR  &= ~(1 << 22);  // turn debug off
+    TEN_KHZ_TIMER->DIER |= (0x1UL << (0U)); // enable interrupt
+    // RCC->APB2ENR  &= ~(1 << 22);  // turn debug off
 #ifdef USE_ADC
     ADC_Init();
     enableADC_DMA();
@@ -830,12 +847,17 @@ void enableCorePeripherals()
     __IO uint32_t wait_loop_index = 0;
     /* Enable comparator */
     LL_COMP_Enable(MAIN_COMP);
-#ifdef N_VARIANT  // needs comp 1 and 2
+#ifdef N_VARIANT // needs comp 1 and 2
     LL_COMP_Enable(COMP1);
 #endif
-    wait_loop_index = ((LL_COMP_DELAY_STARTUP_US * (SystemCoreClock / (100000 * 2))) / 10);
+    wait_loop_index
+        = ((LL_COMP_DELAY_STARTUP_US * (SystemCoreClock / (100000 * 2))) / 10);
     while (wait_loop_index != 0) {
         wait_loop_index--;
     }
 #endif
+
+    NVIC_SetPriority(EXTI4_15_IRQn, 2);
+    NVIC_EnableIRQ(EXTI4_15_IRQn);
+    EXTI->IMR1 |= (1 << 15);
 }

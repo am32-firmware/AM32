@@ -7,6 +7,8 @@
 
 #include "WS2812.h"
 
+#include "targets.h"
+
 char dma_busy;
 uint16_t led_Buffer[28] = { 0,  0,
                            20, 20, 20, 20, 20, 20, 20, 20,
@@ -14,13 +16,14 @@ uint16_t led_Buffer[28] = { 0,  0,
                            20, 20, 20, 20, 20, 20, 20, 20
                             0,  0,
                           };
-
 void send_LED_DMA()
 {
     dma_busy = 1;
     TIM16->CNT = 0;
-    LL_DMA_ConfigAddresses(DMA1, LL_DMA_CHANNEL_6, (uint32_t)&led_Buffer, (uint32_t)&TIM16->CCR1, LL_DMA_GetDataTransferDirection(DMA1, LL_DMA_CHANNEL_6));
-    LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_6, 28);
+    LL_DMA_ConfigAddresses(
+        DMA1, LL_DMA_CHANNEL_6, (uint32_t)&led_Buffer, (uint32_t)&TIM16->CCR1,
+        LL_DMA_GetDataTransferDirection(DMA1, LL_DMA_CHANNEL_6));
+    LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_6, 24);
     LL_DMA_EnableIT_TC(DMA1, LL_DMA_CHANNEL_6);
     LL_DMA_EnableIT_TE(DMA1, LL_DMA_CHANNEL_6);
     LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_6);
@@ -33,13 +36,12 @@ void send_LED_DMA()
 void send_LED_RGB(uint8_t red, uint8_t green, uint8_t blue)
 {
     if (!dma_busy) {
-        uint32_t twenty_four_bit_color_number = green << 16 | red << 8 | blue ;
+        uint32_t twenty_four_bit_color_number = green << 16 | red << 8 | blue;
 
         for (int i = 0; i < 24 ; i ++) {
             led_Buffer[i + 2] = (((twenty_four_bit_color_number >> (23 - i)) & 1) * 40) + 20;
         }
-
-        send_LED_DMA();
+       send_LED_DMA();
     }
 }
 
@@ -50,11 +52,11 @@ void WS2812_Init(void)
     NVIC_EnableIRQ(DMA1_Ch4_7_DMAMUX1_OVR_IRQn);
     /* USER CODE END TIM16_Init 0 */
 
-    LL_TIM_InitTypeDef TIM_InitStruct = {0};
-    LL_TIM_OC_InitTypeDef TIM_OC_InitStruct = {0};
-    LL_TIM_BDTR_InitTypeDef TIM_BDTRInitStruct = {0};
+    LL_TIM_InitTypeDef TIM_InitStruct = { 0 };
+    LL_TIM_OC_InitTypeDef TIM_OC_InitStruct = { 0 };
+    LL_TIM_BDTR_InitTypeDef TIM_BDTRInitStruct = { 0 };
 
-    LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
     /* Peripheral clock enable */
     LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM16);
@@ -64,9 +66,11 @@ void WS2812_Init(void)
     /* TIM16_CH1 Init */
     LL_DMA_SetPeriphRequest(DMA1, LL_DMA_CHANNEL_6, LL_DMAMUX_REQ_TIM16_CH1);
 
-    LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_6, LL_DMA_DIRECTION_MEMORY_TO_PERIPH);
+    LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_6,
+        LL_DMA_DIRECTION_MEMORY_TO_PERIPH);
 
-    LL_DMA_SetChannelPriorityLevel(DMA1, LL_DMA_CHANNEL_6, LL_DMA_PRIORITY_HIGH);
+    LL_DMA_SetChannelPriorityLevel(DMA1, LL_DMA_CHANNEL_6,
+        LL_DMA_PRIORITY_HIGH);
 
     LL_DMA_SetMode(DMA1, LL_DMA_CHANNEL_6, LL_DMA_MODE_NORMAL);
 
@@ -124,5 +128,38 @@ void WS2812_Init(void)
     GPIO_InitStruct.Alternate = LL_GPIO_AF_2;
     LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-    TIM16->CCER |=  1 << 0;
+    TIM16->CCER |= 1 << 0;
 }
+
+// void waitClockCycles(uint16_t cycles){
+//	UTILITY_TIMER->CNT = 0;
+//	while (UTILITY_TIMER->CNT < cycles){
+//	}
+//
+// }
+
+// void sendBit(uint8_t inbit){
+//  	GPIOB->BSRR = LL_GPIO_PIN_8;
+//	waitClockCycles(CPU_FREQUENCY_MHZ>>(3-inbit));
+//	GPIOB->BRR = LL_GPIO_PIN_8;
+//	waitClockCycles(CPU_FREQUENCY_MHZ>>(1+inbit));
+// }
+//
+// void send_LED_RGB(uint8_t red, uint8_t green, uint8_t blue){
+//__disable_irq();
+//	UTILITY_TIMER->PSC = 0;
+//	LL_TIM_GenerateEvent_UPDATE(UTILITY_TIMER);
+//   uint32_t twenty_four_bit_color_number = green << 16 | red << 8 | blue ;
+//   for(int i = 0; i < 24 ; i ++){
+//	  sendBit((twenty_four_bit_color_number >> (23 - i))&1);
+//   }
+//   GPIOB->BRR = LL_GPIO_PIN_8;
+//   UTILITY_TIMER->PSC = CPU_FREQUENCY_MHZ;
+//   LL_TIM_GenerateEvent_UPDATE(UTILITY_TIMER);
+//__enable_irq();
+// }
+
+// void WS2812_Init(void)
+//{
+//	LL_GPIO_SetPinMode(GPIOB, LL_GPIO_PIN_8, LL_GPIO_MODE_OUTPUT);
+// }

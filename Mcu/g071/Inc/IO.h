@@ -8,6 +8,8 @@
 #ifndef IO_H_
 #define IO_H_
 
+#endif /* IO_H_ */
+
 #include "main.h"
 
 void changeToOutput();
@@ -29,5 +31,3 @@ extern char send_telemetry;
 extern uint8_t degrees_celsius;
 
 extern uint16_t ADC_raw_volts;
-
-#endif /* IO_H_ */

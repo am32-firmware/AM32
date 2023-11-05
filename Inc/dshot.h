@@ -5,13 +5,13 @@
  *      Author: Alka
  */
 
+#include "main.h"
+
 #ifndef INC_DSHOT_H_
 #define INC_DSHOT_H_
 
-#include "main.h"
-
 void computeDshotDMA(void);
-void make_dshot_package();
+void make_dshot_package(uint16_t com_time);
 
 extern void playInputTune(void);
 extern void playInputTune2(void);
@@ -26,6 +26,6 @@ extern char buffer_divider;
 extern uint8_t last_dshot_command;
 extern uint16_t commutation_interval;
 
-//int e_com_time;
+// int e_com_time;
 
 #endif /* INC_DSHOT_H_ */

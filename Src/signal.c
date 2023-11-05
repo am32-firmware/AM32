@@ -29,8 +29,8 @@ uint8_t buffersize = 32;
 uint32_t average_signal_pulse;
 uint8_t average_count;
 uint32_t average_packet_length;
-uint16_t dshot_frametime_high;
-uint16_t dshot_frametime_low;
+uint16_t dshot_frametime_high = 50000;
+uint16_t dshot_frametime_low = 0;
 
 void computeMSInput()
 {
@@ -158,9 +158,8 @@ void transfercomplete()
             }
         }
         if (!armed) {
-            if (dshot && (average_count < 8)) {
+            if (dshot && (average_count <8) && (zero_input_count > 5)) {
                 average_count++;
-                dshot_frametime_high = (dma_buffer[31] - dma_buffer[0]) * 2;
                 average_packet_length = average_packet_length + (dma_buffer[31] - dma_buffer[0]);
                 if (average_count == 8) {
                     dshot_frametime_high = (average_packet_length >> 3) + (average_packet_length >> 7);

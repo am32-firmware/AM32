@@ -172,7 +172,16 @@
 *1.98    - Dshot erpm rounding compensation.
 *1.99    - Add max duty cycle change to individual targets ( will later become an settings option)
                  - Fix dshot telemetry delay f4 and e230 mcu
-
+*2.00    - Cleanup of target structure
+*2.01    - Increase 10khztimer to 20khz, increase max duty cycle change. 
+*2.02	 - Increase startup power for inverted output targets.
+*2.03    - Move chime from dshot direction change commands to save command.
+*2.04    - Fix current protection, max duty cycle not increasing
+                 - Fix double startup chime
+                 - Change current averaging method for more precision
+                 - Fix startup ramp speed adjustment
+*2.05		 - Fix ramp tied to input frequency								 
+                 
 */
 #include "main.h"
 #include "ADC.h"
@@ -199,7 +208,7 @@
 #endif
 
 #define VERSION_MAJOR 2
-#define VERSION_MINOR 03
+#define VERSION_MINOR 05
 
 uint32_t pwm_frequency_conversion_factor = 0;
 uint16_t blank_time;
@@ -376,6 +385,7 @@ uint16_t low_pin_count = 0;
 uint8_t max_duty_cycle_change = 2;
 char fast_accel = 1;
 uint16_t last_duty_cycle = 0;
+uint16_t duty_cycle_setpoint = 0;
 char play_tone_flag = 0;
 
 typedef enum {
@@ -1167,9 +1177,9 @@ void setInput()
             }
 
             if (use_sin_start) {
-                duty_cycle = map(input, 137, 2047, minimum_duty_cycle, TIMER1_MAX_ARR);
+                duty_cycle_setpoint = map(input, 137, 2047, minimum_duty_cycle, TIMER1_MAX_ARR);
             } else {
-                duty_cycle = map(input, 47, 2047, minimum_duty_cycle, TIMER1_MAX_ARR);
+                duty_cycle_setpoint = map(input, 47, 2047, minimum_duty_cycle, TIMER1_MAX_ARR);
             }
 
             if (!RC_CAR_REVERSE) {
@@ -1241,7 +1251,7 @@ void setInput()
                     } else {
                         allOff();
                     }
-                    duty_cycle = 0;
+                    duty_cycle_setpoint = 0;
                 }
 
                 phase_A_position = ((step - 1) * 60) + enter_sine_angle;
@@ -1260,31 +1270,31 @@ void setInput()
                 if (use_sin_start == 1) {
                     stepper_sine = 1;
                 }
-                duty_cycle = 0;
+                duty_cycle_setpoint = 0;
             }
         }
         if (!prop_brake_active) {
             if (input >= 47 && (zero_crosses < (20 >> stall_protection))) {
-                if (duty_cycle < min_startup_duty) {
-                    duty_cycle = min_startup_duty;
+                if (duty_cycle_setpoint < min_startup_duty) {
+                    duty_cycle_setpoint = min_startup_duty;
                 }
-                if (duty_cycle > startup_max_duty_cycle) {
-                    duty_cycle = startup_max_duty_cycle;
+                if (duty_cycle_setpoint > startup_max_duty_cycle) {
+                    duty_cycle_setpoint = startup_max_duty_cycle;
                 }
             }
 
-            if (duty_cycle > duty_cycle_maximum) {
-                duty_cycle = duty_cycle_maximum;
+            if (duty_cycle_setpoint > duty_cycle_maximum) {
+                duty_cycle_setpoint = duty_cycle_maximum;
             }
             if (use_current_limit) {
-                if (duty_cycle > use_current_limit_adjust) {
-                    duty_cycle = use_current_limit_adjust;
+                if (duty_cycle_setpoint > use_current_limit_adjust) {
+                    duty_cycle_setpoint = use_current_limit_adjust;
                 }
             }
 
             if (stall_protection_adjust > 0 && input > 47) {
 
-                duty_cycle = duty_cycle + (uint16_t)stall_protection_adjust;
+                duty_cycle_setpoint = duty_cycle_setpoint + (uint16_t)stall_protection_adjust;
             }
         }
     }
@@ -1292,7 +1302,7 @@ void setInput()
 
 void tenKhzRoutine()
 { // 20khz as of 2.00 to be renamed
-
+    duty_cycle = duty_cycle_setpoint;
     tenkhzcounter++;
     ledcounter++;
     one_khz_loop_counter++;
@@ -1375,8 +1385,8 @@ void tenKhzRoutine()
                 if (use_current_limit_adjust < minimum_duty_cycle) {
                     use_current_limit_adjust = minimum_duty_cycle;
                 }
-                if (use_current_limit_adjust > duty_cycle) {
-                    use_current_limit_adjust = duty_cycle;
+                if (use_current_limit_adjust > tim1_arr) {
+                    use_current_limit_adjust = tim1_arr;
                 }
             }
             if (stall_protection && running) { // this boosts throttle as the rpm gets lower, for crawlers and rc cars only, do not use for multirotors.
@@ -1412,7 +1422,7 @@ void tenKhzRoutine()
                 max_duty_cycle_change = voltage_based_max_change * 3;
             }
 #else
-            if (duty_cycle < 150) {
+            if (last_duty_cycle < 150) {
                 max_duty_cycle_change = RAMP_SPEED_STARTUP;
             } else {
                 if (average_interval > 500) {
@@ -1435,23 +1445,21 @@ void tenKhzRoutine()
                 duty_cycle = last_duty_cycle - max_duty_cycle_change;
                 fast_accel = 0;
             } else {
+							 
                 fast_accel = 0;
             }
         }
         if ((armed && running) && input > 47) {
             if (VARIABLE_PWM) {
             }
-            adjusted_duty_cycle = ((duty_cycle * pwm_frequency_conversion_factor) >> 10) + 1;
+             adjusted_duty_cycle = ((duty_cycle * tim1_arr) / TIMER1_MAX_ARR)+1;
 
         } else {
 
             if (prop_brake_active) {
-                adjusted_duty_cycle = TIMER1_MAX_ARR - ((duty_cycle * pwm_frequency_conversion_factor) >> 10) + 1;
+                adjusted_duty_cycle = TIMER1_MAX_ARR - ((duty_cycle * tim1_arr)/TIMER1_MAX_ARR);
             } else {
-                //		uint32_t bignumber = duty_cycle * tim1_arr;
-                //	adjusted_duty_cycle = ((duty_cycle * tim1_arr)/TIMER1_MAX_ARR);
-                adjusted_duty_cycle = ((duty_cycle * pwm_frequency_conversion_factor) >> 10) + 1;
-                //			adjusted_duty_cycle =  bignumber / TIMER1_MAX_ARR  ;
+                adjusted_duty_cycle = ((duty_cycle * tim1_arr) / TIMER1_MAX_ARR);
             }
         }
 
@@ -1754,7 +1762,9 @@ int main(void)
     }
 
 #endif
-
+#ifdef MCU_G071
+setInputPullDown();
+#endif
     while (1) {
 #ifdef MCU_F031
         if (input_ready) {
@@ -1765,9 +1775,10 @@ int main(void)
 
         RELOAD_WATCHDOG_COUNTER();
         e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation_intervals[2] + commutation_intervals[3] + commutation_intervals[4] + commutation_intervals[5]) + 4) >> 1; // COMMUTATION INTERVAL IS 0.5US INCREMENTS
-        tim1_arr = map(commutation_interval, 96, 200, TIMER1_MAX_ARR / 2, TIMER1_MAX_ARR);
-        pwm_frequency_conversion_factor = (tim1_arr << 10) / TIMER1_MAX_ARR; // multply by 1024
-
+        if (VARIABLE_PWM) {
+					tim1_arr = map(commutation_interval, 96, 200, TIMER1_MAX_ARR / 2, TIMER1_MAX_ARR);
+//      	pwm_frequency_conversion_factor = (tim1_arr << 10) / TIMER1_MAX_ARR; // multply by 1024
+			  }
         if (signaltimeout > (LOOP_FREQUENCY_HZ >> 1)) { // half second timeout when armed;
             if (armed) {
                 allOff();
@@ -1980,8 +1991,8 @@ int main(void)
             }
             if (zero_crosses < 100 || commutation_interval > 500) {
 #ifdef MCU_G071
-                TIM1->CCR5 = 500; // comparator blanking
-                filter_level = 3;
+                TIM1->CCR5 = 50; // comparator blanking
+                filter_level = 4;
 #else
                 filter_level = 12;
 #endif

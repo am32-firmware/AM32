@@ -10,9 +10,12 @@
 #include "targets.h"
 
 char dma_busy;
-uint16_t led_Buffer[24] = { 20, 20, 20, 20, 20, 20, 20, 20, 60, 60, 60, 60,
-    60, 60, 60, 60, 20, 20, 20, 20, 20, 20, 20, 20 };
-
+uint16_t led_Buffer[28] = { 0,  0,
+                           20, 20, 20, 20, 20, 20, 20, 20,
+                           60, 60, 60, 60, 60, 60, 60, 60,
+                           20, 20, 20, 20, 20, 20, 20, 20
+                            0,  0,
+                          };
 void send_LED_DMA()
 {
     dma_busy = 1;
@@ -35,12 +38,10 @@ void send_LED_RGB(uint8_t red, uint8_t green, uint8_t blue)
     if (!dma_busy) {
         uint32_t twenty_four_bit_color_number = green << 16 | red << 8 | blue;
 
-        for (int i = 0; i < 24; i++) {
-            led_Buffer[i]
-                = (((twenty_four_bit_color_number >> (23 - i)) & 1) * 40) + 20;
+        for (int i = 0; i < 24 ; i ++) {
+            led_Buffer[i + 2] = (((twenty_four_bit_color_number >> (23 - i)) & 1) * 40) + 20;
         }
-
-        send_LED_DMA();
+       send_LED_DMA();
     }
 }
 

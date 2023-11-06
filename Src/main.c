@@ -335,7 +335,7 @@ char RC_CAR_REVERSE = 0; // have to set bidirectional, comp_pwm off and stall pr
 uint16_t ADC_CCR = 30;
 uint16_t current_angle = 90;
 uint16_t desired_angle = 90;
-
+char return_to_center = 0;
 uint16_t target_e_com_time = 0;
 int16_t Speed_pid_output;
 char use_speed_control_loop = 0;
@@ -1002,32 +1002,40 @@ void setInput()
                 if (newinput > (1000 + (servo_dead_band << 1))) {
                     if (forward == dir_reversed) {
                         adjusted_input = 0;
-                        if (running) {
+         //               if (running) {
                             prop_brake_active = 1;
-                        } else {
-                            forward = 1 - dir_reversed;
-                        }
+								if(return_to_center){
+                  forward = 1 - dir_reversed;
+									prop_brake_active = 0;
+									return_to_center = 0;
+              }
                     }
                     if (prop_brake_active == 0) {
+											  return_to_center = 0;
                         adjusted_input = map(newinput, 1000 + (servo_dead_band << 1), 2000, 47, 2047);
                     }
                 }
                 if (newinput < (1000 - (servo_dead_band << 1))) {
-                    if (forward == (1 - dir_reversed)) {
-                        if (running) {
+                   if (forward == (1 - dir_reversed)) {
+										      adjusted_input = 0;
                             prop_brake_active = 1;
-                        } else {
-                            forward = dir_reversed;
-                        }
-                        adjusted_input = 0;
+                       if(return_to_center){
+													forward = dir_reversed;
+												   prop_brake_active = 0;
+												   return_to_center = 0;
+												}
                     }
                     if (prop_brake_active == 0) {
+											  return_to_center = 0;
                         adjusted_input = map(newinput, 0, 1000 - (servo_dead_band << 1), 2047, 47);
                     }
                 }
                 if (newinput >= (1000 - (servo_dead_band << 1)) && newinput <= (1000 + (servo_dead_band << 1))) {
                     adjusted_input = 0;
-                    prop_brake_active = 0;
+									  if (prop_brake_active) {
+                       prop_brake_active = 0;
+											 return_to_center = 1;
+										}
                 }
             } else {
                 if (newinput > (1000 + (servo_dead_band << 1))) {
@@ -1210,7 +1218,7 @@ void setInput()
             }
 
             if (!comp_pwm) {
-                duty_cycle = 0;
+            duty_cycle_setpoint = 0;
                 if (!running) {
                     old_routine = 1;
                     zero_crosses = 0;
@@ -1224,8 +1232,8 @@ void setInput()
                 }
                 if (RC_CAR_REVERSE && prop_brake_active) {
 #ifndef PWM_ENABLE_BRIDGE
-                    duty_cycle = getAbsDif(1000, newinput) + 1000;
-                    if (duty_cycle == 2000) {
+                    duty_cycle_setpoint = getAbsDif(1000, newinput) + 1000;
+                    if (duty_cycle_setpoint >= 1999) {
                         fullBrake();
                     } else {
                         proportionalBrake();
@@ -1457,7 +1465,7 @@ void tenKhzRoutine()
         } else {
 
             if (prop_brake_active) {
-                adjusted_duty_cycle = TIMER1_MAX_ARR - ((duty_cycle * tim1_arr)/TIMER1_MAX_ARR);
+                adjusted_duty_cycle = TIMER1_MAX_ARR - duty_cycle;
             } else {
                 adjusted_duty_cycle = ((duty_cycle * tim1_arr) / TIMER1_MAX_ARR);
             }
@@ -1551,6 +1559,9 @@ void zcfoundroutine()
     }
 #ifdef MCU_GDE23
     TIMER_CAR(COM_TIMER) = waitTime;
+#endif
+#ifdef MCU_F051
+		COM_TIMER->ARR = waitTime;
 #endif
     commutate();
     bemfcounter = 0;

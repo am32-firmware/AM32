@@ -361,14 +361,14 @@ ARM Macro Assembler    Page 6
   248 00000014                 END
               00000000 
               00000000 
-Command Line: --debug --xref --diag_suppress=9931,A1950W --cpu=Cortex-M0 --depe
-nd=.\objects\startup_stm32f051k8.d -o.\objects\startup_stm32f051k8.o -I.\RTE\_R
-HINO80A_F051 -IC:\KeilPacks\ARM\CMSIS\5.9.0\CMSIS\Core\Include -IC:\KeilPacks\K
-eil\STM32F0xx_DFP\2.1.1\Drivers\CMSIS\Device\ST\STM32F0xx\Include --predefine="
-__EVAL SETA 1" --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION S
-ETA 538" --predefine="_RTE_ SETA 1" --predefine="STM32F051x8 SETA 1" --predefin
-e="_RTE_ SETA 1" --list=startup_stm32f051k8.lst ..\Mcu\f051\Startup\mdk\startup
-_stm32f051k8.s
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M0 --depend=.\ob
+jects\startup_stm32f051k8.d -o.\objects\startup_stm32f051k8.o -I.\RTE\_AM32REF_
+F051 -IC:\Users\alkaz\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Includ
+e -IC:\Users\alkaz\AppData\Local\Arm\Packs\Keil\STM32F0xx_DFP\2.1.1\Drivers\CMS
+IS\Device\ST\STM32F0xx\Include --predefine="__EVAL SETA 1" --predefine="__MICRO
+LIB SETA 1" --predefine="__UVISION_VERSION SETA 536" --predefine="_RTE_ SETA 1"
+ --predefine="STM32F051x8 SETA 1" --predefine="_RTE_ SETA 1" --list=startup_stm
+32f051k8.lst ..\Mcu\f051\Startup\mdk\startup_stm32f051k8.s
 
 
 

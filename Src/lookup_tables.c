@@ -9,6 +9,7 @@
 
 #include "functions.h"
 #include "stdbool.h"
+#unclide "lookup_tables.h"
 
 
 //setup circular dependence

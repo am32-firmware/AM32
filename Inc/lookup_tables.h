@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <stdint.h>
 
 typedef enum {
     SCALE_TYPE_INT8 = 0,

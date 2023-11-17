@@ -180,7 +180,10 @@
                  - Fix double startup chime
                  - Change current averaging method for more precision
                  - Fix startup ramp speed adjustment
-*2.05		 - Fix ramp tied to input frequency								 
+*2.05		 - Fix ramp tied to input frequency	
+*2.06		 - Added LUT support 
+						- changed input to scale before logic
+				 - General code changes to improve logic flow and reduce code space		
                  
 */
 #include "main.h"
@@ -197,7 +200,9 @@
 #include "signal.h"
 #include "sounds.h"
 #include "targets.h"
+#include "lookup_tables.h"
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifdef USE_LED_STRIP
 #include "WS2812.h"
@@ -208,7 +213,7 @@
 #endif
 
 #define VERSION_MAJOR 2
-#define VERSION_MINOR 05
+#define VERSION_MINOR 06
 
 uint32_t pwm_frequency_conversion_factor = 0;
 uint16_t blank_time;
@@ -290,6 +295,7 @@ uint8_t TEMPERATURE_LIMIT = 255; // degrees 255 to disable
 char advance_level = 2; // 7.5 degree increments 0 , 7.5, 15, 22.5)
 uint16_t motor_kv = 2000;
 char motor_poles = 14;
+uint32_t e_comm_target_divisor = 8571428;
 uint16_t CURRENT_LIMIT = 202;
 uint8_t sine_mode_power = 5;
 char drag_brake_strength = 10; // Drag Brake Power when brake on stop is enabled
@@ -567,29 +573,16 @@ uint8_t ubAnalogWatchdogStatus = RESET;
 //	 }
 // }
 
-float doPidCalculations(struct fastPID* pidnow, int actual, int target)
+int32_t doPidCalculations(struct fastPID * pidnow, int actual, int target)
 {
 
     pidnow->error = actual - target;
-    pidnow->integral = pidnow->integral + pidnow->error * pidnow->Ki;
-    if (pidnow->integral > pidnow->integral_limit) {
-        pidnow->integral = pidnow->integral_limit;
-    }
-    if (pidnow->integral < -pidnow->integral_limit) {
-        pidnow->integral = -pidnow->integral_limit;
-    }
+		pidnow->integral = Clamp(pidnow->integral + pidnow->error * pidnow->Ki, -pidnow->integral_limit, pidnow->integral_limit);
 
     pidnow->derivative = pidnow->Kd * (pidnow->error - pidnow->last_error);
     pidnow->last_error = pidnow->error;
 
-    pidnow->pid_output = pidnow->error * pidnow->Kp + pidnow->integral + pidnow->derivative;
-
-    if (pidnow->pid_output > pidnow->output_limit) {
-        pidnow->pid_output = pidnow->output_limit;
-    }
-    if (pidnow->pid_output < -pidnow->output_limit) {
-        pidnow->pid_output = -pidnow->output_limit;
-    }
+    pidnow->pid_output = Clamp(pidnow->error * pidnow->Kp + pidnow->integral + pidnow->derivative, -pidnow->output_limit, pidnow->output_limit);
     return pidnow->pid_output;
 }
 
@@ -660,6 +653,7 @@ void loadEEpromSettings()
     }
     motor_kv = (eepromBuffer[26] * 40) + 20;
     motor_poles = eepromBuffer[27];
+		e_comm_target_divisor = 60000000 / (motor_poles / 2);
     if (eepromBuffer[28] == 0x01) {
         brake_on_stop = 1;
     } else {
@@ -853,56 +847,35 @@ void getBemfState()
 #else
     current_state = !getCompOutputLevel(); // polarity reversed
 #endif
-    if (rising) {
-        if (current_state) {
-            bemfcounter++;
-        } else {
-            bad_count++;
-            if (bad_count > bad_count_threshold) {
-                bemfcounter = 0;
-            }
-        }
-    } else {
-        if (!current_state) {
-            bemfcounter++;
-        } else {
-            bad_count++;
-            if (bad_count > bad_count_threshold) {
-                bemfcounter = 0;
-            }
-        }
-    }
+		if (rising == current_state) {
+			bemfcounter++;
+		} else {
+			bad_count++;
+			if (bad_count > bad_count_threshold) {
+					bemfcounter = 0;
+			}			
+		}
 }
 
 void commutate()
 {
-
-    if (forward == 1) {
-        step++;
-        if (step > 6) {
-            step = 1;
-            desync_check = 1;
-        }
-        rising = step % 2;
-    } else {
-        step--;
-        if (step < 1) {
-            step = 6;
-            desync_check = 1;
-        }
-        rising = !(step % 2);
-    }
+		step = RotateMinMax(step, forward ? 1 : -1, 1, 6);
+		desync_check = (forward && step == 1) || (!forward && step == 6);	
+		rising = (step % 2) == forward;
+	
     __disable_irq(); // don't let dshot interrupt
     if (!prop_brake_active) {
         comStep(step);
     }
     __enable_irq();
     changeCompInput();
+		
     if (stall_protection || RC_CAR_REVERSE) {
         if (average_interval > 2000) {
             old_routine = 1;
         }
     }
+		
     bemfcounter = 0;
     zcfound = 0;
     commutation_intervals[step - 1] = thiszctime; // just used to calulate average
@@ -992,126 +965,150 @@ void startMotor()
     }
     enableCompInterrupts();
 }
+typedef enum {
+	IS_NEUTRAL = 0,
+	IS_REVERSE = 1,
+	IS_FORWARD = 2
+} inputBiDirectionalStates_e;
+
+bool scalesSet = 0;
+uint8_t previous_input_state = IS_NEUTRAL;
+uint8_t current_input_state = IS_NEUTRAL;
+
+scale_result_t scale_result_input;
+scale_result_t scale_result_input_adjust;
+
+scale_t scaleInput;
+scale_t scaleInputAdjust;
+scale_functions_t scaleFunctions_int;
+map_t mapInput;
+map_t mapInputDir;
+map_t mapInputAdjust;
+
+static int16_t InputScaleServo[6] =   {   0, 949, 950, 1050, 1051, 2000};
+static int16_t InputMapServo[6] =     {2047,  47,   0,    0,   47, 2047};
+static int16_t InputDirMapPWM[6] =    {   1,   1,   0,    0,    2,    2};
+
+static int16_t InputScaleDShot[6] =   {   0,  47,  48, 1047, 1049, 2047};
+static int16_t InputMapDShot[6] =     {   0,  47,  48, 2047,   48, 2047};
+static int16_t InputDirMapDshot[6] =  {   0,   0,   1,    1,    2,    2};
+
+
+static int16_t InputScaleSineStart[6] =   {   0,  30,  31,  99, 100, 2047};
+static int16_t InputMapSineStart[6] =  		{   0,   0,  47, 160, 161, 2047};
+
+int16_t scaled_input = 0;
+int16_t scaled_input_adjust = 0;
+
+void SetScales(void) {
+	if (!scalesSet) {        
+			SetScaleFunctions_int(&scaleFunctions_int);            
+			scaleInput.Type = SCALE_TYPE_INT16;
+			scaleInput.Length = 6;
+			__scale_t_SetResult(&scaleInput, &scale_result_input);
+			scaleInput.Data = InputScaleServo;
+			scaleInput.SourceValue = &newinput;   
+			scale_result_input.ScaledValue = &scaled_input;
+			
+			scaleInputAdjust.Type = SCALE_TYPE_INT16;
+			scaleInputAdjust.Length = 6;
+			__scale_t_SetResult(&scaleInputAdjust, &scale_result_input_adjust);
+			scaleInputAdjust.Data = InputScaleSineStart;
+			scaleInput.SourceValue = &adjusted_input;
+			scale_result_input_adjust.ScaledValue = &scaled_input_adjust;
+		
+			mapInput.Adder = 0;
+			mapInput.Data = InputMapServo;
+			mapInput.Dimensions = 2;
+			mapInput.ScaledValue = scaleInput.Result;
+
+			mapInputDir.Adder = 0;
+			mapInputDir.Data = InputDirMapPWM;
+			mapInputDir.Dimensions = 2;
+			mapInputDir.ScaledValue = scaleInput.Result;		
+		
+			mapInputAdjust.Adder = 0;
+			mapInputAdjust.Data = InputMapSineStart;
+			mapInputAdjust.Dimensions = 2;
+			mapInput.ScaledValue = scaleInputAdjust.Result;
+			
+			scalesSet = true;
+	}	
+}
+
+void GetMappedInput(void) {
+	if (bi_direction) {
+		if (dshot) {
+			scaleInput.Data = InputScaleDShot;
+			mapInput.Data = InputMapDShot;
+			mapInputDir.Data = InputDirMapDshot;
+		}
+		
+		if (scaleFunctions_int.Compare(scaleInput.SourceValue, scale_result_input.ScaledValue) != 0) {
+			Scale(&scaleInput, &scaleFunctions_int);
+			MapLookup(&mapInput, &scale_result_input, &scaleFunctions_int);
+			MapLookup(&mapInputDir, &scale_result_input, &scaleFunctions_int);
+		}
+	}
+}
+
+void input_bi_dir(bool dir_change) {
+	if (dir_change) {
+			if (((commutation_interval > reverse_speed_threshold) && (duty_cycle < 200)) || stepper_sine) {
+					forward = !forward;
+					zero_crosses = 0;
+					old_routine = 1;
+					maskPhaseInterrupts();
+					brushed_direction_set = 0;
+			} else {
+					current_input_state = IS_NEUTRAL; //translates to adjusted_input = 0
+			}
+	}
+	
+  adjusted_input = (uint16_t)scaled_input;
+}
+void input_RC_CAR_REV(bool dir_change) {
+	if (dir_change) {				
+				current_input_state = IS_NEUTRAL; //translates to adjusted_input = 0
+				prop_brake_active = !return_to_center;
+				if (return_to_center) {
+					forward = !forward; //just flip it
+					return_to_center = 0;				
+				}			
+		}
+		if (!prop_brake_active) {
+			return_to_center = 0;
+			adjusted_input = (uint16_t)scaled_input;
+		}
+}
 
 void setInput()
 {
-
-    if (bi_direction) {
-        if (dshot == 0) {
-            if (RC_CAR_REVERSE) {
-                if (newinput > (1000 + (servo_dead_band << 1))) {
-                    if (forward == dir_reversed) {
-                        adjusted_input = 0;
-         //               if (running) {
-                            prop_brake_active = 1;
-								if(return_to_center){
-                  forward = 1 - dir_reversed;
-									prop_brake_active = 0;
-									return_to_center = 0;
-              }
-                    }
-                    if (prop_brake_active == 0) {
-											  return_to_center = 0;
-                        adjusted_input = map(newinput, 1000 + (servo_dead_band << 1), 2000, 47, 2047);
-                    }
-                }
-                if (newinput < (1000 - (servo_dead_band << 1))) {
-                   if (forward == (1 - dir_reversed)) {
-										      adjusted_input = 0;
-                            prop_brake_active = 1;
-                       if(return_to_center){
-													forward = dir_reversed;
-												   prop_brake_active = 0;
-												   return_to_center = 0;
-												}
-                    }
-                    if (prop_brake_active == 0) {
-											  return_to_center = 0;
-                        adjusted_input = map(newinput, 0, 1000 - (servo_dead_band << 1), 2047, 47);
-                    }
-                }
-                if (newinput >= (1000 - (servo_dead_band << 1)) && newinput <= (1000 + (servo_dead_band << 1))) {
-                    adjusted_input = 0;
-									  if (prop_brake_active) {
-                       prop_brake_active = 0;
-											 return_to_center = 1;
-										}
-                }
-            } else {
-                if (newinput > (1000 + (servo_dead_band << 1))) {
-                    if (forward == dir_reversed) {
-                        if (((commutation_interval > reverse_speed_threshold) && (duty_cycle < 200)) || stepper_sine) {
-                            forward = 1 - dir_reversed;
-                            zero_crosses = 0;
-                            old_routine = 1;
-                            maskPhaseInterrupts();
-                            brushed_direction_set = 0;
-                        } else {
-                            newinput = 1000;
-                        }
-                    }
-                    adjusted_input = map(newinput, 1000 + (servo_dead_band << 1), 2000, 47, 2047);
-                }
-                if (newinput < (1000 - (servo_dead_band << 1))) {
-                    if (forward == (1 - dir_reversed)) {
-                        if (((commutation_interval > reverse_speed_threshold) && (duty_cycle < 200)) || stepper_sine) {
-                            zero_crosses = 0;
-                            old_routine = 1;
-                            forward = dir_reversed;
-                            maskPhaseInterrupts();
-                            brushed_direction_set = 0;
-                        } else {
-                            newinput = 1000;
-                        }
-                    }
-                    adjusted_input = map(newinput, 0, 1000 - (servo_dead_band << 1), 2047, 47);
-                }
-
-                if (newinput >= (1000 - (servo_dead_band << 1)) && newinput <= (1000 + (servo_dead_band << 1))) {
-                    adjusted_input = 0;
-                    brushed_direction_set = 0;
-                }
-            }
-        }
-
-        if (dshot) {
-            if (newinput > 1047) {
-
-                if (forward == dir_reversed) {
-                    if (((commutation_interval > reverse_speed_threshold) && (duty_cycle < 200)) || stepper_sine) {
-                        forward = 1 - dir_reversed;
-                        zero_crosses = 0;
-                        old_routine = 1;
-                        maskPhaseInterrupts();
-                        brushed_direction_set = 0;
-                    } else {
-                        newinput = 0;
-                    }
-                }
-                adjusted_input = ((newinput - 1048) * 2 + 47) - reversing_dead_band;
-            }
-            if (newinput <= 1047 && newinput > 47) {
-                if (forward == (1 - dir_reversed)) {
-                    if (((commutation_interval > reverse_speed_threshold) && (duty_cycle < 200)) || stepper_sine) {
-                        zero_crosses = 0;
-                        old_routine = 1;
-                        forward = dir_reversed;
-                        maskPhaseInterrupts();
-                        brushed_direction_set = 0;
-                    } else {
-                        newinput = 0;
-                    }
-                }
-                adjusted_input = ((newinput - 48) * 2 + 47) - reversing_dead_band;
-            }
-            if (newinput < 48) {
-                adjusted_input = 0;
-                brushed_direction_set = 0;
-            }
-        }
-    } else {
-        adjusted_input = newinput;
-    }
+	GetMappedInput();
+	if (bi_direction) {
+		//To change direction requires one of each, it doesn't matter which order
+		bool dir_change = (current_input_state + previous_input_state == (IS_NEUTRAL + IS_FORWARD)); 
+		if (current_input_state > IS_NEUTRAL) {
+			if (RC_CAR_REVERSE) {
+				input_RC_CAR_REV(dir_change);
+			} else {
+				input_bi_dir(dir_change);
+			}
+		} 
+		if (current_input_state == IS_NEUTRAL) {
+			adjusted_input = 0;
+			if (RC_CAR_REVERSE) {
+				return_to_center = prop_brake_active; //important to have before the next line!
+				prop_brake_active = 0;
+			} else {
+				brushed_direction_set = 0;
+			}
+		}		
+		previous_input_state = current_input_state;
+	} else  {
+		adjusted_input = newinput;
+	}
+	
 #ifndef BRUSHED_MODE
     if ((bemf_timeout_happened > bemf_timeout) && stuck_rotor_protection) {
         allOff();
@@ -1127,47 +1124,27 @@ void setInput()
 #ifdef FIXED_DUTY_MODE
         input = FIXED_DUTY_MODE_POWER * 20 + 47;
 #else
-        if (use_sin_start) {
-            if (adjusted_input < 30) { // dead band ?
-                input = 0;
-            }
-            if (adjusted_input > 30 && adjusted_input < (sine_mode_changeover_thottle_level * 20)) {
-                input = map(adjusted_input, 30, (sine_mode_changeover_thottle_level * 20), 47, 160);
-            }
-            if (adjusted_input >= (sine_mode_changeover_thottle_level * 20)) {
-                input = map(adjusted_input, (sine_mode_changeover_thottle_level * 20), 2047, 160, 2047);
-            }
-        } else {
-            if (use_speed_control_loop) {
-                if (drive_by_rpm) {
-                    target_e_com_time = 60000000 / map(adjusted_input, 47, 2047, MINIMUM_RPM_SPEED_CONTROL, MAXIMUM_RPM_SPEED_CONTROL) / (motor_poles / 2);
-                    if (adjusted_input < 47) { // dead band ?
-                        input = 0;
-                        speedPid.error = 0;
-                        input_override = 0;
-                    } else {
-                        input = (uint16_t)input_override; // speed control pid override
-                        if (input_override > 2047) {
-                            input = 2047;
-                        }
-                        if (input_override < 48) {
-                            input = 48;
-                        }
-                    }
-                } else {
-
-                    input = (uint16_t)input_override; // speed control pid override
-                    if (input_override > 2047) {
-                        input = 2047;
-                    }
-                    if (input_override < 48) {
-                        input = 48;
-                    }
-                }
-            } else {
-
-                input = adjusted_input;
-            }
+        if (use_sin_start) {					
+					 scaleInputAdjust.Data = InputScaleSineStart;
+					 mapInputAdjust.Data = InputMapSineStart;
+					 Scale(&scaleInputAdjust, &scaleFunctions_int);
+					 MapLookup(&mapInputAdjust, &scale_result_input_adjust, &scaleFunctions_int);
+					 input = (uint16_t)scaled_input_adjust;
+				}	else {
+					bool zeroInput = (use_speed_control_loop && drive_by_rpm && current_input_state == IS_NEUTRAL);
+					if (zeroInput) {
+								input = 0;
+								speedPid.error = 0;
+								input_override = 0;						
+					} else if (use_speed_control_loop) {
+						if (drive_by_rpm) {
+              target_e_com_time = e_comm_target_divisor / map(adjusted_input, 47, 2047, MINIMUM_RPM_SPEED_CONTROL, MAXIMUM_RPM_SPEED_CONTROL);							
+						}
+						input = Clamp(input_override, 48, 2047);
+						
+					} else {
+						input = adjusted_input;
+					}
         }
 #endif
     }
@@ -1232,7 +1209,8 @@ void setInput()
                 }
                 if (RC_CAR_REVERSE && prop_brake_active) {
 #ifndef PWM_ENABLE_BRIDGE
-                    duty_cycle_setpoint = getAbsDif(1000, newinput) + 1000;
+										duty_cycle_setpoint = ABS(1000 - newinput) + 1000;
+                    //duty_cycle_setpoint = getAbsDif(1000, newinput) + 1000;
                     if (duty_cycle_setpoint >= 1999) {
                         fullBrake();
                     } else {
@@ -1261,20 +1239,10 @@ void setInput()
                     }
                     duty_cycle_setpoint = 0;
                 }
-
-                phase_A_position = ((step - 1) * 60) + enter_sine_angle;
-                if (phase_A_position > 359) {
-                    phase_A_position -= 360;
-                }
-                phase_B_position = phase_A_position + 119;
-                if (phase_B_position > 359) {
-                    phase_B_position -= 360;
-                }
-                phase_C_position = phase_A_position + 239;
-                if (phase_C_position > 359) {
-                    phase_C_position -= 360;
-                }
-
+								phase_A_position = RotateMinMax(0, ((step - 1) * 60) + enter_sine_angle, 0, 359);
+								phase_B_position = RotateMinMax(phase_A_position, 119, 0, 359);
+								phase_C_position = RotateMinMax(phase_A_position, 239, 0, 359);
+								
                 if (use_sin_start == 1) {
                     stepper_sine = 1;
                 }
@@ -1282,23 +1250,12 @@ void setInput()
             }
         }
         if (!prop_brake_active) {
-            if (input >= 47 && (zero_crosses < (20 >> stall_protection))) {
-                if (duty_cycle_setpoint < min_startup_duty) {
-                    duty_cycle_setpoint = min_startup_duty;
-                }
-                if (duty_cycle_setpoint > startup_max_duty_cycle) {
-                    duty_cycle_setpoint = startup_max_duty_cycle;
-                }
-            }
-
-            if (duty_cycle_setpoint > duty_cycle_maximum) {
-                duty_cycle_setpoint = duty_cycle_maximum;
-            }
-            if (use_current_limit) {
-                if (duty_cycle_setpoint > use_current_limit_adjust) {
-                    duty_cycle_setpoint = use_current_limit_adjust;
-                }
-            }
+					bool startup = (input >= 47 && (zero_crosses < (20 >> stall_protection)));
+					// if starting up, clamp to smaller of startup_max or standard max.  
+					uint16_t maxDuty = startup? MIN(startup_max_duty_cycle, duty_cycle_maximum) : duty_cycle_maximum;
+					
+					duty_cycle_setpoint = Clamp(duty_cycle_setpoint, min_startup_duty, maxDuty);
+					
 
             if (stall_protection_adjust > 0 && input > 47) {
 
@@ -1372,52 +1329,30 @@ void tenKhzRoutine()
             maskPhaseInterrupts();
             getBemfState();
             if (!zcfound) {
-                if (rising) {
-                    if (bemfcounter > min_bemf_counts_up) {
-                        zcfound = 1;
-                        zcfoundroutine();
-                    }
-                } else {
-                    if (bemfcounter > min_bemf_counts_down) {
-                        zcfound = 1;
-                        zcfoundroutine();
-                    }
-                }
+							if (bemfcounter > rising? min_bemf_counts_up : min_bemf_counts_down) {
+									zcfound = 1;
+									zcfoundroutine();								
+							}
             }
         }
 
         if (one_khz_loop_counter > PID_LOOP_DIVIDER) { // 1khz PID loop
             one_khz_loop_counter = 0;
-            if (use_current_limit && running) {
-                use_current_limit_adjust -= (int16_t)(doPidCalculations(&currentPid, actual_current, CURRENT_LIMIT * 100) / 10000);
-                if (use_current_limit_adjust < minimum_duty_cycle) {
-                    use_current_limit_adjust = minimum_duty_cycle;
-                }
-                if (use_current_limit_adjust > tim1_arr) {
-                    use_current_limit_adjust = tim1_arr;
-                }
-            }
-            if (stall_protection && running) { // this boosts throttle as the rpm gets lower, for crawlers and rc cars only, do not use for multirotors.
-                stall_protection_adjust += (doPidCalculations(&stallPid, commutation_interval, stall_protect_target_interval)) / 10000;
-                if (stall_protection_adjust > 150) {
-                    stall_protection_adjust = 150;
-                }
-                if (stall_protection_adjust <= 0) {
-                    stall_protection_adjust = 0;
-                }
-            }
-            if (use_speed_control_loop && running) {
-                input_override += doPidCalculations(&speedPid, e_com_time, target_e_com_time) / 10000;
-                if (input_override > 2047) {
-                    input_override = 2047;
-                }
-                if (input_override < 0) {
-                    input_override = 0;
-                }
-                if (zero_crosses < 100) {
-                    speedPid.integral = 0;
-                }
-            }
+					
+						if (running) {							
+							if (use_current_limit) {
+									use_current_limit_adjust = Clamp( use_current_limit_adjust - (doPidCalculations(&currentPid, actual_current, CURRENT_LIMIT * 100) / 10000), minimum_duty_cycle, tim1_arr);								
+							}
+							if (stall_protection ) { // this boosts throttle as the rpm gets lower, for crawlers and rc cars only, do not use for multirotors.
+									stall_protection_adjust = Clamp(stall_protection_adjust + (doPidCalculations(&stallPid, commutation_interval, stall_protect_target_interval)) / 10000, 0, 150);
+							}
+							if (use_speed_control_loop) {
+									input_override = Clamp(input_override + doPidCalculations(&speedPid, e_com_time, target_e_com_time) / 10000, 0, 2047);
+									if (zero_crosses < 100) {
+											speedPid.integral = 0;
+									}
+							}
+						}
         }
 
         if (maximum_throttle_change_ramp) {
@@ -1439,23 +1374,12 @@ void tenKhzRoutine()
                     max_duty_cycle_change = RAMP_SPEED_HIGH_RPM;
                 }
             }
-#endif
-
-            if ((duty_cycle - last_duty_cycle) > max_duty_cycle_change) {
-                duty_cycle = last_duty_cycle + max_duty_cycle_change;
-                if (commutation_interval > 500) {
-                    fast_accel = 1;
-                } else {
-                    fast_accel = 0;
-                }
-
-            } else if ((last_duty_cycle - duty_cycle) > max_duty_cycle_change) {
-                duty_cycle = last_duty_cycle - max_duty_cycle_change;
-                fast_accel = 0;
-            } else {
-							 
-                fast_accel = 0;
-            }
+#endif		
+						
+						uint16_t duty_cycle_delta = (duty_cycle - last_duty_cycle);
+						fast_accel = (duty_cycle_delta > max_duty_cycle_change ) && ( commutation_interval > 500 );						
+						duty_cycle = Clamp(duty_cycle_delta, last_duty_cycle - max_duty_cycle_change, last_duty_cycle + max_duty_cycle_change);
+						
         }
         if ((armed && running) && input > 47) {
             if (VARIABLE_PWM) {
@@ -1507,33 +1431,9 @@ void processDshot()
 
 void advanceincrement()
 {
-    if (!forward) {
-        phase_A_position++;
-        if (phase_A_position > 359) {
-            phase_A_position = 0;
-        }
-        phase_B_position++;
-        if (phase_B_position > 359) {
-            phase_B_position = 0;
-        }
-        phase_C_position++;
-        if (phase_C_position > 359) {
-            phase_C_position = 0;
-        }
-    } else {
-        phase_A_position--;
-        if (phase_A_position < 0) {
-            phase_A_position = 359;
-        }
-        phase_B_position--;
-        if (phase_B_position < 0) {
-            phase_B_position = 359;
-        }
-        phase_C_position--;
-        if (phase_C_position < 0) {
-            phase_C_position = 359;
-        }
-    }
+	phase_A_position = RotateMinMax(phase_A_position, forward ? 1 : -1, 0, 359);
+	phase_B_position = RotateMinMax(phase_B_position, forward ? 1 : -1, 0, 359);
+	phase_C_position = RotateMinMax(phase_C_position, forward ? 1 : -1, 0, 359);
 #ifdef GIMBAL_MODE
     setPWMCompare1(((2 * pwmSin[phase_A_position]) + gate_drive_offset) * TIMER1_MAX_ARR / 2000);
     setPWMCompare2(((2 * pwmSin[phase_B_position]) + gate_drive_offset) * TIMER1_MAX_ARR / 2000);
@@ -1646,7 +1546,7 @@ int main(void)
     enableCorePeripherals();
 
     loadEEpromSettings();
-
+		SetScales();
     EEPROM_VERSION = *(uint8_t*)(0x08000FFC);
 #ifdef USE_MAKE
     if (firmware_info.version_major != eepromBuffer[3] || firmware_info.version_minor != eepromBuffer[4]) {
@@ -1724,7 +1624,7 @@ int main(void)
 #ifdef FIXED_SPEED_MODE
     use_speed_control_loop = 1;
     use_sin_start = 0;
-    target_e_com_time = 60000000 / FIXED_SPEED_MODE_RPM / (motor_poles / 2);
+    target_e_com_time = e_comm_target_divisor / FIXED_SPEED_MODE_RPM;
     input = 48;
 #endif
 
@@ -1884,7 +1784,8 @@ setInputPullDown();
 
         average_interval = e_com_time / 3;
         if (desync_check && zero_crosses > 10) {
-            if ((getAbsDif(last_average_interval, average_interval) > average_interval >> 1) && (average_interval < 2000)) { // throttle resitricted before zc 20.
+            //if ((getAbsDif(last_average_interval, average_interval) > average_interval >> 1) && (average_interval < 2000)) { // throttle resitricted before zc 20.
+            if ((ABS(last_average_interval - average_interval) > average_interval >> 1) && (average_interval < 2000)) { // throttle resitricted before zc 20.
                 zero_crosses = 0;
                 desync_happened++;
                 if ((!bi_direction && (input > 47)) || commutation_interval > 1000) {

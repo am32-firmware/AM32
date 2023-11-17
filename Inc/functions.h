@@ -15,6 +15,14 @@ int getAbsDif(int number1, int number2);
 void delayMicros(uint32_t micros);
 void delayMillis(uint32_t millis);
 long map(long x, long in_min, long in_max, long out_min, long out_max);
+
+//common functions which when used extensively will reduce code size, slight speed hit as a consequence
+//however, given that the MCUs seem to be more space constrained, this should be OK
+int32_t RotateMinMax(const int32_t startValue, const int32_t amount, const int32_t min, const int32_t max);
+int32_t Clamp(const int32_t var, const int32_t min, const int32_t max);
+int32_t Min(const int32_t var, const int32_t var1);
+int32_t Max(const int32_t var, const int32_t var1);
+
 #ifdef ARTERY
 void gpio_mode_QUICK(gpio_type* gpio_periph, uint32_t mode, uint32_t pull_up_down, uint32_t pin);
 #endif

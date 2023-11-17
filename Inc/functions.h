@@ -11,6 +11,24 @@
 #include "main.h"
 #include "targets.h"
 
+#define MIN(a,b) \
+  __extension__ ({ __typeof__ (a) _a = (a); \
+  __typeof__ (b) _b = (b); \
+  _a < _b ? _a : _b; })
+#define MAX(a,b) \
+  __extension__ ({ __typeof__ (a) _a = (a); \
+  __typeof__ (b) _b = (b); \
+  _a > _b ? _a : _b; })
+	
+	
+#define ABS(x) \
+  __extension__ ({ __typeof__ (x) _x = (x); \
+  _x > 0 ? _x : -_x; })
+#define SIGN(x) \
+  __extension__ ({ __typeof__ (x) _x = (x); \
+  (_x > 0) - (_x < 0); })
+
+
 int getAbsDif(int number1, int number2);
 void delayMicros(uint32_t micros);
 void delayMillis(uint32_t millis);

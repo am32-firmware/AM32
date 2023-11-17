@@ -45,6 +45,34 @@ int getAbsDif(int number1, int number2)
     return result;
 }
 
+
+int32_t Min(const int32_t var, const int32_t var1) {
+	return var > var1 ? var1 : var;
+}
+
+int32_t Max(const int32_t var, const int32_t var1) {
+	return var < var1 ? var1 : var;
+}
+
+int32_t Clamp(const int32_t var, const int32_t min, const int32_t max) {
+		if (var < min) {
+			return min;
+		} else if (var > max) {
+			return max;
+		}
+		return var;
+}
+
+int32_t RotateMinMax(const int32_t startValue, const int32_t amount, const int32_t min, const int32_t max) {
+    if (startValue + amount < min) {
+        return (max + 1) - (min - (startValue + amount));
+    }
+    else if (startValue + amount > max) {
+        return (min - 1) + ((startValue + amount) - max);
+    }
+    return startValue + amount;
+}
+
 #ifdef STMICRO
 void delayMicros(uint32_t micros)
 {

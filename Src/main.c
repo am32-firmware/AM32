@@ -1777,6 +1777,9 @@ int main(void)
 setInputPullDown();
 #endif
     while (1) {
+#ifdef FIXED_DUTY_MODE
+        setInput();
+#endif
 #ifdef MCU_F031
         if (input_ready) {
             processDshot();

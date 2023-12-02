@@ -1306,6 +1306,7 @@ void setInput()
             }
         }
     }
+#endif
 }
 
 void tenKhzRoutine()
@@ -1599,7 +1600,7 @@ void runBrushedLoop()
         brushed_direction_set = 1;
     }
 
-    brushed_duty_cycle = map(adjusted_input, 48, 2047, 0, TIMER1_MAX_ARR - 50);
+    brushed_duty_cycle = map(adjusted_input, 48, 2047, 0, (TIMER1_MAX_ARR - (TIMER1_MAX_ARR/20)));
 
     if (degrees_celsius > TEMPERATURE_LIMIT) {
         duty_cycle_maximum = map(degrees_celsius, TEMPERATURE_LIMIT, TEMPERATURE_LIMIT + 20, TIMER1_MAX_ARR / 2, 1);
@@ -1778,7 +1779,7 @@ setInputPullDown();
 #endif
     while (1) {
 #ifdef FIXED_DUTY_MODE
-        setInput();
+setInput();
 #endif
 #ifdef MCU_F031
         if (input_ready) {
@@ -2148,7 +2149,7 @@ setInputPullDown();
 
 #endif // gimbal mode
         } // stepper/sine mode end
-#endif // end of brushless mode
+
 
 #ifdef BRUSHED_MODE
         runBrushedLoop();

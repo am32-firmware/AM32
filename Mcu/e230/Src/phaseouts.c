@@ -374,7 +374,7 @@ void allpwm()
     phaseCPWM();
 }
 
-#ifdef BRUSHED_MODE
+
 void twoChannelForward()
 {
     phaseAPWM();
@@ -388,4 +388,3 @@ void twoChannelReverse()
     phaseBPWM();
     phaseCLOW();
 }
-#endif

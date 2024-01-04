@@ -199,6 +199,26 @@
 #define USE_SERIAL_TELEMETRY
 #endif
 
+#ifdef  NEUTRON_4IN1_F421
+#define FIRMWARE_NAME           "NEUTRON_4IN1"
+#define FILE_NAME                "NEUTRON_4IN1_F421"
+#define DEAD_TIME               50
+#define HARDWARE_GROUP_AT_C
+#define HARDWARE_GROUP_AT_045
+#define USE_SERIAL_TELEMETRY
+#endif
+
+#ifdef  RR_ROBOT_DUAL_ESC_F421
+#define FIRMWARE_NAME           "RR DUAL ESC "
+#define FILE_NAME                "RR_ROBOT_DUAL_ESC_F421"
+#define DEAD_TIME               50
+#define HARDWARE_GROUP_AT_C
+#define HARDWARE_GROUP_AT_045
+#define USE_SERIAL_TELEMETRY
+#define VOLTAGE_BASED_RAMP
+#define MILLIVOLT_PER_AMP  12
+#endif
+
 #ifdef DARWIN_F421
 #define FIRMWARE_NAME "DARWIN F421 "
 #define FILE_NAME "DARWIN_F421"
@@ -219,7 +239,7 @@
 
 #ifdef AT32F421_PB4_054
 #define FIRMWARE_NAME "AT32PB4_054 "
-#define FILE_NAME "AT32F421_PB4_054"
+#define FILE_NAME "AT32PB4_054_F421"
 #define DEAD_TIME 80
 #define HARDWARE_GROUP_AT_B
 #define HARDWARE_GROUP_AT_054
@@ -228,7 +248,7 @@
 
 #ifdef AT32F421_PB4_405
 #define FIRMWARE_NAME "AT32PB4_405 "
-#define FILE_NAME "AT32F421_PB4_405"
+#define FILE_NAME "AT32PB4_405_F421"
 #define DEAD_TIME 80
 #define HARDWARE_GROUP_AT_B
 #define HARDWARE_GROUP_AT_405
@@ -237,7 +257,7 @@
 
 #ifdef AT32F421_PB4_540
 #define FIRMWARE_NAME "AT32PB4_540 "
-#define FILE_NAME "AT32F421_PB4_540"
+#define FILE_NAME "AT32PB4_540_F421"
 #define DEAD_TIME 80
 #define HARDWARE_GROUP_AT_B
 #define HARDWARE_GROUP_AT_540
@@ -392,6 +412,34 @@
 #endif
 
 /*****************************************************AT32F415 targets ************************************************/
+
+#ifdef PB450_F051
+#define FILE_NAME "PB450_F051"
+#define FIRMWARE_NAME "PB450_F051  "
+#define DEAD_TIME 45
+#define HARDWARE_GROUP_F0_U
+#define USE_SERIAL_TELEMETRY
+#define HARDWARE_GROUP_F0_450
+#endif
+
+#ifdef PB054_F051
+#define FILE_NAME "PB054_F051"
+#define FIRMWARE_NAME "PB054_F051  "
+#define DEAD_TIME 45
+#define HARDWARE_GROUP_F0_U
+#define USE_SERIAL_TELEMETRY
+#define HARDWARE_GROUP_F0_054
+#endif
+
+#ifdef PB405_F051
+#define FILE_NAME "PB405_F051"
+#define FIRMWARE_NAME "PB405_F051  "
+#define DEAD_TIME 45
+#define HARDWARE_GROUP_F0_U
+#define USE_SERIAL_TELEMETRY
+#define HARDWARE_GROUP_F0_405
+#endif
+
 
 #ifdef FD6288_F051
 #define FILE_NAME "FD6288_F051"
@@ -681,6 +729,23 @@
 #define FIRMWARE_NAME "SEQURE G071 "
 #define DEAD_TIME 60
 #define MILLIVOLT_PER_AMP 33
+#define CURRENT_OFFSET 0
+#define TARGET_STALL_PROTECTION_INTERVAL 9000
+#define TARGET_VOLTAGE_DIVIDER 210
+#define HARDWARE_GROUP_G0_A
+#define USE_SERIAL_TELEMETRY
+#define SIXTY_FOUR_KB_MEMORY
+#define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_4
+#define CURRENT_ADC_PIN LL_GPIO_PIN_4
+#define USE_LED_STRIP
+#endif
+
+
+#ifdef SEQURE_12S_G071
+#define FILE_NAME "SEQURE_12S_G071"
+#define FIRMWARE_NAME "SEQURE PRO  "
+#define DEAD_TIME 60
+#define MILLIVOLT_PER_AMP 10
 #define CURRENT_OFFSET 0
 #define TARGET_STALL_PROTECTION_INTERVAL 9000
 #define TARGET_VOLTAGE_DIVIDER 210
@@ -1101,11 +1166,72 @@
 #define PHASE_C_GPIO_HIGH LL_GPIO_PIN_8
 #define PHASE_C_GPIO_PORT_HIGH GPIOA
 
-#define PHASE_A_COMP COMP_PA5
-#define PHASE_B_COMP COMP_PA4
-#define PHASE_C_COMP COMP_PA0
+#define HARDWARE_GROUP_F0_540
 
 #endif
+
+
+#ifdef HARDWARE_GROUP_F0_U
+
+#define MCU_F051
+#define USE_TIMER_3_CHANNEL_1
+#define INPUT_PIN LL_GPIO_PIN_4
+#define INPUT_PIN_PORT GPIOB
+#define IC_TIMER_CHANNEL LL_TIM_CHANNEL_CH1
+#define IC_TIMER_REGISTER TIM3
+#define IC_TIMER_POINTER htim3
+#define INPUT_DMA_CHANNEL LL_DMA_CHANNEL_4
+#define DMA_HANDLE_TYPE_DEF hdma_tim3_ch1
+#define IC_DMA_IRQ_NAME DMA1_Channel4_5_IRQn
+
+#define PHASE_A_GPIO_LOW LL_GPIO_PIN_1
+#define PHASE_A_GPIO_PORT_LOW GPIOB
+#define PHASE_A_GPIO_HIGH LL_GPIO_PIN_10
+#define PHASE_A_GPIO_PORT_HIGH GPIOA
+
+#define PHASE_B_GPIO_LOW LL_GPIO_PIN_0
+#define PHASE_B_GPIO_PORT_LOW GPIOB
+#define PHASE_B_GPIO_HIGH LL_GPIO_PIN_9
+#define PHASE_B_GPIO_PORT_HIGH GPIOA
+
+#define PHASE_C_GPIO_LOW LL_GPIO_PIN_7
+#define PHASE_C_GPIO_PORT_LOW GPIOA
+#define PHASE_C_GPIO_HIGH LL_GPIO_PIN_8
+#define PHASE_C_GPIO_PORT_HIGH GPIOA
+
+#endif
+
+#ifdef HARDWARE_GROUP_F0_045     // tried B
+#define PHASE_A_COMP COMP_PA0 // pa0     // works for polling mode
+#define PHASE_B_COMP COMP_PA4 // pa4
+#define PHASE_C_COMP COMP_PA5 // pa5
+#endif
+#ifdef HARDWARE_GROUP_F0_504              // tried F
+#define PHASE_A_COMP COMP_PA5 // pa5            // works for polling mode
+#define PHASE_B_COMP COMP_PA0 // pa0
+#define PHASE_C_COMP COMP_PA4 // pa4
+#endif
+#ifdef HARDWARE_GROUP_F0_450
+#define PHASE_A_COMP COMP_PA4 // pa4            // works for polling mode
+#define PHASE_B_COMP COMP_PA5 // pa5
+#define PHASE_C_COMP COMP_PA0 // pa0
+#endif
+#ifdef HARDWARE_GROUP_F0_054
+#define PHASE_A_COMP COMP_PA0 // pa0            // works for polling mode
+#define PHASE_B_COMP COMP_PA5 // pa5
+#define PHASE_C_COMP COMP_PA4 // pa4
+#endif
+#ifdef HARDWARE_GROUP_F0_405
+#define PHASE_A_COMP COMP_PA4 // pa4            // works for polling mode
+#define PHASE_B_COMP COMP_PA0 // pa0
+#define PHASE_C_COMP COMP_PA5 // pa5
+#endif
+#ifdef HARDWARE_GROUP_F0_540                // tried H
+#define PHASE_A_COMP COMP_PA5 // pa5           // works for polling mode
+#define PHASE_B_COMP COMP_PA4 // pa4
+#define PHASE_C_COMP COMP_PA0 // pa0
+#endif
+
 
 /************************************* G071 Hardware Groups **********************************/
 
@@ -1787,7 +1913,7 @@
 
 #define MCU_AT421
 #define USE_TIMER_15_CHANNEL_1
-#define USE_PA14_TELEMETRY
+//#define USE_PA14_TELEMETRY
 #define USE_PA6_TEMP
 #define INPUT_PIN GPIO_PINS_2
 #define INPUT_PIN_SOURCE GPIO_PINS_SOURCE2

@@ -94,7 +94,7 @@ void computeServoInput()
                 }
             } else {
                 servorawinput = map((dma_buffer[1] - dma_buffer[0]), servo_low_threshold, servo_high_threshold, 47, 2047);
-                if (servorawinput == 47) {
+                if (servorawinput <= 48) {
                     servorawinput = 0;
                 }
             }

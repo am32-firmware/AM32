@@ -297,9 +297,9 @@ void comStep(char newStep)
 {
     switch (newStep) {
     case 1: // A-B
-        phaseAPWM();
+			  phaseCFLOAT();
         phaseBLOW();
-        phaseCFLOAT();
+        phaseAPWM();
         break;
 
     case 2: // C-B
@@ -309,27 +309,27 @@ void comStep(char newStep)
         break;
 
     case 3: // C-A
+			  phaseBFLOAT();
         phaseALOW();
-        phaseBFLOAT();
         phaseCPWM();
         break;
 
     case 4: // B-A
-        phaseALOW();
-        phaseBPWM();
         phaseCFLOAT();
+		    phaseALOW();
+        phaseBPWM();
         break;
 
     case 5: // B-C
         phaseAFLOAT();
-        phaseBPWM();
         phaseCLOW();
+		    phaseBPWM();
         break;
 
     case 6: // A-C
-        phaseAPWM();
         phaseBFLOAT();
         phaseCLOW();
+		    phaseAPWM();
         break;
     }
 }

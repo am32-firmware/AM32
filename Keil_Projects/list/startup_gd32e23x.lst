@@ -377,12 +377,13 @@ ARM Macro Assembler    Page 6
   255 00000014                 END
               00000000 
               00000000 
-Command Line: --xref --diag_suppress=9931 --cpu=Cortex-M23 --depend=.\output\st
-artup_gd32e23x.d -o.\output\startup_gd32e23x.o -IC:\Users\alkaz\AppData\Local\A
-rm\Packs\GigaDevice\GD32E23x_DFP\1.0.1\Device\Include --predefine="__EVAL SETA 
-1" --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 536" --p
-redefine="GD32E23x SETA 1" --list=.\list\startup_gd32e23x.lst ..\Mcu\e230\Start
-up\mdk\startup_gd32e23x.s
+Command Line: --xref --diag_suppress=9931,A1950W --cpu=Cortex-M23 --depend=.\ob
+jects\startup_gd32e23x.d -o.\objects\startup_gd32e23x.o -I.\RTE\_SKYSTARS_KM55_
+E230 -IC:\KeilPacks\ARM\CMSIS\5.9.0\CMSIS\Core\Include -IC:\KeilPacks\GigaDevic
+e\GD32E23x_DFP\1.0.1\Device\Include --predefine="__EVAL SETA 1" --predefine="__
+MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 538" --predefine="_RTE_ SE
+TA 1" --predefine="GD32E23x SETA 1" --predefine="_RTE_ SETA 1" --list=.\list\st
+artup_gd32e23x.lst ..\Mcu\e230\Startup\mdk\startup_gd32e23x.s
 
 
 
@@ -900,4 +901,4 @@ Symbol: __main
       At line 133 in file ..\Mcu\e230\Startup\mdk\startup_gd32e23x.s
 Comment: __main used once
 2 symbols
-387 symbols in table
+388 symbols in table

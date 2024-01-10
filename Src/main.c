@@ -243,7 +243,7 @@ fastPID speedPid = { // commutation speed loop time
 };
 
 fastPID currentPid = { // 1khz loop time
-    .Kp = 800,
+    .Kp = 400,
     .Ki = 0,
     .Kd = 1000,
     .integral_limit = 20000,
@@ -670,14 +670,17 @@ void loadEEpromSettings()
     } else {
         stall_protection = 0;
     }
-    setVolume(5);
+    setVolume(2);
     if (eepromBuffer[1] > 0) { // these commands weren't introduced until eeprom version 1.
-
+#ifdef CUSTOM_RAMP
+			
+#else
         if (eepromBuffer[30] > 11) {
             setVolume(5);
         } else {
             setVolume(eepromBuffer[30]);
         }
+#endif
         if (eepromBuffer[31] == 0x01) {
             TLM_ON_INTERVAL = 1;
         } else {
@@ -1369,6 +1372,7 @@ void tenKhzRoutine()
 #ifndef BRUSHED_MODE
 
     if (!stepper_sine) {
+#ifndef CUSTOM_RAMP
         if (old_routine && running) {
             maskPhaseInterrupts();
             getBemfState();
@@ -1386,7 +1390,7 @@ void tenKhzRoutine()
                 }
             }
         }
-
+#endif
         if (one_khz_loop_counter > PID_LOOP_DIVIDER) { // 1khz PID loop
             one_khz_loop_counter = 0;
             if (use_current_limit && running) {
@@ -1441,7 +1445,9 @@ void tenKhzRoutine()
                 }
             }
 #endif
-
+#ifdef CUSTOM_RAMP
+             max_duty_cycle_change = eepromBuffer[30];
+#endif
             if ((duty_cycle - last_duty_cycle) > max_duty_cycle_change) {
                 duty_cycle = last_duty_cycle + max_duty_cycle_change;
                 if (commutation_interval > 500) {
@@ -1487,7 +1493,7 @@ void tenKhzRoutine()
         signaltimeout = 0;
     }
 #else
-    signaltimeout++;
+    signaltimeout++;         
 
 #endif
 }
@@ -2004,19 +2010,19 @@ setInput();
             if (degrees_celsius > TEMPERATURE_LIMIT) {
                 duty_cycle_maximum = map(degrees_celsius, TEMPERATURE_LIMIT - 10, TEMPERATURE_LIMIT + 10, throttle_max_at_high_rpm / 2, 1);
             }
-            if (zero_crosses < 100 || commutation_interval > 500) {
+            if (zero_crosses < 100 && commutation_interval > 500) {
 #ifdef MCU_G071
-                TIM1->CCR5 = 50; // comparator blanking
-                filter_level = 4;
+                TIM1->CCR5 = 500; // comparator blanking
+                filter_level = 8;
 #else
                 filter_level = 12;
 #endif
             } else {
 #ifdef MCU_G071
                 TIM1->CCR5 = 50;
-#else
-                filter_level = map(average_interval, 100, 500, 3, 12);
 #endif
+                filter_level = map(average_interval, 100, 500, 3, 12);
+
             }
             if (commutation_interval < 100) {
                 filter_level = 2;
@@ -2028,23 +2034,25 @@ setInput();
             }
 
             /**************** old routine*********************/
-            // if (old_routine && running){
-            //	maskPhaseInterrupts();
-            //	 		 getBemfState();
-            //	 	  if (!zcfound){
-            //	 		  if (rising){
-            //	 		 if (bemfcounter > min_bemf_counts_up){
-            //	 			 zcfound = 1;
-            //	 			 zcfoundroutine();
-            //	 		}
-            //	 		  }else{
-            //	 			  if (bemfcounter > min_bemf_counts_down){
-            //  			  			 zcfound = 1;
-            //	 		  			 zcfoundroutine();
-            //	 			  		}
-            //	 		  }
-            //	 	  }
-            // }
+#ifdef CUSTOM_RAMP
+             if (old_routine && running){
+            	maskPhaseInterrupts();
+            	 		 getBemfState();
+            	 	  if (!zcfound){
+            	 		  if (rising){
+            	 		 if (bemfcounter > min_bemf_counts_up){
+            	 			 zcfound = 1;
+            	 			 zcfoundroutine();
+            	 		}
+            	 		  }else{
+            	 			  if (bemfcounter > min_bemf_counts_down){
+              			  			 zcfound = 1;
+            	 		  			 zcfoundroutine();
+            	 			  		}
+            	 		  }
+            	 	  }
+             }
+#endif
             if (INTERVAL_TIMER_COUNT > 45000 && running == 1) {
                 bemf_timeout_happened++;
 

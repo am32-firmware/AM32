@@ -160,12 +160,12 @@ void DMA1_Channel5_4_IRQHandler(void)
         EXINT->swtrg = EXINT_LINE_15;
         return;
     }
-    if (dma_flag_get(DMA1_HDT5_FLAG) == SET) {
-        if (servoPwm) {
-            IC_TIMER_REGISTER->cctrl_bit.c1p = TMR_INPUT_FALLING_EDGE;
-            DMA1->clr = DMA1_HDT5_FLAG;
-        }
-    }
+//    if (dma_flag_get(DMA1_HDT5_FLAG) == SET) {
+//        if (servoPwm) {
+//            IC_TIMER_REGISTER->cctrl_bit.c1p = TMR_INPUT_FALLING_EDGE;
+//            DMA1->clr = DMA1_HDT5_FLAG;
+//        }
+//    }
 
     if (dma_flag_get(DMA1_FDT5_FLAG) == SET) {
         DMA1->clr = DMA1_GL5_FLAG;

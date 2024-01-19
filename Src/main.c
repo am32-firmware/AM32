@@ -181,7 +181,9 @@
                  - Change current averaging method for more precision
                  - Fix startup ramp speed adjustment
 *2.05		 - Fix ramp tied to input frequency								 
-                 
+*2.06    - fix input pullups
+         - Remove half xfer insterrupt from servo routine
+				 - update running brake and brake on stop
 */
 #include "main.h"
 #include "ADC.h"
@@ -208,7 +210,7 @@
 #endif
 
 #define VERSION_MAJOR 2
-#define VERSION_MINOR 05
+#define VERSION_MINOR 06
 
 uint32_t pwm_frequency_conversion_factor = 0;
 uint16_t blank_time;
@@ -266,6 +268,7 @@ enum inputType {
     EDTARM,
 };
 
+uint16_t prop_brake_duty_cycle = 0;
 uint16_t ledcounter = 0;
 uint32_t process_time = 0;
 uint32_t start_process = 0;
@@ -361,7 +364,7 @@ char low_rpm_throttle_limit = 1;
 uint16_t low_voltage_count = 0;
 uint16_t telem_ms_count;
 
-char VOLTAGE_DIVIDER = TARGET_VOLTAGE_DIVIDER; // 100k upper and 10k lower resistor in divider
+uint16_t VOLTAGE_DIVIDER = TARGET_VOLTAGE_DIVIDER; // 100k upper and 10k lower resistor in divider
 uint16_t battery_voltage; // scale in volts * 10.  1260 is a battery voltage of 12.60
 char cell_count = 0;
 char brushed_direction_set = 0;
@@ -732,6 +735,12 @@ void loadEEpromSettings()
             startup_max_duty_cycle = startup_max_duty_cycle + dead_time_override;
 #ifdef STMICRO
             TIM1->BDTR |= dead_time_override;
+#endif
+#ifdef ARTERY
+						TMR1->brk |= dead_time_override;
+#endif
+#ifdef GIGADEVICES
+						 TIMER_CCHP(TIMER0)|= dead_time_override;
 #endif
         }
 
@@ -1252,7 +1261,7 @@ void setInput()
                     if (brake_on_stop) {
                         if (!use_sin_start) {
 #ifndef PWM_ENABLE_BRIDGE
-                            duty_cycle = (TIMER1_MAX_ARR - 19) + drag_brake_strength * 2;
+                            prop_brake_duty_cycle = (TIMER1_MAX_ARR - 19) + drag_brake_strength * 2;
                             proportionalBrake();
                             prop_brake_active = 1;
 #else
@@ -1472,7 +1481,7 @@ void tenKhzRoutine()
         } else {
 
             if (prop_brake_active) {
-                adjusted_duty_cycle = TIMER1_MAX_ARR - duty_cycle;
+                adjusted_duty_cycle = TIMER1_MAX_ARR - ((prop_brake_duty_cycle * tim1_arr) / TIMER1_MAX_ARR) + 1;
             } else {
                 adjusted_duty_cycle = ((duty_cycle * tim1_arr) / TIMER1_MAX_ARR);
             }
@@ -1780,8 +1789,10 @@ int main(void)
     }
 
 #endif
-#ifdef MCU_G071
+#ifdef NEUTRONRC_G071
 setInputPullDown();
+#else
+setInputPullUp();
 #endif
     while (1) {
 #ifdef FIXED_DUTY_MODE

@@ -271,12 +271,12 @@ void setInputPolarityRising()
 
 void setInputPullDown()
 {
-    gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_INPUT, GPIO_PULL_DOWN, INPUT_PIN);
+    gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_MUX, GPIO_PULL_DOWN, INPUT_PIN);
 }
 
 void setInputPullUp()
 {
-    gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_INPUT, GPIO_PULL_UP, INPUT_PIN);
+    gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_MUX, GPIO_PULL_UP, INPUT_PIN);
 }
 
 void enableHalfTransferInt()

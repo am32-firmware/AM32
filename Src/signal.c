@@ -49,8 +49,8 @@ void computeMSInput()
 
 void computeServoInput()
 {
-
-    if (((dma_buffer[1] - dma_buffer[0]) > 800) && ((dma_buffer[1] - dma_buffer[0]) < 2200)) {
+   if (((dma_buffer[1] - dma_buffer[0]) > 800) && ((dma_buffer[1] - dma_buffer[0]) < 2200)) {
+		
         if (calibration_required) {
             if (!high_calibration_set) {
                 if (high_calibration_counts == 0) {
@@ -98,9 +98,9 @@ void computeServoInput()
                     servorawinput = 0;
                 }
             }
-            signaltimeout = 0;
+          signaltimeout = 0;  
         }
-    } else {
+   } else {
         zero_input_count = 0; // reset if out of range
     }
 
@@ -115,6 +115,7 @@ void computeServoInput()
 
 void transfercomplete()
 {
+		signaltimeout = 0;
     if (armed && dshot_telemetry) {
         if (out_put) {
             receiveDshotDma();
@@ -150,11 +151,13 @@ void transfercomplete()
                 receiveDshotDma();
             }
             if (servoPwm == 1) {
-                computeServoInput();
-                // setup rising pin trigger.
-                setInputPolarityRising();
+							if(getInputPinState()){
+								buffersize = 3;
+								}else{
+								buffersize = 2;
+							  computeServoInput();
+								}
                 receiveDshotDma();
-                enableHalfTransferInt();
             }
         }
         if (!armed) {

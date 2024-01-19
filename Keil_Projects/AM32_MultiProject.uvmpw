@@ -9,6 +9,7 @@
 
   <project>
     <PathAndName>.\Am32e230.uvprojx</PathAndName>
+    <NodeIsExpanded>1</NodeIsExpanded>
     <NodeIsCheckedInBatchBuild>1</NodeIsCheckedInBatchBuild>
   </project>
 
@@ -19,6 +20,7 @@
 
   <project>
     <PathAndName>.\Am32F051.uvprojx</PathAndName>
+    <NodeIsExpanded>1</NodeIsExpanded>
     <NodeIsCheckedInBatchBuild>1</NodeIsCheckedInBatchBuild>
   </project>
 
@@ -29,18 +31,19 @@
 
   <project>
     <PathAndName>.\Am32F421.uvprojx</PathAndName>
+    <NodeIsActive>1</NodeIsActive>
+    <NodeIsExpanded>1</NodeIsExpanded>
     <NodeIsCheckedInBatchBuild>1</NodeIsCheckedInBatchBuild>
   </project>
 
   <project>
     <PathAndName>.\Am32G071.uvprojx</PathAndName>
+    <NodeIsExpanded>1</NodeIsExpanded>
     <NodeIsCheckedInBatchBuild>1</NodeIsCheckedInBatchBuild>
   </project>
 
   <project>
     <PathAndName>.\Am32G431.uvprojx</PathAndName>
-    <NodeIsActive>1</NodeIsActive>
-    <NodeIsExpanded>1</NodeIsExpanded>
   </project>
 
 </ProjectWorkspace>

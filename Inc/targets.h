@@ -278,6 +278,20 @@
 
 /***************************************End Generic *****************************************/
 
+#ifdef GIPSY_F421
+#define FIRMWARE_NAME "GiPSy F421  "
+#define FILE_NAME "GIPSY_F421"
+#define DEAD_TIME 80
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_045
+#define USE_SERIAL_TELEMETRY
+#define TARGET_VOLTAGE_DIVIDER 1010
+#define MILLIVOLT_PER_AMP 50
+#define ADC_CHANNEL_CURRENT ADC_CHANNEL_3
+#define ADC_CHANNEL_VOLTAGE ADC_CHANNEL_6
+#endif
+
+
 #ifdef TEKKO32_F421
 #define FIRMWARE_NAME "Tekko32 F4  "
 #define FILE_NAME "TEKKO32_F421"
@@ -731,13 +745,11 @@
 #define FILE_NAME "GEN_64K_G071"
 #define FIRMWARE_NAME "G071 64kESC "
 #define DEAD_TIME 60
-#define MILLIVOLT_PER_AMP 67
+#define MILLIVOLT_PER_AMP 20
 #define CURRENT_OFFSET 0
 #define HARDWARE_GROUP_G0_A
 #define USE_SERIAL_TELEMETRY
 #define SIXTY_FOUR_KB_MEMORY
-#define LOOP_FREQUENCY_HZ 500
-#define CUSTOM_RAMP
 #endif
 
 #ifdef TMOTOR_G071

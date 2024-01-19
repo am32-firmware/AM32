@@ -71,7 +71,8 @@ void sendDshotDma()
 uint8_t
 getInputPinState()
 {
-    return (INPUT_PIN_PORT->idt & INPUT_PIN);
+	  uint8_t state = INPUT_PIN_PORT->idt & INPUT_PIN;
+    return state;
 }
 
 void setInputPolarityRising()
@@ -81,12 +82,12 @@ void setInputPolarityRising()
 
 void setInputPullDown()
 {
-    gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_INPUT, GPIO_PULL_DOWN, INPUT_PIN);
+    gpio_mode_set(INPUT_PIN_PORT, GPIO_MODE_MUX, GPIO_PULL_DOWN, INPUT_PIN);
 }
 
 void setInputPullUp()
 {
-    gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_INPUT, GPIO_PULL_UP, INPUT_PIN);
+    gpio_mode_set(INPUT_PIN_PORT, GPIO_MODE_MUX, GPIO_PULL_UP, INPUT_PIN);
 }
 
 void enableHalfTransferInt()
@@ -95,5 +96,5 @@ void enableHalfTransferInt()
 }
 void setInputPullNone()
 {
-    gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_MUX, GPIO_PULL_NONE, INPUT_PIN);
+    gpio_mode_set(INPUT_PIN_PORT, GPIO_MODE_MUX, GPIO_PULL_NONE, INPUT_PIN);
 }

@@ -73,12 +73,12 @@ void setInputPolarityRising()
 
 void setInputPullDown()
 {
-    gpio_mode_set(GPIOB, GPIO_MODE_INPUT, GPIO_PUPD_PULLDOWN, INPUT_PIN);
+    gpio_mode_set(GPIOB, GPIO_MODE_AF, GPIO_PUPD_PULLDOWN, INPUT_PIN);
 }
 
 void setInputPullUp()
 {
-    gpio_mode_set(GPIOB, GPIO_MODE_INPUT, GPIO_PUPD_PULLUP, INPUT_PIN);
+    gpio_mode_set(GPIOB, GPIO_MODE_AF, GPIO_PUPD_PULLUP, INPUT_PIN);
 }
 
 void enableHalfTransferInt()

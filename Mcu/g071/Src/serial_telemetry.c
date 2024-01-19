@@ -6,9 +6,11 @@
  */
 
 #include "serial_telemetry.h"
+#include "targets.h"
 
 uint8_t aTxBuffer[10];
 uint8_t nbDataToTransmit = sizeof(aTxBuffer);
+
 
 void telem_UART_Init()
 {

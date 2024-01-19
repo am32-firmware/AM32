@@ -110,6 +110,11 @@ void gpio_mode_QUICK(gpio_type* gpio_periph, uint32_t mode, uint32_t pull_up_dow
 {
     gpio_periph->cfgr = (((((gpio_periph->cfgr))) & (~(((pin * pin) * (0x3UL << (0U)))))) | (((pin * pin) * mode)));
 }
+void gpio_mode_set(gpio_type* gpio_periph, uint32_t mode, uint32_t pull_up_down, uint32_t pin)
+{
+ gpio_periph->cfgr = (((((gpio_periph->cfgr))) & (~(((pin * pin) * (0x3UL << (0U)))))) | (((pin * pin) * mode)));
+ gpio_periph->pull = ((((((gpio_periph->pull))) & (~(((pin * pin) * (0x3UL << (0U)))))) | (((pin * pin) * pull_up_down))));
+}
 #endif
 #ifdef MCU_AT415
 void gpio_mode_QUICK(gpio_type* gpio_periph, uint32_t mode, uint32_t pull_up_down, uint32_t pin)

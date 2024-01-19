@@ -378,7 +378,7 @@ ARM Macro Assembler    Page 6
               00000000 
               00000000 
 Command Line: --xref --diag_suppress=9931,A1950W --cpu=Cortex-M23 --depend=.\ob
-jects\startup_gd32e23x.d -o.\objects\startup_gd32e23x.o -I.\RTE\_SKYSTARS_KM55_
+jects\startup_gd32e23x.d -o.\objects\startup_gd32e23x.o -I.\RTE\_SKYSTARS_AM45_
 E230 -IC:\KeilPacks\ARM\CMSIS\5.9.0\CMSIS\Core\Include -IC:\KeilPacks\GigaDevic
 e\GD32E23x_DFP\1.0.1\Device\Include --predefine="__EVAL SETA 1" --predefine="__
 MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 538" --predefine="_RTE_ SE

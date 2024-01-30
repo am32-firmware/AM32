@@ -184,6 +184,8 @@
 *2.06    - fix input pullups
          - Remove half xfer insterrupt from servo routine
 				 - update running brake and brake on stop
+*2.07    - Dead time change f4a				 
+*2.08		 - Move zero crosss timing 
 */
 #include "main.h"
 #include "ADC.h"
@@ -210,7 +212,7 @@
 #endif
 
 #define VERSION_MAJOR 2
-#define VERSION_MINOR 06
+#define VERSION_MINOR 8
 
 uint32_t pwm_frequency_conversion_factor = 0;
 uint16_t blank_time;
@@ -253,9 +255,9 @@ fastPID currentPid = { // 1khz loop time
 };
 
 fastPID stallPid = { // 1khz loop time
-    .Kp = 2,
+    .Kp = 1,
     .Ki = 0,
-    .Kd = 50,
+    .Kd = 100,
     .integral_limit = 10000,
     .output_limit = 50000
 };
@@ -268,6 +270,7 @@ enum inputType {
     EDTARM,
 };
 
+char set_hysteris = 0;
 uint16_t prop_brake_duty_cycle = 0;
 uint16_t ledcounter = 0;
 uint32_t process_time = 0;
@@ -654,7 +657,7 @@ void loadEEpromSettings()
     }
 
     if (eepromBuffer[25] < 151 && eepromBuffer[25] > 49) {
-        min_startup_duty = (eepromBuffer[25] + DEAD_TIME * 2);
+        min_startup_duty = (eepromBuffer[25] + DEAD_TIME);
         minimum_duty_cycle = (eepromBuffer[25] / 2 + DEAD_TIME / 3);
         stall_protect_minimum_duty = minimum_duty_cycle + 10;
     } else {
@@ -888,8 +891,7 @@ void getBemfState()
 
 void commutate()
 {
-
-    if (forward == 1) {
+   if (forward == 1) {
         step++;
         if (step > 6) {
             step = 1;
@@ -922,7 +924,6 @@ void commutate()
 
 void PeriodElapsedCallback()
 {
-
     DISABLE_COM_TIMER_INT(); // disable interrupt
     commutate();
     commutation_interval = ((3 * commutation_interval) + thiszctime) >> 2;
@@ -938,8 +939,6 @@ void PeriodElapsedCallback()
 
 void interruptRoutine()
 {
-    // uint8_t badzccount = 0;
-    thiszctime = INTERVAL_TIMER_COUNT;
     if (average_interval > 125) {
         if ((INTERVAL_TIMER_COUNT < 125) && (duty_cycle < 600) && (zero_crosses < 500)) { // should be impossible, desync?exit anyway
             return;
@@ -954,7 +953,7 @@ void interruptRoutine()
             return;
         }
     }
-
+thiszctime = INTERVAL_TIMER_COUNT;
     if (rising) {
         for (int i = 0; i < filter_level; i++) {
 #ifdef MCU_F031
@@ -962,7 +961,6 @@ void interruptRoutine()
 #else
             if (getCompOutputLevel()) {
 #endif
-                //		badzccount++;
                 return;
             }
         }
@@ -973,15 +971,10 @@ void interruptRoutine()
 #else
             if (!getCompOutputLevel()) {
 #endif
-                //		badzccount++;
                 return;
             }
         }
     }
-    //			if(badzccount > bad_count_threshold){
-    //				return;
-    //			}
-
     maskPhaseInterrupts();
     __disable_irq();
     if (INTERVAL_TIMER_COUNT > thiszctime) {
@@ -1433,7 +1426,6 @@ void tenKhzRoutine()
                 }
             }
         }
-
         if (maximum_throttle_change_ramp) {
             //	max_duty_cycle_change = map(k_erpm, low_rpm_level, high_rpm_level, 1, 40);
 #ifdef VOLTAGE_BASED_RAMP
@@ -1486,7 +1478,6 @@ void tenKhzRoutine()
                 adjusted_duty_cycle = ((duty_cycle * tim1_arr) / TIMER1_MAX_ARR);
             }
         }
-
         last_duty_cycle = duty_cycle;
         SET_AUTO_RELOAD_PWM(tim1_arr);
         SET_DUTY_CYCLE_ALL(adjusted_duty_cycle);
@@ -1685,7 +1676,7 @@ int main(void)
 #endif
 
     if (use_sin_start) {
-        min_startup_duty = sin_mode_min_s_d;
+    //    min_startup_duty = sin_mode_min_s_d;
     }
     if (dir_reversed == 1) {
         forward = 0;
@@ -2030,7 +2021,7 @@ setInput();
 #endif
             } else {
 #ifdef MCU_G071
-                TIM1->CCR5 = 50;
+                TIM1->CCR5 = 100;
 #endif
                 filter_level = map(average_interval, 100, 500, 3, 12);
 
@@ -2043,6 +2034,27 @@ setInput();
 
                 filter_level = filter_level * 2;
             }
+#ifdef MCU_G071
+
+						if(average_interval > 1000){
+							if(old_routine){
+							set_hysteris = 0;
+							MODIFY_REG(COMP2->CSR, COMP_CSR_HYST, LL_COMP_HYSTERESIS_NONE);
+							}else{
+						if(!set_hysteris){
+                MODIFY_REG(COMP2->CSR, COMP_CSR_HYST, LL_COMP_HYSTERESIS_LOW);
+								set_hysteris = 1;	
+						}
+						}
+						}else{
+							if(set_hysteris){
+							MODIFY_REG(COMP2->CSR, COMP_CSR_HYST, LL_COMP_HYSTERESIS_NONE);
+							set_hysteris = 0;
+							}
+						}
+					
+#endif					
+						
 
             /**************** old routine*********************/
 #ifdef CUSTOM_RAMP

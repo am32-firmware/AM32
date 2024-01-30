@@ -25,7 +25,7 @@ void changeToOutput()
     IC_TIMER_REGISTER->cm1 = 0x60; // oc mode pwm
     IC_TIMER_REGISTER->cctrl = 0x3; //
     IC_TIMER_REGISTER->div = output_timer_prescaler;
-    IC_TIMER_REGISTER->pr = 76;
+    IC_TIMER_REGISTER->pr = 76; // 76 to start
 
     out_put = 1;
     IC_TIMER_REGISTER->swevt_bit.ovfswtr = TRUE;
@@ -35,7 +35,7 @@ void changeToInput()
 {
     INPUT_DMA_CHANNEL->ctrl |= DMA_DIR_PERIPHERAL_TO_MEMORY;
     tmr_reset(IC_TIMER_REGISTER);
-    IC_TIMER_REGISTER->cm1 = 0x7001;
+    IC_TIMER_REGISTER->cm1 = 0x71;
     IC_TIMER_REGISTER->cctrl = 0xB;
     IC_TIMER_REGISTER->div = ic_timer_prescaler;
     IC_TIMER_REGISTER->pr = 0xFFFF;

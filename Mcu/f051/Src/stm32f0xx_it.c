@@ -105,9 +105,7 @@ void DMA1_Channel2_3_IRQHandler(void)
     } else if (LL_DMA_IsActiveFlag_TE2(DMA1)) {
         LL_DMA_ClearFlag_GI2(DMA1);
         LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);
-    }
-		if(serial_mode == 5){
-			
+    }	
 }
 
 /**

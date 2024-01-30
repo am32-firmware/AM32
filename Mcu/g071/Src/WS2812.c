@@ -23,7 +23,7 @@ void send_LED_DMA()
     LL_DMA_ConfigAddresses(
         DMA1, LL_DMA_CHANNEL_6, (uint32_t)&led_Buffer, (uint32_t)&TIM16->CCR1,
         LL_DMA_GetDataTransferDirection(DMA1, LL_DMA_CHANNEL_6));
-    LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_6, 24);
+    LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_6, 28);
     LL_DMA_EnableIT_TC(DMA1, LL_DMA_CHANNEL_6);
     LL_DMA_EnableIT_TE(DMA1, LL_DMA_CHANNEL_6);
     LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_6);

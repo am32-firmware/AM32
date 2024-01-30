@@ -78,7 +78,7 @@ void changeToInput()
 
     // IC_TIMER_REGISTER->CCMR1 = 0x1;
     //	TIMER_CHCTL0(IC_TIMER_REGISTER) = 0x1;
-    IC_TIMER_REGISTER->cm1 = 0x7001;
+    IC_TIMER_REGISTER->cm1 = 0x71;
     //	  IC_TIMER_REGISTER->CCER = 0xa;
     // TIMER_CHCTL2(IC_TIMER_REGISTER) = 0xa;
     IC_TIMER_REGISTER->cctrl = 0xB;

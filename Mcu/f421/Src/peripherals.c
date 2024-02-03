@@ -43,10 +43,7 @@ void initCorePeripherals(void)
 #endif
 }
 
-void initAfterJump(void)
-{
-    __enable_irq();
-}
+void initAfterJump(void) { __enable_irq(); }
 
 void system_clock_config(void)
 {
@@ -203,9 +200,7 @@ void MX_DMA_Init(void)
     NVIC_EnableIRQ(DMA1_Channel5_4_IRQn);
 }
 
-void MX_GPIO_Init(void)
-{
-}
+void MX_GPIO_Init(void) { }
 
 void UN_TIM_Init(void)
 {
@@ -275,15 +270,9 @@ void reloadWatchDogCounter()
     WDT->cmd = WDT_CMD_RELOAD;
 }
 
-void disableComTimerInt()
-{
-    COM_TIMER->iden &= ~TMR_OVF_INT;
-}
+void disableComTimerInt() { COM_TIMER->iden &= ~TMR_OVF_INT; }
 
-void enableComTimerInt()
-{
-    COM_TIMER->iden |= TMR_OVF_INT;
-}
+void enableComTimerInt() { COM_TIMER->iden |= TMR_OVF_INT; }
 
 void setAndEnableComInt(uint16_t time)
 {
@@ -293,26 +282,16 @@ void setAndEnableComInt(uint16_t time)
     COM_TIMER->iden |= TMR_OVF_INT;
 }
 
-uint16_t
-getintervaTimerCount()
-{
-    return INTERVAL_TIMER->cval;
-}
+uint16_t getintervaTimerCount() { return INTERVAL_TIMER->cval; }
 
 void setintervaTimerCount(uint16_t intertime)
 {
     INTERVAL_TIMER->cval = intertime;
 }
 
-void setPrescalerPWM(uint16_t presc)
-{
-    TMR1->div = presc;
-}
+void setPrescalerPWM(uint16_t presc) { TMR1->div = presc; }
 
-void setAutoReloadPWM(uint16_t relval)
-{
-    TMR1->pr = relval;
-}
+void setAutoReloadPWM(uint16_t relval) { TMR1->pr = relval; }
 
 void setDutyCycleAll(uint16_t newdc)
 {
@@ -321,18 +300,9 @@ void setDutyCycleAll(uint16_t newdc)
     TMR1->c3dt = newdc;
 }
 
-void setPWMCompare1(uint16_t compareone)
-{
-    TMR1->c1dt = compareone;
-}
-void setPWMCompare2(uint16_t comparetwo)
-{
-    TMR1->c2dt = comparetwo;
-}
-void setPWMCompare3(uint16_t comparethree)
-{
-    TMR1->c3dt = comparethree;
-}
+void setPWMCompare1(uint16_t compareone) { TMR1->c1dt = compareone; }
+void setPWMCompare2(uint16_t comparetwo) { TMR1->c2dt = comparetwo; }
+void setPWMCompare3(uint16_t comparethree) { TMR1->c3dt = comparethree; }
 
 void generatePwmTimerEvent()
 {

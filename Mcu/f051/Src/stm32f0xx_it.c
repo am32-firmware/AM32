@@ -53,9 +53,7 @@ int interrupt_time = 0;
 /**
  * @brief This function handles Non maskable interrupt.
  */
-void NMI_Handler(void)
-{
-}
+void NMI_Handler(void) { }
 
 /**
  * @brief This function handles Hard fault interrupt.
@@ -69,23 +67,17 @@ void HardFault_Handler(void)
 /**
  * @brief This function handles System service call via SWI instruction.
  */
-void SVC_Handler(void)
-{
-}
+void SVC_Handler(void) { }
 
 /**
  * @brief This function handles Pendable request for system service.
  */
-void PendSV_Handler(void)
-{
-}
+void PendSV_Handler(void) { }
 
 /**
  * @brief This function handles System tick timer.
  */
-void SysTick_Handler(void)
-{
-}
+void SysTick_Handler(void) { }
 
 /******************************************************************************/
 /* STM32F0xx Peripheral Interrupt Handlers */
@@ -105,7 +97,7 @@ void DMA1_Channel2_3_IRQHandler(void)
     } else if (LL_DMA_IsActiveFlag_TE2(DMA1)) {
         LL_DMA_ClearFlag_GI2(DMA1);
         LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);
-    }	
+    }
 }
 
 /**

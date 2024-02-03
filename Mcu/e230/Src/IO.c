@@ -36,8 +36,7 @@ void receiveDshotDma()
     TIMER_DMAINTEN(IC_TIMER_REGISTER) |= (uint32_t)TIMER_DMA_CH0D;
     TIMER_CHCTL2(IC_TIMER_REGISTER) |= (uint32_t)TIMER_CCX_ENABLE;
     TIMER_CTL0(IC_TIMER_REGISTER) |= (uint32_t)TIMER_CTL0_CEN;
-    DMA_CHCTL(INPUT_DMA_CHANNEL)
-        = 0x0000098b; // just set the whole reg in one go to enable
+    DMA_CHCTL(INPUT_DMA_CHANNEL) = 0x0000098b; // just set the whole reg in one go to enable
 }
 
 void sendDshotDma()
@@ -51,8 +50,7 @@ void sendDshotDma()
     out_put = 1;
     TIMER_SWEVG(IC_TIMER_REGISTER) |= (uint32_t)TIMER_EVENT_SRC_UPG;
     DMA_CHMADDR(INPUT_DMA_CHANNEL) = (uint32_t)&gcr;
-    DMA_CHCNT(INPUT_DMA_CHANNEL)
-        = ((23 + buffer_padding) & DMA_CHANNEL_CNT_MASK);
+    DMA_CHCNT(INPUT_DMA_CHANNEL) = ((23 + buffer_padding) & DMA_CHANNEL_CNT_MASK);
     DMA_CHCTL(INPUT_DMA_CHANNEL) = 0x0000099b;
     TIMER_DMAINTEN(IC_TIMER_REGISTER) |= (uint32_t)TIMER_DMA_CH0D;
     TIMER_CHCTL2(IC_TIMER_REGISTER) |= (uint32_t)TIMER_CCX_ENABLE;
@@ -60,11 +58,7 @@ void sendDshotDma()
     TIMER_CTL0(IC_TIMER_REGISTER) |= (uint32_t)TIMER_CTL0_CEN;
 }
 
-uint8_t
-getInputPinState()
-{
-    return GPIO_ISTAT(INPUT_PIN_PORT) & (INPUT_PIN);
-}
+uint8_t getInputPinState() { return GPIO_ISTAT(INPUT_PIN_PORT) & (INPUT_PIN); }
 
 void setInputPolarityRising()
 {
@@ -81,10 +75,7 @@ void setInputPullUp()
     gpio_mode_set(GPIOB, GPIO_MODE_AF, GPIO_PUPD_PULLUP, INPUT_PIN);
 }
 
-void enableHalfTransferInt()
-{
-    DMA_CHCTL(INPUT_DMA_CHANNEL) |= DMA_INT_HTF;
-}
+void enableHalfTransferInt() { DMA_CHCTL(INPUT_DMA_CHANNEL) |= DMA_INT_HTF; }
 void setInputPullNone()
 {
     gpio_mode_set(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, INPUT_PIN);

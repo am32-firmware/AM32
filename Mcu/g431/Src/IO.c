@@ -32,7 +32,6 @@ void receiveDshotDma()
     IC_TIMER_REGISTER->CCMR1 = 0x0601;
     IC_TIMER_REGISTER->CCER = 0xa;
 
-
     IC_TIMER_REGISTER->PSC = ic_timer_prescaler;
     IC_TIMER_REGISTER->ARR = 0xFFFF;
     IC_TIMER_REGISTER->EGR |= TIM_EGR_UG;
@@ -55,7 +54,7 @@ void sendDshotDma()
     IC_TIMER_REGISTER->CCMR1 = 0x60;
     IC_TIMER_REGISTER->CCER = 0x3;
 #endif
- 
+
     LL_APB2_GRP1_ForceReset(LL_APB2_GRP1_PERIPH_TIM15); // de-init timer 2
     LL_APB2_GRP1_ReleaseReset(LL_APB2_GRP1_PERIPH_TIM15);
     IC_TIMER_REGISTER->CCMR1 = 0x60;
@@ -76,11 +75,7 @@ void sendDshotDma()
     IC_TIMER_REGISTER->CR1 |= TIM_CR1_CEN;
 }
 
-uint8_t
-getInputPinState()
-{
-    return (INPUT_PIN_PORT->IDR & INPUT_PIN);
-}
+uint8_t getInputPinState() { return (INPUT_PIN_PORT->IDR & INPUT_PIN); }
 
 void setInputPolarityRising()
 {
@@ -98,10 +93,7 @@ void setInputPullUp()
     LL_GPIO_SetPinPull(INPUT_PIN_PORT, INPUT_PIN, LL_GPIO_PULL_UP);
 }
 
-void enableHalfTransferInt()
-{
-    LL_DMA_EnableIT_HT(DMA1, INPUT_DMA_CHANNEL);
-}
+void enableHalfTransferInt() { LL_DMA_EnableIT_HT(DMA1, INPUT_DMA_CHANNEL); }
 void setInputPullNone()
 {
     LL_GPIO_SetPinPull(INPUT_PIN_PORT, INPUT_PIN, LL_GPIO_PULL_NO);

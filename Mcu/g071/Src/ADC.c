@@ -74,9 +74,7 @@ void activateADC(void)
     if (LL_ADC_IsEnabled(ADC1) == 0) {
         /* Enable ADC internal voltage regulator */
         LL_ADC_EnableInternalRegulator(ADC1);
-        wait_loop_index = ((LL_ADC_DELAY_INTERNAL_REGUL_STAB_US
-                               * (SystemCoreClock / (100000 * 2)))
-            / 10);
+        wait_loop_index = ((LL_ADC_DELAY_INTERNAL_REGUL_STAB_US * (SystemCoreClock / (100000 * 2))) / 10);
         while (wait_loop_index != 0) {
             wait_loop_index--;
         }
@@ -140,8 +138,7 @@ void ADC_Init(void)
     LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_2,
         LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
 
-    LL_DMA_SetChannelPriorityLevel(DMA1, LL_DMA_CHANNEL_2,
-        LL_DMA_PRIORITY_HIGH);
+    LL_DMA_SetChannelPriorityLevel(DMA1, LL_DMA_CHANNEL_2, LL_DMA_PRIORITY_HIGH);
 
     LL_DMA_SetMode(DMA1, LL_DMA_CHANNEL_2, LL_DMA_MODE_CIRCULAR);
 

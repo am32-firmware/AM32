@@ -11,7 +11,6 @@
 uint8_t aTxBuffer[10];
 uint8_t nbDataToTransmit = sizeof(aTxBuffer);
 
-
 void telem_UART_Init()
 {
     LL_USART_InitTypeDef USART_InitStruct = { 0 };
@@ -65,8 +64,7 @@ void telem_UART_Init()
     LL_USART_ConfigHalfDuplexMode(USART1);
 
     LL_USART_Enable(USART1);
-    while ((!(LL_USART_IsActiveFlag_TEACK(USART1)))
-        || (!(LL_USART_IsActiveFlag_REACK(USART1)))) {
+    while ((!(LL_USART_IsActiveFlag_TEACK(USART1))) || (!(LL_USART_IsActiveFlag_REACK(USART1)))) {
     }
 
     LL_DMA_ConfigAddresses(
@@ -91,8 +89,7 @@ void send_telem_DMA()
     LL_USART_SetTransferDirection(USART1, LL_USART_DIRECTION_RX);
 }
 
-uint8_t
-update_crc8(uint8_t crc, uint8_t crc_seed)
+uint8_t update_crc8(uint8_t crc, uint8_t crc_seed)
 {
     uint8_t crc_u, i;
     crc_u = crc;
@@ -102,8 +99,7 @@ update_crc8(uint8_t crc, uint8_t crc_seed)
     return (crc_u);
 }
 
-uint8_t
-get_crc8(uint8_t* Buf, uint8_t BufLen)
+uint8_t get_crc8(uint8_t* Buf, uint8_t BufLen)
 {
     uint8_t crc = 0, i;
     for (i = 0; i < BufLen; i++)

@@ -24,8 +24,7 @@ void telem_UART_Init(void)
     gpio_af_set(GPIOB, GPIO_AF_0, GPIO_PIN_6);
 
     gpio_mode_set(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO_PIN_6);
-    gpio_output_options_set(GPIOB, GPIO_OTYPE_PP, GPIO_OSPEED_10MHZ,
-        GPIO_PIN_6);
+    gpio_output_options_set(GPIOB, GPIO_OTYPE_PP, GPIO_OSPEED_10MHZ, GPIO_PIN_6);
 
     dma_struct_para_init(&dma_init_struct);
 
@@ -70,8 +69,7 @@ void send_telem_DMA()
     //  usart_transmit_config(USART0, USART_TRANSMIT_DISABLE);
 }
 
-uint8_t
-update_crc8(uint8_t crc, uint8_t crc_seed)
+uint8_t update_crc8(uint8_t crc, uint8_t crc_seed)
 {
     uint8_t crc_u, i;
     crc_u = crc;
@@ -81,8 +79,7 @@ update_crc8(uint8_t crc, uint8_t crc_seed)
     return (crc_u);
 }
 
-uint8_t
-get_crc8(uint8_t* Buf, uint8_t BufLen)
+uint8_t get_crc8(uint8_t* Buf, uint8_t BufLen)
 {
     uint8_t crc = 0, i;
     for (i = 0; i < BufLen; i++)

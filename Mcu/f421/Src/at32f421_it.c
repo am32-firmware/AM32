@@ -35,9 +35,7 @@ int exti_int = 0;
  * @param  None
  * @retval None
  */
-void NMI_Handler(void)
-{
-}
+void NMI_Handler(void) { }
 
 /**
  * @brief  This function handles Hard Fault exception.
@@ -92,36 +90,28 @@ void UsageFault_Handler(void)
  * @param  None
  * @retval None
  */
-void SVC_Handler(void)
-{
-}
+void SVC_Handler(void) { }
 
 /**
  * @brief  This function handles Debug Monitor exception.
  * @param  None
  * @retval None
  */
-void DebugMon_Handler(void)
-{
-}
+void DebugMon_Handler(void) { }
 
 /**
  * @brief  This function handles PendSV_Handler exception.
  * @param  None
  * @retval None
  */
-void PendSV_Handler(void)
-{
-}
+void PendSV_Handler(void) { }
 
 /**
  * @brief  This function handles SysTick Handler.
  * @param  None
  * @retval None
  */
-void SysTick_Handler(void)
-{
-}
+void SysTick_Handler(void) { }
 
 void DMA1_Channel1_IRQHandler(void)
 {
@@ -160,12 +150,12 @@ void DMA1_Channel5_4_IRQHandler(void)
         EXINT->swtrg = EXINT_LINE_15;
         return;
     }
-//    if (dma_flag_get(DMA1_HDT5_FLAG) == SET) {
-//        if (servoPwm) {
-//            IC_TIMER_REGISTER->cctrl_bit.c1p = TMR_INPUT_FALLING_EDGE;
-//            DMA1->clr = DMA1_HDT5_FLAG;
-//        }
-//    }
+    //    if (dma_flag_get(DMA1_HDT5_FLAG) == SET) {
+    //        if (servoPwm) {
+    //            IC_TIMER_REGISTER->cctrl_bit.c1p = TMR_INPUT_FALLING_EDGE;
+    //            DMA1->clr = DMA1_HDT5_FLAG;
+    //        }
+    //    }
 
     if (dma_flag_get(DMA1_FDT5_FLAG) == SET) {
         DMA1->clr = DMA1_GL5_FLAG;

@@ -49,8 +49,8 @@ void computeMSInput()
 
 void computeServoInput()
 {
-   if (((dma_buffer[1] - dma_buffer[0]) > 800) && ((dma_buffer[1] - dma_buffer[0]) < 2200)) {
-		
+    if (((dma_buffer[1] - dma_buffer[0]) > 800) && ((dma_buffer[1] - dma_buffer[0]) < 2200)) {
+
         if (calibration_required) {
             if (!high_calibration_set) {
                 if (high_calibration_counts == 0) {
@@ -88,19 +88,22 @@ void computeServoInput()
         } else {
             if (bi_direction) {
                 if (dma_buffer[1] - dma_buffer[0] <= servo_neutral) {
-                    servorawinput = map((dma_buffer[1] - dma_buffer[0]), servo_low_threshold, servo_neutral, 0, 1000);
+                    servorawinput = map((dma_buffer[1] - dma_buffer[0]),
+                        servo_low_threshold, servo_neutral, 0, 1000);
                 } else {
-                    servorawinput = map((dma_buffer[1] - dma_buffer[0]), servo_neutral + 1, servo_high_threshold, 1001, 2000);
+                    servorawinput = map((dma_buffer[1] - dma_buffer[0]), servo_neutral + 1,
+                        servo_high_threshold, 1001, 2000);
                 }
             } else {
-                servorawinput = map((dma_buffer[1] - dma_buffer[0]), servo_low_threshold, servo_high_threshold, 47, 2047);
+                servorawinput = map((dma_buffer[1] - dma_buffer[0]), servo_low_threshold,
+                    servo_high_threshold, 47, 2047);
                 if (servorawinput <= 48) {
                     servorawinput = 0;
                 }
             }
-          signaltimeout = 0;  
+            signaltimeout = 0;
         }
-   } else {
+    } else {
         zero_input_count = 0; // reset if out of range
     }
 
@@ -115,7 +118,7 @@ void computeServoInput()
 
 void transfercomplete()
 {
-		signaltimeout = 0;
+    signaltimeout = 0;
     if (armed && dshot_telemetry) {
         if (out_put) {
             receiveDshotDma();
@@ -151,17 +154,17 @@ void transfercomplete()
                 receiveDshotDma();
             }
             if (servoPwm == 1) {
-							if(getInputPinState()){
-								buffersize = 3;
-								}else{
-								buffersize = 2;
-							  computeServoInput();
-								}
+                if (getInputPinState()) {
+                    buffersize = 3;
+                } else {
+                    buffersize = 2;
+                    computeServoInput();
+                }
                 receiveDshotDma();
             }
         }
         if (!armed) {
-            if (dshot && (average_count <8) && (zero_input_count > 5)) {
+            if (dshot && (average_count < 8) && (zero_input_count > 5)) {
                 average_count++;
                 average_packet_length = average_packet_length + (dma_buffer[31] - dma_buffer[0]);
                 if (average_count == 8) {
@@ -172,7 +175,8 @@ void transfercomplete()
             if (adjusted_input < 0) {
                 adjusted_input = 0;
             }
-            if (adjusted_input == 0 && calibration_required == 0) { // note this in input..not newinput so it will be adjusted be main loop
+            if (adjusted_input == 0 && calibration_required == 0) { // note this in input..not newinput so it
+                                                                    // will be adjusted be main loop
                 zero_input_count++;
             } else {
                 zero_input_count = 0;

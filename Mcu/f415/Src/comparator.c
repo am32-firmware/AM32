@@ -9,11 +9,7 @@
 
 #include "targets.h"
 
-uint8_t
-getCompOutputLevel()
-{
-    return CMP->ctrlsts1_bit.cmp1value;
-}
+uint8_t getCompOutputLevel() { return CMP->ctrlsts1_bit.cmp1value; }
 
 void maskPhaseInterrupts()
 {

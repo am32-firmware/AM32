@@ -174,9 +174,9 @@ void phaseALOW()
 void phaseBPWM()
 {
     if (!comp_pwm) { // for future
-                     // LL_GPIO_SetPinMode(PHASE_B_GPIO_PORT_LOW, PHASE_B_GPIO_LOW,
-                     // LL_GPIO_MODE_OUTPUT); PHASE_B_GPIO_PORT_LOW->LOW_BITREG_OFF =
-                     // PHASE_B_GPIO_LOW;
+                     // LL_GPIO_SetPinMode(PHASE_B_GPIO_PORT_LOW,
+                     // PHASE_B_GPIO_LOW, LL_GPIO_MODE_OUTPUT);
+                     // PHASE_B_GPIO_PORT_LOW->LOW_BITREG_OFF = PHASE_B_GPIO_LOW;
     } else {
         LL_GPIO_SetPinMode(PHASE_B_GPIO_PORT_ENABLE, PHASE_B_GPIO_ENABLE,
             LL_GPIO_MODE_OUTPUT); // enable on
@@ -297,7 +297,7 @@ void comStep(char newStep)
 {
     switch (newStep) {
     case 1: // A-B
-			  phaseCFLOAT();
+        phaseCFLOAT();
         phaseBLOW();
         phaseAPWM();
         break;
@@ -309,27 +309,27 @@ void comStep(char newStep)
         break;
 
     case 3: // C-A
-			  phaseBFLOAT();
+        phaseBFLOAT();
         phaseALOW();
         phaseCPWM();
         break;
 
     case 4: // B-A
         phaseCFLOAT();
-		    phaseALOW();
+        phaseALOW();
         phaseBPWM();
         break;
 
     case 5: // B-C
         phaseAFLOAT();
         phaseCLOW();
-		    phaseBPWM();
+        phaseBPWM();
         break;
 
     case 6: // A-C
         phaseBFLOAT();
         phaseCLOW();
-		    phaseAPWM();
+        phaseAPWM();
         break;
     }
 }

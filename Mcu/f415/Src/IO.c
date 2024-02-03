@@ -258,11 +258,7 @@ void sendDshotDma()
 
 // }
 
-uint8_t
-getInputPinState()
-{
-    return (INPUT_PIN_PORT->idt & INPUT_PIN);
-}
+uint8_t getInputPinState() { return (INPUT_PIN_PORT->idt & INPUT_PIN); }
 
 void setInputPolarityRising()
 {
@@ -279,10 +275,7 @@ void setInputPullUp()
     gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_MUX, GPIO_PULL_UP, INPUT_PIN);
 }
 
-void enableHalfTransferInt()
-{
-    INPUT_DMA_CHANNEL->ctrl |= DMA_HDT_INT;
-}
+void enableHalfTransferInt() { INPUT_DMA_CHANNEL->ctrl |= DMA_HDT_INT; }
 void setInputPullNone()
 {
     gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_MUX, GPIO_PULL_NONE, INPUT_PIN);

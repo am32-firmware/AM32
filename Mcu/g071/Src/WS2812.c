@@ -10,12 +10,36 @@
 #include "targets.h"
 
 char dma_busy;
-uint16_t led_Buffer[28] = { 0,  0,
-                           20, 20, 20, 20, 20, 20, 20, 20,
-                           60, 60, 60, 60, 60, 60, 60, 60,
-                           20, 20, 20, 20, 20, 20, 20, 20,
-                            0,  0,
-                          };
+uint16_t led_Buffer[28] = {
+    0,
+    0,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    60,
+    60,
+    60,
+    60,
+    60,
+    60,
+    60,
+    60,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    0,
+    0,
+};
 void send_LED_DMA()
 {
     dma_busy = 1;
@@ -38,10 +62,10 @@ void send_LED_RGB(uint8_t red, uint8_t green, uint8_t blue)
     if (!dma_busy) {
         uint32_t twenty_four_bit_color_number = green << 16 | red << 8 | blue;
 
-        for (int i = 0; i < 24 ; i ++) {
+        for (int i = 0; i < 24; i++) {
             led_Buffer[i + 2] = (((twenty_four_bit_color_number >> (23 - i)) & 1) * 40) + 20;
         }
-       send_LED_DMA();
+        send_LED_DMA();
     }
 }
 
@@ -69,8 +93,7 @@ void WS2812_Init(void)
     LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_6,
         LL_DMA_DIRECTION_MEMORY_TO_PERIPH);
 
-    LL_DMA_SetChannelPriorityLevel(DMA1, LL_DMA_CHANNEL_6,
-        LL_DMA_PRIORITY_HIGH);
+    LL_DMA_SetChannelPriorityLevel(DMA1, LL_DMA_CHANNEL_6, LL_DMA_PRIORITY_HIGH);
 
     LL_DMA_SetMode(DMA1, LL_DMA_CHANNEL_6, LL_DMA_MODE_NORMAL);
 

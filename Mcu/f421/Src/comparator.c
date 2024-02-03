@@ -9,11 +9,7 @@
 
 #include "targets.h"
 
-uint8_t
-getCompOutputLevel()
-{
-    return CMP->ctrlsts_bit.cmpvalue;
-}
+uint8_t getCompOutputLevel() { return CMP->ctrlsts_bit.cmpvalue; }
 
 void maskPhaseInterrupts()
 {
@@ -21,10 +17,7 @@ void maskPhaseInterrupts()
     EXINT->intsts = EXTI_LINE;
 }
 
-void enableCompInterrupts()
-{
-    EXINT->inten |= EXTI_LINE;
-}
+void enableCompInterrupts() { EXINT->inten |= EXTI_LINE; }
 
 void changeCompInput()
 {

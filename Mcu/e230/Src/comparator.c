@@ -9,11 +9,7 @@
 
 #include "targets.h"
 
-uint8_t
-getCompOutputLevel()
-{
-    return cmp_output_level_get();
-}
+uint8_t getCompOutputLevel() { return cmp_output_level_get(); }
 
 void maskPhaseInterrupts()
 {

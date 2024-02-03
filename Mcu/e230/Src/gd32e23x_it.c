@@ -29,9 +29,7 @@ int interrupt_time = 0;
     \param[out] none
     \retval     none
 */
-void NMI_Handler(void)
-{
-}
+void NMI_Handler(void) { }
 
 /*!
     \brief      this function handles HardFault exception
@@ -52,9 +50,7 @@ void HardFault_Handler(void)
     \param[out] none
     \retval     none
 */
-void SVC_Handler(void)
-{
-}
+void SVC_Handler(void) { }
 
 /*!
     \brief      this function handles PendSV exception
@@ -62,9 +58,7 @@ void SVC_Handler(void)
     \param[out] none
     \retval     none
 */
-void PendSV_Handler(void)
-{
-}
+void PendSV_Handler(void) { }
 
 /*!
     \brief      this function handles SysTick exception
@@ -72,10 +66,7 @@ void PendSV_Handler(void)
     \param[out] none
     \retval     none
 */
-void SysTick_Handler(void)
-{
-    delay_decrement();
-}
+void SysTick_Handler(void) { delay_decrement(); }
 
 void DMA_Channel3_4_IRQHandler(void)
 {
@@ -141,18 +132,13 @@ void TIMER15_IRQHandler(void)
     interrupt_time = TIMER_CNT(UTILITY_TIMER) - interrupt_time;
 }
 
-void TIMER14_IRQHandler(void)
-{
-    timer_flag_clear(TIMER14, TIMER_FLAG_UP);
-}
+void TIMER14_IRQHandler(void) { timer_flag_clear(TIMER14, TIMER_FLAG_UP); }
 
 /**
  * @brief This function handles USART1 global interrupt / USART1 wake-up
  * interrupt through EXTI line 25.
  */
-void USART1_IRQHandler(void)
-{
-}
+void USART1_IRQHandler(void) { }
 
 void TIMER2_IRQHandler(void)
 {

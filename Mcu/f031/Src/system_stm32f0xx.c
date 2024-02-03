@@ -124,8 +124,8 @@
 */
 uint32_t SystemCoreClock = 8000000;
 
-const uint8_t AHBPrescTable[16]
-    = { 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9 };
+const uint8_t AHBPrescTable[16] = { 0, 0, 0, 0, 0, 0, 0, 0,
+    1, 2, 3, 4, 6, 7, 8, 9 };
 const uint8_t APBPrescTable[8] = { 0, 0, 0, 0, 1, 2, 3, 4 };
 
 /**
@@ -226,8 +226,7 @@ void SystemCoreClockUpdate(void)
              */
             SystemCoreClock = (HSE_VALUE / predivfactor) * pllmull;
         }
-#if defined(STM32F042x6) || defined(STM32F048xx) || defined(STM32F072xB) \
-    || defined(STM32F078xx) || defined(STM32F091xC) || defined(STM32F098xx)
+#if defined(STM32F042x6) || defined(STM32F048xx) || defined(STM32F072xB) || defined(STM32F078xx) || defined(STM32F091xC) || defined(STM32F098xx)
         else if (pllsource == RCC_CFGR_PLLSRC_HSI48_PREDIV) {
             /* HSI48 used as PLL clock source : SystemCoreClock = HSI48/PREDIV *
              * PLLMUL */
@@ -236,10 +235,7 @@ void SystemCoreClockUpdate(void)
 #endif /* STM32F042x6 || STM32F048xx || STM32F072xB || STM32F078xx || \
           STM32F091xC || STM32F098xx */
         else {
-#if defined(STM32F042x6) || defined(STM32F048xx) || defined(STM32F070x6)    \
-    || defined(STM32F078xx) || defined(STM32F071xB) || defined(STM32F072xB) \
-    || defined(STM32F070xB) || defined(STM32F091xC) || defined(STM32F098xx) \
-    || defined(STM32F030xC)
+#if defined(STM32F042x6) || defined(STM32F048xx) || defined(STM32F070x6) || defined(STM32F078xx) || defined(STM32F071xB) || defined(STM32F072xB) || defined(STM32F070xB) || defined(STM32F091xC) || defined(STM32F098xx) || defined(STM32F030xC)
             /* HSI used as PLL clock source : SystemCoreClock = HSI/PREDIV *
              * PLLMUL
              */

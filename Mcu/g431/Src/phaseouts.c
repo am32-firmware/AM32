@@ -175,9 +175,9 @@ void phaseALOW()
 void phaseBPWM()
 {
     if (!comp_pwm) { // for future
-                     // LL_GPIO_SetPinMode(PHASE_B_GPIO_PORT_LOW, PHASE_B_GPIO_LOW,
-                     // LL_GPIO_MODE_OUTPUT); PHASE_B_GPIO_PORT_LOW->LOW_BITREG_OFF =
-                     // PHASE_B_GPIO_LOW;
+                     // LL_GPIO_SetPinMode(PHASE_B_GPIO_PORT_LOW,
+                     // PHASE_B_GPIO_LOW, LL_GPIO_MODE_OUTPUT);
+                     // PHASE_B_GPIO_PORT_LOW->LOW_BITREG_OFF = PHASE_B_GPIO_LOW;
     } else {
         LL_GPIO_SetPinMode(PHASE_B_GPIO_PORT_ENABLE, PHASE_B_GPIO_ENABLE,
             LL_GPIO_MODE_OUTPUT); // enable on

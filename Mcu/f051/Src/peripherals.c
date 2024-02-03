@@ -38,10 +38,8 @@ void initAfterJump(void)
     volatile uint32_t* VectorTable = (volatile uint32_t*)0x20000000;
     uint32_t vector_index = 0;
     for (vector_index = 0; vector_index < 48; vector_index++) {
-        VectorTable[vector_index] = *(
-            __IO uint32_t*)(APPLICATION_ADDRESS
-            + (vector_index << 2)); // no VTOR on cortex-MO so
-                                    // need to copy vector table
+        VectorTable[vector_index] = *(__IO uint32_t*)(APPLICATION_ADDRESS + (vector_index << 2)); // no VTOR on cortex-MO so
+                                                                                                  // need to copy vector table
     }
     /* Enable the SYSCFG peripheral clock*/
     do {
@@ -50,18 +48,15 @@ void initAfterJump(void)
                  ->APB2ENR)
             |= ((0x1U << (0U))));
         /* Delay after an RCC peripheral clock enabling */
-        tmpreg = ((((RCC_TypeDef*)((((uint32_t)0x40000000U) + 0x00020000)
-                        + 0x00001000))
+        tmpreg = ((((RCC_TypeDef*)((((uint32_t)0x40000000U) + 0x00020000) + 0x00001000))
                           ->APB2ENR)
             & ((0x1U << (0U))));
         ((void)(tmpreg));
     } while (0U);
     //	  /* Remap SRAM at 0x00000000 */
     do {
-        ((SYSCFG_TypeDef*)(((uint32_t)0x40000000U) + 0x00010000))->CFGR1
-            &= ~((0x3U << (0U)));
-        ((SYSCFG_TypeDef*)(((uint32_t)0x40000000U) + 0x00010000))->CFGR1
-            |= ((0x1U << (0U)) | (0x2U << (0U)));
+        ((SYSCFG_TypeDef*)(((uint32_t)0x40000000U) + 0x00010000))->CFGR1 &= ~((0x3U << (0U)));
+        ((SYSCFG_TypeDef*)(((uint32_t)0x40000000U) + 0x00010000))->CFGR1 |= ((0x1U << (0U)) | (0x2U << (0U)));
     } while (0);
 
     if (SysTick_Config(SystemCoreClock / 1000)) {
@@ -505,15 +500,9 @@ void reloadWatchDogCounter()
     LL_IWDG_ReloadCounter(IWDG);
 }
 
-void disableComTimerInt()
-{
-    COM_TIMER->DIER &= ~((0x1UL << (0U)));
-}
+void disableComTimerInt() { COM_TIMER->DIER &= ~((0x1UL << (0U))); }
 
-void enableComTimerInt()
-{
-    COM_TIMER->DIER |= (0x1UL << (0U));
-}
+void enableComTimerInt() { COM_TIMER->DIER |= (0x1UL << (0U)); }
 
 void setAndEnableComInt(uint16_t time)
 {
@@ -523,26 +512,13 @@ void setAndEnableComInt(uint16_t time)
     COM_TIMER->DIER |= (0x1UL << (0U));
 }
 
-uint16_t
-getintervaTimerCount()
-{
-    return INTERVAL_TIMER->CNT;
-}
+uint16_t getintervaTimerCount() { return INTERVAL_TIMER->CNT; }
 
-void setintervaTimerCount(uint16_t intertime)
-{
-    INTERVAL_TIMER->CNT = 0;
-}
+void setintervaTimerCount(uint16_t intertime) { INTERVAL_TIMER->CNT = 0; }
 
-void setPrescalerPWM(uint16_t presc)
-{
-    TIM1->PSC = presc;
-}
+void setPrescalerPWM(uint16_t presc) { TIM1->PSC = presc; }
 
-void setAutoReloadPWM(uint16_t relval)
-{
-    TIM1->ARR = relval;
-}
+void setAutoReloadPWM(uint16_t relval) { TIM1->ARR = relval; }
 
 void setDutyCycleAll(uint16_t newdc)
 {
@@ -553,10 +529,7 @@ void setDutyCycleAll(uint16_t newdc)
 
 void inline setPWMCompare1(uint16_t compareone) { TIM1->CCR1 = compareone; }
 void inline setPWMCompare2(uint16_t comparetwo) { TIM1->CCR2 = comparetwo; }
-void inline setPWMCompare3(uint16_t comparethree)
-{
-    TIM1->CCR3 = comparethree;
-}
+void inline setPWMCompare3(uint16_t comparethree) { TIM1->CCR3 = comparethree; }
 
 void inline generatePwmTimerEvent() { LL_TIM_GenerateEvent_UPDATE(TIM1); }
 
@@ -579,11 +552,9 @@ void enableCorePeripherals()
     LL_TIM_CC_EnableChannel(
         TIM1, LL_TIM_CHANNEL_CH5); // timer used for comparator blanking
 #endif
-    LL_TIM_CC_EnableChannel(
-        TIM1,
+    LL_TIM_CC_EnableChannel(TIM1,
         LL_TIM_CHANNEL_CH4); // timer used for timing adc read
-    TIM1->CCR4
-        = 100; // set in 10khz loop to match pwm cycle timed to end of pwm on
+    TIM1->CCR4 = 100; // set in 10khz loop to match pwm cycle timed to end of pwm on
 
     /* Enable counter */
     LL_TIM_EnableCounter(TIM1);
@@ -594,8 +565,7 @@ void enableCorePeripherals()
 #ifdef USE_ADC_INPUT
 
 #else
-    LL_TIM_CC_EnableChannel(
-        IC_TIMER_REGISTER,
+    LL_TIM_CC_EnableChannel(IC_TIMER_REGISTER,
         IC_TIMER_CHANNEL); // input capture and output compare
     LL_TIM_EnableCounter(IC_TIMER_REGISTER);
 #endif
@@ -644,8 +614,7 @@ void enableCorePeripherals()
 #ifdef N_VARIANT // needs comp 1 and 2
     LL_COMP_Enable(COMP1);
 #endif
-    wait_loop_index
-        = ((LL_COMP_DELAY_STARTUP_US * (SystemCoreClock / (100000 * 2))) / 10);
+    wait_loop_index = ((LL_COMP_DELAY_STARTUP_US * (SystemCoreClock / (100000 * 2))) / 10);
     while (wait_loop_index != 0) {
         wait_loop_index--;
     }

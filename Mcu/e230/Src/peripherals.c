@@ -67,10 +67,7 @@ void MX_IWDG_Init(void)
     fwdgt_enable();
 }
 
-void reloadWatchDogCounter()
-{
-    fwdgt_counter_reload();
-}
+void reloadWatchDogCounter() { fwdgt_counter_reload(); }
 
 void TIM0_Init(void)
 {
@@ -244,17 +241,14 @@ void MX_DMA_Init(void)
     //  NVIC_EnableIRQ(DMA_Channel3_4_IRQn);
 }
 
-void MX_GPIO_Init(void)
-{
-}
+void MX_GPIO_Init(void) { }
 
 void UN_TIM_Init(void)
 {
     rcu_periph_clock_enable(RCU_GPIOB);
     rcu_periph_clock_enable(RCU_DMA);
 
-    gpio_output_options_set(GPIOB, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ,
-        GPIO_PIN_4);
+    gpio_output_options_set(GPIOB, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ, GPIO_PIN_4);
     gpio_af_set(GPIOB, GPIO_AF_1, GPIO_PIN_4);
 
     dma_periph_address_config(INPUT_DMA_CHANNEL,
@@ -352,26 +346,13 @@ void setAndEnableComInt(uint16_t time)
     TIMER_DMAINTEN(COM_TIMER) |= (uint32_t)TIMER_INT_UP;
 }
 
-uint16_t
-getintervaTimerCount()
-{
-    return TIMER_CNT(INTERVAL_TIMER);
-}
+uint16_t getintervaTimerCount() { return TIMER_CNT(INTERVAL_TIMER); }
 
-void setintervaTimerCount(uint16_t intertime)
-{
-    TIMER_CNT(INTERVAL_TIMER) = 0;
-}
+void setintervaTimerCount(uint16_t intertime) { TIMER_CNT(INTERVAL_TIMER) = 0; }
 
-void setPrescalerPWM(uint16_t presc)
-{
-    TIMER_PSC(TIMER0) = presc;
-}
+void setPrescalerPWM(uint16_t presc) { TIMER_PSC(TIMER0) = presc; }
 
-void setAutoReloadPWM(uint16_t relval)
-{
-    TIMER_CAR(TIMER0) = relval;
-}
+void setAutoReloadPWM(uint16_t relval) { TIMER_CAR(TIMER0) = relval; }
 
 void setDutyCycleAll(uint16_t newdc)
 {
@@ -380,14 +361,8 @@ void setDutyCycleAll(uint16_t newdc)
     TIMER_CH2CV(TIMER0) = newdc;
 }
 
-void setPWMCompare1(uint16_t compareone)
-{
-    TIMER_CH0CV(TIMER0) = compareone;
-}
-void setPWMCompare2(uint16_t comparetwo)
-{
-    TIMER_CH1CV(TIMER0) = comparetwo;
-}
+void setPWMCompare1(uint16_t compareone) { TIMER_CH0CV(TIMER0) = compareone; }
+void setPWMCompare2(uint16_t comparetwo) { TIMER_CH1CV(TIMER0) = comparetwo; }
 void setPWMCompare3(uint16_t comparethree)
 {
     TIMER_CH2CV(TIMER0) = comparethree;
@@ -431,11 +406,9 @@ void enableCorePeripherals()
     // timer_event_software_generate(TIMER0, TIMER_EVENT_SRC_UPG);
 
 #ifndef BRUSHED_MODE
-    TIMER_CTL0(COM_TIMER)
-        |= (uint32_t)TIMER_CTL0_CEN; // commutation_timer priority 0
+    TIMER_CTL0(COM_TIMER) |= (uint32_t)TIMER_CTL0_CEN; // commutation_timer priority 0
     timer_event_software_generate(COM_TIMER, TIMER_EVENT_SRC_UPG);
-    TIMER_DMAINTEN(COM_TIMER) &= (~(
-        uint32_t)TIMER_INT_UP); // disable interrupt until after polling mode
+    TIMER_DMAINTEN(COM_TIMER) &= (~(uint32_t)TIMER_INT_UP); // disable interrupt until after polling mode
 #endif
     TIMER_CTL0(UTILITY_TIMER) |= (uint32_t)TIMER_CTL0_CEN;
     TIMER_CTL0(INTERVAL_TIMER) |= (uint32_t)TIMER_CTL0_CEN;

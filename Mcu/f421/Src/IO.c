@@ -68,10 +68,9 @@ void sendDshotDma()
     IC_TIMER_REGISTER->ctrl1_bit.tmren = TRUE;
 }
 
-uint8_t
-getInputPinState()
+uint8_t getInputPinState()
 {
-	  uint8_t state = INPUT_PIN_PORT->idt & INPUT_PIN;
+    uint8_t state = INPUT_PIN_PORT->idt & INPUT_PIN;
     return state;
 }
 
@@ -90,10 +89,7 @@ void setInputPullUp()
     gpio_mode_set(INPUT_PIN_PORT, GPIO_MODE_MUX, GPIO_PULL_UP, INPUT_PIN);
 }
 
-void enableHalfTransferInt()
-{
-    INPUT_DMA_CHANNEL->ctrl |= DMA_HDT_INT;
-}
+void enableHalfTransferInt() { INPUT_DMA_CHANNEL->ctrl |= DMA_HDT_INT; }
 void setInputPullNone()
 {
     gpio_mode_set(INPUT_PIN_PORT, GPIO_MODE_MUX, GPIO_PULL_NONE, INPUT_PIN);

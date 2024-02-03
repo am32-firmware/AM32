@@ -103,14 +103,10 @@ void SystemInit(void)
 
     RCU_MODIFY(0x80);
     RCU_CFG0 &= ~RCU_CFG0_SCS;
-    RCU_CTL0 &= ~(RCU_CTL0_HXTALEN | RCU_CTL0_CKMEN | RCU_CTL0_PLLEN
-        | RCU_CTL0_HXTALBPS);
+    RCU_CTL0 &= ~(RCU_CTL0_HXTALEN | RCU_CTL0_CKMEN | RCU_CTL0_PLLEN | RCU_CTL0_HXTALBPS);
     /* reset RCU */
-    RCU_CFG0 &= ~(RCU_CFG0_SCS | RCU_CFG0_AHBPSC | RCU_CFG0_APB1PSC
-        | RCU_CFG0_APB2PSC | RCU_CFG0_ADCPSC | RCU_CFG0_CKOUTSEL
-        | RCU_CFG0_CKOUTDIV | RCU_CFG0_PLLDV);
-    RCU_CFG0 &= ~(RCU_CFG0_PLLSEL | RCU_CFG0_PLLMF | RCU_CFG0_PLLMF4
-        | RCU_CFG0_PLLDV);
+    RCU_CFG0 &= ~(RCU_CFG0_SCS | RCU_CFG0_AHBPSC | RCU_CFG0_APB1PSC | RCU_CFG0_APB2PSC | RCU_CFG0_ADCPSC | RCU_CFG0_CKOUTSEL | RCU_CFG0_CKOUTDIV | RCU_CFG0_PLLDV);
+    RCU_CFG0 &= ~(RCU_CFG0_PLLSEL | RCU_CFG0_PLLMF | RCU_CFG0_PLLMF4 | RCU_CFG0_PLLDV);
     RCU_CFG1 &= ~(RCU_CFG1_PREDV);
     RCU_CFG2 &= ~(RCU_CFG2_USART0SEL | RCU_CFG2_ADCSEL);
     RCU_CFG2 &= ~RCU_CFG2_IRC28MDIV;
@@ -134,8 +130,7 @@ void SystemInit(void)
     \param[out] none
     \retval     none
 */
-static void
-system_clock_config(void)
+static void system_clock_config(void)
 {
 #ifdef __SYSTEM_CLOCK_8M_HXTAL
     system_clock_8m_hxtal();
@@ -157,8 +152,7 @@ system_clock_config(void)
     \param[out] none
     \retval     none
 */
-static void
-system_clock_8m_hxtal(void)
+static void system_clock_8m_hxtal(void)
 {
     uint32_t timeout = 0U;
     uint32_t stab_flag = 0U;
@@ -200,8 +194,7 @@ system_clock_8m_hxtal(void)
     \brief      configure the system clock to 72M by PLL which selects HXTAL as
    its clock source \param[in]  none \param[out] none \retval     none
 */
-static void
-system_clock_72m_hxtal(void)
+static void system_clock_72m_hxtal(void)
 {
     uint32_t timeout = 0U;
     uint32_t stab_flag = 0U;
@@ -256,8 +249,7 @@ system_clock_72m_hxtal(void)
     \brief      configure the system clock to 72M by PLL which selects IRC8M/2
    as its clock source \param[in]  none \param[out] none \retval     none
 */
-static void
-system_clock_72m_irc8m(void)
+static void system_clock_72m_irc8m(void)
 {
     uint32_t timeout = 0U;
     uint32_t stab_flag = 0U;
@@ -313,8 +305,7 @@ system_clock_72m_irc8m(void)
     \param[out] none
     \retval     none
 */
-static void
-system_clock_8m_irc8m(void)
+static void system_clock_8m_irc8m(void)
 {
     /* AHB = SYSCLK */
     RCU_CFG0 |= RCU_AHB_CKSYS_DIV1;
@@ -343,8 +334,7 @@ void SystemCoreClockUpdate(void)
     uint32_t pllmf = 0U, pllmf4 = 0U, pllsel = 0U, prediv = 0U, idx = 0U,
              clk_exp = 0U;
     /* exponent of AHB clock divider */
-    const uint8_t ahb_exp[16]
-        = { 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9 };
+    const uint8_t ahb_exp[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9 };
 
     sws = GET_BITS(RCU_CFG0, 2, 3);
     switch (sws) {

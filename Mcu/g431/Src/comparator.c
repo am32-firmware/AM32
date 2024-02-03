@@ -37,25 +37,21 @@
 COMP_TypeDef* active_COMP = COMP2;
 uint32_t current_EXTI_LINE = LL_EXTI_LINE_22;
 
-uint8_t
-getCompOutputLevel()
+uint8_t getCompOutputLevel()
 {
     return (active_COMP->CSR >> 30 & 1);
-//	  return LL_COMP_ReadOutputLevel(active_COMP);
+    //	  return LL_COMP_ReadOutputLevel(active_COMP);
 }
 
 void maskPhaseInterrupts()
 {
-	  EXTI->IMR1 &= ~(1 << 21);
+    EXTI->IMR1 &= ~(1 << 21);
     EXTI->IMR1 &= ~(1 << 22);
     EXTI->PR1 = LL_EXTI_LINE_22;
-	  EXTI->PR1 = LL_EXTI_LINE_21;
+    EXTI->PR1 = LL_EXTI_LINE_21;
 }
 
-void enableCompInterrupts()
-{
-    EXTI->IMR1 |= current_EXTI_LINE;
-}
+void enableCompInterrupts() { EXTI->IMR1 |= current_EXTI_LINE; }
 
 void changeCompInput()
 {

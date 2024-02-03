@@ -8,19 +8,20 @@
 #include "functions.h"
 #include "targets.h"
 
-//long map(long x, long in_min, long in_max, long out_min, long out_max)
+// long map(long x, long in_min, long in_max, long out_min, long out_max)
 //{
-//    if (x < in_min) {
-//        x = in_min;
-//    }
-//    if (x > in_max) {
-//        x = in_max;
-//    }
-//    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-//}
+//     if (x < in_min) {
+//         x = in_min;
+//     }
+//     if (x > in_max) {
+//         x = in_max;
+//     }
+//     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+// }
 
-long map(long x, long in_min, long in_max, long out_min, long out_max) {
-    if(x >= in_max)
+long map(long x, long in_min, long in_max, long out_min, long out_max)
+{
+    if (x >= in_max)
         return out_max;
     if (in_min > in_max)
         return map(x, in_max, in_min, out_max, out_min);
@@ -58,7 +59,7 @@ void delayMillis(uint32_t millis)
     UTILITY_TIMER->CNT = 0;
     UTILITY_TIMER->PSC = CPU_FREQUENCY_MHZ * 100;
     LL_TIM_GenerateEvent_UPDATE(UTILITY_TIMER);
-    while (UTILITY_TIMER->CNT < millis*10) {
+    while (UTILITY_TIMER->CNT < millis * 10) {
     }
     UTILITY_TIMER->PSC = CPU_FREQUENCY_MHZ; // back to micros
     LL_TIM_GenerateEvent_UPDATE(UTILITY_TIMER);
@@ -81,7 +82,8 @@ void delayMillis(uint32_t millis)
     while (TIMER_CNT(UTILITY_TIMER) < (millis * 2)) {
     }
     TIMER_PSC(UTILITY_TIMER) = CPU_FREQUENCY_MHZ; // back to micros
-    timer_prescaler_config(UTILITY_TIMER, CPU_FREQUENCY_MHZ, TIMER_PSC_RELOAD_NOW);
+    timer_prescaler_config(UTILITY_TIMER, CPU_FREQUENCY_MHZ,
+        TIMER_PSC_RELOAD_NOW);
 }
 #endif
 
@@ -106,18 +108,21 @@ void delayMillis(uint32_t millis)
 }
 
 #ifdef MCU_AT421
-void gpio_mode_QUICK(gpio_type* gpio_periph, uint32_t mode, uint32_t pull_up_down, uint32_t pin)
+void gpio_mode_QUICK(gpio_type* gpio_periph, uint32_t mode,
+    uint32_t pull_up_down, uint32_t pin)
 {
     gpio_periph->cfgr = (((((gpio_periph->cfgr))) & (~(((pin * pin) * (0x3UL << (0U)))))) | (((pin * pin) * mode)));
 }
-void gpio_mode_set(gpio_type* gpio_periph, uint32_t mode, uint32_t pull_up_down, uint32_t pin)
+void gpio_mode_set(gpio_type* gpio_periph, uint32_t mode, uint32_t pull_up_down,
+    uint32_t pin)
 {
- gpio_periph->cfgr = (((((gpio_periph->cfgr))) & (~(((pin * pin) * (0x3UL << (0U)))))) | (((pin * pin) * mode)));
- gpio_periph->pull = ((((((gpio_periph->pull))) & (~(((pin * pin) * (0x3UL << (0U)))))) | (((pin * pin) * pull_up_down))));
+    gpio_periph->cfgr = (((((gpio_periph->cfgr))) & (~(((pin * pin) * (0x3UL << (0U)))))) | (((pin * pin) * mode)));
+    gpio_periph->pull = ((((((gpio_periph->pull))) & (~(((pin * pin) * (0x3UL << (0U)))))) | (((pin * pin) * pull_up_down))));
 }
 #endif
 #ifdef MCU_AT415
-void gpio_mode_QUICK(gpio_type* gpio_periph, uint32_t mode, uint32_t pull_up_down, uint32_t pin)
+void gpio_mode_QUICK(gpio_type* gpio_periph, uint32_t mode,
+    uint32_t pull_up_down, uint32_t pin)
 {
     __disable_irq();
     gpio_init_type gpio_init_struct;

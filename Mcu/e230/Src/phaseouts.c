@@ -34,9 +34,7 @@ extern char prop_brake_active;
 void gpio_mode_QUICK(uint32_t gpio_periph, uint32_t mode, uint32_t pull_up_down,
     uint32_t pin)
 {
-    GPIO_CTL(gpio_periph)
-        = ((((((GPIO_CTL(gpio_periph)))) & (~(((pin * pin) * (0x3UL << (0U))))))
-            | (((pin * pin) * mode))));
+    GPIO_CTL(gpio_periph) = ((((((GPIO_CTL(gpio_periph)))) & (~(((pin * pin) * (0x3UL << (0U)))))) | (((pin * pin) * mode))));
 }
 
 void proportionalBrake()
@@ -198,8 +196,8 @@ void phaseBPWM()
 {
     if (!comp_pwm) { // for future
                      // gpio_mode_QUICK(PHASE_B_GPIO_PORT_LOW, GPIO_MODE_OUTPUT,
-                     // GPIO_PUPD_NONE, PHASE_B_GPIO_LOW); GPIO_BC(PHASE_B_GPIO_PORT_LOW) =
-                     // PHASE_B_GPIO_LOW;
+                     // GPIO_PUPD_NONE, PHASE_B_GPIO_LOW);
+                     // GPIO_BC(PHASE_B_GPIO_PORT_LOW) = PHASE_B_GPIO_LOW;
     } else {
         LL_GPIO_SetPinMode(PHASE_B_GPIO_PORT_ENABLE, PHASE_B_GPIO_ENABLE,
             LL_GPIO_MODE_OUTPUT); // enable on
@@ -320,7 +318,7 @@ void comStep(int newStep)
 {
     switch (newStep) {
     case 1: // A-B
-			  phaseCFLOAT();
+        phaseCFLOAT();
         phaseBLOW();
         phaseAPWM();
         break;
@@ -332,27 +330,27 @@ void comStep(int newStep)
         break;
 
     case 3: // C-A
-			  phaseBFLOAT();
+        phaseBFLOAT();
         phaseALOW();
         phaseCPWM();
         break;
 
     case 4: // B-A
         phaseCFLOAT();
-		    phaseALOW();
+        phaseALOW();
         phaseBPWM();
         break;
 
     case 5: // B-C
         phaseAFLOAT();
         phaseCLOW();
-		    phaseBPWM();
+        phaseBPWM();
         break;
 
     case 6: // A-C
         phaseBFLOAT();
         phaseCLOW();
-		    phaseAPWM();
+        phaseAPWM();
         break;
     }
 }
@@ -370,7 +368,6 @@ void allpwm()
     phaseBPWM();
     phaseCPWM();
 }
-
 
 void twoChannelForward()
 {

@@ -1,9 +1,9 @@
 
-#include "main.h"
 #include "stm32g4xx_it.h"
 #include "ADC.h"
 #include "IO.h"
 #include "WS2812.h"
+#include "main.h"
 #include "targets.h"
 
 extern void transfercomplete();
@@ -22,58 +22,43 @@ extern uint8_t compute_dshot_flag;
 
 int interrupt = 0;
 
-
-
 void NMI_Handler(void)
 {
-   while (1)
-  {
-  }
+    while (1) {
+    }
 }
 
 void HardFault_Handler(void)
 {
-  while (1)
-  {
-  }
+    while (1) {
+    }
 }
 
 void MemManage_Handler(void)
 {
-  while (1)
-  {
-  }
+    while (1) {
+    }
 }
 
 void BusFault_Handler(void)
 {
-  while (1)
-  {
-  }
+    while (1) {
+    }
 }
 
 void UsageFault_Handler(void)
 {
-  while (1)
-  {
-  }
+    while (1) {
+    }
 }
 
-void SVC_Handler(void)
-{
-}
+void SVC_Handler(void) { }
 
-void DebugMon_Handler(void)
-{
-}
+void DebugMon_Handler(void) { }
 
-void PendSV_Handler(void)
-{
-}
+void PendSV_Handler(void) { }
 
-void SysTick_Handler(void)
-{
-}
+void SysTick_Handler(void) { }
 
 void DMA1_Channel1_IRQHandler(void)
 {
@@ -111,11 +96,11 @@ void DMA1_Channel1_IRQHandler(void)
 
 void COMP1_2_3_IRQHandler(void)
 {
-	interrupt++;
+    interrupt++;
     if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_22)) {
         LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_22);
         interruptRoutine();
-      return;
+        return;
     }
 
     if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_21)) {
@@ -137,7 +122,6 @@ void TIM1_UP_TIM16_IRQHandler(void)
 {
     PeriodElapsedCallback();
     LL_TIM_ClearFlag_UPDATE(TIM16);
- 
 }
 
 void EXTI15_10_IRQHandler(void)
@@ -145,5 +129,3 @@ void EXTI15_10_IRQHandler(void)
     LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_15);
     processDshot();
 }
-
-

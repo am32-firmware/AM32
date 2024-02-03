@@ -231,7 +231,8 @@ void receiveDshotDma()
 // 	if ((smallestnumber > 1)&&(smallestnumber < 4)&& (average_signal_pulse
 // < 50)) { 		ic_timer_prescaler= 0; output_timer_prescaler=0; dshot
 // = 1; 		buffer_divider = 44; 		dshot_runout_timer =
-// 65000; 		armed_count_threshold = 10000; 		buffer_padding = 9; 		buffersize = 32;
+// 65000; 		armed_count_threshold = 10000; 		buffer_padding = 9;
+// buffersize = 32;
 // 	}
 // 	if ((smallestnumber >= 4 )&&(smallestnumber < 8)&&
 // (average_signal_pulse < 50)){ 		dshot = 1;
@@ -264,11 +265,7 @@ void receiveDshotDma()
 
 // }
 
-uint8_t
-getInputPinState()
-{
-    return (INPUT_PIN_PORT->IDR & INPUT_PIN);
-}
+uint8_t getInputPinState() { return (INPUT_PIN_PORT->IDR & INPUT_PIN); }
 
 void setInputPolarityRising()
 {
@@ -286,10 +283,7 @@ void setInputPullUp()
     LL_GPIO_SetPinPull(INPUT_PIN_PORT, INPUT_PIN, LL_GPIO_PULL_UP);
 }
 
-void enableHalfTransferInt()
-{
-    LL_DMA_EnableIT_HT(DMA1, INPUT_DMA_CHANNEL);
-}
+void enableHalfTransferInt() { LL_DMA_EnableIT_HT(DMA1, INPUT_DMA_CHANNEL); }
 void setInputPullNone()
 {
     LL_GPIO_SetPinPull(INPUT_PIN_PORT, INPUT_PIN, LL_GPIO_PULL_NO);
@@ -352,9 +346,9 @@ void setInputPullNone()
 //
 //			if(bi_direction){
 //				if(dma_buffer[j] - lastnumber <=
-// servo_neutral){ 				servorawinput = map((dma_buffer[j] - lastnumber),
-// servo_low_threshold, servo_neutral, 0, 1000);
-// }else{ servorawinput = map((dma_buffer[j] - lastnumber), servo_neutral+1,
+// servo_neutral){ 				servorawinput = map((dma_buffer[j] -
+// lastnumber), servo_low_threshold, servo_neutral, 0, 1000); }else{
+// servorawinput = map((dma_buffer[j] - lastnumber), servo_neutral+1,
 // servo_high_threshold, 1001, 2000);
 //				}
 //			}else{

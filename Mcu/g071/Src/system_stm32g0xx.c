@@ -143,9 +143,8 @@
 */
 uint32_t SystemCoreClock = 16000000UL;
 
-const uint32_t AHBPrescTable[16UL]
-    = { 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL,
-          1UL, 2UL, 3UL, 4UL, 6UL, 7UL, 8UL, 9UL };
+const uint32_t AHBPrescTable[16UL] = { 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL,
+    1UL, 2UL, 3UL, 4UL, 6UL, 7UL, 8UL, 9UL };
 const uint32_t APBPrescTable[8UL] = { 0UL, 0UL, 0UL, 0UL, 1UL, 2UL, 3UL, 4UL };
 
 /**
@@ -174,12 +173,9 @@ void SystemInit(void)
     /* Configure the Vector Table location add offset address
      * ------------------*/
 #ifdef VECT_TAB_SRAM
-    SCB->VTOR = SRAM_BASE
-        | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal SRAM */
+    SCB->VTOR = SRAM_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal SRAM */
 #else
-    SCB->VTOR
-        = FLASH_BASE
-        | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal FLASH */
+    SCB->VTOR = FLASH_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal FLASH */
 #endif
 }
 
@@ -265,18 +261,15 @@ void SystemCoreClockUpdate(void)
         {
             pllvco = (HSI_VALUE / pllm);
         }
-        pllvco = pllvco
-            * ((RCC->PLLCFGR & RCC_PLLCFGR_PLLN) >> RCC_PLLCFGR_PLLN_Pos);
-        pllr = (((RCC->PLLCFGR & RCC_PLLCFGR_PLLR) >> RCC_PLLCFGR_PLLR_Pos)
-            + 1UL);
+        pllvco = pllvco * ((RCC->PLLCFGR & RCC_PLLCFGR_PLLN) >> RCC_PLLCFGR_PLLN_Pos);
+        pllr = (((RCC->PLLCFGR & RCC_PLLCFGR_PLLR) >> RCC_PLLCFGR_PLLR_Pos) + 1UL);
 
         SystemCoreClock = pllvco / pllr;
         break;
 
     case RCC_CFGR_SWS_HSI: /* HSI used as system clock */
     default: /* HSI used as system clock */
-        hsidiv = (1UL << ((READ_BIT(RCC->CR, RCC_CR_HSIDIV))
-                      >> RCC_CR_HSIDIV_Pos));
+        hsidiv = (1UL << ((READ_BIT(RCC->CR, RCC_CR_HSIDIV)) >> RCC_CR_HSIDIV_Pos));
         SystemCoreClock = (HSI_VALUE / hsidiv);
         break;
     }

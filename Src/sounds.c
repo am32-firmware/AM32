@@ -19,7 +19,8 @@ void pause(uint16_t ms)
 {
     SET_DUTY_CYCLE_ALL(0);
     delayMillis(ms);
-    SET_DUTY_CYCLE_ALL(beep_volume); // volume of the beep, (duty cycle) don't go above 25 out of 2000
+    SET_DUTY_CYCLE_ALL(beep_volume); // volume of the beep, (duty cycle) don't go
+                                     // above 25 out of 2000
 }
 
 void setVolume(uint8_t volume)
@@ -35,7 +36,8 @@ void setVolume(uint8_t volume)
 
 void setCaptureCompare()
 {
-    SET_DUTY_CYCLE_ALL(beep_volume); // volume of the beep, (duty cycle) don't go above 25 out of 2000
+    SET_DUTY_CYCLE_ALL(beep_volume); // volume of the beep, (duty cycle) don't go
+                                     // above 25 out of 2000
 }
 
 void playBJNote(uint16_t freq, uint16_t bduration)
@@ -46,7 +48,8 @@ void playBJNote(uint16_t freq, uint16_t bduration)
     timerOne_reload = 4800000 / freq;
 
     SET_AUTO_RELOAD_PWM(timerOne_reload);
-    SET_DUTY_CYCLE_ALL(beep_volume * timerOne_reload / TIM1_AUTORELOAD); // volume of the beep, (duty cycle) don't go above 25 out of 2000
+    SET_DUTY_CYCLE_ALL(beep_volume * timerOne_reload / TIM1_AUTORELOAD); // volume of the beep, (duty cycle) don't
+                                                                         // go above 25 out of 2000
     delayMillis(bduration);
 }
 
@@ -264,13 +267,12 @@ void playBeaconTune3()
 // #ifdef GIGADEVICES
 
 // void pause(uint16_t ms){
-// 	TIMER_CH0CV(TIMER0) = 0; // volume of the beep, (duty cycle) don't go above 25 out of 2000
-// 	TIMER_CH1CV(TIMER0) = 0;
-// 	TIMER_CH2CV(TIMER0) = 0;
+// 	TIMER_CH0CV(TIMER0) = 0; // volume of the beep, (duty cycle) don't go
+// above 25 out of 2000 	TIMER_CH1CV(TIMER0) = 0; 	TIMER_CH2CV(TIMER0) = 0;
 
 // 	delayMillis(ms);
-// 	TIMER_CH0CV(TIMER0) = beep_volume; // volume of the beep, (duty cycle) don't go above 25 out of 2000
-// 	TIMER_CH1CV(TIMER0) = beep_volume;
+// 	TIMER_CH0CV(TIMER0) = beep_volume; // volume of the beep, (duty cycle)
+// don't go above 25 out of 2000 	TIMER_CH1CV(TIMER0) = beep_volume;
 // 	TIMER_CH2CV(TIMER0) = beep_volume;
 // }
 
@@ -281,12 +283,13 @@ void playBeaconTune3()
 // 	if(volume < 0){
 // 		volume = 0;
 // 	}
-// 	beep_volume = volume * 2;           // volume variable from 0 - 11 equates to CCR value of 0-22
+// 	beep_volume = volume * 2;           // volume variable from 0 - 11
+// equates to CCR value of 0-22
 // }
 
 // void setCaptureCompare(){
-// 	TIMER_CH0CV(TIMER0) = beep_volume; // volume of the beep, (duty cycle) don't go above 25 out of 2000
-// 	TIMER_CH1CV(TIMER0) = beep_volume;
+// 	TIMER_CH0CV(TIMER0) = beep_volume; // volume of the beep, (duty cycle)
+// don't go above 25 out of 2000 	TIMER_CH1CV(TIMER0) = beep_volume;
 // 	TIMER_CH2CV(TIMER0) = beep_volume;
 // }
 
@@ -297,7 +300,8 @@ void playBeaconTune3()
 // 	timerOne_reload = 4800000 / freq;
 
 // 	TIMER_CAR(TIMER0) = timerOne_reload;
-// 	TIMER_CH0CV(TIMER0) = beep_volume * timerOne_reload /TIM1_AUTORELOAD ; // volume of the beep, (duty cycle) don't go above 25 out of 2000
+// 	TIMER_CH0CV(TIMER0) = beep_volume * timerOne_reload /TIM1_AUTORELOAD ;
+// // volume of the beep, (duty cycle) don't go above 25 out of 2000
 // 	TIMER_CH1CV(TIMER0) = beep_volume * timerOne_reload /TIM1_AUTORELOAD;
 // 	TIMER_CH2CV(TIMER0) = beep_volume * timerOne_reload /TIM1_AUTORELOAD;
 
@@ -323,15 +327,14 @@ void playBeaconTune3()
 
 // 		}else{
 // 			if(eepromBuffer[i+1] == 0){
-// 				duration = full_time_count * 254 + eepromBuffer[i];
-// 				TIMER_CH0CV(TIMER0) = 0 ; //
-// 				TIMER_CH1CV(TIMER0) = 0;
+// 				duration = full_time_count * 254 +
+// eepromBuffer[i]; 				TIMER_CH0CV(TIMER0) = 0 ; // 				TIMER_CH1CV(TIMER0) = 0;
 // 				TIMER_CH2CV(TIMER0) = 0;
 // 				delayMillis(duration);
 // 			}else{
 // 			frequency = getBlueJayNoteFrequency(eepromBuffer[i+1]);
-// 			duration= (full_time_count * 254 + eepromBuffer[i])  * (float)(1000 / frequency);
-// 			playBJNote(frequency, duration);
+// 			duration= (full_time_count * 254 + eepromBuffer[i])  *
+// (float)(1000 / frequency); 			playBJNote(frequency, duration);
 // 			}
 // 			full_time_count = 0;
 // 		}
@@ -512,14 +515,12 @@ void playBeaconTune3()
 
 // #ifdef ARTERY
 // void pause(uint16_t ms){
-// 	TMR1->c1dt = 0; // volume of the beep, (duty cycle) don't go above 25 out of 2000
-// 	TMR1->c2dt = 0;
-// 	TMR1->c3dt = 0;
+// 	TMR1->c1dt = 0; // volume of the beep, (duty cycle) don't go above 25
+// out of 2000 	TMR1->c2dt = 0; 	TMR1->c3dt = 0;
 
 // 	delayMillis(ms);
-// 	TMR1->c1dt = beep_volume; // volume of the beep, (duty cycle) don't go above 25 out of 2000
-// 	TMR1->c2dt = beep_volume;
-// 	TMR1->c3dt = beep_volume;
+// 	TMR1->c1dt = beep_volume; // volume of the beep, (duty cycle) don't go
+// above 25 out of 2000 	TMR1->c2dt = beep_volume; 	TMR1->c3dt = beep_volume;
 // }
 
 // void setVolume(uint8_t volume){
@@ -529,13 +530,13 @@ void playBeaconTune3()
 // 	if(volume < 0){
 // 		volume = 0;
 // 	}
-// 	beep_volume = volume * 2;           // volume variable from 0 - 11 equates to CCR value of 0-22
+// 	beep_volume = volume * 2;           // volume variable from 0 - 11
+// equates to CCR value of 0-22
 // }
 
 // void setCaptureCompare(){
-// 	TMR1->c1dt = beep_volume; // volume of the beep, (duty cycle) don't go above 25 out of 2000
-// 	TMR1->c2dt = beep_volume;
-// 	TMR1->c3dt = beep_volume;
+// 	TMR1->c1dt = beep_volume; // volume of the beep, (duty cycle) don't go
+// above 25 out of 2000 	TMR1->c2dt = beep_volume; 	TMR1->c3dt = beep_volume;
 // }
 
 // void playBJNote(uint16_t freq, uint16_t bduration){        // hz and ms
@@ -545,9 +546,10 @@ void playBeaconTune3()
 // 	timerOne_reload = 4800000 / freq;
 
 // 	TMR1->pr = timerOne_reload;
-// 	TMR1->c1dt = beep_volume * timerOne_reload /TIM1_AUTORELOAD ; // volume of the beep, (duty cycle) don't go above 25 out of 2000
-// 	TMR1->c2dt = beep_volume * timerOne_reload /TIM1_AUTORELOAD;
-// 	TMR1->c3dt = beep_volume * timerOne_reload /TIM1_AUTORELOAD;
+// 	TMR1->c1dt = beep_volume * timerOne_reload /TIM1_AUTORELOAD ; // volume
+// of the beep, (duty cycle) don't go above 25 out of 2000 	TMR1->c2dt =
+// beep_volume * timerOne_reload /TIM1_AUTORELOAD; 	TMR1->c3dt = beep_volume *
+// timerOne_reload /TIM1_AUTORELOAD;
 
 // 	delayMillis(bduration);
 // }
@@ -571,15 +573,13 @@ void playBeaconTune3()
 
 // 		}else{
 // 			if(eepromBuffer[i+1] == 0){
-// 				duration = full_time_count * 254 + eepromBuffer[i];
-// 				TMR1->c1dt = 0 ; //
-// 				TMR1->c2dt = 0;
-// 				TMR1->c3dt = 0;
+// 				duration = full_time_count * 254 +
+// eepromBuffer[i]; 				TMR1->c1dt = 0 ; // 				TMR1->c2dt = 0; 				TMR1->c3dt = 0;
 // 				delayMillis(duration);
 // 			}else{
 // 			frequency = getBlueJayNoteFrequency(eepromBuffer[i+1]);
-// 			duration= ((full_time_count * 254 + eepromBuffer[i])  * (100000 / frequency)) / 100;
-// 			playBJNote(frequency, duration);
+// 			duration= ((full_time_count * 254 + eepromBuffer[i])  *
+// (100000 / frequency)) / 100; 			playBJNote(frequency, duration);
 // 			}
 // 			full_time_count = 0;
 // 		}

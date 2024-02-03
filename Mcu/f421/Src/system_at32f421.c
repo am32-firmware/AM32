@@ -47,8 +47,7 @@
 /** @addtogroup AT32F421_system_private_variables
  * @{
  */
-unsigned int system_core_clock
-    = HICK_VALUE; /*!< system clock frequency (core clock) */
+unsigned int system_core_clock = HICK_VALUE; /*!< system clock frequency (core clock) */
 /**
  * @}
  */
@@ -98,9 +97,7 @@ void SystemInit(void)
     /* disable all interrupts enable and clear pending bits  */
     CRM->clkint = 0x009F0000;
 
-#if defined(AT32F421K8T7) || defined(AT32F421G8U7) || defined(AT32F421K6T7) \
-    || defined(AT32F421G6U7) || defined(AT32F421K4T7)                       \
-    || defined(AT32F421G4U7)
+#if defined(AT32F421K8T7) || defined(AT32F421G8U7) || defined(AT32F421K6T7) || defined(AT32F421G6U7) || defined(AT32F421K4T7) || defined(AT32F421G4U7)
     REG32(0x40021014) |= 0x00060000;
     REG32(0x48000400) &= 0xFFFCFFCF;
     REG32(0x48000400) |= 0x00010010;
@@ -117,13 +114,9 @@ void SystemInit(void)
 #endif
 
 #ifdef VECT_TAB_SRAM
-    SCB->VTOR
-        = SRAM_BASE
-        | VECT_TAB_OFFSET; /* vector table relocation in internal sram. */
+    SCB->VTOR = SRAM_BASE | VECT_TAB_OFFSET; /* vector table relocation in internal sram. */
 #else
-    SCB->VTOR
-        = FLASH_BASE
-        | VECT_TAB_OFFSET; /* vector table relocation in internal flash. */
+    SCB->VTOR = FLASH_BASE | VECT_TAB_OFFSET; /* vector table relocation in internal flash. */
 #endif
 }
 
@@ -142,16 +135,15 @@ void system_core_clock_update(void)
     uint32_t pllrcsfreq = 0, pll_ms = 0, pll_ns = 0, pll_fr = 0;
     crm_sclk_type sclk_source;
 
-    static const uint8_t sys_ahb_div_table[16]
-        = { 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9 };
+    static const uint8_t sys_ahb_div_table[16] = { 0, 0, 0, 0, 0, 0, 0, 0,
+        1, 2, 3, 4, 6, 7, 8, 9 };
 
     /* get sclk source */
     sclk_source = crm_sysclk_switch_status_get();
 
     switch (sclk_source) {
     case CRM_SCLK_HICK:
-        if (((CRM->misc2_bit.hick_to_sclk) != RESET)
-            && ((CRM->misc1_bit.hickdiv) != RESET))
+        if (((CRM->misc2_bit.hick_to_sclk) != RESET) && ((CRM->misc1_bit.hickdiv) != RESET))
             system_core_clock = HICK_VALUE * 6;
         else
             system_core_clock = HICK_VALUE;
@@ -201,8 +193,7 @@ void system_core_clock_update(void)
                     pllrcsfreq = HEXT_VALUE;
                 }
             }
-            system_core_clock = (uint32_t)(((uint64_t)pllrcsfreq * pll_ns)
-                / (pll_ms * (0x1 << pll_fr)));
+            system_core_clock = (uint32_t)(((uint64_t)pllrcsfreq * pll_ns) / (pll_ms * (0x1 << pll_fr)));
         }
         break;
     default:

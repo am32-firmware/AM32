@@ -144,8 +144,7 @@ void MX_COMP1_Init(void)
     /* Note: Variable divided by 2 to compensate partially CPU processing cycles
      */
     __IO uint32_t wait_loop_index = 0;
-    wait_loop_index = (LL_COMP_DELAY_VOLTAGE_SCALER_STAB_US
-        * (SystemCoreClock / (1000000 * 2)));
+    wait_loop_index = (LL_COMP_DELAY_VOLTAGE_SCALER_STAB_US * (SystemCoreClock / (1000000 * 2)));
     while (wait_loop_index != 0) {
         wait_loop_index--;
     }
@@ -213,8 +212,7 @@ void MX_COMP2_Init(void)
     /* Note: Variable divided by 2 to compensate partially CPU processing cycles
      */
     __IO uint32_t wait_loop_index = 0;
-    wait_loop_index = (LL_COMP_DELAY_VOLTAGE_SCALER_STAB_US
-        * (SystemCoreClock / (1000000 * 2)));
+    wait_loop_index = (LL_COMP_DELAY_VOLTAGE_SCALER_STAB_US * (SystemCoreClock / (1000000 * 2)));
     while (wait_loop_index != 0) {
         wait_loop_index--;
     }
@@ -526,8 +524,7 @@ void MX_TIM3_Init(void)
         LL_TIM_ACTIVEINPUT_DIRECTTI);
     LL_TIM_IC_SetPrescaler(TIM3, LL_TIM_CHANNEL_CH1, LL_TIM_ICPSC_DIV1);
     LL_TIM_IC_SetFilter(TIM3, LL_TIM_CHANNEL_CH1, LL_TIM_IC_FILTER_FDIV1);
-    LL_TIM_IC_SetPolarity(TIM3, LL_TIM_CHANNEL_CH1,
-        LL_TIM_IC_POLARITY_BOTHEDGE);
+    LL_TIM_IC_SetPolarity(TIM3, LL_TIM_CHANNEL_CH1, LL_TIM_IC_POLARITY_BOTHEDGE);
     /* USER CODE BEGIN TIM3_Init 2 */
 
     /* USER CODE END TIM3_Init 2 */
@@ -590,8 +587,7 @@ void MX_TIM16_Init(void)
         LL_TIM_ACTIVEINPUT_DIRECTTI);
     LL_TIM_IC_SetPrescaler(TIM16, LL_TIM_CHANNEL_CH1, LL_TIM_ICPSC_DIV1);
     LL_TIM_IC_SetFilter(TIM16, LL_TIM_CHANNEL_CH1, LL_TIM_IC_FILTER_FDIV1);
-    LL_TIM_IC_SetPolarity(TIM16, LL_TIM_CHANNEL_CH1,
-        LL_TIM_IC_POLARITY_BOTHEDGE);
+    LL_TIM_IC_SetPolarity(TIM16, LL_TIM_CHANNEL_CH1, LL_TIM_IC_POLARITY_BOTHEDGE);
     /* USER CODE BEGIN TIM3_Init 2 */
 
     /* USER CODE END TIM3_Init 2 */
@@ -705,20 +701,11 @@ void MX_GPIO_Init(void)
     LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOB);
 }
 
-void reloadWatchDogCounter()
-{
-    LL_IWDG_ReloadCounter(IWDG);
-}
+void reloadWatchDogCounter() { LL_IWDG_ReloadCounter(IWDG); }
 
-void disableComTimerInt()
-{
-    COM_TIMER->DIER &= ~((0x1UL << (0U)));
-}
+void disableComTimerInt() { COM_TIMER->DIER &= ~((0x1UL << (0U))); }
 
-void enableComTimerInt()
-{
-    COM_TIMER->DIER |= (0x1UL << (0U));
-}
+void enableComTimerInt() { COM_TIMER->DIER |= (0x1UL << (0U)); }
 
 void setAndEnableComInt(uint16_t time)
 {
@@ -728,26 +715,16 @@ void setAndEnableComInt(uint16_t time)
     COM_TIMER->DIER |= (0x1UL << (0U));
 }
 
-uint16_t
-getintervaTimerCount()
-{
-    return INTERVAL_TIMER->CNT;
-}
+uint16_t getintervaTimerCount() { return INTERVAL_TIMER->CNT; }
 
 void setintervaTimerCount(uint16_t intertime)
 {
     INTERVAL_TIMER->CNT = intertime;
 }
 
-void setPrescalerPWM(uint16_t presc)
-{
-    TIM1->PSC = presc;
-}
+void setPrescalerPWM(uint16_t presc) { TIM1->PSC = presc; }
 
-void setAutoReloadPWM(uint16_t relval)
-{
-    TIM1->ARR = relval;
-}
+void setAutoReloadPWM(uint16_t relval) { TIM1->ARR = relval; }
 
 void setDutyCycleAll(uint16_t newdc)
 {
@@ -756,23 +733,11 @@ void setDutyCycleAll(uint16_t newdc)
     TIM1->CCR3 = newdc;
 }
 
-void setPWMCompare1(uint16_t compareone)
-{
-    TIM1->CCR1 = compareone;
-}
-void setPWMCompare2(uint16_t comparetwo)
-{
-    TIM1->CCR2 = comparetwo;
-}
-void setPWMCompare3(uint16_t comparethree)
-{
-    TIM1->CCR3 = comparethree;
-}
+void setPWMCompare1(uint16_t compareone) { TIM1->CCR1 = compareone; }
+void setPWMCompare2(uint16_t comparetwo) { TIM1->CCR2 = comparetwo; }
+void setPWMCompare3(uint16_t comparethree) { TIM1->CCR3 = comparethree; }
 
-void generatePwmTimerEvent()
-{
-    LL_TIM_GenerateEvent_UPDATE(TIM1);
-}
+void generatePwmTimerEvent() { LL_TIM_GenerateEvent_UPDATE(TIM1); }
 
 void resetInputCaptureTimer()
 {
@@ -793,11 +758,9 @@ void enableCorePeripherals()
     LL_TIM_CC_EnableChannel(
         TIM1, LL_TIM_CHANNEL_CH5); // timer used for comparator blanking
 #endif
-    LL_TIM_CC_EnableChannel(
-        TIM1,
+    LL_TIM_CC_EnableChannel(TIM1,
         LL_TIM_CHANNEL_CH4); // timer used for timing adc read
-    TIM1->CCR4
-        = 100; // set in 10khz loop to match pwm cycle timed to end of pwm on
+    TIM1->CCR4 = 100; // set in 10khz loop to match pwm cycle timed to end of pwm on
 
     /* Enable counter */
     LL_TIM_EnableCounter(TIM1);
@@ -808,8 +771,7 @@ void enableCorePeripherals()
 #ifdef USE_ADC_INPUT
 
 #else
-    LL_TIM_CC_EnableChannel(
-        IC_TIMER_REGISTER,
+    LL_TIM_CC_EnableChannel(IC_TIMER_REGISTER,
         IC_TIMER_CHANNEL); // input capture and output compare
     LL_TIM_EnableCounter(IC_TIMER_REGISTER);
 #endif
@@ -850,8 +812,7 @@ void enableCorePeripherals()
 #ifdef N_VARIANT // needs comp 1 and 2
     LL_COMP_Enable(COMP1);
 #endif
-    wait_loop_index
-        = ((LL_COMP_DELAY_STARTUP_US * (SystemCoreClock / (100000 * 2))) / 10);
+    wait_loop_index = ((LL_COMP_DELAY_STARTUP_US * (SystemCoreClock / (100000 * 2))) / 10);
     while (wait_loop_index != 0) {
         wait_loop_index--;
     }

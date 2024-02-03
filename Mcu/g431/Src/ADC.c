@@ -4,39 +4,39 @@
 // *  Created on: May 20, 2020
 // *      Author: Alka
 // */
-//#include "ADC.h"
+// #include "ADC.h"
 
-//#ifdef USE_ADC_INPUT
-//uint16_t ADCDataDMA[4];
-//#else
-//uint16_t ADCDataDMA[3];
-//#endif
+// #ifdef USE_ADC_INPUT
+// uint16_t ADCDataDMA[4];
+// #else
+// uint16_t ADCDataDMA[3];
+// #endif
 
-//extern uint16_t ADC_raw_temp;
-//extern uint16_t ADC_raw_volts;
-//extern uint16_t ADC_raw_current;
-//extern uint16_t ADC_raw_input;
+// extern uint16_t ADC_raw_temp;
+// extern uint16_t ADC_raw_volts;
+// extern uint16_t ADC_raw_current;
+// extern uint16_t ADC_raw_input;
 
 //#define ADC_DELAY_CALIB_ENABLE_CPU_CYCLES \
 //    (LL_ADC_DELAY_CALIB_ENABLE_ADC_CYCLES * 64)
 
-//void ADC_DMA_Callback()
+// void ADC_DMA_Callback()
 //{ // read dma buffer and set extern variables
 
-//#ifdef USE_ADC_INPUT
-//    ADC_raw_temp = ADCDataDMA[3];
-//    ADC_raw_volts = ADCDataDMA[1] / 2;
-//    ADC_raw_current = ADCDataDMA[2];
-//    ADC_raw_input = ADCDataDMA[0];
+// #ifdef USE_ADC_INPUT
+//     ADC_raw_temp = ADCDataDMA[3];
+//     ADC_raw_volts = ADCDataDMA[1] / 2;
+//     ADC_raw_current = ADCDataDMA[2];
+//     ADC_raw_input = ADCDataDMA[0];
 
-//#else
-//    ADC_raw_temp = ADCDataDMA[2];
-//    ADC_raw_volts = ADCDataDMA[1];
-//    ADC_raw_current = ADCDataDMA[0];
-//#endif
-//}
+// #else
+//     ADC_raw_temp = ADCDataDMA[2];
+//     ADC_raw_volts = ADCDataDMA[1];
+//     ADC_raw_current = ADCDataDMA[0];
+// #endif
+// }
 
-//void enableADC_DMA()
+// void enableADC_DMA()
 //{ // enables channel
 
 //    NVIC_SetPriority(DMA1_Channel2_3_IRQn, 3);
@@ -48,14 +48,14 @@
 //        (uint32_t)&ADCDataDMA, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
 
 //    /* Set DMA transfer size */
-//#ifdef USE_ADC_INPUT
+// #ifdef USE_ADC_INPUT
 //    LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_2, 4);
-//#else
+// #else
 //    LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_2, 3);
 
-//#endif
-//    /* Enable DMA transfer interruption: transfer complete */
-//    LL_DMA_EnableIT_TC(DMA1, LL_DMA_CHANNEL_2);
+// #endif
+//     /* Enable DMA transfer interruption: transfer complete */
+//     LL_DMA_EnableIT_TC(DMA1, LL_DMA_CHANNEL_2);
 
 //    /* Enable DMA transfer interruption: transfer error */
 //    LL_DMA_EnableIT_TE(DMA1, LL_DMA_CHANNEL_2);
@@ -66,10 +66,10 @@
 //    LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_2);
 //}
 
-//void activateADC(void)
+// void activateADC(void)
 //{
-//    __IO uint32_t wait_loop_index = 0U;
-//    __IO uint32_t backup_setting_adc_dma_transfer = 0U;
+//     __IO uint32_t wait_loop_index = 0U;
+//     __IO uint32_t backup_setting_adc_dma_transfer = 0U;
 
 //    if (LL_ADC_IsEnabled(ADC1) == 0) {
 //        /* Enable ADC internal voltage regulator */
@@ -95,9 +95,9 @@
 
 //        /* Delay between ADC end of calibration and ADC enable. */
 //        /* Note: Variable divided by 2 to compensate partially */
-//        /*       CPU processing cycles (depends on compilation optimization). */
-//        wait_loop_index = (ADC_DELAY_CALIB_ENABLE_CPU_CYCLES >> 1);
-//        while (wait_loop_index != 0) {
+//        /*       CPU processing cycles (depends on compilation optimization).
+//        */ wait_loop_index = (ADC_DELAY_CALIB_ENABLE_CPU_CYCLES >> 1); while
+//        (wait_loop_index != 0) {
 //            wait_loop_index--;
 //        }
 //        /* Enable ADC */
@@ -107,7 +107,7 @@
 //        ADC->CCR |= ADC_CCR_TSEN;
 //    }
 //}
-//void ADC_Init(void)
+// void ADC_Init(void)
 //{
 //    LL_ADC_REG_InitTypeDef ADC_REG_InitStruct = { 0 };
 //    LL_ADC_InitTypeDef ADC_InitStruct = { 0 };
@@ -145,7 +145,8 @@
 
 //    LL_DMA_SetMode(DMA1, LL_DMA_CHANNEL_2, LL_DMA_MODE_CIRCULAR);
 
-//    LL_DMA_SetPeriphIncMode(DMA1, LL_DMA_CHANNEL_2, LL_DMA_PERIPH_NOINCREMENT);
+//    LL_DMA_SetPeriphIncMode(DMA1, LL_DMA_CHANNEL_2,
+//    LL_DMA_PERIPH_NOINCREMENT);
 
 //    LL_DMA_SetMemoryIncMode(DMA1, LL_DMA_CHANNEL_2, LL_DMA_MEMORY_INCREMENT);
 
@@ -187,12 +188,14 @@
 //    ADC_InitStruct.LowPowerMode = LL_ADC_LP_MODE_NONE;
 //    LL_ADC_Init(ADC1, &ADC_InitStruct);
 
-//    LL_ADC_REG_SetSequencerRanks(ADC1, LL_ADC_REG_RANK_1, CURRENT_ADC_CHANNEL);
-//    LL_ADC_SetChannelSamplingTime(ADC1, CURRENT_ADC_CHANNEL,
+//    LL_ADC_REG_SetSequencerRanks(ADC1, LL_ADC_REG_RANK_1,
+//    CURRENT_ADC_CHANNEL); LL_ADC_SetChannelSamplingTime(ADC1,
+//    CURRENT_ADC_CHANNEL,
 //        LL_ADC_SAMPLINGTIME_COMMON_1);
 
-//    LL_ADC_REG_SetSequencerRanks(ADC1, LL_ADC_REG_RANK_2, VOLTAGE_ADC_CHANNEL);
-//    LL_ADC_SetChannelSamplingTime(ADC1, VOLTAGE_ADC_CHANNEL,
+//    LL_ADC_REG_SetSequencerRanks(ADC1, LL_ADC_REG_RANK_2,
+//    VOLTAGE_ADC_CHANNEL); LL_ADC_SetChannelSamplingTime(ADC1,
+//    VOLTAGE_ADC_CHANNEL,
 //        LL_ADC_SAMPLINGTIME_COMMON_1);
 
 //    LL_ADC_REG_SetSequencerRanks(ADC1, LL_ADC_REG_RANK_3,

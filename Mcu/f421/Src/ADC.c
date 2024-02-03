@@ -92,8 +92,7 @@ void ADC_Init(void)
     adc_ordinary_channel_set(ADC1, ADC_CHANNEL_TEMP, 3, ADC_SAMPLETIME_28_5);
 #endif
     adc_tempersensor_vintrv_enable(TRUE);
-    adc_ordinary_conversion_trigger_set(ADC1, ADC12_ORDINARY_TRIG_SOFTWARE,
-        TRUE);
+    adc_ordinary_conversion_trigger_set(ADC1, ADC12_ORDINARY_TRIG_SOFTWARE, TRUE);
 
     adc_dma_mode_enable(ADC1, TRUE);
 
@@ -106,8 +105,7 @@ void ADC_Init(void)
         ;
 }
 
-int16_t
-getConvertedDegrees(uint16_t adcrawtemp)
+int16_t getConvertedDegrees(uint16_t adcrawtemp)
 {
     return (12600 - (int32_t)adcrawtemp * 33000 / 4096) / -42 + 15;
 }

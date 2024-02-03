@@ -40,17 +40,15 @@
 // #define USE_ADC_INPUT
 // #define USE_ALKAS_DEBUG_LED
 
-
 #ifdef REF_G431
 #define FIRMWARE_NAME "Ref G431    "
 #define FILE_NAME "REF_G431"
 #define DEAD_TIME 80
 #define HARDWARE_GROUP_G4_A
 #define TARGET_STALL_PROTECTION_INTERVAL 20000
-//#define PA6_VOLTAGE
-//#define USE_SERIAL_TELEMETRY
+// #define PA6_VOLTAGE
+// #define USE_SERIAL_TELEMETRY
 #endif
-
 
 #ifdef GD32DEV_A_E230
 #define FIRMWARE_NAME "GD32 Dev A  "
@@ -115,7 +113,8 @@
 #define USE_SERIAL_TELEMETRY
 #endif
 
-/*********************************************************************AT32F421 targets*********************************************/
+/*********************************************************************AT32F421
+ * targets*********************************************/
 
 #ifdef SWAP_PB0_PA7_F421
 #define FIRMWARE_NAME "SWAP PB0 PA7"
@@ -211,24 +210,24 @@
 #define USE_SERIAL_TELEMETRY
 #endif
 
-#ifdef  NEUTRON_4IN1_F421
-#define FIRMWARE_NAME           "NEUTRON_4IN1"
-#define FILE_NAME                "NEUTRON_4IN1_F421"
-#define DEAD_TIME               50
+#ifdef NEUTRON_4IN1_F421
+#define FIRMWARE_NAME "NEUTRON_4IN1"
+#define FILE_NAME "NEUTRON_4IN1_F421"
+#define DEAD_TIME 50
 #define HARDWARE_GROUP_AT_C
 #define HARDWARE_GROUP_AT_045
 #define USE_SERIAL_TELEMETRY
 #endif
 
-#ifdef  RR_ROBOT_DUAL_ESC_F421
-#define FIRMWARE_NAME           "RR DUAL ESC "
-#define FILE_NAME                "RR_ROBOT_DUAL_ESC_F421"
-#define DEAD_TIME               50
+#ifdef RR_ROBOT_DUAL_ESC_F421
+#define FIRMWARE_NAME "RR DUAL ESC "
+#define FILE_NAME "RR_ROBOT_DUAL_ESC_F421"
+#define DEAD_TIME 50
 #define HARDWARE_GROUP_AT_C
 #define HARDWARE_GROUP_AT_045
 #define USE_SERIAL_TELEMETRY
 #define VOLTAGE_BASED_RAMP
-#define MILLIVOLT_PER_AMP  12
+#define MILLIVOLT_PER_AMP 12
 #endif
 
 #ifdef DARWIN_F421
@@ -276,7 +275,8 @@
 #define USE_SERIAL_TELEMETRY
 #endif
 
-/***************************************End Generic *****************************************/
+/***************************************End Generic
+ * *****************************************/
 
 #ifdef GIPSY_F421
 #define FIRMWARE_NAME "GiPSy F421  "
@@ -290,7 +290,6 @@
 #define ADC_CHANNEL_CURRENT ADC_CHANNEL_3
 #define ADC_CHANNEL_VOLTAGE ADC_CHANNEL_6
 #endif
-
 
 #ifdef TEKKO32_F421
 #define FIRMWARE_NAME "Tekko32 F4  "
@@ -437,7 +436,8 @@
 #define USE_SERIAL_TELEMETRY
 #endif
 
-/*****************************************************AT32F415 targets ************************************************/
+/*****************************************************AT32F415 targets
+ * ************************************************/
 
 #ifdef PB450_F051
 #define FILE_NAME "PB450_F051"
@@ -465,7 +465,6 @@
 #define USE_SERIAL_TELEMETRY
 #define HARDWARE_GROUP_F0_405
 #endif
-
 
 #ifdef FD6288_F051
 #define FILE_NAME "FD6288_F051"
@@ -739,7 +738,8 @@
 #define HARDWARE_GROUP_F0_A
 #define USE_SERIAL_TELEMETRY
 #endif
-/*******************************   G071 Targets *********************************/
+/*******************************   G071 Targets
+ * *********************************/
 
 #ifdef GEN_64K_G071
 #define FILE_NAME "GEN_64K_G071"
@@ -779,7 +779,6 @@
 #define CURRENT_ADC_PIN LL_GPIO_PIN_4
 #define USE_LED_STRIP
 #endif
-
 
 #ifdef SEQURE_12S_G071
 #define FILE_NAME "SEQURE_12S_G071"
@@ -822,7 +821,7 @@
 #define SIXTY_FOUR_KB_MEMORY
 #endif
 
-#ifdef  FLYCOLOR_HV3_G071
+#ifdef FLYCOLOR_HV3_G071
 #define FILE_NAME "FLYCOLOR_HV3_G071"
 #define FIRMWARE_NAME "Flycolor HV3"
 #define DEAD_TIME 80
@@ -928,7 +927,8 @@
 #define SIXTY_FOUR_KB_MEMORY
 #endif
 
-/********************************** F031 Targets ***********************************/
+/********************************** F031 Targets
+ * ***********************************/
 
 #ifdef REF_F031
 #define FILE_NAME "REF_F031"
@@ -945,7 +945,8 @@
 #define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_7
 #endif
 
-/********************************** defaults if not set ***************************/
+/********************************** defaults if not set
+ * ***************************/
 
 #ifndef TARGET_VOLTAGE_DIVIDER
 #define TARGET_VOLTAGE_DIVIDER 110
@@ -979,7 +980,8 @@
 #define RAMP_SPEED_HIGH_RPM 40
 #endif
 
-/************************************ F051 Hardware Groups ****************************/
+/************************************ F051 Hardware Groups
+ * ****************************/
 
 #ifdef HARDWARE_GROUP_F0_A
 
@@ -1222,7 +1224,6 @@
 
 #endif
 
-
 #ifdef HARDWARE_GROUP_F0_U
 
 #define MCU_F051
@@ -1253,12 +1254,12 @@
 
 #endif
 
-#ifdef HARDWARE_GROUP_F0_045     // tried B
+#ifdef HARDWARE_GROUP_F0_045 // tried B
 #define PHASE_A_COMP COMP_PA0 // pa0     // works for polling mode
 #define PHASE_B_COMP COMP_PA4 // pa4
 #define PHASE_C_COMP COMP_PA5 // pa5
 #endif
-#ifdef HARDWARE_GROUP_F0_504              // tried F
+#ifdef HARDWARE_GROUP_F0_504 // tried F
 #define PHASE_A_COMP COMP_PA5 // pa5            // works for polling mode
 #define PHASE_B_COMP COMP_PA0 // pa0
 #define PHASE_C_COMP COMP_PA4 // pa4
@@ -1278,14 +1279,14 @@
 #define PHASE_B_COMP COMP_PA0 // pa0
 #define PHASE_C_COMP COMP_PA5 // pa5
 #endif
-#ifdef HARDWARE_GROUP_F0_540                // tried H
+#ifdef HARDWARE_GROUP_F0_540 // tried H
 #define PHASE_A_COMP COMP_PA5 // pa5           // works for polling mode
 #define PHASE_B_COMP COMP_PA4 // pa4
 #define PHASE_C_COMP COMP_PA0 // pa0
 #endif
 
-
-/************************************* G071 Hardware Groups **********************************/
+/************************************* G071 Hardware Groups
+ * **********************************/
 
 #ifdef HARDWARE_GROUP_G0_A
 
@@ -1682,9 +1683,9 @@
 #define PHASE_C_GPIO_HIGH LL_GPIO_PIN_8
 #define PHASE_C_GPIO_PORT_HIGH GPIOA
 
-#define PHASE_A_COMP LL_COMP_INPUT_MINUS_IO1 // 
-#define PHASE_B_COMP LL_COMP_INPUT_MINUS_IO1 // 
-#define PHASE_C_COMP LL_COMP_INPUT_MINUS_IO2 // 
+#define PHASE_A_COMP LL_COMP_INPUT_MINUS_IO1 //
+#define PHASE_B_COMP LL_COMP_INPUT_MINUS_IO1 //
+#define PHASE_C_COMP LL_COMP_INPUT_MINUS_IO2 //
 
 #define PHASE_A_EXTI_LINE LL_EXTI_LINE_22
 #define PHASE_A_COMP_NUMBER COMP2
@@ -1703,7 +1704,8 @@
 
 #endif
 
-/************************************ G031 Hardware Groups ************************************************/
+/************************************ G031 Hardware Groups
+ * ************************************************/
 
 #ifdef HARDWARE_GROUP_F031_A
 
@@ -2015,7 +2017,7 @@
 
 #define MCU_AT421
 #define USE_TIMER_15_CHANNEL_1
-//#define USE_PA14_TELEMETRY
+// #define USE_PA14_TELEMETRY
 #define USE_PA6_TEMP
 #define INPUT_PIN GPIO_PINS_2
 #define INPUT_PIN_SOURCE GPIO_PINS_SOURCE2
@@ -2122,7 +2124,8 @@
 #define PHASE_C_COMP 0x400000D1 // pa5
 #endif
 
-/************************************ MCU COMMON PERIPHERALS **********************************************/
+/************************************ MCU COMMON PERIPHERALS
+ * **********************************************/
 
 #ifdef MCU_F051
 #define STMICRO
@@ -2202,8 +2205,6 @@
 #define COM_TIMER_IRQ TIM14_IRQn
 #endif
 
-
-
 #ifdef MCU_G431
 #define STMICRO
 #define CPU_FREQUENCY_MHZ 150
@@ -2218,23 +2219,22 @@
 #define EXTI_LINE LL_EXTI_LINE_22
 #define TARGET_MIN_BEMF_COUNTS 3
 #define COMPARATOR_IRQ COMP1_2_3_IRQn
-//#define USE_ADC
-//#ifndef CURRENT_ADC_CHANNEL
-//#define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_5
-//#endif
-//#ifndef VOLTAGE_ADC_CHANNEL
-//#define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_6
-//#endif
-//#ifndef CURRENT_ADC_PIN
-//#define CURRENT_ADC_PIN LL_GPIO_PIN_5
-//#endif
-//#ifndef VOLTAGE_ADC_PIN
-//#define VOLTAGE_ADC_PIN LL_GPIO_PIN_6
-//#endif
+// #define USE_ADC
+// #ifndef CURRENT_ADC_CHANNEL
+// #define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_5
+// #endif
+// #ifndef VOLTAGE_ADC_CHANNEL
+// #define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_6
+// #endif
+// #ifndef CURRENT_ADC_PIN
+// #define CURRENT_ADC_PIN LL_GPIO_PIN_5
+// #endif
+// #ifndef VOLTAGE_ADC_PIN
+// #define VOLTAGE_ADC_PIN LL_GPIO_PIN_6
+// #endif
 #define DSHOT_PRIORITY_THRESHOLD 60
 #define COM_TIMER_IRQ TIM1_UP_TIM16_IRQn
 #endif
-
 
 #ifdef MCU_GDE23
 #define GIGADEVICES

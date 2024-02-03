@@ -20,8 +20,7 @@ void save_flash_nolib(uint8_t* data, int length, uint32_t add)
     uint32_t data_to_FLASH[length / 4];
     memset(data_to_FLASH, 0, length / 4);
     for (int i = 0; i < length / 4; i++) {
-        data_to_FLASH[i] = data[i * 4 + 3] << 24 | data[i * 4 + 2] << 16
-            | data[i * 4 + 1] << 8 | data[i * 4]; // make 16 bit
+        data_to_FLASH[i] = data[i * 4 + 3] << 24 | data[i * 4 + 2] << 16 | data[i * 4 + 1] << 8 | data[i * 4]; // make 16 bit
     }
     volatile uint32_t data_length = length / 4;
 
@@ -41,8 +40,7 @@ void save_flash_nolib(uint8_t* data, int length, uint32_t add)
         //				fmc_flag_clear(FMC_FLAG_END |
         // FMC_FLAG_WPERR |
         // FMC_FLAG_PGERR);
-        flash_flag_clear(FLASH_PROGRAM_ERROR | FLASH_EPP_ERROR
-            | FLASH_OPERATE_DONE);
+        flash_flag_clear(FLASH_PROGRAM_ERROR | FLASH_EPP_ERROR | FLASH_OPERATE_DONE);
         index++;
     }
     flash_lock();

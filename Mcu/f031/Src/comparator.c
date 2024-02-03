@@ -22,10 +22,7 @@ void maskPhaseInterrupts()
     EXTI->PR |= 1 << PHASE_C_EXTI_LINE;
 }
 
-void enableCompInterrupts()
-{
-    EXTI->IMR |= (1 << current_EXTI_LINE);
-}
+void enableCompInterrupts() { EXTI->IMR |= (1 << current_EXTI_LINE); }
 
 void changeCompInput()
 {

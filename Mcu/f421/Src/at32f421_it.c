@@ -1,3 +1,10 @@
+/* Includes
+ * ------------------------------------------------------------------*/
+#include "at32f421_it.h"
+
+#include "adc.h"
+#include "main.h"
+#include "targets.h"
 extern void transfercomplete();
 extern void PeriodElapsedCallback();
 extern void interruptRoutine();
@@ -12,8 +19,9 @@ extern char send_telemetry;
 extern char telemetry_done;
 extern char servoPwm;
 extern char dshot;
-
+extern uint16_t commutation_interval;
 int exti_int = 0;
+<<<<<<< Updated upstream
 
 /* Includes
  * ------------------------------------------------------------------*/
@@ -36,6 +44,11 @@ int exti_int = 0;
  * @retval None
  */
 void NMI_Handler(void) { }
+=======
+void NMI_Handler(void)
+{
+}
+>>>>>>> Stashed changes
 
 /**
  * @brief  This function handles Hard Fault exception.
@@ -131,8 +144,6 @@ void DMA1_Channel3_2_IRQHandler(void)
     if (dma_flag_get(DMA1_FDT2_FLAG) == SET) {
         DMA1->clr = DMA1_GL2_FLAG;
         DMA1_CHANNEL2->ctrl_bit.chen = FALSE;
-        //	USART1->ctrl1_bit.ren = TRUE;
-        //	USART1->ctrl1_bit.ten = FALSE;
     }
     if (dma_flag_get(DMA1_DTERR2_FLAG) == SET) {
         DMA1->clr = DMA1_GL2_FLAG;
@@ -199,11 +210,12 @@ void DMA1_Channel5_4_IRQHandler(void)
  */
 void ADC1_CMP_IRQHandler(void)
 {
-    if ((EXINT->intsts & EXTI_LINE) != (uint32_t)RESET) {
-        //	EXTI->PND = EXTI_LINE;
-        EXINT->intsts = EXTI_LINE;
-        interruptRoutine();
+if ((EXINT->intsts & EXTI_LINE) != (uint32_t)RESET) {
+	EXINT->intsts = EXTI_LINE;
+	if((INTERVAL_TIMER->cval) > (commutation_interval >> 1)){
+       interruptRoutine();
     }
+	}
 }
 
 /**
@@ -219,21 +231,9 @@ void TMR14_GLOBAL_IRQHandler(void)
  * @brief This function handles TIM14 global interrupt.
  */
 void TMR16_GLOBAL_IRQHandler(void)
-{
-    /* USER CODE BEGIN TIM14_IRQn 0 */
-    //	  if(LL_TIM_IsActiveFlag_UPDATE(TIM14) == 1)
-    //	  {
-    //  timer_interrupt_flag_clear(TIMER15, TIMER_INT_FLAG_UP);
-
+{ 
     TMR16->ists = 0x00;
     PeriodElapsedCallback();
-
-    //	  }
-
-    /* USER CODE END TIM14_IRQn 0 */
-    /* USER CODE BEGIN TIM14_IRQn 1 */
-
-    /* USER CODE END TIM14_IRQn 1 */
 }
 
 void TMR15_GLOBAL_IRQHandler(void)

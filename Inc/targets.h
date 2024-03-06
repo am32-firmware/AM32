@@ -327,6 +327,24 @@
 #define ADC_CHANNEL_TEMP ADC_CHANNEL_6
 #endif
 
+#ifdef FLYROTOR_150A_F421
+#define FIRMWARE_NAME "FLYROTOR_150"
+#define FILE_NAME "FLYROTOR_F421"
+#define DEAD_TIME 100
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_450
+#define USE_SERIAL_TELEMETRY
+#define MILLIVOLT_PER_AMP 19
+#define TARGET_VOLTAGE_DIVIDER 190
+#define USE_NTC
+#define USE_LED_STRIP
+#define WS2812_PIN GPIO_PINS_3
+#define USE_PULSE_OUT
+#define ADC_CHANNEL_CURRENT ADC_CHANNEL_3
+#define ADC_CHANNEL_VOLTAGE ADC_CHANNEL_2
+#define ADC_CHANNEL_TEMP ADC_CHANNEL_6
+#endif
+
 #ifdef HAKRC_K_F421
 #define FIRMWARE_NAME "HAKRC F4 K  "
 #define FILE_NAME "HAKRC_K_F421"
@@ -374,6 +392,21 @@
 #define HARDWARE_GROUP_AT_C
 #define HARDWARE_GROUP_AT_045
 #define USE_SERIAL_TELEMETRY
+#endif
+
+#ifdef TBS_12S_F421
+#define FIRMWARE_NAME "TBS 12S"
+#define FILE_NAME "TBS_12S_F421"
+#define DEAD_TIME 120
+#define HARDWARE_GROUP_AT_C
+#define HARDWARE_GROUP_AT_045
+#define USE_SERIAL_TELEMETRY
+#define ADC_CHANNEL_VOLTAGE ADC_CHANNEL_6
+#define ADC_CHANNEL_CURRENT ADC_CHANNEL_3
+#define TARGET_VOLTAGE_DIVIDER 210
+#define MILLIVOLT_PER_AMP 5
+#define RAMP_SPEED_LOW_RPM 1
+#define RAMP_SPEED_HIGH_RPM 1
 #endif
 
 #ifdef AIKON_SINGLE_F421
@@ -436,8 +469,24 @@
 #define USE_SERIAL_TELEMETRY
 #endif
 
+<<<<<<< Updated upstream
 /*****************************************************AT32F415 targets
  * ************************************************/
+=======
+
+#ifdef AM60_V2_F421
+#define FIRMWARE_NAME "F421 Am60   "
+#define FILE_NAME "AM60_V2_F421"
+#define DEAD_TIME 70
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_045
+#define USE_SERIAL_TELEMETRY
+#endif
+
+
+
+/*****************************************************AT32F415 targets ************************************************/
+>>>>>>> Stashed changes
 
 #ifdef PB450_F051
 #define FILE_NAME "PB450_F051"
@@ -482,6 +531,15 @@
 #define HARDWARE_GROUP_F0_B
 #define USE_SERIAL_TELEMETRY
 // #define USE_RGB_LED
+#endif
+
+#ifdef OCDRC_F051
+#define FILE_NAME "OCDRC_F051"
+#define FIRMWARE_NAME "OCDRC Esc   "
+#define DEAD_TIME 45
+#define HARDWARE_GROUP_F0_B
+#define USE_SERIAL_TELEMETRY
+#define USE_RGB_LED
 #endif
 
 #ifdef MP6531_F051

@@ -224,11 +224,12 @@ an settings option)
 #endif
 
 #define VERSION_MAJOR 2
-#define VERSION_MINOR 8
+#define VERSION_MINOR 9
 
 uint32_t pwm_frequency_conversion_factor = 0;
 uint16_t blank_time;
 void zcfoundroutine(void);
+uint16_t spike = 0;
 
 // firmware build options !! fixed speed and duty cycle modes are not to be used
 // with sinusoidal startup !!
@@ -311,6 +312,7 @@ char TLM_ON_INTERVAL = 0;
 uint8_t telemetry_interval_ms = 30;
 uint8_t TEMPERATURE_LIMIT = 255; // degrees 255 to disable
 char advance_level = 2; // 7.5 degree increments 0 , 7.5, 15, 22.5)
+char temp_advance = 1;
 uint16_t motor_kv = 2000;
 char motor_poles = 14;
 uint16_t CURRENT_LIMIT = 202;
@@ -409,6 +411,7 @@ uint16_t low_pin_count = 0;
 
 uint8_t max_duty_cycle_change = 2;
 char fast_accel = 1;
+char fast_deccel = 0;
 uint16_t last_duty_cycle = 0;
 uint16_t duty_cycle_setpoint = 0;
 char play_tone_flag = 0;
@@ -939,15 +942,27 @@ void commutate()
     }
     bemfcounter = 0;
     zcfound = 0;
-    commutation_intervals[step - 1] = thiszctime; // just used to calulate average
+		
+		if(thiszctime < 100){
+			spike++;
+		}
+
+    commutation_intervals[step - 1] = commutation_interval; // just used to calulate average
+#ifdef USE_PULSE_OUT
+		if(rising){
+			GPIOB->scr = GPIO_PINS_8;
+		}else{
+			GPIOB->clr = GPIO_PINS_8;
+		}
+#endif
 }
 
 void PeriodElapsedCallback()
 {
     DISABLE_COM_TIMER_INT(); // disable interrupt
     commutate();
-    commutation_interval = ((3 * commutation_interval) + thiszctime) >> 2;
-    advance = (commutation_interval >> 3) * advance_level; // 60 divde 8 7.5 degree increments
+    commutation_interval = (3*commutation_interval + thiszctime) >> 2;
+  	advance = (commutation_interval >> 3) * temp_advance; // 60 divde 8 7.5 degree increments
     waitTime = (commutation_interval >> 1) - advance;
     if (!old_routine) {
         enableCompInterrupts(); // enable comp interrupt
@@ -959,12 +974,9 @@ void PeriodElapsedCallback()
 
 void interruptRoutine()
 {
-    if (average_interval > 125) {
+   if (average_interval > 125) {
         if ((INTERVAL_TIMER_COUNT < 125) && (duty_cycle < 600) && (zero_crosses < 500)) { // should be impossible, desync?exit anyway
-            return;
-        }
-        if (INTERVAL_TIMER_COUNT < (commutation_interval >> 1)) {
-            return;
+           return;
         }
         stuckcounter++; // stuck at 100 interrupts before the main loop happens
                         // again.
@@ -974,7 +986,10 @@ void interruptRoutine()
             return;
         }
     }
+<<<<<<< Updated upstream
     thiszctime = INTERVAL_TIMER_COUNT;
+=======
+>>>>>>> Stashed changes
     if (rising) {
         for (int i = 0; i < filter_level; i++) {
 #ifdef MCU_F031
@@ -996,13 +1011,11 @@ void interruptRoutine()
             }
         }
     }
-    maskPhaseInterrupts();
+    
     __disable_irq();
-    if (INTERVAL_TIMER_COUNT > thiszctime) {
-        SET_INTERVAL_TIMER_COUNT(INTERVAL_TIMER_COUNT - thiszctime);
-    } else {
-        SET_INTERVAL_TIMER_COUNT(0);
-    }
+		maskPhaseInterrupts();
+		thiszctime = INTERVAL_TIMER_COUNT;  
+    SET_INTERVAL_TIMER_COUNT(0);
     waitTime = waitTime >> fast_accel;
     SET_AND_ENABLE_COM_INT(waitTime); // enable COM_TIMER interrupt
     __enable_irq();
@@ -1482,6 +1495,7 @@ void tenKhzRoutine()
                 duty_cycle = last_duty_cycle + max_duty_cycle_change;
                 if (commutation_interval > 500) {
                     fast_accel = 1;
+									  temp_advance = advance_level;
                 } else {
                     fast_accel = 0;
                 }
@@ -1489,8 +1503,17 @@ void tenKhzRoutine()
             } else if ((last_duty_cycle - duty_cycle) > max_duty_cycle_change) {
                 duty_cycle = last_duty_cycle - max_duty_cycle_change;
                 fast_accel = 0;
+							  temp_advance = 1;
             } else {
+<<<<<<< Updated upstream
 
+=======
+							if(duty_cycle < 300 && commutation_interval < 300){
+								temp_advance = 1;
+							}else{
+								temp_advance =  advance_level;
+							}
+>>>>>>> Stashed changes
                 fast_accel = 0;
             }
         }
@@ -2076,6 +2099,7 @@ int main(void)
 
                 filter_level = filter_level * 2;
             }
+						
 #ifdef MCU_G071
 
             if (average_interval > 1000) {

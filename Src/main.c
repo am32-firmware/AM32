@@ -986,10 +986,6 @@ void interruptRoutine()
             return;
         }
     }
-<<<<<<< Updated upstream
-    thiszctime = INTERVAL_TIMER_COUNT;
-=======
->>>>>>> Stashed changes
     if (rising) {
         for (int i = 0; i < filter_level; i++) {
 #ifdef MCU_F031
@@ -1505,15 +1501,12 @@ void tenKhzRoutine()
                 fast_accel = 0;
 							  temp_advance = 1;
             } else {
-<<<<<<< Updated upstream
-
-=======
 							if(duty_cycle < 300 && commutation_interval < 300){
 								temp_advance = 1;
 							}else{
 								temp_advance =  advance_level;
 							}
->>>>>>> Stashed changes
+
                 fast_accel = 0;
             }
         }

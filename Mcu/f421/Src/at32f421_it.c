@@ -21,40 +21,7 @@ extern char servoPwm;
 extern char dshot;
 extern uint16_t commutation_interval;
 int exti_int = 0;
-<<<<<<< Updated upstream
 
-/* Includes
- * ------------------------------------------------------------------*/
-#include "at32f421_it.h"
-
-#include "adc.h"
-#include "main.h"
-#include "targets.h"
-/** @addtogroup AT32F421_StdPeriph_Templates
- * @{
- */
-
-/** @addtogroup GPIO_LED_Toggle
- * @{
- */
-
-/**
- * @brief  This function handles NMI exception.
- * @param  None
- * @retval None
- */
-void NMI_Handler(void) { }
-=======
-void NMI_Handler(void)
-{
-}
->>>>>>> Stashed changes
-
-/**
- * @brief  This function handles Hard Fault exception.
- * @param  None
- * @retval None
- */
 void HardFault_Handler(void)
 {
     /* Go to infinite loop when Hard Fault exception occurs */

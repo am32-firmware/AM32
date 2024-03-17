@@ -19,6 +19,10 @@ void playDuskingTune(void);
 void playDefaultTone(void);
 void playChangedTone(void);
 
+void playNonReversedTune(void);
+void playReversedTune(void);
+void playRotorSenseSaveTune(void);
+
 void setVolume(uint8_t volume);
 
 extern void delayMillis(uint32_t millis);

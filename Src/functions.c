@@ -39,6 +39,37 @@ long map(long x, long in_min, long in_max, long out_min, long out_max)
         return map(x, in_mid + 1, in_max, out_mid, out_max);
 }
 
+int findIndex(uint8_t *array, uint8_t size, uint8_t target) 
+{
+    int i=0;
+    while((i<size) && (array[i] != target)) i++;
+
+    return (i<size) ? (i) : (-1);
+}
+
+bool searchSequence(uint8_t array[], uint8_t size, uint8_t sequence[], uint8_t sequenceSize) {
+    // Loop through the array
+    for (int i = 0; i < size; i++) {
+        // Check if the current position matches the first element of the sequence
+        if (array[i] == sequence[0]) {
+            // Check if the sequence matches starting from the current position
+            bool found = true;
+            for (int j = 0; j < sequenceSize; j++) {
+                if (array[(i + j) % size] != sequence[j]) {
+                    found = false;
+                    break;
+                }
+            }
+            if (found) {
+                // Sequence found
+                return true;
+            }
+        }
+    }
+    // Sequence not found
+    return false;
+}
+
 uint32_t getAbsDif(int number1, int number2)
 {
     int result = number1 - number2;

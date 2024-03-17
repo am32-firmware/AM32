@@ -1208,6 +1208,14 @@ if (!stepper_sine && armed) {
 #endif
 }
 
+uint8_t rotorSenseValue = 0;
+uint8_t rotorSenseValueLast = 0;
+uint8_t rotorSenseFalseDetected = 0;
+uint8_t rotorSenseSequence[6] = {5, 4, 6, 2, 3, 1};
+uint8_t rotorSenseReversedSequence[6] = {1, 3, 2, 6, 4, 5};
+uint8_t rotorSenseDetectedSequence[6] = {0, 0, 0, 0, 0, 0};
+uint8_t rotorSenseDetectedSequenceIndex = 0;
+
 void tenKhzRoutine()
 { // 20khz as of 2.00 to be renamed
     duty_cycle = duty_cycle_setpoint;
@@ -1258,6 +1266,61 @@ void tenKhzRoutine()
                     armed_timeout_count = 0;
                 }
             }
+        }
+    } else if (!running && (eepromBuffer.flags & ROTOR_SENSE_DONE) == AM32_FLAG_UNSET) {
+        step = 1;
+        changeCompInput();
+        delayMicros(1);
+        RELOAD_WATCHDOG_COUNTER();
+        rotorSenseValue = getCompOutputLevel();
+        step = 2;
+        changeCompInput();
+        delayMicros(1);
+        RELOAD_WATCHDOG_COUNTER();
+        rotorSenseValue = getCompOutputLevel() << 1 | rotorSenseValue;
+        step = 3;
+        changeCompInput();
+        delayMicros(1);
+        RELOAD_WATCHDOG_COUNTER();
+        rotorSenseValue = getCompOutputLevel() << 2 | rotorSenseValue;
+    
+        if (rotorSenseValue != rotorSenseValueLast && rotorSenseValue > 0 && rotorSenseValue < 7) {
+            rotorSenseDetectedSequence[rotorSenseDetectedSequenceIndex++] = rotorSenseValue;
+            
+            if (rotorSenseDetectedSequenceIndex > 5) {
+                if (searchSequence(rotorSenseDetectedSequence, 6, rotorSenseSequence, 6)) {
+                    playNonReversedTune();
+                    if (dir_reversed == 1) {
+                        rotorSenseFalseDetected++;
+                    } else {
+                        rotorSenseFalseDetected = 0;
+                    }
+                } else {
+                    if (searchSequence(rotorSenseDetectedSequence, 6, rotorSenseReversedSequence, 6)) {
+                        playReversedTune();
+                        if (dir_reversed == 0) {
+                            rotorSenseFalseDetected++;
+                        } else {
+                            rotorSenseFalseDetected = 0;
+                        }
+                    }
+                }
+                
+                if (rotorSenseFalseDetected == 2) {
+                    dir_reversed = (dir_reversed + 1) % 2;
+                    saveEEpromSettings();
+                    playRotorSenseSaveTune();
+                    rotorSenseFalseDetected = 0;
+                }
+            
+                
+                rotorSenseDetectedSequenceIndex = 0;
+                
+                ZERO_A(rotorSenseDetectedSequence);
+                
+            }
+
+            rotorSenseValueLast = rotorSenseValue;
         }
     }
 

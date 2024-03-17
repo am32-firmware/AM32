@@ -120,6 +120,75 @@ void playStartupTune()
     __enable_irq();
 }
 
+void playReversedTune()
+{
+    __disable_irq();
+    
+    comStep(3);
+    RELOAD_WATCHDOG_COUNTER();
+    
+    for(uint8_t i = 0; i < 8; ++i) {
+        RELOAD_WATCHDOG_COUNTER();
+        playBJNote(500, 50);
+        SET_DUTY_CYCLE_ALL(0);
+        delayMillis(20);
+    }
+    
+    allOff(); // turn all channels low again
+    SET_PRESCALER_PWM(0); // set prescaler back to 0.
+    SET_AUTO_RELOAD_PWM(TIMER1_MAX_ARR);
+    signaltimeout = 0;
+    RELOAD_WATCHDOG_COUNTER();
+    
+    __enable_irq();
+}
+
+void playRotorSenseSaveTune()
+{
+    __disable_irq();
+    
+    comStep(3);
+    RELOAD_WATCHDOG_COUNTER();
+    
+    for(uint8_t i = 0; i < 3; ++i) {
+        RELOAD_WATCHDOG_COUNTER();
+        playBJNote(300, 100);
+        SET_DUTY_CYCLE_ALL(0);
+        delayMillis(20);
+    }
+    
+    allOff(); // turn all channels low again
+    SET_PRESCALER_PWM(0); // set prescaler back to 0.
+    SET_AUTO_RELOAD_PWM(TIMER1_MAX_ARR);
+    signaltimeout = 0;
+    RELOAD_WATCHDOG_COUNTER();
+    
+    __enable_irq();
+}
+
+void playNonReversedTune()
+{
+    __disable_irq();
+    
+    comStep(3);
+    RELOAD_WATCHDOG_COUNTER();
+    
+    for(uint8_t i = 0; i < 8; ++i) {
+        RELOAD_WATCHDOG_COUNTER();
+        playBJNote(400, 50);
+        SET_DUTY_CYCLE_ALL(0);
+        delayMillis(20);
+    }
+    
+    allOff(); // turn all channels low again
+    SET_PRESCALER_PWM(0); // set prescaler back to 0.
+    SET_AUTO_RELOAD_PWM(TIMER1_MAX_ARR);
+    signaltimeout = 0;
+    RELOAD_WATCHDOG_COUNTER();
+    
+    __enable_irq();
+}
+
 void playBrushedStartupTune()
 {
     __disable_irq();

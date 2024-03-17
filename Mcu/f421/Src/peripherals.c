@@ -73,8 +73,20 @@ void AT_COMP_Init(void)
     crm_periph_clock_enable(CRM_CMP_PERIPH_CLOCK, TRUE);
     gpio_mode_QUICK(GPIOA, GPIO_MODE_ANALOG, GPIO_PULL_NONE, GPIO_PINS_1);
     gpio_mode_QUICK(GPIOA, GPIO_MODE_ANALOG, GPIO_PULL_NONE, GPIO_PINS_5);
+
+    cmp_init_type cmp_init_struct;
+    cmp_default_para_init(&cmp_init_struct);
+    cmp_init_struct.cmp_inverting = CMP_INVERTING_1_4VREFINT;
+    cmp_init_struct.cmp_output = CMP_OUTPUT_NONE;
+    cmp_init_struct.cmp_polarity = CMP_POL_NON_INVERTING;
+    cmp_init_struct.cmp_speed = CMP_SPEED_MEDIUM;
+    cmp_init_struct.cmp_hysteresis = CMP_HYSTERESIS_NONE;
+
+    cmp_init(CMP1_SELECTION, &cmp_init_struct);
+
     NVIC_SetPriority(ADC1_CMP_IRQn, 0);
     NVIC_EnableIRQ(ADC1_CMP_IRQn);
+
     cmp_enable(CMP1_SELECTION, TRUE);
 }
 

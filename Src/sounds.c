@@ -69,17 +69,17 @@ void playBlueJayTune()
         RELOAD_WATCHDOG_COUNTER();
         signaltimeout = 0;
 
-        if (eepromBuffer[i] == 255) {
+        if (eepromBuffer.buffer[i] == 255) {
             full_time_count++;
 
         } else {
-            if (eepromBuffer[i + 1] == 0) {
-                duration = full_time_count * 254 + eepromBuffer[i];
+            if (eepromBuffer.buffer[i + 1] == 0) {
+                duration = full_time_count * 254 + eepromBuffer.buffer[i];
                 SET_DUTY_CYCLE_ALL(0);
                 delayMillis(duration);
             } else {
-                frequency = getBlueJayNoteFrequency(eepromBuffer[i + 1]);
-                duration = ((full_time_count * 254 + eepromBuffer[i]) * (100000 / frequency)) / 100;
+                frequency = getBlueJayNoteFrequency(eepromBuffer.buffer[i + 1]);
+                duration = ((full_time_count * 254 + eepromBuffer.buffer[i]) * (100000 / frequency)) / 100;
                 playBJNote(frequency, duration);
             }
             full_time_count = 0;
@@ -322,18 +322,18 @@ void playBeaconTune3()
 // 		fwdgt_counter_reload();
 // 		signaltimeout = 0;
 
-// 		if(eepromBuffer[i] == 255){
+// 		if(eepromBuffer.buffer[i] == 255){
 // 			full_time_count++;
 
 // 		}else{
-// 			if(eepromBuffer[i+1] == 0){
+// 			if(eepromBuffer.buffer[i+1] == 0){
 // 				duration = full_time_count * 254 +
-// eepromBuffer[i]; 				TIMER_CH0CV(TIMER0) = 0 ; // 				TIMER_CH1CV(TIMER0) = 0;
+// eepromBuffer.buffer[i]; 				TIMER_CH0CV(TIMER0) = 0 ; // 				TIMER_CH1CV(TIMER0) = 0;
 // 				TIMER_CH2CV(TIMER0) = 0;
 // 				delayMillis(duration);
 // 			}else{
-// 			frequency = getBlueJayNoteFrequency(eepromBuffer[i+1]);
-// 			duration= (full_time_count * 254 + eepromBuffer[i])  *
+// 			frequency = getBlueJayNoteFrequency(eepromBuffer.buffer[i+1]);
+// 			duration= (full_time_count * 254 + eepromBuffer.buffer[i])  *
 // (float)(1000 / frequency); 			playBJNote(frequency, duration);
 // 			}
 // 			full_time_count = 0;
@@ -568,17 +568,17 @@ void playBeaconTune3()
 // 	WDT->cmd = WDT_CMD_RELOAD;
 // 		signaltimeout = 0;
 
-// 		if(eepromBuffer[i] == 255){
+// 		if(eepromBuffer.buffer[i] == 255){
 // 			full_time_count++;
 
 // 		}else{
-// 			if(eepromBuffer[i+1] == 0){
+// 			if(eepromBuffer.buffer[i+1] == 0){
 // 				duration = full_time_count * 254 +
-// eepromBuffer[i]; 				TMR1->c1dt = 0 ; // 				TMR1->c2dt = 0; 				TMR1->c3dt = 0;
+// eepromBuffer.buffer[i]; 				TMR1->c1dt = 0 ; // 				TMR1->c2dt = 0; 				TMR1->c3dt = 0;
 // 				delayMillis(duration);
 // 			}else{
-// 			frequency = getBlueJayNoteFrequency(eepromBuffer[i+1]);
-// 			duration= ((full_time_count * 254 + eepromBuffer[i])  *
+// 			frequency = getBlueJayNoteFrequency(eepromBuffer.buffer[i+1]);
+// 			duration= ((full_time_count * 254 + eepromBuffer.buffer[i])  *
 // (100000 / frequency)) / 100; 			playBJNote(frequency, duration);
 // 			}
 // 			full_time_count = 0;

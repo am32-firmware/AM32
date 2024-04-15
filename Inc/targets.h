@@ -242,9 +242,12 @@
 #ifdef AT32SLOTCAR_F421
 #define FIRMWARE_NAME "AT32_SC     "
 #define FILE_NAME "AT32SLOTCAR_F421"
-#define DEAD_TIME 180
+#define DEAD_TIME 60
 #define HARDWARE_GROUP_AT_B
 #define HARDWARE_GROUP_AT_045
+//#define FIXED_DUTY_MODE
+//#define FIXED_DUTY_MODE_POWER 100
+#define DEBUG
 #endif
 /****************************************Generic********************************************/
 
@@ -469,20 +472,33 @@
 #define USE_SERIAL_TELEMETRY
 #endif
 
+#ifdef SPEEDYBEE_65A_F421
+#define FIRMWARE_NAME "SPEEDY 65A  "
+#define FILE_NAME "SPEEDYBEE_65A_F421"
+#define DEAD_TIME 80
+#define HARDWARE_GROUP_AT_C
+#define HARDWARE_GROUP_AT_540
+#define USE_SERIAL_TELEMETRY
+#endif
 
-/*****************************************************AT32F415 targets
- * ************************************************/
 
-#ifdef AM60_V2_F421
+#ifdef SKYSTARS_AM60_V2_F421
 #define FIRMWARE_NAME "F421 Am60   "
-#define FILE_NAME "AM60_V2_F421"
+#define FILE_NAME "SKYSTARS_AM60_V2_F421"
 #define DEAD_TIME 70
 #define HARDWARE_GROUP_AT_B
 #define HARDWARE_GROUP_AT_045
 #define USE_SERIAL_TELEMETRY
 #endif
 
-
+#ifdef SKYSTARS_MVP60_F421
+#define FIRMWARE_NAME "Skystars 60A"
+#define FILE_NAME "SKYSTARS_MVP60_F421"
+#define DEAD_TIME 70
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_045
+#define USE_SERIAL_TELEMETRY
+#endif
 
 /*****************************************************AT32F415 targets ************************************************/
 
@@ -519,6 +535,15 @@
 #define DEAD_TIME 45
 #define HARDWARE_GROUP_F0_A
 #define TARGET_VOLTAGE_DIVIDER 65
+#define USE_SERIAL_TELEMETRY
+#endif
+
+#ifdef SDMODEL_F051
+#define FILE_NAME "SDMODEL_F051"
+#define FIRMWARE_NAME "SDModel F051"
+#define DEAD_TIME 45
+#define HARDWARE_GROUP_F0_U
+#define HARDWARE_GROUP_F0_045
 #define USE_SERIAL_TELEMETRY
 #endif
 
@@ -2195,7 +2220,7 @@
 #define APPLICATION_ADDRESS 0x08001000
 #define MAIN_COMP COMP1
 #define EXTI_LINE LL_EXTI_LINE_21
-#define TARGET_MIN_BEMF_COUNTS 4
+#define TARGET_MIN_BEMF_COUNTS 3
 #define COMPARATOR_IRQ ADC1_COMP_IRQn
 #define USE_ADC
 #ifndef CURRENT_ADC_PIN
@@ -2242,7 +2267,7 @@
 #define APPLICATION_ADDRESS 0x08001000
 #define MAIN_COMP COMP2
 #define EXTI_LINE LL_EXTI_LINE_18
-#define TARGET_MIN_BEMF_COUNTS 3
+#define TARGET_MIN_BEMF_COUNTS 2
 #define COMPARATOR_IRQ ADC1_COMP_IRQn
 #define USE_ADC
 #ifndef CURRENT_ADC_CHANNEL

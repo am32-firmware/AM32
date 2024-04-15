@@ -374,12 +374,12 @@ ARM Macro Assembler    Page 6
               00000000 
 Command Line: --debug --xref --diag_suppress=9931,A1950W --cpu=Cortex-M0+ --dep
 end=.\objects\startup_stm32g071xx.d -o.\objects\startup_stm32g071xx.o -I.\RTE\_
-GEN_64K_G071 -IC:\KeilPacks\ARM\CMSIS\5.9.0\CMSIS\Core\Include -IC:\KeilPacks\K
-eil\STM32G0xx_DFP\1.4.0\Drivers\CMSIS\Device\ST\STM32G0xx\Include --predefine="
-__EVAL SETA 1" --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION S
-ETA 538" --predefine="_RTE_ SETA 1" --predefine="STM32G071xx SETA 1" --predefin
-e="_RTE_ SETA 1" --list=startup_stm32g071xx.lst ..\Mcu\g071\Startup\mdk\startup
-_stm32g071xx.s
+SEQURE_G071 -IC:\KeilPacks\ARM\CMSIS\5.9.0\CMSIS\Core\Include -IC:\KeilPacks\Ke
+il\STM32G0xx_DFP\1.4.0\Drivers\CMSIS\Device\ST\STM32G0xx\Include --predefine="_
+_EVAL SETA 1" --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SE
+TA 538" --predefine="_RTE_ SETA 1" --predefine="STM32G071xx SETA 1" --predefine
+="_RTE_ SETA 1" --list=startup_stm32g071xx.lst ..\Mcu\g071\Startup\mdk\startup_
+stm32g071xx.s
 
 
 

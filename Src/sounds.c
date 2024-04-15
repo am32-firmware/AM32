@@ -45,7 +45,7 @@ void playBJNote(uint16_t freq, uint16_t bduration)
     uint16_t timerOne_reload = TIM1_AUTORELOAD;
 
     SET_PRESCALER_PWM(10);
-    timerOne_reload = 4800000 / freq;
+    timerOne_reload = CPU_FREQUENCY_MHZ*100000 / freq;
 
     SET_AUTO_RELOAD_PWM(timerOne_reload);
     SET_DUTY_CYCLE_ALL(beep_volume * timerOne_reload / TIM1_AUTORELOAD); // volume of the beep, (duty cycle) don't

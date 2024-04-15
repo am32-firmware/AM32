@@ -198,6 +198,10 @@ an settings option)
                                  - update running brake and brake on stop
 *2.07    - Dead time change f4a
 *2.08		 - Move zero crosss timing
+*2.09    - filter out short zero crosses
+*2.10    - Polling only below commutation intverval of 1500-2000us
+				 - fix tune frequency again
+*2.11    - RC-Car mode fix
 */
 #include "main.h"
 #include "ADC.h"
@@ -224,27 +228,27 @@ an settings option)
 #endif
 
 #define VERSION_MAJOR 2
-#define VERSION_MINOR 9
+#define VERSION_MINOR 11
 
-uint32_t pwm_frequency_conversion_factor = 0;
-uint16_t blank_time;
 void zcfoundroutine(void);
-uint16_t spike = 0;
 
 // firmware build options !! fixed speed and duty cycle modes are not to be used
 // with sinusoidal startup !!
 
 // #define FIXED_DUTY_MODE  // bypasses signal input and arming, uses a set duty
-// cycle. For pumps, slot cars etc #define FIXED_DUTY_MODE_POWER 100     //
+// cycle. For pumps, slot cars etc 
+//#define FIXED_DUTY_MODE_POWER 100     //
 // 0-100 percent not used in fixed speed mode
 
 // #define FIXED_SPEED_MODE  // bypasses input signal and runs at a fixed rpm
-// using the speed control loop PID #define FIXED_SPEED_MODE_RPM  1000  //
+// using the speed control loop PID 
+//#define FIXED_SPEED_MODE_RPM  1000  //
 // intended final rpm , ensure pole pair numbers are entered correctly in config
 // tool.
 
 // #define BRUSHED_MODE         // overrides all brushless config settings,
-// enables two channels for brushed control #define GIMBAL_MODE     // also
+// enables two channels for brushed control 
+//#define GIMBAL_MODE     // also
 // sinusoidal_startup needs to be on, maps input to sinusoidal angle.
 
 //===========================================================================
@@ -419,7 +423,7 @@ char play_tone_flag = 0;
 typedef enum { GPIO_PIN_RESET = 0U,
     GPIO_PIN_SET } GPIO_PinState;
 
-uint16_t startup_max_duty_cycle = 300 + DEAD_TIME;
+uint16_t startup_max_duty_cycle = 200 + DEAD_TIME;
 uint16_t minimum_duty_cycle = DEAD_TIME;
 uint16_t stall_protect_minimum_duty = DEAD_TIME;
 char desync_check = 0;
@@ -935,19 +939,12 @@ void commutate()
     }
     __enable_irq();
     changeCompInput();
-    if (stall_protection || RC_CAR_REVERSE) {
-        if (average_interval > 2000) {
-            old_routine = 1;
-        }
-    }
+	if (average_interval > 2000) {
+      old_routine = 1;
+   }
     bemfcounter = 0;
     zcfound = 0;
-		
-		if(thiszctime < 100){
-			spike++;
-		}
-
-    commutation_intervals[step - 1] = commutation_interval; // just used to calulate average
+   commutation_intervals[step - 1] = commutation_interval; // just used to calulate average
 #ifdef USE_PULSE_OUT
 		if(rising){
 			GPIOB->scr = GPIO_PINS_8;
@@ -986,28 +983,27 @@ void interruptRoutine()
             return;
         }
     }
-    if (rising) {
+//    if (rising) {
         for (int i = 0; i < filter_level; i++) {
 #ifdef MCU_F031
-            if ((current_GPIO_PORT->IDR & current_GPIO_PIN) == (uint32_t)GPIO_PIN_RESET) {
+            if ((current_GPIO_PORT->IDR & current_GPIO_PIN) != rising) {
 #else
-            if (getCompOutputLevel()) {
+            if (getCompOutputLevel() == rising) {
 #endif
                 return;
             }
         }
-    } else {
-        for (int i = 0; i < filter_level; i++) {
-#ifdef MCU_F031
-            if ((current_GPIO_PORT->IDR & current_GPIO_PIN) != (uint32_t)GPIO_PIN_RESET) {
-#else
-            if (!getCompOutputLevel()) {
-#endif
-                return;
-            }
-        }
-    }
-    
+//    } else {
+ //       for (int i = 0; i < filter_level; i++) {
+//#ifdef MCU_F031
+ //           if ((current_GPIO_PORT->IDR & current_GPIO_PIN) != (uint32_t)GPIO_PIN_RESET) {
+//#else
+ //           if (!getCompOutputLevel()) {
+//#endif
+//                return;
+//            }
+//        }
+ //   }
     __disable_irq();
 		maskPhaseInterrupts();
 		thiszctime = INTERVAL_TIMER_COUNT;  
@@ -1269,8 +1265,8 @@ void setInput()
                 }
                 if (RC_CAR_REVERSE && prop_brake_active) {
 #ifndef PWM_ENABLE_BRIDGE
-                    duty_cycle_setpoint = getAbsDif(1000, newinput) + 1000;
-                    if (duty_cycle_setpoint >= 1999) {
+                    prop_brake_duty_cycle = getAbsDif(1000, newinput) + 1000;
+                    if (prop_brake_duty_cycle >= 1999) {
                         fullBrake();
                     } else {
                         proportionalBrake();
@@ -1618,6 +1614,12 @@ void zcfoundroutine()
 #ifdef MCU_F051
     COM_TIMER->ARR = waitTime;
 #endif
+		#ifdef MCU_G071
+    COM_TIMER->ARR = waitTime;
+#endif
+#ifdef MCU_AT32
+		COM_TIMER->pr = waitTime;
+#endif
     commutate();
     bemfcounter = 0;
     bad_count = 0;
@@ -1629,7 +1631,7 @@ void zcfoundroutine()
             enableCompInterrupts(); // enable interrupt
         }
     } else {
-        if (zero_crosses > 30) {
+        if (commutation_interval < 1500) {
             old_routine = 0;
             enableCompInterrupts(); // enable interrupt
         }
@@ -1780,6 +1782,7 @@ int main(void)
     armed = 1;
     adjusted_input = 48;
     newinput = 48;
+		comStep(2);
 #ifdef FIXED_SPEED_MODE
     use_speed_control_loop = 1;
     use_sin_start = 0;
@@ -1853,8 +1856,6 @@ int main(void)
         if (VARIABLE_PWM) {
             tim1_arr = map(commutation_interval, 96, 200, TIMER1_MAX_ARR / 2,
                 TIMER1_MAX_ARR);
-            //      	pwm_frequency_conversion_factor = (tim1_arr << 10) /
-            //      TIMER1_MAX_ARR; // multply by 1024
         }
         if (signaltimeout > (LOOP_FREQUENCY_HZ >> 1)) { // half second timeout when armed;
             if (armed) {
@@ -2093,26 +2094,26 @@ int main(void)
                 filter_level = filter_level * 2;
             }
 						
-#ifdef MCU_G071
+//#ifdef MCU_G071
 
-            if (average_interval > 1000) {
-                if (old_routine) {
-                    set_hysteris = 0;
-                    MODIFY_REG(COMP2->CSR, COMP_CSR_HYST, LL_COMP_HYSTERESIS_NONE);
-                } else {
-                    if (!set_hysteris) {
-                        MODIFY_REG(COMP2->CSR, COMP_CSR_HYST, LL_COMP_HYSTERESIS_LOW);
-                        set_hysteris = 1;
-                    }
-                }
-            } else {
-                if (set_hysteris) {
-                    MODIFY_REG(COMP2->CSR, COMP_CSR_HYST, LL_COMP_HYSTERESIS_NONE);
-                    set_hysteris = 0;
-                }
-            }
+//            if (average_interval > 1000) {
+//                if (old_routine) {
+//                    set_hysteris = 0;
+//                    MODIFY_REG(COMP2->CSR, COMP_CSR_HYST, LL_COMP_HYSTERESIS_NONE);
+//                } else {
+//                    if (!set_hysteris) {
+//                        MODIFY_REG(COMP2->CSR, COMP_CSR_HYST, LL_COMP_HYSTERESIS_LOW);
+//                        set_hysteris = 1;
+//                    }
+//                }
+//            } else {
+//                if (set_hysteris) {
+//                    MODIFY_REG(COMP2->CSR, COMP_CSR_HYST, LL_COMP_HYSTERESIS_NONE);
+//                    set_hysteris = 0;
+//                }
+//            }
 
-#endif
+//#endif
 
             /**************** old routine*********************/
 #ifdef CUSTOM_RAMP

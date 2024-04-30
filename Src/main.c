@@ -228,7 +228,7 @@ an settings option)
 #endif
 
 #define VERSION_MAJOR 2
-#define VERSION_MINOR 11
+#define VERSION_MINOR 12
 
 void zcfoundroutine(void);
 
@@ -423,7 +423,7 @@ char play_tone_flag = 0;
 typedef enum { GPIO_PIN_RESET = 0U,
     GPIO_PIN_SET } GPIO_PinState;
 
-uint16_t startup_max_duty_cycle = 200 + DEAD_TIME;
+uint16_t startup_max_duty_cycle = 175 + DEAD_TIME;
 uint16_t minimum_duty_cycle = DEAD_TIME;
 uint16_t stall_protect_minimum_duty = DEAD_TIME;
 char desync_check = 0;
@@ -1265,8 +1265,8 @@ void setInput()
                 }
                 if (RC_CAR_REVERSE && prop_brake_active) {
 #ifndef PWM_ENABLE_BRIDGE
-                    prop_brake_duty_cycle = getAbsDif(1000, newinput) + 1000;
-                    if (prop_brake_duty_cycle >= 1999) {
+                    prop_brake_duty_cycle = ((getAbsDif(1000, newinput) + 1000) * TIMER1_MAX_ARR)/2000;
+                    if (prop_brake_duty_cycle >= (TIMER1_MAX_ARR - 1)) {
                         fullBrake();
                     } else {
                         proportionalBrake();
@@ -2074,14 +2074,14 @@ int main(void)
             }
             if (zero_crosses < 100 && commutation_interval > 500) {
 #ifdef MCU_G071
-                TIM1->CCR5 = 500; // comparator blanking
+                TIM1->CCR5 = 100; // comparator blanking
                 filter_level = 8;
 #else
                 filter_level = 12;
 #endif
             } else {
 #ifdef MCU_G071
-                TIM1->CCR5 = 100;
+                TIM1->CCR5 = 10;
 #endif
                 filter_level = map(average_interval, 100, 500, 3, 12);
             }
@@ -2089,10 +2089,10 @@ int main(void)
                 filter_level = 2;
             }
 
-            if (motor_kv < 500) {
+//            if (motor_kv < 500) {
 
-                filter_level = filter_level * 2;
-            }
+//                filter_level = filter_level * 2;
+//            }
 						
 //#ifdef MCU_G071
 

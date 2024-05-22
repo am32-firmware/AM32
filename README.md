@@ -18,10 +18,8 @@ AM32 has the following features:
 - Variable PWM frequency
 - Sinusoidal startup mode, which is designed to get larger motors up to speed
 ## Build instructions
--"make" - builds all targets
--"make AM32_XXX_F051 builds" a speciic target
--Github actions
--Fork project and run the build action within github itself.
+Download and install Keil community edition. Open the Keil project for the mcu you want in the "Keil projects" folder. Install any mcu packs if prompted. 
+Select the build target from the drop down box and build project 
 
 ## Firmware Release & Configuration Tool
 

@@ -23,7 +23,7 @@ Select the build target from the drop down box and build project
 
 ## Firmware Release & Configuration Tool
 
-The latest release of the firmware can be found [here](https://github.com/AlkaMotors/AM32-MultiRotor-ESC-firmware/releases/).
+The latest release of the firmware can be found [here](https://am32.ca/downloads).
 
 To configure AM32 and upload firmware you can use the Multi_ESC config tool using Betaflight passthrough. They can be downloaded from here:
 
@@ -67,6 +67,8 @@ https://www.patreon.com/user?u=44228479
 The AM32 project would not have made this far without help from the following sponsors:
 
 Holmes Hobbies - https://holmeshobbies.com/ - The project would not be where it is today without the support of HH. Check out the Crawlmaster V2 for the best am32 experience!
+
+Repeat Robotics - https://repeat-robotics.com/ - Bringing Am32 esc's to the fighting robot community!
 
 Quaternium - https://www.quaternium.com/ - Firmware development support and hardware donations
 

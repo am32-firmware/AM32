@@ -374,12 +374,12 @@ ARM Macro Assembler    Page 6
               00000000 
 Command Line: --debug --xref --diag_suppress=9931,A1950W --cpu=Cortex-M0+ --dep
 end=.\objects\startup_stm32g071xx.d -o.\objects\startup_stm32g071xx.o -I.\RTE\_
-FLYCOLOR_HV3_G071 -IC:\KeilPacks\ARM\CMSIS\5.9.0\CMSIS\Core\Include -IC:\KeilPa
-cks\Keil\STM32G0xx_DFP\1.4.0\Drivers\CMSIS\Device\ST\STM32G0xx\Include --predef
-ine="__EVAL SETA 1" --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERS
-ION SETA 538" --predefine="_RTE_ SETA 1" --predefine="STM32G071xx SETA 1" --pre
-define="_RTE_ SETA 1" --list=startup_stm32g071xx.lst ..\Mcu\g071\Startup\mdk\st
-artup_stm32g071xx.s
+MAMBA_S80_12S_G071 -IC:\Users\eikea\AppData\Local\Arm\Packs\ARM\CMSIS\6.1.0\CMS
+IS\Core\Include -IC:\Users\eikea\AppData\Local\Arm\Packs\Keil\STM32G0xx_DFP\1.5
+.0\Drivers\CMSIS\Device\ST\STM32G0xx\Include --predefine="__EVAL SETA 1" --pred
+efine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 540" --predefine=
+"STM32G071xx SETA 1" --predefine="_RTE_ SETA 1" --list=startup_stm32g071xx.lst 
+..\Mcu\g071\Startup\mdk\startup_stm32g071xx.s
 
 
 

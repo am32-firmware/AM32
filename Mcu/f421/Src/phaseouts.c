@@ -329,36 +329,42 @@ void comStep(int newStep)
         phaseCFLOAT();
         phaseBLOW();
         phaseAPWM();
+        CMP->ctrlsts = PHASE_C_COMP;
         break;
 
     case 2: // C-B
         phaseAFLOAT();
         phaseBLOW();
         phaseCPWM();
+        CMP->ctrlsts = PHASE_A_COMP;
         break;
 
     case 3: // C-A
         phaseBFLOAT();
         phaseALOW();
         phaseCPWM();
+        CMP->ctrlsts = PHASE_B_COMP;
         break;
 
     case 4: // B-A
         phaseCFLOAT();
         phaseALOW();
         phaseBPWM();
+        CMP->ctrlsts = PHASE_C_COMP;
         break;
 
     case 5: // B-C
         phaseAFLOAT();
         phaseCLOW();
         phaseBPWM();
+	    CMP->ctrlsts = PHASE_A_COMP;
         break;
 
     case 6: // A-C
         phaseBFLOAT();
         phaseCLOW();
         phaseAPWM();
+	    CMP->ctrlsts = PHASE_B_COMP;
         break;
     }
 }

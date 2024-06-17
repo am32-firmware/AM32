@@ -361,4 +361,8 @@ void enableCorePeripherals()
     NVIC_SetPriority(EXINT15_4_IRQn, 2);
     NVIC_EnableIRQ(EXINT15_4_IRQn);
     EXINT->inten |= EXINT_LINE_15;
+		
+#ifdef USE_PULSE_OUT
+ gpio_mode_QUICK(GPIOB, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, GPIO_PINS_8);
+#endif
 }

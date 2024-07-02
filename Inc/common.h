@@ -37,9 +37,6 @@ extern GPIO_TypeDef* current_GPIO_PORT;
 #ifndef MCU_F031
 extern COMP_TypeDef* active_COMP;
 #endif
-#ifdef MCU_F031
-extern char input_ready;
-#endif
 #endif
 #ifdef GIGADEVICES
 extern uint32_t current_GPIO_PORT;
@@ -53,7 +50,9 @@ extern char dshot_extended_telemetry;
 extern char EDT_ARM_ENABLE;
 extern char EDT_ARMED;
 extern uint16_t send_extended_dshot;
-
+#ifdef NEED_INPUT_READY
+extern volatile char input_ready;
+#endif
 // typedef struct PID{
 //	float error;
 //	float Kp;

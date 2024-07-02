@@ -58,8 +58,10 @@ static inline uint16_t get_timer_us16(void) {
     return TIMER_CNT(UTILITY_TIMER);
 #elif defined(ARTERY)
     return UTILITY_TIMER->cval;
+#elif defined(WCH)
+    return UTILITY_TIMER->CNT>>1;
 #else
-    #error unsupported MCU
+#error unsupported MCU
 #endif
 }
 

@@ -553,6 +553,9 @@ uint16_t waitTime = 0;
 uint16_t signaltimeout = 0;
 uint8_t ubAnalogWatchdogStatus = RESET;
 
+#ifdef NEED_INPUT_READY
+volatile char input_ready = 0;
+#endif
 
 int32_t doPidCalculations(struct fastPID* pidnow, int actual, int target)
 {
@@ -680,6 +683,9 @@ void loadEEpromSettings()
 #endif
 #ifdef GIGADEVICES
         TIMER_CCHP(TIMER0) |= dead_time_override;
+#endif
+#ifdef WCH
+            TIM1->BDTR |= dead_time_override;
 #endif
         }
         if (eepromBuffer.limits.temperature < 70 || eepromBuffer.limits.temperature > 140) {
@@ -1768,7 +1774,8 @@ int main(void)
 #if defined(FIXED_DUTY_MODE) || defined(FIXED_SPEED_MODE)
         setInput();
 #endif
-#ifdef MCU_F031
+
+#ifdef NEED_INPUT_READY
         if (input_ready) {
             processDshot();
             input_ready = 0;
@@ -1897,16 +1904,16 @@ if(zero_crosses < 5){
             last_average_interval = average_interval;
         }
 
-#ifndef MCU_F031
+#ifndef NEED_INPUT_READY
         if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD)) {
-            NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
-            NVIC_SetPriority(COM_TIMER_IRQ, 1);
-            NVIC_SetPriority(COMPARATOR_IRQ, 1);
-        } else {
-            NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
-            NVIC_SetPriority(COM_TIMER_IRQ, 0);
-            NVIC_SetPriority(COMPARATOR_IRQ, 0);
-        }
+             NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
+             NVIC_SetPriority(COM_TIMER_IRQ, 1);
+             NVIC_SetPriority(COMPARATOR_IRQ, 1);
+         } else {
+             NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
+             NVIC_SetPriority(COM_TIMER_IRQ, 0);
+             NVIC_SetPriority(COMPARATOR_IRQ, 0);
+         }
 #endif
         if (send_telemetry) {
 #ifdef USE_SERIAL_TELEMETRY
@@ -1936,6 +1943,10 @@ if(zero_crosses < 5){
 #ifdef ARTERY
             ADC_DMA_Callback();
             adc_ordinary_software_trigger_enable(ADC1, TRUE);
+            converted_degrees = getConvertedDegrees(ADC_raw_temp);
+#endif
+#ifdef WCH
+            startADCConversion( );
             converted_degrees = getConvertedDegrees(ADC_raw_temp);
 #endif
             degrees_celsius = converted_degrees;

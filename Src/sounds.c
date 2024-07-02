@@ -97,7 +97,12 @@ void playStartupTune()
     __disable_irq();
 
     uint8_t value = *(uint8_t*)(EEPROM_START_ADD + 48);
-    if (value != 0xFF) {
+#ifdef WCH
+    if (value != 0x39)
+#else
+    if (value != 0xFF)
+#endif
+    {
         playBlueJayTune();
     } else {
         SET_AUTO_RELOAD_PWM(TIM1_AUTORELOAD);

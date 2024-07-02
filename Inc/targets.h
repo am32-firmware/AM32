@@ -475,6 +475,20 @@
 
 /*****************************************************AT32F415 targets
  * ************************************************/
+#ifdef AIRBOT_V20x
+#define USE_MAKE
+//#define USE_PA2_AS_COMP
+#define FIRMWARE_NAME "AIRBOT_V203 "
+#define FILE_NAME "AIRBOT_PA0_V203"
+#define DEAD_TIME 75
+#define HARDWARE_GROUP_CH_A
+#define USE_SERIAL_TELEMETRY
+#endif
+
+
+/*****************************************************CH32V203 targets
+ * ************************************************/
+
 
 #ifdef PB450_F051
 #define FILE_NAME "PB450_F051"
@@ -2218,6 +2232,38 @@
 #define PHASE_C_COMP 0x400000D1 // pa5
 #endif
 
+
+
+#ifdef HARDWARE_GROUP_CH_A
+
+#define MCU_CH32V203
+#define USE_TIMER_15_CHANNEL_1
+
+#define INPUT_PIN GPIO_Pin_0
+#define INPUT_PIN_PORT GPIOA
+#define IC_TIMER_CHANNEL        (1-1)
+#define IC_TIMER_REGISTER       TIM2
+#define INPUT_DMA_CHANNEL       DMA1_Channel5
+#define IC_DMA_IRQ_NAME         DMA1_Channel5_IRQn
+
+#define PHASE_A_GPIO_LOW        GPIO_Pin_1
+#define PHASE_A_GPIO_PORT_LOW   GPIOB
+#define PHASE_A_GPIO_HIGH       GPIO_Pin_10
+#define PHASE_A_GPIO_PORT_HIGH  GPIOA
+
+#define PHASE_B_GPIO_LOW        GPIO_Pin_0
+#define PHASE_B_GPIO_PORT_LOW   GPIOB
+#define PHASE_B_GPIO_HIGH       GPIO_Pin_9
+#define PHASE_B_GPIO_PORT_HIGH  GPIOA
+
+#define PHASE_C_GPIO_LOW        GPIO_Pin_7
+#define PHASE_C_GPIO_PORT_LOW   GPIOA
+#define PHASE_C_GPIO_HIGH       GPIO_Pin_8
+#define PHASE_C_GPIO_PORT_HIGH  GPIOA
+
+
+#endif
+
 /************************************ MCU COMMON PERIPHERALS
  * **********************************************/
 
@@ -2395,6 +2441,36 @@
 #define DSHOT_PRIORITY_THRESHOLD 50
 #define COM_TIMER_IRQ TMR1_TRG_HALL_TMR11_IRQn
 #endif
+
+
+
+#ifdef MCU_CH32V203
+#define WCH
+#define CPU_FREQUENCY_MHZ    48                      //PWM freq is 48MHz, CPU freq is 96MHz
+#define EEPROM_START_ADD     (uint32_t)0x08007C00
+#define INTERVAL_TIMER       TIM4
+#define TEN_KHZ_TIMER        SysTick
+#define UTILITY_TIMER        NULL                      //for delay unimportant
+#define COM_TIMER            TIM3                      //for
+#define TIM1_AUTORELOAD      2000
+#define APPLICATION_ADDRESS  0x08001000
+
+#define TARGET_MIN_BEMF_COUNTS  6
+#define USE_ADC
+// #define DSHOT_PRE            95
+#define DSHOT_PRIORITY_THRESHOLD 50
+#define COM_TIMER_IRQ      TIM3_IRQn
+
+#ifndef USE_PA2_AS_COMP
+  #define COMPARATOR_IRQ    EXTI3_IRQn
+  #define COMPARATOR_IRQ_2  EXTI4_IRQn
+#else
+  #define COMPARATOR_IRQ   EXTI2_IRQn
+#endif
+
+#endif
+
+
 
 #ifndef LOOP_FREQUENCY_HZ
 #define LOOP_FREQUENCY_HZ 20000

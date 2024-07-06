@@ -474,16 +474,17 @@ void MX_TIM3_Init(void)
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM3);
 
     LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOB);
+		LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOA);
     /**TIM3 GPIO Configuration
     PB4   ------> TIM3_CH1
     */
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_4;
+    GPIO_InitStruct.Pin = INPUT_PIN;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
     GPIO_InitStruct.Alternate = LL_GPIO_AF_1;
-    LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    LL_GPIO_Init(INPUT_PIN_PORT, &GPIO_InitStruct);
 
     /* TIM3 DMA Init */
 

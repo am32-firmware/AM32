@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Release Notes for STM32L4R9I_EVAL Board Drivers</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="_htmresc/mini-st_2020.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  <link rel="icon" type="image/x-icon" href="_htmresc/favicon.png" />
+</head>
+<body>
+<div class="row">
+<div class="col-sm-12 col-lg-4">
+<center>
+<h1 id="release-notes-for">Release Notes for</h1>
+<h1 id="stm32l4r9i_eval-board-drivers"><mark>STM32L4R9I_EVAL Board Drivers</mark></h1>
+<p>Copyright © 2017 STMicroelectronics<br />
+</p>
+<a href="https://www.st.com" class="logo"><img src="_htmresc/st_logo_2020.png" alt="ST logo" /></a>
+</center>
+<h1 id="purpose">Purpose</h1>
+<p>This directory contains the board drivers to demonstrate the capabilities of the STM32L4R9I_EVAL Kit.</p>
+</div>
+<div class="col-sm-12 col-lg-8">
+<h1 id="update-history">Update History</h1>
+<div class="collapse">
+<input type="checkbox" id="collapse-section23" checked aria-hidden="true"> <label for="collapse-section23" aria-hidden="true">V1.1.2 / 09-Juin-2023</label>
+<div>
+<h2 id="main-changes">Main Changes</h2>
+<ul>
+<li>All source files: update disclaimer to add reference to the new license agreement.</li>
+</ul>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section22"  aria-hidden="true"> <label for="collapse-section22" aria-hidden="true">V1.1.1 / 11-February-2021</label>
+<div>
+<h2 id="main-changes-1">Main Changes</h2>
+<ul>
+<li>Removal of <strong>OctoSPI PSRAM</strong> support on STM32L4R9I-EVAL board
+<ul>
+<li>Files stm32l4r9i_eval_ospi_ram.c / .h have been removed</li>
+<li>Please refer to STM32L4Rxxx and STM32L4Sxxx device errata sheet</li>
+</ul></li>
+<li>Minor update of Release Notes template</li>
+<li>Add License.md file for GitHub publication</li>
+</ul>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section21" aria-hidden="true"> <label for="collapse-section21" aria-hidden="true">V1.1.0 / 26-June-2020</label>
+<div>
+<h2 id="main-changes-2">Main Changes</h2>
+<ul>
+<li>Update of STM32L4R9I_EVAL board driver following the update of HAL OSPI driver for STM32L4+ devices
+<ul>
+<li>Remove wrap configuration</li>
+<li>Add missing delay block bypass and multiplex mode configurations</li>
+</ul></li>
+<li>Update common GPIO configuration in BSP_SD_MspInit() to remove internal pull-up</li>
+</ul>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section20" aria-hidden="true"> <label for="collapse-section20" aria-hidden="true">V1.0.4 / 18-October-2019</label>
+<div>
+<h2 id="main-changes-3">Main Changes</h2>
+<ul>
+<li>Minor update in release notes format</li>
+</ul>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section19" aria-hidden="true"> <label for="collapse-section19" aria-hidden="true">V1.0.3 / 03-April-2019</label>
+<div>
+<h2 id="main-changes-4">Main Changes</h2>
+<ul>
+<li>stm32l4r9i_eval_dsi_lcd.c
+<ul>
+<li>Correct logical test in DrawChar()</li>
+</ul></li>
+<li>stm32l4r9i_eval_rgb_lcd.c
+<ul>
+<li>Correct logical test in DrawChar() and BSP_LCD_DisplayStringAt()</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section18" aria-hidden="true"> <label for="collapse-section18" aria-hidden="true">V1.0.2 / 27-July-2018</label>
+<div>
+<h2 id="main-changes-5">Main Changes</h2>
+<ul>
+<li>Release notes update to new format</li>
+</ul>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section17" aria-hidden="true"> <label for="collapse-section17" aria-hidden="true">V1.0.1 / 25-August-2017</label>
+<div>
+<h2 id="main-changes-6">Main Changes</h2>
+<ul>
+<li>Fix typo on LPUART1 in stm32l4r9i_eval.h</li>
+</ul>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section9" aria-hidden="true"> <label for="collapse-section9" aria-hidden="true">V1.0.0 / 13-October-2017</label>
+<div>
+<h2 id="main-changes-7">Main Changes</h2>
+<ul>
+<li>First official release of <strong>STM32L4R9I_EVAL</strong> board drivers for STM32Cube L4 FW package</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<footer class="sticky">
+For complete documentation on <mark>STM32 Microcontrollers</mark> , visit: <a href="http://www.st.com/STM32">http://www.st.com/STM32</a>
+</footer>
+</body>
+</html>

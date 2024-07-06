@@ -1,0 +1,1289 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html><head>
+<title>Static Call Graph - [.\output\AM32_GD32DEV_B_E230.axf]</title></head>
+<body><HR>
+<H1>Static Call Graph for image .\output\AM32_GD32DEV_B_E230.axf</H1><HR>
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6190004: Last Updated: Tue Jun 25 16:02:01 2024
+<BR><P>
+<H3>Maximum Stack Usage =          0 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
+Call chain for Maximum Stack Depth:</H3>
+
+<P>
+<H3>
+Mutually Recursive functions
+</H3> <LI><a href="#[e]">DMA_Channel0_IRQHandler</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[e]">DMA_Channel0_IRQHandler</a><BR>
+ <LI><a href="#[2]">HardFault_Handler</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[2]">HardFault_Handler</a><BR>
+</UL>
+<P>
+<H3>
+Function Pointers
+</H3><UL>
+ <LI><a href="#[11]">ADC_CMP_IRQHandler</a> from gd32e23x_it.o(.text.ADC_CMP_IRQHandler) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[e]">DMA_Channel0_IRQHandler</a> from startup_gd32e23x.o(.text) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[f]">DMA_Channel1_2_IRQHandler</a> from startup_gd32e23x.o(.text) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[10]">DMA_Channel3_4_IRQHandler</a> from gd32e23x_it.o(.text.DMA_Channel3_4_IRQHandler) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[b]">EXTI0_1_IRQHandler</a> from startup_gd32e23x.o(.text) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[c]">EXTI2_3_IRQHandler</a> from startup_gd32e23x.o(.text) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[d]">EXTI4_15_IRQHandler</a> from gd32e23x_it.o(.text.EXTI4_15_IRQHandler) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[9]">FMC_IRQHandler</a> from startup_gd32e23x.o(.text) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[2]">HardFault_Handler</a> from gd32e23x_it.o(.text.HardFault_Handler) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[20]">I2C0_ER_IRQHandler</a> from startup_gd32e23x.o(.text) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[1a]">I2C0_EV_IRQHandler</a> from startup_gd32e23x.o(.text) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[21]">I2C1_ER_IRQHandler</a> from startup_gd32e23x.o(.text) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[1b]">I2C1_EV_IRQHandler</a> from startup_gd32e23x.o(.text) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[7]">LVD_IRQHandler</a> from startup_gd32e23x.o(.text) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[1]">NMI_Handler</a> from gd32e23x_it.o(.text.NMI_Handler) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[4]">PendSV_Handler</a> from gd32e23x_it.o(.text.PendSV_Handler) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[a]">RCU_IRQHandler</a> from startup_gd32e23x.o(.text) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[8]">RTC_IRQHandler</a> from startup_gd32e23x.o(.text) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[0]">Reset_Handler</a> from startup_gd32e23x.o(.text) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[1c]">SPI0_IRQHandler</a> from startup_gd32e23x.o(.text) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[1d]">SPI1_IRQHandler</a> from startup_gd32e23x.o(.text) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[3]">SVC_Handler</a> from gd32e23x_it.o(.text.SVC_Handler) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[5]">SysTick_Handler</a> from gd32e23x_it.o(.text.SysTick_Handler) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[23]">SystemInit</a> from system_gd32e23x.o(.text.SystemInit) referenced from startup_gd32e23x.o(.text)
+ <LI><a href="#[12]">TIMER0_BRK_UP_TRG_COM_IRQHandler</a> from startup_gd32e23x.o(.text) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[13]">TIMER0_Channel_IRQHandler</a> from startup_gd32e23x.o(.text) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[16]">TIMER13_IRQHandler</a> from gd32e23x_it.o(.text.TIMER13_IRQHandler) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[17]">TIMER14_IRQHandler</a> from gd32e23x_it.o(.text.TIMER14_IRQHandler) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[18]">TIMER15_IRQHandler</a> from gd32e23x_it.o(.text.TIMER15_IRQHandler) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[19]">TIMER16_IRQHandler</a> from startup_gd32e23x.o(.text) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[14]">TIMER2_IRQHandler</a> from gd32e23x_it.o(.text.TIMER2_IRQHandler) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[15]">TIMER5_IRQHandler</a> from startup_gd32e23x.o(.text) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[1e]">USART0_IRQHandler</a> from startup_gd32e23x.o(.text) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[1f]">USART1_IRQHandler</a> from gd32e23x_it.o(.text.USART1_IRQHandler) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[6]">WWDGT_IRQHandler</a> from startup_gd32e23x.o(.text) referenced from startup_gd32e23x.o(RESET)
+ <LI><a href="#[24]">__main</a> from entry.o(.ARM.Collect$$$$00000000) referenced from startup_gd32e23x.o(.text)
+ <LI><a href="#[22]">main</a> from main.o(.text.main) referenced from entry9a.o(.ARM.Collect$$$$0000000B)
+</UL>
+<P>
+<H3>
+Global Symbols
+</H3>
+<P><STRONG><a name="[24]"></a>__main</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, entry.o(.ARM.Collect$$$$00000000))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(.text)
+</UL>
+<P><STRONG><a name="[25]"></a>_main_scatterload</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, entry5.o(.ARM.Collect$$$$00000004))
+<BR><BR>[Calls]<UL><LI><a href="#[26]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__scatterload
+</UL>
+
+<P><STRONG><a name="[3e]"></a>__main_after_scatterload</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, entry5.o(.ARM.Collect$$$$00000004))
+<BR><BR>[Called By]<UL><LI><a href="#[26]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__scatterload
+</UL>
+
+<P><STRONG><a name="[0]"></a>Reset_Handler</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, startup_gd32e23x.o(.text))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[e]"></a>DMA_Channel0_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_gd32e23x.o(.text))
+<BR><BR>[Calls]<UL><LI><a href="#[e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DMA_Channel0_IRQHandler
+</UL>
+<BR>[Called By]<UL><LI><a href="#[e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DMA_Channel0_IRQHandler
+</UL>
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[f]"></a>DMA_Channel1_2_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_gd32e23x.o(.text))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[b]"></a>EXTI0_1_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_gd32e23x.o(.text))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[c]"></a>EXTI2_3_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_gd32e23x.o(.text))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[9]"></a>FMC_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_gd32e23x.o(.text))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[20]"></a>I2C0_ER_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_gd32e23x.o(.text))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[1a]"></a>I2C0_EV_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_gd32e23x.o(.text))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[21]"></a>I2C1_ER_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_gd32e23x.o(.text))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[1b]"></a>I2C1_EV_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_gd32e23x.o(.text))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[7]"></a>LVD_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_gd32e23x.o(.text))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[a]"></a>RCU_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_gd32e23x.o(.text))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[8]"></a>RTC_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_gd32e23x.o(.text))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[1c]"></a>SPI0_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_gd32e23x.o(.text))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[1d]"></a>SPI1_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_gd32e23x.o(.text))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[12]"></a>TIMER0_BRK_UP_TRG_COM_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_gd32e23x.o(.text))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[13]"></a>TIMER0_Channel_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_gd32e23x.o(.text))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[19]"></a>TIMER16_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_gd32e23x.o(.text))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[15]"></a>TIMER5_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_gd32e23x.o(.text))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[1e]"></a>USART0_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_gd32e23x.o(.text))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[6]"></a>WWDGT_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_gd32e23x.o(.text))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[a0]"></a>__aeabi_memcpy</STRONG> (Thumb, 36 bytes, Stack size 0 bytes, memcpya.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[28]"></a>__aeabi_memset</STRONG> (Thumb, 14 bytes, Stack size 0 bytes, memseta.o(.text), UNUSED)
+<BR><BR>[Called By]<UL><LI><a href="#[29]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_memset$wrapper
+<LI><a href="#[27]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memclr
+</UL>
+
+<P><STRONG><a name="[27]"></a>__aeabi_memclr</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, memseta.o(.text), UNUSED)
+<BR><BR>[Calls]<UL><LI><a href="#[28]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memset
+</UL>
+
+<P><STRONG><a name="[b0]"></a>__aeabi_memclr4</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, memseta.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;save_flash_nolib
+</UL>
+
+<P><STRONG><a name="[29]"></a>_memset$wrapper</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, memseta.o(.text), UNUSED)
+<BR><BR>[Calls]<UL><LI><a href="#[28]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memset
+</UL>
+
+<P><STRONG><a name="[2a]"></a>__aeabi_fadd</STRONG> (Thumb, 162 bytes, Stack size 0 bytes, fadd.o(.text))
+<BR><BR>[Calls]<UL><LI><a href="#[2c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_float_round
+<LI><a href="#[2b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_float_epilogue
+</UL>
+<BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;tenKhzRoutine
+<LI><a href="#[2e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_frsub
+<LI><a href="#[2d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fsub
+</UL>
+
+<P><STRONG><a name="[2d]"></a>__aeabi_fsub</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, fadd.o(.text), UNUSED)
+<BR><BR>[Calls]<UL><LI><a href="#[2a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fadd
+</UL>
+
+<P><STRONG><a name="[2e]"></a>__aeabi_frsub</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, fadd.o(.text), UNUSED)
+<BR><BR>[Calls]<UL><LI><a href="#[2a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fadd
+</UL>
+
+<P><STRONG><a name="[2f]"></a>__aeabi_fdiv</STRONG> (Thumb, 124 bytes, Stack size 0 bytes, fdiv.o(.text))
+<BR><BR>[Calls]<UL><LI><a href="#[2c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_float_round
+</UL>
+<BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;tenKhzRoutine
+</UL>
+
+<P><STRONG><a name="[30]"></a>__aeabi_dadd</STRONG> (Thumb, 328 bytes, Stack size 0 bytes, dadd.o(.text))
+<BR><BR>[Calls]<UL><LI><a href="#[32]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_lasr
+<LI><a href="#[31]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_llsl
+<LI><a href="#[34]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_round
+<LI><a href="#[33]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_epilogue
+</UL>
+<BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[36]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_drsub
+<LI><a href="#[35]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dsub
+</UL>
+
+<P><STRONG><a name="[35]"></a>__aeabi_dsub</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, dadd.o(.text), UNUSED)
+<BR><BR>[Calls]<UL><LI><a href="#[30]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dadd
+</UL>
+
+<P><STRONG><a name="[36]"></a>__aeabi_drsub</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, dadd.o(.text), UNUSED)
+<BR><BR>[Calls]<UL><LI><a href="#[30]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dadd
+</UL>
+
+<P><STRONG><a name="[37]"></a>__aeabi_dmul</STRONG> (Thumb, 202 bytes, Stack size 0 bytes, dmul.o(.text))
+<BR><BR>[Calls]<UL><LI><a href="#[33]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_epilogue
+</UL>
+<BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[38]"></a>__aeabi_ddiv</STRONG> (Thumb, 234 bytes, Stack size 0 bytes, ddiv.o(.text))
+<BR><BR>[Calls]<UL><LI><a href="#[34]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_round
+</UL>
+<BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[c2]"></a>__aeabi_fcmple</STRONG> (Thumb, 28 bytes, Stack size 0 bytes, fcmple.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setInput
+</UL>
+
+<P><STRONG><a name="[bf]"></a>__aeabi_fcmplt</STRONG> (Thumb, 28 bytes, Stack size 0 bytes, fcmplt.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;tenKhzRoutine
+<LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setInput
+</UL>
+
+<P><STRONG><a name="[c0]"></a>__aeabi_fcmpge</STRONG> (Thumb, 28 bytes, Stack size 0 bytes, fcmpge.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setInput
+</UL>
+
+<P><STRONG><a name="[c9]"></a>__aeabi_fcmpgt</STRONG> (Thumb, 28 bytes, Stack size 0 bytes, fcmpgt.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;tenKhzRoutine
+</UL>
+
+<P><STRONG><a name="[39]"></a>__aeabi_i2f</STRONG> (Thumb, 22 bytes, Stack size 0 bytes, fflti.o(.text))
+<BR><BR>[Calls]<UL><LI><a href="#[2b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_float_epilogue
+</UL>
+<BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;tenKhzRoutine
+</UL>
+
+<P><STRONG><a name="[3a]"></a>__aeabi_ui2d</STRONG> (Thumb, 24 bytes, Stack size 0 bytes, dfltui.o(.text))
+<BR><BR>[Calls]<UL><LI><a href="#[33]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_epilogue
+</UL>
+<BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[a6]"></a>__aeabi_f2iz</STRONG> (Thumb, 50 bytes, Stack size 0 bytes, ffixi.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;tenKhzRoutine
+<LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setInput
+</UL>
+
+<P><STRONG><a name="[3b]"></a>__aeabi_d2iz</STRONG> (Thumb, 62 bytes, Stack size 0 bytes, dfixi.o(.text))
+<BR><BR>[Calls]<UL><LI><a href="#[3c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_llsr
+</UL>
+<BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[31]"></a>__aeabi_llsl</STRONG> (Thumb, 32 bytes, Stack size 0 bytes, llshl.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[30]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dadd
+<LI><a href="#[33]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_epilogue
+</UL>
+
+<P><STRONG><a name="[3c]"></a>__aeabi_llsr</STRONG> (Thumb, 34 bytes, Stack size 0 bytes, llushr.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[3b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_d2iz
+<LI><a href="#[33]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_epilogue
+</UL>
+
+<P><STRONG><a name="[32]"></a>__aeabi_lasr</STRONG> (Thumb, 38 bytes, Stack size 0 bytes, llsshr.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[30]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dadd
+</UL>
+
+<P><STRONG><a name="[2c]"></a>_float_round</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, fepilogue.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[2a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fadd
+<LI><a href="#[2f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fdiv
+</UL>
+
+<P><STRONG><a name="[2b]"></a>_float_epilogue</STRONG> (Thumb, 114 bytes, Stack size 0 bytes, fepilogue.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[2a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fadd
+<LI><a href="#[39]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_i2f
+</UL>
+
+<P><STRONG><a name="[34]"></a>_double_round</STRONG> (Thumb, 26 bytes, Stack size 0 bytes, depilogue.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[38]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ddiv
+<LI><a href="#[30]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dadd
+<LI><a href="#[33]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_epilogue
+</UL>
+
+<P><STRONG><a name="[33]"></a>_double_epilogue</STRONG> (Thumb, 164 bytes, Stack size 0 bytes, depilogue.o(.text))
+<BR><BR>[Calls]<UL><LI><a href="#[3d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__ARM_clz
+<LI><a href="#[3c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_llsr
+<LI><a href="#[31]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_llsl
+<LI><a href="#[34]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_round
+</UL>
+<BR>[Called By]<UL><LI><a href="#[30]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dadd
+<LI><a href="#[37]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dmul
+<LI><a href="#[3a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ui2d
+</UL>
+
+<P><STRONG><a name="[26]"></a>__scatterload</STRONG> (Thumb, 28 bytes, Stack size 0 bytes, init.o(.text))
+<BR><BR>[Calls]<UL><LI><a href="#[3e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__main_after_scatterload
+</UL>
+<BR>[Called By]<UL><LI><a href="#[25]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_main_scatterload
+</UL>
+
+<P><STRONG><a name="[11]"></a>ADC_CMP_IRQHandler</STRONG> (Thumb, 32 bytes, Stack size 0 bytes, gd32e23x_it.o(.text.ADC_CMP_IRQHandler))
+<BR><BR>[Calls]<UL><LI><a href="#[3f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;exti_interrupt_flag_get
+<LI><a href="#[40]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;exti_flag_clear
+<LI><a href="#[41]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;interruptRoutine
+</UL>
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[a9]"></a>ADC_DMA_Callback</STRONG> (Thumb, 24 bytes, Stack size 0 bytes, adc.o(.text.ADC_DMA_Callback))
+<BR><BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[42]"></a>ADC_Init</STRONG> (Thumb, 228 bytes, Stack size 0 bytes, adc.o(.text.ADC_Init))
+<BR><BR>[Calls]<UL><LI><a href="#[49]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dma_channel_enable
+<LI><a href="#[48]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dma_circulation_enable
+<LI><a href="#[47]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dma_init
+<LI><a href="#[46]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dma_deinit
+<LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;adc_external_trigger_source_config
+<LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;adc_external_trigger_config
+<LI><a href="#[4e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;adc_regular_channel_config
+<LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;adc_channel_length_config
+<LI><a href="#[4b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;adc_data_alignment_config
+<LI><a href="#[4a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;adc_special_function_config
+<LI><a href="#[4d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;adc_tempsensor_vrefint_enable
+<LI><a href="#[54]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;adc_dma_mode_enable
+<LI><a href="#[53]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;adc_calibration_enable
+<LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;adc_enable
+<LI><a href="#[55]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;adc_software_trigger_enable
+<LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;delayMicros
+<LI><a href="#[44]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;rcu_adc_clock_config
+<LI><a href="#[43]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;rcu_periph_clock_enable
+<LI><a href="#[45]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gpio_mode_set
+</UL>
+<BR>[Called By]<UL><LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;enableCorePeripherals
+</UL>
+
+<P><STRONG><a name="[10]"></a>DMA_Channel3_4_IRQHandler</STRONG> (Thumb, 164 bytes, Stack size 0 bytes, gd32e23x_it.o(.text.DMA_Channel3_4_IRQHandler))
+<BR><BR>[Calls]<UL><LI><a href="#[58]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dma_interrupt_flag_clear
+<LI><a href="#[57]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dma_interrupt_flag_get
+<LI><a href="#[59]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dma_channel_disable
+<LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sendDshotDma
+<LI><a href="#[5a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;transfercomplete
+<LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;receiveDshotDma
+</UL>
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[d]"></a>EXTI4_15_IRQHandler</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, gd32e23x_it.o(.text.EXTI4_15_IRQHandler))
+<BR><BR>[Calls]<UL><LI><a href="#[40]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;exti_flag_clear
+<LI><a href="#[5c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;processDshot
+</UL>
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[2]"></a>HardFault_Handler</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, gd32e23x_it.o(.text.HardFault_Handler))
+<BR><BR>[Calls]<UL><LI><a href="#[2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HardFault_Handler
+</UL>
+<BR>[Called By]<UL><LI><a href="#[2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HardFault_Handler
+</UL>
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[5d]"></a>MX_IWDG_Init</STRONG> (Thumb, 22 bytes, Stack size 0 bytes, peripherals.o(.text.MX_IWDG_Init))
+<BR><BR>[Calls]<UL><LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fwdgt_config
+<LI><a href="#[5f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fwdgt_enable
+</UL>
+<BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[1]"></a>NMI_Handler</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, gd32e23x_it.o(.text.NMI_Handler))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[4]"></a>PendSV_Handler</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, gd32e23x_it.o(.text.PendSV_Handler))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[60]"></a>PeriodElapsedCallback</STRONG> (Thumb, 200 bytes, Stack size 0 bytes, main.o(.text.PeriodElapsedCallback))
+<BR><BR>[Calls]<UL><LI><a href="#[63]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;enableCompInterrupts
+<LI><a href="#[62]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;changeCompInput
+<LI><a href="#[61]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;comStep
+</UL>
+<BR>[Called By]<UL><LI><a href="#[18]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIMER15_IRQHandler
+</UL>
+
+<P><STRONG><a name="[3]"></a>SVC_Handler</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, gd32e23x_it.o(.text.SVC_Handler))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[5]"></a>SysTick_Handler</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, gd32e23x_it.o(.text.SysTick_Handler))
+<BR><BR>[Calls]<UL><LI><a href="#[64]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;delay_decrement
+</UL>
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[23]"></a>SystemInit</STRONG> (Thumb, 420 bytes, Stack size 0 bytes, system_gd32e23x.o(.text.SystemInit))
+<BR><BR>[Calls]<UL><LI><a href="#[65]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;nvic_vector_table_set
+</UL>
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(.text)
+</UL>
+<P><STRONG><a name="[66]"></a>TIM0_Init</STRONG> (Thumb, 472 bytes, Stack size 0 bytes, peripherals.o(.text.TIM0_Init))
+<BR><BR>[Calls]<UL><LI><a href="#[6d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_channel_output_shadow_config
+<LI><a href="#[6c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_channel_output_mode_config
+<LI><a href="#[6b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_channel_output_config
+<LI><a href="#[6a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_channel_output_struct_para_init
+<LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_break_config
+<LI><a href="#[6e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_break_struct_para_init
+<LI><a href="#[70]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_interrupt_disable
+<LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_auto_reload_shadow_enable
+<LI><a href="#[69]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_init
+<LI><a href="#[68]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_struct_para_init
+<LI><a href="#[67]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_deinit
+<LI><a href="#[43]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;rcu_periph_clock_enable
+<LI><a href="#[73]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gpio_af_set
+<LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gpio_output_options_set
+<LI><a href="#[45]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gpio_mode_set
+</UL>
+<BR>[Called By]<UL><LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initCorePeripherals
+</UL>
+
+<P><STRONG><a name="[16]"></a>TIMER13_IRQHandler</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, gd32e23x_it.o(.text.TIMER13_IRQHandler))
+<BR><BR>[Calls]<UL><LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;tenKhzRoutine
+<LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_interrupt_flag_clear
+</UL>
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[17]"></a>TIMER14_IRQHandler</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, gd32e23x_it.o(.text.TIMER14_IRQHandler))
+<BR><BR>[Calls]<UL><LI><a href="#[76]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_flag_clear
+</UL>
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[18]"></a>TIMER15_IRQHandler</STRONG> (Thumb, 32 bytes, Stack size 0 bytes, gd32e23x_it.o(.text.TIMER15_IRQHandler))
+<BR><BR>[Calls]<UL><LI><a href="#[60]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PeriodElapsedCallback
+<LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_interrupt_flag_clear
+</UL>
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[14]"></a>TIMER2_IRQHandler</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, gd32e23x_it.o(.text.TIMER2_IRQHandler))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[77]"></a>UN_TIM_Init</STRONG> (Thumb, 176 bytes, Stack size 0 bytes, peripherals.o(.text.UN_TIM_Init))
+<BR><BR>[Calls]<UL><LI><a href="#[79]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dma_memory_address_config
+<LI><a href="#[78]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dma_periph_address_config
+<LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_input_pwm_capture_config
+<LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_channel_input_struct_para_init
+<LI><a href="#[7a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_auto_reload_shadow_disable
+<LI><a href="#[7d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_enable
+<LI><a href="#[43]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;rcu_periph_clock_enable
+<LI><a href="#[73]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gpio_af_set
+<LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gpio_output_options_set
+<LI><a href="#[45]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gpio_mode_set
+</UL>
+<BR>[Called By]<UL><LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;enableCorePeripherals
+</UL>
+
+<P><STRONG><a name="[1f]"></a>USART1_IRQHandler</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, gd32e23x_it.o(.text.USART1_IRQHandler))
+<BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
+</UL>
+<P><STRONG><a name="[53]"></a>adc_calibration_enable</STRONG> (Thumb, 68 bytes, Stack size 0 bytes, gd32e23x_adc.o(.text.adc_calibration_enable))
+<BR><BR>[Called By]<UL><LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_Init
+</UL>
+
+<P><STRONG><a name="[4c]"></a>adc_channel_length_config</STRONG> (Thumb, 60 bytes, Stack size 0 bytes, gd32e23x_adc.o(.text.adc_channel_length_config))
+<BR><BR>[Called By]<UL><LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_Init
+</UL>
+
+<P><STRONG><a name="[4b]"></a>adc_data_alignment_config</STRONG> (Thumb, 24 bytes, Stack size 0 bytes, gd32e23x_adc.o(.text.adc_data_alignment_config))
+<BR><BR>[Called By]<UL><LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_Init
+</UL>
+
+<P><STRONG><a name="[54]"></a>adc_dma_mode_enable</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, gd32e23x_adc.o(.text.adc_dma_mode_enable))
+<BR><BR>[Called By]<UL><LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_Init
+</UL>
+
+<P><STRONG><a name="[51]"></a>adc_enable</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, gd32e23x_adc.o(.text.adc_enable))
+<BR><BR>[Called By]<UL><LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_Init
+</UL>
+
+<P><STRONG><a name="[50]"></a>adc_external_trigger_config</STRONG> (Thumb, 64 bytes, Stack size 0 bytes, gd32e23x_adc.o(.text.adc_external_trigger_config))
+<BR><BR>[Called By]<UL><LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_Init
+</UL>
+
+<P><STRONG><a name="[4f]"></a>adc_external_trigger_source_config</STRONG> (Thumb, 32 bytes, Stack size 0 bytes, gd32e23x_adc.o(.text.adc_external_trigger_source_config))
+<BR><BR>[Called By]<UL><LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_Init
+</UL>
+
+<P><STRONG><a name="[4e]"></a>adc_regular_channel_config</STRONG> (Thumb, 136 bytes, Stack size 0 bytes, gd32e23x_adc.o(.text.adc_regular_channel_config))
+<BR><BR>[Called By]<UL><LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_Init
+</UL>
+
+<P><STRONG><a name="[55]"></a>adc_software_trigger_enable</STRONG> (Thumb, 40 bytes, Stack size 0 bytes, gd32e23x_adc.o(.text.adc_software_trigger_enable))
+<BR><BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_Init
+</UL>
+
+<P><STRONG><a name="[4a]"></a>adc_special_function_config</STRONG> (Thumb, 112 bytes, Stack size 0 bytes, gd32e23x_adc.o(.text.adc_special_function_config))
+<BR><BR>[Called By]<UL><LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_Init
+</UL>
+
+<P><STRONG><a name="[4d]"></a>adc_tempsensor_vrefint_enable</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, gd32e23x_adc.o(.text.adc_tempsensor_vrefint_enable))
+<BR><BR>[Called By]<UL><LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_Init
+</UL>
+
+<P><STRONG><a name="[aa]"></a>allOff</STRONG> (Thumb, 116 bytes, Stack size 0 bytes, phaseouts.o(.text.allOff))
+<BR><BR>[Called By]<UL><LI><a href="#[b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playBlueJayTune
+<LI><a href="#[a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playStartupTune
+<LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[b3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playInputTune
+<LI><a href="#[b4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playInputTune2
+<LI><a href="#[b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playBeaconTune3
+<LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playChangedTone
+<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playDefaultTone
+<LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setInput
+</UL>
+
+<P><STRONG><a name="[ab]"></a>allpwm</STRONG> (Thumb, 136 bytes, Stack size 0 bytes, phaseouts.o(.text.allpwm))
+<BR><BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[62]"></a>changeCompInput</STRONG> (Thumb, 88 bytes, Stack size 0 bytes, comparator.o(.text.changeCompInput))
+<BR><BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[c8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;zcfoundroutine
+<LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setInput
+<LI><a href="#[60]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PeriodElapsedCallback
+</UL>
+
+<P><STRONG><a name="[8d]"></a>cmp_enable</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, gd32e23x_cmp.o(.text.cmp_enable))
+<BR><BR>[Called By]<UL><LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;enableCorePeripherals
+</UL>
+
+<P><STRONG><a name="[96]"></a>cmp_mode_init</STRONG> (Thumb, 32 bytes, Stack size 0 bytes, gd32e23x_cmp.o(.text.cmp_mode_init))
+<BR><BR>[Called By]<UL><LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initCorePeripherals
+</UL>
+
+<P><STRONG><a name="[97]"></a>cmp_output_init</STRONG> (Thumb, 32 bytes, Stack size 0 bytes, gd32e23x_cmp.o(.text.cmp_output_init))
+<BR><BR>[Called By]<UL><LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initCorePeripherals
+</UL>
+
+<P><STRONG><a name="[91]"></a>cmp_output_level_get</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, gd32e23x_cmp.o(.text.cmp_output_level_get))
+<BR><BR>[Called By]<UL><LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;getCompOutputLevel
+</UL>
+
+<P><STRONG><a name="[61]"></a>comStep</STRONG> (Thumb, 636 bytes, Stack size 0 bytes, phaseouts.o(.text.comStep))
+<BR><BR>[Called By]<UL><LI><a href="#[b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playBlueJayTune
+<LI><a href="#[a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playStartupTune
+<LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[c8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;zcfoundroutine
+<LI><a href="#[b3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playInputTune
+<LI><a href="#[b4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playInputTune2
+<LI><a href="#[b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playBeaconTune3
+<LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playChangedTone
+<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playDefaultTone
+<LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setInput
+<LI><a href="#[60]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PeriodElapsedCallback
+</UL>
+
+<P><STRONG><a name="[7e]"></a>computeDshotDMA</STRONG> (Thumb, 980 bytes, Stack size 0 bytes, dshot.o(.text.computeDshotDMA))
+<BR><BR>[Calls]<UL><LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;saveEEpromSettings
+<LI><a href="#[7f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;getInputPinState
+</UL>
+<BR>[Called By]<UL><LI><a href="#[5a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;transfercomplete
+<LI><a href="#[5c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;processDshot
+</UL>
+
+<P><STRONG><a name="[81]"></a>computeServoInput</STRONG> (Thumb, 360 bytes, Stack size 0 bytes, signal.o(.text.computeServoInput))
+<BR><BR>[Calls]<UL><LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playChangedTone
+<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playDefaultTone
+<LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;getAbsDif
+<LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;map
+<LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;saveEEpromSettings
+</UL>
+<BR>[Called By]<UL><LI><a href="#[5a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;transfercomplete
+</UL>
+
+<P><STRONG><a name="[52]"></a>delayMicros</STRONG> (Thumb, 32 bytes, Stack size 0 bytes, functions.o(.text.delayMicros))
+<BR><BR>[Called By]<UL><LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;enableCorePeripherals
+<LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_Init
+</UL>
+
+<P><STRONG><a name="[86]"></a>delayMillis</STRONG> (Thumb, 68 bytes, Stack size 0 bytes, functions.o(.text.delayMillis))
+<BR><BR>[Calls]<UL><LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_prescaler_config
+</UL>
+<BR>[Called By]<UL><LI><a href="#[b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playBlueJayTune
+<LI><a href="#[a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playStartupTune
+<LI><a href="#[b3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playInputTune
+<LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;tenKhzRoutine
+<LI><a href="#[b4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playInputTune2
+<LI><a href="#[b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playBeaconTune3
+<LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playChangedTone
+<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playDefaultTone
+</UL>
+
+<P><STRONG><a name="[64]"></a>delay_decrement</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, systick.o(.text.delay_decrement))
+<BR><BR>[Called By]<UL><LI><a href="#[5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Handler
+</UL>
+
+<P><STRONG><a name="[cc]"></a>detectInput</STRONG> (Thumb, 472 bytes, Stack size 0 bytes, signal.o(.text.detectInput))
+<BR><BR>[Called By]<UL><LI><a href="#[5a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;transfercomplete
+</UL>
+
+<P><STRONG><a name="[59]"></a>dma_channel_disable</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, gd32e23x_dma.o(.text.dma_channel_disable))
+<BR><BR>[Called By]<UL><LI><a href="#[a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;send_telem_DMA
+<LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DMA_Channel3_4_IRQHandler
+</UL>
+
+<P><STRONG><a name="[49]"></a>dma_channel_enable</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, gd32e23x_dma.o(.text.dma_channel_enable))
+<BR><BR>[Called By]<UL><LI><a href="#[a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;send_telem_DMA
+<LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;telem_UART_Init
+<LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_Init
+</UL>
+
+<P><STRONG><a name="[c4]"></a>dma_circulation_disable</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, gd32e23x_dma.o(.text.dma_circulation_disable))
+<BR><BR>[Called By]<UL><LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;telem_UART_Init
+</UL>
+
+<P><STRONG><a name="[48]"></a>dma_circulation_enable</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, gd32e23x_dma.o(.text.dma_circulation_enable))
+<BR><BR>[Called By]<UL><LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_Init
+</UL>
+
+<P><STRONG><a name="[46]"></a>dma_deinit</STRONG> (Thumb, 44 bytes, Stack size 0 bytes, gd32e23x_dma.o(.text.dma_deinit))
+<BR><BR>[Called By]<UL><LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;telem_UART_Init
+<LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_Init
+</UL>
+
+<P><STRONG><a name="[47]"></a>dma_init</STRONG> (Thumb, 112 bytes, Stack size 0 bytes, gd32e23x_dma.o(.text.dma_init))
+<BR><BR>[Called By]<UL><LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;telem_UART_Init
+<LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_Init
+</UL>
+
+<P><STRONG><a name="[58]"></a>dma_interrupt_flag_clear</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, gd32e23x_dma.o(.text.dma_interrupt_flag_clear))
+<BR><BR>[Called By]<UL><LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DMA_Channel3_4_IRQHandler
+</UL>
+
+<P><STRONG><a name="[57]"></a>dma_interrupt_flag_get</STRONG> (Thumb, 56 bytes, Stack size 0 bytes, gd32e23x_dma.o(.text.dma_interrupt_flag_get))
+<BR><BR>[Called By]<UL><LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DMA_Channel3_4_IRQHandler
+</UL>
+
+<P><STRONG><a name="[79]"></a>dma_memory_address_config</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, gd32e23x_dma.o(.text.dma_memory_address_config))
+<BR><BR>[Called By]<UL><LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UN_TIM_Init
+</UL>
+
+<P><STRONG><a name="[78]"></a>dma_periph_address_config</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, gd32e23x_dma.o(.text.dma_periph_address_config))
+<BR><BR>[Called By]<UL><LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UN_TIM_Init
+</UL>
+
+<P><STRONG><a name="[c3]"></a>dma_struct_para_init</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, gd32e23x_dma.o(.text.dma_struct_para_init))
+<BR><BR>[Called By]<UL><LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;telem_UART_Init
+</UL>
+
+<P><STRONG><a name="[63]"></a>enableCompInterrupts</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, comparator.o(.text.enableCompInterrupts))
+<BR><BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[c8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;zcfoundroutine
+<LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setInput
+<LI><a href="#[60]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PeriodElapsedCallback
+</UL>
+
+<P><STRONG><a name="[88]"></a>enableCorePeripherals</STRONG> (Thumb, 252 bytes, Stack size 0 bytes, peripherals.o(.text.enableCorePeripherals))
+<BR><BR>[Calls]<UL><LI><a href="#[8d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;cmp_enable
+<LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;delayMicros
+<LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_channel_complementary_output_state_config
+<LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_channel_output_state_config
+<LI><a href="#[8b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_primary_output_config
+<LI><a href="#[8c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_event_software_generate
+<LI><a href="#[8e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;rcu_periph_clock_disable
+<LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UN_TIM_Init
+<LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_Init
+</UL>
+<BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[40]"></a>exti_flag_clear</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, gd32e23x_exti.o(.text.exti_flag_clear))
+<BR><BR>[Called By]<UL><LI><a href="#[d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EXTI4_15_IRQHandler
+<LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_CMP_IRQHandler
+</UL>
+
+<P><STRONG><a name="[98]"></a>exti_init</STRONG> (Thumb, 104 bytes, Stack size 0 bytes, gd32e23x_exti.o(.text.exti_init))
+<BR><BR>[Called By]<UL><LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initCorePeripherals
+</UL>
+
+<P><STRONG><a name="[99]"></a>exti_interrupt_flag_clear</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, gd32e23x_exti.o(.text.exti_interrupt_flag_clear))
+<BR><BR>[Called By]<UL><LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initCorePeripherals
+</UL>
+
+<P><STRONG><a name="[3f]"></a>exti_interrupt_flag_get</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, gd32e23x_exti.o(.text.exti_interrupt_flag_get))
+<BR><BR>[Called By]<UL><LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_CMP_IRQHandler
+</UL>
+
+<P><STRONG><a name="[ba]"></a>fmc_flag_clear</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, gd32e23x_fmc.o(.text.fmc_flag_clear))
+<BR><BR>[Called By]<UL><LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;save_flash_nolib
+</UL>
+
+<P><STRONG><a name="[bb]"></a>fmc_lock</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, gd32e23x_fmc.o(.text.fmc_lock))
+<BR><BR>[Called By]<UL><LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;save_flash_nolib
+</UL>
+
+<P><STRONG><a name="[b8]"></a>fmc_page_erase</STRONG> (Thumb, 376 bytes, Stack size 0 bytes, gd32e23x_fmc.o(.text.fmc_page_erase))
+<BR><BR>[Called By]<UL><LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;save_flash_nolib
+</UL>
+
+<P><STRONG><a name="[94]"></a>fmc_prefetch_enable</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, gd32e23x_fmc.o(.text.fmc_prefetch_enable))
+<BR><BR>[Called By]<UL><LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initAfterJump
+</UL>
+
+<P><STRONG><a name="[b7]"></a>fmc_unlock</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, gd32e23x_fmc.o(.text.fmc_unlock))
+<BR><BR>[Called By]<UL><LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;save_flash_nolib
+</UL>
+
+<P><STRONG><a name="[b9]"></a>fmc_word_program</STRONG> (Thumb, 368 bytes, Stack size 0 bytes, gd32e23x_fmc.o(.text.fmc_word_program))
+<BR><BR>[Called By]<UL><LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;save_flash_nolib
+</UL>
+
+<P><STRONG><a name="[93]"></a>fmc_wscnt_set</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, gd32e23x_fmc.o(.text.fmc_wscnt_set))
+<BR><BR>[Called By]<UL><LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initAfterJump
+</UL>
+
+<P><STRONG><a name="[c1]"></a>fullBrake</STRONG> (Thumb, 116 bytes, Stack size 0 bytes, phaseouts.o(.text.fullBrake))
+<BR><BR>[Called By]<UL><LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setInput
+</UL>
+
+<P><STRONG><a name="[5e]"></a>fwdgt_config</STRONG> (Thumb, 136 bytes, Stack size 0 bytes, gd32e23x_fwdgt.o(.text.fwdgt_config))
+<BR><BR>[Called By]<UL><LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_IWDG_Init
+</UL>
+
+<P><STRONG><a name="[a3]"></a>fwdgt_counter_reload</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, gd32e23x_fwdgt.o(.text.fwdgt_counter_reload))
+<BR><BR>[Called By]<UL><LI><a href="#[b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playBlueJayTune
+<LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[b3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playInputTune
+<LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;tenKhzRoutine
+<LI><a href="#[b4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playInputTune2
+<LI><a href="#[b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playBeaconTune3
+<LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playChangedTone
+<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playDefaultTone
+</UL>
+
+<P><STRONG><a name="[5f]"></a>fwdgt_enable</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, gd32e23x_fwdgt.o(.text.fwdgt_enable))
+<BR><BR>[Called By]<UL><LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_IWDG_Init
+</UL>
+
+<P><STRONG><a name="[8f]"></a>generatePwmTimerEvent</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, peripherals.o(.text.generatePwmTimerEvent))
+<BR><BR>[Calls]<UL><LI><a href="#[8c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_event_software_generate
+</UL>
+<BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[83]"></a>getAbsDif</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, functions.o(.text.getAbsDif))
+<BR><BR>[Called By]<UL><LI><a href="#[5a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;transfercomplete
+<LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;computeServoInput
+<LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setInput
+</UL>
+
+<P><STRONG><a name="[90]"></a>getCompOutputLevel</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, comparator.o(.text.getCompOutputLevel))
+<BR><BR>[Calls]<UL><LI><a href="#[91]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;cmp_output_level_get
+</UL>
+<BR>[Called By]<UL><LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;tenKhzRoutine
+<LI><a href="#[41]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;interruptRoutine
+</UL>
+
+<P><STRONG><a name="[7f]"></a>getInputPinState</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, io.o(.text.getInputPinState))
+<BR><BR>[Called By]<UL><LI><a href="#[5a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;transfercomplete
+<LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;computeDshotDMA
+</UL>
+
+<P><STRONG><a name="[73]"></a>gpio_af_set</STRONG> (Thumb, 280 bytes, Stack size 0 bytes, gd32e23x_gpio.o(.text.gpio_af_set))
+<BR><BR>[Called By]<UL><LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UN_TIM_Init
+<LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;telem_UART_Init
+<LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM0_Init
+</UL>
+
+<P><STRONG><a name="[45]"></a>gpio_mode_set</STRONG> (Thumb, 476 bytes, Stack size 0 bytes, gd32e23x_gpio.o(.text.gpio_mode_set))
+<BR><BR>[Called By]<UL><LI><a href="#[a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setInputPullUp
+<LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initCorePeripherals
+<LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UN_TIM_Init
+<LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;telem_UART_Init
+<LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM0_Init
+<LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_Init
+</UL>
+
+<P><STRONG><a name="[72]"></a>gpio_output_options_set</STRONG> (Thumb, 308 bytes, Stack size 0 bytes, gd32e23x_gpio.o(.text.gpio_output_options_set))
+<BR><BR>[Called By]<UL><LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UN_TIM_Init
+<LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;telem_UART_Init
+<LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM0_Init
+</UL>
+
+<P><STRONG><a name="[92]"></a>initAfterJump</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, peripherals.o(.text.initAfterJump))
+<BR><BR>[Calls]<UL><LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fmc_prefetch_enable
+<LI><a href="#[93]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fmc_wscnt_set
+</UL>
+<BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[95]"></a>initCorePeripherals</STRONG> (Thumb, 304 bytes, Stack size 0 bytes, peripherals.o(.text.initCorePeripherals))
+<BR><BR>[Calls]<UL><LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;exti_interrupt_flag_clear
+<LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;exti_init
+<LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;cmp_output_init
+<LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;cmp_mode_init
+<LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_auto_reload_shadow_enable
+<LI><a href="#[7d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_enable
+<LI><a href="#[43]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;rcu_periph_clock_enable
+<LI><a href="#[9a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;nvic_irq_enable
+<LI><a href="#[45]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gpio_mode_set
+<LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;telem_UART_Init
+<LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM0_Init
+</UL>
+<BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[41]"></a>interruptRoutine</STRONG> (Thumb, 144 bytes, Stack size 0 bytes, main.o(.text.interruptRoutine))
+<BR><BR>[Calls]<UL><LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maskPhaseInterrupts
+<LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;getCompOutputLevel
+</UL>
+<BR>[Called By]<UL><LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_CMP_IRQHandler
+</UL>
+
+<P><STRONG><a name="[9d]"></a>loadEEpromSettings</STRONG> (Thumb, 704 bytes, Stack size 0 bytes, main.o(.text.loadEEpromSettings))
+<BR><BR>[Calls]<UL><LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setVolume
+<LI><a href="#[9e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;read_flash_bin
+<LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;map
+</UL>
+<BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[22]"></a>main</STRONG> (Thumb, 2932 bytes, Stack size 0 bytes, main.o(.text.main))
+<BR><BR>[Calls]<UL><LI><a href="#[af]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;resetInputCaptureTimer
+<LI><a href="#[8f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;generatePwmTimerEvent
+<LI><a href="#[ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;allpwm
+<LI><a href="#[55]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;adc_software_trigger_enable
+<LI><a href="#[3b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_d2iz
+<LI><a href="#[38]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ddiv
+<LI><a href="#[30]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dadd
+<LI><a href="#[37]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dmul
+<LI><a href="#[3a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ui2d
+<LI><a href="#[a9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_DMA_Callback
+<LI><a href="#[a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;send_telem_DMA
+<LI><a href="#[a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;makeTelemPackage
+<LI><a href="#[a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setInputPullUp
+<LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;receiveDshotDma
+<LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_IWDG_Init
+<LI><a href="#[a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playStartupTune
+<LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;enableCorePeripherals
+<LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initCorePeripherals
+<LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initAfterJump
+<LI><a href="#[ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setPWMCompare3
+<LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setPWMCompare2
+<LI><a href="#[ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setPWMCompare1
+<LI><a href="#[2a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fadd
+<LI><a href="#[2f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fdiv
+<LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fwdgt_counter_reload
+<LI><a href="#[a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;proportionalBrake
+<LI><a href="#[a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2iz
+<LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;allOff
+<LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maskPhaseInterrupts
+<LI><a href="#[63]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;enableCompInterrupts
+<LI><a href="#[62]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;changeCompInput
+<LI><a href="#[61]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;comStep
+<LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;save_flash_nolib
+<LI><a href="#[9d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;loadEEpromSettings
+<LI><a href="#[39]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_i2f
+<LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;delayMicros
+<LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;getAbsDif
+<LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;map
+<LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memclr4
+<LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memcpy
+</UL>
+<BR>[Address Reference Count : 1]<UL><LI> entry9a.o(.ARM.Collect$$$$0000000B)
+</UL>
+<P><STRONG><a name="[a7]"></a>makeTelemPackage</STRONG> (Thumb, 1580 bytes, Stack size 0 bytes, serial_telemetry.o(.text.makeTelemPackage))
+<BR><BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[b6]"></a>make_dshot_package</STRONG> (Thumb, 428 bytes, Stack size 0 bytes, dshot.o(.text.make_dshot_package))
+<BR><BR>[Called By]<UL><LI><a href="#[5a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;transfercomplete
+<LI><a href="#[5c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;processDshot
+</UL>
+
+<P><STRONG><a name="[82]"></a>map</STRONG> (Thumb, 92 bytes, Stack size 0 bytes, functions.o(.text.map))
+<BR><BR>[Called By]<UL><LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;computeServoInput
+<LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setInput
+<LI><a href="#[9d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;loadEEpromSettings
+</UL>
+
+<P><STRONG><a name="[9c]"></a>maskPhaseInterrupts</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, comparator.o(.text.maskPhaseInterrupts))
+<BR><BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;tenKhzRoutine
+<LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setInput
+<LI><a href="#[41]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;interruptRoutine
+</UL>
+
+<P><STRONG><a name="[9a]"></a>nvic_irq_enable</STRONG> (Thumb, 76 bytes, Stack size 0 bytes, gd32e23x_misc.o(.text.nvic_irq_enable))
+<BR><BR>[Called By]<UL><LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initCorePeripherals
+</UL>
+
+<P><STRONG><a name="[65]"></a>nvic_vector_table_set</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, gd32e23x_misc.o(.text.nvic_vector_table_set))
+<BR><BR>[Called By]<UL><LI><a href="#[23]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SystemInit
+</UL>
+
+<P><STRONG><a name="[b1]"></a>playBeaconTune3</STRONG> (Thumb, 88 bytes, Stack size 0 bytes, sounds.o(.text.playBeaconTune3))
+<BR><BR>[Calls]<UL><LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fwdgt_counter_reload
+<LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;allOff
+<LI><a href="#[61]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;comStep
+<LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;delayMillis
+</UL>
+<BR>[Called By]<UL><LI><a href="#[5a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;transfercomplete
+<LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setInput
+</UL>
+
+<P><STRONG><a name="[b2]"></a>playBlueJayTune</STRONG> (Thumb, 192 bytes, Stack size 0 bytes, sounds.o(.text.playBlueJayTune))
+<BR><BR>[Calls]<UL><LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fwdgt_counter_reload
+<LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;allOff
+<LI><a href="#[61]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;comStep
+<LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;delayMillis
+</UL>
+<BR>[Called By]<UL><LI><a href="#[a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playStartupTune
+</UL>
+
+<P><STRONG><a name="[85]"></a>playChangedTone</STRONG> (Thumb, 72 bytes, Stack size 0 bytes, sounds.o(.text.playChangedTone))
+<BR><BR>[Calls]<UL><LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fwdgt_counter_reload
+<LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;allOff
+<LI><a href="#[61]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;comStep
+<LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;delayMillis
+</UL>
+<BR>[Called By]<UL><LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;computeServoInput
+<LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setInput
+</UL>
+
+<P><STRONG><a name="[84]"></a>playDefaultTone</STRONG> (Thumb, 72 bytes, Stack size 0 bytes, sounds.o(.text.playDefaultTone))
+<BR><BR>[Calls]<UL><LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fwdgt_counter_reload
+<LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;allOff
+<LI><a href="#[61]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;comStep
+<LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;delayMillis
+</UL>
+<BR>[Called By]<UL><LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;computeServoInput
+<LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setInput
+</UL>
+
+<P><STRONG><a name="[b3]"></a>playInputTune</STRONG> (Thumb, 88 bytes, Stack size 0 bytes, sounds.o(.text.playInputTune))
+<BR><BR>[Calls]<UL><LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fwdgt_counter_reload
+<LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;allOff
+<LI><a href="#[61]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;comStep
+<LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;delayMillis
+</UL>
+<BR>[Called By]<UL><LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;tenKhzRoutine
+</UL>
+
+<P><STRONG><a name="[b4]"></a>playInputTune2</STRONG> (Thumb, 92 bytes, Stack size 0 bytes, sounds.o(.text.playInputTune2))
+<BR><BR>[Calls]<UL><LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fwdgt_counter_reload
+<LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;allOff
+<LI><a href="#[61]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;comStep
+<LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;delayMillis
+</UL>
+<BR>[Called By]<UL><LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setInput
+</UL>
+
+<P><STRONG><a name="[a2]"></a>playStartupTune</STRONG> (Thumb, 116 bytes, Stack size 0 bytes, sounds.o(.text.playStartupTune))
+<BR><BR>[Calls]<UL><LI><a href="#[b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playBlueJayTune
+<LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;allOff
+<LI><a href="#[61]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;comStep
+<LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;delayMillis
+</UL>
+<BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[5c]"></a>processDshot</STRONG> (Thumb, 48 bytes, Stack size 0 bytes, main.o(.text.processDshot))
+<BR><BR>[Calls]<UL><LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setInput
+<LI><a href="#[b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;make_dshot_package
+<LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;computeDshotDMA
+</UL>
+<BR>[Called By]<UL><LI><a href="#[d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EXTI4_15_IRQHandler
+</UL>
+
+<P><STRONG><a name="[a5]"></a>proportionalBrake</STRONG> (Thumb, 104 bytes, Stack size 0 bytes, phaseouts.o(.text.proportionalBrake))
+<BR><BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setInput
+</UL>
+
+<P><STRONG><a name="[44]"></a>rcu_adc_clock_config</STRONG> (Thumb, 200 bytes, Stack size 0 bytes, gd32e23x_rcu.o(.text.rcu_adc_clock_config))
+<BR><BR>[Called By]<UL><LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_Init
+</UL>
+
+<P><STRONG><a name="[cd]"></a>rcu_clock_freq_get</STRONG> (Thumb, 372 bytes, Stack size 0 bytes, gd32e23x_rcu.o(.text.rcu_clock_freq_get))
+<BR><BR>[Called By]<UL><LI><a href="#[c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;usart_baudrate_set
+</UL>
+
+<P><STRONG><a name="[8e]"></a>rcu_periph_clock_disable</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, gd32e23x_rcu.o(.text.rcu_periph_clock_disable))
+<BR><BR>[Called By]<UL><LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;enableCorePeripherals
+</UL>
+
+<P><STRONG><a name="[43]"></a>rcu_periph_clock_enable</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, gd32e23x_rcu.o(.text.rcu_periph_clock_enable))
+<BR><BR>[Called By]<UL><LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initCorePeripherals
+<LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UN_TIM_Init
+<LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;telem_UART_Init
+<LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM0_Init
+<LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_Init
+</UL>
+
+<P><STRONG><a name="[cb]"></a>rcu_periph_reset_disable</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, gd32e23x_rcu.o(.text.rcu_periph_reset_disable))
+<BR><BR>[Called By]<UL><LI><a href="#[67]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_deinit
+</UL>
+
+<P><STRONG><a name="[ca]"></a>rcu_periph_reset_enable</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, gd32e23x_rcu.o(.text.rcu_periph_reset_enable))
+<BR><BR>[Called By]<UL><LI><a href="#[67]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_deinit
+</UL>
+
+<P><STRONG><a name="[9e]"></a>read_flash_bin</STRONG> (Thumb, 80 bytes, Stack size 0 bytes, eeprom.o(.text.read_flash_bin))
+<BR><BR>[Called By]<UL><LI><a href="#[9d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;loadEEpromSettings
+</UL>
+
+<P><STRONG><a name="[56]"></a>receiveDshotDma</STRONG> (Thumb, 108 bytes, Stack size 0 bytes, io.o(.text.receiveDshotDma))
+<BR><BR>[Called By]<UL><LI><a href="#[5a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;transfercomplete
+<LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DMA_Channel3_4_IRQHandler
+</UL>
+
+<P><STRONG><a name="[af]"></a>resetInputCaptureTimer</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, peripherals.o(.text.resetInputCaptureTimer))
+<BR><BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[80]"></a>saveEEpromSettings</STRONG> (Thumb, 88 bytes, Stack size 0 bytes, main.o(.text.saveEEpromSettings))
+<BR><BR>[Calls]<UL><LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;save_flash_nolib
+</UL>
+<BR>[Called By]<UL><LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;computeServoInput
+<LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;computeDshotDMA
+</UL>
+
+<P><STRONG><a name="[a1]"></a>save_flash_nolib</STRONG> (Thumb, 420 bytes, Stack size 0 bytes, eeprom.o(.text.save_flash_nolib))
+<BR><BR>[Calls]<UL><LI><a href="#[ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fmc_flag_clear
+<LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fmc_word_program
+<LI><a href="#[b8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fmc_page_erase
+<LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fmc_lock
+<LI><a href="#[b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fmc_unlock
+<LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memclr4
+</UL>
+<BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;saveEEpromSettings
+</UL>
+
+<P><STRONG><a name="[5b]"></a>sendDshotDma</STRONG> (Thumb, 116 bytes, Stack size 0 bytes, io.o(.text.sendDshotDma))
+<BR><BR>[Called By]<UL><LI><a href="#[5a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;transfercomplete
+<LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DMA_Channel3_4_IRQHandler
+</UL>
+
+<P><STRONG><a name="[a8]"></a>send_telem_DMA</STRONG> (Thumb, 64 bytes, Stack size 0 bytes, serial_telemetry.o(.text.send_telem_DMA))
+<BR><BR>[Calls]<UL><LI><a href="#[49]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dma_channel_enable
+<LI><a href="#[59]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dma_channel_disable
+<LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;usart_dma_transmit_config
+<LI><a href="#[bc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;usart_receive_config
+<LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;usart_transmit_config
+</UL>
+<BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[b5]"></a>setInput</STRONG> (Thumb, 1800 bytes, Stack size 0 bytes, main.o(.text.setInput))
+<BR><BR>[Calls]<UL><LI><a href="#[a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;proportionalBrake
+<LI><a href="#[c2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fcmple
+<LI><a href="#[c1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fullBrake
+<LI><a href="#[b4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playInputTune2
+<LI><a href="#[b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playBeaconTune3
+<LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playChangedTone
+<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playDefaultTone
+<LI><a href="#[c0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fcmpge
+<LI><a href="#[a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2iz
+<LI><a href="#[bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fcmplt
+<LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;allOff
+<LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maskPhaseInterrupts
+<LI><a href="#[63]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;enableCompInterrupts
+<LI><a href="#[62]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;changeCompInput
+<LI><a href="#[61]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;comStep
+<LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;getAbsDif
+<LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;map
+</UL>
+<BR>[Called By]<UL><LI><a href="#[5c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;processDshot
+</UL>
+
+<P><STRONG><a name="[a4]"></a>setInputPullUp</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, io.o(.text.setInputPullUp))
+<BR><BR>[Calls]<UL><LI><a href="#[45]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gpio_mode_set
+</UL>
+<BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[ac]"></a>setPWMCompare1</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, peripherals.o(.text.setPWMCompare1))
+<BR><BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[ad]"></a>setPWMCompare2</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, peripherals.o(.text.setPWMCompare2))
+<BR><BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[ae]"></a>setPWMCompare3</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, peripherals.o(.text.setPWMCompare3))
+<BR><BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[9f]"></a>setVolume</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, sounds.o(.text.setVolume))
+<BR><BR>[Called By]<UL><LI><a href="#[9d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;loadEEpromSettings
+</UL>
+
+<P><STRONG><a name="[9b]"></a>telem_UART_Init</STRONG> (Thumb, 188 bytes, Stack size 0 bytes, serial_telemetry.o(.text.telem_UART_Init))
+<BR><BR>[Calls]<UL><LI><a href="#[49]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dma_channel_enable
+<LI><a href="#[c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dma_circulation_disable
+<LI><a href="#[47]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dma_init
+<LI><a href="#[c3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dma_struct_para_init
+<LI><a href="#[46]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dma_deinit
+<LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;usart_dma_transmit_config
+<LI><a href="#[c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;usart_halfduplex_enable
+<LI><a href="#[bc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;usart_receive_config
+<LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;usart_transmit_config
+<LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;usart_enable
+<LI><a href="#[c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;usart_baudrate_set
+<LI><a href="#[43]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;rcu_periph_clock_enable
+<LI><a href="#[73]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gpio_af_set
+<LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gpio_output_options_set
+<LI><a href="#[45]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gpio_mode_set
+</UL>
+<BR>[Called By]<UL><LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initCorePeripherals
+</UL>
+
+<P><STRONG><a name="[75]"></a>tenKhzRoutine</STRONG> (Thumb, 992 bytes, Stack size 0 bytes, main.o(.text.tenKhzRoutine))
+<BR><BR>[Calls]<UL><LI><a href="#[c9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fcmpgt
+<LI><a href="#[2a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fadd
+<LI><a href="#[2f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fdiv
+<LI><a href="#[c8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;zcfoundroutine
+<LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fwdgt_counter_reload
+<LI><a href="#[b3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playInputTune
+<LI><a href="#[a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2iz
+<LI><a href="#[bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fcmplt
+<LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maskPhaseInterrupts
+<LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;getCompOutputLevel
+<LI><a href="#[39]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_i2f
+<LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;delayMillis
+</UL>
+<BR>[Called By]<UL><LI><a href="#[16]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIMER13_IRQHandler
+</UL>
+
+<P><STRONG><a name="[7a]"></a>timer_auto_reload_shadow_disable</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, gd32e23x_timer.o(.text.timer_auto_reload_shadow_disable))
+<BR><BR>[Called By]<UL><LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UN_TIM_Init
+</UL>
+
+<P><STRONG><a name="[71]"></a>timer_auto_reload_shadow_enable</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, gd32e23x_timer.o(.text.timer_auto_reload_shadow_enable))
+<BR><BR>[Called By]<UL><LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initCorePeripherals
+<LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM0_Init
+</UL>
+
+<P><STRONG><a name="[6f]"></a>timer_break_config</STRONG> (Thumb, 30 bytes, Stack size 0 bytes, gd32e23x_timer.o(.text.timer_break_config))
+<BR><BR>[Called By]<UL><LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM0_Init
+</UL>
+
+<P><STRONG><a name="[6e]"></a>timer_break_struct_para_init</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, gd32e23x_timer.o(.text.timer_break_struct_para_init))
+<BR><BR>[Called By]<UL><LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM0_Init
+</UL>
+
+<P><STRONG><a name="[8a]"></a>timer_channel_complementary_output_state_config</STRONG> (Thumb, 54 bytes, Stack size 0 bytes, gd32e23x_timer.o(.text.timer_channel_complementary_output_state_config))
+<BR><BR>[Called By]<UL><LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;enableCorePeripherals
+</UL>
+
+<P><STRONG><a name="[7b]"></a>timer_channel_input_struct_para_init</STRONG> (Thumb, 14 bytes, Stack size 0 bytes, gd32e23x_timer.o(.text.timer_channel_input_struct_para_init))
+<BR><BR>[Called By]<UL><LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UN_TIM_Init
+</UL>
+
+<P><STRONG><a name="[6b]"></a>timer_channel_output_config</STRONG> (Thumb, 528 bytes, Stack size 0 bytes, gd32e23x_timer.o(.text.timer_channel_output_config))
+<BR><BR>[Called By]<UL><LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM0_Init
+</UL>
+
+<P><STRONG><a name="[6c]"></a>timer_channel_output_mode_config</STRONG> (Thumb, 92 bytes, Stack size 0 bytes, gd32e23x_timer.o(.text.timer_channel_output_mode_config))
+<BR><BR>[Called By]<UL><LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM0_Init
+</UL>
+
+<P><STRONG><a name="[6d]"></a>timer_channel_output_shadow_config</STRONG> (Thumb, 92 bytes, Stack size 0 bytes, gd32e23x_timer.o(.text.timer_channel_output_shadow_config))
+<BR><BR>[Called By]<UL><LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM0_Init
+</UL>
+
+<P><STRONG><a name="[89]"></a>timer_channel_output_state_config</STRONG> (Thumb, 90 bytes, Stack size 0 bytes, gd32e23x_timer.o(.text.timer_channel_output_state_config))
+<BR><BR>[Called By]<UL><LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;enableCorePeripherals
+</UL>
+
+<P><STRONG><a name="[6a]"></a>timer_channel_output_struct_para_init</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, gd32e23x_timer.o(.text.timer_channel_output_struct_para_init))
+<BR><BR>[Called By]<UL><LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM0_Init
+</UL>
+
+<P><STRONG><a name="[67]"></a>timer_deinit</STRONG> (Thumb, 100 bytes, Stack size 0 bytes, gd32e23x_timer.o(.text.timer_deinit))
+<BR><BR>[Calls]<UL><LI><a href="#[cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;rcu_periph_reset_disable
+<LI><a href="#[ca]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;rcu_periph_reset_enable
+</UL>
+<BR>[Called By]<UL><LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM0_Init
+</UL>
+
+<P><STRONG><a name="[7d]"></a>timer_enable</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, gd32e23x_timer.o(.text.timer_enable))
+<BR><BR>[Called By]<UL><LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initCorePeripherals
+<LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UN_TIM_Init
+</UL>
+
+<P><STRONG><a name="[8c]"></a>timer_event_software_generate</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, gd32e23x_timer.o(.text.timer_event_software_generate))
+<BR><BR>[Called By]<UL><LI><a href="#[8f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;generatePwmTimerEvent
+<LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;enableCorePeripherals
+</UL>
+
+<P><STRONG><a name="[76]"></a>timer_flag_clear</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, gd32e23x_timer.o(.text.timer_flag_clear))
+<BR><BR>[Called By]<UL><LI><a href="#[17]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIMER14_IRQHandler
+</UL>
+
+<P><STRONG><a name="[69]"></a>timer_init</STRONG> (Thumb, 144 bytes, Stack size 0 bytes, gd32e23x_timer.o(.text.timer_init))
+<BR><BR>[Called By]<UL><LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM0_Init
+</UL>
+
+<P><STRONG><a name="[7c]"></a>timer_input_pwm_capture_config</STRONG> (Thumb, 344 bytes, Stack size 0 bytes, gd32e23x_timer.o(.text.timer_input_pwm_capture_config))
+<BR><BR>[Called By]<UL><LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UN_TIM_Init
+</UL>
+
+<P><STRONG><a name="[70]"></a>timer_interrupt_disable</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, gd32e23x_timer.o(.text.timer_interrupt_disable))
+<BR><BR>[Called By]<UL><LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM0_Init
+</UL>
+
+<P><STRONG><a name="[74]"></a>timer_interrupt_flag_clear</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, gd32e23x_timer.o(.text.timer_interrupt_flag_clear))
+<BR><BR>[Called By]<UL><LI><a href="#[18]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIMER15_IRQHandler
+<LI><a href="#[16]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIMER13_IRQHandler
+</UL>
+
+<P><STRONG><a name="[87]"></a>timer_prescaler_config</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, gd32e23x_timer.o(.text.timer_prescaler_config))
+<BR><BR>[Called By]<UL><LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;delayMillis
+</UL>
+
+<P><STRONG><a name="[8b]"></a>timer_primary_output_config</STRONG> (Thumb, 22 bytes, Stack size 0 bytes, gd32e23x_timer.o(.text.timer_primary_output_config))
+<BR><BR>[Called By]<UL><LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;enableCorePeripherals
+</UL>
+
+<P><STRONG><a name="[68]"></a>timer_struct_para_init</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, gd32e23x_timer.o(.text.timer_struct_para_init))
+<BR><BR>[Called By]<UL><LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM0_Init
+</UL>
+
+<P><STRONG><a name="[5a]"></a>transfercomplete</STRONG> (Thumb, 304 bytes, Stack size 0 bytes, signal.o(.text.transfercomplete))
+<BR><BR>[Calls]<UL><LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sendDshotDma
+<LI><a href="#[cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;detectInput
+<LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;computeServoInput
+<LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;receiveDshotDma
+<LI><a href="#[b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playBeaconTune3
+<LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;getAbsDif
+<LI><a href="#[b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;make_dshot_package
+<LI><a href="#[7f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;getInputPinState
+<LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;computeDshotDMA
+</UL>
+<BR>[Called By]<UL><LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DMA_Channel3_4_IRQHandler
+</UL>
+
+<P><STRONG><a name="[c6]"></a>usart_baudrate_set</STRONG> (Thumb, 80 bytes, Stack size 0 bytes, gd32e23x_usart.o(.text.usart_baudrate_set))
+<BR><BR>[Calls]<UL><LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;rcu_clock_freq_get
+</UL>
+<BR>[Called By]<UL><LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;telem_UART_Init
+</UL>
+
+<P><STRONG><a name="[be]"></a>usart_dma_transmit_config</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, gd32e23x_usart.o(.text.usart_dma_transmit_config))
+<BR><BR>[Called By]<UL><LI><a href="#[a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;send_telem_DMA
+<LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;telem_UART_Init
+</UL>
+
+<P><STRONG><a name="[c7]"></a>usart_enable</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, gd32e23x_usart.o(.text.usart_enable))
+<BR><BR>[Called By]<UL><LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;telem_UART_Init
+</UL>
+
+<P><STRONG><a name="[c5]"></a>usart_halfduplex_enable</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, gd32e23x_usart.o(.text.usart_halfduplex_enable))
+<BR><BR>[Called By]<UL><LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;telem_UART_Init
+</UL>
+
+<P><STRONG><a name="[bc]"></a>usart_receive_config</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, gd32e23x_usart.o(.text.usart_receive_config))
+<BR><BR>[Called By]<UL><LI><a href="#[a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;send_telem_DMA
+<LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;telem_UART_Init
+</UL>
+
+<P><STRONG><a name="[bd]"></a>usart_transmit_config</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, gd32e23x_usart.o(.text.usart_transmit_config))
+<BR><BR>[Called By]<UL><LI><a href="#[a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;send_telem_DMA
+<LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;telem_UART_Init
+</UL>
+
+<P><STRONG><a name="[c8]"></a>zcfoundroutine</STRONG> (Thumb, 252 bytes, Stack size 0 bytes, main.o(.text.zcfoundroutine))
+<BR><BR>[Calls]<UL><LI><a href="#[63]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;enableCompInterrupts
+<LI><a href="#[62]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;changeCompInput
+<LI><a href="#[61]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;comStep
+</UL>
+<BR>[Called By]<UL><LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;tenKhzRoutine
+</UL>
+
+<P><STRONG><a name="[3d]"></a>__ARM_clz</STRONG> (Thumb, 46 bytes, Stack size 0 bytes, depilogue.o(i.__ARM_clz))
+<BR><BR>[Called By]<UL><LI><a href="#[33]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_epilogue
+</UL>
+<P>
+<H3>
+Local Symbols
+</H3><P>
+<H3>
+Undefined Global Symbols
+</H3><HR></body></html>

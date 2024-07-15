@@ -1390,7 +1390,10 @@
 #define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_7
 #endif
 
-
+#ifndef FIRMWARE_NAME
+/* if you get this then you have forgotten to add the section for your target above */
+#error "Missing defines for target"
+#endif
 
 /********************************** defaults if not set
  * ***************************/

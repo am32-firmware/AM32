@@ -27,11 +27,11 @@ include f415makefile.mk
 MCU_TYPE ?= F051
 
 # additional libs
-LIBS := -lc -lm -lnosys
+LIBS := -lnosys
 
 # Compiler options
-CFLAGS_COMMON := -DUSE_MAKE -g
-CFLAGS_COMMON += -I$(MAIN_INC_DIR) -O3 -Wall -ffunction-sections
+CFLAGS_COMMON := -DUSE_MAKE -fsingle-precision-constant -fomit-frame-pointer -ffast-math
+CFLAGS_COMMON += -I$(MAIN_INC_DIR) -g -O3 -Wall -ffunction-sections
 CFLAGS_COMMON += -D$(TARGET)
 
 # Linker options

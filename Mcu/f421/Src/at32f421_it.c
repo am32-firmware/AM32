@@ -2,7 +2,7 @@
  * ------------------------------------------------------------------*/
 #include "at32f421_it.h"
 
-#include "adc.h"
+#include "ADC.h"
 #include "main.h"
 #include "targets.h"
 extern void transfercomplete();

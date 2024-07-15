@@ -30,7 +30,7 @@ MCU_TYPE ?= F051
 LIBS := -lc -lm -lnosys
 
 # Compiler options
-CFLAGS_COMMON := -DUSE_MAKE
+CFLAGS_COMMON := -DUSE_MAKE -g
 CFLAGS_COMMON += -I$(MAIN_INC_DIR) -O3 -Wall -ffunction-sections
 CFLAGS_COMMON += -D$(TARGET)
 

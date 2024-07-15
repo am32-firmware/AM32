@@ -117,3 +117,12 @@ $(TOOLS_DIR):
 
 # include the tools makefile
 include $(ROOT)/make/tools.mk
+
+targets:
+	$(QUIET)echo "Targets for each MCU. To build a target use 'make TARGETNAME'"
+	$(QUIET)echo "F051 Targets: " $(TARGETS_F051)
+	$(QUIET)echo "G071 Targets: " $(TARGETS_G071)
+	$(QUIET)echo "F031 Targets: " $(TARGETS_F031)
+	$(QUIET)echo "E230 Targets: " $(TARGETS_E230)
+	$(QUIET)echo "F421 Targets: " $(TARGETS_F421)
+	$(QUIET)echo "F415 Targets: " $(TARGETS_F415)

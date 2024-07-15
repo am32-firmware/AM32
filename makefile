@@ -73,7 +73,7 @@ clean :
 	rm -rf $(BIN_DIR)/*
 
 binary : $(TARGET_BASENAME).bin
-	@$(ECHO) All done
+	@$(ECHO) done $(TARGET)
 
 $(TARGETS_F051) :
 	@$(MAKE) -s MCU_TYPE=F051 TARGET=$@ binary

@@ -212,6 +212,7 @@ an settings option)
 				 - Add per target over-ride option to max duty cycle change.
 				 - todo fix signal detection
 *2.16    - add L431 
+				 - add variable auto timing
 */
 #include "main.h"
 #include "ADC.h"
@@ -341,6 +342,9 @@ uint16_t stall_protect_target_interval = TARGET_STALL_PROTECTION_INTERVAL;
 char USE_HALL_SENSOR = 0;
 uint16_t enter_sine_angle = 180;
 char do_once_sinemode = 0;
+uint8_t auto_advance_level;
+char auto_advance = 0;
+
 //============================= Servo Settings ==============================
 uint16_t servo_low_threshold = 1100; // anything below this point considered 0
 uint16_t servo_high_threshold = 1900; // anything above this point considered 2000 (max)
@@ -584,7 +588,7 @@ uint16_t thiszctime;
 
 uint16_t duty_cycle = 0;
 char step = 1;
-uint16_t commutation_interval = 12500;
+uint32_t commutation_interval = 12500;
 uint16_t waitTime = 0;
 uint16_t signaltimeout = 0;
 uint8_t ubAnalogWatchdogStatus = RESET;
@@ -753,6 +757,7 @@ void loadEEpromSettings()
             RC_CAR_REVERSE = 0;
         }
         if (eepromBuffer[39] == 0x01) {
+					auto_advance = 1;
 #ifdef HAS_HALL_SENSORS
             USE_HALL_SENSOR = 1;
 #else
@@ -833,7 +838,8 @@ void loadEEpromSettings()
             low_rpm_throttle_limit = 0;
         }
         low_rpm_level = motor_kv / 100 / (32 / motor_poles);
-        high_rpm_level = motor_kv / 17 / (32 / motor_poles);
+
+        high_rpm_level = motor_kv / 12 / (32 / motor_poles);				
     }
     reverse_speed_threshold = map(motor_kv, 300, 3000, 1000, 500);
     //   reverse_speed_threshold = 200;
@@ -954,7 +960,7 @@ void commutate()
     }
     __enable_irq();
     changeCompInput();
-	if (average_interval > 2000) {
+	if (average_interval > 1700) {
       old_routine = 1;
    }
     bemfcounter = 0;
@@ -974,7 +980,11 @@ void PeriodElapsedCallback()
     DISABLE_COM_TIMER_INT(); // disable interrupt
     commutate();
     commutation_interval = (3*commutation_interval + thiszctime) >> 2;
-  	advance = (commutation_interval >> 3) * temp_advance; // 60 divde 8 7.5 degree increments
+  	if(!auto_advance){
+	  advance = (commutation_interval >> 3) * temp_advance; // 60 divde 8 7.5 degree increments
+		}else{
+	  advance = (commutation_interval * auto_advance_level) >> 6; // 60 divde 64 0.9375 degree increments
+		}
     waitTime = (commutation_interval >> 1) - advance;
     if (!old_routine) {
         enableCompInterrupts(); // enable comp interrupt
@@ -1008,22 +1018,22 @@ void interruptRoutine()
                 return;
             }
         }
-//    } else {
- //       for (int i = 0; i < filter_level; i++) {
-//#ifdef MCU_F031
- //           if ((current_GPIO_PORT->IDR & current_GPIO_PIN) != (uint32_t)GPIO_PIN_RESET) {
-//#else
- //           if (!getCompOutputLevel()) {
-//#endif
-//                return;
-//            }
-//        }
- //   }
     __disable_irq();
 		maskPhaseInterrupts();
 		thiszctime = INTERVAL_TIMER_COUNT;  
     SET_INTERVAL_TIMER_COUNT(0);
-    waitTime = waitTime >> fast_accel;
+//		if(thiszctime < (commutation_interval - (commutation_interval>>2))){
+//			send_LED_RGB(0, 0, 255);
+//				//	waitTime = waitTime + commutation_interval - thiszctime;
+//			    waitTime = waitTime + (commutation_interval>>2);
+//			  //  thiszctime = commutation_interval + (commutation_interval>>2);
+//		}else if(thiszctime > (commutation_interval + (commutation_interval>>2))){
+//			send_LED_RGB(255, 0, 0);
+//			 //   waitTime = waitTime - thiszctime - commutation_interval; 
+//			    waitTime = waitTime - (commutation_interval>>2);
+//			 //   thiszctime = commutation_interval - (commutation_interval>>2);
+//		}
+   // waitTime = waitTime >> fast_accel;
     SET_AND_ENABLE_COM_INT(waitTime+1); // enable COM_TIMER interrupt
     __enable_irq();
 }
@@ -1246,6 +1256,7 @@ void setInput()
         if (input < 47 + (80 * use_sin_start)) {
             if (play_tone_flag != 0) {
                 switch (play_tone_flag) {
+									
                 case 1:
                     playDefaultTone();
                     break;
@@ -1389,7 +1400,11 @@ void tenKhzRoutine()
                                     RELOAD_WATCHDOG_COUNTER();
                                 }
                             } else {
-                                playInputTune();
+#ifdef MCU_AT415
+															play_tone_flag = 4;
+#else
+															playInputTune();
+#endif
                             }
                             if (!servoPwm) {
                                 RC_CAR_REVERSE = 0;
@@ -1419,6 +1434,7 @@ void tenKhzRoutine()
     if (!stepper_sine) {
 #ifndef CUSTOM_RAMP
         if (old_routine && running) {
+	//				send_LED_RGB(255, 0, 0);
             maskPhaseInterrupts();
             getBemfState();
             if (!zcfound) {
@@ -1616,8 +1632,16 @@ void zcfoundroutine()
     thiszctime = INTERVAL_TIMER_COUNT;
     SET_INTERVAL_TIMER_COUNT(0);
     commutation_interval = (thiszctime + (3 * commutation_interval)) / 4;
-    advance = commutation_interval / advancedivisor;
+    advance = (commutation_interval >> 3) * 2; //   7.5 degree increments
     waitTime = commutation_interval / 2 - advance;
+//			if(thiszctime < (commutation_interval - (commutation_interval>>2))){
+//					waitTime = waitTime + commutation_interval - thiszctime;
+//			    thiszctime = commutation_interval - (commutation_interval>>2);
+//		}else if(thiszctime > (commutation_interval + (commutation_interval>>2))){
+//			    waitTime = waitTime - thiszctime - commutation_interval; 
+//			    thiszctime = commutation_interval - (commutation_interval>>2);
+//		}
+	
     while ((INTERVAL_TIMER_COUNT) < (waitTime)) {
         if (zero_crosses < 5) {
             break;
@@ -1646,7 +1670,7 @@ void zcfoundroutine()
             enableCompInterrupts(); // enable interrupt
         }
     } else {
-        if (commutation_interval < 1500) {
+        if (commutation_interval < 1300) {
             old_routine = 0;
             enableCompInterrupts(); // enable interrupt
         }
@@ -1819,7 +1843,11 @@ int main(void)
     maskPhaseInterrupts();
     playBrushedStartupTune();
 #else
+ #ifdef MCU_AT415
+    play_tone_flag = 5;
+ #else
     playStartupTune();
+	#endif
 #endif
     zero_input_count = 0;
     MX_IWDG_Init();
@@ -2017,14 +2045,8 @@ int main(void)
         }
         adc_counter++;
         if (adc_counter > 200) { // for adc and telemetry
-#if defined(MCU_F051) || defined(MCU_G071) || defined(MCU_F031)
+#if defined(STMICRO)
             ADC_DMA_Callback();
-            ADC_CCR = TIM1->CCR3 * 2 / 3 + 1; // sample current at quarter pwm on
-            if (ADC_CCR > tim1_arr) {
-                ADC_CCR = tim1_arr;
-            }
-            TIM1->CCR4 = ADC_CCR;
-
             LL_ADC_REG_StartConversion(ADC1);
             converted_degrees = __LL_ADC_CALC_TEMPERATURE(3300, ADC_raw_temp, LL_ADC_RESOLUTION_12B);
 #endif
@@ -2113,7 +2135,7 @@ int main(void)
             if (commutation_interval < 50) {
                 filter_level = 2;
             }
-						
+						auto_advance_level = map(duty_cycle, 100, 2000, 13, 23);
 
             /**************** old routine*********************/
 #ifdef CUSTOM_RAMP

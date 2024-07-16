@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\output\AM32_GD32DEV_B_E230.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\output\AM32_GD32DEV_B_E230.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6190004: Last Updated: Tue Jun 25 16:02:01 2024
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6190004: Last Updated: Mon Jul 15 06:56:08 2024
 <BR><P>
 <H3>Maximum Stack Usage =          0 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -376,7 +376,7 @@ Global Symbols
 <P><STRONG><a name="[4]"></a>PendSV_Handler</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, gd32e23x_it.o(.text.PendSV_Handler))
 <BR>[Address Reference Count : 1]<UL><LI> startup_gd32e23x.o(RESET)
 </UL>
-<P><STRONG><a name="[60]"></a>PeriodElapsedCallback</STRONG> (Thumb, 200 bytes, Stack size 0 bytes, main.o(.text.PeriodElapsedCallback))
+<P><STRONG><a name="[60]"></a>PeriodElapsedCallback</STRONG> (Thumb, 192 bytes, Stack size 0 bytes, main.o(.text.PeriodElapsedCallback))
 <BR><BR>[Calls]<UL><LI><a href="#[63]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;enableCompInterrupts
 <LI><a href="#[62]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;changeCompInput
 <LI><a href="#[61]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;comStep
@@ -805,14 +805,14 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[41]"></a>interruptRoutine</STRONG> (Thumb, 144 bytes, Stack size 0 bytes, main.o(.text.interruptRoutine))
+<P><STRONG><a name="[41]"></a>interruptRoutine</STRONG> (Thumb, 136 bytes, Stack size 0 bytes, main.o(.text.interruptRoutine))
 <BR><BR>[Calls]<UL><LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maskPhaseInterrupts
 <LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;getCompOutputLevel
 </UL>
 <BR>[Called By]<UL><LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_CMP_IRQHandler
 </UL>
 
-<P><STRONG><a name="[9d]"></a>loadEEpromSettings</STRONG> (Thumb, 704 bytes, Stack size 0 bytes, main.o(.text.loadEEpromSettings))
+<P><STRONG><a name="[9d]"></a>loadEEpromSettings</STRONG> (Thumb, 700 bytes, Stack size 0 bytes, main.o(.text.loadEEpromSettings))
 <BR><BR>[Calls]<UL><LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setVolume
 <LI><a href="#[9e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;read_flash_bin
 <LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;map
@@ -820,7 +820,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[22]"></a>main</STRONG> (Thumb, 2932 bytes, Stack size 0 bytes, main.o(.text.main))
+<P><STRONG><a name="[22]"></a>main</STRONG> (Thumb, 2924 bytes, Stack size 0 bytes, main.o(.text.main))
 <BR><BR>[Calls]<UL><LI><a href="#[af]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;resetInputCaptureTimer
 <LI><a href="#[8f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;generatePwmTimerEvent
 <LI><a href="#[ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;allpwm
@@ -1050,7 +1050,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[b5]"></a>setInput</STRONG> (Thumb, 1800 bytes, Stack size 0 bytes, main.o(.text.setInput))
+<P><STRONG><a name="[b5]"></a>setInput</STRONG> (Thumb, 1740 bytes, Stack size 0 bytes, main.o(.text.setInput))
 <BR><BR>[Calls]<UL><LI><a href="#[a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;proportionalBrake
 <LI><a href="#[c2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fcmple
 <LI><a href="#[c1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fullBrake
@@ -1114,7 +1114,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initCorePeripherals
 </UL>
 
-<P><STRONG><a name="[75]"></a>tenKhzRoutine</STRONG> (Thumb, 992 bytes, Stack size 0 bytes, main.o(.text.tenKhzRoutine))
+<P><STRONG><a name="[75]"></a>tenKhzRoutine</STRONG> (Thumb, 1016 bytes, Stack size 0 bytes, main.o(.text.tenKhzRoutine))
 <BR><BR>[Calls]<UL><LI><a href="#[c9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fcmpgt
 <LI><a href="#[2a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fadd
 <LI><a href="#[2f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fdiv
@@ -1269,7 +1269,7 @@ Global Symbols
 <LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;telem_UART_Init
 </UL>
 
-<P><STRONG><a name="[c8]"></a>zcfoundroutine</STRONG> (Thumb, 252 bytes, Stack size 0 bytes, main.o(.text.zcfoundroutine))
+<P><STRONG><a name="[c8]"></a>zcfoundroutine</STRONG> (Thumb, 240 bytes, Stack size 0 bytes, main.o(.text.zcfoundroutine))
 <BR><BR>[Calls]<UL><LI><a href="#[63]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;enableCompInterrupts
 <LI><a href="#[62]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;changeCompInput
 <LI><a href="#[61]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;comStep

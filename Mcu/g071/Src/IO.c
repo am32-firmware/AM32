@@ -14,7 +14,7 @@
 #include "targets.h"
 
 uint8_t buffer_padding = 7;
-char ic_timer_prescaler = CPU_FREQUENCY_MHZ / 4;
+char ic_timer_prescaler = CPU_FREQUENCY_MHZ / 6;
 uint32_t dma_buffer[64] = { 0 };
 char out_put = 0;
 

@@ -84,7 +84,7 @@ extern char dshot_telemetry;
 extern char armed;
 extern char out_put;
 extern uint8_t compute_dshot_flag;
-extern uint16_t commutation_interval;
+extern uint32_t commutation_interval;
 
 /* USER CODE END EV */
 

@@ -1,7 +1,7 @@
 Dependencies for Project 'Am32e230', Target 'GD32DEV_B_E230': (DO NOT MODIFY !)
 CompilerVersion: 6190000::V6.19::ARMCLANG
 F (..\Src\dshot.c)(0x666844EA)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m23 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -D__MICROLIB -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../mcu/e230/Drivers/CMSIS/Core/Include -I ../mcu/e230/Drivers/GD32E23x_standard_peripheral/Include -I ../mcu/e230/Drivers/CMSIS/Include -I ../mcu/e230/Inc -I ../inc-I./RTE/_GD32DEV_B_E230-IC:/KeilPacks/ARM/CMSIS/5.9.0/CMSIS/Core/Include-IC:/KeilPacks/GigaDevice/GD32E23x_DFP/1.0.1/Device/Include-D__UVISION_VERSION="538" -D_RTE_ -DGD32E23x -D_RTE_ -DGD32E230 -DGD32DEV_B_E230-o ./output/dshot.o -MD)
-I (..\inc\dshot.h)(0x65492C4B)
+I (..\inc\dshot.h)(0x668C94BC)
 I (..\mcu\e230\Inc\main.h)(0x65492C4B)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6388F1C8)
 I (..\mcu\e230\Drivers\CMSIS\Include\gd32e23x.h)(0x636A9E67)
@@ -29,7 +29,7 @@ I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_misc.h)(0x5
 I (..\mcu\e230\Inc\IO.h)(0x65492C4B)
 I (..\inc\common.h)(0x663F6DBD)
 I (..\inc\functions.h)(0x65E8C0DE)
-I (..\inc\targets.h)(0x66798C4E)
+I (..\inc\targets.h)(0x6694F219)
 I (..\inc\sounds.h)(0x65492C4B)
 F (..\Src\functions.c)(0x66685C3B)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m23 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -D__MICROLIB -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../mcu/e230/Drivers/CMSIS/Core/Include -I ../mcu/e230/Drivers/GD32E23x_standard_peripheral/Include -I ../mcu/e230/Drivers/CMSIS/Include -I ../mcu/e230/Inc -I ../inc-I./RTE/_GD32DEV_B_E230-IC:/KeilPacks/ARM/CMSIS/5.9.0/CMSIS/Core/Include-IC:/KeilPacks/GigaDevice/GD32E23x_DFP/1.0.1/Device/Include-D__UVISION_VERSION="538" -D_RTE_ -DGD32E23x -D_RTE_ -DGD32E230 -DGD32DEV_B_E230-o ./output/functions.o -MD)
 I (..\inc\functions.h)(0x65E8C0DE)
@@ -57,8 +57,8 @@ I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_timer.h)(0x
 I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_usart.h)(0x5FD3E890)
 I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_cmp.h)(0x60B53C1F)
 I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_misc.h)(0x5FCF8FB1)
-I (..\inc\targets.h)(0x66798C4E)
-F (..\Src\main.c)(0x667B13F5)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m23 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -D__MICROLIB -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../mcu/e230/Drivers/CMSIS/Core/Include -I ../mcu/e230/Drivers/GD32E23x_standard_peripheral/Include -I ../mcu/e230/Drivers/CMSIS/Include -I ../mcu/e230/Inc -I ../inc-I./RTE/_GD32DEV_B_E230-IC:/KeilPacks/ARM/CMSIS/5.9.0/CMSIS/Core/Include-IC:/KeilPacks/GigaDevice/GD32E23x_DFP/1.0.1/Device/Include-D__UVISION_VERSION="538" -D_RTE_ -DGD32E23x -D_RTE_ -DGD32E230 -DGD32DEV_B_E230-o ./output/main.o -MD)
+I (..\inc\targets.h)(0x6694F219)
+F (..\Src\main.c)(0x66903271)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m23 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -D__MICROLIB -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../mcu/e230/Drivers/CMSIS/Core/Include -I ../mcu/e230/Drivers/GD32E23x_standard_peripheral/Include -I ../mcu/e230/Drivers/CMSIS/Include -I ../mcu/e230/Inc -I ../inc-I./RTE/_GD32DEV_B_E230-IC:/KeilPacks/ARM/CMSIS/5.9.0/CMSIS/Core/Include-IC:/KeilPacks/GigaDevice/GD32E23x_DFP/1.0.1/Device/Include-D__UVISION_VERSION="538" -D_RTE_ -DGD32E23x -D_RTE_ -DGD32E230 -DGD32DEV_B_E230-o ./output/main.o -MD)
 I (..\mcu\e230\Inc\main.h)(0x65492C4B)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6388F1C8)
 I (..\mcu\e230\Drivers\CMSIS\Include\gd32e23x.h)(0x636A9E67)
@@ -84,11 +84,11 @@ I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_usart.h)(0x
 I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_cmp.h)(0x60B53C1F)
 I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_misc.h)(0x5FCF8FB1)
 I (..\mcu\e230\Inc\ADC.h)(0x65492C4B)
-I (..\inc\targets.h)(0x66798C4E)
+I (..\inc\targets.h)(0x6694F219)
 I (..\mcu\e230\Inc\IO.h)(0x65492C4B)
 I (..\inc\common.h)(0x663F6DBD)
 I (..\mcu\e230\Inc\comparator.h)(0x63697E26)
-I (..\inc\dshot.h)(0x65492C4B)
+I (..\inc\dshot.h)(0x668C94BC)
 I (..\mcu\e230\Inc\eeprom.h)(0x65492C4B)
 I (..\inc\functions.h)(0x65E8C0DE)
 I (..\mcu\e230\Inc\peripherals.h)(0x65492C4B)
@@ -124,12 +124,12 @@ I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_cmp.h)(0x60
 I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_misc.h)(0x5FCF8FB1)
 I (..\mcu\e230\Inc\IO.h)(0x65492C4B)
 I (..\inc\common.h)(0x663F6DBD)
-I (..\inc\dshot.h)(0x65492C4B)
+I (..\inc\dshot.h)(0x668C94BC)
 I (..\inc\functions.h)(0x65E8C0DE)
-I (..\inc\targets.h)(0x66798C4E)
+I (..\inc\targets.h)(0x6694F219)
 I (..\mcu\e230\Inc\serial_telemetry.h)(0x65492C4B)
 I (..\inc\sounds.h)(0x65492C4B)
-F (..\Src\sounds.c)(0x663F6CEB)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m23 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -D__MICROLIB -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../mcu/e230/Drivers/CMSIS/Core/Include -I ../mcu/e230/Drivers/GD32E23x_standard_peripheral/Include -I ../mcu/e230/Drivers/CMSIS/Include -I ../mcu/e230/Inc -I ../inc-I./RTE/_GD32DEV_B_E230-IC:/KeilPacks/ARM/CMSIS/5.9.0/CMSIS/Core/Include-IC:/KeilPacks/GigaDevice/GD32E23x_DFP/1.0.1/Device/Include-D__UVISION_VERSION="538" -D_RTE_ -DGD32E23x -D_RTE_ -DGD32E230 -DGD32DEV_B_E230-o ./output/sounds.o -MD)
+F (..\Src\sounds.c)(0x668988CC)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m23 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -D__MICROLIB -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../mcu/e230/Drivers/CMSIS/Core/Include -I ../mcu/e230/Drivers/GD32E23x_standard_peripheral/Include -I ../mcu/e230/Drivers/CMSIS/Include -I ../mcu/e230/Inc -I ../inc-I./RTE/_GD32DEV_B_E230-IC:/KeilPacks/ARM/CMSIS/5.9.0/CMSIS/Core/Include-IC:/KeilPacks/GigaDevice/GD32E23x_DFP/1.0.1/Device/Include-D__UVISION_VERSION="538" -D_RTE_ -DGD32E23x -D_RTE_ -DGD32E230 -DGD32DEV_B_E230-o ./output/sounds.o -MD)
 I (..\inc\sounds.h)(0x65492C4B)
 I (..\mcu\e230\Inc\main.h)(0x65492C4B)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x6388F1C8)
@@ -158,12 +158,12 @@ I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_misc.h)(0x5
 I (..\inc\common.h)(0x663F6DBD)
 I (..\mcu\e230\Inc\eeprom.h)(0x65492C4B)
 I (..\inc\functions.h)(0x65E8C0DE)
-I (..\inc\targets.h)(0x66798C4E)
+I (..\inc\targets.h)(0x6694F219)
 I (..\mcu\e230\Inc\peripherals.h)(0x65492C4B)
 I (..\mcu\e230\Inc\phaseouts.h)(0x65492C4B)
 F (..\Src\firmwareversion.c)(0x63F3CBB1)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m23 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -D__MICROLIB -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../mcu/e230/Drivers/CMSIS/Core/Include -I ../mcu/e230/Drivers/GD32E23x_standard_peripheral/Include -I ../mcu/e230/Drivers/CMSIS/Include -I ../mcu/e230/Inc -I ../inc-I./RTE/_GD32DEV_B_E230-IC:/KeilPacks/ARM/CMSIS/5.9.0/CMSIS/Core/Include-IC:/KeilPacks/GigaDevice/GD32E23x_DFP/1.0.1/Device/Include-D__UVISION_VERSION="538" -D_RTE_ -DGD32E23x -D_RTE_ -DGD32E230 -DGD32DEV_B_E230-o ./output/firmwareversion.o -MD)
 I (..\inc\firmwareversion.h)(0x63F3CBE2)
-I (..\inc\targets.h)(0x66798C4E)
+I (..\inc\targets.h)(0x6694F219)
 F (..\Mcu\e230\Drivers\GD32E23x_standard_peripheral\Source\gd32e23x_adc.c)(0x5FCF8FB0)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m23 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -D__MICROLIB -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../mcu/e230/Drivers/CMSIS/Core/Include -I ../mcu/e230/Drivers/GD32E23x_standard_peripheral/Include -I ../mcu/e230/Drivers/CMSIS/Include -I ../mcu/e230/Inc -I ../inc-I./RTE/_GD32DEV_B_E230-IC:/KeilPacks/ARM/CMSIS/5.9.0/CMSIS/Core/Include-IC:/KeilPacks/GigaDevice/GD32E23x_DFP/1.0.1/Device/Include-D__UVISION_VERSION="538" -D_RTE_ -DGD32E23x -D_RTE_ -DGD32E230 -DGD32DEV_B_E230-o ./output/gd32e23x_adc.o -MD)
 I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_adc.h)(0x5FCF8FB1)
 I (..\mcu\e230\Drivers\CMSIS\Include\gd32e23x.h)(0x636A9E67)
@@ -628,7 +628,7 @@ I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_timer.h)(0x
 I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_usart.h)(0x5FD3E890)
 I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_cmp.h)(0x60B53C1F)
 I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_misc.h)(0x5FCF8FB1)
-I (..\inc\targets.h)(0x66798C4E)
+I (..\inc\targets.h)(0x6694F219)
 I (..\inc\functions.h)(0x65E8C0DE)
 F (..\Mcu\e230\Src\comparator.c)(0x65E8C0DE)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m23 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -D__MICROLIB -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../mcu/e230/Drivers/CMSIS/Core/Include -I ../mcu/e230/Drivers/GD32E23x_standard_peripheral/Include -I ../mcu/e230/Drivers/CMSIS/Include -I ../mcu/e230/Inc -I ../inc-I./RTE/_GD32DEV_B_E230-IC:/KeilPacks/ARM/CMSIS/5.9.0/CMSIS/Core/Include-IC:/KeilPacks/GigaDevice/GD32E23x_DFP/1.0.1/Device/Include-D__UVISION_VERSION="538" -D_RTE_ -DGD32E23x -D_RTE_ -DGD32E230 -DGD32DEV_B_E230-o ./output/comparator.o -MD)
 I (..\mcu\e230\Inc\comparator.h)(0x63697E26)
@@ -656,7 +656,7 @@ I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_timer.h)(0x
 I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_usart.h)(0x5FD3E890)
 I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_cmp.h)(0x60B53C1F)
 I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_misc.h)(0x5FCF8FB1)
-I (..\inc\targets.h)(0x66798C4E)
+I (..\inc\targets.h)(0x6694F219)
 F (..\Mcu\e230\Src\eeprom.c)(0x65E8C0DE)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m23 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -D__MICROLIB -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../mcu/e230/Drivers/CMSIS/Core/Include -I ../mcu/e230/Drivers/GD32E23x_standard_peripheral/Include -I ../mcu/e230/Drivers/CMSIS/Include -I ../mcu/e230/Inc -I ../inc-I./RTE/_GD32DEV_B_E230-IC:/KeilPacks/ARM/CMSIS/5.9.0/CMSIS/Core/Include-IC:/KeilPacks/GigaDevice/GD32E23x_DFP/1.0.1/Device/Include-D__UVISION_VERSION="538" -D_RTE_ -DGD32E23x -D_RTE_ -DGD32E230 -DGD32DEV_B_E230-o ./output/eeprom.o -MD)
 I (..\mcu\e230\Inc\eeprom.h)(0x65492C4B)
 I (..\mcu\e230\Inc\main.h)(0x65492C4B)
@@ -712,7 +712,7 @@ I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_misc.h)(0x5
 I (..\inc\common.h)(0x663F6DBD)
 I (..\mcu\e230\Inc\main.h)(0x65492C4B)
 I (..\mcu\e230\Inc\systick.h)(0x65492C4B)
-I (..\inc\targets.h)(0x66798C4E)
+I (..\inc\targets.h)(0x6694F219)
 F (..\Mcu\e230\Src\IO.c)(0x666DED0F)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m23 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -D__MICROLIB -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../mcu/e230/Drivers/CMSIS/Core/Include -I ../mcu/e230/Drivers/GD32E23x_standard_peripheral/Include -I ../mcu/e230/Drivers/CMSIS/Include -I ../mcu/e230/Inc -I ../inc-I./RTE/_GD32DEV_B_E230-IC:/KeilPacks/ARM/CMSIS/5.9.0/CMSIS/Core/Include-IC:/KeilPacks/GigaDevice/GD32E23x_DFP/1.0.1/Device/Include-D__UVISION_VERSION="538" -D_RTE_ -DGD32E23x -D_RTE_ -DGD32E230 -DGD32DEV_B_E230-o ./output/io.o -MD)
 I (..\mcu\e230\Inc\IO.h)(0x65492C4B)
 I (..\mcu\e230\Inc\main.h)(0x65492C4B)
@@ -740,9 +740,9 @@ I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_usart.h)(0x
 I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_cmp.h)(0x60B53C1F)
 I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_misc.h)(0x5FCF8FB1)
 I (..\inc\common.h)(0x663F6DBD)
-I (..\inc\dshot.h)(0x65492C4B)
+I (..\inc\dshot.h)(0x668C94BC)
 I (..\inc\functions.h)(0x65E8C0DE)
-I (..\inc\targets.h)(0x66798C4E)
+I (..\inc\targets.h)(0x6694F219)
 I (..\mcu\e230\Inc\serial_telemetry.h)(0x65492C4B)
 F (..\Mcu\e230\Src\peripherals.c)(0x65E8C0DE)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m23 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -D__MICROLIB -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../mcu/e230/Drivers/CMSIS/Core/Include -I ../mcu/e230/Drivers/GD32E23x_standard_peripheral/Include -I ../mcu/e230/Drivers/CMSIS/Include -I ../mcu/e230/Inc -I ../inc-I./RTE/_GD32DEV_B_E230-IC:/KeilPacks/ARM/CMSIS/5.9.0/CMSIS/Core/Include-IC:/KeilPacks/GigaDevice/GD32E23x_DFP/1.0.1/Device/Include-D__UVISION_VERSION="538" -D_RTE_ -DGD32E23x -D_RTE_ -DGD32E230 -DGD32DEV_B_E230-o ./output/peripherals.o -MD)
 I (..\mcu\e230\Inc\peripherals.h)(0x65492C4B)
@@ -771,7 +771,7 @@ I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_usart.h)(0x
 I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_cmp.h)(0x60B53C1F)
 I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_misc.h)(0x5FCF8FB1)
 I (..\mcu\e230\Inc\ADC.h)(0x65492C4B)
-I (..\inc\targets.h)(0x66798C4E)
+I (..\inc\targets.h)(0x6694F219)
 I (..\inc\common.h)(0x663F6DBD)
 I (..\inc\functions.h)(0x65E8C0DE)
 I (..\mcu\e230\Inc\serial_telemetry.h)(0x65492C4B)
@@ -801,7 +801,7 @@ I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_timer.h)(0x
 I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_usart.h)(0x5FD3E890)
 I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_cmp.h)(0x60B53C1F)
 I (..\mcu\e230\Drivers\GD32E23x_standard_peripheral\Include\gd32e23x_misc.h)(0x5FCF8FB1)
-I (..\inc\targets.h)(0x66798C4E)
+I (..\inc\targets.h)(0x6694F219)
 F (..\Mcu\e230\Src\serial_telemetry.c)(0x65E8C0DE)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m23 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -D__MICROLIB -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../mcu/e230/Drivers/CMSIS/Core/Include -I ../mcu/e230/Drivers/GD32E23x_standard_peripheral/Include -I ../mcu/e230/Drivers/CMSIS/Include -I ../mcu/e230/Inc -I ../inc-I./RTE/_GD32DEV_B_E230-IC:/KeilPacks/ARM/CMSIS/5.9.0/CMSIS/Core/Include-IC:/KeilPacks/GigaDevice/GD32E23x_DFP/1.0.1/Device/Include-D__UVISION_VERSION="538" -D_RTE_ -DGD32E23x -D_RTE_ -DGD32E230 -DGD32DEV_B_E230-o ./output/serial_telemetry.o -MD)
 I (..\mcu\e230\Inc\serial_telemetry.h)(0x65492C4B)
 I (..\mcu\e230\Inc\main.h)(0x65492C4B)

@@ -223,6 +223,10 @@ an settings option)
 #include "WS2812.h"
 #endif
 
+#if DRONECAN_SUPPORT
+#include "DroneCAN/DroneCAN.h"
+#endif
+
 #ifdef USE_CRSF_INPUT
 #include "crsf.h"
 #endif
@@ -393,7 +397,7 @@ uint16_t telem_ms_count;
 
 uint16_t VOLTAGE_DIVIDER = TARGET_VOLTAGE_DIVIDER; // 100k upper and 10k lower resistor in divider
 uint16_t
-    battery_voltage; // scale in volts * 10.  1260 is a battery voltage of 12.60
+    battery_voltage; // scale in volts * 100.  1260 is a battery voltage of 12.60
 char cell_count = 0;
 char brushed_direction_set = 0;
 
@@ -1699,7 +1703,7 @@ void runBrushedLoop()
 int main(void)
 {
 
-    initAfterJump();
+    // initAfterJump();
 
     initCorePeripherals();
 
@@ -1989,7 +1993,7 @@ int main(void)
         }
         adc_counter++;
         if (adc_counter > 200) { // for adc and telemetry
-#if defined(MCU_F051) || defined(MCU_G071) || defined(MCU_F031)
+#if defined(MCU_F051) || defined(MCU_G071) || defined(MCU_F031) || defined(MCU_L431)
             ADC_DMA_Callback();
             ADC_CCR = TIM1->CCR3 * 2 / 3 + 1; // sample current at quarter pwm on
             if (ADC_CCR > tim1_arr) {
@@ -2242,6 +2246,9 @@ int main(void)
 
 #ifdef BRUSHED_MODE
         runBrushedLoop();
+#endif
+#if DRONECAN_SUPPORT
+	DroneCAN_update();
 #endif
     }
 }

@@ -1,0 +1,9 @@
+[submodule "modules/DroneCAN/libcanard"]
+	path = modules/DroneCAN/libcanard
+	url = https://github.com/dronecan/libcanard.git
+[submodule "modules/DroneCAN/dronecan_dsdlc"]
+	path = modules/DroneCAN/dronecan_dsdlc
+	url = https://github.com/dronecan/dronecan_dsdlc.git
+[submodule "modules/DroneCAN/DSDL"]
+	path = modules/DroneCAN/DSDL
+	url = https://github.com/dronecan/DSDL.git

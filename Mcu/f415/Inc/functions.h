@@ -11,8 +11,8 @@
 #endif /* FUNCTIONS_H_ */
 
 #include "main.h"
-void gpio_mode_QUICK(gpio_type* gpio_periph, uint16_t mode,
-    uint16_t pull_up_down, uint32_t pin);
+void gpio_mode_QUICK(gpio_type* gpio_periph, uint32_t mode,
+    uint32_t pull_up_down, uint32_t pin);
 void gpio_mode_set(uint32_t mode, uint32_t pull_up_down, uint32_t pin);
 int getAbsDif(int number1, int number2);
 void delayMicros(uint32_t micros);

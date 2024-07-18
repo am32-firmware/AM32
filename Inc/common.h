@@ -22,6 +22,10 @@ extern char ic_timer_prescaler;
 extern uint8_t buffersize;
 extern char output_timer_prescaler;
 extern uint8_t compute_dshot_flag;
+extern uint16_t battery_voltage; // in centi-volts (1260 == 12.60 volts)
+extern int16_t actual_current; // in Amps * 50 (ie. divide by 50 to get Amps)
+extern uint16_t e_rpm; // electrical revolution /100 so, 123 is 12300 erpm
+extern uint8_t degrees_celsius;
 #ifdef STMICRO
 extern GPIO_TypeDef* current_GPIO_PORT;
 #ifndef MCU_F031

@@ -1,0 +1,1 @@
+/Applications/STMicroelectronics/STM32Cube/STM32CubeProgrammer/STM32CubeProgrammer.app/Contents/MacOs/bin/STM32_Programmer_CLI -c port=SWD -w ./obj/AM32_VIMDRONES_L431_2.12.bin 0x08001000 -rst

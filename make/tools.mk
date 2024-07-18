@@ -317,3 +317,15 @@ breakpad_clean:
 	$(V1) [ ! -d "$(BREAKPAD_DIR)" ] || $(RM) -rf $(BREAKPAD_DIR)
 	@echo " CLEAN        $(BREAKPAD_DL_FILE)"
 	$(V1) $(RM) -f $(BREAKPAD_DL_FILE)
+
+ifeq ($(MCU_TYPE),L431)
+ifeq ($(shell [ -d "gen/dsdl_generated" ] || echo "missing"), missing)
+    $(error Plese run "make dsdl_generate" first)
+endif
+endif
+
+# target for DSDL generation
+dsdl_generate:
+	$(QUIET)mkdir -p gen/dsdl_generated
+	$(QUIET)python3 modules/DroneCAN/dronecan_dsdlc/dronecan_dsdlc.py -O gen/dsdl_generated modules/DroneCAN/DSDL/dronecan modules/DroneCAN/DSDL/uavcan modules/DroneCAN/DSDL/com modules/DroneCAN/DSDL/ardupilot
+

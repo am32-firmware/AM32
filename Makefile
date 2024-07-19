@@ -1,5 +1,9 @@
 QUIET = @
 
+# update version numbers here
+VERSION_MAJOR := 2
+VERSION_MINOR := 12
+
 # tools
 CC = $(ARM_SDK_PREFIX)gcc
 CP = $(ARM_SDK_PREFIX)objcopy
@@ -33,6 +37,7 @@ LIBS := -lnosys
 CFLAGS_COMMON := -DUSE_MAKE -fsingle-precision-constant -fomit-frame-pointer -ffast-math
 CFLAGS_COMMON += -I$(MAIN_INC_DIR) -g -O3 -Wall -ffunction-sections
 CFLAGS_COMMON += -D$(TARGET)
+CFLAGS_COMMON += -DVERSION_MAJOR=$(VERSION_MAJOR) -DVERSION_MINOR=$(VERSION_MINOR)
 
 # Linker options
 LDFLAGS_COMMON := -specs=nano.specs $(LIBS) -Wl,--gc-sections -Wl,--print-memory-usage

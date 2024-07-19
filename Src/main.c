@@ -227,8 +227,9 @@ an settings option)
 #include "crsf.h"
 #endif
 
-#define VERSION_MAJOR 2
-#define VERSION_MINOR 12
+#if !defined(VERSION_MAJOR) || !defined(VERSION_MINOR)
+#error "Makefile should define VERSION_MAJOR and VERSION_MINOR"
+#endif
 
 void zcfoundroutine(void);
 

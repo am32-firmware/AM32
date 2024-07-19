@@ -1,3 +1,4 @@
+
 QUIET = @
 
 # update version numbers here
@@ -48,19 +49,18 @@ ROOT := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 # Search source files
 SRC_COMMON := $(foreach dir,$(SRC_DIRS_COMMON),$(wildcard $(dir)/*.[cs]))
 
-VERSION_MAJOR := $(shell grep "#define VERSION_MAJOR" $(MAIN_SRC_DIR)/main.c | awk '{print $$3}' )
-VERSION_MINOR := $(shell grep "#define VERSION_MINOR" $(MAIN_SRC_DIR)/main.c | awk '{print $$3}' )
-
 FIRMWARE_VERSION := $(VERSION_MAJOR).$(VERSION_MINOR)
 
-TARGET_BASENAME = $(BIN_DIR)/$(IDENTIFIER)_$(TARGET)_$(FIRMWARE_VERSION)
+TARGET_FNAME = $(IDENTIFIER)_$(TARGET)_$(FIRMWARE_VERSION)
+TARGET_BASENAME = $(BIN_DIR)/$(TARGET_FNAME)
 
 # Build tools, so we all share the same versions
 # import macros common to all supported build systems
-include $(ROOT)/make/system-id.mk
+# include $(ROOT)/make/system-id.mk
 
 # configure some directories that are relative to wherever ROOT_DIR is located
-BIN_DIR := $(ROOT)/obj
+OBJ := obj
+BIN_DIR := $(ROOT)/$(OBJ)
 
 TOOLS_DIR ?= $(ROOT)/tools
 DL_DIR := $(ROOT)/downloads
@@ -74,10 +74,17 @@ e230 : $(TARGETS_E230)
 f421 : $(TARGETS_F421)
 f415 : $(TARGETS_F415)
 
+$(OBJ):
+	@$(MKDIR) $(OBJ) > $(NUL)
+
 clean :
-	rm -rf $(BIN_DIR)/*
+	@echo "Removing $(OBJ) directory"
+	@$(RMDIR) $(OBJ)
 
 binary : $(TARGET_BASENAME).bin
+# we copy debug.elf to give us a constant debug target for vscode
+# this means the debug button will always debug the last target built
+	@$(COPY) $(OBJ)$(DSEP)$(TARGET_FNAME).elf $(OBJ)$(DSEP)debug.elf > $(NUL)
 	@$(ECHO) done $(TARGET)
 
 $(TARGETS_F051) :
@@ -99,13 +106,11 @@ $(TARGETS_F415) :
 	@$(MAKE) -s MCU_TYPE=F415 TARGET=$@ binary		
 
 # Compile target
-$(TARGET_BASENAME).elf: SRC := $(SRC_COMMON) $(SRC_$(MCU_TYPE))
 $(TARGET_BASENAME).elf: CFLAGS := $(MCU_$(MCU_TYPE)) $(CFLAGS_$(MCU_TYPE)) $(CFLAGS_COMMON)
 $(TARGET_BASENAME).elf: LDFLAGS := $(LDFLAGS_COMMON) $(LDFLAGS_$(MCU_TYPE)) -T$(LDSCRIPT_$(MCU_TYPE))
-$(TARGET_BASENAME).elf: $(SRC)
+$(TARGET_BASENAME).elf: $(SRC_COMMON) $(SRC_$(MCU_TYPE)) $(OBJ)
 	@$(ECHO) Compiling $(notdir $@)
-	$(QUIET)mkdir -p $(dir $@)
-	$(QUIET)$(CC) $(CFLAGS) $(LDFLAGS) -MMD -MP -MF $(@:.elf=.d) -o $(@) $(SRC)
+	$(QUIET)$(CC) $(CFLAGS) $(LDFLAGS) -MMD -MP -MF $(@:.elf=.d) -o $(@) $(SRC_COMMON) $(SRC_$(MCU_TYPE))
 
 # Generate bin and hex files
 $(TARGET_BASENAME).bin: $(TARGET_BASENAME).elf
@@ -115,10 +120,10 @@ $(TARGET_BASENAME).bin: $(TARGET_BASENAME).elf
 
 # mkdirs
 $(DL_DIR):
-	$(QUIET)mkdir -p $@
+	$(QUIET)$(MKDIR) $@
 
 $(TOOLS_DIR):
-	$(QUIET)mkdir -p $@
+	$(QUIET)$(MKDIR) $@
 
 # include the tools makefile
 include $(ROOT)/make/tools.mk

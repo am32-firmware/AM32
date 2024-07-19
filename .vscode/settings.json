@@ -1,17 +1,17 @@
 {
-    "makefile.makePath": "/usr/bin/make",
-    "makefile.launchConfigurations": [
+    "OS": "windows",
+    "makefile.makePath": "tools/windows/make/bin/make.exe",
+
+    //"OS": "linux",
+    //"makefile.makePath": "/usr/bin/make",
+
+    "makefile.configurations": [
         {
-            "cwd": "/home/tridge/project/UAV/AM32/AM32",
-            "name": "Make Clean",
-            "request": "launch",
-            "type": "cppdbg",
-            "program": "${workspaceFolder}/Makefile",
-            "args": [
-                "clean"
-            ],
-            "stopAtEntry": false,
-            "externalConsole": false
+            "name": "MakeParallel",
+            "makeArgs": [
+                "-j8"
+            ]
         }
     ]
+}
 }

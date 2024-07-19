@@ -4,19 +4,46 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+      // STLink configuration
+      {
+        "name": "AM32 STLink",
+        "cwd": "${workspaceFolder}",
+        "executable": "${workspaceFolder}/obj/debug.elf",
+        "liveWatch": {
+            "enabled": true,
+            "samplesPerSecond": 4,
+        },
+        "request": "launch",
+        "type": "cortex-debug",
+        "servertype": "openocd",
+	      "configFiles": [
+            "${workspaceFolder}/tools/openocd-at32f421.cfg",
+        ],
+	      "showDevDebugOutput": "none",
+
+      	"serverpath": "${workspaceFolder}${/}tools${/}${config:OS}${/}openocd${/}bin${/}openocd",
+	      "armToolchainPath": "${workspaceRoot}/tools/${config:OS}/xpack-arm-none-eabi-gcc-10.3.1-2.3/bin",
+      },
+
+      // JLink configuration
       {
         "type": "cortex-debug",
         "request": "launch",
-        "name": "AM32 Build/Debug",
+        "name": "AM32 JLink",
         "cwd": "${workspaceRoot}",
-        "executable": "${workspaceRoot}/obj/AM32_FOXEER_F421_2.12.elf",
-        "gdbTarget": ":3333",
-        "showDevDebugOutput": "none",
-        "servertype" : "external",
+	      "device" : "-AT32F421K8U7",
+	      "gdbPath": "${workspaceRoot}/tools/${config:OS}/xpack-arm-none-eabi-gcc-10.3.1-2.3/bin/arm-none-eabi-gdb",
+        "executable": "${workspaceRoot}/obj/debug.elf",
+	      "showDevDebugOutput": "raw",
+        "servertype" : "jlink",
         "swoConfig": {
           "enabled": false,
         },
         "serialNumber": "", 
+        "liveWatch": {
+          "enabled": true,
+          "samplesPerSecond": 4
+        }
       }
     ]
   }

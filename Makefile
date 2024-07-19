@@ -3,7 +3,7 @@ QUIET = @
 
 # tools
 CC = $(ARM_SDK_PREFIX)gcc
-CP = $(ARM_SDK_PREFIX)objcopy
+OBJCOPY = $(ARM_SDK_PREFIX)objcopy
 ECHO = echo
 
 # common variables
@@ -30,6 +30,18 @@ MCU_TYPE ?= F051
 # additional libs
 LIBS := -lnosys
 
+# Working directories
+ROOT := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
+
+# include the rules for OS independence
+include $(ROOT)/make/tools.mk
+
+# extract version from Inc/version.h
+VERSION_MAJOR := $(shell $(FGREP) "#define VERSION_MAJOR" $(MAIN_INC_DIR)/version.h | $(CUT) -d' ' -f3 )
+VERSION_MINOR := $(shell $(FGREP) "#define VERSION_MINOR" $(MAIN_INC_DIR)/version.h | $(CUT) -d' ' -f3 )
+
+FIRMWARE_VERSION := $(VERSION_MAJOR).$(VERSION_MINOR)
+
 # Compiler options
 CFLAGS_COMMON := -DUSE_MAKE -fsingle-precision-constant -fomit-frame-pointer -ffast-math
 CFLAGS_COMMON += -I$(MAIN_INC_DIR) -g -O3 -Wall -ffunction-sections
@@ -38,20 +50,11 @@ CFLAGS_COMMON += -D$(TARGET)
 # Linker options
 LDFLAGS_COMMON := -specs=nano.specs $(LIBS) -Wl,--gc-sections -Wl,--print-memory-usage
 
-# Working directories
-ROOT := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
-
 # Search source files
 SRC_COMMON := $(foreach dir,$(SRC_DIRS_COMMON),$(wildcard $(dir)/*.[cs]))
 
-FIRMWARE_VERSION := $(VERSION_MAJOR).$(VERSION_MINOR)
-
 TARGET_FNAME = $(IDENTIFIER)_$(TARGET)_$(FIRMWARE_VERSION)
 TARGET_BASENAME = $(BIN_DIR)/$(TARGET_FNAME)
-
-# Build tools, so we all share the same versions
-# import macros common to all supported build systems
-# include $(ROOT)/make/system-id.mk
 
 # configure some directories that are relative to wherever ROOT_DIR is located
 OBJ := obj
@@ -79,10 +82,10 @@ MCU_LOWER = $(call lc,$(MCU_TYPE))
 binary : $(TARGET_BASENAME).bin
 # we copy debug.elf to give us a constant debug target for vscode
 # this means the debug button will always debug the last target built
-	@$(COPY) $(OBJ)$(DSEP)$(TARGET_FNAME).elf $(OBJ)$(DSEP)debug.elf > $(NUL)
+	@$(CP) -f $(OBJ)$(DSEP)$(TARGET_FNAME).elf $(OBJ)$(DSEP)debug.elf > $(NUL)
 # also copy the openocd.cfg from the MCU directory to obj/openocd.cfg for auto config of Cortex-Debug
 # in vscode
-	@$(COPY) Mcu$(DSEP)$(MCU_LOWER)$(DSEP)openocd.cfg $(OBJ)$(DSEP)openocd.cfg > $(NUL)
+	@$(CP) -f Mcu$(DSEP)$(MCU_LOWER)$(DSEP)openocd.cfg $(OBJ)$(DSEP)openocd.cfg > $(NUL)
 	@$(ECHO) done $(TARGET)
 
 $(TARGETS_F051) :
@@ -108,24 +111,24 @@ $(TARGET_BASENAME).elf: CFLAGS := $(MCU_$(MCU_TYPE)) $(CFLAGS_$(MCU_TYPE)) $(CFL
 $(TARGET_BASENAME).elf: LDFLAGS := $(LDFLAGS_COMMON) $(LDFLAGS_$(MCU_TYPE)) -T$(LDSCRIPT_$(MCU_TYPE))
 $(TARGET_BASENAME).elf: $(SRC_COMMON) $(SRC_$(MCU_TYPE))
 	@$(ECHO) Compiling $(notdir $@)
-	$(QUIRT)$(MKDIR) $(OBJ)
+	$(QUIRT)$(MKDIR) -p $(OBJ)
 	$(QUIET)$(CC) $(CFLAGS) $(LDFLAGS) -MMD -MP -MF $(@:.elf=.d) -o $(@) $(SRC_COMMON) $(SRC_$(MCU_TYPE))
 
 # Generate bin and hex files
 $(TARGET_BASENAME).bin: $(TARGET_BASENAME).elf
 	@$(ECHO) Generating $(notdir $@)
-	$(QUIET)$(CP) -O binary $(<) $@
-	$(QUIET)$(CP) $(<) -O ihex $(@:.bin=.hex)
+	$(QUIET)$(OBJCOPY) -O binary $(<) $@
+	$(QUIET)$(OBJCOPY) $(<) -O ihex $(@:.bin=.hex)
 
 # mkdirs
 $(DL_DIR):
-	$(QUIET)$(MKDIR) $@
+	$(QUIET)$(MKDIR) -p $@
 
 $(TOOLS_DIR):
-	$(QUIET)$(MKDIR) $@
+	$(QUIET)$(MKDIR) -p $@
 
-# include the tools makefile
-include $(ROOT)/make/tools.mk
+# include the targets for installing tools
+include $(ROOT)/make/tools_install.mk
 
 targets:
 	$(QUIET)echo "Targets for each MCU. To build a target use 'make TARGETNAME'"

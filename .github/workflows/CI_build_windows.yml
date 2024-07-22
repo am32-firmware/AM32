@@ -1,10 +1,10 @@
-name: CI Build Linux
+name: CI Build Windows
 
 on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: 'ubuntu-latest'
+    runs-on: 'windows-latest'
 
     steps:
       - uses: actions/checkout@v4
@@ -14,7 +14,7 @@ jobs:
       - name: Build CI
         run: |
           make arm_sdk_install
-          make -j8
+          tools/windows/make/bin/make
 
       - name: Archive build
         uses: actions/upload-artifact@v3

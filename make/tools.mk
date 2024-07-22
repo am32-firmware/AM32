@@ -6,8 +6,8 @@
 
 
 # download location for tools
-WINDOWS_TOOLS=http://uav.tridgell.net/AM32/tools/windows-tools.zip
-LINUX_TOOLS=http://uav.tridgell.net/AM32/tools/linux-tools.tar.gz
+WINDOWS_TOOLS=https://firmware.ardupilot.org/Tools/AM32-tools/windows-tools.zip
+LINUX_TOOLS=https://firmware.ardupilot.org/Tools/AM32-tools/linux-tools.tar.gz
 
 ifeq ($(OS),Windows_NT)
 ARM_SDK_PREFIX:=tools/windows/xpack-arm-none-eabi-gcc-10.3.1-2.3/bin/arm-none-eabi-

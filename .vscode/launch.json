@@ -17,7 +17,7 @@
         "type": "cortex-debug",
         "servertype": "openocd",
 	      "configFiles": [
-            "${workspaceFolder}/tools/openocd-at32f421.cfg",
+	    "${workspaceFolder}/obj/openocd.cfg",
         ],
 	      "showDevDebugOutput": "none",
 

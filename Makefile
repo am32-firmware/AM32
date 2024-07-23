@@ -74,17 +74,20 @@ e230 : $(TARGETS_E230)
 f421 : $(TARGETS_F421)
 f415 : $(TARGETS_F415)
 
-$(OBJ):
-	@$(MKDIR) $(OBJ) > $(NUL)
-
 clean :
-	@echo "Removing $(OBJ) directory"
-	@$(RMDIR) $(OBJ)
+	@echo Removing $(OBJ) directory
+	@$(RM) -rf $(OBJ)
+
+# lowercase version of MCU_TYPE
+MCU_LOWER = $(call lc,$(MCU_TYPE))
 
 binary : $(TARGET_BASENAME).bin
 # we copy debug.elf to give us a constant debug target for vscode
 # this means the debug button will always debug the last target built
 	@$(COPY) $(OBJ)$(DSEP)$(TARGET_FNAME).elf $(OBJ)$(DSEP)debug.elf > $(NUL)
+# also copy the openocd.cfg from the MCU directory to obj/openocd.cfg for auto config of Cortex-Debug
+# in vscode
+	@$(COPY) Mcu$(DSEP)$(MCU_LOWER)$(DSEP)openocd.cfg $(OBJ)$(DSEP)openocd.cfg > $(NUL)
 	@$(ECHO) done $(TARGET)
 
 $(TARGETS_F051) :
@@ -108,8 +111,9 @@ $(TARGETS_F415) :
 # Compile target
 $(TARGET_BASENAME).elf: CFLAGS := $(MCU_$(MCU_TYPE)) $(CFLAGS_$(MCU_TYPE)) $(CFLAGS_COMMON)
 $(TARGET_BASENAME).elf: LDFLAGS := $(LDFLAGS_COMMON) $(LDFLAGS_$(MCU_TYPE)) -T$(LDSCRIPT_$(MCU_TYPE))
-$(TARGET_BASENAME).elf: $(SRC_COMMON) $(SRC_$(MCU_TYPE)) $(OBJ)
+$(TARGET_BASENAME).elf: $(SRC_COMMON) $(SRC_$(MCU_TYPE))
 	@$(ECHO) Compiling $(notdir $@)
+	$(QUIRT)$(MKDIR) $(OBJ)
 	$(QUIET)$(CC) $(CFLAGS) $(LDFLAGS) -MMD -MP -MF $(@:.elf=.d) -o $(@) $(SRC_COMMON) $(SRC_$(MCU_TYPE))
 
 # Generate bin and hex files

@@ -7,10 +7,21 @@
 
     "makefile.configurations": [
         {
-            "name": "MakeParallel",
+            "name": "MakeSingle",
+            "makeArgs": [
+                "-j1"
+            ]
+	},
+        {
+            "name": "MakeParallel-8",
             "makeArgs": [
                 "-j8"
             ]
-        }
-    ]
+	},
+        {
+	    "name": "MakeParallel-MAX",
+            "makeArgs": [
+		"-j"
+            ]
+	}
 }

@@ -89,24 +89,48 @@ void SystemClock_Config(void)
 //  }
 }
 
+#ifdef USE_COMP_1
+
 void MX_COMP1_Init(void)
 {
     LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
-
+    LL_COMP_InitTypeDef COMP_InitStruct = {0};
    LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
     /**COMP1 GPIO Configuration
     PA1   ------> COMP1_INP
     PA5   ------> COMP1_INM
     */
-  GPIO_InitStruct.Pin = LL_GPIO_PIN_1|LL_GPIO_PIN_4;
+  GPIO_InitStruct.Pin = LL_GPIO_PIN_1|LL_GPIO_PIN_4|LL_GPIO_PIN_5;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
   LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   NVIC_SetPriority(COMP_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),0, 0));
   NVIC_EnableIRQ(COMP_IRQn);
-}
 
+  COMP_InitStruct.PowerMode = LL_COMP_POWERMODE_HIGHSPEED;
+  COMP_InitStruct.InputPlus = LL_COMP_INPUT_PLUS_IO3;
+  COMP_InitStruct.InputMinus = LL_COMP_INPUT_MINUS_IO5;
+  COMP_InitStruct.InputHysteresis = LL_COMP_HYSTERESIS_NONE;
+  COMP_InitStruct.OutputPolarity = LL_COMP_OUTPUTPOL_NONINVERTED;
+  COMP_InitStruct.OutputBlankingSource = LL_COMP_BLANKINGSRC_NONE;
+  LL_COMP_Init(COMP1, &COMP_InitStruct);
+  LL_COMP_SetCommonWindowMode(__LL_COMP_COMMON_INSTANCE(COMP1), LL_COMP_WINDOWMODE_DISABLE);
+
+  __IO uint32_t wait_loop_index = 0;
+  wait_loop_index = (LL_COMP_DELAY_VOLTAGE_SCALER_STAB_US * (SystemCoreClock / (1000000 * 2)));
+  while(wait_loop_index != 0)
+  {
+    wait_loop_index--;
+  }
+  LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_21);
+  LL_EXTI_DisableEvent_0_31(LL_EXTI_LINE_21);
+  LL_EXTI_DisableIT_0_31(LL_EXTI_LINE_21);
+  
+}
+#endif
+
+#ifdef USE_COMP_2
 void MX_COMP2_Init(void)
 {
 
@@ -173,6 +197,8 @@ void MX_COMP2_Init(void)
   /* USER CODE END COMP2_Init 2 */
 
 }
+#endif
+
 
 void MX_IWDG_Init(void)
 {

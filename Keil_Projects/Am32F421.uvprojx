@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -595,7 +595,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -1174,7 +1174,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -1753,7 +1753,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -2332,7 +2332,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -2911,7 +2911,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -3490,7 +3490,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -4069,7 +4069,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -4648,7 +4648,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -5227,7 +5227,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -5806,7 +5806,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -6385,7 +6385,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -6964,7 +6964,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -7543,7 +7543,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -8122,7 +8122,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -8701,7 +8701,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -9280,7 +9280,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -9859,7 +9859,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -10438,7 +10438,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -11017,7 +11017,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -11596,7 +11596,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -12175,7 +12175,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -12754,7 +12754,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -13333,7 +13333,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -13912,7 +13912,7 @@
         <TargetCommonOption>
           <Device>-AT32F421K8U7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F421_DFP.2.1.6</PackID>
+          <PackID>ArteryTek.AT32F421_DFP.2.0.5</PackID>
           <Cpu>IRAM(0x20000000,0x4000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M4") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>

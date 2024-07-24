@@ -1,6 +1,5 @@
 
-TARGETS_E230 := GD32DEV_A_E230
-
+TARGETS_E230 := $(call get_targets,E230)
 
 HAL_FOLDER_E230 := $(HAL_FOLDER)/e230
 

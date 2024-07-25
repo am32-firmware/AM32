@@ -238,8 +238,7 @@ an settings option)
 #include "crsf.h"
 #endif
 
-#define VERSION_MAJOR 2
-#define VERSION_MINOR 16
+#include <version.h>
 
 void zcfoundroutine(void);
 

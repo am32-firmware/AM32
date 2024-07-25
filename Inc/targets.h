@@ -327,7 +327,7 @@
 #endif
 /****************************************Generic********************************************/
 
-#ifdef AT32F421_PB4_054
+#ifdef AT32PB4_054_F421
 #define FIRMWARE_NAME "AT32PB4_054 "
 #define FILE_NAME "AT32PB4_054_F421"
 #define DEAD_TIME 80
@@ -336,7 +336,7 @@
 #define USE_SERIAL_TELEMETRY
 #endif
 
-#ifdef AT32F421_PB4_405
+#ifdef AT32PB4_405_F421
 #define FIRMWARE_NAME "AT32PB4_405 "
 #define FILE_NAME "AT32PB4_405_F421"
 #define DEAD_TIME 80
@@ -345,7 +345,7 @@
 #define USE_SERIAL_TELEMETRY
 #endif
 
-#ifdef AT32F421_PB4_540
+#ifdef AT32PB4_540_F421
 #define FIRMWARE_NAME "AT32PB4_540 "
 #define FILE_NAME "AT32PB4_540_F421"
 #define DEAD_TIME 80
@@ -406,7 +406,7 @@
 #define ADC_CHANNEL_TEMP ADC_CHANNEL_6
 #endif
 
-#ifdef FLYROTOR_150A_F421
+#ifdef FLYROTOR_F421
 #define FIRMWARE_NAME "FLYROTOR_150"
 #define FILE_NAME "FLYROTOR_F421"
 #define DEAD_TIME 100
@@ -513,12 +513,13 @@
 #define FILE_NAME "AT32DEV_F415"
 #define DEAD_TIME 100
 #define HARDWARE_GROUP_AT_D
+#define HARDWARE_GROUP_AT_045
 #define USE_SERIAL_TELEMETRY
 #endif
 
 #ifdef DAKEFPV_35A_F415
 #define FIRMWARE_NAME "DakeFPV 35A "
-#define FILE_NAME "DAKEFPV_35A_F415"
+#define FILE_NAME "DAKEFPV_35A_F415" // DISABLE_BUILD
 #define DEAD_TIME 20
 #define HARDWARE_GROUP_AT_D
 #define USE_SERIAL_TELEMETRY
@@ -535,7 +536,7 @@
 
 #ifdef SPEEDYBEE_F421
 #define FIRMWARE_NAME "SpeedyBee F4"
-#define FILE_NAME "SpeedyBee_F421"
+#define FILE_NAME "SPEEDYBEE_F421"
 #define DEAD_TIME 100
 #define HARDWARE_GROUP_AT_C
 #define HARDWARE_GROUP_AT_540
@@ -867,7 +868,7 @@
 #endif
 
 #ifdef ARIA_RAMP_F051
-#define FILE_NAME "FLYCOLOR_F051"
+#define FILE_NAME "ARIA_RAMP_F051"
 #define FIRMWARE_NAME "Aria Slow  "
 #define DEAD_TIME 45
 #define HARDWARE_GROUP_F0_A
@@ -1134,7 +1135,7 @@
 #endif
 
 #ifdef IFLIGHT_12S_SINGLE_N_G071
-#define FILE_NAME "IFLIGHT_12S_G071"
+#define FILE_NAME "IFLIGHT_12S_SINGLE_N_G071"
 #define FIRMWARE_NAME "12s G071N "
 #define DEAD_TIME 100
 #define MILLIVOLT_PER_AMP 67
@@ -1390,7 +1391,10 @@
 #define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_7
 #endif
 
-
+#ifndef FIRMWARE_NAME
+/* if you get this then you have forgotten to add the section for your target above */
+#error "Missing defines for target"
+#endif
 
 /********************************** defaults if not set
  * ***************************/

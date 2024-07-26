@@ -32,7 +32,7 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 MEMORY
 {
 FLASH (rx)      : ORIGIN = 0x08001000, LENGTH = 27K
-FLASH_VERSION (rx)  : ORIGIN = 0x08007C00 - 48, LENGTH = 14
+FLASH_VERSION (rx)  : ORIGIN = 0x08007C00 - 48, LENGTH = 16
 FILE_NAME     (rx)  : ORIGIN = 0x08007C00 - 32, LENGTH = 32
 EEPROM        (rx)  : ORIGIN = 0x08007C00, LENGTH = 1K
 RAM (xrw)       : ORIGIN = 0x20000000, LENGTH = 32K
@@ -107,6 +107,7 @@ SECTIONS
   {
     . = ALIGN(4);
 	KEEP (*(.firmware_info))
+    . = ALIGN(4);
   } >FLASH_VERSION
 
 
@@ -115,6 +116,7 @@ SECTIONS
   {
     . = ALIGN(4);
 	KEEP (*(.file_name))
+    . = ALIGN(4);
   } >FILE_NAME
 
   /* used by the startup to initialize data */

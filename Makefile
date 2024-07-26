@@ -44,7 +44,7 @@ FIRMWARE_VERSION := $(VERSION_MAJOR).$(VERSION_MINOR)
 # Compiler options
 
 CFLAGS_BASE := -DUSE_MAKE -fsingle-precision-constant -fomit-frame-pointer -ffast-math
-CFLAGS_BASE += -I$(MAIN_INC_DIR) -g -O3 -Wall -ffunction-sections
+CFLAGS_BASE += -I$(MAIN_INC_DIR) -g3 -O3 -Wall -ffunction-sections
 
 CFLAGS_COMMON := $(CFLAGS_BASE) -D$(TARGET)
 

@@ -21,9 +21,11 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32l4xx_it.h"
+#ifndef BOOTLOADER
 #include "ADC.h"
 #include "targets.h"
 #include "IO.h"
+#endif
 //#include "WS2812.h"
 
 
@@ -173,6 +175,7 @@ void SysTick_Handler(void)
   /* USER CODE END SysTick_IRQn 1 */
 }
 
+#ifndef BOOTLOADER
 /******************************************************************************/
 /* STM32L4xx Peripheral Interrupt Handlers                                    */
 /* Add here the Interrupt Handlers for the used peripherals.                  */
@@ -288,4 +291,4 @@ void EXTI15_10_IRQHandler(void)
     LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_15);
     processDshot();
 }
-
+#endif // BOOTLOADER

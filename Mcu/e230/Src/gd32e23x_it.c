@@ -21,7 +21,9 @@ int interrupt_time = 0;
 #include "common.h"
 #include "main.h"
 #include "systick.h"
+#ifndef BOOTLOADER
 #include "targets.h"
+#endif
 
 /*!
     \brief      this function handles NMI exception
@@ -60,6 +62,7 @@ void SVC_Handler(void) { }
 */
 void PendSV_Handler(void) { }
 
+#ifndef BOOTLOADER
 /*!
     \brief      this function handles SysTick exception
     \param[in]  none
@@ -151,3 +154,4 @@ void EXTI4_15_IRQHandler(void)
 
     processDshot();
 }
+#endif // BOOTLOADER

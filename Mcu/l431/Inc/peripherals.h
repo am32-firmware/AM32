@@ -38,6 +38,7 @@ void MX_TIM2_Init(void);
 void MX_IWDG_Init(void);
 void MX_TIM16_Init(void);
 void MX_TIM14_Init(void);
+void MX_TIM15_Init(void);
 void MX_TIM6_Init(void);
 void MX_TIM7_Init(void);
 void init_OPAMP(void);

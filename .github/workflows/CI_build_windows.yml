@@ -15,6 +15,7 @@ jobs:
         run: |
           make arm_sdk_install
           tools/windows/make/bin/make
+          tools/windows/make/bin/make bootloaders
 
       - name: Archive build
         uses: actions/upload-artifact@v3

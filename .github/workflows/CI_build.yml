@@ -15,6 +15,7 @@ jobs:
         run: |
           make arm_sdk_install
           make -j8
+          make bootloaders -j8
 
       - name: Archive build
         uses: actions/upload-artifact@v3

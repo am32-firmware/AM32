@@ -28,7 +28,7 @@ MCU_TYPE := NONE
 
 # MCU types that we build a bootloader for - this should be $(MCU_TYPES) in the future
 # when all bootloader porting is completed
-BL_MCU_TYPES := E230 F031 F051 F415 F421 G071
+BL_MCU_TYPES := E230 F031 F051 F415 F421 G071 G431
 
 # Function to include makefile for each MCU type
 define INCLUDE_MCU_MAKEFILES
@@ -110,8 +110,8 @@ $(foreach MCU,$(MCU_TYPES),$(foreach TARGET,$(TARGETS_$(MCU)), $(eval $(call CRE
 # bootloader build
 BOOTLOADER_VERSION := $(shell $(FGREP) "define BOOTLOADER_VERSION" $(MAIN_INC_DIR)/version.h | $(CUT) -d" " -f3 )
 
-# we support bootloader comms on either PB4 or PA2
-BOOTLOADER_PINS = PB4 PA2
+# we support bootloader comms on a list of possible pins
+BOOTLOADER_PINS = PB4 PA2 PA15
 
 SRC_BL := $(foreach dir,bootloader,$(wildcard $(dir)/*.[cs]))
 LDSCRIPT_BL := bootloader/ldscript_bl.ld
@@ -132,7 +132,6 @@ $(BIN_DIR)/$(call BOOTLOADER_BASENAME_VER,$(1),$(2)).elf: LDFLAGS_BL := $$(LDFLA
 $(BIN_DIR)/$(call BOOTLOADER_BASENAME_VER,$(1),$(2)).elf: $$(SRC_BL)
 	$$(QUIET)echo building bootloader for $(1) with pin $(2)
 	$$(QUIET)$$(MKDIR) -p $(OBJ)
-	$$(QUIET)echo BUILT $(1) pin $(2) > $$@
 	$$(QUIET)echo Compiling $(notdir $$@)
 	$$(QUIET)$$(CC) $$(CFLAGS_BL) $$(LDFLAGS_BL) -o $$(@) $$(SRC_BL) $$(SRC_$(1)_BL) -Os
 	$$(QUIET)$$(CP) -f $$@ $$(OBJ)$$(DSEP)debug.elf

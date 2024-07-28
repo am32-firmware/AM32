@@ -3,6 +3,8 @@
  */
 #pragma once
 
+#define GPIO_PIN(n) (1U<<(n))
+
 static inline void gpio_mode_set_input(uint32_t pin, uint32_t pull_up_down)
 {
     if (pin < 8) {

@@ -6,8 +6,7 @@
  */
 #pragma once
 
-#define GPIO_PINS_2 (1U<<2)
-#define GPIO_PINS_4 (1U<<4)
+#define GPIO_PIN(n) (1U<<(n))
 
 #define GPIO_PULL_NONE LL_GPIO_PULL_NO
 #define GPIO_PULL_UP   LL_GPIO_PULL_UP

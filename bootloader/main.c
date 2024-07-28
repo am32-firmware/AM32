@@ -8,11 +8,6 @@
 
 #include <version.h>
 
-#if !defined(USE_PA2) && !defined(USE_PB4)
-//#define USE_PB4
-#define USE_PA2
-#endif
-
 /* Includes ------------------------------------------------------------------*/
 #include <stdbool.h>
 #include <stdio.h>
@@ -22,6 +17,10 @@
 
 //#define USE_ADC_INPUT      // will go right to application and ignore eeprom
 //#define UPDATE_EEPROM_ENABLE
+
+// use this to check the clock config for the MCU (with a logic
+// analyser on the input pin)
+//#define BOOTLOADER_TEST_CLOCK
 
 #include <string.h>
 
@@ -33,7 +32,6 @@
 #else
 #define EEPROM_RELATIVE_START 0x7c00
 #endif
-
 
 typedef void (*pFunction)(void);
 
@@ -57,25 +55,29 @@ typedef void (*pFunction)(void);
 #define CMD_SET_ADDRESS     0xFF
 #define CMD_SET_BUFFER      0xFE
 
-
 #ifdef USE_PA2
-#define input_pin     GPIO_PINS_2
+#define input_pin        GPIO_PIN(2)
 #define input_port       GPIOA
 #define PIN_NUMBER       2
 #define PORT_LETTER      0
-#endif
-
-#ifdef USE_PB4
-#define input_pin       GPIO_PINS_4
+#elif defined(USE_PB4)
+#define input_pin         GPIO_PIN(4)
 #define input_port        GPIOB
 #define PIN_NUMBER        4
 #define PORT_LETTER       1
+#elif defined(USE_PA15)
+#define input_pin         GPIO_PIN(15)
+#define input_port        GPIOA
+#define PIN_NUMBER        15
+#define PORT_LETTER       0
+#else
+#error "Bootloader comms pin not defined"
 #endif
 
 #include <blutil.h>
 
 static uint16_t low_pin_count;
-static char receviedByte;
+static char receiveByte;
 static int count;
 static char messagereceived;
 static uint16_t invalid_command;
@@ -115,11 +117,11 @@ static pFunction JumpToApplication;
 /* USER CODE BEGIN PFP */
 static void serialwriteChar(char data);
 static void sendString(uint8_t data[], int len);
-static void recieveBuffer();
+static void receiveBuffer();
 
-#define BAUDRATE              19200
-#define BITTIME          1000000/BAUDRATE
-#define HALFBITTIME       500000/BAUDRATE
+#define BAUDRATE      19200
+#define BITTIME          52 // 1000000/BAUDRATE
+#define HALFBITTIME      26 // 500000/BAUDRATE
 
 static void delayMicroseconds(uint32_t micros)
 {
@@ -458,7 +460,7 @@ static void serialreadChar()
 
     delayMicroseconds(HALFBITTIME); //wait till the stop bit time begins
     messagereceived = 1;
-    receviedByte = rxbyte;
+    receiveByte = rxbyte;
 }
 
 
@@ -492,7 +494,7 @@ static void sendString(uint8_t *data, int len)
     }
 }
 
-static void recieveBuffer()
+static void receiveBuffer()
 {
     count = 0;
     messagereceived = 0;
@@ -550,7 +552,6 @@ static void checkForSignal()
 	if(!gpio_read(input_pin)){
 	    low_pin_count++;
 	}else{
-
 	}
 
 	delayMicroseconds(10);
@@ -599,14 +600,36 @@ static void checkForSignal()
     }
 }
 
+#ifdef BOOTLOADER_TEST_CLOCK
+/*
+  this should provide a 2ms low followed by a 1ms high if the clock is correct
+ */
+static void test_clock(void)
+{
+    setTransmit();
+    while (1) {
+	gpio_clear(input_pin);
+	bl_timer_reset();
+	while (bl_timer_us() < 2000) ;
+	gpio_set(input_pin);
+	bl_timer_reset();
+	while (bl_timer_us() < 1000) ;
+    }
+}
+#endif // BOOTLOADER_TEST_CLOCK
+
 int main(void)
 {
     bl_clock_config();
     bl_timer_init();
     bl_gpio_init();
 
+#ifdef BOOTLOADER_TEST_CLOCK
+    test_clock();
+#endif
+
     checkForSignal();
-	 
+
     gpio_mode_set_input(input_pin, GPIO_PULL_NONE);
 		
 #ifdef USE_ADC_INPUT  // go right to application
@@ -620,7 +643,7 @@ int main(void)
 #endif
 
     while (1) {
-	  recieveBuffer();
+	  receiveBuffer();
 	  if (invalid_command > 100) {
 	      jump();
 	  }

@@ -3,8 +3,7 @@
  */
 #pragma once
 
-#define GPIO_PINS_2 GPIO_PIN_2
-#define GPIO_PINS_4 GPIO_PIN_4
+#define GPIO_PIN(n) (1U<<(n))
 
 #define GPIO_PULL_NONE GPIO_PUPD_NONE
 #define GPIO_PULL_UP GPIO_PUPD_PULLUP

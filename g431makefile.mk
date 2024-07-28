@@ -1,34 +1,36 @@
+MCU := G431
+PART := STM32G431xx
 
-TARGETS_G431 := $(call get_targets,G431)
+TARGETS_$(MCU) := $(call get_targets,$(MCU))
 
-HAL_FOLDER_G431 := $(HAL_FOLDER)/g431
+HAL_FOLDER_$(MCU) := $(HAL_FOLDER)/g431
 
-MCU_G431 := -mcpu=cortex-m0 -mthumb
-LDSCRIPT_G431 := $(HAL_FOLDER_G431)/STM32G431CBUX_FLASH.ld
+MCU_$(MCU) := -mcpu=cortex-m4 -mthumb
+LDSCRIPT_$(MCU) := $(wildcard $(HAL_FOLDER_$(MCU))/*.ld)
 
-SRC_DIR_G431 := \
-	$(HAL_FOLDER_G431)/Startup \
-	$(HAL_FOLDER_G431)/Src \
-	$(HAL_FOLDER_G431)/Drivers/STM32G4xx_HAL_Driver/Src
+SRC_BASE_DIR_$(MCU) := \
+	$(HAL_FOLDER_$(MCU))/Startup \
+	$(HAL_FOLDER_$(MCU))/Drivers/STM32G4xx_HAL_Driver/Src
 
-CFLAGS_G431 := \
-	-I$(HAL_FOLDER_G431)/Inc \
-	-I$(HAL_FOLDER_G431)/Drivers/STM32G4xx_HAL_Driver/Inc \
-	-I$(HAL_FOLDER_G431)/Drivers/CMSIS/Include \
-	-I$(HAL_FOLDER_G431)/Drivers/CMSIS/Device/ST/STM32G4xx/Include
+SRC_DIR_$(MCU) := \
+	$(SRC_BASE_DIR_$(MCU)) \
+	$(HAL_FOLDER_$(MCU))/Src
 
-CFLAGS_G431 += \
+CFLAGS_$(MCU) := \
+	-I$(HAL_FOLDER_$(MCU))/Inc \
+	-I$(HAL_FOLDER_$(MCU))/Drivers/STM32G4xx_HAL_Driver/Inc \
+	-I$(HAL_FOLDER_$(MCU))/Drivers/CMSIS/Include \
+	-I$(HAL_FOLDER_$(MCU))/Drivers/CMSIS/Device/ST/STM32G4xx/Include
+
+CFLAGS_$(MCU) += \
 	-DHSE_VALUE=8000000 \
-	-DSTM32G431xx \
+	-D$(PART) \
 	-DHSE_STARTUP_TIMEOUT=100 \
 	-DLSE_STARTUP_TIMEOUT=5000 \
-	-DLSE_VALUE=32768 \
-	-DDATA_CACHE_ENABLE=1 \
-	-DINSTRUCTION_CACHE_ENABLE=0 \
-	-DVDD_VALUE=3300 \
-	-DLSI_VALUE=32000 \
-	-DHSI_VALUE=16000000 \
-	-DUSE_FULL_LL_DRIVER \
-	-DPREFETCH_ENABLE=1
+	-DUSE_FULL_LL_DRIVER
 
-SRC_G431 := $(foreach dir,$(SRC_DIR_G431),$(wildcard $(dir)/*.[cs]))
+SRC_$(MCU) := $(foreach dir,$(SRC_DIR_$(MCU)),$(wildcard $(dir)/*.[cs]))
+SRC_$(MCU)_BL := $(foreach dir,$(SRC_BASE_DIR_$(MCU)),$(wildcard $(dir)/*.[cs])) \
+	$(HAL_FOLDER_$(MCU))/Src/eeprom.c \
+	$(HAL_FOLDER_$(MCU))/Src/system_stm32g4xx.c \
+	$(wildcard $(HAL_FOLDER_$(MCU))/Src/*_it.c)

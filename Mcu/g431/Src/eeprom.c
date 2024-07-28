@@ -10,7 +10,7 @@
 
 #include <string.h>
 
-#define page_size 0x800 // 2 kb for g071
+#define page_size 0x800 // 2 kb for g431
 uint32_t FLASH_FKEY1 = 0x45670123;
 uint32_t FLASH_FKEY2 = 0xCDEF89AB;
 

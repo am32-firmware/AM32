@@ -495,6 +495,43 @@ void initLed()
 }
 #endif
 
+#ifdef USE_NSLEEP
+void initnSleep()
+{
+    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+    GPIO_InitStruct.Pin = NSLEEP_PIN;
+    GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+    LL_GPIO_Init(NSLEEP_PORT, &GPIO_InitStruct);
+    NSLEEP_PORT->BSRR = NSLEEP_PIN;
+}
+#endif
+
+#ifdef USE_NFAULT
+void initnFault()
+{
+    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+    GPIO_InitStruct.Pin = NFAULT_PIN;
+    GPIO_InitStruct.Mode = LL_GPIO_MODE_INPUT;
+    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_UP;
+    LL_GPIO_Init(NFAULT_PORT, &GPIO_InitStruct);
+}
+#endif
+
+#ifdef USE_DRVOFF
+void initDrvoff()
+{
+    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+    GPIO_InitStruct.Pin = DRVOFF_PIN;
+    GPIO_InitStruct.Mode = LL_GPIO_MODE_INPUT;
+    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+    LL_GPIO_Init(DRVOFF_PORT, &GPIO_InitStruct);
+}
+#endif
+
 void reloadWatchDogCounter()
 {
     LL_IWDG_ReloadCounter(IWDG);
@@ -583,6 +620,18 @@ void enableCorePeripherals()
 
 #ifdef USE_CUSTOM_LED
     initLed();
+#endif
+
+#ifdef USE_NSLEEP
+    initnSleep();
+#endif
+
+#ifdef USE_NFAULT
+    initnFault();
+#endif
+
+#ifdef USE_DRVOFF
+    initDrvoff();
 #endif
 
 #ifndef BRUSHED_MODE

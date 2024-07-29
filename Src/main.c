@@ -1989,7 +1989,7 @@ int main(void)
         }
         adc_counter++;
         if (adc_counter > 200) { // for adc and telemetry
-#if defined(MCU_F051) || defined(MCU_G071) || defined(MCU_F031)
+#if defined(MCU_F051) || defined(MCU_G071) || defined(MCU_F031) || defined(MCU_L431)
             ADC_DMA_Callback();
             ADC_CCR = TIM1->CCR3 * 2 / 3 + 1; // sample current at quarter pwm on
             if (ADC_CCR > tim1_arr) {

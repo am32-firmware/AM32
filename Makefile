@@ -23,12 +23,12 @@ ROOT := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 include $(ROOT)/make/tools.mk
 
 # supported MCU types
-MCU_TYPES := E230 F031 F051 F415 F421 G071 G431
+MCU_TYPES := E230 F031 F051 F415 F421 G071 G431 L431
 MCU_TYPE := NONE
 
 # MCU types that we build a bootloader for - this should be $(MCU_TYPES) in the future
 # when all bootloader porting is completed
-BL_MCU_TYPES := E230 F031 F051 F415 F421 G071 G431
+BL_MCU_TYPES := E230 F031 F051 F415 F421 G071 G431 L431
 
 # Function to include makefile for each MCU type
 define INCLUDE_MCU_MAKEFILES

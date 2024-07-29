@@ -22,6 +22,9 @@
 // analyser on the input pin)
 //#define BOOTLOADER_TEST_CLOCK
 
+// when there is no app fw yet, disable jump()
+//#define DISABLE_JUMP
+
 #include <string.h>
 
 #define STM32_FLASH_START 0x08000000
@@ -135,6 +138,7 @@ static void delayMicroseconds(uint32_t micros)
  */
 static void jump()
 {
+#ifndef DISABLE_JUMP
     __disable_irq();
     JumpAddress = *(__IO uint32_t*) (APPLICATION_ADDRESS + 4);
     uint8_t value = *(uint8_t*)(EEPROM_START_ADD);
@@ -147,6 +151,7 @@ static void jump()
 
     __set_MSP(*(__IO uint32_t*) APPLICATION_ADDRESS);
     JumpToApplication();
+#endif
 }
 
 

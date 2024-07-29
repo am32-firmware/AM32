@@ -21,8 +21,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32l4xx_it.h"
+#ifndef BOOTLOADER
 #include "ADC.h"
 #include "targets.h"
+#endif
 //#include "WS2812.h"
 
 
@@ -174,6 +176,7 @@ void SysTick_Handler(void)
 /* please refer to the startup file (startup_stm32l4xx.s).                    */
 /******************************************************************************/
 
+#ifndef BOOTLOADER
 /**
   * @brief This function handles DMA1 channel4 global interrupt.
   */
@@ -286,4 +289,6 @@ void COMP_IRQHandler(void)
 	    interruptRoutine();
 	  }
 }
+
+#endif // BOOTLOADER
 

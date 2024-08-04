@@ -2319,58 +2319,58 @@ Image Symbol Table
     [Anonymous Symbol]                       0x0800343c   Section        0  peripherals.o(.text.initCorePeripherals)
     [Anonymous Symbol]                       0x080035cc   Section        0  main.o(.text.interruptRoutine)
     [Anonymous Symbol]                       0x08003680   Section        0  main.o(.text.loadEEpromSettings)
-    [Anonymous Symbol]                       0x080039b0   Section        0  main.o(.text.main)
-    [Anonymous Symbol]                       0x08004590   Section        0  dshot.o(.text.make_dshot_package)
-    [Anonymous Symbol]                       0x08004774   Section        0  functions.o(.text.map)
-    [Anonymous Symbol]                       0x080047e0   Section        0  comparator.o(.text.maskPhaseInterrupts)
-    [Anonymous Symbol]                       0x080047f8   Section        0  sounds.o(.text.playBeaconTune3)
-    [Anonymous Symbol]                       0x0800488c   Section        0  sounds.o(.text.playBlueJayTune)
-    [Anonymous Symbol]                       0x080049bc   Section        0  sounds.o(.text.playChangedTone)
-    [Anonymous Symbol]                       0x08004a24   Section        0  sounds.o(.text.playDefaultTone)
-    [Anonymous Symbol]                       0x08004a8c   Section        0  sounds.o(.text.playInputTune)
-    [Anonymous Symbol]                       0x08004b08   Section        0  sounds.o(.text.playInputTune2)
-    [Anonymous Symbol]                       0x08004b84   Section        0  sounds.o(.text.playStartupTune)
-    [Anonymous Symbol]                       0x08004c14   Section        0  main.o(.text.processDshot)
-    [Anonymous Symbol]                       0x08004c4c   Section        0  phaseouts.o(.text.proportionalBrake)
-    [Anonymous Symbol]                       0x08004cc4   Section        0  eeprom.o(.text.read_flash_bin)
-    [Anonymous Symbol]                       0x08004d28   Section        0  io.o(.text.receiveDshotDma)
-    [Anonymous Symbol]                       0x08004da8   Section        0  peripherals.o(.text.resetInputCaptureTimer)
-    [Anonymous Symbol]                       0x08004db8   Section        0  main.o(.text.saveEEpromSettings)
-    [Anonymous Symbol]                       0x08004e38   Section        0  eeprom.o(.text.save_flash_nolib)
-    [Anonymous Symbol]                       0x08004f5c   Section        0  io.o(.text.sendDshotDma)
-    [Anonymous Symbol]                       0x08004ff8   Section        0  main.o(.text.setInput)
-    [Anonymous Symbol]                       0x0800575c   Section        0  io.o(.text.setInputPullUp)
-    [Anonymous Symbol]                       0x0800576c   Section        0  peripherals.o(.text.setPWMCompare1)
-    [Anonymous Symbol]                       0x08005778   Section        0  peripherals.o(.text.setPWMCompare2)
-    [Anonymous Symbol]                       0x08005784   Section        0  peripherals.o(.text.setPWMCompare3)
-    [Anonymous Symbol]                       0x08005790   Section        0  sounds.o(.text.setVolume)
-    [Anonymous Symbol]                       0x080057a4   Section        0  peripherals.o(.text.system_clock_config)
-    [Anonymous Symbol]                       0x0800581c   Section        0  system_at32f421.o(.text.system_core_clock_update)
-    system_core_clock_update.sys_ahb_div_table 0x080058fc   Number         0  system_at32f421.o(.text.system_core_clock_update)
-    [Anonymous Symbol]                       0x0800590c   Section        0  main.o(.text.tenKhzRoutine)
-    [Anonymous Symbol]                       0x08005df0   Section        0  at32f421_tmr.o(.text.tmr_channel_enable)
-    [Anonymous Symbol]                       0x08005e88   Section        0  at32f421_tmr.o(.text.tmr_output_channel_buffer_enable)
-    [Anonymous Symbol]                       0x08005eec   Section        0  at32f421_tmr.o(.text.tmr_output_channel_polarity_set)
-    [Anonymous Symbol]                       0x08005f8c   Section        0  at32f421_tmr.o(.text.tmr_period_buffer_enable)
-    [Anonymous Symbol]                       0x08005fa0   Section        0  at32f421_tmr.o(.text.tmr_reset)
-    [Anonymous Symbol]                       0x0800605c   Section        0  signal.o(.text.transfercomplete)
-    [Anonymous Symbol]                       0x080061f8   Section        0  main.o(.text.zcfoundroutine)
-    x$fpl$fadd                               0x0800630c   Section      196  faddsub_clz.o(x$fpl$fadd)
-    _fadd1                                   0x0800631b   Thumb Code     0  faddsub_clz.o(x$fpl$fadd)
-    x$fpl$fcmp                               0x080063d0   Section       84  fcmp.o(x$fpl$fcmp)
-    x$fpl$fcmpinf                            0x08006424   Section       24  fcmpi.o(x$fpl$fcmpinf)
-    _fdiv1                                   0x0800643d   Thumb Code     0  fdiv.o(x$fpl$fdiv)
-    x$fpl$fdiv                               0x0800643c   Section      388  fdiv.o(x$fpl$fdiv)
-    x$fpl$feqf                               0x080065c0   Section      104  feqf.o(x$fpl$feqf)
-    x$fpl$ffix                               0x08006628   Section       54  ffix.o(x$fpl$ffix)
-    x$fpl$fflt                               0x08006660   Section       48  fflt_clz.o(x$fpl$fflt)
-    x$fpl$fgeqf                              0x08006690   Section      104  fgeqf.o(x$fpl$fgeqf)
-    x$fpl$fleqf                              0x080066f8   Section      104  fleqf.o(x$fpl$fleqf)
-    x$fpl$fnaninf                            0x08006760   Section      140  fnaninf.o(x$fpl$fnaninf)
-    x$fpl$fretinf                            0x080067ec   Section       10  fretinf.o(x$fpl$fretinf)
-    x$fpl$fsub                               0x080067f8   Section      234  faddsub_clz.o(x$fpl$fsub)
-    _fsub1                                   0x08006807   Thumb Code     0  faddsub_clz.o(x$fpl$fsub)
-    x$fpl$usenofp                            0x080068e2   Section        0  usenofp.o(x$fpl$usenofp)
+    [Anonymous Symbol]                       0x080039a4   Section        0  main.o(.text.main)
+    [Anonymous Symbol]                       0x0800458c   Section        0  dshot.o(.text.make_dshot_package)
+    [Anonymous Symbol]                       0x08004770   Section        0  functions.o(.text.map)
+    [Anonymous Symbol]                       0x080047dc   Section        0  comparator.o(.text.maskPhaseInterrupts)
+    [Anonymous Symbol]                       0x080047f4   Section        0  sounds.o(.text.playBeaconTune3)
+    [Anonymous Symbol]                       0x08004888   Section        0  sounds.o(.text.playBlueJayTune)
+    [Anonymous Symbol]                       0x080049b8   Section        0  sounds.o(.text.playChangedTone)
+    [Anonymous Symbol]                       0x08004a20   Section        0  sounds.o(.text.playDefaultTone)
+    [Anonymous Symbol]                       0x08004a88   Section        0  sounds.o(.text.playInputTune)
+    [Anonymous Symbol]                       0x08004b04   Section        0  sounds.o(.text.playInputTune2)
+    [Anonymous Symbol]                       0x08004b80   Section        0  sounds.o(.text.playStartupTune)
+    [Anonymous Symbol]                       0x08004c10   Section        0  main.o(.text.processDshot)
+    [Anonymous Symbol]                       0x08004c48   Section        0  phaseouts.o(.text.proportionalBrake)
+    [Anonymous Symbol]                       0x08004cc0   Section        0  eeprom.o(.text.read_flash_bin)
+    [Anonymous Symbol]                       0x08004d24   Section        0  io.o(.text.receiveDshotDma)
+    [Anonymous Symbol]                       0x08004da4   Section        0  peripherals.o(.text.resetInputCaptureTimer)
+    [Anonymous Symbol]                       0x08004db4   Section        0  main.o(.text.saveEEpromSettings)
+    [Anonymous Symbol]                       0x08004e34   Section        0  eeprom.o(.text.save_flash_nolib)
+    [Anonymous Symbol]                       0x08004f58   Section        0  io.o(.text.sendDshotDma)
+    [Anonymous Symbol]                       0x08004ff4   Section        0  main.o(.text.setInput)
+    [Anonymous Symbol]                       0x0800576c   Section        0  io.o(.text.setInputPullUp)
+    [Anonymous Symbol]                       0x0800577c   Section        0  peripherals.o(.text.setPWMCompare1)
+    [Anonymous Symbol]                       0x08005788   Section        0  peripherals.o(.text.setPWMCompare2)
+    [Anonymous Symbol]                       0x08005794   Section        0  peripherals.o(.text.setPWMCompare3)
+    [Anonymous Symbol]                       0x080057a0   Section        0  sounds.o(.text.setVolume)
+    [Anonymous Symbol]                       0x080057b4   Section        0  peripherals.o(.text.system_clock_config)
+    [Anonymous Symbol]                       0x0800582c   Section        0  system_at32f421.o(.text.system_core_clock_update)
+    system_core_clock_update.sys_ahb_div_table 0x0800590c   Number         0  system_at32f421.o(.text.system_core_clock_update)
+    [Anonymous Symbol]                       0x0800591c   Section        0  main.o(.text.tenKhzRoutine)
+    [Anonymous Symbol]                       0x08005e00   Section        0  at32f421_tmr.o(.text.tmr_channel_enable)
+    [Anonymous Symbol]                       0x08005e98   Section        0  at32f421_tmr.o(.text.tmr_output_channel_buffer_enable)
+    [Anonymous Symbol]                       0x08005efc   Section        0  at32f421_tmr.o(.text.tmr_output_channel_polarity_set)
+    [Anonymous Symbol]                       0x08005f9c   Section        0  at32f421_tmr.o(.text.tmr_period_buffer_enable)
+    [Anonymous Symbol]                       0x08005fb0   Section        0  at32f421_tmr.o(.text.tmr_reset)
+    [Anonymous Symbol]                       0x0800606c   Section        0  signal.o(.text.transfercomplete)
+    [Anonymous Symbol]                       0x08006208   Section        0  main.o(.text.zcfoundroutine)
+    x$fpl$fadd                               0x0800631c   Section      196  faddsub_clz.o(x$fpl$fadd)
+    _fadd1                                   0x0800632b   Thumb Code     0  faddsub_clz.o(x$fpl$fadd)
+    x$fpl$fcmp                               0x080063e0   Section       84  fcmp.o(x$fpl$fcmp)
+    x$fpl$fcmpinf                            0x08006434   Section       24  fcmpi.o(x$fpl$fcmpinf)
+    _fdiv1                                   0x0800644d   Thumb Code     0  fdiv.o(x$fpl$fdiv)
+    x$fpl$fdiv                               0x0800644c   Section      388  fdiv.o(x$fpl$fdiv)
+    x$fpl$feqf                               0x080065d0   Section      104  feqf.o(x$fpl$feqf)
+    x$fpl$ffix                               0x08006638   Section       54  ffix.o(x$fpl$ffix)
+    x$fpl$fflt                               0x08006670   Section       48  fflt_clz.o(x$fpl$fflt)
+    x$fpl$fgeqf                              0x080066a0   Section      104  fgeqf.o(x$fpl$fgeqf)
+    x$fpl$fleqf                              0x08006708   Section      104  fleqf.o(x$fpl$fleqf)
+    x$fpl$fnaninf                            0x08006770   Section      140  fnaninf.o(x$fpl$fnaninf)
+    x$fpl$fretinf                            0x080067fc   Section       10  fretinf.o(x$fpl$fretinf)
+    x$fpl$fsub                               0x08006808   Section      234  faddsub_clz.o(x$fpl$fsub)
+    _fsub1                                   0x08006817   Thumb Code     0  faddsub_clz.o(x$fpl$fsub)
+    x$fpl$usenofp                            0x080068f2   Section        0  usenofp.o(x$fpl$usenofp)
     __tagsym$$used.0                         0x08007be0   Number         0  firmwareversion.o(.rodata.test)
     .L_MergedGlobals                         0x20000000   Data          96  main.o(.data..L_MergedGlobals)
     [Anonymous Symbol]                       0x20000000   Section        0  main.o(.data..L_MergedGlobals)
@@ -2601,76 +2601,76 @@ Image Symbol Table
     initAfterJump                            0x08003439   Thumb Code     4  peripherals.o(.text.initAfterJump)
     initCorePeripherals                      0x0800343d   Thumb Code   398  peripherals.o(.text.initCorePeripherals)
     interruptRoutine                         0x080035cd   Thumb Code   180  main.o(.text.interruptRoutine)
-    loadEEpromSettings                       0x08003681   Thumb Code   814  main.o(.text.loadEEpromSettings)
-    main                                     0x080039b1   Thumb Code  3040  main.o(.text.main)
-    make_dshot_package                       0x08004591   Thumb Code   484  dshot.o(.text.make_dshot_package)
-    map                                      0x08004775   Thumb Code   108  functions.o(.text.map)
-    maskPhaseInterrupts                      0x080047e1   Thumb Code    24  comparator.o(.text.maskPhaseInterrupts)
-    playBeaconTune3                          0x080047f9   Thumb Code   148  sounds.o(.text.playBeaconTune3)
-    playBlueJayTune                          0x0800488d   Thumb Code   302  sounds.o(.text.playBlueJayTune)
-    playChangedTone                          0x080049bd   Thumb Code   104  sounds.o(.text.playChangedTone)
-    playDefaultTone                          0x08004a25   Thumb Code   104  sounds.o(.text.playDefaultTone)
-    playInputTune                            0x08004a8d   Thumb Code   122  sounds.o(.text.playInputTune)
-    playInputTune2                           0x08004b09   Thumb Code   124  sounds.o(.text.playInputTune2)
-    playStartupTune                          0x08004b85   Thumb Code   144  sounds.o(.text.playStartupTune)
-    processDshot                             0x08004c15   Thumb Code    56  main.o(.text.processDshot)
-    proportionalBrake                        0x08004c4d   Thumb Code   120  phaseouts.o(.text.proportionalBrake)
-    read_flash_bin                           0x08004cc5   Thumb Code    98  eeprom.o(.text.read_flash_bin)
-    receiveDshotDma                          0x08004d29   Thumb Code   126  io.o(.text.receiveDshotDma)
-    resetInputCaptureTimer                   0x08004da9   Thumb Code    16  peripherals.o(.text.resetInputCaptureTimer)
-    saveEEpromSettings                       0x08004db9   Thumb Code   126  main.o(.text.saveEEpromSettings)
-    save_flash_nolib                         0x08004e39   Thumb Code   290  eeprom.o(.text.save_flash_nolib)
-    sendDshotDma                             0x08004f5d   Thumb Code   154  io.o(.text.sendDshotDma)
-    setInput                                 0x08004ff9   Thumb Code  1890  main.o(.text.setInput)
-    setInputPullUp                           0x0800575d   Thumb Code    14  io.o(.text.setInputPullUp)
-    setPWMCompare1                           0x0800576d   Thumb Code    12  peripherals.o(.text.setPWMCompare1)
-    setPWMCompare2                           0x08005779   Thumb Code    12  peripherals.o(.text.setPWMCompare2)
-    setPWMCompare3                           0x08005785   Thumb Code    12  peripherals.o(.text.setPWMCompare3)
-    setVolume                                0x08005791   Thumb Code    20  sounds.o(.text.setVolume)
-    system_clock_config                      0x080057a5   Thumb Code   118  peripherals.o(.text.system_clock_config)
-    system_core_clock_update                 0x0800581d   Thumb Code   224  system_at32f421.o(.text.system_core_clock_update)
-    tenKhzRoutine                            0x0800590d   Thumb Code  1252  main.o(.text.tenKhzRoutine)
-    tmr_channel_enable                       0x08005df1   Thumb Code   150  at32f421_tmr.o(.text.tmr_channel_enable)
-    tmr_output_channel_buffer_enable         0x08005e89   Thumb Code    98  at32f421_tmr.o(.text.tmr_output_channel_buffer_enable)
-    tmr_output_channel_polarity_set          0x08005eed   Thumb Code   158  at32f421_tmr.o(.text.tmr_output_channel_polarity_set)
-    tmr_period_buffer_enable                 0x08005f8d   Thumb Code    18  at32f421_tmr.o(.text.tmr_period_buffer_enable)
-    tmr_reset                                0x08005fa1   Thumb Code   186  at32f421_tmr.o(.text.tmr_reset)
-    transfercomplete                         0x0800605d   Thumb Code   412  signal.o(.text.transfercomplete)
-    zcfoundroutine                           0x080061f9   Thumb Code   274  main.o(.text.zcfoundroutine)
-    __aeabi_fadd                             0x0800630d   Thumb Code     0  faddsub_clz.o(x$fpl$fadd)
-    _fadd                                    0x0800630d   Thumb Code   196  faddsub_clz.o(x$fpl$fadd)
-    __aeabi_fcmpeq                           0x080063d1   Thumb Code     0  fcmp.o(x$fpl$fcmp)
-    _feq                                     0x080063d1   Thumb Code    14  fcmp.o(x$fpl$fcmp)
-    _fneq                                    0x080063df   Thumb Code    14  fcmp.o(x$fpl$fcmp)
-    __aeabi_fcmpgt                           0x080063ed   Thumb Code     0  fcmp.o(x$fpl$fcmp)
-    _fgr                                     0x080063ed   Thumb Code    14  fcmp.o(x$fpl$fcmp)
-    __aeabi_fcmpge                           0x080063fb   Thumb Code     0  fcmp.o(x$fpl$fcmp)
-    _fgeq                                    0x080063fb   Thumb Code    14  fcmp.o(x$fpl$fcmp)
-    __aeabi_fcmple                           0x08006409   Thumb Code     0  fcmp.o(x$fpl$fcmp)
-    _fleq                                    0x08006409   Thumb Code    14  fcmp.o(x$fpl$fcmp)
-    __aeabi_fcmplt                           0x08006417   Thumb Code     0  fcmp.o(x$fpl$fcmp)
-    _fls                                     0x08006417   Thumb Code    14  fcmp.o(x$fpl$fcmp)
-    __fpl_fcmp_Inf                           0x08006425   Thumb Code    24  fcmpi.o(x$fpl$fcmpinf)
-    __aeabi_fdiv                             0x0800643d   Thumb Code     0  fdiv.o(x$fpl$fdiv)
-    _fdiv                                    0x0800643d   Thumb Code   384  fdiv.o(x$fpl$fdiv)
-    __aeabi_cfcmpeq                          0x080065c1   Thumb Code     0  feqf.o(x$fpl$feqf)
-    _fcmpeq                                  0x080065c1   Thumb Code   104  feqf.o(x$fpl$feqf)
-    __aeabi_f2iz                             0x08006629   Thumb Code     0  ffix.o(x$fpl$ffix)
-    _ffix                                    0x08006629   Thumb Code    54  ffix.o(x$fpl$ffix)
-    __aeabi_i2f                              0x08006661   Thumb Code     0  fflt_clz.o(x$fpl$fflt)
-    _fflt                                    0x08006661   Thumb Code    48  fflt_clz.o(x$fpl$fflt)
-    _fcmpge                                  0x08006691   Thumb Code   104  fgeqf.o(x$fpl$fgeqf)
-    __aeabi_cfcmple                          0x080066f9   Thumb Code     0  fleqf.o(x$fpl$fleqf)
-    _fcmple                                  0x080066f9   Thumb Code   104  fleqf.o(x$fpl$fleqf)
-    __fpl_fcmple_InfNaN                      0x0800674b   Thumb Code     0  fleqf.o(x$fpl$fleqf)
-    __fpl_fnaninf                            0x08006761   Thumb Code   140  fnaninf.o(x$fpl$fnaninf)
-    __fpl_fretinf                            0x080067ed   Thumb Code    10  fretinf.o(x$fpl$fretinf)
-    __aeabi_fsub                             0x080067f9   Thumb Code     0  faddsub_clz.o(x$fpl$fsub)
-    _fsub                                    0x080067f9   Thumb Code   234  faddsub_clz.o(x$fpl$fsub)
-    __I$use$fp                               0x080068e2   Number         0  usenofp.o(x$fpl$usenofp)
-    gcr_encode_table                         0x080068e2   Data          16  dshot.o(.rodata.gcr_encode_table)
-    Region$$Table$$Base                      0x080068f4   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x08006914   Number         0  anon$$obj.o(Region$$Table)
+    loadEEpromSettings                       0x08003681   Thumb Code   802  main.o(.text.loadEEpromSettings)
+    main                                     0x080039a5   Thumb Code  3048  main.o(.text.main)
+    make_dshot_package                       0x0800458d   Thumb Code   484  dshot.o(.text.make_dshot_package)
+    map                                      0x08004771   Thumb Code   108  functions.o(.text.map)
+    maskPhaseInterrupts                      0x080047dd   Thumb Code    24  comparator.o(.text.maskPhaseInterrupts)
+    playBeaconTune3                          0x080047f5   Thumb Code   148  sounds.o(.text.playBeaconTune3)
+    playBlueJayTune                          0x08004889   Thumb Code   302  sounds.o(.text.playBlueJayTune)
+    playChangedTone                          0x080049b9   Thumb Code   104  sounds.o(.text.playChangedTone)
+    playDefaultTone                          0x08004a21   Thumb Code   104  sounds.o(.text.playDefaultTone)
+    playInputTune                            0x08004a89   Thumb Code   122  sounds.o(.text.playInputTune)
+    playInputTune2                           0x08004b05   Thumb Code   124  sounds.o(.text.playInputTune2)
+    playStartupTune                          0x08004b81   Thumb Code   144  sounds.o(.text.playStartupTune)
+    processDshot                             0x08004c11   Thumb Code    56  main.o(.text.processDshot)
+    proportionalBrake                        0x08004c49   Thumb Code   120  phaseouts.o(.text.proportionalBrake)
+    read_flash_bin                           0x08004cc1   Thumb Code    98  eeprom.o(.text.read_flash_bin)
+    receiveDshotDma                          0x08004d25   Thumb Code   126  io.o(.text.receiveDshotDma)
+    resetInputCaptureTimer                   0x08004da5   Thumb Code    16  peripherals.o(.text.resetInputCaptureTimer)
+    saveEEpromSettings                       0x08004db5   Thumb Code   126  main.o(.text.saveEEpromSettings)
+    save_flash_nolib                         0x08004e35   Thumb Code   290  eeprom.o(.text.save_flash_nolib)
+    sendDshotDma                             0x08004f59   Thumb Code   154  io.o(.text.sendDshotDma)
+    setInput                                 0x08004ff5   Thumb Code  1910  main.o(.text.setInput)
+    setInputPullUp                           0x0800576d   Thumb Code    14  io.o(.text.setInputPullUp)
+    setPWMCompare1                           0x0800577d   Thumb Code    12  peripherals.o(.text.setPWMCompare1)
+    setPWMCompare2                           0x08005789   Thumb Code    12  peripherals.o(.text.setPWMCompare2)
+    setPWMCompare3                           0x08005795   Thumb Code    12  peripherals.o(.text.setPWMCompare3)
+    setVolume                                0x080057a1   Thumb Code    20  sounds.o(.text.setVolume)
+    system_clock_config                      0x080057b5   Thumb Code   118  peripherals.o(.text.system_clock_config)
+    system_core_clock_update                 0x0800582d   Thumb Code   224  system_at32f421.o(.text.system_core_clock_update)
+    tenKhzRoutine                            0x0800591d   Thumb Code  1252  main.o(.text.tenKhzRoutine)
+    tmr_channel_enable                       0x08005e01   Thumb Code   150  at32f421_tmr.o(.text.tmr_channel_enable)
+    tmr_output_channel_buffer_enable         0x08005e99   Thumb Code    98  at32f421_tmr.o(.text.tmr_output_channel_buffer_enable)
+    tmr_output_channel_polarity_set          0x08005efd   Thumb Code   158  at32f421_tmr.o(.text.tmr_output_channel_polarity_set)
+    tmr_period_buffer_enable                 0x08005f9d   Thumb Code    18  at32f421_tmr.o(.text.tmr_period_buffer_enable)
+    tmr_reset                                0x08005fb1   Thumb Code   186  at32f421_tmr.o(.text.tmr_reset)
+    transfercomplete                         0x0800606d   Thumb Code   412  signal.o(.text.transfercomplete)
+    zcfoundroutine                           0x08006209   Thumb Code   274  main.o(.text.zcfoundroutine)
+    __aeabi_fadd                             0x0800631d   Thumb Code     0  faddsub_clz.o(x$fpl$fadd)
+    _fadd                                    0x0800631d   Thumb Code   196  faddsub_clz.o(x$fpl$fadd)
+    __aeabi_fcmpeq                           0x080063e1   Thumb Code     0  fcmp.o(x$fpl$fcmp)
+    _feq                                     0x080063e1   Thumb Code    14  fcmp.o(x$fpl$fcmp)
+    _fneq                                    0x080063ef   Thumb Code    14  fcmp.o(x$fpl$fcmp)
+    __aeabi_fcmpgt                           0x080063fd   Thumb Code     0  fcmp.o(x$fpl$fcmp)
+    _fgr                                     0x080063fd   Thumb Code    14  fcmp.o(x$fpl$fcmp)
+    __aeabi_fcmpge                           0x0800640b   Thumb Code     0  fcmp.o(x$fpl$fcmp)
+    _fgeq                                    0x0800640b   Thumb Code    14  fcmp.o(x$fpl$fcmp)
+    __aeabi_fcmple                           0x08006419   Thumb Code     0  fcmp.o(x$fpl$fcmp)
+    _fleq                                    0x08006419   Thumb Code    14  fcmp.o(x$fpl$fcmp)
+    __aeabi_fcmplt                           0x08006427   Thumb Code     0  fcmp.o(x$fpl$fcmp)
+    _fls                                     0x08006427   Thumb Code    14  fcmp.o(x$fpl$fcmp)
+    __fpl_fcmp_Inf                           0x08006435   Thumb Code    24  fcmpi.o(x$fpl$fcmpinf)
+    __aeabi_fdiv                             0x0800644d   Thumb Code     0  fdiv.o(x$fpl$fdiv)
+    _fdiv                                    0x0800644d   Thumb Code   384  fdiv.o(x$fpl$fdiv)
+    __aeabi_cfcmpeq                          0x080065d1   Thumb Code     0  feqf.o(x$fpl$feqf)
+    _fcmpeq                                  0x080065d1   Thumb Code   104  feqf.o(x$fpl$feqf)
+    __aeabi_f2iz                             0x08006639   Thumb Code     0  ffix.o(x$fpl$ffix)
+    _ffix                                    0x08006639   Thumb Code    54  ffix.o(x$fpl$ffix)
+    __aeabi_i2f                              0x08006671   Thumb Code     0  fflt_clz.o(x$fpl$fflt)
+    _fflt                                    0x08006671   Thumb Code    48  fflt_clz.o(x$fpl$fflt)
+    _fcmpge                                  0x080066a1   Thumb Code   104  fgeqf.o(x$fpl$fgeqf)
+    __aeabi_cfcmple                          0x08006709   Thumb Code     0  fleqf.o(x$fpl$fleqf)
+    _fcmple                                  0x08006709   Thumb Code   104  fleqf.o(x$fpl$fleqf)
+    __fpl_fcmple_InfNaN                      0x0800675b   Thumb Code     0  fleqf.o(x$fpl$fleqf)
+    __fpl_fnaninf                            0x08006771   Thumb Code   140  fnaninf.o(x$fpl$fnaninf)
+    __fpl_fretinf                            0x080067fd   Thumb Code    10  fretinf.o(x$fpl$fretinf)
+    __aeabi_fsub                             0x08006809   Thumb Code     0  faddsub_clz.o(x$fpl$fsub)
+    _fsub                                    0x08006809   Thumb Code   234  faddsub_clz.o(x$fpl$fsub)
+    __I$use$fp                               0x080068f2   Number         0  usenofp.o(x$fpl$usenofp)
+    gcr_encode_table                         0x080068f2   Data          16  dshot.o(.rodata.gcr_encode_table)
+    Region$$Table$$Base                      0x08006904   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x08006924   Number         0  anon$$obj.o(Region$$Table)
     test                                     0x08007be0   Data          30  firmwareversion.o(.rodata.test)
     eeprom_layout_version                    0x20000000   Data           1  main.o(.data..L_MergedGlobals)
     comp_pwm                                 0x20000001   Data           1  main.o(.data..L_MergedGlobals)
@@ -2872,70 +2872,70 @@ Memory Map of the image
 
   Image Entry point : 0x080010cd
 
-  Load Region LR_IROM1 (Base: 0x08001000, Size: 0x00005cd8, Max: 0x0000ffff, ABSOLUTE, COMPRESSED[0x00005c00])
+  Load Region LR_IROM1 (Base: 0x08001000, Size: 0x00005ce8, Max: 0x0000ffff, ABSOLUTE, COMPRESSED[0x00005c10])
 
-    Execution Region ER_IROM1 (Exec base: 0x08001000, Load base: 0x08001000, Size: 0x00005914, Max: 0x0000ffff, ABSOLUTE)
+    Execution Region ER_IROM1 (Exec base: 0x08001000, Load base: 0x08001000, Size: 0x00005924, Max: 0x0000ffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
     0x08001000   0x08001000   0x000000cc   Data   RO         1353    RESET               startup_at32f421.o
-    0x080010cc   0x080010cc   0x00000008   Code   RO         1366  * !!!main             c_w.l(__main.o)
-    0x080010d4   0x080010d4   0x00000034   Code   RO         1568    !!!scatter          c_w.l(__scatter.o)
-    0x08001108   0x08001108   0x0000005a   Code   RO         1566    !!dczerorl2         c_w.l(__dczerorl2.o)
+    0x080010cc   0x080010cc   0x00000008   Code   RO         1362  * !!!main             c_w.l(__main.o)
+    0x080010d4   0x080010d4   0x00000034   Code   RO         1564    !!!scatter          c_w.l(__scatter.o)
+    0x08001108   0x08001108   0x0000005a   Code   RO         1562    !!dczerorl2         c_w.l(__dczerorl2.o)
     0x08001162   0x08001162   0x00000002   PAD
-    0x08001164   0x08001164   0x0000001c   Code   RO         1570    !!handler_zi        c_w.l(__scatter_zi.o)
-    0x08001180   0x08001180   0x00000002   Code   RO         1428    .ARM.Collect$$libinit$$00000000  c_w.l(libinit.o)
-    0x08001182   0x08001182   0x00000000   Code   RO         1435    .ARM.Collect$$libinit$$00000002  c_w.l(libinit2.o)
-    0x08001182   0x08001182   0x00000000   Code   RO         1437    .ARM.Collect$$libinit$$00000004  c_w.l(libinit2.o)
-    0x08001182   0x08001182   0x00000000   Code   RO         1439    .ARM.Collect$$libinit$$00000006  c_w.l(libinit2.o)
-    0x08001182   0x08001182   0x00000000   Code   RO         1442    .ARM.Collect$$libinit$$0000000C  c_w.l(libinit2.o)
-    0x08001182   0x08001182   0x00000000   Code   RO         1444    .ARM.Collect$$libinit$$0000000E  c_w.l(libinit2.o)
-    0x08001182   0x08001182   0x00000000   Code   RO         1446    .ARM.Collect$$libinit$$00000010  c_w.l(libinit2.o)
-    0x08001182   0x08001182   0x00000000   Code   RO         1449    .ARM.Collect$$libinit$$00000013  c_w.l(libinit2.o)
-    0x08001182   0x08001182   0x00000000   Code   RO         1451    .ARM.Collect$$libinit$$00000015  c_w.l(libinit2.o)
-    0x08001182   0x08001182   0x00000000   Code   RO         1453    .ARM.Collect$$libinit$$00000017  c_w.l(libinit2.o)
-    0x08001182   0x08001182   0x00000000   Code   RO         1455    .ARM.Collect$$libinit$$00000019  c_w.l(libinit2.o)
-    0x08001182   0x08001182   0x00000000   Code   RO         1457    .ARM.Collect$$libinit$$0000001B  c_w.l(libinit2.o)
-    0x08001182   0x08001182   0x00000000   Code   RO         1459    .ARM.Collect$$libinit$$0000001D  c_w.l(libinit2.o)
-    0x08001182   0x08001182   0x00000000   Code   RO         1461    .ARM.Collect$$libinit$$0000001F  c_w.l(libinit2.o)
-    0x08001182   0x08001182   0x00000000   Code   RO         1463    .ARM.Collect$$libinit$$00000021  c_w.l(libinit2.o)
-    0x08001182   0x08001182   0x00000000   Code   RO         1465    .ARM.Collect$$libinit$$00000023  c_w.l(libinit2.o)
-    0x08001182   0x08001182   0x00000000   Code   RO         1467    .ARM.Collect$$libinit$$00000025  c_w.l(libinit2.o)
-    0x08001182   0x08001182   0x00000000   Code   RO         1469    .ARM.Collect$$libinit$$00000027  c_w.l(libinit2.o)
-    0x08001182   0x08001182   0x00000000   Code   RO         1473    .ARM.Collect$$libinit$$0000002E  c_w.l(libinit2.o)
-    0x08001182   0x08001182   0x00000000   Code   RO         1475    .ARM.Collect$$libinit$$00000030  c_w.l(libinit2.o)
-    0x08001182   0x08001182   0x00000000   Code   RO         1477    .ARM.Collect$$libinit$$00000032  c_w.l(libinit2.o)
-    0x08001182   0x08001182   0x00000000   Code   RO         1479    .ARM.Collect$$libinit$$00000034  c_w.l(libinit2.o)
-    0x08001182   0x08001182   0x00000002   Code   RO         1480    .ARM.Collect$$libinit$$00000035  c_w.l(libinit2.o)
-    0x08001184   0x08001184   0x00000002   Code   RO         1502    .ARM.Collect$$libshutdown$$00000000  c_w.l(libshutdown.o)
-    0x08001186   0x08001186   0x00000000   Code   RO         1517    .ARM.Collect$$libshutdown$$00000002  c_w.l(libshutdown2.o)
-    0x08001186   0x08001186   0x00000000   Code   RO         1519    .ARM.Collect$$libshutdown$$00000004  c_w.l(libshutdown2.o)
-    0x08001186   0x08001186   0x00000000   Code   RO         1522    .ARM.Collect$$libshutdown$$00000007  c_w.l(libshutdown2.o)
-    0x08001186   0x08001186   0x00000000   Code   RO         1525    .ARM.Collect$$libshutdown$$0000000A  c_w.l(libshutdown2.o)
-    0x08001186   0x08001186   0x00000000   Code   RO         1527    .ARM.Collect$$libshutdown$$0000000C  c_w.l(libshutdown2.o)
-    0x08001186   0x08001186   0x00000000   Code   RO         1530    .ARM.Collect$$libshutdown$$0000000F  c_w.l(libshutdown2.o)
-    0x08001186   0x08001186   0x00000002   Code   RO         1531    .ARM.Collect$$libshutdown$$00000010  c_w.l(libshutdown2.o)
-    0x08001188   0x08001188   0x00000000   Code   RO         1390    .ARM.Collect$$rtentry$$00000000  c_w.l(__rtentry.o)
-    0x08001188   0x08001188   0x00000000   Code   RO         1403    .ARM.Collect$$rtentry$$00000002  c_w.l(__rtentry2.o)
-    0x08001188   0x08001188   0x00000006   Code   RO         1415    .ARM.Collect$$rtentry$$00000004  c_w.l(__rtentry4.o)
-    0x0800118e   0x0800118e   0x00000000   Code   RO         1405    .ARM.Collect$$rtentry$$00000009  c_w.l(__rtentry2.o)
-    0x0800118e   0x0800118e   0x00000004   Code   RO         1406    .ARM.Collect$$rtentry$$0000000A  c_w.l(__rtentry2.o)
-    0x08001192   0x08001192   0x00000000   Code   RO         1408    .ARM.Collect$$rtentry$$0000000C  c_w.l(__rtentry2.o)
-    0x08001192   0x08001192   0x00000008   Code   RO         1409    .ARM.Collect$$rtentry$$0000000D  c_w.l(__rtentry2.o)
-    0x0800119a   0x0800119a   0x00000002   Code   RO         1432    .ARM.Collect$$rtexit$$00000000  c_w.l(rtexit.o)
-    0x0800119c   0x0800119c   0x00000000   Code   RO         1482    .ARM.Collect$$rtexit$$00000002  c_w.l(rtexit2.o)
-    0x0800119c   0x0800119c   0x00000004   Code   RO         1483    .ARM.Collect$$rtexit$$00000003  c_w.l(rtexit2.o)
-    0x080011a0   0x080011a0   0x00000006   Code   RO         1484    .ARM.Collect$$rtexit$$00000004  c_w.l(rtexit2.o)
+    0x08001164   0x08001164   0x0000001c   Code   RO         1566    !!handler_zi        c_w.l(__scatter_zi.o)
+    0x08001180   0x08001180   0x00000002   Code   RO         1424    .ARM.Collect$$libinit$$00000000  c_w.l(libinit.o)
+    0x08001182   0x08001182   0x00000000   Code   RO         1431    .ARM.Collect$$libinit$$00000002  c_w.l(libinit2.o)
+    0x08001182   0x08001182   0x00000000   Code   RO         1433    .ARM.Collect$$libinit$$00000004  c_w.l(libinit2.o)
+    0x08001182   0x08001182   0x00000000   Code   RO         1435    .ARM.Collect$$libinit$$00000006  c_w.l(libinit2.o)
+    0x08001182   0x08001182   0x00000000   Code   RO         1438    .ARM.Collect$$libinit$$0000000C  c_w.l(libinit2.o)
+    0x08001182   0x08001182   0x00000000   Code   RO         1440    .ARM.Collect$$libinit$$0000000E  c_w.l(libinit2.o)
+    0x08001182   0x08001182   0x00000000   Code   RO         1442    .ARM.Collect$$libinit$$00000010  c_w.l(libinit2.o)
+    0x08001182   0x08001182   0x00000000   Code   RO         1445    .ARM.Collect$$libinit$$00000013  c_w.l(libinit2.o)
+    0x08001182   0x08001182   0x00000000   Code   RO         1447    .ARM.Collect$$libinit$$00000015  c_w.l(libinit2.o)
+    0x08001182   0x08001182   0x00000000   Code   RO         1449    .ARM.Collect$$libinit$$00000017  c_w.l(libinit2.o)
+    0x08001182   0x08001182   0x00000000   Code   RO         1451    .ARM.Collect$$libinit$$00000019  c_w.l(libinit2.o)
+    0x08001182   0x08001182   0x00000000   Code   RO         1453    .ARM.Collect$$libinit$$0000001B  c_w.l(libinit2.o)
+    0x08001182   0x08001182   0x00000000   Code   RO         1455    .ARM.Collect$$libinit$$0000001D  c_w.l(libinit2.o)
+    0x08001182   0x08001182   0x00000000   Code   RO         1457    .ARM.Collect$$libinit$$0000001F  c_w.l(libinit2.o)
+    0x08001182   0x08001182   0x00000000   Code   RO         1459    .ARM.Collect$$libinit$$00000021  c_w.l(libinit2.o)
+    0x08001182   0x08001182   0x00000000   Code   RO         1461    .ARM.Collect$$libinit$$00000023  c_w.l(libinit2.o)
+    0x08001182   0x08001182   0x00000000   Code   RO         1463    .ARM.Collect$$libinit$$00000025  c_w.l(libinit2.o)
+    0x08001182   0x08001182   0x00000000   Code   RO         1465    .ARM.Collect$$libinit$$00000027  c_w.l(libinit2.o)
+    0x08001182   0x08001182   0x00000000   Code   RO         1469    .ARM.Collect$$libinit$$0000002E  c_w.l(libinit2.o)
+    0x08001182   0x08001182   0x00000000   Code   RO         1471    .ARM.Collect$$libinit$$00000030  c_w.l(libinit2.o)
+    0x08001182   0x08001182   0x00000000   Code   RO         1473    .ARM.Collect$$libinit$$00000032  c_w.l(libinit2.o)
+    0x08001182   0x08001182   0x00000000   Code   RO         1475    .ARM.Collect$$libinit$$00000034  c_w.l(libinit2.o)
+    0x08001182   0x08001182   0x00000002   Code   RO         1476    .ARM.Collect$$libinit$$00000035  c_w.l(libinit2.o)
+    0x08001184   0x08001184   0x00000002   Code   RO         1498    .ARM.Collect$$libshutdown$$00000000  c_w.l(libshutdown.o)
+    0x08001186   0x08001186   0x00000000   Code   RO         1513    .ARM.Collect$$libshutdown$$00000002  c_w.l(libshutdown2.o)
+    0x08001186   0x08001186   0x00000000   Code   RO         1515    .ARM.Collect$$libshutdown$$00000004  c_w.l(libshutdown2.o)
+    0x08001186   0x08001186   0x00000000   Code   RO         1518    .ARM.Collect$$libshutdown$$00000007  c_w.l(libshutdown2.o)
+    0x08001186   0x08001186   0x00000000   Code   RO         1521    .ARM.Collect$$libshutdown$$0000000A  c_w.l(libshutdown2.o)
+    0x08001186   0x08001186   0x00000000   Code   RO         1523    .ARM.Collect$$libshutdown$$0000000C  c_w.l(libshutdown2.o)
+    0x08001186   0x08001186   0x00000000   Code   RO         1526    .ARM.Collect$$libshutdown$$0000000F  c_w.l(libshutdown2.o)
+    0x08001186   0x08001186   0x00000002   Code   RO         1527    .ARM.Collect$$libshutdown$$00000010  c_w.l(libshutdown2.o)
+    0x08001188   0x08001188   0x00000000   Code   RO         1386    .ARM.Collect$$rtentry$$00000000  c_w.l(__rtentry.o)
+    0x08001188   0x08001188   0x00000000   Code   RO         1399    .ARM.Collect$$rtentry$$00000002  c_w.l(__rtentry2.o)
+    0x08001188   0x08001188   0x00000006   Code   RO         1411    .ARM.Collect$$rtentry$$00000004  c_w.l(__rtentry4.o)
+    0x0800118e   0x0800118e   0x00000000   Code   RO         1401    .ARM.Collect$$rtentry$$00000009  c_w.l(__rtentry2.o)
+    0x0800118e   0x0800118e   0x00000004   Code   RO         1402    .ARM.Collect$$rtentry$$0000000A  c_w.l(__rtentry2.o)
+    0x08001192   0x08001192   0x00000000   Code   RO         1404    .ARM.Collect$$rtentry$$0000000C  c_w.l(__rtentry2.o)
+    0x08001192   0x08001192   0x00000008   Code   RO         1405    .ARM.Collect$$rtentry$$0000000D  c_w.l(__rtentry2.o)
+    0x0800119a   0x0800119a   0x00000002   Code   RO         1428    .ARM.Collect$$rtexit$$00000000  c_w.l(rtexit.o)
+    0x0800119c   0x0800119c   0x00000000   Code   RO         1478    .ARM.Collect$$rtexit$$00000002  c_w.l(rtexit2.o)
+    0x0800119c   0x0800119c   0x00000004   Code   RO         1479    .ARM.Collect$$rtexit$$00000003  c_w.l(rtexit2.o)
+    0x080011a0   0x080011a0   0x00000006   Code   RO         1480    .ARM.Collect$$rtexit$$00000004  c_w.l(rtexit2.o)
     0x080011a6   0x080011a6   0x00000002   PAD
     0x080011a8   0x080011a8   0x00000040   Code   RO         1354    .text               startup_at32f421.o
-    0x080011e8   0x080011e8   0x0000004e   Code   RO         1362    .text               c_w.l(rt_memclr_w.o)
-    0x08001236   0x08001236   0x00000006   Code   RO         1364    .text               c_w.l(heapauxi.o)
-    0x0800123c   0x0800123c   0x0000004a   Code   RO         1419    .text               c_w.l(sys_stackheap_outer.o)
-    0x08001286   0x08001286   0x00000012   Code   RO         1421    .text               c_w.l(exit.o)
-    0x08001298   0x08001298   0x00000008   Code   RO         1429    .text               c_w.l(libspace.o)
-    0x080012a0   0x080012a0   0x0000000c   Code   RO         1492    .text               c_w.l(sys_exit.o)
-    0x080012ac   0x080012ac   0x00000002   Code   RO         1507    .text               c_w.l(use_no_semi.o)
-    0x080012ae   0x080012ae   0x00000000   Code   RO         1509    .text               c_w.l(indicate_semi.o)
+    0x080011e8   0x080011e8   0x0000004e   Code   RO         1358    .text               c_w.l(rt_memclr_w.o)
+    0x08001236   0x08001236   0x00000006   Code   RO         1360    .text               c_w.l(heapauxi.o)
+    0x0800123c   0x0800123c   0x0000004a   Code   RO         1415    .text               c_w.l(sys_stackheap_outer.o)
+    0x08001286   0x08001286   0x00000012   Code   RO         1417    .text               c_w.l(exit.o)
+    0x08001298   0x08001298   0x00000008   Code   RO         1425    .text               c_w.l(libspace.o)
+    0x080012a0   0x080012a0   0x0000000c   Code   RO         1488    .text               c_w.l(sys_exit.o)
+    0x080012ac   0x080012ac   0x00000002   Code   RO         1503    .text               c_w.l(use_no_semi.o)
+    0x080012ae   0x080012ae   0x00000000   Code   RO         1505    .text               c_w.l(indicate_semi.o)
     0x080012ae   0x080012ae   0x00000002   PAD
     0x080012b0   0x080012b0   0x00000036   Code   RO         1134    .text.ADC1_CMP_IRQHandler  at32f421_it.o
     0x080012e6   0x080012e6   0x00000002   PAD
@@ -3078,80 +3078,80 @@ Memory Map of the image
     0x0800343c   0x0800343c   0x0000018e   Code   RO         1214    .text.initCorePeripherals  peripherals.o
     0x080035ca   0x080035ca   0x00000002   PAD
     0x080035cc   0x080035cc   0x000000b4   Code   RO           52    .text.interruptRoutine  main.o
-    0x08003680   0x08003680   0x0000032e   Code   RO           40    .text.loadEEpromSettings  main.o
-    0x080039ae   0x080039ae   0x00000002   PAD
-    0x080039b0   0x080039b0   0x00000be0   Code   RO           66    .text.main          main.o
-    0x08004590   0x08004590   0x000001e4   Code   RO            4    .text.make_dshot_package  dshot.o
-    0x08004774   0x08004774   0x0000006c   Code   RO           18    .text.map           functions.o
-    0x080047e0   0x080047e0   0x00000018   Code   RO         1158    .text.maskPhaseInterrupts  comparator.o
-    0x080047f8   0x080047f8   0x00000094   Code   RO          171    .text.playBeaconTune3  sounds.o
-    0x0800488c   0x0800488c   0x0000012e   Code   RO          155    .text.playBlueJayTune  sounds.o
-    0x080049ba   0x080049ba   0x00000002   PAD
-    0x080049bc   0x080049bc   0x00000068   Code   RO          169    .text.playChangedTone  sounds.o
-    0x08004a24   0x08004a24   0x00000068   Code   RO          167    .text.playDefaultTone  sounds.o
-    0x08004a8c   0x08004a8c   0x0000007a   Code   RO          165    .text.playInputTune  sounds.o
-    0x08004b06   0x08004b06   0x00000002   PAD
-    0x08004b08   0x08004b08   0x0000007c   Code   RO          163    .text.playInputTune2  sounds.o
-    0x08004b84   0x08004b84   0x00000090   Code   RO          157    .text.playStartupTune  sounds.o
-    0x08004c14   0x08004c14   0x00000038   Code   RO           62    .text.processDshot  main.o
-    0x08004c4c   0x08004c4c   0x00000078   Code   RO         1278    .text.proportionalBrake  phaseouts.o
-    0x08004cc4   0x08004cc4   0x00000062   Code   RO         1173    .text.read_flash_bin  eeprom.o
-    0x08004d26   0x08004d26   0x00000002   PAD
-    0x08004d28   0x08004d28   0x0000007e   Code   RO         1187    .text.receiveDshotDma  io.o
-    0x08004da6   0x08004da6   0x00000002   PAD
-    0x08004da8   0x08004da8   0x00000010   Code   RO         1266    .text.resetInputCaptureTimer  peripherals.o
-    0x08004db8   0x08004db8   0x0000007e   Code   RO           42    .text.saveEEpromSettings  main.o
-    0x08004e36   0x08004e36   0x00000002   PAD
-    0x08004e38   0x08004e38   0x00000122   Code   RO         1171    .text.save_flash_nolib  eeprom.o
-    0x08004f5a   0x08004f5a   0x00000002   PAD
-    0x08004f5c   0x08004f5c   0x0000009a   Code   RO         1189    .text.sendDshotDma  io.o
-    0x08004ff6   0x08004ff6   0x00000002   PAD
-    0x08004ff8   0x08004ff8   0x00000762   Code   RO           56    .text.setInput      main.o
-    0x0800575a   0x0800575a   0x00000002   PAD
-    0x0800575c   0x0800575c   0x0000000e   Code   RO         1197    .text.setInputPullUp  io.o
+    0x08003680   0x08003680   0x00000322   Code   RO           40    .text.loadEEpromSettings  main.o
+    0x080039a2   0x080039a2   0x00000002   PAD
+    0x080039a4   0x080039a4   0x00000be8   Code   RO           66    .text.main          main.o
+    0x0800458c   0x0800458c   0x000001e4   Code   RO            4    .text.make_dshot_package  dshot.o
+    0x08004770   0x08004770   0x0000006c   Code   RO           18    .text.map           functions.o
+    0x080047dc   0x080047dc   0x00000018   Code   RO         1158    .text.maskPhaseInterrupts  comparator.o
+    0x080047f4   0x080047f4   0x00000094   Code   RO          171    .text.playBeaconTune3  sounds.o
+    0x08004888   0x08004888   0x0000012e   Code   RO          155    .text.playBlueJayTune  sounds.o
+    0x080049b6   0x080049b6   0x00000002   PAD
+    0x080049b8   0x080049b8   0x00000068   Code   RO          169    .text.playChangedTone  sounds.o
+    0x08004a20   0x08004a20   0x00000068   Code   RO          167    .text.playDefaultTone  sounds.o
+    0x08004a88   0x08004a88   0x0000007a   Code   RO          165    .text.playInputTune  sounds.o
+    0x08004b02   0x08004b02   0x00000002   PAD
+    0x08004b04   0x08004b04   0x0000007c   Code   RO          163    .text.playInputTune2  sounds.o
+    0x08004b80   0x08004b80   0x00000090   Code   RO          157    .text.playStartupTune  sounds.o
+    0x08004c10   0x08004c10   0x00000038   Code   RO           62    .text.processDshot  main.o
+    0x08004c48   0x08004c48   0x00000078   Code   RO         1278    .text.proportionalBrake  phaseouts.o
+    0x08004cc0   0x08004cc0   0x00000062   Code   RO         1173    .text.read_flash_bin  eeprom.o
+    0x08004d22   0x08004d22   0x00000002   PAD
+    0x08004d24   0x08004d24   0x0000007e   Code   RO         1187    .text.receiveDshotDma  io.o
+    0x08004da2   0x08004da2   0x00000002   PAD
+    0x08004da4   0x08004da4   0x00000010   Code   RO         1266    .text.resetInputCaptureTimer  peripherals.o
+    0x08004db4   0x08004db4   0x0000007e   Code   RO           42    .text.saveEEpromSettings  main.o
+    0x08004e32   0x08004e32   0x00000002   PAD
+    0x08004e34   0x08004e34   0x00000122   Code   RO         1171    .text.save_flash_nolib  eeprom.o
+    0x08004f56   0x08004f56   0x00000002   PAD
+    0x08004f58   0x08004f58   0x0000009a   Code   RO         1189    .text.sendDshotDma  io.o
+    0x08004ff2   0x08004ff2   0x00000002   PAD
+    0x08004ff4   0x08004ff4   0x00000776   Code   RO           56    .text.setInput      main.o
     0x0800576a   0x0800576a   0x00000002   PAD
-    0x0800576c   0x0800576c   0x0000000c   Code   RO         1258    .text.setPWMCompare1  peripherals.o
-    0x08005778   0x08005778   0x0000000c   Code   RO         1260    .text.setPWMCompare2  peripherals.o
-    0x08005784   0x08005784   0x0000000c   Code   RO         1262    .text.setPWMCompare3  peripherals.o
-    0x08005790   0x08005790   0x00000014   Code   RO          147    .text.setVolume     sounds.o
-    0x080057a4   0x080057a4   0x00000076   Code   RO         1216    .text.system_clock_config  peripherals.o
-    0x0800581a   0x0800581a   0x00000002   PAD
-    0x0800581c   0x0800581c   0x000000f0   Code   RO         1340    .text.system_core_clock_update  system_at32f421.o
-    0x0800590c   0x0800590c   0x000004e4   Code   RO           58    .text.tenKhzRoutine  main.o
-    0x08005df0   0x08005df0   0x00000096   Code   RO          921    .text.tmr_channel_enable  at32f421_tmr.o
-    0x08005e86   0x08005e86   0x00000002   PAD
-    0x08005e88   0x08005e88   0x00000062   Code   RO          907    .text.tmr_output_channel_buffer_enable  at32f421_tmr.o
-    0x08005eea   0x08005eea   0x00000002   PAD
-    0x08005eec   0x08005eec   0x0000009e   Code   RO          959    .text.tmr_output_channel_polarity_set  at32f421_tmr.o
-    0x08005f8a   0x08005f8a   0x00000002   PAD
-    0x08005f8c   0x08005f8c   0x00000012   Code   RO          905    .text.tmr_period_buffer_enable  at32f421_tmr.o
-    0x08005f9e   0x08005f9e   0x00000002   PAD
-    0x08005fa0   0x08005fa0   0x000000ba   Code   RO          867    .text.tmr_reset     at32f421_tmr.o
-    0x0800605a   0x0800605a   0x00000002   PAD
-    0x0800605c   0x0800605c   0x0000019c   Code   RO          126    .text.transfercomplete  signal.o
-    0x080061f8   0x080061f8   0x00000112   Code   RO           60    .text.zcfoundroutine  main.o
-    0x0800630a   0x0800630a   0x00000002   PAD
-    0x0800630c   0x0800630c   0x000000c4   Code   RO         1368    x$fpl$fadd          fz_ws.l(faddsub_clz.o)
-    0x080063d0   0x080063d0   0x00000054   Code   RO         1374    x$fpl$fcmp          fz_ws.l(fcmp.o)
-    0x08006424   0x08006424   0x00000018   Code   RO         1417    x$fpl$fcmpinf       fz_ws.l(fcmpi.o)
-    0x0800643c   0x0800643c   0x00000184   Code   RO         1377    x$fpl$fdiv          fz_ws.l(fdiv.o)
-    0x080065c0   0x080065c0   0x00000068   Code   RO         1391    x$fpl$feqf          fz_ws.l(feqf.o)
-    0x08006628   0x08006628   0x00000036   Code   RO         1380    x$fpl$ffix          fz_ws.l(ffix.o)
-    0x0800665e   0x0800665e   0x00000002   PAD
-    0x08006660   0x08006660   0x00000030   Code   RO         1385    x$fpl$fflt          fz_ws.l(fflt_clz.o)
-    0x08006690   0x08006690   0x00000068   Code   RO         1393    x$fpl$fgeqf         fz_ws.l(fgeqf.o)
-    0x080066f8   0x080066f8   0x00000068   Code   RO         1395    x$fpl$fleqf         fz_ws.l(fleqf.o)
-    0x08006760   0x08006760   0x0000008c   Code   RO         1397    x$fpl$fnaninf       fz_ws.l(fnaninf.o)
-    0x080067ec   0x080067ec   0x0000000a   Code   RO         1399    x$fpl$fretinf       fz_ws.l(fretinf.o)
-    0x080067f6   0x080067f6   0x00000002   PAD
-    0x080067f8   0x080067f8   0x000000ea   Code   RO         1370    x$fpl$fsub          fz_ws.l(faddsub_clz.o)
-    0x080068e2   0x080068e2   0x00000000   Code   RO         1401    x$fpl$usenofp       fz_ws.l(usenofp.o)
-    0x080068e2   0x080068e2   0x00000010   Data   RO            6    .rodata.gcr_encode_table  dshot.o
-    0x080068f2   0x080068f2   0x00000002   PAD
-    0x080068f4   0x080068f4   0x00000020   Data   RO         1565    Region$$Table       anon$$obj.o
+    0x0800576c   0x0800576c   0x0000000e   Code   RO         1197    .text.setInputPullUp  io.o
+    0x0800577a   0x0800577a   0x00000002   PAD
+    0x0800577c   0x0800577c   0x0000000c   Code   RO         1258    .text.setPWMCompare1  peripherals.o
+    0x08005788   0x08005788   0x0000000c   Code   RO         1260    .text.setPWMCompare2  peripherals.o
+    0x08005794   0x08005794   0x0000000c   Code   RO         1262    .text.setPWMCompare3  peripherals.o
+    0x080057a0   0x080057a0   0x00000014   Code   RO          147    .text.setVolume     sounds.o
+    0x080057b4   0x080057b4   0x00000076   Code   RO         1216    .text.system_clock_config  peripherals.o
+    0x0800582a   0x0800582a   0x00000002   PAD
+    0x0800582c   0x0800582c   0x000000f0   Code   RO         1340    .text.system_core_clock_update  system_at32f421.o
+    0x0800591c   0x0800591c   0x000004e4   Code   RO           58    .text.tenKhzRoutine  main.o
+    0x08005e00   0x08005e00   0x00000096   Code   RO          921    .text.tmr_channel_enable  at32f421_tmr.o
+    0x08005e96   0x08005e96   0x00000002   PAD
+    0x08005e98   0x08005e98   0x00000062   Code   RO          907    .text.tmr_output_channel_buffer_enable  at32f421_tmr.o
+    0x08005efa   0x08005efa   0x00000002   PAD
+    0x08005efc   0x08005efc   0x0000009e   Code   RO          959    .text.tmr_output_channel_polarity_set  at32f421_tmr.o
+    0x08005f9a   0x08005f9a   0x00000002   PAD
+    0x08005f9c   0x08005f9c   0x00000012   Code   RO          905    .text.tmr_period_buffer_enable  at32f421_tmr.o
+    0x08005fae   0x08005fae   0x00000002   PAD
+    0x08005fb0   0x08005fb0   0x000000ba   Code   RO          867    .text.tmr_reset     at32f421_tmr.o
+    0x0800606a   0x0800606a   0x00000002   PAD
+    0x0800606c   0x0800606c   0x0000019c   Code   RO          126    .text.transfercomplete  signal.o
+    0x08006208   0x08006208   0x00000112   Code   RO           60    .text.zcfoundroutine  main.o
+    0x0800631a   0x0800631a   0x00000002   PAD
+    0x0800631c   0x0800631c   0x000000c4   Code   RO         1364    x$fpl$fadd          fz_ws.l(faddsub_clz.o)
+    0x080063e0   0x080063e0   0x00000054   Code   RO         1370    x$fpl$fcmp          fz_ws.l(fcmp.o)
+    0x08006434   0x08006434   0x00000018   Code   RO         1413    x$fpl$fcmpinf       fz_ws.l(fcmpi.o)
+    0x0800644c   0x0800644c   0x00000184   Code   RO         1373    x$fpl$fdiv          fz_ws.l(fdiv.o)
+    0x080065d0   0x080065d0   0x00000068   Code   RO         1387    x$fpl$feqf          fz_ws.l(feqf.o)
+    0x08006638   0x08006638   0x00000036   Code   RO         1376    x$fpl$ffix          fz_ws.l(ffix.o)
+    0x0800666e   0x0800666e   0x00000002   PAD
+    0x08006670   0x08006670   0x00000030   Code   RO         1381    x$fpl$fflt          fz_ws.l(fflt_clz.o)
+    0x080066a0   0x080066a0   0x00000068   Code   RO         1389    x$fpl$fgeqf         fz_ws.l(fgeqf.o)
+    0x08006708   0x08006708   0x00000068   Code   RO         1391    x$fpl$fleqf         fz_ws.l(fleqf.o)
+    0x08006770   0x08006770   0x0000008c   Code   RO         1393    x$fpl$fnaninf       fz_ws.l(fnaninf.o)
+    0x080067fc   0x080067fc   0x0000000a   Code   RO         1395    x$fpl$fretinf       fz_ws.l(fretinf.o)
+    0x08006806   0x08006806   0x00000002   PAD
+    0x08006808   0x08006808   0x000000ea   Code   RO         1366    x$fpl$fsub          fz_ws.l(faddsub_clz.o)
+    0x080068f2   0x080068f2   0x00000000   Code   RO         1397    x$fpl$usenofp       fz_ws.l(usenofp.o)
+    0x080068f2   0x080068f2   0x00000010   Data   RO            6    .rodata.gcr_encode_table  dshot.o
+    0x08006902   0x08006902   0x00000002   PAD
+    0x08006904   0x08006904   0x00000020   Data   RO         1561    Region$$Table       anon$$obj.o
 
 
-    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x08006918, Size: 0x00000e50, Max: 0x00004000, ABSOLUTE, COMPRESSED[0x000002e8])
+    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x08006928, Size: 0x00000e50, Max: 0x00004000, ABSOLUTE, COMPRESSED[0x000002e8])
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
@@ -3166,7 +3166,7 @@ Memory Map of the image
     0x200000e8   COMPRESSED   0x000002d0   Data   RW           96    .data.pwmSin        main.o
     0x200003b8   COMPRESSED   0x00000004   Data   RW         1342    .data.system_core_clock  system_at32f421.o
     0x200003bc   COMPRESSED   0x00000004   PAD
-    0x200003c0        -       0x00000060   Zero   RW         1430    .bss                c_w.l(libspace.o)
+    0x200003c0        -       0x00000060   Zero   RW         1426    .bss                c_w.l(libspace.o)
     0x20000420        -       0x0000005c   Zero   RW            9    .bss..L_MergedGlobals  dshot.o
     0x2000047c        -       0x0000001c   Zero   RW          136    .bss..L_MergedGlobals.1  signal.o
     0x20000498        -       0x0000007c   Zero   RW          112    .bss..L_MergedGlobals.2  main.o
@@ -3220,16 +3220,16 @@ Image component sizes
          0          0         30          0          0        401   firmwareversion.o
        298          0          0          0          0      12308   functions.o
        308          0          0          2        257      13083   io.o
-      7892         14          0        936        530      28892   main.o
+      7908         12          0        936        530      28926   main.o
       1206          0          0          0          0      26734   peripherals.o
       1616         12          0          0          0      10971   phaseouts.o
       1472          0          0         10         28       3942   signal.o
       1068          0          0          0          1       9105   sounds.o
-        64         26        204          0       1536        848   startup_at32f421.o
+        64         26        204          0       1536        228   startup_at32f421.o
        380         16          0          4          0       7644   system_at32f421.o
 
     ----------------------------------------------------------------------
-     20636        164        286        956       2612     271072   Object Totals
+     20652        162        286        956       2612     270486   Object Totals
          0          0         32          0          0          0   (incl. Generated)
        148          0          4          4         10          0   (incl. Padding)
 
@@ -3292,15 +3292,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-     22550        284        286        956       2708     271656   Grand Totals
-     22550        284        286        744       2708     271656   ELF Image Totals (compressed)
-     22550        284        286        744          0          0   ROM Totals
+     22566        282        286        956       2708     271070   Grand Totals
+     22566        282        286        744       2708     271070   ELF Image Totals (compressed)
+     22566        282        286        744          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                22836 (  22.30kB)
+    Total RO  Size (Code + RO Data)                22852 (  22.32kB)
     Total RW  Size (RW Data + ZI Data)              3664 (   3.58kB)
-    Total ROM Size (Code + RO Data + RW Data)      23580 (  23.03kB)
+    Total ROM Size (Code + RO Data + RW Data)      23596 (  23.04kB)
 
 ==============================================================================
 

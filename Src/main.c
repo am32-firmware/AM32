@@ -289,7 +289,7 @@ fastPID currentPid = { // 1khz loop time
 fastPID stallPid = { // 1khz loop time
     .Kp = 1,
     .Ki = 0,
-    .Kd = 100,
+    .Kd = 50,
     .integral_limit = 10000,
     .output_limit = 50000
 };
@@ -842,9 +842,9 @@ void loadEEpromSettings()
     }
     reverse_speed_threshold = map(motor_kv, 300, 3000, 1000, 500);
     //   reverse_speed_threshold = 200;
-    if (!comp_pwm) {
-        bi_direction = 0;
-    }
+//    if (!comp_pwm) {
+//        bi_direction = 0;
+//    }
 }
 
 void saveEEpromSettings()
@@ -1242,7 +1242,7 @@ void setInput()
             }
 
             if (use_sin_start) {
-                duty_cycle_setpoint = map(input, 137, 2047, minimum_duty_cycle, 2000);
+                duty_cycle_setpoint = map(input, 137, 2047, minimum_duty_cycle+40, 2000);
             } else {
                 duty_cycle_setpoint = map(input, 47, 2047, minimum_duty_cycle, 2000);
             }
@@ -1467,8 +1467,7 @@ void tenKhzRoutine()
             if (stall_protection && running) { // this boosts throttle as the rpm gets lower, for crawlers
                                                // and rc cars only, do not use for multirotors.
                 stall_protection_adjust += (doPidCalculations(&stallPid, commutation_interval,
-                                               stall_protect_target_interval))
-                    / 10000;
+                                               stall_protect_target_interval))/ 10000;
                 if (stall_protection_adjust > 150) {
                     stall_protection_adjust = 150;
                 }
@@ -2112,7 +2111,9 @@ int main(void)
                     throttle_max_at_high_rpm); // for more performance lower the
                                                // high_rpm_level, set to a
                                                // consvervative number in source.
-            }
+            }else{
+							duty_cycle_maximum = 2000;
+						}
 
             if (degrees_celsius > TEMPERATURE_LIMIT) {
                 duty_cycle_maximum = map(degrees_celsius, TEMPERATURE_LIMIT - 10, TEMPERATURE_LIMIT + 10,

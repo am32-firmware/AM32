@@ -373,13 +373,11 @@ ARM Macro Assembler    Page 6
               00000000 
               00000000 
 Command Line: --debug --xref --diag_suppress=9931,A1950W --cpu=Cortex-M0+ --dep
-end=.\objects\startup_stm32g071xx.d -o.\objects\startup_stm32g071xx.o -I.\RTE\_
-MAMBA_S80_12S_G071 -IC:\Users\eikea\AppData\Local\Arm\Packs\ARM\CMSIS\6.1.0\CMS
-IS\Core\Include -IC:\Users\eikea\AppData\Local\Arm\Packs\Keil\STM32G0xx_DFP\1.5
-.0\Drivers\CMSIS\Device\ST\STM32G0xx\Include --predefine="__EVAL SETA 1" --pred
-efine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 540" --predefine=
-"STM32G071xx SETA 1" --predefine="_RTE_ SETA 1" --list=startup_stm32g071xx.lst 
-..\Mcu\g071\Startup\mdk\startup_stm32g071xx.s
+end=.\objects\startup_stm32g071xx.d -o.\objects\startup_stm32g071xx.o -IC:\Keil
+Packs\Keil\STM32G0xx_DFP\1.4.0\Drivers\CMSIS\Device\ST\STM32G0xx\Include --pred
+efine="__EVAL SETA 1" --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VE
+RSION SETA 538" --predefine="STM32G071xx SETA 1" --list=startup_stm32g071xx.lst
+ ..\Mcu\g071\Startup\mdk\startup_stm32g071xx.s
 
 
 
@@ -924,4 +922,4 @@ Symbol: __main
       At line 123 in file ..\Mcu\g071\Startup\mdk\startup_stm32g071xx.s
 Comment: __main used once
 2 symbols
-391 symbols in table
+390 symbols in table

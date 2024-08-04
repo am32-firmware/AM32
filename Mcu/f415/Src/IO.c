@@ -13,7 +13,7 @@
 #include "serial_telemetry.h"
 #include "targets.h"
 
-char ic_timer_prescaler = CPU_FREQUENCY_MHZ / 8;
+char ic_timer_prescaler = CPU_FREQUENCY_MHZ / 6;
 // char output_timer_prescaler;
 // int buffersize = 32;
 // int smallestnumber = 0;
@@ -267,12 +267,12 @@ void setInputPolarityRising()
 
 void setInputPullDown()
 {
-    gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_MUX, GPIO_PULL_DOWN, INPUT_PIN);
+    gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_INPUT, GPIO_PULL_DOWN, INPUT_PIN);
 }
 
 void setInputPullUp()
 {
-    gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_MUX, GPIO_PULL_UP, INPUT_PIN);
+    gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_INPUT, GPIO_PULL_UP, INPUT_PIN);
 }
 
 void enableHalfTransferInt() { INPUT_DMA_CHANNEL->ctrl |= DMA_HDT_INT; }

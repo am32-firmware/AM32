@@ -1,6 +1,5 @@
 
-TARGETS_GD32 := \
-	GD32TEST
+TARGETS_GD32 := $(call get_targets,GD32)
 
 HAL_FOLDER_GD32 := $(HAL_FOLDER)/f350
 

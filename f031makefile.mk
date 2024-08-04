@@ -1,5 +1,5 @@
 
-TARGETS_F031 := REF_F031 \
+TARGETS_F031 := $(call get_targets,F031)
 
 HAL_FOLDER_F031 := $(HAL_FOLDER)/f031
 

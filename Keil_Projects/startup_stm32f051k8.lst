@@ -362,8 +362,8 @@ ARM Macro Assembler    Page 6
               00000000 
               00000000 
 Command Line: --debug --xref --diag_suppress=9931,A1950W --cpu=Cortex-M0 --depe
-nd=.\objects\startup_stm32f051k8.d -o.\objects\startup_stm32f051k8.o -I.\RTE\_R
-EPEAT_DRIVE_F051 -IC:\KeilPacks\Keil\STM32F0xx_DFP\2.1.1\Drivers\CMSIS\Device\S
+nd=.\objects\startup_stm32f051k8.d -o.\objects\startup_stm32f051k8.o -I.\RTE\_L
+UMINOUSBEES_F051 -IC:\KeilPacks\Keil\STM32F0xx_DFP\2.1.1\Drivers\CMSIS\Device\S
 T\STM32F0xx\Include --predefine="__EVAL SETA 1" --predefine="__MICROLIB SETA 1"
  --predefine="__UVISION_VERSION SETA 538" --predefine="_RTE_ SETA 1" --predefin
 e="STM32F051x8 SETA 1" --predefine="_RTE_ SETA 1" --list=startup_stm32f051k8.ls

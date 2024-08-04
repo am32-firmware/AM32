@@ -23,6 +23,8 @@ long map(long x, long in_min, long in_max, long out_min, long out_max)
 {
     if (x >= in_max)
         return out_max;
+		if (x <= in_min)
+        return out_min;
     if (in_min > in_max)
         return map(x, in_max, in_min, out_max, out_min);
     if (out_min == out_max)

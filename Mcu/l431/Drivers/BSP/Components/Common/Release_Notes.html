@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Release Notes for BSP Components Common Drivers</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../../../_htmresc/mini-st.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<div class="row">
+<div class="col-sm-12 col-lg-4">
+<div class="card fluid">
+<div class="sectione dark">
+<center>
+<h1 id="release-notes-for-bsp-components-common-drivers"><small>Release Notes for</small> <mark>BSP Components Common Drivers</mark></h1>
+<p>Copyright © 2017 STMicroelectronics<br />
+</p>
+<a href="https://www.st.com" class="logo"><img src="../../../../_htmresc/st_logo.png" alt="ST logo" /></a>
+</center>
+</div>
+</div>
+<h1 id="license">License</h1>
+<p>Licensed by ST under BSD 3-Clause license (the "License"). You may not use this package except in compliance with the License. You may obtain a copy of the License at:</p>
+<p><a href="https://opensource.org/licenses/BSD-3-Clause">https://opensource.org/licenses/BSD-3-Clause</a></p>
+<h1 id="purpose">Purpose</h1>
+<p>This directory contains the BSP components common drivers.</p>
+</div>
+<div class="col-sm-12 col-lg-8">
+<h1 id="update-history">Update History</h1>
+<div class="collapse">
+<input type="checkbox" id="collapse-section22" checked aria-hidden="true"> <label for="collapse-section22" aria-hidden="true">V5.1.2 / 03-April-2019</label>
+<div>
+<h2 id="main-changes">Main Changes</h2>
+<ul>
+<li>Update release notes format</li>
+</ul>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section21" aria-hidden="true"> <label for="collapse-section21" aria-hidden="true">V5.1.1 / 31-August-2018</label>
+<div>
+<h2 id="main-changes-1">Main Changes</h2>
+<ul>
+<li>Reformat the BSD 3-Clause license declaration in the files header (replace license terms by a web reference to OSI website where those terms lie)</li>
+<li>Correct sensor names in headers files hsensor.h and psensor.h</li>
+</ul>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section20" aria-hidden="true"> <label for="collapse-section20" aria-hidden="true">V5.1.0 / 21-November-2017</label>
+<div>
+<h2 id="main-changes-2">Main Changes</h2>
+<ul>
+<li>Add dpredriver.h: support of DP redriver class</li>
+<li>Add pwrmon.h: support of power monitor class</li>
+<li>Add usbtypecswitch.h: support of USB type C switch class</li>
+</ul>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section19" aria-hidden="true"> <label for="collapse-section19" aria-hidden="true">V5.0.0 / 01-March-2017</label>
+<div>
+<h2 id="main-changes-3">Main Changes</h2>
+<ul>
+<li>Add hsensor.h: support of humidity class</li>
+<li>Add psensor.h: support of pressure class</li>
+<li>Update tsensor.h: Temperature can be negative</li>
+<li>Update accelero.h: LowPower API can enable or disable the low power mode</li>
+<li>Update magneto.h: LowPower API can enable or disable the low power mode</li>
+</ul>
+<p><strong><span class="underline"><span style="font-size: 10pt; font-family: Verdana; color: black;">Notes:</span></span></strong></p>
+<p>This version breaks the compatibility with previous versions.</p>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section18" aria-hidden="true"> <label for="collapse-section18" aria-hidden="true">V4.0.1 / 21-July-2015</label>
+<div>
+<h2 id="main-changes-4">Main Changes</h2>
+<ul>
+<li>tsensor.h: Fix compilation issue on TSENSOR_InitTypeDef</li>
+</ul>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section17" aria-hidden="true"> <label for="collapse-section17" aria-hidden="true">V4.0.0 / 22-June-2015</label>
+<div>
+<h2 id="main-changes-5">Main Changes</h2>
+<ul>
+<li>accelero.h: add *DeInit field in ACCELERO_DrvTypeDef structure</li>
+<li>audio.h: add *DeInit field in AUDIO_DrvTypeDef structure</li>
+<li>idd.h:
+<ul>
+<li>add Shunt0StabDelay, Shunt1StabDelay, Shunt2StabDelay, Shunt3StabDelay, Shunt4StabDelay and ShuntNbOnBoard fields in IDD_ConfigTypeDef structure</li>
+<li>rename ShuntNumber field to ShuntNbUsed in IDD_ConfigTypeDef structure</li>
+</ul></li>
+<li>magneto.h: add *DeInit field in MAGNETO_DrvTypeDef structure</li>
+</ul>
+<p><strong><span class="underline"><span style="font-size: 10pt; font-family: Verdana; color: black;">Important Note:</span></span></strong></p>
+<p>This release V4.0.0 is not backward compatible with V3.0.0.</p>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section16" aria-hidden="true"> <label for="collapse-section16" aria-hidden="true">V3.0.0 / 28-April-2015</label>
+<div>
+<h2 id="main-changes-6">Main Changes</h2>
+<ul>
+<li>accelero.h: add <em>LowPower</em> field in ACCELERO_DrvTypeDef structure</li>
+<li>magneto.h: add <em>LowPower</em> field in MAGNETO_DrvTypeDef structure</li>
+<li>gyro.h: add <em>DeInit</em> and <em>LowPower</em> fields in GYRO_DrvTypeDef structure</li>
+<li>camera.h: add CAMERA_COLOR_EFFECT_NONE define</li>
+<li>idd.h:
+<ul>
+<li>add MeasureNb, DeltaDelayUnit and DeltaDelayValue fields in IDD_ConfigTypeDef structure</li>
+<li>rename PreDelay field to PreDelayUnit in IDD_ConfigTypeDef structure</li>
+</ul></li>
+</ul>
+<p><strong><span class="underline"><span style="font-size: 10pt; font-family: Verdana; color: black;">Important Note:</span></span></strong></p>
+<p>This release V3.0.0 is not backward compatible with V2.2.0.</p>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section155" aria-hidden="true"> <label for="collapse-section155" aria-hidden="true">V2.2.0 / 09-February-2015</label>
+<div>
+<h2 id="main-changes-7">Main Changes</h2>
+<ul>
+<li>Magnetometer driver function prototypes added (magneto.h file)</li>
+<li>Update “idd.h” file to provide DeInit() and WakeUp() services in IDD current measurement driver</li>
+</ul>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section15" aria-hidden="true"> <label for="collapse-section15" aria-hidden="true">V2.1.0 / 06-February-2015</label>
+<div>
+<h2 id="main-changes-8">Main Changes</h2>
+<ul>
+<li>IDD current measurement driver function prototypes added (idd.h file)</li>
+<li>io.h: add new typedef enum IO_PinState with IO_PIN_RESET and IO_PIN_SET values</li>
+</ul>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section12" aria-hidden="true"> <label for="collapse-section12" aria-hidden="true">V2.0.0 / 15-December-2014</label>
+<div>
+<h2 id="main-changes-9">Main Changes</h2>
+<ul>
+<li>Update “io.h” file to support MFX (Multi Function eXpander) device available on some STM32 boards
+<ul>
+<li>add new entries for IO_ModeTypedef enumeration structure</li>
+<li>update the IO_DrvTypeDef structure
+<ul>
+<li>Update all return values and function parameters to uint32_t</li>
+<li>Add a return value for Config field</li>
+</ul></li>
+</ul></li>
+</ul>
+<p><strong><span class="underline"><span style="font-size: 10pt; font-family: Verdana; color: black;">Important Note:</span></span></strong></p>
+<p>This version V2.0.0 is not backward compatible with V1.2.1.</p>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section9" aria-hidden="true"> <label for="collapse-section9" aria-hidden="true">V1.2.1 / 02-December-2014</label>
+<div>
+<h2 id="main-changes-10">Main Changes</h2>
+<ul>
+<li>gyro.h: change “__GIRO_H” by “__GYRO_H” to fix compilation issue under Mac OS</li>
+</ul>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section8" aria-hidden="true"> <label for="collapse-section8" aria-hidden="true">V1.2.0 / 18-June-2014</label>
+<div>
+<h2 id="main-changes-11">Main Changes</h2>
+<ul>
+<li>EPD (E Paper Display) driver function prototype added (epd.h file)</li>
+</ul>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section7" aria-hidden="true"> <label for="collapse-section7" aria-hidden="true">V1.1.0 / 21-March-2014</label>
+<div>
+<h2 id="main-changes-12">Main Changes</h2>
+<ul>
+<li>Temperature Sensor driver function prototype added</li>
+</ul>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section7" aria-hidden="true"> <label for="collapse-section7" aria-hidden="true">V1.0.0 / 18-February-2014</label>
+<div>
+<h2 id="main-changes-13">Main Changes</h2>
+<ul>
+<li>First official release with Accelerometer, Audio, Camera, Gyroscope, IO, LCD and Touch Screen drivers function prototypes</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<footer class="sticky">
+For complete documentation on <mark>STM32 Microcontrollers</mark> , visit: <a href="http://www.st.com/STM32">http://www.st.com/STM32</a>
+</footer>
+</body>
+</html>

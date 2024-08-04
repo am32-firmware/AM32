@@ -50,7 +50,7 @@ void computeMSInput()
 void computeServoInput()
 {
     if (((dma_buffer[1] - dma_buffer[0]) > 800) && ((dma_buffer[1] - dma_buffer[0]) < 2200)) {
-
+				signaltimeout = 0;
         if (calibration_required) {
             if (!high_calibration_set) {
                 if (high_calibration_counts == 0) {
@@ -118,7 +118,6 @@ void computeServoInput()
 
 void transfercomplete()
 {
-    signaltimeout = 0;
     if (armed && dshot_telemetry) {
         if (out_put) {
             receiveDshotDma();
@@ -201,7 +200,7 @@ void transfercomplete()
 
 void checkDshot()
 {
-    if ((smallestnumber > 1) && (smallestnumber <= 4) && (average_signal_pulse < 60)) {
+    if ((smallestnumber >= 1) && (smallestnumber < 4) && (average_signal_pulse < 60)) {
         ic_timer_prescaler = 0;
         if (CPU_FREQUENCY_MHZ > 100) {
             output_timer_prescaler = 1;
@@ -214,7 +213,7 @@ void checkDshot()
         buffersize = 32;
         inputSet = 1;
     }
-    if ((smallestnumber > 4) && (smallestnumber <= 8) && (average_signal_pulse < 100)) {
+    if ((smallestnumber >= 4) && (smallestnumber <= 8) && (average_signal_pulse < 100)) {
         dshot = 1;
         ic_timer_prescaler = 1;
         if (CPU_FREQUENCY_MHZ > 100) {

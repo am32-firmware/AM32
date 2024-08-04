@@ -2,7 +2,7 @@
  * ------------------------------------------------------------------*/
 #include "at32f421_it.h"
 
-#include "adc.h"
+#include "ADC.h"
 #include "main.h"
 #include "targets.h"
 extern void transfercomplete();
@@ -19,7 +19,7 @@ extern char send_telemetry;
 extern char telemetry_done;
 extern char servoPwm;
 extern char dshot;
-extern uint16_t commutation_interval;
+extern uint32_t commutation_interval;
 int exti_int = 0;
 
 void HardFault_Handler(void)

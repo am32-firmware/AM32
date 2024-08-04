@@ -46,6 +46,7 @@ void computeDshotDMA()
     dshot_frametime = dma_buffer[31] - dma_buffer[0];
     halfpulsetime = dshot_frametime >> 5;
     if ((dshot_frametime > dshot_frametime_low) && (dshot_frametime < dshot_frametime_high)) {
+			signaltimeout = 0;
         for (int i = 0; i < 16; i++) {
             dpulse[i] = ((dma_buffer[j + (i << 1) + 1] - dma_buffer[j + (i << 1)]) > (halfpulsetime));
         }

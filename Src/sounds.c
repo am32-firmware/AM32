@@ -45,7 +45,7 @@ void playBJNote(uint16_t freq, uint16_t bduration)
     uint16_t timerOne_reload = TIM1_AUTORELOAD;
 
     SET_PRESCALER_PWM(10);
-    timerOne_reload = 4800000 / freq;
+    timerOne_reload = CPU_FREQUENCY_MHZ*100000 / freq;
 
     SET_AUTO_RELOAD_PWM(timerOne_reload);
     SET_DUTY_CYCLE_ALL(beep_volume * timerOne_reload / TIM1_AUTORELOAD); // volume of the beep, (duty cycle) don't
@@ -64,7 +64,7 @@ void playBlueJayTune()
     uint16_t duration;
     uint16_t frequency;
     comStep(3);
-    // read_flash_bin(blueJayTuneBuffer , EEPROM_START_ADD + 48 , 128);
+    // read_flash_bin(blueJayTuneBuffer , eeprom_address + 48 , 128);
     for (int i = 52; i < 176; i += 2) {
         RELOAD_WATCHDOG_COUNTER();
         signaltimeout = 0;
@@ -96,7 +96,7 @@ void playStartupTune()
 {
     __disable_irq();
 
-    uint8_t value = *(uint8_t*)(EEPROM_START_ADD + 48);
+    uint8_t value = *(uint8_t*)(eeprom_address + 48);
     if (value != 0xFF) {
         playBlueJayTune();
     } else {
@@ -317,7 +317,7 @@ void playBeaconTune3()
 // 	uint16_t duration;
 // 	float frequency;
 // 	comStep(3);
-// 	//read_flash_bin(blueJayTuneBuffer , EEPROM_START_ADD + 48 , 128);
+// 	//read_flash_bin(blueJayTuneBuffer , eeprom_address + 48 , 128);
 // 	for(int i = 52 ; i < 176 ; i+=2){
 // 		fwdgt_counter_reload();
 // 		signaltimeout = 0;
@@ -349,7 +349,7 @@ void playBeaconTune3()
 // void playStartupTune(){
 // 	__disable_irq();
 
-// 	uint8_t value = *(uint8_t*)(EEPROM_START_ADD+48);
+// 	uint8_t value = *(uint8_t*)(eeprom_address+48);
 // 		if(value != 0xFF){
 // 		playBlueJayTune();
 // 		}else{
@@ -563,7 +563,7 @@ void playBeaconTune3()
 // 	uint16_t duration;
 // 	uint16_t frequency;
 // 	comStep(3);
-// 	//read_flash_bin(blueJayTuneBuffer , EEPROM_START_ADD + 48 , 128);
+// 	//read_flash_bin(blueJayTuneBuffer , eeprom_address + 48 , 128);
 // 	for(int i = 52 ; i < 176 ; i+=2){
 // 	WDT->cmd = WDT_CMD_RELOAD;
 // 		signaltimeout = 0;
@@ -594,7 +594,7 @@ void playBeaconTune3()
 // void playStartupTune(){
 // 	__disable_irq();
 
-// 	uint8_t value = *(uint8_t*)(EEPROM_START_ADD+48);
+// 	uint8_t value = *(uint8_t*)(eeprom_address+48);
 // 		if(value != 0xFF){
 // 		playBlueJayTune();
 // 		}else{

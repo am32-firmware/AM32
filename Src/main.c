@@ -2035,6 +2035,10 @@ int main(void)
 #endif
         if (send_telemetry) {
 #ifdef USE_SERIAL_TELEMETRY
+#ifdef NO_CURRENT_SENSE
+            actual_current = 0;
+            consumed_current = 0;
+#endif
             makeTelemPackage(degrees_celsius, battery_voltage, actual_current,
                 (uint16_t)consumed_current, e_rpm);
             send_telem_DMA();

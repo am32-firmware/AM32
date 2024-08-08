@@ -93,6 +93,8 @@ $$($(2)_BASENAME).bin: $$($(2)_BASENAME).elf
 CFLAGS_$(2) = $(MCU_$(1)) -D$(2) $(CFLAGS_$(1)) $(CFLAGS_COMMON)
 LDFLAGS_$(2) = $(LDFLAGS_COMMON) $(LDFLAGS_$(1)) -T$(LDSCRIPT_$(1))
 
+-include $$($(2)_BASENAME).d
+
 $$($(2)_BASENAME).elf: $(SRC_COMMON) $$(SRC_$(1))
 	@$(ECHO) Compiling $$(notdir $$@)
 	$(QUIET)$(MKDIR) -p $(OBJ)
@@ -127,13 +129,16 @@ $(call BOOTLOADER_BASENAME,$(1),$(2)_V$(BOOTLOADER_VERSION))
 endef
 
 define CREATE_BOOTLOADER_TARGET
+
+-include $(BIN_DIR)/$(call BOOTLOADER_BASENAME_VER,$(1),$(2)).d
+
 $(BIN_DIR)/$(call BOOTLOADER_BASENAME_VER,$(1),$(2)).elf: CFLAGS_BL := $$(MCU_$(1)) $$(CFLAGS_$(1)) $$(CFLAGS_BASE) -DBOOTLOADER -DUSE_$(2)
 $(BIN_DIR)/$(call BOOTLOADER_BASENAME_VER,$(1),$(2)).elf: LDFLAGS_BL := $$(LDFLAGS_COMMON) $$(LDFLAGS_$(1)) -T$$(LDSCRIPT_BL)
-$(BIN_DIR)/$(call BOOTLOADER_BASENAME_VER,$(1),$(2)).elf: $$(SRC_BL)
+$(BIN_DIR)/$(call BOOTLOADER_BASENAME_VER,$(1),$(2)).elf: $$(SRC_$(1)_BL) $$(SRC_BL)
 	$$(QUIET)echo building bootloader for $(1) with pin $(2)
 	$$(QUIET)$$(MKDIR) -p $(OBJ)
 	$$(QUIET)echo Compiling $(notdir $$@)
-	$$(QUIET)$$(CC) $$(CFLAGS_BL) $$(LDFLAGS_BL) -o $$(@) $$(SRC_BL) $$(SRC_$(1)_BL) -Os
+	$$(QUIET)$$(CC) $$(CFLAGS_BL) $$(LDFLAGS_BL) -MMD -MP -MF $$(@:.elf=.d) -o $$(@) $$(SRC_$(1)_BL) $$(SRC_BL) -Os
 	$$(QUIET)$$(CP) -f $$@ $$(OBJ)$$(DSEP)debug.elf
 	$$(QUIET)$$(CP) -f Mcu$(DSEP)$(call lc,$(1))$(DSEP)openocd.cfg $$(OBJ)$$(DSEP)openocd.cfg > $$(NUL)
 

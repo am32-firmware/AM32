@@ -65,21 +65,21 @@ void playBlueJayTune()
     uint16_t frequency;
     comStep(3);
     // read_flash_bin(blueJayTuneBuffer , eeprom_address + 48 , 128);
-    for (int i = 52; i < 176; i += 2) {
+    for (int i = 0; i < 124; i += 2) {
         RELOAD_WATCHDOG_COUNTER();
         signaltimeout = 0;
 
-        if (eepromBuffer.buffer[i] == 255) {
+        if (eepromBuffer.tune[i] == 255) {
             full_time_count++;
 
         } else {
-            if (eepromBuffer.buffer[i + 1] == 0) {
-                duration = full_time_count * 254 + eepromBuffer.buffer[i];
+            if (eepromBuffer.tune[i + 1] == 0) {
+                duration = full_time_count * 254 + eepromBuffer.tune[i];
                 SET_DUTY_CYCLE_ALL(0);
                 delayMillis(duration);
             } else {
-                frequency = getBlueJayNoteFrequency(eepromBuffer.buffer[i + 1]);
-                duration = ((full_time_count * 254 + eepromBuffer.buffer[i]) * (100000 / frequency)) / 100;
+                frequency = getBlueJayNoteFrequency(eepromBuffer.tune[i + 1]);
+                duration = ((full_time_count * 254 + eepromBuffer.tune[i]) * (100000 / frequency)) / 100;
                 playBJNote(frequency, duration);
             }
             full_time_count = 0;

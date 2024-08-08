@@ -47,10 +47,12 @@ typedef union EEprom_u {
         uint8_t sine_mode_power; // 45
         uint8_t input_type; // 46
         uint8_t reserved_2[5]; //47-51
-        uint8_t tune[124];
+        uint8_t tune[124]; // 52-175
     };
     uint8_t buffer[176];
 } EEprom_t;
+
+extern EEprom_t eepromBuffer;
 
 // void save_to_flash(uint8_t *data);
 // void read_flash(uint8_t* data, uint32_t address);

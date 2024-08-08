@@ -758,6 +758,13 @@ void loadEEpromSettings()
         high_rpm_level = motor_kv / 12 / (32 / eepromBuffer.motor_poles);				
     }
     reverse_speed_threshold = map(motor_kv, 300, 3000, 1000, 500);
+
+    if (eepromBuffer.eeprom_version > 2) {
+        if (eepromBuffer.auto_advance > 1) {
+            eepromBuffer.auto_advance = 0;
+            save_flash_nolib(eepromBuffer.buffer, sizeof(eepromBuffer.buffer), eeprom_address);
+        }
+    }
     //   reverse_speed_threshold = 200;
 //    if (!eepromBuffer.comp_pwm) {
 //        eepromBuffer.bi_direction = 0;

@@ -50,8 +50,9 @@ typedef union EEprom_u {
         uint8_t tune[124]; // 52-175
         //eeprom v3
         uint8_t auto_advance; // 176
+        char unused[7]; //177-183
     };
-    uint8_t buffer[177];
+    uint8_t buffer[184];
 } EEprom_t;
 
 extern EEprom_t eepromBuffer;

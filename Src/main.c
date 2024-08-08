@@ -315,7 +315,7 @@ uint16_t target_e_com_time_low;
 uint8_t compute_dshot_flag = 0;
 uint8_t crsf_input_channel = 1;
 uint8_t crsf_output_PWM_channel = 2;
-char eeprom_layout_version = 2;
+char eeprom_layout_version = 3;
 uint8_t telemetry_interval_ms = 30;
 char temp_advance = 1;
 uint16_t motor_kv = 2000;
@@ -324,7 +324,6 @@ uint16_t stall_protect_target_interval = TARGET_STALL_PROTECTION_INTERVAL;
 uint16_t enter_sine_angle = 180;
 char do_once_sinemode = 0;
 uint8_t auto_advance_level;
-char auto_advance = 0;
 
 //============================= Servo Settings ==============================
 uint16_t servo_low_threshold = 1100; // anything below this point considered 0
@@ -355,7 +354,6 @@ const char filename[30] __attribute__((section(".file_name"))) = FILE_NAME;
 
 char firmware_name[12] = FIRMWARE_NAME;
 
-uint8_t EEPROM_VERSION;
 // move these to targets folder or peripherals for each mcu
 uint16_t ADC_CCR = 30;
 uint16_t current_angle = 90;
@@ -682,9 +680,6 @@ void loadEEpromSettings()
 #ifndef HAS_HALL_SENSORS
         eepromBuffer.use_hall_sensors = 0;
 #endif
-        if (eepromBuffer.use_hall_sensors == 0x01) {
-			auto_advance = 1;
-        }
 
         if (eepromBuffer.sine_mode_changeover_thottle_level < 5 || eepromBuffer.sine_mode_changeover_thottle_level > 25) { // sine mode changeover 5-25 percent throttle
             eepromBuffer.sine_mode_changeover_thottle_level = 5;
@@ -722,11 +717,12 @@ void loadEEpromSettings()
         if (eepromBuffer.limits.current > 0 && eepromBuffer.limits.current < 100) {
             use_current_limit = 1;
         }
+        
         if (eepromBuffer.sine_mode_power == 0 || eepromBuffer.sine_mode_power > 10) {
             eepromBuffer.sine_mode_power = 5;
         }
 
-        if (eepromBuffer.input_type>= 0 && eepromBuffer.input_type < 10) {
+        if (eepromBuffer.input_type >= 0 && eepromBuffer.input_type < 10) {
             switch (eepromBuffer.input_type) {
             case AUTO_IN:
                 dshot = 0;
@@ -772,6 +768,10 @@ void saveEEpromSettings()
 {
 
     eepromBuffer.eeprom_version = eeprom_layout_version;
+
+    if (eepromBuffer.eeprom_version == 2) {
+        eepromBuffer.auto_advance = 0;
+    }
 
     save_flash_nolib(eepromBuffer.buffer, sizeof(eepromBuffer.buffer), eeprom_address);
 }
@@ -868,12 +868,12 @@ void PeriodElapsedCallback()
 {
     DISABLE_COM_TIMER_INT(); // disable interrupt
     commutate();
-    commutation_interval = (3*commutation_interval + thiszctime) >> 2;
-  	if(!auto_advance){
+    commutation_interval = (3 * commutation_interval + thiszctime) >> 2;
+  	if (!eepromBuffer.auto_advance) {
 	  advance = (commutation_interval >> 3) * temp_advance; // 60 divde 8 7.5 degree increments
-		}else{
+	} else {
 	  advance = (commutation_interval * auto_advance_level) >> 6; // 60 divde 64 0.9375 degree increments
-		}
+    }
     waitTime = (commutation_interval >> 1) - advance;
     if (!old_routine) {
         enableCompInterrupts(); // enable comp interrupt
@@ -1642,7 +1642,11 @@ int main(void)
 
 	
 #ifdef USE_MAKE
-    if (firmware_info.version_major != eepromBuffer.version.major || firmware_info.version_minor != eepromBuffer.version.minor) {
+    if (
+        firmware_info.version_major != eepromBuffer.version.major ||
+        firmware_info.version_minor != eepromBuffer.version.minor ||
+        eeprom_layout_version > eepromBuffer.eeprom_version
+    ) {
         eepromBuffer.version.major = firmware_info.version_major;
         eepromBuffer.version.minor = firmware_info.version_minor;
         for (int i = 0; i < 12; i++) {
@@ -1651,7 +1655,7 @@ int main(void)
         saveEEpromSettings();
     }
 #else
-    if (VERSION_MAJOR != eepromBuffer.version.major || VERSION_MINOR != eepromBuffer.version.minor) {
+    if (VERSION_MAJOR != eepromBuffer.version.major || VERSION_MINOR != eepromBuffer.version.minor || eeprom_layout_version > eepromBuffer.eeprom_version) {
         eepromBuffer.version.major = VERSION_MAJOR;
         eepromBuffer.version.minor = VERSION_MINOR;
         for (int i = 0; i < 12; i++) {

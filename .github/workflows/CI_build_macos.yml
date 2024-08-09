@@ -1,10 +1,10 @@
-name: CI Build Linux
+name: CI Build MacOS
 
 on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: 'ubuntu-latest'
+    runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v4

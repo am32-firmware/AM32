@@ -2,9 +2,13 @@
  * ------------------------------------------------------------------*/
 #include "at32f421_it.h"
 
+#ifndef BOOTLOADER
 #include "ADC.h"
+#endif
 #include "main.h"
+#ifndef BOOTLOADER
 #include "targets.h"
+#endif
 extern void transfercomplete();
 extern void PeriodElapsedCallback();
 extern void interruptRoutine();
@@ -171,6 +175,7 @@ void DMA1_Channel5_4_IRQHandler(void)
 #endif
 }
 
+#ifndef BOOTLOADER
 /**
  * @brief This function handles ADC and COMP interrupts (COMP interrupts
  * through EXTI lines 21 and 22).
@@ -202,6 +207,8 @@ void TMR16_GLOBAL_IRQHandler(void)
     TMR16->ists = 0x00;
     PeriodElapsedCallback();
 }
+#endif // BOOTLOADER
+
 
 void TMR15_GLOBAL_IRQHandler(void)
 {
@@ -254,6 +261,7 @@ void TMR3_GLOBAL_IRQHandler(void)
 //	  }
 //}
 
+#ifndef BOOTLOADER
 void EXINT15_4_IRQHandler(void)
 {
     exti_int++;
@@ -262,6 +270,8 @@ void EXINT15_4_IRQHandler(void)
         processDshot();
     }
 }
+#endif
+
 
 /******************************************************************************/
 /*                 AT32F4xx Peripherals Interrupt Handlers                   */

@@ -15,7 +15,21 @@ MKDIR:=tools\\windows\\make\\bin\\mkdir
 RM:=tools\\windows\\make\\bin\\rm
 CUT:=tools\\windows\\make\\bin\\cut
 FGREP:=tools\\windows\\make\\bin\\fgrep
+
 else
+# MacOS and Linux
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+ARM_SDK_PREFIX:=tools/macos/xpack-arm-none-eabi-gcc-10.3.1-2.3/bin/arm-none-eabi-
+CP:=cp
+DSEP:=/
+NUL:=/dev/null
+MKDIR:=mkdir
+RM:=rm
+CUT:=cut
+FGREP:=fgrep
+else
+# assume Linux
 ARM_SDK_PREFIX:=tools/linux/xpack-arm-none-eabi-gcc-10.3.1-2.3/bin/arm-none-eabi-
 CP:=cp
 DSEP:=/
@@ -24,6 +38,7 @@ MKDIR:=mkdir
 RM:=rm
 CUT:=cut
 FGREP:=fgrep
+endif
 endif
 
 # workaround for lack of a lowercase function in GNU make

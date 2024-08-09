@@ -3,6 +3,7 @@
 # download location for tools
 WINDOWS_TOOLS=https://firmware.ardupilot.org/Tools/AM32-tools/windows-tools.zip
 LINUX_TOOLS=https://firmware.ardupilot.org/Tools/AM32-tools/linux-tools.tar.gz
+MACOS_TOOLS=https://firmware.ardupilot.org/Tools/AM32-tools/macos-tools.tar.gz
 
 ifeq ($(OS),Windows_NT)
 
@@ -15,6 +16,18 @@ arm_sdk_install:
 	@echo windows tools install done
 
 else
+# MacOS and Linux
+UNAME_S := $(shell uname -s)
+
+ifeq ($(UNAME_S),Darwin)
+
+arm_sdk_install:
+	@echo Installing macos tools
+	@wget $(MACOS_TOOLS)
+	@tar xzf macos-tools.tar.gz
+	@echo macos tools install done
+
+else
 
 arm_sdk_install:
 	@echo Installing linux tools
@@ -22,4 +35,5 @@ arm_sdk_install:
 	@tar xzf linux-tools.tar.gz
 	@echo linux tools install done
 
+endif
 endif

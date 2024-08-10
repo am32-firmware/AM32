@@ -24,8 +24,6 @@ void setInputPullUp();
 void enableHalfTransferInt();
 void setInputPullNone();
 
-extern char bi_direction;
-
 extern char send_telemetry;
 extern uint8_t degrees_celsius;
 

@@ -8,7 +8,6 @@
 #include "main.h"
 
 extern char out_put;
-extern char bi_direction;
 extern char inputSet;
 extern char dshot;
 extern char servoPwm;

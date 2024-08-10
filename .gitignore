@@ -13,3 +13,5 @@ Keil_Projects/Listings
 *.hex
 *.log
 *~
+*.map
+*.o

@@ -1648,10 +1648,7 @@ void zcfoundroutine()
 #ifdef MCU_GDE23
     TIMER_CAR(COM_TIMER) = waitTime;
 #endif
-#ifdef MCU_F051
-    COM_TIMER->ARR = waitTime;
-#endif
-		#ifdef MCU_G071
+#ifdef STMICRO
     COM_TIMER->ARR = waitTime;
 #endif
 #ifdef MCU_AT32

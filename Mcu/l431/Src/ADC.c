@@ -44,6 +44,7 @@ ADC_raw_current = ADCDataDMA[0];
 void ADC_Init(void)
 {       // gpio A3 mapped to channel 8, A6 to 11, temp on channel 17.
   LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
+	LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_3, LL_GPIO_MODE_ANALOG);
   LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_6, LL_GPIO_MODE_ANALOG);
 
 //  NVIC_SetPriority(ADC1_2_IRQn, 0); /* ADC IRQ greater priority than DMA IRQ */

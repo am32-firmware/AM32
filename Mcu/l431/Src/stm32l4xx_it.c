@@ -23,6 +23,7 @@
 #include "stm32l4xx_it.h"
 #include "ADC.h"
 #include "targets.h"
+#include "IO.h"
 //#include "WS2812.h"
 
 
@@ -30,11 +31,16 @@ extern void transfercomplete();
 extern void PeriodElapsedCallback();
 extern void interruptRoutine();
 extern void tenKhzRoutine();
-
+extern void processDshot();
 
 extern char send_telemetry;
-int update_interupt = 0;
+int interrupt_time = 0;
 extern char servoPwm;
+extern char dshot_telemetry;
+extern char armed;
+extern char out_put;
+extern uint8_t compute_dshot_flag;
+extern uint32_t commutation_interval;
 
 /******************************************************************************/
 /*           Cortex-M4 Processor Interruption and Exception Handlers          */
@@ -216,47 +222,41 @@ void DMA1_Channel4_IRQHandler(void){
 
 void DMA1_Channel5_IRQHandler(void)
 {
-  /* USER CODE BEGIN DMA1_Channel5_IRQn 0 */
-	if(LL_DMA_IsActiveFlag_HT5(DMA1)){
-		if(servoPwm){
-		LL_TIM_IC_SetPolarity(IC_TIMER_REGISTER, IC_TIMER_CHANNEL, LL_TIM_IC_POLARITY_FALLING);
-		 LL_DMA_ClearFlag_HT5(DMA1);
-		}
-	}
-	  if(LL_DMA_IsActiveFlag_TC5(DMA1) == 1)
-	  {
-	    LL_DMA_ClearFlag_GI5(DMA1);
-	    LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_5);
-	    transfercomplete();
-	    return;
-	  }
-	  else if(LL_DMA_IsActiveFlag_TE5(DMA1) == 1)
-	  {
-		  LL_DMA_ClearFlag_GI5(DMA1);
-	  }
-  /* USER CODE END DMA1_Channel5_IRQn 0 */
-
-  /* USER CODE BEGIN DMA1_Channel5_IRQn 1 */
-
-  /* USER CODE END DMA1_Channel5_IRQn 1 */
+     if (armed && dshot_telemetry) {
+        DMA1->IFCR |= DMA_IFCR_CGIF5;
+        DMA1_Channel5->CCR = 0x00;
+        if (out_put) {
+            receiveDshotDma();
+            compute_dshot_flag = 2;
+        } else {
+            sendDshotDma();
+            compute_dshot_flag = 1;
+        }
+        EXTI->SWIER1 |= LL_EXTI_LINE_15;
+       return;
+    }
+    if (LL_DMA_IsActiveFlag_HT5(DMA1)) {
+        if (servoPwm) {
+            LL_TIM_IC_SetPolarity(IC_TIMER_REGISTER, IC_TIMER_CHANNEL,
+                LL_TIM_IC_POLARITY_FALLING);
+            LL_DMA_ClearFlag_HT5(DMA1);
+        }
+    }
+    if (LL_DMA_IsActiveFlag_TC5(DMA1) == 1) {
+        DMA1->IFCR |= DMA_IFCR_CGIF5;
+        DMA1_Channel5->CCR = 0x00;
+        transfercomplete();
+        EXTI->SWIER1 |= LL_EXTI_LINE_15;
+    } else if (LL_DMA_IsActiveFlag_TE5(DMA1) == 1) {
+        LL_DMA_ClearFlag_GI5(DMA1);
+    }
 }
 void TIM6_DAC_IRQHandler(void)
 {
-  /* USER CODE BEGIN TIM6_DAC_IRQn 0 */
-	//TIM6->DIER &= ~(0x1UL << (0U));
-	  if(LL_TIM_IsActiveFlag_UPDATE(TIM6) == 1)
-	  {
-
-	    LL_TIM_ClearFlag_UPDATE(TIM6);
-	    tenKhzRoutine();
-
-	  }
-
-  /* USER CODE END TIM6_DAC_IRQn 0 */
-
-  /* USER CODE BEGIN TIM6_DAC_IRQn 1 */
-
-  /* USER CODE END TIM6_DAC_IRQn 1 */
+	if(LL_TIM_IsActiveFlag_UPDATE(TIM6) == 1) {
+		LL_TIM_ClearFlag_UPDATE(TIM6);
+		tenKhzRoutine();
+	}
 }
 
 
@@ -275,15 +275,17 @@ void TIM1_UP_TIM16_IRQHandler(void)
 
 void COMP_IRQHandler(void)
 {
-
-  /* USER CODE BEGIN ADC1_COMP_IRQn 0 */
-	  if(LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_22) != RESET)
+	  if(LL_EXTI_IsActiveFlag_0_31(EXTI_LINE) != RESET)
 	  {
-	    /* Clear flag of EXTI */
-	    LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_22);
-
-	    /* Call interruption treatment function */
+	    LL_EXTI_ClearFlag_0_31(EXTI_LINE);
 	    interruptRoutine();
 	  }
+}
+
+void EXTI15_10_IRQHandler(void)
+{
+	  interrupt_time ++;
+    LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_15);
+    processDshot();
 }
 

@@ -1648,10 +1648,7 @@ void zcfoundroutine()
 #ifdef MCU_GDE23
     TIMER_CAR(COM_TIMER) = waitTime;
 #endif
-#ifdef MCU_F051
-    COM_TIMER->ARR = waitTime;
-#endif
-		#ifdef MCU_G071
+#ifdef STMICRO
     COM_TIMER->ARR = waitTime;
 #endif
 #ifdef MCU_AT32
@@ -1737,11 +1734,11 @@ int main(void)
 {
 
     initAfterJump();
-
+ 
     initCorePeripherals();
-
+  
     enableCorePeripherals();
-
+    
     loadEEpromSettings();
 
  //   EEPROM_VERSION = *(uint8_t*)(0x08000FFC);
@@ -1895,6 +1892,7 @@ int main(void)
 
 
     while (1) {
+
 #ifdef FIXED_DUTY_MODE
         setInput();
 #endif

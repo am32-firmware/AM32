@@ -30,7 +30,7 @@ void receiveDshotDma()
     RCC->APB2RSTR &= ~LL_APB1_GRP2_PERIPH_TIM15;
 #endif
     IC_TIMER_REGISTER->CCMR1 = 0x01;
-    IC_TIMER_REGISTER->CCER = 0xa;
+    IC_TIMER_REGISTER->CCER = 0xb;
     IC_TIMER_REGISTER->PSC = ic_timer_prescaler;
     IC_TIMER_REGISTER->ARR = 0xFFFF;
     IC_TIMER_REGISTER->EGR |= TIM_EGR_UG;

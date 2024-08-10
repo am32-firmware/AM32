@@ -29,10 +29,10 @@ void initCorePeripherals(void)
     MX_GPIO_Init();
     MX_DMA_Init();
     MX_COMP2_Init();
+	  MX_COMP1_Init();
     MX_TIM1_Init();
     MX_TIM2_Init();
     MX_TIM16_Init();
-    MX_COMP1_Init();
     MX_TIM17_Init();
     MX_TIM6_Init();
     MX_TIM15_Init();

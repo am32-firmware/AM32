@@ -13,6 +13,8 @@
 #include "serial_telemetry.h"
 #include "targets.h"
 
+extern char bemf_timeout;
+
 void initCorePeripherals(void)
 {
 
@@ -25,13 +27,21 @@ void initCorePeripherals(void)
     MX_DMA_Init();
     MX_TIM1_Init();
     MX_TIM2_Init();
+	#ifdef USE_COMP_1
     MX_COMP1_Init();
+	#endif
+  #ifdef USE_COMP_2
+    MX_COMP2_Init();
+	#endif
     MX_TIM16_Init();
     MX_TIM6_Init();
     MX_TIM7_Init();
     UN_TIM_Init();
 #ifdef USE_SERIAL_TELEMETRY
     telem_UART_Init();
+#endif
+#ifdef USE_INTERNAL_AMP
+     init_OPAMP();
 #endif
 }
 
@@ -219,7 +229,7 @@ void MX_TIM1_Init(void)
 
     TIM_InitStruct.Prescaler = 0;
     TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
-    TIM_InitStruct.Autoreload = 1999;
+    TIM_InitStruct.Autoreload = 3334;
     TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
     TIM_InitStruct.RepetitionCounter = 0;
     LL_TIM_Init(TIM1, &TIM_InitStruct);
@@ -303,7 +313,7 @@ PA10   ------> TIM1_CH3
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = LOW_OUTPUT_TYPE;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    GPIO_InitStruct.Alternate = LL_GPIO_AF_2;
+    GPIO_InitStruct.Alternate = LL_GPIO_AF_1;
     LL_GPIO_Init(PHASE_A_GPIO_PORT_LOW, &GPIO_InitStruct);
 
     GPIO_InitStruct.Pin = PHASE_B_GPIO_LOW;
@@ -311,7 +321,7 @@ PA10   ------> TIM1_CH3
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = LOW_OUTPUT_TYPE;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    GPIO_InitStruct.Alternate = LL_GPIO_AF_2;
+    GPIO_InitStruct.Alternate = LL_GPIO_AF_1;
     LL_GPIO_Init(PHASE_B_GPIO_PORT_LOW, &GPIO_InitStruct);
 
     GPIO_InitStruct.Pin = PHASE_C_GPIO_LOW;
@@ -319,7 +329,7 @@ PA10   ------> TIM1_CH3
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = LOW_OUTPUT_TYPE;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    GPIO_InitStruct.Alternate = LL_GPIO_AF_2;
+    GPIO_InitStruct.Alternate = LL_GPIO_AF_1;
     LL_GPIO_Init(PHASE_C_GPIO_PORT_LOW, &GPIO_InitStruct);
 
     GPIO_InitStruct.Pin = PHASE_A_GPIO_HIGH;
@@ -327,7 +337,7 @@ PA10   ------> TIM1_CH3
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = HIGH_OUTPUT_TYPE;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    GPIO_InitStruct.Alternate = LL_GPIO_AF_2;
+    GPIO_InitStruct.Alternate = LL_GPIO_AF_1;
     LL_GPIO_Init(PHASE_A_GPIO_PORT_HIGH, &GPIO_InitStruct);
 
     GPIO_InitStruct.Pin = PHASE_B_GPIO_HIGH;
@@ -335,7 +345,7 @@ PA10   ------> TIM1_CH3
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = HIGH_OUTPUT_TYPE;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    GPIO_InitStruct.Alternate = LL_GPIO_AF_2;
+    GPIO_InitStruct.Alternate = LL_GPIO_AF_1;
     LL_GPIO_Init(PHASE_B_GPIO_PORT_HIGH, &GPIO_InitStruct);
 
     GPIO_InitStruct.Pin = PHASE_C_GPIO_HIGH;
@@ -343,7 +353,7 @@ PA10   ------> TIM1_CH3
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = HIGH_OUTPUT_TYPE;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    GPIO_InitStruct.Alternate = LL_GPIO_AF_2;
+    GPIO_InitStruct.Alternate = LL_GPIO_AF_1;
     LL_GPIO_Init(PHASE_C_GPIO_PORT_HIGH, &GPIO_InitStruct);
 
     //  NVIC_SetPriority(TIM1_BRK_UP_TRG_COM_IRQn, 2);
@@ -365,6 +375,7 @@ void MX_TIM6_Init(void)
     NVIC_EnableIRQ(TIM6_DAC_IRQn);
     TIM6->PSC = 79;
     TIM6->ARR = 1000000 / LOOP_FREQUENCY_HZ;
+
 }
 
 void MX_TIM7_Init(void)
@@ -465,7 +476,7 @@ void UN_TIM_Init(void)
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    GPIO_InitStruct.Alternate = LL_GPIO_AF_0;
+    GPIO_InitStruct.Alternate = LL_GPIO_AF_14;
     LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 #endif
 
@@ -485,27 +496,21 @@ void UN_TIM_Init(void)
     LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 #endif
 
-    /* TIM16 DMA Init */
+  LL_DMA_SetPeriphRequest(DMA1, LL_DMA_CHANNEL_5, LL_DMA_REQUEST_7);
 
-    /* TIM16_CH1_UP Init */
-    // LL_DMA_SetDataTransferDirection(DMA1, INPUT_DMA_CHANNEL,
-    // LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
+  LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_5, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
 
-    // LL_DMA_SetChannelPriorityLevel(DMA1, INPUT_DMA_CHANNEL,
-    // LL_DMA_PRIORITY_LOW);
+  LL_DMA_SetChannelPriorityLevel(DMA1, LL_DMA_CHANNEL_5, LL_DMA_PRIORITY_HIGH);
 
-    // LL_DMA_SetMode(DMA1, INPUT_DMA_CHANNEL, LL_DMA_MODE_NORMAL);
+  LL_DMA_SetMode(DMA1, LL_DMA_CHANNEL_5, LL_DMA_MODE_NORMAL);
 
-    // LL_DMA_SetPeriphIncMode(DMA1, INPUT_DMA_CHANNEL,
-    // LL_DMA_PERIPH_NOINCREMENT);
+  LL_DMA_SetPeriphIncMode(DMA1, LL_DMA_CHANNEL_5, LL_DMA_PERIPH_NOINCREMENT);
 
-    // LL_DMA_SetMemoryIncMode(DMA1, INPUT_DMA_CHANNEL, LL_DMA_MEMORY_INCREMENT);
+  LL_DMA_SetMemoryIncMode(DMA1, LL_DMA_CHANNEL_5, LL_DMA_MEMORY_INCREMENT);
 
-    // LL_DMA_SetPeriphSize(DMA1, INPUT_DMA_CHANNEL, LL_DMA_PDATAALIGN_HALFWORD);
+  LL_DMA_SetPeriphSize(DMA1, LL_DMA_CHANNEL_5, LL_DMA_PDATAALIGN_HALFWORD);
 
-    // LL_DMA_SetMemorySize(DMA1, INPUT_DMA_CHANNEL, LL_DMA_MDATAALIGN_WORD);
-
-    /* TIM16 interrupt Init */
+  LL_DMA_SetMemorySize(DMA1, LL_DMA_CHANNEL_5, LL_DMA_MDATAALIGN_WORD);
 
 #ifdef USE_TIMER_15_CHANNEL_1
     NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
@@ -583,6 +588,36 @@ void initLed()
 }
 #endif
 
+void init_OPAMP(void)
+{
+  LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
+
+  LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_0, LL_GPIO_MODE_ANALOG);
+  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_OPAMP);
+  if (__LL_OPAMP_IS_ENABLED_ALL_COMMON_INSTANCE() == 0)
+  {
+    LL_OPAMP_SetCommonPowerRange(__LL_OPAMP_COMMON_INSTANCE(OPAMP1), LL_OPAMP_POWERSUPPLY_RANGE_HIGH);
+  }
+//  LL_OPAMP_SetPowerMode(OPAMP1, LL_OPAMP_POWERMODE_NORMAL);
+//  LL_OPAMP_SetMode(OPAMP1, LL_OPAMP_MODE_FUNCTIONAL);
+  LL_OPAMP_SetFunctionalMode(OPAMP1, LL_OPAMP_MODE_PGA);
+  LL_OPAMP_SetPGAGain(OPAMP1, LL_OPAMP_PGA_GAIN_16);
+  LL_OPAMP_SetInputNonInverting(OPAMP1, LL_OPAMP_INPUT_NONINVERT_IO0);
+  LL_OPAMP_SetInputInverting(OPAMP1, LL_OPAMP_INPUT_INVERT_CONNECT_NO);
+  // LL_OPAMP_SetTrimmingMode(OPAMP1, LL_OPAMP_TRIMMING_FACTORY);
+
+  __IO uint32_t wait_loop_index = 0;
+   LL_OPAMP_Enable(OPAMP1);
+
+  wait_loop_index = ((LL_OPAMP_DELAY_STARTUP_US * (SystemCoreClock / (100000 * 2))) / 10);
+  while(wait_loop_index != 0)
+  {
+    wait_loop_index--;
+  }
+}
+
+
+
 void reloadWatchDogCounter()
 {
     LL_IWDG_ReloadCounter(IWDG);
@@ -636,13 +671,9 @@ void enableCorePeripherals()
     LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH2N);
     LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH3N);
 
-#ifdef MCU_G071
-    LL_TIM_CC_EnableChannel(
-        TIM1, LL_TIM_CHANNEL_CH5); // timer used for comparator blanking
-#endif
     LL_TIM_CC_EnableChannel(TIM1,
-        LL_TIM_CHANNEL_CH4); // timer used for timing adc read
-    TIM1->CCR4 = 100; // set in 10khz loop to match pwm cycle timed to end of pwm on
+    LL_TIM_CHANNEL_CH4);
+    TIM1->CCR4 = 100; 
 
     /* Enable counter */
     LL_TIM_EnableCounter(TIM1);
@@ -672,7 +703,6 @@ void enableCorePeripherals()
 #ifdef USE_CUSTOM_LED
     initLed();
 #endif
-
 #ifndef BRUSHED_MODE
     LL_TIM_EnableCounter(COM_TIMER); // commutation_timer priority 0
     LL_TIM_GenerateEvent_UPDATE(COM_TIMER);
@@ -688,25 +718,19 @@ void enableCorePeripherals()
     LL_TIM_EnableCounter(TEN_KHZ_TIMER); // 10khz timer
     LL_TIM_GenerateEvent_UPDATE(TEN_KHZ_TIMER);
     TEN_KHZ_TIMER->DIER |= (0x1UL << (0U)); // enable interrupt
-    // RCC->APB2ENR  &= ~(1 << 22);  // turn debug off
 #ifdef USE_ADC
     ADC_Init();
     enableADC_DMA();
     activateADC();
 #endif
 
-#ifndef MCU_F031
     __IO uint32_t wait_loop_index = 0;
     /* Enable comparator */
     LL_COMP_Enable(MAIN_COMP);
-#ifdef N_VARIANT // needs comp 1 and 2
-    LL_COMP_Enable(COMP1);
-#endif
     wait_loop_index = ((LL_COMP_DELAY_STARTUP_US * (SystemCoreClock / (100000 * 2))) / 10);
     while (wait_loop_index != 0) {
         wait_loop_index--;
     }
-#endif
     NVIC_SetPriority(EXTI15_10_IRQn, 2);
     NVIC_EnableIRQ(EXTI15_10_IRQn);
     EXTI->IMR1 |= (1 << 15);

@@ -196,7 +196,7 @@ void MX_COMP2_Init(void)
     /* USER CODE BEGIN COMP2_Init 1 */
     LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_SYSCFG);
     /* USER CODE END COMP2_Init 1 */
-    COMP_InitStruct.InputPlus = LL_COMP_INPUT_PLUS_IO3;
+    COMP_InitStruct.InputPlus = COMP_INPUT_PLUS;
     COMP_InitStruct.InputMinus = LL_COMP_INPUT_MINUS_IO3;
     COMP_InitStruct.InputHysteresis = LL_COMP_HYSTERESIS_NONE;
     COMP_InitStruct.OutputPolarity = LL_COMP_OUTPUTPOL_NONINVERTED;

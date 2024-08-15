@@ -1417,6 +1417,18 @@
 #define SIXTY_FOUR_KB_MEMORY
 #endif
 
+#ifdef STELLAR_G071_V1
+#define FILE_NAME "STELLAR_G071_V1"
+#define FIRMWARE_NAME "Stellar V1"
+#define DEAD_TIME 80
+#define MILLIVOLT_PER_AMP 15
+#define CURRENT_OFFSET 0
+#define TARGET_VOLTAGE_DIVIDER 210
+#define HARDWARE_GROUP_G0_N
+#define USE_SERIAL_TELEMETRY
+#define SIXTY_FOUR_KB_MEMORY
+#endif
+
 /********************************** F031 Targets
  * ***********************************/
 

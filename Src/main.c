@@ -315,7 +315,7 @@ uint16_t target_e_com_time_low;
 uint8_t compute_dshot_flag = 0;
 uint8_t crsf_input_channel = 1;
 uint8_t crsf_output_PWM_channel = 2;
-char eeprom_layout_version = 3;
+char eeprom_layout_version = EEPROM_VERSION;
 uint8_t telemetry_interval_ms = 30;
 char temp_advance = 1;
 uint16_t motor_kv = 2000;
@@ -621,6 +621,10 @@ void loadEEpromSettings()
 		//*eepromBuffer = *(EEprom_t*)(eeprom_address);
     read_flash_bin(eepromBuffer.buffer, eeprom_address, sizeof(eepromBuffer.buffer));
 
+    if (eepromBuffer.advance_level > 3) {
+        eepromBuffer.advance_level = 2;
+    }
+
     if (eepromBuffer.pwm_frequency < 49 && eepromBuffer.pwm_frequency > 7) {
         if (eepromBuffer.pwm_frequency < 49 && eepromBuffer.pwm_frequency > 23) {
             TIMER1_MAX_ARR = map(eepromBuffer.pwm_frequency, 24, 48, TIM1_AUTORELOAD, TIM1_AUTORELOAD / 2);
@@ -759,12 +763,6 @@ void loadEEpromSettings()
     }
     reverse_speed_threshold = map(motor_kv, 300, 3000, 1000, 500);
 
-    if (eepromBuffer.eeprom_version > 2) {
-        if (eepromBuffer.auto_advance > 1) {
-            eepromBuffer.auto_advance = 0;
-            save_flash_nolib(eepromBuffer.buffer, sizeof(eepromBuffer.buffer), eeprom_address);
-        }
-    }
     //   reverse_speed_threshold = 200;
 //    if (!eepromBuffer.comp_pwm) {
 //        eepromBuffer.bi_direction = 0;
@@ -775,10 +773,6 @@ void saveEEpromSettings()
 {
 
     eepromBuffer.eeprom_version = eeprom_layout_version;
-
-    if (eepromBuffer.eeprom_version == 2) {
-        eepromBuffer.auto_advance = 0;
-    }
 
     save_flash_nolib(eepromBuffer.buffer, sizeof(eepromBuffer.buffer), eeprom_address);
 }
@@ -876,7 +870,7 @@ void PeriodElapsedCallback()
     DISABLE_COM_TIMER_INT(); // disable interrupt
     commutate();
     commutation_interval = (3 * commutation_interval + thiszctime) >> 2;
-  	if (!eepromBuffer.auto_advance) {
+  	if (!eepromBuffer.use_hall_sensors) {
 	  advance = (commutation_interval >> 3) * temp_advance; // 60 divde 8 7.5 degree increments
 	} else {
 	  advance = (commutation_interval * auto_advance_level) >> 6; // 60 divde 64 0.9375 degree increments
@@ -1643,9 +1637,9 @@ int main(void)
 
  //   EEPROM_VERSION = *(uint8_t*)(0x08000FFC);
 
-	  if((*(uint32_t*)(0x08000FE0)) == 0xf8){
-			eeprom_address = (uint32_t)0x0800F800;
-		}
+	if((*(uint32_t*)(0x08000FE0)) == 0xf8){
+	    eeprom_address = (uint32_t)0x0800F800;
+	}
 
 	
 #ifdef USE_MAKE

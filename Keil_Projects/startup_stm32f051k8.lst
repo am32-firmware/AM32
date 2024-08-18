@@ -362,12 +362,13 @@ ARM Macro Assembler    Page 6
               00000000 
               00000000 
 Command Line: --debug --xref --diag_suppress=9931,A1950W --cpu=Cortex-M0 --depe
-nd=.\objects\startup_stm32f051k8.d -o.\objects\startup_stm32f051k8.o -I.\RTE\_L
-UMINOUSBEES_F051 -IC:\KeilPacks\Keil\STM32F0xx_DFP\2.1.1\Drivers\CMSIS\Device\S
-T\STM32F0xx\Include --predefine="__EVAL SETA 1" --predefine="__MICROLIB SETA 1"
- --predefine="__UVISION_VERSION SETA 538" --predefine="_RTE_ SETA 1" --predefin
-e="STM32F051x8 SETA 1" --predefine="_RTE_ SETA 1" --list=startup_stm32f051k8.ls
-t ..\Mcu\f051\Startup\mdk\startup_stm32f051k8.s
+nd=.\objects\startup_stm32f051k8.d -o.\objects\startup_stm32f051k8.o -I.\RTE\_D
+M_VISHNU32 -IC:\KeilPacks\ARM\CMSIS\5.9.0\CMSIS\Core\Include -IC:\KeilPacks\Kei
+l\STM32F0xx_DFP\2.1.1\Drivers\CMSIS\Device\ST\STM32F0xx\Include --predefine="__
+EVAL SETA 1" --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SET
+A 538" --predefine="_RTE_ SETA 1" --predefine="STM32F051x8 SETA 1" --predefine=
+"_RTE_ SETA 1" --list=startup_stm32f051k8.lst ..\Mcu\f051\Startup\mdk\startup_s
+tm32f051k8.s
 
 
 

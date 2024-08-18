@@ -1435,6 +1435,24 @@
 #define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_7
 #endif
 
+/********************************** H563 Targets
+ * ***********************************/
+
+#ifdef BLUEESC_H563
+#define FILE_NAME "BLUEESC_H563"
+#define FIRMWARE_NAME "BlueESC H563"
+#define DEAD_TIME 60
+#define HARDWARE_GROUP_F031_A
+#define TARGET_STALL_PROTECTION_INTERVAL 8000
+#define MILLIVOLT_PER_AMP 28
+#define USE_SERIAL_TELEMETRY
+#define CURRENT_SENSE_ADC_PIN LL_GPIO_PIN_5
+#define VOLTAGE_SENSE_ADC_PIN LL_GPIO_PIN_7
+
+#define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_5
+#define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_7
+#endif
+
 #ifndef FIRMWARE_NAME
 /* if you get this then you have forgotten to add the section for your target above */
 #error "Missing defines for target"

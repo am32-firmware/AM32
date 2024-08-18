@@ -13,12 +13,12 @@ SRC_DIR_H563 := \
 
 CFLAGS_H563 := \
 	-I$(HAL_FOLDER_H563)/Inc \
-	-I$(HAL_FOLDER_H563)/Drivers/drivers/inc \
-	-I$(HAL_FOLDER_H563)/Drivers/CMSIS/cm4/core_support \
-	-I$(HAL_FOLDER_H563)/Drivers/CMSIS/cm4/device_support
+	-I$(HAL_FOLDER_H563)/Drivers/STM32H5xx_HAL_Driver/Inc \
+	-I$(HAL_FOLDER_H563)/Drivers/CMSIS/Include \
+	-I$(HAL_FOLDER_H563)/Drivers/CMSIS/Device/ST/STM32H5xx/Include
 
 CFLAGS_H563 += \
-	 -DAT32H563K8U7 \
+	 -DSTM32H563xx \
 	 -DUSE_STDPERIPH_DRIVER
 
 

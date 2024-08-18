@@ -89,14 +89,22 @@ void SysTick_Handler(void) { }
 /**
  * @brief This function handles DMA1 channel 2 and 3 interrupts.
  */
+
+// DMA1 Channel 2 is used for DSHOT serial telemetry (USART2)
 void DMA1_Channel2_3_IRQHandler(void)
 {
-    if (LL_DMA_IsActiveFlag_TC2(DMA1)) {
-        LL_DMA_ClearFlag_GI2(DMA1);
-        LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);
-    } else if (LL_DMA_IsActiveFlag_TE2(DMA1)) {
-        LL_DMA_ClearFlag_GI2(DMA1);
-        LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);
+    // check DMA1 Channel 2 Transfer Complete flag
+    if (LL_DMA_IsActiveFlag_TC(GPDMA1, LL_DMA_CHANNEL_2)) {
+        // clear DMA1 Channel 2 Global Interrupt flag
+        LL_DMA_ClearFlag_TC(GPDMA1, LL_DMA_CHANNEL_2);
+        // disable DMA1 Channel 2
+        LL_DMA_DisableChannel(GPDMA1, LL_DMA_CHANNEL_2);
+    // check DMA1 Channel 2 Data Transfer Error flag
+    } else if (LL_DMA_IsActiveFlag_DTE(GPDMA1, LL_DMA_CHANNEL_2)) {
+        // clear DMA1 Channel 2 Global Interrupt flag
+        LL_DMA_ClearFlag_DTE(GPDMA1, LL_DMA_CHANNEL_2);
+        // disable DMA1 Channel 2
+        LL_DMA_DisableChannel(GPDMA1, LL_DMA_CHANNEL_2);
     }
 }
 
@@ -191,10 +199,12 @@ void DMA1_Channel4_5_IRQHandler(void)
  * @brief This function handles ADC and COMP interrupts (COMP interrupts
  * through EXTI lines 21 and 22).
  */
+// The comparator triggers interruptRoutine
 void ADC1_COMP_IRQHandler(void)
 {
-    if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_21) != RESET) {
-        LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_21);
+    // TODO, figure out rising/falling
+    if (LL_EXTI_IsActiveFallingFlag_0_31(LL_EXTI_LINE_21) != RESET) {
+        LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_21);
         interruptRoutine();
     }
     //
@@ -203,6 +213,7 @@ void ADC1_COMP_IRQHandler(void)
 /**
  * @brief This function handles TIM6 global and DAC underrun error interrupts.
  */
+// TIM6 is used to trigger the tenKhzRoutine
 void TIM6_DAC_IRQHandler(void)
 {
     if (LL_TIM_IsActiveFlag_UPDATE(TIM6) == 1) {
@@ -214,6 +225,7 @@ void TIM6_DAC_IRQHandler(void)
 /**
  * @brief This function handles TIM14 global interrupt.
  */
+// TIM14 is the COM_TIMER
 void TIM14_IRQHandler(void)
 {
     LL_TIM_ClearFlag_UPDATE(TIM14);
@@ -272,21 +284,22 @@ void TIM3_IRQHandler(void)
     }
 }
 
-void DMA1_Channel1_IRQHandler(void) // ADC
+// DMA1 Channel 1 is used for triggering ADC_DMA_Callback
+void DMA1_Channel1_IRQHandler(void)
 {
-    if (LL_DMA_IsActiveFlag_TC1(DMA1) == 1) {
+    if (LL_DMA_IsActiveFlag_TC(GPDMA1, LL_DMA_CHANNEL_1) == 1) {
         /* Clear flag DMA global interrupt */
         /* (global interrupt flag: half transfer and transfer complete flags) */
-        LL_DMA_ClearFlag_GI1(DMA1);
+        LL_DMA_ClearFlag_TC(GPDMA1, LL_DMA_CHANNEL_1);
         ADC_DMA_Callback();
         /* Call interruption treatment function */
         //   AdcDmaTransferComplete_Callback();
     }
 
     /* Check whether DMA transfer error caused the DMA interruption */
-    if (LL_DMA_IsActiveFlag_TE1(DMA1) == 1) {
+    if (LL_DMA_IsActiveFlag_DTE(GPDMA1, LL_DMA_CHANNEL_1) == 1) {
         /* Clear flag DMA transfer error */
-        LL_DMA_ClearFlag_TE1(DMA1);
+        LL_DMA_ClearFlag_DTE(GPDMA1, LL_DMA_CHANNEL_1);
 
         /* Call interruption treatment function */
     }
@@ -306,7 +319,8 @@ void TIM1_BRK_UP_TRG_COM_IRQHandler(void)
 
 void EXTI4_15_IRQHandler(void)
 {
-    LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_15);
+    // TODO, figure out rising/falling
+    LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_15);
     processDshot();
 }
 

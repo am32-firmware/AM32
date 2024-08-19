@@ -89,7 +89,7 @@ void telem_UART_Init(void)
 
     /* USART2 DMA Init */
     DMA_DeInit(DMA1_Channel7);
-    DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t) &(USART1->DATAR);
+    DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t) &(USART2->DATAR);
     DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)&aTxBuffer[0];
     DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralDST;
     DMA_InitStructure.DMA_BufferSize = nbDataToTransmit;

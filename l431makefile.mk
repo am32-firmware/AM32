@@ -37,7 +37,3 @@ CFLAGS_$(MCU) += \
 	-DPREFETCH_ENABLE=1
 
 SRC_$(MCU) := $(foreach dir,$(SRC_DIR_$(MCU)),$(wildcard $(dir)/*.[cs]))
-SRC_$(MCU)_BL := $(foreach dir,$(SRC_BASE_DIR_$(MCU)),$(wildcard $(dir)/*.[cs])) \
-	$(HAL_FOLDER_$(MCU))/Src/eeprom.c \
-	$(HAL_FOLDER_$(MCU))/Src/system_stm32l4xx.c \
-	$(wildcard $(HAL_FOLDER_$(MCU))/Src/*_it.c)

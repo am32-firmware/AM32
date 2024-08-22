@@ -36,4 +36,16 @@ CFLAGS_$(MCU) += \
 	-DUSE_FULL_LL_DRIVER \
 	-DPREFETCH_ENABLE=1
 
+
+CFLAGS_$(MCU) += \
+	-ISrc/DroneCAN \
+	-ISrc/DroneCAN/libcanard \
+	-ISrc/DroneCAN/libcanard/drivers/stm32 \
+	-ISrc/DroneCAN/dsdl_generated/include
+
+SRC_DIR_$(MCU) += Src/DroneCAN \
+		Src/DroneCAN/dsdl_generated/src \
+		Src/DroneCAN/libcanard \
+		Src/DroneCAN/libcanard/drivers/stm32
+
 SRC_$(MCU) := $(foreach dir,$(SRC_DIR_$(MCU)),$(wildcard $(dir)/*.[cs]))

@@ -12,6 +12,9 @@
 #include "ADC.h"
 #include "serial_telemetry.h"
 #include "targets.h"
+#if DRONECAN_SUPPORT
+#include <DroneCAN.h>
+#endif
 
 extern char bemf_timeout;
 
@@ -42,6 +45,9 @@ void initCorePeripherals(void)
 #endif
 #ifdef USE_INTERNAL_AMP
      init_OPAMP();
+#endif
+#ifdef DRONECAN_SUPPORT
+     DroneCAN_Init();
 #endif
 }
 

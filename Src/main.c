@@ -240,6 +240,10 @@ an settings option)
 #include "crsf.h"
 #endif
 
+#if DRONECAN_SUPPORT
+#include "DroneCAN/DroneCAN.h"
+#endif
+
 #include <version.h>
 
 void zcfoundroutine(void);
@@ -2176,6 +2180,9 @@ int main(void)
 
 #ifdef BRUSHED_MODE
         runBrushedLoop();
+#endif
+#if DRONECAN_SUPPORT
+	DroneCAN_update();
 #endif
     }
 }

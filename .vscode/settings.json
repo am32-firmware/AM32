@@ -6,22 +6,24 @@
     //"makefile.makePath": "/usr/bin/make",
 
     "makefile.configurations": [
-        {
+    {
             "name": "MakeSingle",
             "makeArgs": [
                 "-j1"
             ]
 	},
-        {
+    {
             "name": "MakeParallel-8",
             "makeArgs": [
                 "-j8"
             ]
 	},
-        {
+    {
 	    "name": "MakeParallel-MAX",
             "makeArgs": [
 		"-j"
             ]
 	}
+],
+"editor.renderWhitespace": "all"
 }

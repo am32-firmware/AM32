@@ -6,6 +6,20 @@
     "configurations": [
       // STLink configuration
       {
+        "name": "H503",
+        "cwd": "${workspaceRoot}",
+        "executable": "${workspaceFolder}/obj/debug.elf",
+        "request": "launch",
+        "type": "cortex-debug",
+        "servertype": "openocd",
+        "configFiles": [
+            "board/st_nucleo_h5.cfg"
+            // "${workspaceFolder}/obj/openocd.cfg"
+
+        ],
+        "svdFile": "svd/stm32h5/STM32H503.svd"
+    },
+      {
         "name": "AM32 STLink",
         "cwd": "${workspaceFolder}",
         "executable": "${workspaceFolder}/obj/debug.elf",

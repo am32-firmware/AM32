@@ -46,14 +46,17 @@ FIRMWARE_VERSION := $(VERSION_MAJOR).$(VERSION_MINOR)
 
 # Compiler options
 CFLAGS_COMMON := -DUSE_MAKE -fsingle-precision-constant -fomit-frame-pointer -ffast-math
-CFLAGS_COMMON += -I$(MAIN_INC_DIR) -g -O3 -Wall -ffunction-sections
+CFLAGS_COMMON += -I$(MAIN_INC_DIR) -g -Wall -ffunction-sections
 CFLAGS_COMMON += -D$(TARGET)
 
 # Linker options
-LDFLAGS_COMMON := -specs=nano.specs $(LIBS) -Wl,--gc-sections -Wl,--print-memory-usage
+LDFLAGS_COMMON := -specs=nano.specs $(LIBS) -Wl,--gc-sections -Wl,--print-memory-usage -Wl,-Map=output.map
 
 # Search source files
 SRC_COMMON := $(foreach dir,$(SRC_DIRS_COMMON),$(wildcard $(dir)/*.[cs]))
+SRC_MAIN := $(SRC_DIRS_COMMON)/main.c
+SRC_COMMON := $(filter-out $(SRC_MAIN), $(SRC_COMMON))
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/main.c
 
 TARGET_FNAME = $(IDENTIFIER)_$(TARGET)_$(FIRMWARE_VERSION)
 TARGET_BASENAME = $(BIN_DIR)/$(TARGET_FNAME)
@@ -116,10 +119,10 @@ $(TARGETS_H563) :
 # Compile target
 $(TARGET_BASENAME).elf: CFLAGS := $(MCU_$(MCU_TYPE)) $(CFLAGS_$(MCU_TYPE)) $(CFLAGS_COMMON)
 $(TARGET_BASENAME).elf: LDFLAGS := $(LDFLAGS_COMMON) $(LDFLAGS_$(MCU_TYPE)) -T$(LDSCRIPT_$(MCU_TYPE))
-$(TARGET_BASENAME).elf: $(SRC_COMMON) $(SRC_$(MCU_TYPE))
+$(TARGET_BASENAME).elf: $(SRC_MAIN) $(SRC_COMMON) $(SRC_$(MCU_TYPE))
 	@$(ECHO) Compiling $(notdir $@)
-	$(QUIRT)$(MKDIR) -p $(OBJ)
-	$(QUIET)$(CC) $(CFLAGS) $(LDFLAGS) -MMD -MP -MF $(@:.elf=.d) -o $(@) $(SRC_COMMON) $(SRC_$(MCU_TYPE))
+	$(QUIET)$(MKDIR) -p $(OBJ)
+	$(CC) $(CFLAGS) $(LDFLAGS) -MMD -MP -MF $(@:.elf=.d) -o $(@) $(SRC_MAIN) $(SRC_COMMON) $(SRC_$(MCU_TYPE))
 
 # Generate bin and hex files
 $(TARGET_BASENAME).bin: $(TARGET_BASENAME).elf

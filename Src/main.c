@@ -606,7 +606,7 @@ float doPidCalculations(struct fastPID* pidnow, int actual, int target)
 
 void loadEEpromSettings()
 {
-		//*eepromBuffer = *(EEprom_t*)(eeprom_address);
+                //*eepromBuffer = *(EEprom_t*)(eeprom_address);
     read_flash_bin(eepromBuffer.buffer, eeprom_address, sizeof(eepromBuffer.buffer));
 
     if (eepromBuffer.advance_level > 3) {

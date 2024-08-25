@@ -294,7 +294,10 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
             break;
 	default:
             return;
-        }
+	}
+
+	// make dir_reversed change work without reboot
+	forward = 1 - dir_reversed;
     }
 
     /*

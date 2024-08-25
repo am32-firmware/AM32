@@ -8,6 +8,7 @@
 
 #include "eeprom.h"
 #include <string.h>
+#include <targets.h>
 
 #define page_size 0x800                   // 2 kb for l431
 uint32_t FLASH_FKEY1 =0x45670123;

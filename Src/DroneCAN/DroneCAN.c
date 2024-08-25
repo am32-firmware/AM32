@@ -59,9 +59,11 @@ static struct {
     uint8_t node_id;
     uint8_t transfer_id;
     uint32_t last_read_ms;
-    int fd;
     uint32_t offset;
 } fwupdate;
+
+// _flash_update points to the flash space after eeprom, usually 0x08010000
+extern uint8_t _flash_update[1];
 
 /*
   state of user settings. This will be saved in settings.dat. On a
@@ -80,6 +82,7 @@ enum VarType {
 };
 
 static void can_printf(const char *fmt, ...);
+static void processTxQueue(void);
 
 // some convenience macros
 #define MIN(a,b) ((a)<(b)?(a):(b))
@@ -477,6 +480,144 @@ static void handle_RawCommand(CanardInstance *ins, CanardRxTransfer *transfer)
 }
 
 /*
+  handle a BeginFirmwareUpdate request from a management tool like
+  DroneCAN GUI tool or MissionPlanner
+ */
+static void handle_begin_firmware_update(CanardInstance* ins, CanardRxTransfer* transfer)
+{
+    /*
+      decode the request
+     */
+    struct uavcan_protocol_file_BeginFirmwareUpdateRequest req;
+    if (uavcan_protocol_file_BeginFirmwareUpdateRequest_decode(transfer, &req)) {
+        return;
+    }
+
+    /*
+      check for a repeated BeginFirmwareUpdateRequest
+     */
+    if (fwupdate.node_id == transfer->source_node_id &&
+	memcmp(fwupdate.path, req.image_file_remote_path.path.data, req.image_file_remote_path.path.len) == 0) {
+	/* ignore duplicate request */
+	return;
+    }
+
+    if (running) {
+	can_printf("No firmware update while running");
+	return;
+    }
+
+
+    fwupdate.offset = 0;
+    fwupdate.node_id = transfer->source_node_id;
+    strncpy(fwupdate.path, (char*)req.image_file_remote_path.path.data, req.image_file_remote_path.path.len);
+
+    uint8_t buffer[UAVCAN_PROTOCOL_FILE_BEGINFIRMWAREUPDATE_RESPONSE_MAX_SIZE];
+    struct uavcan_protocol_file_BeginFirmwareUpdateResponse reply;
+    memset(&reply, 0, sizeof(reply));
+    reply.error = UAVCAN_PROTOCOL_FILE_BEGINFIRMWAREUPDATE_RESPONSE_ERROR_OK;
+
+    uint32_t total_size = uavcan_protocol_file_BeginFirmwareUpdateResponse_encode(&reply, buffer);
+
+    canardRequestOrRespond(ins,
+                           transfer->source_node_id,
+                           UAVCAN_PROTOCOL_FILE_BEGINFIRMWAREUPDATE_SIGNATURE,
+                           UAVCAN_PROTOCOL_FILE_BEGINFIRMWAREUPDATE_ID,
+                           &transfer->transfer_id,
+                           transfer->priority,
+                           CanardResponse,
+                           &buffer[0],
+                           total_size);
+
+    can_printf("Started firmware update\n");
+}
+
+/*
+  send a read for a firmware update. This asks the client (firmware
+  server) for a piece of the new firmware
+ */
+static void send_firmware_read(void)
+{
+    uint32_t now = millis32();
+    if (fwupdate.last_read_ms != 0 && now - fwupdate.last_read_ms < 750) {
+        // the server may still be responding
+        return;
+    }
+    fwupdate.last_read_ms = now;
+
+    uint8_t buffer[UAVCAN_PROTOCOL_FILE_READ_REQUEST_MAX_SIZE];
+
+    struct uavcan_protocol_file_ReadRequest pkt;
+    memset(&pkt, 0, sizeof(pkt));
+
+    pkt.path.path.len = strlen((const char *)fwupdate.path);
+    pkt.offset = fwupdate.offset;
+    memcpy(pkt.path.path.data, fwupdate.path, pkt.path.path.len);
+
+    uint16_t total_size = uavcan_protocol_file_ReadRequest_encode(&pkt, buffer);
+
+    canardRequestOrRespond(&canard,
+			   fwupdate.node_id,
+                           UAVCAN_PROTOCOL_FILE_READ_SIGNATURE,
+                           UAVCAN_PROTOCOL_FILE_READ_ID,
+			   &fwupdate.transfer_id,
+                           CANARD_TRANSFER_PRIORITY_HIGH,
+                           CanardRequest,
+                           &buffer[0],
+                           total_size);
+}
+
+/*
+  handle response to send_firmware_read()
+ */
+static void handle_file_read_response(CanardInstance* ins, CanardRxTransfer* transfer)
+{
+    if (running) {
+	// cancel if user starts a motor
+	fwupdate.node_id = 0;
+	return;
+    }
+
+    if ((transfer->transfer_id+1)%32 != fwupdate.transfer_id ||
+	transfer->source_node_id != fwupdate.node_id) {
+	/* not for us */
+	can_printf("Firmware update: not for us id=%u/%u\n", (unsigned)transfer->transfer_id, (unsigned)fwupdate.transfer_id);
+	return;
+    }
+    struct uavcan_protocol_file_ReadResponse pkt;
+    if (uavcan_protocol_file_ReadResponse_decode(transfer, &pkt)) {
+	/* bad packet */
+	can_printf("Firmware update: bad packet\n");
+	return;
+    }
+    if (pkt.error.value != UAVCAN_PROTOCOL_FILE_ERROR_OK) {
+	/* read failed */
+	fwupdate.node_id = 0;
+	can_printf("Firmware update read failure\n");
+	return;
+    }
+
+    uint32_t len = pkt.data.len;
+    len = (len+7U) & ~7U;
+    save_flash_nolib(pkt.data.data, len, (uint32_t)&_flash_update[fwupdate.offset]);
+
+    fwupdate.offset += pkt.data.len;
+
+    if (pkt.data.len < 256) {
+	/* firmware updare done */
+	can_printf("Firmwate update complete\n");
+	fwupdate.node_id = 0;
+	flash_upgrade(&_flash_update[0], fwupdate.offset); // this jumps to new firmware
+	return;
+    }
+
+    /* trigger a new read */
+    fwupdate.last_read_ms = 0;
+    send_firmware_read();
+    processTxQueue();
+}
+
+/*
   data for dynamic node allocation process
 */
 static struct {
@@ -607,7 +748,18 @@ static void onTransferReceived(CanardInstance *ins, CanardRxTransfer *transfer)
             handle_RestartNode(ins, transfer);
             break;
         }
+	case UAVCAN_PROTOCOL_FILE_BEGINFIRMWAREUPDATE_ID: {
+	    handle_begin_firmware_update(ins, transfer);
+	    break;
 	}
+	}
+    }
+    if (transfer->transfer_type == CanardTransferTypeResponse) {
+	switch (transfer->data_type_id) {
+	case UAVCAN_PROTOCOL_FILE_READ_ID:
+	    handle_file_read_response(ins, transfer);
+	    break;
+        }
     }
     if (transfer->transfer_type == CanardTransferTypeBroadcast) {
         // check if we want to handle a specific broadcast message
@@ -660,6 +812,10 @@ static bool shouldAcceptTransfer(const CanardInstance *ins,
             *out_data_type_signature = UAVCAN_PROTOCOL_RESTARTNODE_SIGNATURE;
             return true;
         }
+	case UAVCAN_PROTOCOL_FILE_BEGINFIRMWAREUPDATE_ID: {
+	    *out_data_type_signature = UAVCAN_PROTOCOL_FILE_BEGINFIRMWAREUPDATE_SIGNATURE;
+	    return true;
+	}
 	}
     }
     if (transfer_type == CanardTransferTypeResponse) {
@@ -703,7 +859,7 @@ static void send_NodeStatus(void)
     // put number of commands we have received in vendor status since the last NodeStatus
     // this means vendor status gives us approximate command rate in commands/second
     last_canstats = canstats;
-    node_status.vendor_specific_status_code = last_canstats.num_commands;
+    node_status.vendor_specific_status_code = canstats.num_commands;
     memset(&canstats, 0, sizeof(canstats));
 
     /*
@@ -889,10 +1045,17 @@ void DroneCAN_update()
 	next_1hz_service_at += 1000000ULL;
 	process1HzTasks(ts);
     }
-    if (ts >= next_50hz_service_at) {
+    if (ts >= next_50hz_service_at && fwupdate.node_id == 0) {
 	next_50hz_service_at += 1000000ULL/50U;
 	send_ESCStatus();
     }
+
+    if (fwupdate.node_id != 0) {
+	send_firmware_read();
+    }
+
+    processTxQueue();
+
     RESTORE_CAN_IRQ();
 }
 

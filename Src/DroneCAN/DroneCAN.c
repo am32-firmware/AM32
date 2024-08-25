@@ -62,6 +62,8 @@ static struct {
     uint32_t offset;
 } fwupdate;
 
+static bool dronecan_armed;
+
 // _flash_update points to the flash space after eeprom, usually 0x08010000
 extern uint8_t _flash_update[1];
 
@@ -435,6 +437,18 @@ static void handle_GetNodeInfo(CanardInstance *ins, CanardRxTransfer *transfer)
 extern void transfercomplete();
 extern void setInput();
 
+
+/*
+  process throttle input from DroneCAN
+ */
+static void set_input(uint16_t input)
+{
+    newinput = dronecan_armed? input : 0;
+    inputSet = 1;
+    transfercomplete();
+    setInput();
+}
+
 /*
   handle a ESC RawCommand request
 */
@@ -462,21 +476,32 @@ static void handle_RawCommand(CanardInstance *ins, CanardRxTransfer *transfer)
       we will ignore reverse throttle for now. The main code expects
       throttle demands in newinput global
     */
+    uint16_t this_input;
     if (input_can <= 0) {
-	newinput = 0;
+	this_input = 0;
     } else {
-	newinput = (uint16_t)(47 + input_can * (2000.0 / 8192));
+	this_input = (uint16_t)(47 + input_can * (2000.0 / 8192));
     }
 
-    // tell main loop we have had signal so we don't reset
-    signaltimeout = 0;
-
-    // process the new input
-    inputSet = 1;
-    transfercomplete();
-    setInput();
+    set_input(this_input);
 
     canstats.num_commands++;
+}
+
+/*
+  handle ArmingStatus messages
+*/
+static void handle_ArmingStatus(CanardInstance *ins, CanardRxTransfer *transfer)
+{
+    struct uavcan_equipment_safety_ArmingStatus cmd;
+    if (uavcan_equipment_safety_ArmingStatus_decode(transfer, &cmd)) {
+        return;
+    }
+
+    dronecan_armed = (cmd.status == UAVCAN_EQUIPMENT_SAFETY_ARMINGSTATUS_STATUS_FULLY_ARMED);
+    if (!dronecan_armed) {
+	set_input(0);
+    }
 }
 
 /*
@@ -727,6 +752,9 @@ static void request_DNA()
 */
 static void onTransferReceived(CanardInstance *ins, CanardRxTransfer *transfer)
 {
+    // tell main loop we have had signal so we don't reset
+    signaltimeout = 0;
+
     canstats.on_receive++;
     // switch on data type ID to pass to the right handler function
     if (transfer->transfer_type == CanardTransferTypeRequest) {
@@ -770,6 +798,10 @@ static void onTransferReceived(CanardInstance *ins, CanardRxTransfer *transfer)
         }
         case UAVCAN_PROTOCOL_DYNAMIC_NODE_ID_ALLOCATION_ID: {
             handle_DNA_Allocation(ins, transfer);
+            break;
+        }
+	case UAVCAN_EQUIPMENT_SAFETY_ARMINGSTATUS_ID: {
+	    handle_ArmingStatus(ins, transfer);
             break;
         }
         }
@@ -835,6 +867,10 @@ static bool shouldAcceptTransfer(const CanardInstance *ins,
         }
         case UAVCAN_PROTOCOL_DYNAMIC_NODE_ID_ALLOCATION_ID: {
             *out_data_type_signature = UAVCAN_PROTOCOL_DYNAMIC_NODE_ID_ALLOCATION_SIGNATURE;
+            return true;
+        }
+	case UAVCAN_EQUIPMENT_SAFETY_ARMINGSTATUS_ID: {
+	    *out_data_type_signature = UAVCAN_EQUIPMENT_SAFETY_ARMINGSTATUS_SIGNATURE;
             return true;
         }
         }

@@ -25,7 +25,8 @@ generate() {
 download
 generate
 
-MSGS="uavcan.protocol.NodeStatus uavcan.protocol.HardwareVersion uavcan.protocol.SoftwareVersion uavcan.protocol.GetNodeInfo uavcan.equipment.esc uavcan.protocol.dynamic_node_id uavcan.protocol.param uavcan.protocol.file uavcan.protocol.RestartNode uavcan.protocol.RestartNode uavcan.protocol.debug"
+# list of messages which we need to support, wildcards are added to get the sub-messages
+MSGS="uavcan.protocol.NodeStatus uavcan.protocol.HardwareVersion uavcan.protocol.SoftwareVersion uavcan.protocol.GetNodeInfo uavcan.equipment.esc uavcan.protocol.dynamic_node_id uavcan.protocol.param uavcan.protocol.file uavcan.protocol.RestartNode uavcan.protocol.RestartNode uavcan.protocol.debug uavcan.equipment.safety.ArmingStatus"
 
 rm -rf Src/DroneCAN/dsdl_generated
 mkdir -p Src/DroneCAN/dsdl_generated/src

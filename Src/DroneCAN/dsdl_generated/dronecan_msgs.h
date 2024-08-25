@@ -3,6 +3,7 @@
 #include "uavcan.equipment.esc.RPMCommand.h"
 #include "uavcan.equipment.esc.StatusExtended.h"
 #include "uavcan.equipment.esc.Status.h"
+#include "uavcan.equipment.safety.ArmingStatus.h"
 #include "uavcan.protocol.debug.KeyValue.h"
 #include "uavcan.protocol.debug.LogLevel.h"
 #include "uavcan.protocol.debug.LogMessage.h"

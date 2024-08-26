@@ -182,7 +182,7 @@ void make_dshot_package(uint16_t com_time)
         dshot_full_number = send_extended_dshot;
         send_extended_dshot = 0;
     } else {
-        if (!running || (com_time > 65535)) {
+        if (!running) {
             com_time = 65535;
         }
         //	calculate shift amount for data in format eee mmm mmm mmm, first 1 found

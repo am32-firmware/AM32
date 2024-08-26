@@ -805,7 +805,7 @@ void loadEEpromSettings()
             sine_mode_power = eepromBuffer[45];
         }
 
-        if (eepromBuffer[46] >= 0 && eepromBuffer[46] < 10) {
+        if (eepromBuffer[46] < 10) {
             switch (eepromBuffer[46]) {
             case AUTO_IN:
                 dshot = 0;
@@ -1340,7 +1340,7 @@ void setInput()
             }
         }
         if (!prop_brake_active) {
-            if (input >= 47 && (zero_crosses < (30 >> stall_protection))) {
+            if (input >= 47 && (zero_crosses < (30U >> stall_protection))) {
                 if (duty_cycle_setpoint < min_startup_duty) {
                     duty_cycle_setpoint = min_startup_duty;
                 }

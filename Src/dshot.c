@@ -42,13 +42,12 @@ uint16_t halfpulsetime = 0;
 
 void computeDshotDMA()
 {
-    int j = 0;
     dshot_frametime = dma_buffer[31] - dma_buffer[0];
     halfpulsetime = dshot_frametime >> 5;
     if ((dshot_frametime > dshot_frametime_low) && (dshot_frametime < dshot_frametime_high)) {
 			signaltimeout = 0;
         for (int i = 0; i < 16; i++) {
-            dpulse[i] = ((dma_buffer[j + (i << 1) + 1] - dma_buffer[j + (i << 1)]) > (halfpulsetime));
+            dpulse[i] = ((dma_buffer[(i << 1) + 1] - dma_buffer[(i << 1)]) > (halfpulsetime));
         }
         uint8_t calcCRC = ((dpulse[0] ^ dpulse[4] ^ dpulse[8]) << 3 | (dpulse[1] ^ dpulse[5] ^ dpulse[9]) << 2 | (dpulse[2] ^ dpulse[6] ^ dpulse[10]) << 1 | (dpulse[3] ^ dpulse[7] ^ dpulse[11]));
         uint8_t checkCRC = (dpulse[12] << 3 | dpulse[13] << 2 | dpulse[14] << 1 | dpulse[15]);

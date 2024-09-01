@@ -32,6 +32,10 @@ CFLAGS_H563 += \
 
 SRC_H563 := \
 	$(SRC_DIR_H563_STARTUP)/startup_stm32h563xx.s \
+	$(SRC_DIR_H563_SRC)/phaseouts.c \
+	$(SRC_DIR_H563_SRC)/peripherals.c \
+	$(SRC_DIR_H563_SRC)/IO.c \
+	$(SRC_DIR_H563_SRC)/eeprom.c \
 	$(SRC_DIR_H563_SRC)/serial_telemetry.c \
 	$(SRC_DIR_H563_SRC)/stm32h5xx_it.c \
 	$(SRC_DIR_H563_SRC)/system_stm32h5xx.c \

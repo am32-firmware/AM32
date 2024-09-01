@@ -7,6 +7,7 @@
  */
 
 #include "eeprom.h"
+#include "stm32h563xx.h"
 
 #include <string.h>
 
@@ -28,46 +29,47 @@ void save_flash_nolib(uint8_t* data, int length, uint32_t add)
 
     // unlock flash
 
-    while ((FLASH->SR & FLASH_SR_BSY) != 0) {
+    while ((FLASH->NSSR & FLASH_SR_BSY) != 0) {
         /*  add time-out*/
     }
-    if ((FLASH->CR & FLASH_CR_LOCK) != 0) {
-        FLASH->KEYR = FLASH_FKEY1;
-        FLASH->KEYR = FLASH_FKEY2;
+    if ((FLASH->NSCR & FLASH_CR_LOCK) != 0) {
+        FLASH->NSKEYR = FLASH_FKEY1;
+        FLASH->NSKEYR = FLASH_FKEY2;
     }
 
     // erase page if address even divisable by 1024
     if ((add % 1024) == 0) {
-        FLASH->CR |= FLASH_CR_PER;
-        FLASH->AR = add;
-        FLASH->CR |= FLASH_CR_STRT;
-        while ((FLASH->SR & FLASH_SR_BSY) != 0) {
+        FLASH->NSCR |= FLASH_CR_SER;
+        FLASH->NSCR &= ~FLASH_CR_SNB_Msk;
+        FLASH->NSCR = (add%128) << FLASH_CR_SNB_Pos;
+        FLASH->NSCR |= FLASH_CR_START;
+        while ((FLASH->NSSR & FLASH_SR_BSY) != 0) {
             /*  add time-out */
         }
-        if ((FLASH->SR & FLASH_SR_EOP) != 0) {
-            FLASH->SR = FLASH_SR_EOP;
+        if ((FLASH->NSSR & FLASH_SR_EOP) != 0) {
+            FLASH->NSSR = FLASH_SR_EOP;
         } else {
             /* error */
         }
-        FLASH->CR &= ~FLASH_CR_PER;
+        FLASH->NSCR &= ~FLASH_CR_SER;
     }
 
     volatile uint32_t write_cnt = 0, index = 0;
     while (index < data_length) {
-        FLASH->CR |= FLASH_CR_PG; /* (1) */
+        FLASH->NSCR |= FLASH_CR_PG; /* (1) */
         *(__IO uint16_t*)(add + write_cnt) = data_to_FLASH[index];
-        while ((FLASH->SR & FLASH_SR_BSY) != 0) { /*  add time-out  */
+        while ((FLASH->NSSR & FLASH_SR_BSY) != 0) { /*  add time-out  */
         }
-        if ((FLASH->SR & FLASH_SR_EOP) != 0) {
-            FLASH->SR = FLASH_SR_EOP;
+        if ((FLASH->NSSR & FLASH_SR_EOP) != 0) {
+            FLASH->NSSR = FLASH_SR_EOP;
         } else {
             /*  error  */
         }
-        FLASH->CR &= ~FLASH_CR_PG;
+        FLASH->NSCR &= ~FLASH_CR_PG;
         write_cnt += 2;
         index++;
     }
-    SET_BIT(FLASH->CR, FLASH_CR_LOCK);
+    SET_BIT(FLASH->NSCR, FLASH_CR_LOCK);
 }
 
 void read_flash_bin(uint8_t* data, uint32_t add, int out_buff_len)

@@ -13,12 +13,75 @@
 #include "serial_telemetry.h"
 #include "targets.h"
 
+void msp_system_initialize()
+{
+
+  // Set core voltage regulator output scaling for maximum performance
+  PWR->VOSCR |= 0b11 << PWR_VOSCR_VOS_Pos;
+  while (!(PWR->VOSSR & PWR_VOSSR_VOSRDY));
+  while (!(PWR->VOSSR & PWR_VOSSR_ACTVOSRDY));
+
+  // set flash latency to 5 wait states for 250MHz SYSCLK
+  FLASH->ACR |= 5 << FLASH_ACR_LATENCY_Pos;
+
+  // enable prefetch buffer
+  FLASH->ACR |= FLASH_ACR_PRFTEN;
+
+  // ~~~~~~~~ USE HSE ~~~~~~~~~~~~~~
+  // turn the HSE on
+  RCC->CR |= RCC_CR_HSEON;
+
+  // wait for high speed external oscillator (HSE) to be ready
+  while (!(RCC->CR & RCC_CR_HSERDY));
+
+  // // set pll clock source to HSI
+  // RCC->PLL1CFGR |= 0b01 << RCC_PLL1CFGR_PLL1SRC_Pos;
+
+  // // set pll clock source to HSE
+  RCC->PLL1CFGR |= 0b11 << RCC_PLL1CFGR_PLL1SRC_Pos;
+
+  // // // ~~~~~~~~ \USE HSE ~~~~~~~~~~~~~
+
+  // The frequency of the reference clock provided to the PLLs (refx_ck) must range from 1 to
+  // 16 MHz. The DIVMx dividers of the RCC PLL clock source selection register
+  // (RCC_PLL1CFGR) must be properly programmed in order to match this condition.
+  // divide by 12, 2MHz for a 24MHz HSE
+  uint32_t pll1cfgr = RCC->PLL1CFGR;
+  pll1cfgr &= ~RCC_PLL1CFGR_PLL1M_Msk;
+  RCC->PLL1CFGR |= pll1cfgr | (12 << RCC_PLL1CFGR_PLL1M_Pos);
+
+  // enable PLL1 p_clk output for use as SYSCLK
+  RCC->PLL1CFGR |= 1 << RCC_PLL1CFGR_PLL1PEN_Pos;
+
+  // set pll multiplier
+  uint32_t pll1divr = RCC->PLL1DIVR;
+  // pll1divr &= ~(RCC_PLL1DIVR_PLL1N_Msk);
+  pll1divr &= ~(RCC_PLL1DIVR_PLL1N_Msk);
+    // RCC->PLL1DIVR = pll1divr | ((250-1) << RCC_PLL1DIVR_PLL1N_Pos);
+  // pll1divr |= ((SYSCLK_FREQUENCY/1000000 - 1) << RCC_PLL1DIVR_PLL1N_Pos);
+  // RCC->PLL1DIVR = pll1divr | (249 << RCC_PLL1DIVR_PLL1N_Pos);
+  RCC->PLL1DIVR = pll1divr | (249 << RCC_PLL1DIVR_PLL1N_Pos);
+
+  // turn the pll on
+  RCC->CR |= RCC_CR_PLL1ON;
+
+  // wait for pll to be ready
+  while (!(RCC->CR & RCC_CR_PLL1RDY));
+
+  // switch system clock to pll1 p_clk
+  RCC->CFGR1 |= 0b11 << RCC_CFGR1_SW_Pos;
+
+  // wait for any ongoing cache invalidation
+  while (ICACHE->CR & ICACHE_SR_BUSYF);
+  // enable icache miss monitor, hit monitor, and icache itself
+  ICACHE->CR |= ICACHE_CR_MISSMEN | ICACHE_CR_HITMEN | ICACHE_CR_EN;
+}
+
 void initCorePeripherals(void)
 {
-    SystemClock_Config();
-    LL_APB1_GRP2_EnableClock(LL_APB1_GRP2_PERIPH_SYSCFG);
-    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_PWR);
-    FLASH->ACR |= FLASH_ACR_PRFTBE; //// prefetch buffer enable
+    msp_system_initialize();
+    // LL_APB1_GRP2_EnableClock(LL_APB1_GRP2_PERIPH_SYSCFG);
+    // LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_PWR);
     MX_GPIO_Init();
     MX_DMA_Init();
     MX_TIM1_Init();
@@ -35,102 +98,7 @@ void initCorePeripherals(void)
 
 void initAfterJump(void)
 {
-    volatile uint32_t* VectorTable = (volatile uint32_t*)0x20000000;
-    uint32_t vector_index = 0;
-    for (vector_index = 0; vector_index < 48; vector_index++) {
-        VectorTable[vector_index] = *(__IO uint32_t*)(APPLICATION_ADDRESS + (vector_index << 2)); // no VTOR on cortex-MO so
-                                                                                                  // need to copy vector table
-    }
-    /* Enable the SYSCFG peripheral clock*/
-    do {
-        volatile uint32_t tmpreg;
-        ((((RCC_TypeDef*)((((uint32_t)0x40000000U) + 0x00020000) + 0x00001000))
-                 ->APB2ENR)
-            |= ((0x1U << (0U))));
-        /* Delay after an RCC peripheral clock enabling */
-        tmpreg = ((((RCC_TypeDef*)((((uint32_t)0x40000000U) + 0x00020000) + 0x00001000))
-                          ->APB2ENR)
-            & ((0x1U << (0U))));
-        ((void)(tmpreg));
-    } while (0U);
-    //	  /* Remap SRAM at 0x00000000 */
-    do {
-        ((SYSCFG_TypeDef*)(((uint32_t)0x40000000U) + 0x00010000))->CFGR1 &= ~((0x3U << (0U)));
-        ((SYSCFG_TypeDef*)(((uint32_t)0x40000000U) + 0x00010000))->CFGR1 |= ((0x1U << (0U)) | (0x2U << (0U)));
-    } while (0);
-
-    if (SysTick_Config(SystemCoreClock / 1000)) {
-        /* Capture error */
-        while (1) {
-        }
-    }
     __enable_irq();
-}
-
-void SystemClock_Config(void)
-{
-    LL_FLASH_SetLatency(LL_FLASH_LATENCY_1);
-
-    if (LL_FLASH_GetLatency() != LL_FLASH_LATENCY_1) {
-        // Error_Handler();
-    }
-    LL_RCC_HSI_Enable();
-
-    /* Wait till HSI is ready */
-    while (LL_RCC_HSI_IsReady() != 1) {
-    }
-    LL_RCC_HSI_SetCalibTrimming(16);
-    LL_RCC_HSI14_Enable();
-
-    /* Wait till HSI14 is ready */
-    while (LL_RCC_HSI14_IsReady() != 1) {
-    }
-    LL_RCC_HSI14_SetCalibTrimming(16);
-    LL_RCC_LSI_Enable();
-
-    /* Wait till LSI is ready */
-    while (LL_RCC_LSI_IsReady() != 1) {
-    }
-    LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSI_DIV_2, LL_RCC_PLL_MUL_12);
-    LL_RCC_PLL_Enable();
-
-    /* Wait till PLL is ready */
-    while (LL_RCC_PLL_IsReady() != 1) {
-    }
-    LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_1);
-    LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_1);
-    LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_PLL);
-
-    /* Wait till System clock is ready */
-    while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_PLL) {
-    }
-    LL_Init1msTick(48000000);
-    LL_SetSystemCoreClock(48000000);
-    LL_RCC_HSI14_EnableADCControl();
-    LL_RCC_SetUSARTClockSource(LL_RCC_USART1_CLKSOURCE_PCLK1);
-}
-
-void MX_COMP1_Init(void)
-{
-    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
-
-    LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOA);
-    /**COMP1 GPIO Configuration
-    PA1   ------> COMP1_INP
-    PA5   ------> COMP1_INM
-    */
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_1;
-    GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
-    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_5;
-    GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
-    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-    NVIC_SetPriority(ADC1_COMP_IRQn, 0);
-    NVIC_EnableIRQ(ADC1_COMP_IRQn);
 }
 
 void MX_IWDG_Init(void)
@@ -148,7 +116,7 @@ void MX_TIM1_Init(void)
     LL_TIM_OC_InitTypeDef TIM_OC_InitStruct = { 0 };
     LL_TIM_BDTR_InitTypeDef TIM_BDTRInitStruct = { 0 };
     LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
-    LL_APB1_GRP2_EnableClock(LL_APB1_GRP2_PERIPH_TIM1);
+    LL_APB1_GRP2_EnableClock(LL_APB2_GRP1_PERIPH_TIM1);
 
     TIM_InitStruct.Prescaler = 0;
     TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
@@ -209,8 +177,8 @@ void MX_TIM1_Init(void)
     TIM_BDTRInitStruct.AutomaticOutput = LL_TIM_AUTOMATICOUTPUT_DISABLE;
     LL_TIM_BDTR_Init(TIM1, &TIM_BDTRInitStruct);
 
-    LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOA);
-    LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOB);
+    LL_AHB1_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
+    LL_AHB1_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
 /**TIM1 GPIO Configuration
 PA7   ------> TIM1_CH1N
 PB0   ------> TIM1_CH2N
@@ -294,8 +262,8 @@ void MX_TIM6_Init(void)
 {
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM6);
 
-    NVIC_SetPriority(TIM6_DAC_IRQn, 3);
-    NVIC_EnableIRQ(TIM6_DAC_IRQn);
+    NVIC_SetPriority(TIM6_IRQn, 3);
+    NVIC_EnableIRQ(TIM6_IRQn);
     TIM6->PSC = 47;
     TIM6->ARR = 1000000 / LOOP_FREQUENCY_HZ;
 }
@@ -312,7 +280,7 @@ void MX_TIM14_Init(void)
 
 void MX_TIM16_Init(void)
 {
-    LL_APB1_GRP2_EnableClock(LL_APB1_GRP2_PERIPH_TIM16);
+    LL_APB1_GRP2_EnableClock(LL_APB2_GRP1_PERIPH_TIM16);
     //  NVIC_SetPriority(TIM16_IRQn, 2);
     //  NVIC_EnableIRQ(TIM16_IRQn);
     TIM16->PSC = 0;
@@ -322,7 +290,7 @@ void MX_TIM16_Init(void)
 
 void MX_TIM17_Init(void)
 {
-    LL_APB1_GRP2_EnableClock(LL_APB1_GRP2_PERIPH_TIM17);
+    LL_APB1_GRP2_EnableClock(LL_APB2_GRP1_PERIPH_TIM17);
     TIM17->PSC = 47;
     TIM17->ARR = 0XFFFF;
     LL_TIM_DisableARRPreload(TIM17);
@@ -330,33 +298,20 @@ void MX_TIM17_Init(void)
 
 void MX_DMA_Init(void)
 {
-    LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1);
-    NVIC_SetPriority(DMA1_Channel2_3_IRQn, 1);
-    NVIC_EnableIRQ(DMA1_Channel2_3_IRQn);
-    NVIC_SetPriority(DMA1_Channel4_5_IRQn, 1);
-    NVIC_EnableIRQ(DMA1_Channel4_5_IRQn);
+    LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPDMA1);
+    // NVIC_SetPriority(DMA1_Channel2_3_IRQn, 1);
+    // NVIC_EnableIRQ(DMA1_Channel2_3_IRQn);
+    // NVIC_SetPriority(DMA1_Channel4_5_IRQn, 1);
+    // NVIC_EnableIRQ(DMA1_Channel4_5_IRQn);
 }
 
 void MX_GPIO_Init(void)
 {
     /* GPIO Ports Clock Enable */
-    LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOA);
-    LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOB);
+    LL_AHB1_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
+    LL_AHB1_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOB);
 
-    /**/
     LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_15);
-
-/**/
-#ifdef USE_ALKAS_DEBUG_LED
-    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
-
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_15;
-    GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
-    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-#endif
 }
 
 void UN_TIM_Init(void)
@@ -619,7 +574,7 @@ void enableCorePeripherals()
         wait_loop_index--;
     }
 #endif
-    NVIC_SetPriority(EXTI4_15_IRQn, 2);
-    NVIC_EnableIRQ(EXTI4_15_IRQn);
-    EXTI->IMR |= (1 << 15);
+    NVIC_SetPriority(EXTI15_IRQn, 2);
+    NVIC_EnableIRQ(EXTI15_IRQn);
+    EXTI->IMR1 |= (1 << 15);
 }

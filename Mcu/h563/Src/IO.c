@@ -111,7 +111,7 @@ void setInputPullUp()
     LL_GPIO_SetPinPull(INPUT_PIN_PORT, INPUT_PIN, LL_GPIO_PULL_UP);
 }
 
-void enableHalfTransferInt() { LL_DMA_EnableIT_HT(DMA1, INPUT_DMA_CHANNEL); }
+void enableHalfTransferInt() { LL_DMA_EnableIT_HT(GPDMA1, INPUT_DMA_CHANNEL); }
 void setInputPullNone()
 {
     LL_GPIO_SetPinPull(INPUT_PIN_PORT, INPUT_PIN, LL_GPIO_PULL_NO);

@@ -40,6 +40,7 @@ static uint8_t canard_memory_pool[CANARD_POOL_SIZE];
 
 struct {
     uint32_t num_commands;
+    uint32_t total_commands;
     uint32_t num_receive;
     uint32_t num_tx_interrupts;
     uint32_t num_rx_interrupts;
@@ -76,6 +77,8 @@ static struct
 {
     uint8_t can_node;
     uint8_t esc_index;
+    bool require_arming;
+    uint8_t telem_rate;
 } settings;
 
 enum VarType {
@@ -127,6 +130,8 @@ static struct parameter {
     { "ESC_INDEX",              T_UINT8, 0, 32,  &settings.esc_index, 177},
     { "DIR_REVERSED",           T_BOOL,  0, 1,   &dir_reversed},
     { "MOTOR_POLES",            T_UINT8, 0, 64,  &motor_poles, 27 },
+    { "REQUIRE_ARMING",         T_BOOL,  0, 1,   &settings.require_arming, 178 },
+    { "TELEM_RATE",             T_UINT8, 0, 200, &settings.telem_rate, 179 },
     { "VARIABLE_PWM",           T_BOOL,  0, 1,   &VARIABLE_PWM},
     { "USE_SIN_START",          T_BOOL,  0, 1,   &use_sin_start},
     { "COMP_PWM",               T_BOOL,  0, 1,   &comp_pwm},
@@ -144,6 +149,14 @@ static void load_settings(void)
     if (eepromBuffer[177] <= 32) {
 	settings.esc_index = eepromBuffer[177];
     }
+
+    settings.require_arming = eepromBuffer[178] == 0?false:true;
+
+    if (eepromBuffer[179] <= 200 && eepromBuffer[179] > 0) {
+        settings.telem_rate = eepromBuffer[179];
+    } else {
+        settings.telem_rate = 25;
+    }
 }
 
 /*
@@ -153,6 +166,8 @@ static void save_settings(void)
 {
     eepromBuffer[176] = settings.can_node;
     eepromBuffer[177] = settings.esc_index;
+    eepromBuffer[178] = settings.require_arming;
+    eepromBuffer[179] = settings.telem_rate;
     saveEEpromSettings();
     can_printf("saved settings");
 }
@@ -446,7 +461,7 @@ extern void setInput();
  */
 static void set_input(uint16_t input)
 {
-    newinput = dronecan_armed? input : 0;
+    newinput = (dronecan_armed || !settings.require_arming)? input : 0;
     inputSet = 1;
     transfercomplete();
     setInput();
@@ -486,9 +501,10 @@ static void handle_RawCommand(CanardInstance *ins, CanardRxTransfer *transfer)
 	this_input = (uint16_t)(47 + input_can * (2000.0 / 8192));
     }
 
-    set_input(this_input);
-
     canstats.num_commands++;
+    canstats.total_commands++;
+
+    set_input(this_input);
 }
 
 /*
@@ -502,7 +518,7 @@ static void handle_ArmingStatus(CanardInstance *ins, CanardRxTransfer *transfer)
     }
 
     dronecan_armed = (cmd.status == UAVCAN_EQUIPMENT_SAFETY_ARMINGSTATUS_STATUS_FULLY_ARMED);
-    if (!dronecan_armed) {
+    if (!dronecan_armed && settings.require_arming) {
 	set_input(0);
     }
 }
@@ -899,7 +915,7 @@ static void send_NodeStatus(void)
     // this means vendor status gives us approximate command rate in commands/second
     last_canstats = canstats;
     node_status.vendor_specific_status_code = canstats.num_commands;
-    memset(&canstats, 0, sizeof(canstats));
+    canstats.num_commands = 0;
 
     /*
       when doing a firmware update put the size in kbytes in VSSC so
@@ -943,7 +959,7 @@ static void process1HzTasks(uint64_t timestamp_usec)
 }
 
 /*
-  send ESC status at 50Hz
+  send ESC status at TELEM_RATE Hz
 */
 static void send_ESCStatus(void)
 {
@@ -1057,7 +1073,7 @@ static void DroneCAN_Startup(void)
 void DroneCAN_update()
 {
     static uint64_t next_1hz_service_at;
-    static uint64_t next_50hz_service_at;
+    static uint64_t next_telem_service_at;
     static bool done_startup;
     if (!done_startup) {
 	done_startup = true;
@@ -1084,8 +1100,8 @@ void DroneCAN_update()
 	next_1hz_service_at += 1000000ULL;
 	process1HzTasks(ts);
     }
-    if (ts >= next_50hz_service_at && fwupdate.node_id == 0) {
-	next_50hz_service_at += 1000000ULL/50U;
+    if (ts >= next_telem_service_at && fwupdate.node_id == 0) {
+        next_telem_service_at += 1000000ULL/settings.telem_rate;
 	send_ESCStatus();
     }
 
@@ -1173,6 +1189,11 @@ void CAN1_RX1_IRQHandler(void)
 void CAN1_TX_IRQHandler(void)
 {
     handleTxInterrupt();
+}
+
+bool DroneCAN_active(void)
+{
+    return canstats.total_commands != 0;
 }
 
 #endif // DRONECAN_SUPPORT

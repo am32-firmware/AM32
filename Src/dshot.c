@@ -11,6 +11,9 @@
 #include "functions.h"
 #include "sounds.h"
 #include "targets.h"
+#if DRONECAN_SUPPORT
+#include "DroneCAN/DroneCAN.h"
+#endif
 
 int dpulse[16] = { 0 };
 
@@ -95,6 +98,12 @@ void computeDshotDMA()
                 if (EDT_ARM_ENABLE == 1) {
                     EDT_ARMED = 0;
                 }
+#ifdef DRONECAN_SUPPORT
+                if (DroneCAN_active()) {
+                    // allow DroneCAN to override DShot input
+                    return;
+                }
+#endif
                 newinput = 0;
                 dshotcommand = 0;
                 command_count = 0;

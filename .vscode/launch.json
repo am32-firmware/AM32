@@ -20,9 +20,18 @@
 	    "${workspaceFolder}/obj/openocd.cfg",
         ],
 	      "showDevDebugOutput": "none",
-
-      	"serverpath": "${workspaceFolder}${/}tools${/}${config:OS}${/}openocd${/}bin${/}openocd",
-	      "armToolchainPath": "${workspaceRoot}/tools/${config:OS}/xpack-arm-none-eabi-gcc-10.3.1-2.3/bin",
+        "osx": {
+            "serverpath": "${workspaceFolder}/tools/macos/openocd/bin/openocd",
+            "armToolchainPath": "${workspaceFolder}/tools/macos/xpack-arm-none-eabi-gcc-10.3.1-2.3/bin"
+        },
+        "linux": {
+            "serverpath": "${workspaceFolder}/tools/linux/openocd/bin/openocd",
+            "armToolchainPath": "${workspaceFolder}/tools/linux/xpack-arm-none-eabi-gcc-10.3.1-2.3/bin"
+        },
+        "windows": {
+            "serverpath": "${workspaceFolder}\\tools\\windows\\openocd\\bin\\openocd",
+            "armToolchainPath": "${workspaceFolder}\\tools\\windows\\xpack-arm-none-eabi-gcc-10.3.1-2.3\\bin"
+        }
       },
 
       // JLink configuration
@@ -32,7 +41,15 @@
         "name": "AM32 JLink",
         "cwd": "${workspaceRoot}",
 	      "device" : "-AT32F421K8U7",
-	      "gdbPath": "${workspaceRoot}/tools/${config:OS}/xpack-arm-none-eabi-gcc-10.3.1-2.3/bin/arm-none-eabi-gdb",
+        "osx": {
+            "gdbPath": "${workspaceRoot}/tools/macos/xpack-arm-none-eabi-gcc-10.3.1-2.3/bin/arm-none-eabi-gdb"
+        },
+        "linux": {
+            "gdbPath": "${workspaceRoot}/tools/linux/xpack-arm-none-eabi-gcc-10.3.1-2.3/bin/arm-none-eabi-gdb"
+        },
+        "windows": {
+            "gdbPath": "${workspaceRoot}\\tools\\windows\\xpack-arm-none-eabi-gcc-10.3.1-2.3\\bin\\arm-none-eabi-gdb"
+        },
         "executable": "${workspaceRoot}/obj/debug.elf",
 	      "showDevDebugOutput": "raw",
         "servertype" : "jlink",

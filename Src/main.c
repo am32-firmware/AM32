@@ -229,6 +229,7 @@ an settings option)
 #include "sounds.h"
 #include "targets.h"
 #include <stdint.h>
+#include <string.h>
 
 #ifdef USE_LED_STRIP
 #include "WS2812.h"
@@ -356,19 +357,6 @@ uint16_t low_cell_volt_cutoff = 330; // 3.3volts per cell
 
 //=========================== END EEPROM Defaults ===========================
 
-#ifdef USE_MAKE
-typedef struct __attribute__((packed)) {
-    uint8_t version_major;
-    uint8_t version_minor;
-    char device_name[12];
-} firmware_info_s;
-
-firmware_info_s __attribute__((section(".firmware_info"))) firmware_info = {
-    version_major : VERSION_MAJOR,
-    version_minor : VERSION_MINOR,
-    device_name : FIRMWARE_NAME
-};
-#endif
 const char filename[30] __attribute__((section(".file_name"))) = FILE_NAME;
 
 char firmware_name[12] = FIRMWARE_NAME;
@@ -1748,25 +1736,12 @@ int main(void)
 		}
 
 	
-#ifdef USE_MAKE
-    if (firmware_info.version_major != eepromBuffer[3] || firmware_info.version_minor != eepromBuffer[4]) {
-        eepromBuffer[3] = firmware_info.version_major;
-        eepromBuffer[4] = firmware_info.version_minor;
-        for (int i = 0; i < 12; i++) {
-            eepromBuffer[5 + i] = firmware_info.device_name[i];
-        }
-        saveEEpromSettings();
-    }
-#else
     if (VERSION_MAJOR != eepromBuffer[3] || VERSION_MINOR != eepromBuffer[4]) {
         eepromBuffer[3] = VERSION_MAJOR;
         eepromBuffer[4] = VERSION_MINOR;
-        for (int i = 0; i < 12; i++) {
-            eepromBuffer[5 + i] = (uint8_t)FIRMWARE_NAME[i];
-        }
+        strncpy((char *)&eepromBuffer[5], FIRMWARE_NAME, 12);
         saveEEpromSettings();
     }
-#endif
 
     if (use_sin_start) {
         //    min_startup_duty = sin_mode_min_s_d;

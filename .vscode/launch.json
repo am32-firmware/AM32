@@ -6,7 +6,7 @@
     "configurations": [
       // STLink configuration
       {
-        "name": "H503",
+        "name": "H5",
         "cwd": "${workspaceRoot}",
         "executable": "${workspaceFolder}/obj/debug.elf",
         "request": "launch",
@@ -17,7 +17,7 @@
             // "${workspaceFolder}/obj/openocd.cfg"
 
         ],
-        "svdFile": "svd/stm32h5/STM32H503.svd"
+        "svdFile": "svd/stm32h5/STM32H563.svd"
     },
       {
         "name": "AM32 STLink",

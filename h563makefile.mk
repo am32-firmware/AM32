@@ -36,6 +36,11 @@ SRC_H563 := \
 	$(SRC_DIR_H563_SRC)/peripherals.c \
 	$(SRC_DIR_H563_SRC)/IO.c \
 	$(SRC_DIR_H563_SRC)/eeprom.c \
+	$(SRC_DIR_H563_SRC)/comparator.c \
+	$(SRC_DIR_H563_SRC)/ADC.c \
+	$(SRC_DIR_H563_SRC)/dma-stm32h5.c \
+	$(SRC_DIR_H563_SRC)/usart.c \
+	$(SRC_DIR_H563_SRC)/gpio.c \
 	$(SRC_DIR_H563_SRC)/serial_telemetry.c \
 	$(SRC_DIR_H563_SRC)/stm32h5xx_it.c \
 	$(SRC_DIR_H563_SRC)/system_stm32h5xx.c \

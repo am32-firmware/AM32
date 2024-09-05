@@ -284,25 +284,25 @@ void TIM3_IRQHandler(void)
 }
 
 // DMA1 Channel 1 is used for triggering ADC_DMA_Callback
-void DMA1_Channel1_IRQHandler(void)
-{
-    if (LL_DMA_IsActiveFlag_TC(GPDMA1, LL_DMA_CHANNEL_1) == 1) {
-        /* Clear flag DMA global interrupt */
-        /* (global interrupt flag: half transfer and transfer complete flags) */
-        LL_DMA_ClearFlag_TC(GPDMA1, LL_DMA_CHANNEL_1);
-        ADC_DMA_Callback();
-        /* Call interruption treatment function */
-        //   AdcDmaTransferComplete_Callback();
-    }
+// void DMA1_Channel1_IRQHandler(void)
+// {
+//     if (LL_DMA_IsActiveFlag_TC(GPDMA1, LL_DMA_CHANNEL_1) == 1) {
+//         /* Clear flag DMA global interrupt */
+//         /* (global interrupt flag: half transfer and transfer complete flags) */
+//         LL_DMA_ClearFlag_TC(GPDMA1, LL_DMA_CHANNEL_1);
+//         ADC_DMA_Callback();
+//         /* Call interruption treatment function */
+//         //   AdcDmaTransferComplete_Callback();
+//     }
 
-    /* Check whether DMA transfer error caused the DMA interruption */
-    if (LL_DMA_IsActiveFlag_DTE(GPDMA1, LL_DMA_CHANNEL_1) == 1) {
-        /* Clear flag DMA transfer error */
-        LL_DMA_ClearFlag_DTE(GPDMA1, LL_DMA_CHANNEL_1);
+//     /* Check whether DMA transfer error caused the DMA interruption */
+//     if (LL_DMA_IsActiveFlag_DTE(GPDMA1, LL_DMA_CHANNEL_1) == 1) {
+//         /* Clear flag DMA transfer error */
+//         LL_DMA_ClearFlag_DTE(GPDMA1, LL_DMA_CHANNEL_1);
 
-        /* Call interruption treatment function */
-    }
-}
+//         /* Call interruption treatment function */
+//     }
+// }
 
 void TIM1_BRK_UP_TRG_COM_IRQHandler(void)
 {

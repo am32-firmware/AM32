@@ -1,0 +1,38 @@
+analog inputs
+
+Phase A current
+PF14 ADC2_INP6
+
+Phase B current
+PA6 ADC12_INP3
+> ADC2_INP3
+
+Phase C current
+PF12 ADC1_INP6
+
+Phase A voltage
+PA0 ADC12_INP0
+> ADC1_INP0
+
+Phase B voltage
+PC2 ADC1_INP12
+
+Phase C voltage
+PC0 ADC12_INP10
+> ADC2_INP10
+
+Thermistor temperature
+PA5 ADC12_INP19
+
+Die temperature
+ADC1_INP16
+
+Phase A comparator input
+PF4
+
+Phase B comparator input
+PC15
+
+Phase C comparator input
+PC14
+

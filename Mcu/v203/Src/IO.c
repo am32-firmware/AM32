@@ -73,6 +73,10 @@ void changeToInput()
 }
 void receiveDshotDma()
 {
+
+    if(servoPwm == 1)
+        MODIFY_REG(IC_TIMER_REGISTER->CCER,(0x3<<(4*IC_TIMER_CHANNEL)),(0x1<<(4*IC_TIMER_CHANNEL)));// setup rising pin trigger.
+
     changeToInput();
     INPUT_DMA_CHANNEL->MADDR = (uint32_t)&dma_buffer[0];
     INPUT_DMA_CHANNEL->PADDR = (uint32_t)&IC_TIMER_REGISTER->CH1CVR;
@@ -91,6 +95,10 @@ void receiveDshotDma()
 //    IC_TIMER_REGISTER->iden |= TMR_C1_DMA_REQUEST;
 //    IC_TIMER_REGISTER->ctrl1_bit.tmren = TRUE;
 //    INPUT_DMA_CHANNEL->ctrl = 0x0000098b;
+
+    if(servoPwm == 1)
+        INPUT_DMA_CHANNEL->CFGR  |= (0x1<<2);
+
 }
 
 void sendDshotDma()

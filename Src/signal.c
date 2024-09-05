@@ -160,13 +160,7 @@ void transfercomplete()
                     buffersize = 2;
                     computeServoInput();
                 }
-#ifdef MCU_CH32V203
-                MODIFY_REG(IC_TIMER_REGISTER->CCER,(0x3<<(4*IC_TIMER_CHANNEL)),(0x1<<(4*IC_TIMER_CHANNEL)));// setup rising pin trigger.
                 receiveDshotDma();
-                INPUT_DMA_CHANNEL->CFGR  |= (0x1<<2);
-#else
-                receiveDshotDma();
-#endif
             }
         }
         if (!armed) {

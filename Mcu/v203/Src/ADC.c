@@ -37,8 +37,6 @@ void ADC_DMA_Callback()
 #else
     ADC_raw_volts = ADCDataDMA[0];
     ADC_raw_current = ADCDataDMA[1];
-
-//    PRINT("v-c-t:%d-%d-%d \r\n",ADC_raw_volts,ADC_raw_current,ADC_raw_temp);
 #endif
 #endif
 }
@@ -141,7 +139,7 @@ void startADCConversion()
 }
 int16_t getConvertedDegrees(uint16_t adcrawtemp)
 {
-    return TempSensor_Volt_To_Temper(ADC_raw_temp / 4096 * 3300) / 10;  //maybe 4096 is better
+    return TempSensor_Volt_To_Temper(ADC_raw_temp * 3300 / 4096);  //maybe 4096 is better
 }
 
 #endif // USE_ADC

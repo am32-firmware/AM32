@@ -117,7 +117,6 @@ void DMA1_Channel5_IRQHandler(void)
         CLEAR_BIT(INPUT_DMA_CHANNEL->CFGR,0x1);  //disable DMA1_CH5
         transfercomplete();
         DMA1->INTFCR = DMA1_IT_TC5;
-//        NVIC_SetPendingIRQ(Software_IRQn);
         input_ready = 1;
     }
     /* Check whether DMA transfer error caused the DMA interruption */
@@ -137,14 +136,14 @@ void DMA1_Channel7_IRQHandler(void)
     {
         USART_DMACmd(USART2,USART_DMAReq_Tx,DISABLE);
         DMA_Cmd(DMA1_Channel7, DISABLE);
-        MODIFY_REG(USART2->CTLR1, 0x3<<2, 0x0<<3);  //关闭发送
+        MODIFY_REG(USART2->CTLR1, 0x3<<2, 0x0<<3);  //disable send
         DMA_ClearFlag(DMA1_IT_TC7);
     }
     /* Check whether DMA transfer error caused the DMA interruption */
     if(DMA_GetITStatus(DMA1_IT_TE7))
     {
         USART_DMACmd(USART2,USART_DMAReq_Tx,DISABLE);
-        MODIFY_REG(USART2->CTLR1, 0x3<<2, 0x0<<3);  //关闭发送
+        MODIFY_REG(USART2->CTLR1, 0x3<<2, 0x0<<3);  //disable send
         DMA_Cmd(DMA1_Channel7, DISABLE);
         DMA_ClearFlag(DMA1_IT_TE7);
     }
@@ -163,7 +162,6 @@ void EXTI2_IRQHandler(void)
 {
     EXTI->INTFR = EXTI_Line2;
     interruptRoutine( );
-//    PRINT("cmp\r\n");
 }
 #else
 void EXTI3_IRQHandler(void)

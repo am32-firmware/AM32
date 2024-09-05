@@ -1683,11 +1683,6 @@ void runBrushedLoop()
 
 int main(void)
 {
-#ifdef DEBUG_SDI
-    SDI_Printf_Enable( );
-#endif
-    PRINT("START\r\n");
-
     initAfterJump();
 
     initCorePeripherals();
@@ -1832,19 +1827,14 @@ int main(void)
 #ifdef FIXED_DUTY_MODE
         setInput();
 #endif
-#ifdef MCU_F031
+
+#ifdef NEED_INPUT_READY
         if (input_ready) {
             processDshot();
             input_ready = 0;
         }
 #endif
 
-#ifdef MCU_CH32V203
-        if (input_ready) {
-            processDshot();
-            input_ready = 0;
-        }
-#endif
         RELOAD_WATCHDOG_COUNTER();
         e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation_intervals[2] + commutation_intervals[3] + commutation_intervals[4] + commutation_intervals[5]) + 4) >> 1; // COMMUTATION INTERVAL IS 0.5US INCREMENTS
         if (VARIABLE_PWM) {
@@ -1865,7 +1855,6 @@ int main(void)
                 for (int i = 0; i < 64; i++) {
                     dma_buffer[i] = 0;
                 }
-                PRINT("reset1:%d\r\n",signaltimeout);
                 NVIC_SystemReset();
             }
             if (signaltimeout > LOOP_FREQUENCY_HZ << 1) { // 2 second when not armed
@@ -1879,7 +1868,6 @@ int main(void)
                 for (int i = 0; i < 64; i++) {
                     dma_buffer[i] = 0;
                 }
-                PRINT("reset2:%d\r\n",signaltimeout);
                 NVIC_SystemReset();
             }
         }
@@ -1967,26 +1955,7 @@ int main(void)
         }
 
 #ifndef MCU_F031
-#ifdef WCH
-//        if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD))
-//        {
-//             NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
-//             NVIC_SetPriority(COM_TIMER_IRQ, 0xC0);
-//             NVIC_SetPriority(COMPARATOR_IRQ, 0xC0);
-//#ifndef USE_PA2_AS_COMP
-//             NVIC_SetPriority(COMPARATOR_IRQ_2, 0xC0);
-//#endif
-//        }
-//        else
-//        {
-//             NVIC_SetPriority(IC_DMA_IRQ_NAME, 0xC0);
-//             NVIC_SetPriority(COM_TIMER_IRQ, 0);
-//             NVIC_SetPriority(COMPARATOR_IRQ, 0);
-//#ifndef USE_PA2_AS_COMP
-//             NVIC_SetPriority(COMPARATOR_IRQ_2, 0);
-//#endif
-//        }
-#else
+#ifndef WCH
         if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD)) {
              NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
              NVIC_SetPriority(COM_TIMER_IRQ, 1);
@@ -1997,7 +1966,6 @@ int main(void)
              NVIC_SetPriority(COMPARATOR_IRQ, 0);
          }
 #endif
-
 #endif
         if (send_telemetry) {
 #ifdef USE_SERIAL_TELEMETRY
@@ -2032,7 +2000,7 @@ int main(void)
             converted_degrees = getConvertedDegrees(ADC_raw_temp);
 #endif
 #ifdef WCH
-//            ADC_DMA_Callback( ); //中断中被调用
+//            ADC_DMA_Callback( ); //  Called in an interrupt, the first value is the initialized value
             startADCConversion( );
             converted_degrees = getConvertedDegrees(ADC_raw_temp);
 #endif

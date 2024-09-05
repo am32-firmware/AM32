@@ -17,8 +17,6 @@ void save_flash_nolib(uint8_t* data, int length, uint32_t add)
     volatile uint32_t start_addr/*,page_num*/;
     uint16_t data_to_FLASH[128];
     memset(data_to_FLASH, 0, 128);
-
-    //    PRINT("len:%d add:%x\r\n",length,add);
     while ((FLASH->STATR & FLASH_STATR_BSY) != 0)
     {
         /*  add time-out*/

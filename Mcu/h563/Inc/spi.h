@@ -1,0 +1,30 @@
+//white wire
+#pragma once
+
+#include "stm32h563xx.h"
+#define GATE_DRIVER_SPI_NSS_PORT GPIOF
+#define GATE_DRIVER_SPI_NSS_PIN 6
+#define GATE_DRIVER_SPI_NSS_AF 5
+
+// purple wire
+#define GATE_DRIVER_SPI_SCK_PORT GPIOF
+#define GATE_DRIVER_SPI_SCK_PIN 7
+#define GATE_DRIVER_SPI_SCK_AF 5
+// grey wire
+#define GATE_DRIVER_SPI_MISO_PORT GPIOF
+#define GATE_DRIVER_SPI_MISO_PIN 8
+#define GATE_DRIVER_SPI_MISO_AF 5
+// blue wire
+#define GATE_DRIVER_SPI_MOSI_PORT GPIOF
+#define GATE_DRIVER_SPI_MOSI_PIN 9
+#define GATE_DRIVER_SPI_MOSI_AF 5
+
+#define GATE_DRIVER_SPI_PERIPH SPI5
+
+#define DRV8323_REG_CSA_CONTROL (0x6 << 11)
+#define DRV8323_REG_CSA_CONTROL_VALUE 0b01011000001
+
+#define DRV8323_WRITE (0 << 15)
+#define DRV8323_READ (1 << 15)
+
+void spi_initialize(SPI_TypeDef* spi);

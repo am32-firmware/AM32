@@ -56,7 +56,8 @@ LDFLAGS_COMMON := -specs=nano.specs $(LIBS) -Wl,--gc-sections -Wl,--print-memory
 SRC_COMMON := $(foreach dir,$(SRC_DIRS_COMMON),$(wildcard $(dir)/*.[cs]))
 SRC_MAIN := $(SRC_DIRS_COMMON)/main.c
 SRC_COMMON := $(filter-out $(SRC_MAIN), $(SRC_COMMON))
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart.c
 
 TARGET_FNAME = $(IDENTIFIER)_$(TARGET)_$(FIRMWARE_VERSION)
 TARGET_BASENAME = $(BIN_DIR)/$(TARGET_FNAME)

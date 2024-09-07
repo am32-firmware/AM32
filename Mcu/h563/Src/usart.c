@@ -66,8 +66,8 @@ void usart_initialize(usart_t* usart)
     usart->txDma->ref->CDAR = (uint32_t)&usart->ref->TDR;
     // set the channel source address
     usart->txDma->ref->CSAR = (uint32_t)usart->_tx_buffer;
-    // set the transfer length
-    usart->txDma->ref->CBR1 = 256;
+    // // set the transfer length
+    // usart->txDma->ref->CBR1 = 256;
     // set source incrementing burst
     usart->txDma->ref->CTR1 |= DMA_CTR1_SINC;
     // set the peripheral hardware request selection
@@ -79,9 +79,6 @@ void usart_initialize(usart_t* usart)
 
     NVIC_SetPriority(usart->txDma->irqn, 0);
     NVIC_EnableIRQ(usart->txDma->irqn);
-
-    // enable the channel
-    usart->txDma->ref->CCR |= DMA_CCR_EN;
 
     // set the source address
     usart->rxDma->ref->CSAR = (uint32_t)&usart->ref->RDR;

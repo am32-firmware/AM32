@@ -32,26 +32,31 @@ void spi_dma_cb(dmaChannel_t* dma)
 
 void spi_initialize(spi_t* spi)
 {
-    // // set the channel destination address
-    // spi->txDma->ref->CDAR = (uint32_t)&spi->ref->TXDR;
-    // // set the channel source address
-    // spi->txDma->ref->CSAR = (uint32_t)spi->_tx_buffer;
-    // // set the transfer length
-    // spi->txDma->ref->CBR1 = 256;
-    // // set source incrementing burst
-    // spi->txDma->ref->CTR1 |= DMA_CTR1_SINC;
-    // // set the peripheral hardware request selection
-    // spi->txDma->ref->CTR2 |= LL_GPDMA1_REQUEST_SPI5_TX;
-    // // enable transfer complete interrupt
-    // spi->txDma->ref->CCR |= DMA_CCR_TCIE;
-    // spi->txDma->callback = spi_dma_cb;
-    // spi->txDma->userParam = (uint32_t)spi;
+    // set the channel destination address
+    spi->txDma->ref->CDAR = (uint32_t)&spi->ref->TXDR;
+    // set the channel source address
+    spi->txDma->ref->CSAR = (uint32_t)spi->_tx_buffer;
+    // set the transfer length
+    spi->txDma->ref->CBR1 = 256;
+    // set source incrementing burst
+    spi->txDma->ref->CTR1 |= DMA_CTR1_SINC;
+    // set the peripheral hardware request selection
+    spi->txDma->ref->CTR2 |= LL_GPDMA1_REQUEST_SPI5_TX;
+    // enable transfer complete interrupt
+    spi->txDma->ref->CCR |= DMA_CCR_TCIE;
+    spi->txDma->callback = spi_dma_cb;
+    spi->txDma->userParam = (uint32_t)spi;
 
-    // NVIC_SetPriority(spi->txDma->irqn, 0);
-    // NVIC_EnableIRQ(spi->txDma->irqn);
+    // set source data width to half word (16 bit)
+    spi->txDma->ref->CTR1 |= 0b01 << DMA_CTR1_SDW_LOG2_Pos;
+    // set destination data width to half word (16 bit)
+    spi->txDma->ref->CTR1 |= 0b01 << DMA_CTR1_DDW_LOG2_Pos;
+
+    NVIC_SetPriority(spi->txDma->irqn, 0);
+    NVIC_EnableIRQ(spi->txDma->irqn);
 
     // // enable the channel
-    // // spi->txDma->ref->CCR |= DMA_CCR_EN;
+    // spi->txDma->ref->CCR |= DMA_CCR_EN;
 
     // set TSIZE - transfer length in words
     SPI5->CR2 = 1;

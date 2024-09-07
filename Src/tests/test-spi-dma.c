@@ -71,27 +71,10 @@ int main()
     gpio_initialize(&gpioSpiMISO);
     gpio_initialize(&gpioSpiMOSI);
 
-    // for (uint16_t i = 0; i < 10; i++) {
-    //     spi_write(&spi, &i, 1);
-    // }
-    // uint16_t data[] = {0x5555, 0xfefe, 0xabcd};
-    // spi_write(&spi, data, 3);
-
-    // SPI5->TXDR = DRV8323_WRITE | DRV8323_REG_CSA_CONTROL | DRV8323_REG_CSA_CONTROL_VALUE;
-    // spi_enable(&spi);
-    // spi_start_transfer(&spi);
-    // uint16_t word = DRV8323_WRITE | DRV8323_REG_CSA_CONTROL | DRV8323_REG_CSA_CONTROL_VALUE;
-
-
-
-
-
-    // uint16_t word = 0x550f;
-    // spi_write_word(&spi, word);
-    // word = 0xf055;
-    // spi_write_word(&spi, word);
-
-
+    for (uint16_t i = 0; i < 10; i++) {
+        spi_write(&spi, &i, 1);
+    }
+    
 
 
 

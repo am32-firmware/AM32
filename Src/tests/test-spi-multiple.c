@@ -102,9 +102,13 @@ int main()
     word = 0xffff;
     spi_write_word(&spi, word);
 
+    for (int i = 0; i < 0xfffff; i++) {
+        asm("nop");
+    }
 
-
-
+    for (int i = 0; i < 0xffff; i++) {
+        spi_write_word(&spi, i);
+    }
 
     while(1) {
     }

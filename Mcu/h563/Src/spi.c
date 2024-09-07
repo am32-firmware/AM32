@@ -123,10 +123,9 @@ void spi_start_tx_dma_transfer(spi_t* spi)
         return;
     }
 
-
     spi->_dma_transfer_count = spi_tx_dma_waiting(spi);
-    if (spi->_dma_transfer_count) {
-        spi->txDma->ref->CBR1 = spi->_dma_transfer_count;
+    if (spi->_dma_transfer_count > 1) {
+        spi->txDma->ref->CBR1 = spi->_dma_transfer_count - 1;
         spi->txDma->ref->CSAR = (uint32_t)(spi->_tx_buffer + spi->_tx_tail);
         //spi->ref->ICR |= spi_ICR_TCCF; // maybe not necessary
         spi->txDma->ref->CCR |= DMA_CCR_EN;
@@ -141,8 +140,7 @@ void spi_start_tx_dma_transfer(spi_t* spi)
     // enable the spi
     // spi->ref->CR1 |= SPI_CR1_SPE;
     spi_enable(spi);
-
-
+    spi->ref->TXDR = (uint32_t)(spi->_tx_buffer + spi->_tx_tail);
 
     // while (spi->txDma->ref->CBR1 == spi->_dma_transfer_count);
     spi->ref->CR1 |= SPI_CR1_CSTART;

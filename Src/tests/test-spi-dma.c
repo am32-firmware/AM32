@@ -71,9 +71,11 @@ int main()
     gpio_initialize(&gpioSpiMISO);
     gpio_initialize(&gpioSpiMOSI);
 
-    for (uint16_t i = 0; i < 10; i++) {
-        spi_write(&spi, &i, 1);
-    }
+    // for (uint16_t i = 0; i < 2; i++) {
+    //     spi_write(&spi, &i, 1);
+    // }
+    uint16_t data = 0xf550;
+    spi_write(&spi, &data, 1);
     
 
 

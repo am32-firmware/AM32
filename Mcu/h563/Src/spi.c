@@ -133,8 +133,9 @@ void spi_start_tx_dma_transfer(spi_t* spi)
     spi->ref->IFCR |= SPI_IFCR_TXTFC;
     // set TSIZE - transfer length in words
     // spi must be disabled to set TSIZE
-    // SPI5->CR2 = spi->_dma_transfer_count;
-    SPI5->CR2 = 1;
+    SPI5->CR2 = spi->_dma_transfer_count;
+    // SPI5->CR2 = 1;
+    
     // enable the spi
     // spi->ref->CR1 |= SPI_CR1_SPE;
 

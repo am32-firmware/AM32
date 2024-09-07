@@ -173,11 +173,14 @@ void spi_write(spi_t* spi, const uint16_t* data, uint8_t length)
 
 void spi_write_word(spi_t* spi, uint16_t word)
 {
-    // spi_disable(spi);
+    spi_disable(spi);
+    spi->ref->IFCR |= SPI_IFCR_TXTFC;
     spi_enable(spi);
 
     spi->ref->TXDR = word;
     spi_start_transfer(spi);
+    while (!(spi->ref->SR & SPI_SR_EOT));
+
 }
 
 void spi_enable(spi_t* spi)

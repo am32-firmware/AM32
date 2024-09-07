@@ -84,17 +84,22 @@ int main()
 
 
 
-
-    // for (int i = 0; i ++; i < 5) {
-    //     uint16_t word = 0x550f;
-    //     spi_write_word(&spi, word);
-    //     word = 0xf055;
-    //     spi_write_word(&spi, word);
-    // }
-
-    uint16_t word = 0x550f;
+    uint16_t word;
+    word = 0xffff;
     spi_write_word(&spi, word);
-    word = 0xf055;
+    word = 0x0000;
+    spi_write_word(&spi, word);
+
+    for (int i = 0; i < 5; i++) {
+        word = 0x550f;
+        spi_write_word(&spi, word);
+        word = 0xf055;
+        spi_write_word(&spi, word);
+    }
+
+    word = 0x0000;
+    spi_write_word(&spi, word);
+    word = 0xffff;
     spi_write_word(&spi, word);
 
 

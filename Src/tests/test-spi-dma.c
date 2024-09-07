@@ -24,12 +24,12 @@ int main()
     gpio_initialize(&gpioDrv8323Enable);
     gpio_set_speed(&gpioDrv8323Enable, 0b11);
     gpio_reset(&gpioDrv8323Enable);
-    for (int i = 0; i < 0xfff; i++) {
+    for (int i = 0; i < 0xfffff; i++) {
         asm("nop");
     }
     gpio_set(&gpioDrv8323Enable);
 
-    for (int i = 0; i < 0xfff; i++) {
+    for (int i = 0; i < 0xfffff; i++) {
         asm("nop");
     }
 
@@ -54,10 +54,6 @@ int main()
         GATE_DRIVER_SPI_MOSI_AF,
         GPIO_AF);
     
-    gpio_initialize(&gpioSpiNSS);
-    gpio_initialize(&gpioSpiSCK);
-    gpio_initialize(&gpioSpiMISO);
-    gpio_initialize(&gpioSpiMOSI);
 
     spi.ref = SPI5;
 
@@ -70,14 +66,25 @@ int main()
 
     spi_initialize(&spi);
 
+    gpio_initialize(&gpioSpiNSS);
+    gpio_initialize(&gpioSpiSCK);
+    gpio_initialize(&gpioSpiMISO);
+    gpio_initialize(&gpioSpiMOSI);
+
     // for (uint16_t i = 0; i < 10; i++) {
     //     spi_write(&spi, &i, 1);
     // }
     // uint16_t data[] = {0x5555, 0xfefe, 0xabcd};
     // spi_write(&spi, data, 3);
 
-    SPI5->TXDR = DRV8323_WRITE | DRV8323_REG_CSA_CONTROL | DRV8323_REG_CSA_CONTROL_VALUE;
+    // SPI5->TXDR = DRV8323_WRITE | DRV8323_REG_CSA_CONTROL | DRV8323_REG_CSA_CONTROL_VALUE;
+    // spi_enable(&spi);
+    // spi_start_transfer(&spi);
+    // uint16_t word = DRV8323_WRITE | DRV8323_REG_CSA_CONTROL | DRV8323_REG_CSA_CONTROL_VALUE;
+    uint16_t word = 0x550f;
 
+    spi_write_word(&spi, word);
+    
     while(1) {
     }
 }

@@ -32,26 +32,26 @@ void spi_dma_cb(dmaChannel_t* dma)
 
 void spi_initialize(spi_t* spi)
 {
-    // set the channel destination address
-    spi->txDma->ref->CDAR = (uint32_t)&spi->ref->TXDR;
-    // set the channel source address
-    spi->txDma->ref->CSAR = (uint32_t)spi->_tx_buffer;
-    // set the transfer length
-    spi->txDma->ref->CBR1 = 256;
-    // set source incrementing burst
-    spi->txDma->ref->CTR1 |= DMA_CTR1_SINC;
-    // set the peripheral hardware request selection
-    spi->txDma->ref->CTR2 |= LL_GPDMA1_REQUEST_SPI5_TX;
-    // enable transfer complete interrupt
-    spi->txDma->ref->CCR |= DMA_CCR_TCIE;
-    spi->txDma->callback = spi_dma_cb;
-    spi->txDma->userParam = (uint32_t)spi;
+    // // set the channel destination address
+    // spi->txDma->ref->CDAR = (uint32_t)&spi->ref->TXDR;
+    // // set the channel source address
+    // spi->txDma->ref->CSAR = (uint32_t)spi->_tx_buffer;
+    // // set the transfer length
+    // spi->txDma->ref->CBR1 = 256;
+    // // set source incrementing burst
+    // spi->txDma->ref->CTR1 |= DMA_CTR1_SINC;
+    // // set the peripheral hardware request selection
+    // spi->txDma->ref->CTR2 |= LL_GPDMA1_REQUEST_SPI5_TX;
+    // // enable transfer complete interrupt
+    // spi->txDma->ref->CCR |= DMA_CCR_TCIE;
+    // spi->txDma->callback = spi_dma_cb;
+    // spi->txDma->userParam = (uint32_t)spi;
 
-    NVIC_SetPriority(spi->txDma->irqn, 0);
-    NVIC_EnableIRQ(spi->txDma->irqn);
+    // NVIC_SetPriority(spi->txDma->irqn, 0);
+    // NVIC_EnableIRQ(spi->txDma->irqn);
 
-    // enable the channel
-    // spi->txDma->ref->CCR |= DMA_CCR_EN;
+    // // enable the channel
+    // // spi->txDma->ref->CCR |= DMA_CCR_EN;
 
     // set TSIZE - transfer length in words
     SPI5->CR2 = 1;
@@ -81,7 +81,7 @@ void spi_initialize(spi_t* spi)
     // a session and the beginning of the first data frame
     SPI5->CFG2 |= 0b1111;
 
-    SPI5->CFG1 |= SPI_CFG1_TXDMAEN;
+    // SPI5->CFG1 |= SPI_CFG1_TXDMAEN;
     // SPI5->CFG1 |= SPI_CFG1_RXDMAEN;
 
     // set DSIZE (frame width) to 16 bits
@@ -171,15 +171,24 @@ void spi_write(spi_t* spi, const uint16_t* data, uint8_t length)
     spi_start_tx_dma_transfer(spi);
 }
 
+void spi_write_word(spi_t* spi, uint16_t word)
+{
+    // spi_disable(spi);
+    spi_enable(spi);
+
+    spi->ref->TXDR = word;
+    spi_start_transfer(spi);
+}
+
 void spi_enable(spi_t* spi)
 {
     spi->ref->CR1 |= SPI_CR1_SPE;
 }
 
-// void spi_disable(spi_t* spi)
-// {
-//     spi->ref->CR1 &= ~SPI_CR1_SPE;
-// }
+void spi_disable(spi_t* spi)
+{
+    spi->ref->CR1 &= ~SPI_CR1_SPE;
+}
 
 void spi_start_transfer(spi_t* spi)
 {

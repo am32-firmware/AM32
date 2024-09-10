@@ -129,7 +129,7 @@
 #endif
 ///
 #ifdef REF_G431
-#define FIRMWARE_NAME "Ref G431    "
+#define FIRMWARE_NAME "Ref G431"
 #define FILE_NAME "REF_G431"
 #define DEAD_TIME 80
 #define HARDWARE_GROUP_G4_A
@@ -149,7 +149,7 @@
 #endif
 
 #ifdef GD32DEV_A_E230
-#define FIRMWARE_NAME "GD32 Dev A  "
+#define FIRMWARE_NAME "GD32 Dev A"
 #define FILE_NAME "GD32DEV_A_E230"
 #define DEAD_TIME 40
 #define HARDWARE_GROUP_GD_A
@@ -226,7 +226,7 @@
 #endif
 
 #ifdef AIRBEE_F421
-#define FIRMWARE_NAME "AIRBEE F4   "
+#define FIRMWARE_NAME "AIRBEE F4"
 #define FILE_NAME "AIRBEE_F421"
 #define DEAD_TIME 22
 #define HARDWARE_GROUP_AT_045

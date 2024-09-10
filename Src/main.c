@@ -230,6 +230,7 @@ an settings option)
 #include "targets.h"
 #include <stdint.h>
 #include <string.h>
+#include <assert.h>
 
 #ifdef USE_LED_STRIP
 #include "WS2812.h"
@@ -358,8 +359,9 @@ uint16_t low_cell_volt_cutoff = 330; // 3.3volts per cell
 //=========================== END EEPROM Defaults ===========================
 
 const char filename[30] __attribute__((section(".file_name"))) = FILE_NAME;
+static_assert(sizeof(FIRMWARE_NAME) <13,"Firmware name too long");
 
-char firmware_name[12] = FIRMWARE_NAME;
+//char firmware_name[12] = FIRMWARE_NAME;
 
 uint8_t EEPROM_VERSION;
 // move these to targets folder or peripherals for each mcu

@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "gd32e23x.h"
 
-volatile static uint32_t delay;
+static volatile uint32_t delay;
 
 /*!
     \brief      configure systick

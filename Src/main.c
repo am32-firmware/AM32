@@ -359,9 +359,7 @@ uint16_t low_cell_volt_cutoff = 330; // 3.3volts per cell
 //=========================== END EEPROM Defaults ===========================
 
 const char filename[30] __attribute__((section(".file_name"))) = FILE_NAME;
-static_assert(sizeof(FIRMWARE_NAME) <13,"Firmware name too long");
-
-//char firmware_name[12] = FIRMWARE_NAME;
+static_assert(sizeof(FIRMWARE_NAME) <=13,"Firmware name too long");   // max 12 character firmware name plus NULL 
 
 uint8_t EEPROM_VERSION;
 // move these to targets folder or peripherals for each mcu

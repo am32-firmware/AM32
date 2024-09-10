@@ -231,6 +231,7 @@ an settings option)
 #include <stdint.h>
 #include <string.h>
 #include <assert.h>
+#include <string.h>
 
 #ifdef USE_LED_STRIP
 #include "WS2812.h"

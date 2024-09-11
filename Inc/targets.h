@@ -3439,3 +3439,8 @@
 #endif
 
 #define PID_LOOP_DIVIDER (LOOP_FREQUENCY_HZ / 1000)
+
+// default to no DroneCAN support
+#ifndef DRONECAN_SUPPORT
+#define DRONECAN_SUPPORT 0
+#endif

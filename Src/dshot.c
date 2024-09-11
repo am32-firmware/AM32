@@ -98,7 +98,7 @@ void computeDshotDMA()
                 if (EDT_ARM_ENABLE == 1) {
                     EDT_ARMED = 0;
                 }
-#ifdef DRONECAN_SUPPORT
+#if DRONECAN_SUPPORT
                 if (DroneCAN_active()) {
                     // allow DroneCAN to override DShot input
                     return;

@@ -128,14 +128,14 @@ static struct parameter {
     // list of settable parameters
     { "CAN_NODE",               T_UINT8, 0, 127, &settings.can_node, 176},
     { "ESC_INDEX",              T_UINT8, 0, 32,  &settings.esc_index, 177},
-    { "DIR_REVERSED",           T_BOOL,  0, 1,   &dir_reversed},
+    { "DIR_REVERSED",           T_BOOL,  0, 1,   &dir_reversed, 0 },
     { "MOTOR_POLES",            T_UINT8, 0, 64,  &motor_poles, 27 },
     { "REQUIRE_ARMING",         T_BOOL,  0, 1,   &settings.require_arming, 178 },
     { "TELEM_RATE",             T_UINT8, 0, 200, &settings.telem_rate, 179 },
-    { "VARIABLE_PWM",           T_BOOL,  0, 1,   &VARIABLE_PWM},
-    { "USE_SIN_START",          T_BOOL,  0, 1,   &use_sin_start},
-    { "COMP_PWM",               T_BOOL,  0, 1,   &comp_pwm},
-    { "STUCK_ROTOR_PROTECTION", T_BOOL,  0, 1,   &stuck_rotor_protection },
+    { "VARIABLE_PWM",           T_BOOL,  0, 1,   &VARIABLE_PWM, 0},
+    { "USE_SIN_START",          T_BOOL,  0, 1,   &use_sin_start, 0},
+    { "COMP_PWM",               T_BOOL,  0, 1,   &comp_pwm, 0},
+    { "STUCK_ROTOR_PROTECTION", T_BOOL,  0, 1,   &stuck_rotor_protection, 0},
 };
 
 /*

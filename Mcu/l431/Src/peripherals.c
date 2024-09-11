@@ -46,7 +46,7 @@ void initCorePeripherals(void)
 #ifdef USE_INTERNAL_AMP
      init_OPAMP();
 #endif
-#ifdef DRONECAN_SUPPORT
+#if DRONECAN_SUPPORT
      DroneCAN_Init();
 #endif
 }

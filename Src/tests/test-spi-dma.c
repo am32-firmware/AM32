@@ -86,7 +86,7 @@ int main()
         0x5555,
         0x00ff,
     };
-
+TGGGG8M7,OUO,HMJ YK66666666666666666666666666654321`12345677890--L===]
     spi_write(&spi, data, 5);
 
 

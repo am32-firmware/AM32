@@ -13,35 +13,123 @@
 #include "targets.h"
 #include "gpio.h"
 
-
-void comparator_gpio_initialize()
+void comparator_initialize(comparator_t* comp)
 {
-    gpio_t gpioCompPhaseA = DEF_GPIO(COMPA_GPIO_PORT, COMPA_GPIO_PIN, 0, GPIO_INPUT);
-    gpio_t gpioCompPhaseB = DEF_GPIO(COMPB_GPIO_PORT, COMPB_GPIO_PIN, 0, GPIO_INPUT);
-    gpio_t gpioCompPhaseC = DEF_GPIO(COMPC_GPIO_PORT, COMPC_GPIO_PIN, 0, GPIO_INPUT);
-    gpio_initialize(&gpioCompPhaseA);
-    gpio_initialize(&gpioCompPhaseB);
-    gpio_initialize(&gpioCompPhaseC);
-
-    // gpio_t gpioButton = DEF_GPIO(GPIOC, 13, 0, GPIO_INPUT);
-    // gpio_initialize(&gpioButton);
+    // uint8_t i = 0;
+    // while (i < 3) {
+        
+    // }
+    comparator_initialize_gpio_exti(comp->ref);
+    comparator_gpio_exti_nvic_enable(comp->ref);
+    comparator_initialize_gpio(comp->ref);
 }
 
-void comparator_exti_initialize()
+void comparator_initialize_gpio(gpio_t* gpio)
 {
-    // EXTI4 is PF4
-    EXTI->EXTICR[1] |= 0x05 << EXTI_EXTICR2_EXTI4_Pos;
-    // EXTI15 is PC15
-    EXTI->EXTICR[3] |= 0x02 << EXTI_EXTICR4_EXTI15_Pos;
-    // EXTI14 is PC14
-    EXTI->EXTICR[3] |= 0x02 << EXTI_EXTICR4_EXTI14_Pos;
-
-    EXTI->EXTICR[3] |= 0x02 << EXTI_EXTICR4_EXTI13_Pos;
-
-    EXTI->RTSR1 |= EXTI_RTSR1_RT13;
-    EXTI->FTSR1 |= EXTI_FTSR1_FT13;
-    NVIC_EnableIRQ(EXTI13_IRQn);
+    gpio_initialize(gpio);
 }
+
+// void comparator_gpio_initialize()
+// {
+//     gpio_initialize(&gpioCompPhaseA);
+//     gpio_initialize(&gpioCompPhaseB);
+//     gpio_initialize(&gpioCompPhaseC);
+
+//     // gpio_t gpioButton = DEF_GPIO(GPIOC, 13, 0, GPIO_INPUT);
+//     // gpio_initialize(&gpioButton);
+// }
+
+void comparator_gpio_exti_nvic_enable(gpio_t* gpio)
+{
+
+    EXTI->RTSR1 |= 1 << gpio->pin;
+    EXTI->FTSR1 |= 1 << gpio->pin;
+
+    NVIC_EnableIRQ(EXTI0_IRQn + gpio->pin);
+
+}
+
+void comparator_initialize_gpio_exti(gpio_t* gpio)
+{
+    // control register
+    uint32_t cr;
+    // find the control register (0-3) (CR1-CR4)
+    switch (gpio->pin) 
+    {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+        {
+            cr = EXTI->EXTICR[0];
+            break;
+        }
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        {
+            cr = EXTI->EXTICR[1];
+            break;
+        }
+        case 8:
+        case 9:
+        case 10:
+        case 11:
+        {
+            cr = EXTI->EXTICR[2];
+            break;
+        }
+        case 12:
+        case 13:
+        case 14:
+        case 15:
+        {
+            cr = EXTI->EXTICR[3];
+            break;
+        }
+    }
+
+    uint32_t cr_value;
+    switch ((uint32_t)gpio->port) {
+        case GPIOA_BASE:
+            cr_value = 0x00;
+            break;
+        case GPIOB_BASE:
+            cr_value = 0x01;
+            break;
+        case GPIOC_BASE:
+            cr_value = 0x02;
+            break;
+        case GPIOD_BASE:
+            cr_value = 0x03;
+            break;
+        case GPIOE_BASE:
+            cr_value = 0x04;
+            break;
+        case GPIOF_BASE:
+            cr_value = 0x05;
+            break;
+        case GPIOG_BASE:
+            cr_value = 0x06;
+            break;
+        case GPIOH_BASE:
+            cr_value = 0x07;
+            break;
+        case GPIOI_BASE:
+            cr_value = 0x08;
+            break;
+        default:
+            // others reserved
+            break;
+    }
+
+    uint32_t cr_shift = gpio->pin % 4;
+
+    // modify the register
+    *(uint32_t*)cr |= cr_value << cr_shift;
+}
+
 
 uint8_t getCompOutputLevel()
 {

@@ -1438,6 +1438,13 @@
 /********************************** H563 Targets
  * ***********************************/
 
+
+
+
+
+//
+
+
 #ifdef BLUEESC_H563
 #define FILE_NAME "BLUEESC_H563"
 #define FIRMWARE_NAME "BlueESC H563"
@@ -1464,14 +1471,39 @@
 #define LED_B_GPIO_PORT GPIOF
 #define LED_B_GPIO_PIN 4
 
-#define COMPA_GPIO_PORT GPIOF
-#define COMPA_GPIO_PIN 4
 
-#define COMPB_GPIO_PORT GPIOC
-#define COMPB_GPIO_PIN 15
+// // blueesc
+// #define COMPA_GPIO_PORT GPIOF
+// #define COMPA_GPIO_PIN 4
 
-#define COMPC_GPIO_PORT GPIOC
-#define COMPC_GPIO_PIN 14
+#define COMPA_GPIO_PORT GPIOC
+#define COMPA_GPIO_PIN 9
+
+// blueesc
+// #define COMPB_GPIO_PORT GPIOC
+// #define COMPB_GPIO_PIN 15
+// #define COMPB_EXTI_IMR EXTI_IMR1_IM15
+// #define COMPB_EXTI_RTSR EXTI_RTSR1_RT13
+// #define COMPB_EXTI_FTSR EXTI_FTSR1_T13
+// #define COMPB_NVIC_IRQ EXTI15_IRQn
+// #define COMPB_EXTICR
+// #define COMPB_EXTI_CR_POS
+
+
+// PC9 'comp out a'
+// PC11 'comp out b'
+// PD2 'comp oug c'
+
+
+
+// pcba defs
+// #define COMPA_GPIO_PORT GPIOF
+// #define COMPA_GPIO_PIN 4
+
+// #define COMPB_GPIO_PORT GPIOC
+// #define COMPB_GPIO_PIN 15
+// #define COMPC_GPIO_PORT GPIOC
+// #define COMPC_GPIO_PIN 14
 #endif
 
 #ifndef FIRMWARE_NAME

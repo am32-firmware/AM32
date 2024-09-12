@@ -20,8 +20,16 @@
 /* Entry Point */
 ENTRY(Reset_Handler)
 
-/* Highest address of the user mode stack */
-_estack = 0x20004000;    /* end of RAM */
+/*
+  Highest address of the user mode stack
+
+  we set this less than the 16k available due to a bug in the old
+  bootloader for F421. The old bootloader writes to the stack pointer
+  after setting up the stack based on the app header. This means if we
+  set the app stack right at the end of memory then the bootloader
+  hard faults.
+*/
+_estack = 0x20003c00;
 
 /* Generate a link error if heap and stack don't fit into RAM */
 _Min_Heap_Size = 0x200;      /* required amount of heap  */
@@ -34,7 +42,7 @@ FLASH (rx)      : ORIGIN = 0x08001000, LENGTH = 27K
 FLASH_VERSION (rx)  : ORIGIN = 0x08007C00 - 48, LENGTH = 16
 FILE_NAME     (rx)  : ORIGIN = 0x08007C00 - 32, LENGTH = 32
 EEPROM        (rx)  : ORIGIN = 0x08007C00, LENGTH = 1K
-RAM (xrw)       : ORIGIN = 0x20000000, LENGTH = 16K
+RAM (xrw)       : ORIGIN = 0x20000000, LENGTH = 15K
 
 }
 

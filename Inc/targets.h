@@ -1451,6 +1451,27 @@
 
 #define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_5
 #define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_7
+
+// MB1404 nucleo red user LED3
+#define LED_R_GPIO_PORT GPIOG
+#define LED_R_GPIO_PIN 4
+
+// MB1404 nucleo green user LED1
+#define LED_G_GPIO_PORT GPIOB
+#define LED_G_GPIO_PIN 0
+
+// MB1404 nucleo yellow user LED2
+#define LED_B_GPIO_PORT GPIOF
+#define LED_B_GPIO_PIN 4
+
+#define COMPA_GPIO_PORT GPIOF
+#define COMPA_GPIO_PIN 4
+
+#define COMPB_GPIO_PORT GPIOC
+#define COMPB_GPIO_PIN 15
+
+#define COMPC_GPIO_PORT GPIOC
+#define COMPC_GPIO_PIN 14
 #endif
 
 #ifndef FIRMWARE_NAME

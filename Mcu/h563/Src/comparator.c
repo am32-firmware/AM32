@@ -1,12 +1,12 @@
 #include "stm32h563xx.h"
-#define COMPA_GPIO_PORT GPIOF
-#define COMPA_GPIO_PIN 4
+// #define COMPA_GPIO_PORT GPIOF
+// #define COMPA_GPIO_PIN 4
 
-#define COMPB_GPIO_PORT GPIOC
-#define COMPB_GPIO_PIN 15
+// #define COMPB_GPIO_PORT GPIOC
+// #define COMPB_GPIO_PIN 15
 
-#define COMPC_GPIO_PORT GPIOC
-#define COMPC_GPIO_PIN 14
+// #define COMPC_GPIO_PORT GPIOC
+// #define COMPC_GPIO_PIN 14
 
 #include "comparator.h"
 #include "stm32h5xx_ll_gpio.h"

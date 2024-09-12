@@ -40,6 +40,7 @@ SRC_H563 := \
 	$(SRC_DIR_H563_SRC)/ADC.c \
 	$(SRC_DIR_H563_SRC)/spi.c \
 	$(SRC_DIR_H563_SRC)/dma-stm32h5.c \
+	$(SRC_DIR_H563_SRC)/led-gpio-rgb.c \
 	$(SRC_DIR_H563_SRC)/usart.c \
 	$(SRC_DIR_H563_SRC)/gpio.c \
 	$(SRC_DIR_H563_SRC)/serial_telemetry.c \

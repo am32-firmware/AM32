@@ -43,15 +43,15 @@ void led_write(uint32_t grb)
         gpio_reset(&gpioLedB);
     }
 
-    if (grb & (0xff << 4)){
+    if (grb & (0xff << 8)){
         gpio_set(&gpioLedR);
     } else {
         gpio_reset(&gpioLedR);
     }
 
-    if (grb & (0xff << 8)){
-        gpio_set(&gpioLedB);
+    if (grb & (0xff << 16)){
+        gpio_set(&gpioLedG);
     } else {
-        gpio_reset(&gpioLedB);
+        gpio_reset(&gpioLedG);
     }
 }

@@ -59,7 +59,8 @@ SRC_COMMON := $(filter-out $(SRC_MAIN), $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator-3phase.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-exti-button.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-exti-button.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-exti-button-led.c
 
 TARGET_FNAME = $(IDENTIFIER)_$(TARGET)_$(FIRMWARE_VERSION)
 TARGET_BASENAME = $(BIN_DIR)/$(TARGET_FNAME)

@@ -5,11 +5,14 @@
 
 gpio_t gpioButton = DEF_GPIO(GPIOC, 13, 0, GPIO_INPUT);
 
+gpio_t gpioLed = DEF_GPIO(LED_R_GPIO_PORT, LED_R_GPIO_PIN, 0, GPIO_OUTPUT);
+
 
 void button_exti_cb(extiChannel_t* exti)
 {
     EXTI->RPR1 |= 1 << exti->channel;
     EXTI->FPR1 |= 1 << exti->channel;
+    gpio_toggle(&gpioLed);
 }
 
 int main()
@@ -21,6 +24,9 @@ int main()
     EXTI_INTERRUPT_ENABLE_MASK(1 << gpioButton.pin);
 
     gpio_initialize(&gpioButton);
+
+    gpio_initialize(&gpioLed);
+    gpio_reset(&gpioLed);
 
     while(1) {
 

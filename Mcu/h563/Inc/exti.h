@@ -54,7 +54,7 @@ typedef struct extiChannel_s
 {
     // GPIO_TypeDef* gpio;
     uint8_t channel;
-    __IO uint32_t cr;
+    __IO uint32_t* cr;
     uint8_t flagShift;
 
     uint32_t irqn;

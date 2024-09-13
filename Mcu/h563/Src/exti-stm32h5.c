@@ -76,7 +76,7 @@ void exti_configure_port(extiChannel_t* exti, exticr_e port)
     //         break;
     // }
 
-    exti->cr |= port << exti->flagShift;
+    *exti->cr |= port << exti->flagShift;
 }
 
 void exti_configure_trigger(extiChannel_t* exti, extiTrigger_e trigger)

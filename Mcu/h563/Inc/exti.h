@@ -3,15 +3,16 @@
 
 #include "stm32h563xx.h"
 #include "stm32h5xx_ll_exti.h"
+    // .flagShift = 8*(i%4), \
 
 #define DEFINE_EXTI_CHANNEL(i, j) { \
     .channel = i, \
-    .cr = j \
-    /* .flagShift = 8*(i%4), \
-    .irqn = EXTI ## i ## _IRQn*/ \
+    .cr = j, \
+    .flagShift = 8, \
+    .irqn = EXTI ## i ## _IRQn \
 }
 
-#define EXTI_IRQ_ENABLE(c) c->channel->CCR |= DMA_CCR_EN
+// #define EXTI_IRQ_ENABLE(c) c->channel->CCR |= DMA_CCR_EN
 // #define DMA_CHANNEL_SET_CMAR(c, address) c->channel
 
 // #define EXTI_CLEAR_FLAG(d, flag) d->dma->IFCR = (flag << d->flagsShift)
@@ -53,14 +54,16 @@ typedef struct extiChannel_s
 {
     // GPIO_TypeDef* gpio;
     uint8_t channel;
-    uint8_t flagShift;
-    uint8_t portFlag;
     __IO uint32_t cr;
+    uint8_t flagShift;
+
     uint32_t irqn;
     uint32_t userParam;
 
     extiTrigger_e trigger;
     extiCallback_p callback;
+    uint8_t portFlag;
+
 } extiChannel_t;
 
 #define EXTI_INTERRUPT_ENABLE_MASK(mask) { \

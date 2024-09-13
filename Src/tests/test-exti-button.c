@@ -7,13 +7,19 @@ gpio_t gpioButton = DEF_GPIO(GPIOC, 13, 0, GPIO_INPUT);
 
 int main()
 {
-    gpio_initialize(&gpioButton);
 
     // comparator_gpio_initialize();
     // comparator_exti_initialize();
     // enableCompInterrupts();
 
     exti_configure_port(&extiChannels[gpioButton.pin], EXTI_CHANNEL_FROM_PORT(gpioButton.port));
+    exti_configure_trigger(&extiChannels[gpioButton.pin], EXTI_TRIGGER_RISING_FALLING);
+    // exti_configure_nvic(&extiChannels[gpioButton.pin], ENABLE);
+    EXTI_NVIC_ENABLE(gpioButton.pin);
+
+    EXTI_INTERRUPT_ENABLE_MASK(1 << gpioButton.pin);
+    gpio_initialize(&gpioButton);
+
     while(1) {
 
     }

@@ -171,9 +171,6 @@ void transfercomplete()
                     dshot_frametime_low = (average_packet_length >> 3) - (average_packet_length >> 7);
                 }
             }
-            if (adjusted_input < 0) {
-                adjusted_input = 0;
-            }
             if (adjusted_input == 0 && calibration_required == 0) { // note this in input..not newinput so it
                                                                     // will be adjusted be main loop
                 zero_input_count++;

@@ -39,13 +39,13 @@ long map(long x, long in_min, long in_max, long out_min, long out_max)
         return map(x, in_mid + 1, in_max, out_mid, out_max);
 }
 
-int getAbsDif(int number1, int number2)
+uint32_t getAbsDif(int number1, int number2)
 {
     int result = number1 - number2;
     if (result < 0) {
         result = -result;
     }
-    return result;
+    return (uint32_t)result;
 }
 
 #ifdef STMICRO

@@ -28,9 +28,6 @@ void setVolume(uint8_t volume)
     if (volume > 11) {
         volume = 11;
     }
-    if (volume < 0) {
-        volume = 0;
-    }
     beep_volume = volume * 2; // volume variable from 0 - 11 equates to CCR value of 0-22
 }
 

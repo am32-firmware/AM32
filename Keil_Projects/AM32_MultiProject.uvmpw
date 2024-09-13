@@ -9,44 +9,36 @@
 
   <project>
     <PathAndName>.\Am32e230.uvprojx</PathAndName>
-    <NodeIsCheckedInBatchBuild>1</NodeIsCheckedInBatchBuild>
   </project>
 
   <project>
     <PathAndName>.\Am32F031.uvprojx</PathAndName>
-    <NodeIsCheckedInBatchBuild>1</NodeIsCheckedInBatchBuild>
   </project>
 
   <project>
     <PathAndName>.\Am32F051.uvprojx</PathAndName>
-    <NodeIsCheckedInBatchBuild>1</NodeIsCheckedInBatchBuild>
   </project>
 
   <project>
     <PathAndName>.\Am32F415.uvprojx</PathAndName>
-    <NodeIsCheckedInBatchBuild>1</NodeIsCheckedInBatchBuild>
   </project>
 
   <project>
     <PathAndName>.\Am32F421.uvprojx</PathAndName>
-    <NodeIsExpanded>1</NodeIsExpanded>
-    <NodeIsCheckedInBatchBuild>1</NodeIsCheckedInBatchBuild>
+    <NodeIsActive>1</NodeIsActive>
   </project>
 
   <project>
     <PathAndName>.\Am32G071.uvprojx</PathAndName>
-    <NodeIsActive>1</NodeIsActive>
-    <NodeIsCheckedInBatchBuild>1</NodeIsCheckedInBatchBuild>
+    <NodeIsExpanded>1</NodeIsExpanded>
   </project>
 
   <project>
     <PathAndName>.\Am32G431.uvprojx</PathAndName>
-    <NodeIsCheckedInBatchBuild>1</NodeIsCheckedInBatchBuild>
   </project>
 
   <project>
     <PathAndName>.\Am32l431.uvprojx</PathAndName>
-    <NodeIsCheckedInBatchBuild>1</NodeIsCheckedInBatchBuild>
   </project>
 
 </ProjectWorkspace>

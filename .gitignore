@@ -15,3 +15,5 @@ Keil_Projects/Listings
 *~
 *.map
 *.o
+.DS_Store
+.vscode/settings.json

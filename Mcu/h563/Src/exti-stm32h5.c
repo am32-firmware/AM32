@@ -26,18 +26,25 @@ extiChannel_t extiChannels[] = {
     DEFINE_EXTI_CHANNEL(15, EXTI_EXTICR4),
 
 };
-void EXTI1_IRQHandler(void)
+void EXTI0_IRQHandler(void)
 {
     extiCallback_p cb = extiChannels[0].callback;
     if (cb) {
         cb(&extiChannels[0]);
     }
 }
-void EXTI2_IRQHandler(void)
+void EXTI1_IRQHandler(void)
 {
     extiCallback_p cb = extiChannels[1].callback;
     if (cb) {
         cb(&extiChannels[1]);
+    }
+}
+void EXTI13_IRQHandler(void)
+{
+    extiCallback_p cb = extiChannels[13].callback;
+    if (cb) {
+        cb(&extiChannels[13]);
     }
 }
 void exti_configure_port(extiChannel_t* exti, exticr_e port)
@@ -100,6 +107,10 @@ void exti_configure_trigger(extiChannel_t* exti, extiTrigger_e trigger)
     }
 }
 
+void exti_configure_cb(extiChannel_t* exti, extiCallback_p cb)
+{
+    exti->callback = cb;
+}
 
 // void exti_initialize(DMA_TypeDef dma)
 // {

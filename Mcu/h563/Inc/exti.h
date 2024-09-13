@@ -8,7 +8,7 @@
 #define DEFINE_EXTI_CHANNEL(i, j) { \
     .channel = i, \
     .cr = j, \
-    .flagShift = 8, \
+    .flagShift = 8*(i%4), \
     .irqn = EXTI ## i ## _IRQn \
 }
 
@@ -78,7 +78,7 @@ typedef struct extiChannel_s
 } extiChannel_t;
 
 #define EXTI_INTERRUPT_ENABLE_MASK(mask) { \
-    EXTI->IMR1 |= mask; \
+    EXTI->IMR1 |= (mask); \
 }
 #define EXTI_INTERRUPT_DISABLE_MASK(mask) { \
     EXTI->IMR1 &= ~mask; \

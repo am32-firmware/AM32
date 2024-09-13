@@ -71,7 +71,7 @@ void changeToInput()
 #ifdef USE_TIMER_2_CHANNEL_3
     LL_APB1_GRP1_ForceReset(LL_APB1_GRP1_PERIPH_TIM2); // de-init timer 2
     LL_APB1_GRP1_ReleaseReset(LL_APB1_GRP1_PERIPH_TIM2);
-    IC_TIMER_REGISTER->CCMR2 = 0x71;
+    IC_TIMER_REGISTER->CCMR2 = 0x41;
     IC_TIMER_REGISTER->CCER = 0xa00;
 #endif
 
@@ -84,13 +84,13 @@ void changeToInput()
 #ifdef USE_TIMER_16
     LL_APB1_GRP2_ForceReset(LL_APB1_GRP2_PERIPH_TIM16);
     LL_APB1_GRP2_ReleaseReset(LL_APB1_GRP2_PERIPH_TIM16);
-    IC_TIMER_REGISTER->CCMR1 = 0x71;
+    IC_TIMER_REGISTER->CCMR1 = 0x41;
     IC_TIMER_REGISTER->CCER = 0xa;
 #endif
 #ifdef USE_TIMER_2_CHANNEL_1
     LL_APB1_GRP1_ForceReset(LL_APB1_GRP1_PERIPH_TIM2); // de-init timer 2
     LL_APB1_GRP1_ReleaseReset(LL_APB1_GRP1_PERIPH_TIM2);
-    IC_TIMER_REGISTER->CCMR1 = 0x71;
+    IC_TIMER_REGISTER->CCMR1 = 0x41;
     IC_TIMER_REGISTER->CCER = 0xa;
 #endif
     IC_TIMER_REGISTER->PSC = ic_timer_prescaler;

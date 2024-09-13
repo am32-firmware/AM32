@@ -35,7 +35,7 @@ void changeToInput()
 {
     INPUT_DMA_CHANNEL->ctrl |= DMA_DIR_PERIPHERAL_TO_MEMORY;
     tmr_reset(IC_TIMER_REGISTER);
-    IC_TIMER_REGISTER->cm1 = 0x71;
+    IC_TIMER_REGISTER->cm1 = 0x41;
     IC_TIMER_REGISTER->cctrl = 0xB;
     IC_TIMER_REGISTER->div = ic_timer_prescaler;
     IC_TIMER_REGISTER->pr = 0xFFFF;

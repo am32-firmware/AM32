@@ -6,56 +6,36 @@
 #include <string.h>
 #include "debug.h"
 
-
-#define page_size 0x100 // 1 kb for f051
-
-#define FLASH_KEY1                 ((uint32_t)0x45670123)
-#define FLASH_KEY2                 ((uint32_t)0xCDEF89AB)
+#define page_size 0x100 // 256 byte pages for v203
 
 void save_flash_nolib(uint8_t* data, int length, uint32_t add)
 {
-    volatile uint32_t start_addr/*,page_num*/;
-    uint16_t data_to_FLASH[128];
-    memset(data_to_FLASH, 0, 128);
-    while ((FLASH->STATR & FLASH_STATR_BSY) != 0)
-    {
-        /*  add time-out*/
-    }
-    {
-        /* Authorize the FPEC of Bank1 Access */
-        FLASH->KEYR = FLASH_KEY1;
-        FLASH->KEYR = FLASH_KEY2;
-
-        /* Fast program mode unlock */
-        FLASH->MODEKEYR = FLASH_KEY1;
-        FLASH->MODEKEYR = FLASH_KEY2;
+    if ((add & 0x03) != 0 || (length & 0x03) != 0 || (length+(add&0xFF)) > page_size) {
+        return;
     }
 
-    // erase page if address even divisable by 256
-    if((add % 256) == 0)
-    {
-        FLASH_ErasePage_Fast(add);
-    }
+    FLASH_Unlock_Fast();
 
-    start_addr = (add & 0xFFFFFF00);  //256字节对齐  0x08001002
-    for(int i=0;i<128;i++)
-    {
-        data_to_FLASH[i] = *(  (volatile uint16_t *)( start_addr + 2*i )  ); //读取原来的值
-    }
+    uint32_t flash_buffer[page_size/4];
+    const uint8_t page_offset = add & 0xFFU;
+    const uint32_t page_base = add & ~0xFFU;
 
-    for(int j=0;j<length/2;j++)
-    {
-        data_to_FLASH[(add-start_addr)/2 + j] = data[j*2+1] << 8 | data[j*2];
-    }
+    // get existing data
+    memcpy(flash_buffer, (void*)page_base, page_size);
 
-    FLASH_ProgramPage_Fast(start_addr,((uint32_t *)data_to_FLASH));
-    FLASH_Lock( );
+    // overwrite with new data
+    memcpy(&flash_buffer[page_offset/4], data, length);
+
+    // fast erase is 256 bytes at a time, normal Flash_Erasepage
+    // is 4k at a time
+    FLASH_ErasePage_Fast(page_base);
+
+    FLASH_ProgramPage_Fast(page_base, flash_buffer);
+
+    FLASH_Lock_Fast();
 }
 
 void read_flash_bin(uint8_t* data, uint32_t add, int out_buff_len)
 {
-    // volatile uint32_t read_data;
-    for (int i = 0; i < out_buff_len; i++) {
-        data[i] = *(uint8_t*)(add + i);
-    }
+    memcpy(data, (const uint8_t *)add, out_buff_len);
 }

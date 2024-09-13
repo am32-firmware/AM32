@@ -24,7 +24,7 @@ extern char dir_reversed;
 extern char bi_direction;
 extern char buffer_divider;
 extern uint8_t last_dshot_command;
-extern uint16_t commutation_interval;
+extern uint32_t commutation_interval;
 
 // int e_com_time;
 

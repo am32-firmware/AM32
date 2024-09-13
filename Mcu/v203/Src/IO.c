@@ -26,12 +26,14 @@ uint8_t buffer_padding = 7;
 void changeToOutput()
 {
 //    tmr_reset;
-    GPIOA->BSHR  = GPIO_Pin_0;
-    GPIOA->CFGLR &= 0xFFFFFFF0;   //output HIGH first
-    GPIOA->CFGLR |= 0x3;
+    INPUT_PIN_PORT->BSHR  = INPUT_PIN;
+    uint32_t mul = INPUT_PIN*INPUT_PIN*INPUT_PIN*INPUT_PIN;
+    uint32_t mask = 0xf * mul;
+    INPUT_PIN_PORT->CFGLR &= ~mask;   //output HIGH first
+    INPUT_PIN_PORT->CFGLR |= 0x3*mul;
 
-//    GPIOA->CFGLR &= 0xFFFFFFF0;
-    GPIOA->CFGLR |= 0x8;          //then change to AF_PP
+//    INPUT_PIN_PORT->CFGLR &= ~mask;
+    INPUT_PIN_PORT->CFGLR |= 0x8*mul;          //then change to AF_PP
 
     RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM2,ENABLE);
     RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM2,DISABLE);
@@ -51,9 +53,11 @@ void changeToInput()
     RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM2,DISABLE);
     IC_TIMER_REGISTER->CCER =  0;
 
-    GPIOA->BSHR = GPIO_Pin_0;
-    GPIOA->CFGLR &= 0xFFFFFFF0;
-    GPIOA->CFGLR |= 0x4;       //float in
+    INPUT_PIN_PORT->BSHR = INPUT_PIN;
+    uint32_t mul = INPUT_PIN*INPUT_PIN*INPUT_PIN*INPUT_PIN;
+    uint32_t mask = 0xf * mul;
+    INPUT_PIN_PORT->CFGLR &= ~mask;
+    INPUT_PIN_PORT->CFGLR |= 0x4*mul;       //float in
 
     if(servoPwm)
     {
@@ -183,18 +187,34 @@ uint8_t getInputPinState()
 
 void setInputPullDown()
 {
-    INPUT_PIN_PORT->BCR = INPUT_PIN;
-    #warning ONLY FROM GPIO_Pin_0 TO GPIO_Pin_7
-    INPUT_PIN_PORT->CFGLR &= ~(0xF << (INPUT_PIN)*4);  //note only for Px0--Px7
-    INPUT_PIN_PORT->CFGLR |= (0x4<<(INPUT_PIN)*4);
+    volatile uint32_t *cfgr;
+    uint32_t pin = INPUT_PIN;
+    if (pin >= (1U<<8)) {
+        pin >>= 8;
+        cfgr = &INPUT_PIN_PORT->CFGHR;
+    } else {
+        cfgr = &INPUT_PIN_PORT->CFGLR;
+    }
+    const uint32_t mul = pin*pin*pin*pin;
+    const uint32_t CFG = (*cfgr) & ~(0xf * mul);
+    INPUT_PIN_PORT->OUTDR &= ~pin;
+    *cfgr = CFG | (0x8*mul);
 }
 
 void setInputPullUp()
 {
-    INPUT_PIN_PORT->BSHR = INPUT_PIN;
-    #warning ONLY FROM GPIO_Pin_0 TO GPIO_Pin_7
-    INPUT_PIN_PORT->CFGLR &= ~(0xF << (INPUT_PIN)*4);  //note only for Px0--Px7
-    INPUT_PIN_PORT->CFGLR |= (0x4<<(INPUT_PIN)*4);
+    volatile uint32_t *cfgr;
+    uint32_t pin = INPUT_PIN;
+    if (pin >= (1U<<8)) {
+        pin >>= 8;
+        cfgr = &INPUT_PIN_PORT->CFGHR;
+    } else {
+        cfgr = &INPUT_PIN_PORT->CFGLR;
+    }
+    const uint32_t mul = pin*pin*pin*pin;
+    const uint32_t CFG = (*cfgr) & ~(0xf * mul);
+    INPUT_PIN_PORT->OUTDR |= pin;
+    *cfgr = CFG | (0x8*mul);
 }
 
 #ifndef WCH

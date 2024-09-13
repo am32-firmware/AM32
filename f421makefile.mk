@@ -1,27 +1,30 @@
+MCU := F421
+PART := AT32F421K8U7
 
-TARGETS_F421 :=  WRAITH32_F421 AIKON_SINGLE_F421 AIKON_55A_F421 FOXEER_F421 HAKRC_K_F421 \
-	             HAKRC_G_F421 TEKKO32_F421 AT32DEV_F421 DARWIN_F421 NEUTRON_F421 AT32SLOTCAR_F421\
-				 HAKRC_G23_F421 NEUTRON_MINIAIO_F421 FOXEER_F421\  
+MCU_LC := $(call lc,$(MCU))
 
-HAL_FOLDER_F421 := $(HAL_FOLDER)/F421
+TARGETS_$(MCU) := $(call get_targets,$(MCU))
 
-MCU_F421 := -mcpu=cortex-m4 -mthumb 
-LDSCRIPT_F421 := $(HAL_FOLDER_F421)/AT32F421x6_FLASH.ld
+HAL_FOLDER_$(MCU) := $(HAL_FOLDER)/$(MCU_LC)
 
-SRC_DIR_F421 := \
-	$(HAL_FOLDER_F421)/Startup \
-	$(HAL_FOLDER_F421)/Src \
-	$(HAL_FOLDER_F421)/Drivers/drivers/src
+MCU_$(MCU) := -mcpu=cortex-m4 -mthumb
+LDSCRIPT_$(MCU) := $(wildcard $(HAL_FOLDER_$(MCU))/*.ld)
 
-CFLAGS_F421 := \
-	-I$(HAL_FOLDER_F421)/Inc \
-	-I$(HAL_FOLDER_F421)/Drivers/drivers/inc \
-	-I$(HAL_FOLDER_F421)/Drivers/CMSIS/cm4/core_support \
-	-I$(HAL_FOLDER_F421)/Drivers/CMSIS/cm4/device_support
+SRC_BASE_DIR_$(MCU) := \
+	$(HAL_FOLDER_$(MCU))/Startup \
+	$(HAL_FOLDER_$(MCU))/Drivers/drivers/src
 
-CFLAGS_F421 += \
-	 -DAT32F421K8U7 \
+SRC_DIR_$(MCU) := $(SRC_BASE_DIR_$(MCU)) \
+	$(HAL_FOLDER_$(MCU))/Src
+
+CFLAGS_$(MCU) := \
+	-I$(HAL_FOLDER_$(MCU))/Inc \
+	-I$(HAL_FOLDER_$(MCU))/Drivers/drivers/inc \
+	-I$(HAL_FOLDER_$(MCU))/Drivers/CMSIS/cm4/core_support \
+	-I$(HAL_FOLDER_$(MCU))/Drivers/CMSIS/cm4/device_support
+
+CFLAGS_$(MCU) += \
+	 -D$(PART) \
 	 -DUSE_STDPERIPH_DRIVER
-	
 
-SRC_F421 := $(foreach dir,$(SRC_DIR_F421),$(wildcard $(dir)/*.[cs]))
+SRC_$(MCU) := $(foreach dir,$(SRC_DIR_$(MCU)),$(wildcard $(dir)/*.[cs]))

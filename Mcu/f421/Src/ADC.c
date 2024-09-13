@@ -46,9 +46,14 @@ void ADC_DMA_Callback()
 
 void ADC_Init(void)
 {
+#ifdef PA2_VOLTAGE
+    gpio_mode_QUICK(GPIOA, GPIO_MODE_ANALOG, GPIO_PULL_NONE, GPIO_PINS_2);
+#else
     gpio_mode_QUICK(GPIOA, GPIO_MODE_ANALOG, GPIO_PULL_NONE, GPIO_PINS_6);
+#endif
     gpio_mode_QUICK(GPIOA, GPIO_MODE_ANALOG, GPIO_PULL_NONE, GPIO_PINS_3);
-    dma_init_type dma_init_struct;
+ 
+	dma_init_type dma_init_struct;
     crm_periph_clock_enable(CRM_DMA1_PERIPH_CLOCK, TRUE);
     // nvic_irq_enable(DMA1_Channel1_IRQn, 3, 0);
     dma_reset(DMA1_CHANNEL1);

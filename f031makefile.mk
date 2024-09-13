@@ -1,25 +1,31 @@
+MCU := F031
+PART := STM32F031x6
 
-TARGETS_F031 := REF_F031 \
+MCU_LC := $(call lc,$(MCU))
 
-HAL_FOLDER_F031 := $(HAL_FOLDER)/f031
+TARGETS_$(MCU) := $(call get_targets,$(MCU))
 
-MCU_F031 := -mcpu=cortex-m0 -mthumb
-LDSCRIPT_F031 := $(HAL_FOLDER_F031)/STM32F031C6TX_FLASH.ld
+HAL_FOLDER_$(MCU) := $(HAL_FOLDER)/$(MCU_LC)
 
-SRC_DIR_F031 += \
-	$(HAL_FOLDER_F031)/Startup \
-	$(HAL_FOLDER_F031)/Src \
-	$(HAL_FOLDER_F031)/Drivers/STM32F0xx_HAL_Driver/Src
+MCU_$(MCU) := -mcpu=cortex-m0 -mthumb
+LDSCRIPT_$(MCU) := $(wildcard $(HAL_FOLDER_$(MCU))/*.ld)
 
-CFLAGS_F031 := \
-	-I$(HAL_FOLDER_F031)/Inc \
-	-I$(HAL_FOLDER_F031)/Drivers/STM32F0xx_HAL_Driver/Inc \
-	-I$(HAL_FOLDER_F031)/Drivers/CMSIS/Include \
-	-I$(HAL_FOLDER_F031)/Drivers/CMSIS/Device/ST/STM32F0xx/Include
+SRC_BASE_DIR_$(MCU) := \
+	$(HAL_FOLDER_$(MCU))/Startup \
+	$(HAL_FOLDER_$(MCU))/Drivers/STM32F0xx_HAL_Driver/Src
 
-CFLAGS_F031 += \
+SRC_DIR_$(MCU) := $(SRC_BASE_DIR_$(MCU)) \
+	$(HAL_FOLDER_$(MCU))/Src
+
+CFLAGS_$(MCU) := \
+	-I$(HAL_FOLDER_$(MCU))/Inc \
+	-I$(HAL_FOLDER_$(MCU))/Drivers/STM32F0xx_HAL_Driver/Inc \
+	-I$(HAL_FOLDER_$(MCU))/Drivers/CMSIS/Include \
+	-I$(HAL_FOLDER_$(MCU))/Drivers/CMSIS/Device/ST/STM32F0xx/Include
+
+CFLAGS_$(MCU) += \
 	-DHSE_VALUE=8000000 \
-	-DSTM32F031x6 \
+	-D$(PART) \
 	-DHSE_STARTUP_TIMEOUT=100 \
 	-DLSE_STARTUP_TIMEOUT=5000 \
 	-DLSE_VALUE=32768 \
@@ -31,4 +37,4 @@ CFLAGS_F031 += \
 	-DUSE_FULL_LL_DRIVER \
 	-DPREFETCH_ENABLE=1
 
-SRC_F031 := $(foreach dir,$(SRC_DIR_F031),$(wildcard $(dir)/*.[cs]))
+SRC_$(MCU) := $(foreach dir,$(SRC_DIR_$(MCU)),$(wildcard $(dir)/*.[cs]))

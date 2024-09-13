@@ -303,7 +303,7 @@ void UN_TIM2_Init(void) //IC Timer Init
     /*
      *PA0   ------> TIM2_CH1
     */
-    GPIO_InitStruct.GPIO_Pin   = GPIO_Pin_0;
+    GPIO_InitStruct.GPIO_Pin   = INPUT_PIN;
     GPIO_InitStruct.GPIO_Mode  = GPIO_Mode_IN_FLOATING;
     GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOA, &GPIO_InitStruct);

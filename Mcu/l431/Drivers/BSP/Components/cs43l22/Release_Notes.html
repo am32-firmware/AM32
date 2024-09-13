@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Release Notes for CS43L22 Component Drivers</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../../../_htmresc/mini-st.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<div class="row">
+<div class="col-sm-12 col-lg-4">
+<div class="card fluid">
+<div class="sectione dark">
+<center>
+<h1 id="release-notes-for-cs43l22-component-drivers"><small>Release Notes for</small> <mark>CS43L22 Component Drivers</mark></h1>
+<p>Copyright © 2014 STMicroelectronics<br />
+</p>
+<a href="https://www.st.com" class="logo"><img src="../../../../_htmresc/st_logo.png" alt="ST logo" /></a>
+</center>
+</div>
+</div>
+<h1 id="license">License</h1>
+<p>Licensed by ST under BSD 3-Clause license (the "License"). You may not use this package except in compliance with the License. You may obtain a copy of the License at:</p>
+<p><a href="https://opensource.org/licenses/BSD-3-Clause">https://opensource.org/licenses/BSD-3-Clause</a></p>
+<h1 id="purpose">Purpose</h1>
+<p>This directory contains the CS43L22 component drivers.</p>
+</div>
+<div class="col-sm-12 col-lg-8">
+<h1 id="update-history">Update History</h1>
+<div class="collapse">
+<input type="checkbox" id="collapse-section22" checked aria-hidden="true"> <label for="collapse-section22" aria-hidden="true">V2.0.4 / 03-April-2019</label>
+<div>
+<h2 id="main-changes">Main Changes</h2>
+<ul>
+<li>Update release notes format</li>
+</ul>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section20" aria-hidden="true"> <label for="collapse-section20" aria-hidden="true">V2.0.3 / 31-August-2018</label>
+<div>
+<h2 id="main-changes-1">Main Changes</h2>
+<ul>
+<li>Reformat the BSD 3-Clause license declaration in the files header (replace license terms by a web reference to OSI website where those terms lie)</li>
+</ul>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section19" aria-hidden="true"> <label for="collapse-section19" aria-hidden="true">V2.0.2 / 02-October-2015</label>
+<div>
+<h2 id="main-changes-2">Main Changes</h2>
+<ul>
+<li>cs43l22.c/.h:
+<ul>
+<li>Move VOLUME_CONVERT macro from cs43l22.h to cs43l22.c as internally used to convert volume.</li>
+<li>Add literals instead of magic number for cs34l22 registers</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section18" aria-hidden="true"> <label for="collapse-section18" aria-hidden="true">V2.0.1 / 16-September-2015</label>
+<div>
+<h2 id="main-changes-3">Main Changes</h2>
+<ul>
+<li>cs43l22.c:
+<ul>
+<li>Enable the digital soft ramp to avoid clac noise</li>
+<li>Improve mute/unmute by muting/unmuting also the DAC inputs</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section18" aria-hidden="true"> <label for="collapse-section18" aria-hidden="true">V2.0.0 / 24-June-2015</label>
+<div>
+<h2 id="main-changes-4">Main Changes</h2>
+<ul>
+<li>cs43l22.c/.h:
+<ul>
+<li>Add codec de-initialization function: cs43l22_DeInit()</li>
+<li>Add Audio IO de-initialization function prototype: AUDIO_IO_DeInit()</li>
+</ul></li>
+</ul>
+<p><strong><span class="underline"><span style="font-size: 10pt; font-family: Verdana; color: black;">NOTE</span></span></strong><br />
+This release must be used with BSP Common driver V4.0.0 or later</p>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section17" aria-hidden="true"> <label for="collapse-section17" aria-hidden="true">V1.1.0 / 10-February-2015</label>
+<div>
+<h2 id="main-changes-5">Main Changes</h2>
+<ul>
+<li>cs43l22.c/.h:
+<ul>
+<li>Add AUDIO_FREQUENCY_xxx defines for frequencies capabilities (8K to 192K)</li>
+<li>Add codec reset function: cs43l22_Reset()</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section16" aria-hidden="true"> <label for="collapse-section16" aria-hidden="true">V1.0.1 / 02-December-2014</label>
+<div>
+<h2 id="main-changes-6">Main Changes</h2>
+<ul>
+<li>cs43l22.c: change “\” by “/” in the include path to fix compilation issue under Linux</li>
+</ul>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section15" aria-hidden="true"> <label for="collapse-section15" aria-hidden="true">V1.0.0 / 18-February-2014</label>
+<div>
+<h2 id="main-changes-7">Main Changes</h2>
+<ul>
+<li>First official release of CS43L22 audio codec</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<footer class="sticky">
+For complete documentation on <mark>STM32 Microcontrollers</mark> , visit: <a href="http://www.st.com/STM32">http://www.st.com/STM32</a>
+</footer>
+</body>
+</html>

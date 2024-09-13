@@ -81,9 +81,9 @@ void ADCInit(void)
    PA6   ------> ADC_IN6
    */
  #ifdef USE_ADC_INPUT
-     GPIO_InitStruct.GPIO_Pin = GPIO_Pin_0;
+     GPIO_InitStruct.GPIO_Pin = INPUT_PIN;
      GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AIN;
-     GPIO_Init(GPIOA, &GPIO_InitStruct);
+     GPIO_Init(INPUT_PIN_PORT, &GPIO_InitStruct);
  #endif
 
    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_1|GPIO_Pin_6;

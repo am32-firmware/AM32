@@ -1,27 +1,31 @@
+MCU := G071
+PART := STM32G071xx
 
-TARGETS_G071 := \
-	PWM_ENABLE_G071 OPEN_DRAIN_G071 OPEN_DRAIN_B_G071 GEN_64K_G071 DT120_64K_G071 IFLIGHT_BLITZ_G071  \
-	NEUTRONRC_G071 AIKON_PRO_G071 TMOTOR_G071 
+MCU_LC := $(call lc,$(MCU))
 
-HAL_FOLDER_G071 := $(HAL_FOLDER)/g071
+TARGETS_$(MCU) := $(call get_targets,$(MCU))
 
-MCU_G071 := -mcpu=cortex-m0 -mthumb
-LDSCRIPT_G071 := $(HAL_FOLDER_G071)/STM32G071GBUX_FLASH.ld
+HAL_FOLDER_$(MCU) := $(HAL_FOLDER)/$(MCU_LC)
 
-SRC_DIR_G071 := \
-	$(HAL_FOLDER_G071)/Startup \
-	$(HAL_FOLDER_G071)/Src \
-	$(HAL_FOLDER_G071)/Drivers/STM32G0xx_HAL_Driver/Src
+MCU_$(MCU) := -mcpu=cortex-m0 -mthumb
+LDSCRIPT_$(MCU) := $(wildcard $(HAL_FOLDER_$(MCU))/*.ld)
 
-CFLAGS_G071 := \
-	-I$(HAL_FOLDER_G071)/Inc \
-	-I$(HAL_FOLDER_G071)/Drivers/STM32G0xx_HAL_Driver/Inc \
-	-I$(HAL_FOLDER_G071)/Drivers/CMSIS/Include \
-	-I$(HAL_FOLDER_G071)/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+SRC_BASE_DIR_$(MCU) := \
+	$(HAL_FOLDER_$(MCU))/Startup \
+	$(HAL_FOLDER_$(MCU))/Drivers/STM32G0xx_HAL_Driver/Src
 
-CFLAGS_G071 += \
+SRC_DIR_$(MCU) := $(SRC_BASE_DIR_$(MCU)) \
+	$(HAL_FOLDER_$(MCU))/Src
+
+CFLAGS_$(MCU) := \
+	-I$(HAL_FOLDER_$(MCU))/Inc \
+	-I$(HAL_FOLDER_$(MCU))/Drivers/STM32G0xx_HAL_Driver/Inc \
+	-I$(HAL_FOLDER_$(MCU))/Drivers/CMSIS/Include \
+	-I$(HAL_FOLDER_$(MCU))/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+
+CFLAGS_$(MCU) += \
 	-DHSE_VALUE=8000000 \
-	-DSTM32G071xx \
+	-D$(PART) \
 	-DHSE_STARTUP_TIMEOUT=100 \
 	-DLSE_STARTUP_TIMEOUT=5000 \
 	-DLSE_VALUE=32768 \
@@ -33,4 +37,4 @@ CFLAGS_G071 += \
 	-DUSE_FULL_LL_DRIVER \
 	-DPREFETCH_ENABLE=1
 
-SRC_G071 := $(foreach dir,$(SRC_DIR_G071),$(wildcard $(dir)/*.[cs]))
+SRC_$(MCU) := $(foreach dir,$(SRC_DIR_$(MCU)),$(wildcard $(dir)/*.[cs]))

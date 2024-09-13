@@ -1,26 +1,30 @@
+MCU := F415
+PART := AT32F415K8U7_4
 
-TARGETS_F415 := \
-	AT32DEV_F415 TEKKO32_F415
+MCU_LC := $(call lc,$(MCU))
 
-HAL_FOLDER_F415 := $(HAL_FOLDER)/F415
+TARGETS_$(MCU) := $(call get_targets,$(MCU))
 
-MCU_F415 := -mcpu=cortex-m4 -mthumb
-LDSCRIPT_F415 := $(HAL_FOLDER_F415)/AT32F415x8_FLASH.ld
+HAL_FOLDER_$(MCU) := $(HAL_FOLDER)/$(MCU_LC)
 
-SRC_DIR_F415 := \
-	$(HAL_FOLDER_F415)/Startup \
-	$(HAL_FOLDER_F415)/Src \
-	$(HAL_FOLDER_F415)/Drivers/drivers/src
+MCU_$(MCU) := -mcpu=cortex-m4 -mthumb
+LDSCRIPT_$(MCU) := $(wildcard $(HAL_FOLDER_$(MCU))/*.ld)
 
-CFLAGS_F415 := \
-	-I$(HAL_FOLDER_F415)/Inc \
-	-I$(HAL_FOLDER_F415)/Drivers/drivers/inc \
-	-I$(HAL_FOLDER_F415)/Drivers/CMSIS/cm4/core_support \
-	-I$(HAL_FOLDER_F415)/Drivers/CMSIS/cm4/device_support
+SRC_BASE_DIR_$(MCU) := \
+	$(HAL_FOLDER_$(MCU))/Startup \
+	$(HAL_FOLDER_$(MCU))/Drivers/drivers/src
 
-CFLAGS_F415 += \
-	 -DAT32F415K8U7_4 \
+SRC_DIR_$(MCU) := $(SRC_BASE_DIR_$(MCU)) \
+	$(HAL_FOLDER_$(MCU))/Src
+
+CFLAGS_$(MCU) := \
+	-I$(HAL_FOLDER_$(MCU))/Inc \
+	-I$(HAL_FOLDER_$(MCU))/Drivers/drivers/inc \
+	-I$(HAL_FOLDER_$(MCU))/Drivers/CMSIS/cm4/core_support \
+	-I$(HAL_FOLDER_$(MCU))/Drivers/CMSIS/cm4/device_support
+
+CFLAGS_$(MCU) += \
+	 -D$(PART) \
 	 -DUSE_STDPERIPH_DRIVER
-	
 
-SRC_F415 := $(foreach dir,$(SRC_DIR_F415),$(wildcard $(dir)/*.[cs]))
+SRC_$(MCU) := $(foreach dir,$(SRC_DIR_$(MCU)),$(wildcard $(dir)/*.[cs]))

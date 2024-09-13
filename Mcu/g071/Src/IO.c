@@ -14,7 +14,7 @@
 #include "targets.h"
 
 uint8_t buffer_padding = 7;
-char ic_timer_prescaler = CPU_FREQUENCY_MHZ / 5;
+char ic_timer_prescaler = CPU_FREQUENCY_MHZ / 6;
 uint32_t dma_buffer[64] = { 0 };
 char out_put = 0;
 
@@ -23,13 +23,13 @@ void receiveDshotDma()
 #ifdef USE_TIMER_3_CHANNEL_1
     RCC->APBRSTR1 |= LL_APB1_GRP1_PERIPH_TIM3;
     RCC->APBRSTR1 &= ~LL_APB1_GRP1_PERIPH_TIM3;
-    IC_TIMER_REGISTER->CCMR1 = 0x61;
+    IC_TIMER_REGISTER->CCMR1 = 0x41;
     IC_TIMER_REGISTER->CCER = 0xa;
 #endif
 #ifdef USE_TIMER_16_CHANNEL_1
     LL_APB2_GRP1_ForceReset(LL_APB2_GRP1_PERIPH_TIM16); // de-init timer 2
     LL_APB2_GRP1_ReleaseReset(LL_APB2_GRP1_PERIPH_TIM16);
-    IC_TIMER_REGISTER->CCMR1 = 0x61;
+    IC_TIMER_REGISTER->CCMR1 = 0x41;
     IC_TIMER_REGISTER->CCER = 0xa;
 #endif
 

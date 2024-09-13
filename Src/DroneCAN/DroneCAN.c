@@ -104,6 +104,8 @@ static void processTxQueue(void);
   access to settings from main.c
  */
 extern char dir_reversed;
+extern char bi_direction;
+extern char advance_level;
 extern char motor_poles;
 extern char VARIABLE_PWM;
 extern char use_sin_start;
@@ -129,6 +131,7 @@ static struct parameter {
     { "CAN_NODE",               T_UINT8, 0, 127, &settings.can_node, 176},
     { "ESC_INDEX",              T_UINT8, 0, 32,  &settings.esc_index, 177},
     { "DIR_REVERSED",           T_BOOL,  0, 1,   &dir_reversed, 0 },
+    { "BI_DIRECTIONAL",         T_BOOL,  0, 1,   &bi_direction, 0 },
     { "MOTOR_POLES",            T_UINT8, 0, 64,  &motor_poles, 27 },
     { "REQUIRE_ARMING",         T_BOOL,  0, 1,   &settings.require_arming, 178 },
     { "TELEM_RATE",             T_UINT8, 0, 200, &settings.telem_rate, 179 },
@@ -136,6 +139,7 @@ static struct parameter {
     { "USE_SIN_START",          T_BOOL,  0, 1,   &use_sin_start, 0},
     { "COMP_PWM",               T_BOOL,  0, 1,   &comp_pwm, 0},
     { "STUCK_ROTOR_PROTECTION", T_BOOL,  0, 1,   &stuck_rotor_protection, 0},
+    { "ADVANCE_LEVEL",          T_UINT8, 0, 4,   &advance_level, 0},
 };
 
 /*
@@ -490,15 +494,20 @@ static void handle_RawCommand(CanardInstance *ins, CanardRxTransfer *transfer)
       0: off
       1-46: special codes
       47-2047: throttle
-
-      we will ignore reverse throttle for now. The main code expects
-      throttle demands in newinput global
     */
-    uint16_t this_input;
-    if (input_can <= 0) {
-	this_input = 0;
-    } else {
-	this_input = (uint16_t)(47 + input_can * (2000.0 / 8192));
+    uint16_t this_input = 0;
+    if (input_can == 0) {
+        this_input = 0;
+    } else if (bi_direction) {
+        const float scaled_value = input_can * (1000.0 / 8192);
+        if (scaled_value >= 0) {
+            this_input = (uint16_t)(47 + scaled_value);
+        } else {
+            this_input = (uint16_t)(47 + (1000 - scaled_value));
+        }
+    } else if (input_can > 0) {
+        const float scaled_value = input_can * (2000.0 / 8192);
+        this_input = (uint16_t)(47 + scaled_value);
     }
 
     canstats.num_commands++;

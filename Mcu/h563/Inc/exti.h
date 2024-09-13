@@ -1,12 +1,14 @@
 #pragma once
-#include "stm32h563xx.h"
+#include <stdbool.h>
 
-#define DEFINE_EXTI_IRQ(i, j) { \
-    .dma = GPDMA ## i, \
-    .ref = GPDMA ## i ## _ ## Channel ## j, \
-    /* .muxChannel = DMAMUX1_Channel ## k, */\
-    .flagsShift = 4*(j-1), \
-    .irqn = GPDMA ## i ## _Channel ## j ## _IRQn \
+#include "stm32h563xx.h"
+#include "stm32h5xx_ll_exti.h"
+
+#define DEFINE_EXTI_CHANNEL(i, j) { \
+    .channel = i, \
+    .cr = j \
+    /* .flagShift = 8*(i%4), \
+    .irqn = EXTI ## i ## _IRQn*/ \
 }
 
 #define EXTI_IRQ_ENABLE(c) c->channel->CCR |= DMA_CCR_EN
@@ -20,19 +22,60 @@
 // #define DMA_IT_HTIF 0b0100
 // #define DMA_IT_TEIF 0b1000
 
-struct extiIRQ_s;
+
+#define EXTI_CHANNEL_FROM_PORT(port) \
+    (((uint32_t)port - GPIOA_BASE) / 0x0400)
+typedef enum
+{
+    EXTICR_GPIOA = 0x00,
+    EXTICR_GPIOB = 0x01,
+    EXTICR_GPIOC = 0x02,
+    EXTICR_GPIOD = 0x03,
+    EXTICR_GPIOE = 0x04,
+    EXTICR_GPIOF = 0x05,
+    EXTICR_GPIOG = 0x06,
+    EXTICR_GPIOH = 0x07,
+    EXTICR_GPIOI = 0x08,
+} exticr_e;
+
+typedef enum
+{
+    EXTI_TRIGGER_NONE = LL_EXTI_TRIGGER_NONE,
+    EXTI_TRIGGER_RISING = LL_EXTI_TRIGGER_RISING,
+    EXTI_TRIGGER_FALLING = LL_EXTI_TRIGGER_FALLING,
+    EXTI_TRIGGER_RISING_FALLING = LL_EXTI_TRIGGER_RISING_FALLING,
+} extiTrigger_e;
+
+struct extiChannel_s;
 typedef void (*extiCallback_p)(struct extiIRQ_s* channel);
 
-typedef struct extiIRQ_s
+typedef struct extiChannel_s
 {
-    GPIO_TypeDef* gpio;
-    uint16_t* pin;
-    uint8_t flagsShift;
-    uint32_t userParam;
+    // GPIO_TypeDef* gpio;
+    uint8_t channel;
+    uint8_t flagShift;
+    uint8_t portFlag;
+    __IO uint32_t cr;
     uint32_t irqn;
+    uint32_t userParam;
+
+    extiTrigger_e trigger;
     extiCallback_p callback;
-} extiIRQ_t;
+} extiChannel_t;
 
-extern extiIRQ_t extiIRQs[];
+#define EXTI_INTERRUPT_ENABLE_MASK(mask) { \
+    EXTI->IMR1 |= mask; \
+}
+#define EXTI_INTERRUPT_DISABLE_MASK(mask) { \
+    EXTI->IMR1 &= ~mask; \
+}
+#define EXTI_NVIC_ENABLE(channel) { \
+    NVIC_EnableIRQ(EXTI0_IRQn + channel); \
+}
+extern extiChannel_t extiChannels[];
 
+void exti_configure_port(extiChannel_t* exti, exticr_e port);
+void exti_configure_trigger(extiChannel_t* exti, extiTrigger_e trigger);
+void exti_configure_nvic(extiChannel_t* exti, bool enable);
 void exti_initialize(EXTI_TypeDef exti);
+// void exti_

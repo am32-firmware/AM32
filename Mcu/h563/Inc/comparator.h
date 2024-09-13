@@ -4,8 +4,6 @@
 #include "gpio.h"
 
 typedef struct {
-    gpio_t* ref;
-
     // circular buffers
     // buffer size MUST be 256
     // implementation takes advantage of integer overflow
@@ -20,11 +18,14 @@ typedef struct {
 
     // dmaChannel_t* rxDma;
     // dmaChannel_t* txDma;
+    gpio_t* phaseA;
+    gpio_t* phaseB;
+    gpio_t* phaseC;
 
     uint8_t _irqn;
 } comparator_t;
 
-
+extern comparator_t COMPARATOR;
 
 void comparator_initialize(comparator_t* comp);
 void comparator_initialize_gpio(gpio_t* gpio);
@@ -33,7 +34,8 @@ void comparator_initialize_exti(gpio_t* gpio);
 void comparator_initialize_gpio_exti(gpio_t* gpio);
 void comparator_gpio_exti_nvic_enable(gpio_t* gpio);
 
-
+void comparator_disable_interrupts(comparator_t* comp);
+void comparator_enable_interrupts(comparator_t* comp);
 
 void maskPhaseInterrupts();
 void changeCompInput();

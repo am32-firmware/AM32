@@ -12,6 +12,16 @@
     .irqn = EXTI ## i ## _IRQn \
 }
 
+#define DEFINE_EXTI_IRQ_HANDLER(i) { \
+void EXTI ## i ## _IRQHandler(void) \
+{ \
+    extiCallback_p = extiChannels[i].callback; \
+    if (cb) { \
+        cb(&extiChannels[i]); \
+    } \
+} \
+}
+
 // #define EXTI_IRQ_ENABLE(c) c->channel->CCR |= DMA_CCR_EN
 // #define DMA_CHANNEL_SET_CMAR(c, address) c->channel
 

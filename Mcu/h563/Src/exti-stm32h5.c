@@ -26,6 +26,9 @@ extiChannel_t extiChannels[] = {
     DEFINE_EXTI_CHANNEL(15, EXTI_EXTICR4),
 
 };
+
+
+// DEFINE_EXTI_IRQ_HANDLER(0);
 void EXTI0_IRQHandler(void)
 {
     extiCallback_p cb = extiChannels[0].callback;
@@ -40,6 +43,83 @@ void EXTI1_IRQHandler(void)
         cb(&extiChannels[1]);
     }
 }
+void EXTI2_IRQHandler(void)
+{
+    extiCallback_p cb = extiChannels[2].callback;
+    if (cb) {
+        cb(&extiChannels[2]);
+    }
+}
+void EXTI3_IRQHandler(void)
+{
+    extiCallback_p cb = extiChannels[3].callback;
+    if (cb) {
+        cb(&extiChannels[3]);
+    }
+}
+void EXTI4_IRQHandler(void)
+{
+    extiCallback_p cb = extiChannels[4].callback;
+    if (cb) {
+        cb(&extiChannels[4]);
+    }
+}
+void EXTI5_IRQHandler(void)
+{
+    extiCallback_p cb = extiChannels[5].callback;
+    if (cb) {
+        cb(&extiChannels[5]);
+    }
+}
+void EXTI6_IRQHandler(void)
+{
+    extiCallback_p cb = extiChannels[6].callback;
+    if (cb) {
+        cb(&extiChannels[6]);
+    }
+}
+void EXTI7_IRQHandler(void)
+{
+    extiCallback_p cb = extiChannels[7].callback;
+    if (cb) {
+        cb(&extiChannels[7]);
+    }
+}
+void EXTI8_IRQHandler(void)
+{
+    extiCallback_p cb = extiChannels[8].callback;
+    if (cb) {
+        cb(&extiChannels[8]);
+    }
+}
+void EXTI9_IRQHandler(void)
+{
+    extiCallback_p cb = extiChannels[9].callback;
+    if (cb) {
+        cb(&extiChannels[9]);
+    }
+}
+void EXTI10_IRQHandler(void)
+{
+    extiCallback_p cb = extiChannels[10].callback;
+    if (cb) {
+        cb(&extiChannels[10]);
+    }
+}
+void EXTI11_IRQHandler(void)
+{
+    extiCallback_p cb = extiChannels[11].callback;
+    if (cb) {
+        cb(&extiChannels[11]);
+    }
+}
+void EXTI12_IRQHandler(void)
+{
+    extiCallback_p cb = extiChannels[12].callback;
+    if (cb) {
+        cb(&extiChannels[12]);
+    }
+}
 void EXTI13_IRQHandler(void)
 {
     extiCallback_p cb = extiChannels[13].callback;
@@ -47,6 +127,37 @@ void EXTI13_IRQHandler(void)
         cb(&extiChannels[13]);
     }
 }
+void EXTI14_IRQHandler(void)
+{
+    extiCallback_p cb = extiChannels[14].callback;
+    if (cb) {
+        cb(&extiChannels[14]);
+    }
+}
+void EXTI15_IRQHandler(void)
+{
+    extiCallback_p cb = extiChannels[15].callback;
+    if (cb) {
+        cb(&extiChannels[15]);
+    }
+}
+
+
+
+// void EXTI1_IRQHandler(void)
+// {
+//     extiCallback_p cb = extiChannels[1].callback;
+//     if (cb) {
+//         cb(&extiChannels[1]);
+//     }
+// }
+// void EXTI13_IRQHandler(void)
+// {
+//     extiCallback_p cb = extiChannels[13].callback;
+//     if (cb) {
+//         cb(&extiChannels[13]);
+//     }
+// }
 void exti_configure_port(extiChannel_t* exti, exticr_e port)
 {
     // switch ((uint32_t)port) {

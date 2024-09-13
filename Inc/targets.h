@@ -1476,8 +1476,18 @@
 // #define COMPA_GPIO_PORT GPIOF
 // #define COMPA_GPIO_PIN 4
 
+// nucleo
 #define COMPA_GPIO_PORT GPIOC
 #define COMPA_GPIO_PIN 9
+
+#define COMPB_GPIO_PORT GPIOC
+#define COMPB_GPIO_PIN 11
+
+#define COMPC_GPIO_PORT GPIOD
+#define COMPC_GPIO_PIN 2
+
+
+
 
 // blueesc
 // #define COMPB_GPIO_PORT GPIOC

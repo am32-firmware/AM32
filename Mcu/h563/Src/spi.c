@@ -207,13 +207,13 @@ void spi_write_dma(spi_t* spi, const uint16_t* data, uint8_t length) {
     // spi must be disabled to set TSIZE
     spi->ref->CR2 = length;
     
-        if (length > 1) {
+    // if (length > 1) {
 
-            spi->txDma->ref->CBR1 = (length - 1);
-            spi->txDma->ref->CSAR = (uint32_t)(spi->_tx_buffer);
-            //spi->ref->ICR |= spi_ICR_TCCF; // maybe not necessary
-            spi->txDma->ref->CCR |= DMA_CCR_EN;
-        }
+        spi->txDma->ref->CBR1 = length;
+        spi->txDma->ref->CSAR = (uint32_t)(spi->_tx_buffer);
+        //spi->ref->ICR |= spi_ICR_TCCF; // maybe not necessary
+        spi->txDma->ref->CCR |= DMA_CCR_EN;
+    // }
     // enable the spi
     spi_enable(spi);
 
@@ -225,7 +225,7 @@ void spi_write_dma(spi_t* spi, const uint16_t* data, uint8_t length) {
     // spi->ref->TXDR = 0x5555;
     // spi->ref->TXDR = 0x5555;
     // spi->ref->TXDR = 0x5555;
-    // spi->ref->TXDR = 0x5555;
+    spi->ref->TXDR = 0x5555;
     spi->ref->TXDR = 0x5555;
     spi->ref->CR1 |= SPI_CR1_CSTART;
 

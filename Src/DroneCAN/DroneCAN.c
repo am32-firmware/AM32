@@ -50,6 +50,7 @@ struct {
     int32_t rx_ecode;
     uint32_t should_accept;
     uint32_t on_receive;
+    uint64_t last_raw_command_us;
 } canstats, last_canstats;
 
 /*
@@ -512,6 +513,7 @@ static void handle_RawCommand(CanardInstance *ins, CanardRxTransfer *transfer)
 
     canstats.num_commands++;
     canstats.total_commands++;
+    canstats.last_raw_command_us = micros64();
 
     set_input(this_input);
 }
@@ -527,7 +529,7 @@ static void handle_ArmingStatus(CanardInstance *ins, CanardRxTransfer *transfer)
     }
 
     dronecan_armed = (cmd.status == UAVCAN_EQUIPMENT_SAFETY_ARMINGSTATUS_STATUS_FULLY_ARMED);
-    if (!dronecan_armed && settings.require_arming) {
+    if (!dronecan_armed && settings.require_arming && canstats.last_raw_command_us != 0) {
 	set_input(0);
     }
 }
@@ -1119,6 +1121,14 @@ void DroneCAN_update()
     }
 
     processTxQueue();
+
+    if (canstats.last_raw_command_us != 0 && ts - canstats.last_raw_command_us > 250000ULL) {
+        /*
+          we have stopped getting CAN RawCommand, zero input
+         */
+        canstats.last_raw_command_us = 0;
+        set_input(0);
+    }
 
     RESTORE_CAN_IRQ();
 }

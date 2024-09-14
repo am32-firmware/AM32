@@ -205,7 +205,8 @@ void spi_write_dma(spi_t* spi, const uint16_t* data, uint8_t length) {
     spi->ref->IFCR |= SPI_IFCR_TXTFC;
     // set TSIZE - transfer length in words
     // spi must be disabled to set TSIZE
-    spi->ref->CR2 = length;
+    // spi->ref->CR2 = length+2;
+    spi->ref->CR2 = 100;
     
     // if (length > 1) {
 

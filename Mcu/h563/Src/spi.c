@@ -226,9 +226,9 @@ void spi_write_dma(spi_t* spi, const uint16_t* data, uint8_t length) {
     // spi->ref->TXDR = 0x5555;
     // spi->ref->TXDR = 0x5555;
     // spi->ref->TXDR = 0x5555;
-    spi->ref->TXDR = 0x5555;
-    spi->ref->TXDR = 0x5555;
-    spi->ref->CR1 |= SPI_CR1_CSTART;
+    // spi->ref->TXDR = 0x5555;
+    // spi->ref->TXDR = 0x5555;
+    // spi->ref->CR1 |= SPI_CR1_CSTART;
 
 }
 

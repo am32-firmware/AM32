@@ -89,11 +89,17 @@ int main()
         0x00ff,
         0x00ff,
         0x00ff,
+        0x00ff,
+        0x00ff,
+        0x00ff,
+        0x00ff,
+        0x00ff,
+        0x00ff,
     };
 
     // spi_write(&spi, data, 5);
 
-    spi_write_dma(&spi, data, 8);
+    spi_write_dma(&spi, data, 16);
     // spi_disable(&spi);
     // spi.ref->IFCR |= SPI_IFCR_TXTFC;
 

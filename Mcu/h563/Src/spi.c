@@ -211,7 +211,7 @@ void spi_write_dma(spi_t* spi, const uint16_t* data, uint8_t length) {
     
     // if (length > 1) {
 
-        spi->txDma->ref->CBR1 = length;
+        spi->txDma->ref->CBR1 = length*2;
         spi->txDma->ref->CSAR = (uint32_t)(&data[0]);
         //spi->ref->ICR |= spi_ICR_TCCF; // maybe not necessary
         spi->txDma->ref->CCR |= DMA_CCR_EN;

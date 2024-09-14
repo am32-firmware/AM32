@@ -132,7 +132,7 @@ void spi_start_tx_dma_transfer(spi_t* spi)
     if (spi->_dma_transfer_count) {
 
     // disable the spi
-    spi_disable(&spi);
+    // spi_disable(&spi);
 
     spi->ref->CR1 = 0;
     // spi->ref->IFCR = 0xffffffff;
@@ -253,7 +253,11 @@ void spi_enable(spi_t* spi)
 
 void spi_disable(spi_t* spi)
 {
-    spi->ref->CR1 &= ~(SPI_CR1_SPE);
+    // these above don't work?
+    // spi->ref->CR1 &= ~(SPI_CR1_SPE);
+    // spi->ref->CR1 &= 0xfffffffe;
+    // spi->ref->CR1 = spi->ref->CR1 & 0xfffffffe;
+    spi->ref->CR1 = 0;
 }
 
 void spi_start_transfer(spi_t* spi)

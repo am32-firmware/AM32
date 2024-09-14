@@ -80,16 +80,38 @@ int main()
     // spi_write(&spi, &data, 1);
     
     uint16_t data[] = {
-        0xff00,
+        0x5555,
         0x5555,
         0x0550,
         0x5555,
         0x00ff,
+        0x00ff,
+        0x00ff,
+        0x00ff,
+        0x00ff,
     };
 
-    spi_write(&spi, data, 5);
+    // spi_write(&spi, data, 5);
 
+    // spi_write_dma(&spi, data, 8);
+    spi_disable(&spi);
+    spi.ref->IFCR |= SPI_IFCR_TXTFC;
 
+    spi.ref->CR2 = 8;
+    spi_enable(&spi);
+
+    spi.ref->TXDR = 0x5555;
+    spi.ref->TXDR = 0x5555;
+    spi.ref->TXDR = 0x5555;
+    // spi.ref->TXDR = 0x5555;
+    // spi.ref->TXDR = 0x5555;
+    // spi.ref->TXDR = 0x5555;
+    // spi.ref->TXDR = 0x5555;
+    // spi.ref->TXDR = 0x5555;
+    // spi.ref->TXDR = 0x5555;
+    // spi.ref->TXDR = 0x5555;
+    // spi.ref->TXDR = 0x5555;
+    spi.ref->CR1 |= SPI_CR1_CSTART;
     while(1) {
     }
 }

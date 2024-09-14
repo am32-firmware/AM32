@@ -2,10 +2,10 @@
 // #include "stm32f0xx_it.h"
 #include "stm32h563xx.h"
 
-#define EXTI_EXTICR1 (EXTI_BASE + 0x060)
-#define EXTI_EXTICR2 (EXTI_BASE + 0x064)
-#define EXTI_EXTICR3 (EXTI_BASE + 0x068)
-#define EXTI_EXTICR4 (EXTI_BASE + 0x06c)
+#define EXTI_EXTICR1 (uint32_t*)(EXTI_BASE + 0x060)
+#define EXTI_EXTICR2 (uint32_t*)(EXTI_BASE + 0x064)
+#define EXTI_EXTICR3 (uint32_t*)(EXTI_BASE + 0x068)
+#define EXTI_EXTICR4 (uint32_t*)(EXTI_BASE + 0x06c)
 
 extiChannel_t extiChannels[] = {
     DEFINE_EXTI_CHANNEL(0,   EXTI_EXTICR1),

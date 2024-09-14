@@ -58,7 +58,7 @@ typedef enum
 } extiTrigger_e;
 
 struct extiChannel_s;
-typedef void (*extiCallback_p)(struct extiIRQ_s* channel);
+typedef void (*extiCallback_p)(struct extiChannel_s* channel);
 
 typedef struct extiChannel_s
 {

@@ -85,11 +85,23 @@ int main()
         0x0550,
         0x5555,
         0x00ff,
+                0x5555,
+
+        0x5555,
+
+        0x5555,
+
+        0x5555,
+        0x5555,
+
+
     };
 
-    spi_write(&spi, data, 5);
+    spi_write(&spi, data, 10);
 
 
     while(1) {
+        spi_write(&spi, data, 5);
+
     }
 }

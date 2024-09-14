@@ -194,9 +194,9 @@ void spi_write(spi_t* spi, const uint16_t* data, uint8_t length)
 
 void spi_write_dma(spi_t* spi, const uint16_t* data, uint8_t length) {
     // copy data to tx buffer
-    for (uint8_t i = 0; i < length; i++) {
-        spi->_tx_buffer[spi->_tx_head++] = data[i];
-    }
+    // for (uint8_t i = 0; i < length; i++) {
+    //     spi->_tx_buffer[spi->_tx_head++] = data[i];
+    // }
 
     // disable the spi
     spi_disable(&spi);
@@ -212,7 +212,7 @@ void spi_write_dma(spi_t* spi, const uint16_t* data, uint8_t length) {
     // if (length > 1) {
 
         spi->txDma->ref->CBR1 = length;
-        spi->txDma->ref->CSAR = (uint32_t)(spi->_tx_buffer);
+        spi->txDma->ref->CSAR = (uint32_t)(&data[0]);
         //spi->ref->ICR |= spi_ICR_TCCF; // maybe not necessary
         spi->txDma->ref->CCR |= DMA_CCR_EN;
     // }
@@ -229,7 +229,7 @@ void spi_write_dma(spi_t* spi, const uint16_t* data, uint8_t length) {
     // spi->ref->TXDR = 0x5555;
     // spi->ref->TXDR = 0x5555;
     // spi->ref->TXDR = 0x5555;
-    // spi->ref->CR1 |= SPI_CR1_CSTART;
+    spi->ref->CR1 |= SPI_CR1_CSTART;
 
 }
 

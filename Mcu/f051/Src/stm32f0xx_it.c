@@ -46,7 +46,7 @@ extern char out_put;
 extern char compute_dshot_flag;
 /* USER CODE END EV */
 
-int interrupt_time = 0;
+uint16_t interrupt_time = 0;
 /******************************************************************************/
 /*           Cortex-M0 Processor Interruption and Exception Handlers */
 /******************************************************************************/

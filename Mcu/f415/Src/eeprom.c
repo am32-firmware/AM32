@@ -1,6 +1,10 @@
 #include "eeprom.h"
+#include "targets.h"
 
 #include <string.h>
+#include <stdbool.h>
+
+//#pragma GCC optimize("O0")
 
 #include "at32f415_flash.h"
 
@@ -42,7 +46,7 @@ void save_flash_nolib(uint8_t* data, int length, uint32_t add)
     uint32_t index = 0;
     while (index < word_length) {
 	uint32_t word;
-	memcpy(&word, &data[index*4], sizeof(word));
+        memcpy(&word, &data[index*4], sizeof(word));
 	flash_word_program(add + (index * 4), word);
 	flash_flag_clear(FLASH_PROGRAM_ERROR | FLASH_EPP_ERROR | FLASH_OPERATE_DONE);
         index++;

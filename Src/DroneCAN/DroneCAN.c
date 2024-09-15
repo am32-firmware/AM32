@@ -217,7 +217,11 @@ static uint64_t micros64(void)
 {
     static uint64_t base_us;
     static uint16_t last_cnt;
+#ifdef ARTERY
+    uint16_t cnt = UTILITY_TIMER->cval;
+#else
     uint16_t cnt = UTILITY_TIMER->CNT;
+#endif
     if (cnt < last_cnt) {
 	base_us += 0x10000;
     }

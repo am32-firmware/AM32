@@ -33,6 +33,8 @@
  */
 
 #include "at32f415.h"
+#include "targets.h"
+#include "string.h"
 
 /** @addtogroup AT32F415_system_private_defines
  * @{

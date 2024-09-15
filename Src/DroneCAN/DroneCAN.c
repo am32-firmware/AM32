@@ -10,14 +10,15 @@
 
 #include "peripherals.h"
 #include "serial_telemetry.h"
-#include <canard_stm32.h>
-#include <_internal_bxcan.h>
 #include <common.h>
 #include <signal.h>
 #include <version.h>
 #include <eeprom.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
+#include "sys_can.h"
+#include <canard.h>
 
 // include the headers for the generated DroneCAN messages from the
 // dronecan_dsdlc compiler
@@ -31,27 +32,10 @@
 #define CANARD_POOL_SIZE 4096
 #endif
 
-#define BXCAN CANARD_STM32_CAN1
-
 static CanardInstance canard;
 static uint8_t canard_memory_pool[CANARD_POOL_SIZE];
 
-#define NUM_TX_MAILBOXES 3
-
-struct {
-    uint32_t num_commands;
-    uint32_t total_commands;
-    uint32_t num_receive;
-    uint32_t num_tx_interrupts;
-    uint32_t num_rx_interrupts;
-    uint32_t rx_errors;
-    uint32_t esr;
-    uint32_t rxframe_error;
-    int32_t rx_ecode;
-    uint32_t should_accept;
-    uint32_t on_receive;
-    uint64_t last_raw_command_us;
-} canstats, last_canstats;
+struct CANStats canstats;
 
 /*
   keep the state for firmware update
@@ -88,18 +72,11 @@ enum VarType {
 };
 
 static void can_printf(const char *fmt, ...);
-static void processTxQueue(void);
 
 // some convenience macros
 #define MIN(a,b) ((a)<(b)?(a):(b))
 #define C_TO_KELVIN(temp) (temp + 273.15f)
 #define ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
-
-/*
-  macros to prevent corruption of canard state from processing an IRQ while in main update code
- */
-#define DISABLE_CAN_IRQ() do { NVIC_DisableIRQ(CAN1_RX0_IRQn); NVIC_DisableIRQ(CAN1_RX1_IRQn); NVIC_DisableIRQ(CAN1_TX_IRQn); } while(0)
-#define RESTORE_CAN_IRQ() do { NVIC_EnableIRQ(CAN1_RX0_IRQn); NVIC_EnableIRQ(CAN1_RX1_IRQn); NVIC_EnableIRQ(CAN1_TX_IRQn); } while(0)
 
 /*
   access to settings from main.c
@@ -212,32 +189,12 @@ static uint64_t micros64(void)
     return base_us + cnt;
 }
 
-void usleep(uint32_t usec)
-{
-    const uint64_t t0 = micros64();
-    while (micros64() - t0 < usec) ;
-}
-
-
 /*
   get monotonic time in milliseconds since startup
 */
 static uint32_t millis32(void)
 {
     return micros64() / 1000ULL;
-}
-
-/*
-  get a 16 byte unique ID for this node, this should be based on the CPU unique ID or other unique ID
-*/
-static void getUniqueID(uint8_t id[16])
-{
-    const uint8_t *uidbase = (const uint8_t *)UID_BASE;
-    memcpy(id, uidbase, 12);
-
-    // put CPU ID in last 4 bytes, handy for knowing the exact MCU we are on
-    const uint32_t cpuid = SCB->CPUID;
-    memcpy(&id[12], &cpuid, 4);
 }
 
 /*
@@ -412,7 +369,7 @@ static void handle_param_ExecuteOpcode(CanardInstance* ins, CanardRxTransfer* tr
 */
 static void handle_RestartNode(CanardInstance* ins, CanardRxTransfer* transfer)
 {
-    // the ESC should reboot now!
+    // reboot the ESC
     NVIC_SystemReset();
 }
 
@@ -439,7 +396,7 @@ static void handle_GetNodeInfo(CanardInstance *ins, CanardRxTransfer *transfer)
     pkt.hardware_version.major = 2;
     pkt.hardware_version.minor = 3;
 
-    getUniqueID(pkt.hardware_version.unique_id);
+    sys_can_getUniqueID(pkt.hardware_version.unique_id);
 
     strncpy((char*)pkt.name.data, FIRMWARE_NAME, sizeof(pkt.name.data));
     pkt.name.len = strnlen((char*)pkt.name.data, sizeof(pkt.name.data));
@@ -669,7 +626,8 @@ static void handle_file_read_response(CanardInstance* ins, CanardRxTransfer* tra
     /* trigger a new read */
     fwupdate.last_read_ms = 0;
     send_firmware_read();
-    processTxQueue();
+
+    DroneCAN_processTxQueue();
 }
 
 /*
@@ -710,7 +668,7 @@ static void handle_DNA_Allocation(CanardInstance *ins, CanardRxTransfer *transfe
 
     // Obtaining the local unique ID
     uint8_t my_unique_id[sizeof(msg.unique_id.data)];
-    getUniqueID(my_unique_id);
+    sys_can_getUniqueID(my_unique_id);
 
     // Matching the received UID against the local one
     if (memcmp(msg.unique_id.data, my_unique_id, msg.unique_id.len) != 0) {
@@ -753,7 +711,7 @@ static void request_DNA()
     }
 
     uint8_t my_unique_id[16];
-    getUniqueID(my_unique_id);
+    sys_can_getUniqueID(my_unique_id);
 
     static const uint8_t MaxLenOfUniqueIDInRequest = 6;
     uint8_t uid_size = (uint8_t)(16 - DNA.node_id_allocation_unique_id_offset);
@@ -924,7 +882,6 @@ static void send_NodeStatus(void)
 
     // put number of commands we have received in vendor status since the last NodeStatus
     // this means vendor status gives us approximate command rate in commands/second
-    last_canstats = canstats;
     node_status.vendor_specific_status_code = canstats.num_commands;
     canstats.num_commands = 0;
 
@@ -1007,10 +964,10 @@ static void send_ESCStatus(void)
 /*
   receive one frame, only called from interrupt context
 */
-static void receiveFrame(void)
+void DroneCAN_receiveFrame(void)
 {
     CanardCANFrame rx_frame = {0};
-    while (canardSTM32Receive(&rx_frame) > 0) {
+    while (sys_can_receive(&rx_frame) > 0) {
 	canstats.num_receive++;
 	int ecode = canardHandleRxFrame(&canard, &rx_frame, micros64());
 	if (ecode != CANARD_OK) {
@@ -1023,62 +980,34 @@ static void receiveFrame(void)
 /*
   Transmits all frames from the TX queue
 */
-static void processTxQueue(void)
+void DroneCAN_processTxQueue(void)
 {
     for (const CanardCANFrame* txf = NULL; (txf = canardPeekTxQueue(&canard)) != NULL;) {
-	const int16_t tx_res = canardSTM32Transmit(txf);
-	if (tx_res != 0) {  // no timeout,  drop the frame
-	    canardPopTxQueue(&canard);
-	}
+        const int16_t tx_res = sys_can_transmit(txf);
+        if (tx_res == 0) {
+            // no space, stop trying
+            break;
+        }
+        // success or error, remove frame
+        canardPopTxQueue(&canard);
     }
-}
-
-/* CAN init function */
-void DroneCAN_Init(void)
-{
-    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_CAN1);
-    LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
-
-    LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_11 | LL_GPIO_PIN_12;
-    GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
-    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
-    GPIO_InitStruct.Alternate = 9; // AF9==CAN
-    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 }
 
 static void DroneCAN_Startup(void)
 {
     load_settings();
 
-    LL_RCC_ClocksTypeDef Clocks;
-    LL_RCC_GetSystemClocksFreq(&Clocks);
+    // initialise low level CAN peripheral hardware
+    sys_can_init();
 
-    CanardSTM32CANTimings timings;
-    canardSTM32ComputeCANTimings(Clocks.PCLK1_Frequency, 1000000, &timings);
-
-    canardSTM32Init(&timings, CanardSTM32IfaceModeNormal);
-
-    canardInit(&canard,                         // Uninitialized library instance
+    canardInit(&canard,
 	       canard_memory_pool,              // Raw memory chunk used for dynamic allocation
-	       sizeof(canard_memory_pool),      // Size of the above, in bytes
+               sizeof(canard_memory_pool),
 	       onTransferReceived,                // Callback, see CanardOnTransferReception
 	       shouldAcceptTransfer,              // Callback, see CanardShouldAcceptTransfer
 	       NULL);
 
     canardSetLocalNodeID(&canard, settings.can_node);
-
-    /*
-      enable interrupt for CAN receive and transmit
-    */
-    NVIC_SetPriority(CAN1_RX0_IRQn, 5);
-    NVIC_SetPriority(CAN1_RX1_IRQn, 5);
-    NVIC_SetPriority(CAN1_TX_IRQn, 5);
-    NVIC_EnableIRQ(CAN1_RX0_IRQn);
-    NVIC_EnableIRQ(CAN1_RX1_IRQn);
-    NVIC_EnableIRQ(CAN1_TX_IRQn);
-    BXCAN->IER = CANARD_STM32_CAN_IER_FMPIE0 | CANARD_STM32_CAN_IER_FMPIE1 | CANARD_STM32_CAN_IER_TMEIE;
 }
 
 void DroneCAN_update()
@@ -1091,9 +1020,9 @@ void DroneCAN_update()
 	DroneCAN_Startup();
     }
 
-    DISABLE_CAN_IRQ();
+    sys_can_disable_IRQ();
 
-    processTxQueue();
+    DroneCAN_processTxQueue();
 
     // see if we are still doing DNA
     if (canardGetLocalNodeID(&canard) == CANARD_BROADCAST_NODE_ID) {
@@ -1101,7 +1030,7 @@ void DroneCAN_update()
 	if (millis32() > DNA.send_next_node_id_allocation_request_at_ms) {
 	    request_DNA();
 	}
-	RESTORE_CAN_IRQ();
+        sys_can_enable_IRQ();
 	return;
     }
 
@@ -1120,7 +1049,7 @@ void DroneCAN_update()
 	send_firmware_read();
     }
 
-    processTxQueue();
+    DroneCAN_processTxQueue();
 
     if (canstats.last_raw_command_us != 0 && ts - canstats.last_raw_command_us > 250000ULL) {
         /*
@@ -1130,84 +1059,7 @@ void DroneCAN_update()
         set_input(0);
     }
 
-    RESTORE_CAN_IRQ();
-}
-
-static void handleTxMailboxInterrupt(uint8_t mbox, bool txok)
-{
-    processTxQueue();
-}
-
-static void pollErrorFlagsFromISR()
-{
-    const uint8_t lec = (uint8_t)((BXCAN->ESR & CANARD_STM32_CAN_ESR_LEC_MASK) >> CANARD_STM32_CAN_ESR_LEC_SHIFT);
-    if (lec != 0) {
-	canstats.esr = BXCAN->ESR; // Record error status
-	BXCAN->ESR = 0;
-    }
-}
-
-static void handleTxInterrupt(void)
-{
-    canstats.num_tx_interrupts++;
-
-    // TXOK == false means that there was a hardware failure
-    if (BXCAN->TSR & CANARD_STM32_CAN_TSR_RQCP0) {
-        const bool txok = BXCAN->TSR & CANARD_STM32_CAN_TSR_TXOK0;
-        BXCAN->TSR = CANARD_STM32_CAN_TSR_RQCP0;
-	handleTxMailboxInterrupt(0, txok);
-    }
-    if (BXCAN->TSR & CANARD_STM32_CAN_TSR_RQCP1) {
-        const bool txok = BXCAN->TSR & CANARD_STM32_CAN_TSR_TXOK1;
-        BXCAN->TSR = CANARD_STM32_CAN_TSR_RQCP1;
-	handleTxMailboxInterrupt(1, txok);
-    }
-    if (BXCAN->TSR & CANARD_STM32_CAN_TSR_RQCP2) {
-        const bool txok = BXCAN->TSR & CANARD_STM32_CAN_TSR_TXOK2;
-        BXCAN->TSR = CANARD_STM32_CAN_TSR_RQCP2;
-	handleTxMailboxInterrupt(2, txok);
-    }
-
-    pollErrorFlagsFromISR();
-}
-
-static void handleRxInterrupt(uint8_t fifo_index)
-{
-    canstats.num_rx_interrupts++;
-
-    volatile uint32_t* const rfr_reg = (fifo_index == 0) ? &BXCAN->RF0R : &BXCAN->RF1R;
-    if ((*rfr_reg & CANARD_STM32_CAN_RFR_FMP_MASK) == 0) {
-        return;
-    }
-
-    /*
-     * Register overflow as a hardware error
-     */
-    if ((*rfr_reg & CANARD_STM32_CAN_RFR_FOVR) != 0) {
-	canstats.rx_errors++;
-    }
-
-    receiveFrame();
-
-    pollErrorFlagsFromISR();
-}
-
-/*
-  interrupt handlers for CAN1
-*/
-void CAN1_RX0_IRQHandler(void)
-{
-    handleRxInterrupt(0);
-}
-
-void CAN1_RX1_IRQHandler(void)
-{
-    handleRxInterrupt(1);
-}
-
-void CAN1_TX_IRQHandler(void)
-{
-    handleTxInterrupt();
+    sys_can_enable_IRQ();
 }
 
 bool DroneCAN_active(void)

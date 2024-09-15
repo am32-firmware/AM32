@@ -31,23 +31,32 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 /* Specify the memory areas */
 MEMORY
 {
-FLASH (rx)      : ORIGIN = 0x08001000, LENGTH = 27K
-FLASH_VERSION (rx)  : ORIGIN = 0x08007C00 - 48, LENGTH = 16
-FILE_NAME     (rx)  : ORIGIN = 0x08007C00 - 32, LENGTH = 32
-EEPROM        (rx)  : ORIGIN = 0x08007C00, LENGTH = 1K
-RAM (xrw)       : ORIGIN = 0x20000000, LENGTH = 32K
+ RAM          (xrw)  : ORIGIN = 0x20000000, LENGTH = 64K
+ FLASH1        (rx)  : ORIGIN = 0x08004000, LENGTH = 512
+ FILE_NAME     (rx)  : ORIGIN = ORIGIN(FLASH1)+LENGTH(FLASH1), LENGTH = 32
+ EEPROM        (rx)  : ORIGIN = 0x0801f800, LENGTH = 2K
+ FLASH         (rx)  : ORIGIN = ORIGIN(FILE_NAME)+LENGTH(FILE_NAME), LENGTH = ORIGIN(EEPROM)-(ORIGIN(FILE_NAME)+LENGTH(FILE_NAME))
 }
 
 /* Define output sections */
 SECTIONS
 {
-  /* The startup code goes first into FLASH */
+  /* The startup code into "FLASH" Rom type memory */
   .isr_vector :
   {
     . = ALIGN(4);
     KEEP(*(.isr_vector)) /* Startup code */
     . = ALIGN(4);
-  } >FLASH
+    KEEP(*(.app_signature))
+    . = ALIGN(4);
+  } > FLASH1
+
+  .fill_flash1 :
+  {
+        FILL(0x00);
+        . = ORIGIN(FLASH1) + LENGTH(FLASH1) - 1;
+        BYTE(0x00)
+  } > FLASH1
 
   /* The program code and other data goes into FLASH */
   .text :
@@ -103,13 +112,11 @@ SECTIONS
     PROVIDE_HIDDEN (__fini_array_end = .);
   } >FLASH
 
-  .firmware_version :
+  .flash_fill :
   {
-    . = ALIGN(4);
-	KEEP (*(.firmware_info))
-    . = ALIGN(4);
-  } >FLASH_VERSION
-
+        . = ALIGN(4);
+        BYTE(0x00);
+  } > FLASH
 
   /* The file name */
   .file_name :

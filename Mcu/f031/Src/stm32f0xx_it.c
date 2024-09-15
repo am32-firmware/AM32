@@ -65,7 +65,7 @@ extern char servoPwm;
 char input_ready = 0;
 int update_interupt = 0;
 uint8_t update_count = 0;
-int interrupt_time = 0;
+uint16_t interrupt_time = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes
@@ -296,7 +296,7 @@ void TIM14_IRQHandler(void)
         interrupt_time = UTILITY_TIMER->CNT;
         PeriodElapsedCallback();
         LL_TIM_ClearFlag_UPDATE(TIM14);
-        interrupt_time = UTILITY_TIMER->CNT - interrupt_time;
+        interrupt_time = ((uint16_t)UTILITY_TIMER->CNT) - interrupt_time;
     }
     /* USER CODE END TIM14_IRQn 0 */
     /* USER CODE BEGIN TIM14_IRQn 1 */

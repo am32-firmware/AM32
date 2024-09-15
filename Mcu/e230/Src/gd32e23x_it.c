@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 extern void transfercomplete();
 extern void PeriodElapsedCallback();
 extern void interruptRoutine();
@@ -14,7 +16,7 @@ extern char dshot_telemetry;
 extern char out_put;
 extern char armed;
 
-int interrupt_time = 0;
+uint16_t interrupt_time = 0;
 
 #include "gd32e23x_it.h"
 
@@ -129,7 +131,7 @@ void TIMER15_IRQHandler(void)
     interrupt_time = TIMER_CNT(UTILITY_TIMER);
     timer_interrupt_flag_clear(TIMER15, TIMER_INT_FLAG_UP);
     PeriodElapsedCallback();
-    interrupt_time = TIMER_CNT(UTILITY_TIMER) - interrupt_time;
+    interrupt_time = ((uint16_t)TIMER_CNT(UTILITY_TIMER)) - interrupt_time;
 }
 
 void TIMER14_IRQHandler(void) { timer_flag_clear(TIMER14, TIMER_FLAG_UP); }

@@ -13,7 +13,7 @@ extern void tenKhzRoutine();
 extern void processDshot();
 
 extern char send_telemetry;
-int interrupt_time = 0;
+uint16_t interrupt_time = 0;
 extern char servoPwm;
 extern char dshot_telemetry;
 extern char armed;

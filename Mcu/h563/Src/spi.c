@@ -131,31 +131,31 @@ void spi_start_tx_dma_transfer(spi_t* spi)
 
     if (spi->_dma_transfer_count) {
 
-    // disable the spi
-    spi_disable(spi);
+        // disable the spi
+        spi_disable(spi);
 
-    // spi->ref->IFCR = 0xffffffff;
-    spi->ref->IFCR |= SPI_IFCR_TXTFC;
-    // set TSIZE - transfer length in words
-    // spi must be disabled to set TSIZE
-    spi->ref->CR2 = spi->_dma_transfer_count;
-    // SPI5->CR2 = 1;
-    
+        // spi->ref->IFCR = 0xffffffff;
+        spi->ref->IFCR |= SPI_IFCR_TXTFC;
+        // set TSIZE - transfer length in words
+        // spi must be disabled to set TSIZE
+        spi->ref->CR2 = spi->_dma_transfer_count;
+        // SPI5->CR2 = 1;
+        
 
-            spi->txDma->ref->CBR1 = spi->_dma_transfer_count*2;
-            spi->txDma->ref->CSAR = (uint32_t)(spi->_tx_buffer + spi->_tx_tail);
-            //spi->ref->ICR |= spi_ICR_TCCF; // maybe not necessary
-            spi->txDma->ref->CCR |= DMA_CCR_EN;
+        spi->txDma->ref->CBR1 = spi->_dma_transfer_count*2;
+        spi->txDma->ref->CSAR = (uint32_t)(spi->_tx_buffer + spi->_tx_tail);
+        //spi->ref->ICR |= spi_ICR_TCCF; // maybe not necessary
+        spi->txDma->ref->CCR |= DMA_CCR_EN;
 
-    // enable the spi
-    spi_enable(spi);
+        // enable the spi
+        spi_enable(spi);
 
-    // while (spi->txDma->ref->CBR1 == spi->_dma_transfer_count);
+        // while (spi->txDma->ref->CBR1 == spi->_dma_transfer_count);
 
-    // spi->ref->CR1 |= SPI_CR1_SPE;
+        // spi->ref->CR1 |= SPI_CR1_SPE;
 
-    // spi->ref->TXDR = (uint32_t)(spi->_tx_buffer + spi->_tx_tail);
-    spi->ref->CR1 |= SPI_CR1_CSTART;
+        // spi->ref->TXDR = (uint32_t)(spi->_tx_buffer + spi->_tx_tail);
+        spi->ref->CR1 |= SPI_CR1_CSTART;
     }
 
 }

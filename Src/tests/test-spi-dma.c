@@ -96,7 +96,7 @@ int main()
 
 
     while(1) {
-        spi_write(&spi, data, 5);
+        // spi_write(&spi, data, 5);
 
     }
 }

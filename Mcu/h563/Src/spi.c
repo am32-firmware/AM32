@@ -47,10 +47,11 @@ void spi_initialize(spi_t* spi)
     spi->txDma->userParam = (uint32_t)spi;
 
     // set source data width to half word (16 bit)
-    spi->txDma->ref->CTR1 |= 0b01 << DMA_CTR1_SDW_LOG2_Pos;
+    // spi->txDma->ref->CTR1 |= 0b01 << DMA_CTR1_SDW_LOG2_Pos;
+    spi->txDma->ref->CTR1 |= 0b00 << DMA_CTR1_SDW_LOG2_Pos;
     // set destination data width to half word (16 bit)
-    spi->txDma->ref->CTR1 |= 0b01 << DMA_CTR1_DDW_LOG2_Pos;
-    // spi->txDma->ref->CTR1 |= 0b10 << DMA_CTR1_DDW_LOG2_Pos;
+    // spi->txDma->ref->CTR1 |= 0b01 << DMA_CTR1_DDW_LOG2_Pos;
+    spi->txDma->ref->CTR1 |= 0b10 << DMA_CTR1_DDW_LOG2_Pos;
 
     NVIC_SetPriority(spi->txDma->irqn, 0);
     NVIC_EnableIRQ(spi->txDma->irqn);

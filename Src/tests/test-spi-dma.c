@@ -79,17 +79,31 @@ int main()
     // spi_write(&spi, &data, 1);
     // spi_write(&spi, &data, 1);
     
+    // uint16_t data[] = {
+    //     0xff00,
+    //     0x5555,
+    //     0x0550,
+    //     0x5555,
+    //     0x00ff,
+    //     0x5555,
+    //     0x5555,
+    //     0x5555,
+    //     0x5555,
+    //     0x5555,
+    // };
+
     uint16_t data[] = {
-        0xff00,
-        0x5555,
-        0x0550,
-        0x5555,
-        0x00ff,
-        0x5555,
-        0x5555,
-        0x5555,
-        0x5555,
-        0x5555,
+        0xfff0,
+        0xfff1,
+        0xfff2,
+        0xfff3,
+        0xfff4,
+        0xfff5,
+        0xfff6,
+        0xfff7,
+        0xfff8,
+        0xfff9,
+        0xfffa,
     };
 
     spi_write(&spi, data, 10);

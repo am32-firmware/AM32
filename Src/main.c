@@ -361,7 +361,6 @@ uint16_t low_cell_volt_cutoff = 330; // 3.3volts per cell
 const char filename[30] __attribute__((section(".file_name"))) = FILE_NAME;
 _Static_assert(sizeof(FIRMWARE_NAME) <=13,"Firmware name too long");   // max 12 character firmware name plus NULL 
 
-
 uint8_t EEPROM_VERSION;
 // move these to targets folder or peripherals for each mcu
 char RC_CAR_REVERSE = 0; // have to set bidirectional, comp_pwm off and stall
@@ -745,7 +744,6 @@ void loadEEpromSettings()
             RC_CAR_REVERSE = 0;
         }
         if (eepromBuffer[39] == 0x01) {
-					auto_advance = 1;
 #ifdef HAS_HALL_SENSORS
             USE_HALL_SENSOR = 1;
 #else
@@ -821,7 +819,11 @@ void loadEEpromSettings()
             servoPwm = 0;
             EDT_ARMED = 1;
         }
-
+        if (eepromBuffer[47] == 0x01) {
+            auto_advance = 1;
+        } else {
+            auto_advance = 0;
+        }
         if (motor_kv < 300) {
             low_rpm_throttle_limit = 0;
         }

@@ -79,8 +79,8 @@ void spi_initialize(spi_t* spi)
     spi->rxDma->ref->CTR1 |= 0b01 << DMA_CTR1_SDW_LOG2_Pos;
     // spi->txDma->ref->CTR1 |= 0b00 << DMA_CTR1_SDW_LOG2_Pos;
     // set destination data width to half word (16 bit)
-    // spi->rxDma->ref->CTR1 |= 0b01 << DMA_CTR1_DDW_LOG2_Pos;
-    spi->rxDma->ref->CTR1 |= 0b00 << DMA_CTR1_DDW_LOG2_Pos;
+    spi->rxDma->ref->CTR1 |= 0b01 << DMA_CTR1_DDW_LOG2_Pos;
+    // spi->rxDma->ref->CTR1 |= 0b00 << DMA_CTR1_DDW_LOG2_Pos;
     // spi->txDma->ref->CTR1 |= 0b00 << DMA_CTR1_DDW_LOG2_Pos;
 
 

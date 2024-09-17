@@ -98,13 +98,14 @@ int main()
         DRV8323_READ | DRV8323_REG_DRIVER_CONTROL,
         DRV8323_READ | DRV8323_REG_GATE_DRIVE_HS,
         DRV8323_READ | DRV8323_REG_GATE_DRIVE_LS,
+        DRV8323_READ | DRV8323_REG_OCP_CONTROL,
         DRV8323_READ | DRV8323_REG_CSA_CONTROL,
     };
 
-    spi_write(&spi, data, 6);
+    spi_write(&spi, data, 7);
     uint16_t readData[10];
-    while(spi_rx_waiting(&spi) < 6);
-    spi_read(&spi, readData, 6);
+    while(spi_rx_waiting(&spi) < 7);
+    spi_read(&spi, readData, 7);
 
     while(1) {
         // spi_write(&spi, data, 5);

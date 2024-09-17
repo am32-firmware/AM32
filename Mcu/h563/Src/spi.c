@@ -56,6 +56,38 @@ void spi_initialize(spi_t* spi)
     NVIC_SetPriority(spi->txDma->irqn, 0);
     NVIC_EnableIRQ(spi->txDma->irqn);
 
+
+    // set the channel destination address
+    spi->rxDma->ref->CDAR = (uint32_t)spi->_rx_buffer;
+    // set the channel source address
+    spi->rxDma->ref->CSAR = (uint32_t)spi->ref->RXDR;
+
+    // set destination incrementing burst
+    spi->rxDma->ref->CTR1 |= DMA_CTR1_DINC;
+    // set the peripheral hardware request selection
+    spi->rxDma->ref->CTR2 |= LL_GPDMA1_REQUEST_SPI5_RX;
+
+    // set the transfer length
+    spi->rxDma->ref->CBR1 = 256;
+    // set the block repeated destination address offset
+    spi->rxDma->ref->CBR2 |= 256 << DMA_CBR2_BRDAO_Pos;
+    spi->rxDma->ref->CBR1 |= DMA_CBR1_BRDDEC;
+    // configure single LLI to run repeatedly
+    spi->rxDma->ref->CLLR = 0x08000004 & DMA_CLLR_LA_Msk;
+
+    // set source data width to half word (16 bit)
+    spi->rxDma->ref->CTR1 |= 0b01 << DMA_CTR1_SDW_LOG2_Pos;
+    // spi->txDma->ref->CTR1 |= 0b00 << DMA_CTR1_SDW_LOG2_Pos;
+    // set destination data width to half word (16 bit)
+    spi->rxDma->ref->CTR1 |= 0b01 << DMA_CTR1_DDW_LOG2_Pos;
+    // spi->txDma->ref->CTR1 |= 0b00 << DMA_CTR1_DDW_LOG2_Pos;
+
+
+    // lastly enable the dma channel
+    spi->rxDma->ref->CCR |= DMA_CCR_EN;
+
+
+
     // // set TSIZE - transfer length in words
     // SPI5->CR2 = 1;
 
@@ -85,7 +117,7 @@ void spi_initialize(spi_t* spi)
     SPI5->CFG2 |= 0b1111;
 
     SPI5->CFG1 |= SPI_CFG1_TXDMAEN;
-    // SPI5->CFG1 |= SPI_CFG1_RXDMAEN;
+    SPI5->CFG1 |= SPI_CFG1_RXDMAEN;
 
     // set DSIZE (frame width) to 16 bits
     SPI5->CFG1 |= 0b01111;
@@ -95,6 +127,34 @@ void spi_initialize(spi_t* spi)
 
 // spi_enable(spi);
 
+}
+
+// NOTE overruns will result in lost data + corruption
+// conditions will not be corrected
+// data must be read out before an overrun occurs
+uint8_t spi_read(spi_t* spi, uint16_t* word, uint8_t length) {
+    uint16_t i = 0;
+
+    uint16_t read_words = spi_rx_waiting(spi);
+
+    if (length < read_words) {
+        read_words = length;
+    }
+
+    while(i++ < read_words) {
+      *word++ = spi->_rx_buffer[spi->_rx_head++];
+    }
+
+    return read_words;
+}
+
+// rxhead = position of first available byte
+// 256 - CNDTR = position of last received byte
+// rxhead = 0 CNDTR=256 = 0 data waiting
+// rxhead = 0 CNDTR=255 = 1 data waiting
+// rxhead = CNDTR-256 = rx empty
+uint8_t spi_rx_waiting(spi_t* spi) {
+    return 256 - (spi->rxDma->ref->CBR1 & DMA_CBR1_BNDT_Msk) - spi->_rx_head;
 }
 
 // how many bytes are waiting to be shifted out

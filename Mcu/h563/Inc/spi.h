@@ -24,6 +24,14 @@
 
 #define GATE_DRIVER_SPI_PERIPH SPI5
 
+
+#define DRV8323_REG_FAULT_STATUS_1 (0x0 << 11)
+#define DRV8323_REG_VGS_STATUS_2 (0x1 << 11)
+#define DRV8323_REG_DRIVER_CONTROL (0x2 << 11)
+#define DRV8323_REG_GATE_DRIVE_HS (0x3 << 11)
+#define DRV8323_REG_GATE_DRIVE_LS (0x4 << 11)
+#define DRV8323_REG_OCP_CONTROL (0x5 << 11)
+
 #define DRV8323_REG_CSA_CONTROL (0x6 << 11)
 #define DRV8323_REG_CSA_CONTROL_VALUE 0b01011000001
 
@@ -38,8 +46,8 @@ typedef struct {
     // implementation takes advantage of integer overflow
     uint16_t* _rx_buffer;
     uint16_t* _tx_buffer;
-    uint8_t _rx_buffer_size;
-    uint8_t _tx_buffer_size;
+    uint16_t _rx_buffer_size;
+    uint16_t _tx_buffer_size;
     uint8_t _rx_head;
     uint8_t _tx_head;
     uint8_t _tx_tail;

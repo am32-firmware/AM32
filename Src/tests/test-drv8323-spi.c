@@ -93,24 +93,20 @@ int main()
     // };
 
     uint16_t data[] = {
-        0xfff0,
-        0xfff1,
-        0xfff2,
-        0xfff3,
-        0xfff4,
-        0xfff5,
-        0xfff6,
-        0xfff7,
-        0xfff8,
-        0xfff9,
-        0xfffa,
+        DRV8323_READ | DRV8323_REG_FAULT_STATUS_1,
+        DRV8323_READ | DRV8323_REG_VGS_STATUS_2,
+        DRV8323_READ | DRV8323_REG_DRIVER_CONTROL,
+        DRV8323_READ | DRV8323_REG_GATE_DRIVE_HS,
+        DRV8323_READ | DRV8323_REG_GATE_DRIVE_LS,
+        DRV8323_READ | DRV8323_REG_CSA_CONTROL,
     };
 
-    spi_write(&spi, data, 11);
+    spi_write(&spi, data, 6);
     uint16_t readData[10];
-    spi_read(&spi, readData, 10);
+    while(spi_rx_waiting(&spi) < 6);
+    spi_read(&spi, readData, 6);
 
     while(1) {
-        spi_write(&spi, data, 5);
+        // spi_write(&spi, data, 5);
     }
 }

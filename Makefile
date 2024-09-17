@@ -56,7 +56,8 @@ LDFLAGS_COMMON := -specs=nano.specs $(LIBS) -Wl,--gc-sections -Wl,--print-memory
 SRC_COMMON := $(foreach dir,$(SRC_DIRS_COMMON),$(wildcard $(dir)/*.[cs]))
 SRC_MAIN := $(SRC_DIRS_COMMON)/main.c
 SRC_COMMON := $(filter-out $(SRC_MAIN), $(SRC_COMMON))
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-drv8323-spi.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-rng.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator-3phase.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma-single.c

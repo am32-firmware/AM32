@@ -2958,7 +2958,49 @@
 
 #endif
 
+#ifdef     HARDWARE_GROUP_L4_C
 
+#define    MCU_L431
+#define    USE_TIMER_15_CHANNEL_1
+#define    INPUT_PIN               LL_GPIO_PIN_2
+#define    INPUT_PIN_PORT              GPIOA
+#define    IC_TIMER_CHANNEL         LL_TIM_CHANNEL_CH1
+#define    IC_TIMER_REGISTER          TIM15
+#define    IC_TIMER_POINTER           htim15
+
+#define    INPUT_DMA_CHANNEL       LL_DMA_CHANNEL_5
+#define    DMA_HANDLE_TYPE_DEF     hdma_tim15_ch1
+#define    IC_DMA_IRQ_NAME         DMA1_Channel5_IRQn
+
+#define PHASE_A_GPIO_LOW          LL_GPIO_PIN_1
+#define PHASE_A_GPIO_PORT_LOW         GPIOB
+#define PHASE_A_GPIO_HIGH          LL_GPIO_PIN_10
+#define PHASE_A_GPIO_PORT_HIGH         GPIOA
+
+#define PHASE_B_GPIO_LOW          LL_GPIO_PIN_0
+#define PHASE_B_GPIO_PORT_LOW         GPIOB
+#define PHASE_B_GPIO_HIGH          LL_GPIO_PIN_9
+#define PHASE_B_GPIO_PORT_HIGH         GPIOA
+
+#define PHASE_C_GPIO_LOW          LL_GPIO_PIN_7
+#define PHASE_C_GPIO_PORT_LOW         GPIOA
+#define PHASE_C_GPIO_HIGH          LL_GPIO_PIN_8
+#define PHASE_C_GPIO_PORT_HIGH         GPIOA
+
+#define USE_COMP_1
+#define PHASE_A_COMP  LL_COMP_INPUT_MINUS_IO3  // pa0
+#define PHASE_B_COMP  LL_COMP_INPUT_MINUS_IO5  // pa5
+#define PHASE_C_COMP  LL_COMP_INPUT_MINUS_IO4  // pa4
+
+#define COMMON_COMP LL_COMP_INPUT_PLUS_IO3  //pa1
+
+#define CURRENT_SENSE_ADC_PIN        LL_GPIO_PIN_3
+#define VOLTAGE_SENSE_ADC_PIN        LL_GPIO_PIN_6
+
+#define CURRENT_ADC_CHANNEL         LL_ADC_CHANNEL_8
+#define VOLTAGE_ADC_CHANNEL         LL_ADC_CHANNEL_11
+
+#endif
 
 #ifdef     HARDWARE_GROUP_L4_N
 
@@ -3204,7 +3246,7 @@
 #define EXTI_LINE   LL_EXTI_LINE_22
 #endif
 #ifdef USE_COMP_1
-#define MAIN_COMP	COMP2
+#define MAIN_COMP	COMP1
 #define EXTI_LINE   LL_EXTI_LINE_21
 #endif
 #ifndef TARGET_MIN_BEMF_COUNTS

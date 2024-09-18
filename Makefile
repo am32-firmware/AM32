@@ -59,6 +59,9 @@ SRC_COMMON := $(foreach dir,$(SRC_DIRS_COMMON),$(wildcard $(dir)/*.[cs]))
 OBJ := obj
 BIN_DIR := $(ROOT)/$(OBJ)
 
+# find the SVD files
+$(foreach MCU,$(MCU_TYPES),$(eval SVD_$(MCU) := $(wildcard $(HAL_FOLDER_$(MCU))/*.svd)))
+
 .PHONY : clean all binary $(foreach MCU,$(MCU_TYPES),$(call lc,$(MCU)))
 ALL_TARGETS := $(foreach MCU,$(MCU_TYPES),$(TARGETS_$(MCU)))
 all : $(ALL_TARGETS)
@@ -98,10 +101,11 @@ $$($(2)_BASENAME).elf: $(SRC_COMMON) $$(SRC_$(1))
 	$(QUIET)$(CC) $$(CFLAGS_$(2)) $$(LDFLAGS_$(2)) -MMD -MP -MF $$(@:.elf=.d) -o $$(@) $(SRC_COMMON) $$(SRC_$(1))
 # we copy debug.elf to give us a constant debug target for vscode
 # this means the debug button will always debug the last target built
-	@$(CP) -f $$(@) $(OBJ)$(DSEP)debug.elf > $(NUL)
+	$(QUIET)$(CP) -f $$(@) $(OBJ)$(DSEP)debug.elf > $(NUL)
+	$(QUIET)$(CP) -f $$(SVD_$(1)) $(OBJ)/debug.svd
 # also copy the openocd.cfg from the MCU directory to obj/openocd.cfg for auto config of Cortex-Debug
 # in vscode
-	@$(CP) -f Mcu$(DSEP)$(call lc,$(1))$(DSEP)openocd.cfg $(OBJ)$(DSEP)openocd.cfg > $(NUL)
+	$(QUIET)$(CP) -f Mcu$(DSEP)$(call lc,$(1))$(DSEP)openocd.cfg $(OBJ)$(DSEP)openocd.cfg > $(NUL)
 endef
 $(foreach MCU,$(MCU_TYPES),$(foreach TARGET,$(TARGETS_$(MCU)), $(eval $(call CREATE_BUILD_TARGET,$(MCU),$(TARGET)))))
 

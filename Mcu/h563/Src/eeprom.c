@@ -80,15 +80,15 @@ void flash_erase_sector(uint8_t sector)
     flash_unlock();
 
     FLASH->NSCR &= ~FLASH_CR_SNB_Msk;
-    FLASH->NSCR |= FLASH_CR_SER |
-    (sector << FLASH_CR_SNB_Pos);
+    FLASH->NSCR |= FLASH_CR_SER | (sector << FLASH_CR_SNB_Pos);
     // sector << FLASH_CR_SNB_Pos;
     FLASH->NSCR |= FLASH_CR_START;
 
     while (flash_busy());
+    while (flash_dbne());
 
     // maybe not necessary
-    FLASH->NSCR &= ~FLASH_CR_SNB_Msk;
+    // FLASH->NSCR &= ~FLASH_CR_SNB_Msk;
 
     FLASH->NSCR &= ~FLASH_CR_SER;
     flash_lock();

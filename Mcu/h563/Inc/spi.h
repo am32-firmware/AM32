@@ -31,7 +31,6 @@
 #define DRV8323_REG_GATE_DRIVE_HS (0x3 << 11)
 #define DRV8323_REG_GATE_DRIVE_LS (0x4 << 11)
 #define DRV8323_REG_OCP_CONTROL (0x5 << 11)
-
 #define DRV8323_REG_CSA_CONTROL (0x6 << 11)
 #define DRV8323_REG_CSA_CONTROL_VALUE 0b01011000001
 
@@ -67,7 +66,7 @@ uint8_t spi_tx_waiting(spi_t* spi);
 uint8_t spi_tx_available(spi_t* spi);
 void spi_write(spi_t* spi, const uint16_t* data, uint8_t length);
 void spi_write_dma(spi_t* spi, const uint16_t* data, uint8_t length);
-void spi_write_word(spi_t* spi, uint16_t word);
+uint16_t spi_write_word(spi_t* spi, uint16_t word);
 void spi_enable(spi_t* spi);
 void spi_disable(spi_t* spi);
 void spi_start_transfer(spi_t* spi);

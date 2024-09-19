@@ -3,7 +3,6 @@
 
 #include "stm32h563xx.h"
 #include "stm32h5xx_ll_exti.h"
-    // .flagShift = 8*(i%4), \
 
 #define DEFINE_EXTI_CHANNEL(i, j) { \
     .channel = i, \

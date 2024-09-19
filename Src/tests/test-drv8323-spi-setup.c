@@ -3,11 +3,12 @@
 #include "spi.h"
 #include "gpio.h"
 #include "dma.h"
+#include "drv8323-spi.h"
 
-static uint16_t spi_rx_buffer[256];
-static uint16_t spi_tx_buffer[256];
-static spi_t spi;
-
+uint16_t spi_rx_buffer[256];
+uint16_t spi_tx_buffer[256];
+spi_t spi;
+drv8323_t drv;
 int main()
 {
     // enable dma clock
@@ -15,23 +16,22 @@ int main()
     // enable spi clock
     RCC->APB3ENR |= RCC_APB3ENR_SPI5EN;
 
-
     gpio_t gpioDrv8323Enable = DEF_GPIO(
         GPIOF,
         0,
         0,
-        GPIO_OUTPUT    );
+        GPIO_OUTPUT);
     gpio_initialize(&gpioDrv8323Enable);
     gpio_set_speed(&gpioDrv8323Enable, 0b11);
-    gpio_reset(&gpioDrv8323Enable);
-    for (int i = 0; i < 0xfffff; i++) {
-        asm("nop");
-    }
-    gpio_set(&gpioDrv8323Enable);
+    // gpio_reset(&gpioDrv8323Enable);
+    // for (int i = 0; i < 0xfffff; i++) {
+    //     asm("nop");
+    // }
+    // gpio_set(&gpioDrv8323Enable);
 
-    for (int i = 0; i < 0xfffff; i++) {
-        asm("nop");
-    }
+    // for (int i = 0; i < 0xfffff; i++) {
+    //     asm("nop");
+    // }
 
     gpio_t gpioSpiNSS = DEF_GPIO(
         GATE_DRIVER_SPI_NSS_PORT,
@@ -64,12 +64,36 @@ int main()
     spi.rxDma = &dmaChannels[7];
     spi.txDma = &dmaChannels[0];
 
-    spi_initialize(&spi);
+    // spi_initialize(&spi);
 
+    drv.spi = &spi;
+    drv.gpioEnable = &gpioDrv8323Enable;
+
+    drv8323_initialize(&drv);
     gpio_initialize(&gpioSpiNSS);
     gpio_initialize(&gpioSpiSCK);
     gpio_initialize(&gpioSpiMISO);
     gpio_initialize(&gpioSpiMOSI);
+
+    // drv8323_read_reg(&drv, DRV8323_REG_CSA_CONTROL);
+    while (!drv8323_write_reg(&drv,
+        DRV8323_REG_CSA_CONTROL |
+        DRV8323_CSA_VREF_DIV |
+        DRV8323_CSA_CSA_GAIN_40VV |
+        DRV8323_CSA_SEN_LVL_250mV
+    ));
+
+    while (!drv8323_write_reg(&drv,
+    DRV8323_REG_OCP_CONTROL |
+    DRV8323_OCP_DEADTIME_400ns |
+    DRV8323_OCP_DEGLITCH_6us |
+    DRV8323_OCP_VDSLVL_600mV));
+
+    // while (!drv8323_write_reg(&drv,
+    //     DRV8323_REG_DRIVER_CONTROL |
+    //     DRV8323_DRIVER_CONTROL_COAST
+    // ));
+
 
     // for (uint16_t i = 0; i < 200; i++) {
     //     spi_write(&spi, &i, 1);
@@ -92,20 +116,20 @@ int main()
     //     0x5555,
     // };
 
-    uint16_t data[] = {
-        DRV8323_READ | DRV8323_REG_FAULT_STATUS_1,
-        DRV8323_READ | DRV8323_REG_VGS_STATUS_2,
-        DRV8323_READ | DRV8323_REG_DRIVER_CONTROL,
-        DRV8323_READ | DRV8323_REG_GATE_DRIVE_HS,
-        DRV8323_READ | DRV8323_REG_GATE_DRIVE_LS,
-        DRV8323_READ | DRV8323_REG_OCP_CONTROL,
-        DRV8323_READ | DRV8323_REG_CSA_CONTROL,
-    };
+    // uint16_t data[] = {
+    //     DRV8323_READ | DRV8323_REG_FAULT_STATUS_1,
+    //     DRV8323_READ | DRV8323_REG_VGS_STATUS_2,
+    //     DRV8323_READ | DRV8323_REG_DRIVER_CONTROL,
+    //     DRV8323_READ | DRV8323_REG_GATE_DRIVE_HS,
+    //     DRV8323_READ | DRV8323_REG_GATE_DRIVE_LS,
+    //     DRV8323_READ | DRV8323_REG_OCP_CONTROL,
+    //     DRV8323_READ | DRV8323_REG_CSA_CONTROL,
+    // };
 
-    spi_write(&spi, data, 7);
-    uint16_t readData[10];
-    while(spi_rx_waiting(&spi) < 7);
-    spi_read(&spi, readData, 7);
+    // spi_write(&spi, data, 7);
+    // uint16_t readData[10];
+    // while(spi_rx_waiting(&spi) < 7);
+    // spi_read(&spi, readData, 7);
 
     while(1) {
         // spi_write(&spi, data, 5);

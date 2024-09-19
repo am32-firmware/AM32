@@ -118,7 +118,7 @@ void spi_initialize(spi_t* spi)
     SPI5->CFG2 |= 0b1111;
 
     SPI5->CFG1 |= SPI_CFG1_TXDMAEN;
-    SPI5->CFG1 |= SPI_CFG1_RXDMAEN;
+    // SPI5->CFG1 |= SPI_CFG1_RXDMAEN;
 
     // set DSIZE (frame width) to 16 bits
     SPI5->CFG1 |= 0b01111;
@@ -260,7 +260,7 @@ void spi_write_dma(spi_t* spi, const uint16_t* data, uint8_t length) {
     // }
 
     // disable the spi
-    spi_disable(&spi);
+    spi_disable(spi);
 
     // spi->ref->IFCR = 0xffffffff;
     spi->ref->IFCR |= SPI_IFCR_TXTFC;
@@ -295,16 +295,20 @@ void spi_write_dma(spi_t* spi, const uint16_t* data, uint8_t length) {
 }
 
 
-void spi_write_word(spi_t* spi, uint16_t word)
+uint16_t spi_write_word(spi_t* spi, uint16_t word)
 {
     spi_disable(spi);
     spi->ref->IFCR |= SPI_IFCR_TXTFC;
+    spi->ref->CR2 = 1;
     spi_enable(spi);
 
     spi->ref->TXDR = word;
     spi_start_transfer(spi);
-    while (!(spi->ref->SR & SPI_SR_EOT));
-
+    // while (!(spi->ref->SR & SPI_SR_EOT));
+    while (!(spi->ref->SR & SPI_SR_TXC));
+    // while (!(spi->ref->SR & SPI_SR_RXP));
+    // asm("nop");
+    return (uint16_t)spi->ref->RXDR;
 }
 
 void spi_enable(spi_t* spi)

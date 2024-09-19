@@ -30,10 +30,11 @@ void save_flash_nolib(uint8_t* data, int length, uint32_t add)
     }
 
     // erase page if address even divisable by 1024
-    if ((add % 1024) == 0) {
+    if ((add % page_size) == 0) {
         FLASH->NSCR |= FLASH_CR_SER;
         FLASH->NSCR &= ~FLASH_CR_SNB_Msk;
-        FLASH->NSCR = (add%128) << FLASH_CR_SNB_Pos;
+        // FLASH->NSCR = (add%128) << FLASH_CR_SNB_Pos;
+        FLASH->NSCR |= 127 << FLASH_CR_SNB_Pos;
         FLASH->NSCR |= FLASH_CR_START;
         while ((FLASH->NSSR & FLASH_SR_BSY) != 0) {
             /*  add time-out */

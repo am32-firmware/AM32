@@ -562,18 +562,18 @@ void enableCorePeripherals()
     activateADC();
 #endif
 
-#ifndef MCU_F031
-    __IO uint32_t wait_loop_index = 0;
-    /* Enable comparator */
-    LL_COMP_Enable(MAIN_COMP);
-#ifdef N_VARIANT // needs comp 1 and 2
-    LL_COMP_Enable(COMP1);
-#endif
-    wait_loop_index = ((LL_COMP_DELAY_STARTUP_US * (SystemCoreClock / (100000 * 2))) / 10);
-    while (wait_loop_index != 0) {
-        wait_loop_index--;
-    }
-#endif
+// #ifndef MCU_F031
+//     __IO uint32_t wait_loop_index = 0;
+//     /* Enable comparator */
+//     LL_COMP_Enable(MAIN_COMP);
+// #ifdef N_VARIANT // needs comp 1 and 2
+//     LL_COMP_Enable(COMP1);
+// #endif
+//     wait_loop_index = ((LL_COMP_DELAY_STARTUP_US * (SystemCoreClock / (100000 * 2))) / 10);
+//     while (wait_loop_index != 0) {
+//         wait_loop_index--;
+//     }
+// #endif
     NVIC_SetPriority(EXTI15_IRQn, 2);
     NVIC_EnableIRQ(EXTI15_IRQn);
     EXTI->IMR1 |= (1 << 15);

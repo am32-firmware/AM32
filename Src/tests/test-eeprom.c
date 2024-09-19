@@ -2,9 +2,10 @@
 #include "targets.h"
 #include "eeprom.h"
 
-uint16_t data[10];
+uint8_t data[10];
 
-#define EEPROM_START_ADD
+// first bank of high-cycle flash
+// #define EEPROM_START_ADD 0x09000000;
 int main()
 {
     read_flash_bin(data, EEPROM_START_ADD, 10);

@@ -840,6 +840,7 @@ void loadEEpromSettings()
 
 void saveEEpromSettings()
 {
+    allOff(); // turn off all outputs
 
     eepromBuffer[1] = eeprom_layout_version;
     if (dir_reversed == 1) {

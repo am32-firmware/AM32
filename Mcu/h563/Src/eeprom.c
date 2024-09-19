@@ -1,7 +1,14 @@
+#include "targets.h"
 #include "eeprom.h"
 #include "stm32h563xx.h"
 
 #include <string.h>
+// !!!!!!!!!!!!!!!!!!!
+// Per reference manual:
+// The application software must not unlock an
+// already unlocked register, otherwise this
+// register remains locked until the next system reset.
+// !!!!!!!!!!!!!!!!!!!!
 
 // #define APP_START (uint32_t)0x08001000
 // #define FLASH_STORAGE 0x08005000  // at the 31kb mark
@@ -20,50 +27,16 @@ void save_flash_nolib(uint8_t* data, int length, uint32_t add)
     }
     volatile uint32_t data_length = length / 2;
 
-    // unlock flash
+    while (flash_busy());
 
-    while ((FLASH->NSSR & FLASH_SR_BSY) != 0) {
-        /*  add time-out*/
-    }
-    if ((FLASH->NSCR & FLASH_CR_LOCK) != 0) {
-        FLASH->NSKEYR = FLASH_FKEY1;
-        FLASH->NSKEYR = FLASH_FKEY2;
-    }
-
-    // erase page if address even divisable by 1024
-    if ((add % page_size) == 0) {
-        FLASH->NSCR |= FLASH_CR_SER;
-        FLASH->NSCR &= ~FLASH_CR_SNB_Msk;
-        // FLASH->NSCR = (add%128) << FLASH_CR_SNB_Pos;
-        FLASH->NSCR |= 127 << FLASH_CR_SNB_Pos;
-        FLASH->NSCR |= FLASH_CR_START;
-        while ((FLASH->NSSR & FLASH_SR_BSY) != 0) {
-            /*  add time-out */
-        }
-        if ((FLASH->NSSR & FLASH_SR_EOP) != 0) {
-            FLASH->NSSR = FLASH_SR_EOP;
-        } else {
-            /* error */
-        }
-        FLASH->NSCR &= ~FLASH_CR_SER;
-    }
-
+    flash_erase_sector((add - FLASH_BASE)/FLASH_PAGE_SIZE);
+    
     volatile uint32_t write_cnt = 0, index = 0;
     while (index < data_length) {
-        FLASH->NSCR |= FLASH_CR_PG; /* (1) */
-        *(__IO uint16_t*)(add + write_cnt) = data_to_FLASH[index];
-        while ((FLASH->NSSR & FLASH_SR_BSY) != 0) { /*  add time-out  */
-        }
-        if ((FLASH->NSSR & FLASH_SR_EOP) != 0) {
-            FLASH->NSSR = FLASH_SR_EOP;
-        } else {
-            /*  error  */
-        }
-        FLASH->NSCR &= ~FLASH_CR_PG;
+        flash_program_word(data_to_FLASH[index], (add + write_cnt));
         write_cnt += 2;
         index++;
     }
-    SET_BIT(FLASH->NSCR, FLASH_CR_LOCK);
 }
 
 void read_flash_bin(uint8_t* data, uint32_t add, int out_buff_len)
@@ -75,4 +48,87 @@ void read_flash_bin(uint8_t* data, uint32_t add, int out_buff_len)
     for (int i = 0; i < length; i++) {
         readData[i] = *(uint32_t*)(add + i);
     }
+}
+
+void flash_erase_sector(uint8_t sector)
+{
+    // sector out of range
+    if (sector > FLASH_MAX_SECTORS - 1) {
+        return;
+    }
+    // sector must be aligned to page size
+    if (sector%FLASH_PAGE_SIZE) {
+        return;
+    }
+
+    while (flash_busy());
+    while (flash_dbne());
+
+
+    flash_unlock();
+
+    FLASH->NSCR &= ~FLASH_CR_SNB_Msk;
+    FLASH->NSCR |= FLASH_CR_SER |
+    sector << FLASH_CR_SNB_Pos;
+    FLASH->NSCR |= FLASH_CR_START;
+
+    while (flash_busy());
+
+    FLASH->NSCR &= ~FLASH_CR_SER;
+    flash_lock();
+}
+
+bool flash_busy()
+{
+    return FLASH->NSSR & FLASH_SR_BSY;
+}
+
+bool flash_dbne()
+{
+    return FLASH->NSSR & FLASH_SR_DBNE;
+}
+
+void flash_unlock()
+{
+    // unlock the flash
+    if ((FLASH->NSCR & FLASH_CR_LOCK) != 0) {
+        FLASH->NSKEYR = FLASH_FKEY1;
+        FLASH->NSKEYR = FLASH_FKEY2;
+    }
+}
+
+void flash_lock()
+{
+    SET_BIT(FLASH->NSCR, FLASH_CR_LOCK);
+}
+
+void flash_program_word(uint16_t word, uint32_t address)
+{
+    while (flash_busy());
+    while (flash_dbne());
+
+    while (flash_wbne());
+
+    flash_unlock();
+
+    flash_enable_write();
+
+    *(__IO uint16_t*)address = word;
+    while (flash_busy());
+    flash_disable_write();
+    flash_lock();
+}
+
+void flash_enable_write()
+{
+    FLASH->NSCR |= FLASH_CR_PG;
+}
+
+void flash_disable_write()
+{
+    FLASH->NSCR &= ~FLASH_CR_PG;
+}
+bool flash_wbne()
+{
+    return FLASH->NSSR & FLASH_SR_WBNE;
 }

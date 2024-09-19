@@ -2974,7 +2974,11 @@
 #define CPU_FREQUENCY_MHZ 48
 // first bank of high-cycle flash
 // #define EEPROM_START_ADD (uint32_t)0x09000000
-#define EEPROM_START_ADD (uint32_t)0x080FE000
+// #define EEPROM_START_ADD (uint32_t)0x080FE000
+#define FLASH_MAX_SECTORS 64
+#define FLASH_PAGE_SIZE (0x2000)
+#define EEPROM_PAGE (60)
+#define EEPROM_START_ADD (uint32_t)(FLASH_BASE + EEPROM_PAGE*FLASH_PAGE_SIZE)
 // #define EEPROM_START_ADD (uint32_t)0x080FC000
 #define INTERVAL_TIMER TIM3
 #define TEN_KHZ_TIMER TIM16

@@ -53,7 +53,14 @@ int interrupt_time = 0;
 /**
  * @brief This function handles Non maskable interrupt.
  */
-void NMI_Handler(void) { }
+void NMI_Handler(void) { 
+    if (READ_REG(FLASH->ECCDR) == 0xFFFF)
+    {
+        FLASH->ECCDETR |= FLASH_ECCR_ECCD;
+    // __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_ECCD);
+    return;
+    }
+}
 
 /**
  * @brief This function handles Hard fault interrupt.

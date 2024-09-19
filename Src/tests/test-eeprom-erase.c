@@ -12,13 +12,13 @@ int main()
     // }
 
     flash_erase_sector(120);
-    flash_erase_sector(121);
-    flash_erase_sector(122);
-    flash_erase_sector(123);
-    flash_erase_sector(124);
-    flash_erase_sector(125);
-    flash_erase_sector(126);
-    flash_erase_sector(127);
+    // flash_erase_sector(121);
+    // flash_erase_sector(122);
+    // flash_erase_sector(123);
+    // flash_erase_sector(124);
+    // flash_erase_sector(125);
+    // flash_erase_sector(126);
+    // flash_erase_sector(127);
     // save_flash_nolib(data, 10, EEPROM_START_ADD);
 
     while(1) {

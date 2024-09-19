@@ -31,8 +31,16 @@ void save_flash_nolib(uint8_t* data, int length, uint32_t add)
 
     // flash_erase_sector((add - FLASH_BASE)/FLASH_PAGE_SIZE);
     
-    flash_erase_sector((add - EEPROM_BASE)/EEPROM_PAGE_SIZE);
-    
+    // flash_erase_sector((add - EEPROM_BASE)/EEPROM_PAGE_SIZE);
+    // flash_erase_sector(120);
+    // flash_erase_sector(121);
+    // flash_erase_sector(122);
+    // flash_erase_sector(123);
+    // flash_erase_sector(124);
+    // flash_erase_sector(125);
+    // flash_erase_sector(126);
+    // flash_erase_sector(127);
+
     volatile uint32_t write_cnt = 0, index = 0;
     while (index < data_length) {
         flash_program_word(data_to_FLASH[index], (add + write_cnt));
@@ -61,9 +69,9 @@ void flash_erase_sector(uint8_t sector)
     //     return;
     // }
     // sector must be aligned to page size
-    if (sector%EEPROM_PAGE_SIZE) {
-        return;
-    }
+    // if (sector%EEPROM_PAGE_SIZE) {
+    //     return;
+    // }
 
     while (flash_busy());
     while (flash_dbne());
@@ -73,11 +81,14 @@ void flash_erase_sector(uint8_t sector)
 
     FLASH->NSCR &= ~FLASH_CR_SNB_Msk;
     FLASH->NSCR |= FLASH_CR_SER |
-    120 << FLASH_CR_SNB_Pos;
+    (sector << FLASH_CR_SNB_Pos);
     // sector << FLASH_CR_SNB_Pos;
     FLASH->NSCR |= FLASH_CR_START;
 
     while (flash_busy());
+
+    // maybe not necessary
+    FLASH->NSCR &= ~FLASH_CR_SNB_Msk;
 
     FLASH->NSCR &= ~FLASH_CR_SER;
     flash_lock();

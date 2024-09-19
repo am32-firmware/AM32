@@ -5,6 +5,7 @@
 
 // #define APP_START (uint32_t)0x08001000
 // #define FLASH_STORAGE 0x08005000  // at the 31kb mark
+// #define page_size 0x1800 // 1 kb for f051
 #define page_size 0x2000 // 1 kb for f051
 
 uint32_t FLASH_FKEY1 = 0x45670123;
@@ -67,8 +68,11 @@ void save_flash_nolib(uint8_t* data, int length, uint32_t add)
 
 void read_flash_bin(uint8_t* data, uint32_t add, int out_buff_len)
 {
+    FLASH->EDATA1R_CUR |= 1 << 15;
+    uint32_t readData[10];
+    int length = out_buff_len / 2;
     // volatile uint32_t read_data;
-    for (int i = 0; i < out_buff_len; i++) {
-        data[i] = *(uint8_t*)(add + i);
+    for (int i = 0; i < length; i++) {
+        readData[i] = *(uint32_t*)(add + i);
     }
 }

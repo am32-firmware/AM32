@@ -130,5 +130,6 @@ void flash_disable_write()
 }
 bool flash_wbne()
 {
-    return FLASH->NSSR & FLASH_SR_WBNE;
+    // return FLASH->NSSR & FLASH_SR_WBNE;
+    return false;
 }

@@ -61,11 +61,12 @@ void NMI_Handler(void) { }
 void HardFault_Handler(void)
 {
 
-    if (READ_REG(FLASH->ECCDR) == 0xFFFF)
-    {
-    //   __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_ECCD);
-      return;
-    }
+    while(1);
+    // if (READ_REG(FLASH->ECCDR) == 0xFFFF)
+    // {
+    // //   __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_ECCD);
+    //   return;
+    // }
 }
 
 /**

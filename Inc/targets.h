@@ -2978,10 +2978,19 @@
 #define FLASH_MAX_SECTORS 64
 #define FLASH_PAGE_SIZE (0x2000)
 #define EEPROM_PAGE_SIZE (0x1800)
+// #define EEPROM_BASE (0x09000000)
+
+// 0x080f0000 does not read when EDATAEN = 1 and EDATASTR = 7
+// it does read when these bits in the option bytes are cleared
+// the inverse is true of 0x09000000
+// #define EEPROM_BASE (0x080F0000)
 #define EEPROM_BASE (0x09000000)
 // #define EEPROM_BASE (0x080FE000)
+// #define EEPROM_BASE (0x0900a000)
 // #define FLASH_SECTOR 127
-#define EEPROM_PAGE (5)
+#define EEPROM_PAGE (0)
+// #define EEPROM_PAGE (0)
+// #define EEPROM_PAGE (0)
 #define EEPROM_START_ADD (uint32_t)(EEPROM_BASE + EEPROM_PAGE*EEPROM_PAGE_SIZE)
 // #define EEPROM_START_ADD (uint32_t)0x080FC000
 #define INTERVAL_TIMER TIM3

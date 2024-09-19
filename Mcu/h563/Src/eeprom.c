@@ -13,7 +13,7 @@
 // #define APP_START (uint32_t)0x08001000
 // #define FLASH_STORAGE 0x08005000  // at the 31kb mark
 // #define page_size 0x1800 // 1 kb for f051
-#define page_size 0x2000 // 1 kb for f051
+// #define page_size 0x2000 // 1 kb for f051
 
 uint32_t FLASH_FKEY1 = 0x45670123;
 uint32_t FLASH_FKEY2 = 0xCDEF89AB;
@@ -29,7 +29,9 @@ void save_flash_nolib(uint8_t* data, int length, uint32_t add)
 
     while (flash_busy());
 
-    flash_erase_sector((add - FLASH_BASE)/FLASH_PAGE_SIZE);
+    // flash_erase_sector((add - FLASH_BASE)/FLASH_PAGE_SIZE);
+    
+    flash_erase_sector((add - EEPROM_BASE)/EEPROM_PAGE_SIZE);
     
     volatile uint32_t write_cnt = 0, index = 0;
     while (index < data_length) {
@@ -55,11 +57,11 @@ void read_flash_bin(uint8_t* data, uint32_t add, int out_buff_len)
 void flash_erase_sector(uint8_t sector)
 {
     // sector out of range
-    if (sector > FLASH_MAX_SECTORS - 1) {
-        return;
-    }
+    // if (sector > FLASH_MAX_SECTORS - 1) {
+    //     return;
+    // }
     // sector must be aligned to page size
-    if (sector%FLASH_PAGE_SIZE) {
+    if (sector%EEPROM_PAGE_SIZE) {
         return;
     }
 
@@ -71,7 +73,8 @@ void flash_erase_sector(uint8_t sector)
 
     FLASH->NSCR &= ~FLASH_CR_SNB_Msk;
     FLASH->NSCR |= FLASH_CR_SER |
-    sector << FLASH_CR_SNB_Pos;
+    120 << FLASH_CR_SNB_Pos;
+    // sector << FLASH_CR_SNB_Pos;
     FLASH->NSCR |= FLASH_CR_START;
 
     while (flash_busy());

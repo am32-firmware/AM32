@@ -39,7 +39,7 @@ void save_flash_nolib(uint8_t* data, int length, uint32_t add)
     // flash_erase_sector(124);
     // flash_erase_sector(125);
     // flash_erase_sector(126);
-    // flash_erase_sector(127);
+    flash_erase_sector(127);
 
     volatile uint32_t write_cnt = 0, index = 0;
     while (index < data_length) {
@@ -52,9 +52,11 @@ void save_flash_nolib(uint8_t* data, int length, uint32_t add)
 void read_flash_bin(uint8_t* data, uint32_t add, int out_buff_len)
 {
     // FLASH->EDATA1R_CUR |= 1 << 15;
-    uint16_t readData[10];
+
     // uint32_t readData[10];
     int length = out_buff_len / 2;
+    // uint16_t readData[length];
+    uint16_t* readData = (uint16_t*)data;
     // volatile uint32_t read_data;
     for (int i = 0; i < length; i++) {
         readData[i] = *(uint16_t*)(add + i*2);

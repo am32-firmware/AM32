@@ -2975,6 +2975,7 @@
 // first bank of high-cycle flash
 // #define EEPROM_START_ADD (uint32_t)0x09000000
 #define EEPROM_START_ADD (uint32_t)0x080FE000
+// #define EEPROM_START_ADD (uint32_t)0x080FC000
 #define INTERVAL_TIMER TIM3
 #define TEN_KHZ_TIMER TIM16
 #define UTILITY_TIMER TIM17

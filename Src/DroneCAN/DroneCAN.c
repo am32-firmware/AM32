@@ -852,7 +852,7 @@ static void send_ESCStatus(void)
     // make up some synthetic status data
     pkt.error_count = 0;
     pkt.voltage = battery_voltage * 0.01;
-    pkt.current = actual_current * 0.02;
+    pkt.current = actual_current * 0.01;
     pkt.temperature = C_TO_KELVIN(degrees_celsius);
     pkt.rpm = (e_rpm * 100) / ((uint8_t)motor_poles);
     pkt.power_rating_pct = 0; // how do we get this?

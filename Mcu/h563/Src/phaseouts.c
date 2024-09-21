@@ -11,23 +11,23 @@
 extern char comp_pwm;
 extern char prop_brake_active;
 
-#ifdef USE_INVERTED_LOW
-#pragma message("using inverted low side output")
-#define LOW_BITREG_ON BRR
-#define LOW_BITREG_OFF BSRR
-#else
+// #ifdef USE_INVERTED_LOW
+// #pragma message("using inverted low side output")
+// #define LOW_BITREG_ON BRR
+// #define LOW_BITREG_OFF BSRR
+// #else
 #define LOW_BITREG_ON BSRR
 #define LOW_BITREG_OFF BRR
-#endif
+// #endif
 
-#ifdef USE_INVERTED_HIGH
-#pragma message("using inverted high side output")
-// #define HIGH_BITREG_ON  BRR
-#define HIGH_BITREG_OFF BSRR
-#else
-// #define HIGH_BITREG_ON  BSRR
+// #ifdef USE_INVERTED_HIGH
+// #pragma message("using inverted high side output")
+// // #define HIGH_BITREG_ON  BRR
+// #define HIGH_BITREG_OFF BSRR
+// #else
+// // #define HIGH_BITREG_ON  BSRR
 #define HIGH_BITREG_OFF BRR
-#endif
+// #endif
 
 void proportionalBrake()
 { // alternate all channels between braking (ABC LOW)

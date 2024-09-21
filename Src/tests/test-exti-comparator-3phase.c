@@ -1,3 +1,5 @@
+// this is a test of the comparator.h interface
+
 // #include "stm32h563xx.h"
 
 #include "targets.h"

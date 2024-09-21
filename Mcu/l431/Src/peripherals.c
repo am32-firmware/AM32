@@ -60,6 +60,17 @@ void SystemClock_Config(void)
   while (LL_PWR_IsActiveFlag_VOS() != 0)
   {
   }
+
+#ifdef USE_HSE
+  LL_RCC_HSE_EnableBypass();
+  LL_RCC_HSE_Enable();
+#if HSE_VALUE == 24000000
+  LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_3, 20, LL_RCC_PLLR_DIV_2);
+#else
+#error "Unsupported HSE_VALUE"
+#endif
+
+#else
   LL_RCC_MSI_Enable();
 
    /* Wait till MSI is ready */
@@ -71,6 +82,8 @@ void SystemClock_Config(void)
   LL_RCC_MSI_SetRange(LL_RCC_MSIRANGE_6);
   LL_RCC_MSI_SetCalibTrimming(0);
   LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_MSI, LL_RCC_PLLM_DIV_1, 40, LL_RCC_PLLR_DIV_2);
+#endif
+
   LL_RCC_PLL_EnableDomain_SYS();
   LL_RCC_PLL_Enable();
 

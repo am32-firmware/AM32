@@ -57,13 +57,15 @@ int main()
         GPIO_OUTPUT);
     gpio_initialize(&gpioDrv8323Enable);
     gpio_set_speed(&gpioDrv8323Enable, 0b11);
-    // gpio_reset(&gpioDrv8323Enable);
-    // for (int i = 0; i < 0xfffff; i++) {
-    //     asm("nop");
-    // }
-    // gpio_set(&gpioDrv8323Enable);
+    gpio_reset(&gpioDrv8323Enable);
+    for (int i = 0; i < 0xfffff; i++) {
+        asm("nop");
+    }
+    gpio_set(&gpioDrv8323Enable);
 
-
+    for (int i = 0; i < 0xfffff; i++) {
+        asm("nop");
+    }
     // gpio_initialize(&gpioPhaseAHigh);
     // gpio_initialize(&gpioPhaseALow);
     // gpio_initialize(&gpioPhaseBHigh);
@@ -73,7 +75,7 @@ int main()
 
     bridge_initialize();
     bridge_set_mode_audio();
-    bridge_set_audio_frequency(420);
+    bridge_set_audio_frequency(120);
     bridge_set_audio_duty(0x40);
     bridge_enable();
 

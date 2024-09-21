@@ -141,9 +141,9 @@ void bridge_set_run_frequency(uint32_t f)
 void bridge_set_audio_duty(uint8_t duty)
 {
     // duty = duty & 0xf;
-    if (duty > 0xf) {
-        duty = 0xf;
-    }
+    // if (duty > 0xf) {
+    //     duty = 0xf;
+    // }
     TIM1->CCR1 = duty;
     TIM1->CCR2 = duty;
     TIM1->CCR3 = duty;

@@ -1,7 +1,7 @@
-#include "phaseouts.h"
+// #include "phaseouts.h"
 #include "targets.h"
 #include "gpio.h"
-
+#include "bridge.h"
 char comp_pwm = 1;
 uint8_t i = 0;
 
@@ -49,18 +49,23 @@ gpio_t gpioPhaseCLow = DEF_GPIO(
 
 int main()
 {
-    gpio_initialize(&gpioPhaseAHigh);
-    gpio_initialize(&gpioPhaseALow);
-    gpio_initialize(&gpioPhaseBHigh);
-    gpio_initialize(&gpioPhaseBLow);
-    gpio_initialize(&gpioPhaseCHigh);
-    gpio_initialize(&gpioPhaseCLow);
-    
+    // gpio_initialize(&gpioPhaseAHigh);
+    // gpio_initialize(&gpioPhaseALow);
+    // gpio_initialize(&gpioPhaseBHigh);
+    // gpio_initialize(&gpioPhaseBLow);
+    // gpio_initialize(&gpioPhaseCHigh);
+    // gpio_initialize(&gpioPhaseCLow);
+
+    bridge_initialize();
+    bridge_set_mode_audio();
+    bridge_set_audio_frequency(400);
+    bridge_set_audio_duty(0x80);
+    bridge_enable();
     while(1) {
-        comStep(i++%6);
-        for (uint32_t i = 0; i < 320000; i++) {
-            asm("nop");
-        }
+        // comStep(i++%6);
+        // for (uint32_t i = 0; i < 320000; i++) {
+        //     asm("nop");
+        // }
         // delayMillis(500);
     }
 }

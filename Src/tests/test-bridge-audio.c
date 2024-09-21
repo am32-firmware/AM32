@@ -49,6 +49,21 @@ gpio_t gpioPhaseCLow = DEF_GPIO(
 
 int main()
 {
+
+    gpio_t gpioDrv8323Enable = DEF_GPIO(
+        GPIOF,
+        0,
+        0,
+        GPIO_OUTPUT);
+    gpio_initialize(&gpioDrv8323Enable);
+    gpio_set_speed(&gpioDrv8323Enable, 0b11);
+    // gpio_reset(&gpioDrv8323Enable);
+    // for (int i = 0; i < 0xfffff; i++) {
+    //     asm("nop");
+    // }
+    // gpio_set(&gpioDrv8323Enable);
+
+
     // gpio_initialize(&gpioPhaseAHigh);
     // gpio_initialize(&gpioPhaseALow);
     // gpio_initialize(&gpioPhaseBHigh);
@@ -58,9 +73,16 @@ int main()
 
     bridge_initialize();
     bridge_set_mode_audio();
-    bridge_set_audio_frequency(400);
-    bridge_set_audio_duty(0x80);
+    bridge_set_audio_frequency(420);
+    bridge_set_audio_duty(0x40);
     bridge_enable();
+
+    for (uint32_t i = 0; i < 3200000; i++)
+    {
+        asm("nop");
+    }
+
+    bridge_disable();
     while(1) {
         // comStep(i++%6);
         // for (uint32_t i = 0; i < 320000; i++) {

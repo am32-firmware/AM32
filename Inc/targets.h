@@ -2376,14 +2376,16 @@
 
 // INLA PH13 TIM8_CH1N AF03
 
-// white wire
+// white wire // logic analyzer
+// red wire // dev board
 // INLA PE8
 #define PHASE_A_GPIO_LOW LL_GPIO_PIN_8
 #define PHASE_A_GPIO_LOW_PIN 8
 #define PHASE_A_GPIO_PORT_LOW GPIOE
 #define PHASE_A_LOW_AF 1
 
-// grey wire
+// grey wire // logic analyzer
+// blue wire // dev board
 // INHA PE9
 #define PHASE_A_GPIO_HIGH LL_GPIO_PIN_9
 #define PHASE_A_GPIO_HIGH_PIN 9

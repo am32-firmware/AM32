@@ -136,14 +136,13 @@ void bridge_set_run_frequency(uint32_t f)
     // TODO update event to load the prescaler into the shadow register
 }
 
-#define MAX_AUDIO_DUTY (0xaf)
 // for use in audio mode - duty is always 4 bit (0-16)
 // duty may never exceed 12.5%
-void bridge_set_audio_duty(uint16_t duty)
+void bridge_set_audio_duty(uint8_t duty)
 {
-    // limit output
-    if (duty > MAX_AUDIO_DUTY) {
-        duty = MAX_AUDIO_DUTY;
+    // duty = duty & 0xf;
+    if (duty > 0xf) {
+        duty = 0xf;
     }
     TIM1->CCR1 = duty;
     TIM1->CCR2 = duty;

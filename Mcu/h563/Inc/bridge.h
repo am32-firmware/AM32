@@ -22,7 +22,7 @@ extern timComStepChannelConfig comSteps[];
 void bridge_set_deadtime_ns(uint32_t deadtime);
 void bridge_commutate(void);
 void bridge_set_com_step(uint8_t step);
-void bridge_set_audio_duty(uint16_t duty);
+void bridge_set_audio_duty(uint8_t duty);
 void bridge_set_run_duty(uint16_t duty);
 void bridge_set_mode_audio();
 void bridge_set_mode_run();

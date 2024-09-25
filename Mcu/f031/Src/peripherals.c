@@ -21,7 +21,7 @@ void initCorePeripherals(void)
     FLASH->ACR |= FLASH_ACR_PRFTBE; //// prefetch buffer enable
     UN_GPIO_Init();
     MX_DMA_Init();
-    MX_TIM14_Init();
+    com_timer_initialize();
     MX_TIM1_Init();
     MX_TIM3_Init();
     MX_TIM17_Init();
@@ -250,7 +250,7 @@ void MX_TIM3_Init(void)
     LL_TIM_DisableMasterSlaveMode(TIM3);
 }
 
-void MX_TIM14_Init(void)
+void com_timer_initialize(void)
 {
     LL_TIM_InitTypeDef TIM_InitStruct = { 0 };
 

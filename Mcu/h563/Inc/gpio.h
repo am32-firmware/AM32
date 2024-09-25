@@ -15,6 +15,12 @@ typedef struct {
 #define GPIO_AF 0b10
 #define GPIO_ANALOG 0b11
 
+#define GPIO_SPEED_LOW 0b00
+#define GPIO_SPEED_MEDIUM 0b01
+#define GPIO_SPEED_FAST 0b10
+#define GPIO_SPEED_VERYFAST 0b11
+
+
 #define GPIOA_CLOCK_ENABLE() do { \
     RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN; \
 } while(0)

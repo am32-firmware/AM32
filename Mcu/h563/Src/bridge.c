@@ -94,16 +94,6 @@ void bridge_initialize()
     gpio_initialize(&gpioVl);
     gpio_initialize(&gpioWh);
     gpio_initialize(&gpioWl);
-
-#if defined(STSPIN)
-    // set gpio f6 and f7 to enable the internal gate driver
-    gpio_t f6 = DEF_GPIO(GPIOF, 6, 0, GPIO_OUTPUT);
-    gpio_t f7 = DEF_GPIO(GPIOF, 7, 0, GPIO_OUTPUT);
-    gpio_initialize(&f6);
-    gpio_initialize(&f7);
-    gpio_set(&f6);
-    gpio_set(&f7);
-#endif
 }
 
 void bridge_set_mode_audio(void)

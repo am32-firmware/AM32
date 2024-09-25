@@ -74,9 +74,9 @@ int main()
     // gpio_initialize(&gpioPhaseCLow);
 
     bridge_initialize();
-    bridge_set_mode_audio();
-    bridge_set_audio_frequency(420);
-    bridge_set_audio_duty(0x80);
+    bridge_set_mode_run();
+    // bridge_set_run_frequency(16000);
+    bridge_set_run_duty(0x8000);
     bridge_enable();
 
     for (uint32_t i = 0; i < 3200000; i++)

@@ -24,7 +24,7 @@ void initCorePeripherals(void)
     MX_TIM1_Init();
     MX_TIM2_Init();
     MX_COMP1_Init();
-    MX_TIM14_Init();
+    com_timer_initialize();
     MX_TIM6_Init();
     MX_TIM17_Init();
     UN_TIM_Init();
@@ -300,7 +300,7 @@ void MX_TIM6_Init(void)
     TIM6->ARR = 1000000 / LOOP_FREQUENCY_HZ;
 }
 
-void MX_TIM14_Init(void)
+void com_timer_initialize(void)
 {
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM14);
     TIM14->PSC = 23;

@@ -36,3 +36,11 @@ PC15
 Phase C comparator input
 PC14
 
+Input pwm A
+PA8 TIM1_CH1 AF01
+
+when interval timer is tim2, the 32 bits could be used to give a finer resolution for commutation timing
+
+DMA_HANDLE_TYPE_DEF in targets.h appears unused, despite being defined for every? target
+
+enableHalfTransferInt is unused

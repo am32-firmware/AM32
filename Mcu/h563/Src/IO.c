@@ -7,10 +7,12 @@
 
 #include "IO.h"
 
+#include "dma.h"
 #include "common.h"
 #include "dshot.h"
 #include "functions.h"
 #include "serial_telemetry.h"
+#include "stm32h563xx.h"
 #include "targets.h"
 
 char ic_timer_prescaler = (CPU_FREQUENCY_MHZ / 6);
@@ -21,83 +23,88 @@ uint8_t buffer_padding = 0;
 void receiveDshotDma()
 {
     out_put = 0;
-#ifdef USE_TIMER_3_CHANNEL_1
-    RCC->APB1RSTR |= LL_APB1_GRP1_PERIPH_TIM3;
-    RCC->APB1RSTR &= ~LL_APB1_GRP1_PERIPH_TIM3;
-#endif
-#ifdef USE_TIMER_15_CHANNEL_1
-    RCC->APB2RSTR |= LL_APB1_GRP2_PERIPH_TIM15;
-    RCC->APB2RSTR &= ~LL_APB1_GRP2_PERIPH_TIM15;
-#endif
-    IC_TIMER_REGISTER->CCMR1 = 0x01;
-    IC_TIMER_REGISTER->CCER = 0xa;
-    IC_TIMER_REGISTER->PSC = ic_timer_prescaler;
-    IC_TIMER_REGISTER->ARR = 0xFFFF;
-    IC_TIMER_REGISTER->EGR |= TIM_EGR_UG;
+    INPUT_TIMER_RESET();
+    
+    INPUT_TIMER->CCMR1 = 0x01;
+    INPUT_TIMER->CCER = 0xa;
+    INPUT_TIMER->PSC = ic_timer_prescaler;
+    INPUT_TIMER->ARR = 0xFFFF;
+    INPUT_TIMER->EGR |= TIM_EGR_UG;
 
-    IC_TIMER_REGISTER->CNT = 0;
-#ifdef USE_TIMER_3_CHANNEL_1
-    DMA1_Channel4->CMAR = (uint32_t)&dma_buffer;
-    DMA1_Channel4->CPAR = (uint32_t)&IC_TIMER_REGISTER->CCR1;
-    DMA1_Channel4->CNDTR = buffersize;
-    DMA1_Channel4->CCR = 0x98b;
-#endif
-#ifdef USE_TIMER_15_CHANNEL_1
-    DMA1_Channel5->CMAR = (uint32_t)&dma_buffer;
-    DMA1_Channel5->CPAR = (uint32_t)&IC_TIMER_REGISTER->CCR1;
-    DMA1_Channel5->CNDTR = buffersize;
-    DMA1_Channel5->CCR = 0x98b;
-#endif
-    IC_TIMER_REGISTER->DIER |= TIM_DIER_CC1DE;
-    IC_TIMER_REGISTER->CCER |= IC_TIMER_CHANNEL;
-    IC_TIMER_REGISTER->CR1 |= TIM_CR1_CEN;
+    INPUT_TIMER->CNT = 0;
+
+    dmaChannel_t* dmaCh = dmaChannels[INPUT_TIMER_DMA_CHANNEL];
+    dmaCh->ref->CDAR = (uint32_t)&dma_buffer;
+    dmaCh->ref->CSAR = (uint32_t)&INPUT_TIMER->CCR1;
+    dmaCh->ref->CBR1 = buffersize;
+    dmaCh->ref->CTR2 |
+    dmaCh->ref->CTR1 |=
+        DMA_CTR1_DINC | // destination incrementing burst
+        (0b10 << DMA_CTR1_DDW_LOG2_Pos) | // 32 bit destination
+        (0b01 << DMA_CTR1_SDW_LOG2_Pos); // 16 bit source
+    dmaCh->ref->CCR |=
+        DMA_CCR_DTEIE | // data transfer error interrupt enable
+        DMA_CCR_TCIE | // transfer complete interrupt enable
+        DMA_CCR_EN; // enable
+    // dmaCh->ref->CCR = 0x98b;
+
+
+    // msize 0b10
+    // psize 0b01
+    // MINC
+    // teie
+    // tcie
+    // enable
+    INPUT_TIMER->DIER |= TIM_DIER_CC1DE;
+    INPUT_TIMER->CCER |= IC_TIMER_CHANNEL;
+    INPUT_TIMER->CR1 |= TIM_CR1_CEN;
 }
 
-void sendDshotDma()
-{
-    out_put = 1;
-#ifdef USE_TIMER_3_CHANNEL_1
-    //          // de-init timer 2
-    RCC->APB1RSTR |= LL_APB1_GRP1_PERIPH_TIM3;
-    RCC->APB1RSTR &= ~LL_APB1_GRP1_PERIPH_TIM3;
-#endif
-#ifdef USE_TIMER_15_CHANNEL_1
-    RCC->APB2RSTR |= LL_APB1_GRP2_PERIPH_TIM15;
-    RCC->APB2RSTR &= ~LL_APB1_GRP2_PERIPH_TIM15;
-#endif
-    IC_TIMER_REGISTER->CCMR1 = 0x60;
-    IC_TIMER_REGISTER->CCER = 0x3;
-    IC_TIMER_REGISTER->PSC = output_timer_prescaler;
-    IC_TIMER_REGISTER->ARR = 61;
+// void sendDshotDma()
+// {
+//     out_put = 1;
+// #ifdef USE_TIMER_3_CHANNEL_1
+//     //          // de-init timer 2
+//     RCC->APB1RSTR |= LL_APB1_GRP1_PERIPH_TIM3;
+//     RCC->APB1RSTR &= ~LL_APB1_GRP1_PERIPH_TIM3;
+// #endif
+// #ifdef USE_TIMER_15_CHANNEL_1
+//     RCC->APB2RSTR |= LL_APB1_GRP2_PERIPH_TIM15;
+//     RCC->APB2RSTR &= ~LL_APB1_GRP2_PERIPH_TIM15;
+// #endif
+//     INPUT_TIMER->CCMR1 = 0x60;
+//     INPUT_TIMER->CCER = 0x3;
+//     INPUT_TIMER->PSC = output_timer_prescaler;
+//     INPUT_TIMER->ARR = 61;
 
-    IC_TIMER_REGISTER->EGR |= TIM_EGR_UG;
-#ifdef USE_TIMER_3_CHANNEL_1
-    DMA1_Channel4->CMAR = (uint32_t)&gcr;
-    DMA1_Channel4->CPAR = (uint32_t)&IC_TIMER_REGISTER->CCR1;
-    DMA1_Channel4->CNDTR = 23 + buffer_padding;
-    DMA1_Channel4->CCR = 0x99b;
-#endif
-#ifdef USE_TIMER_15_CHANNEL_1
-    //		  LL_DMA_ConfigAddresses(DMA1, INPUT_DMA_CHANNEL,
-    //(uint32_t)&gcr, (uint32_t)&IC_TIMER_REGISTER->CCR1,
-    // LL_DMA_GetDataTransferDirection(DMA1,
-    // INPUT_DMA_CHANNEL));
-    DMA1_Channel5->CMAR = (uint32_t)&gcr;
-    DMA1_Channel5->CPAR = (uint32_t)&IC_TIMER_REGISTER->CCR1;
-    DMA1_Channel5->CNDTR = 23 + buffer_padding;
-    DMA1_Channel5->CCR = 0x99b;
-#endif
-    IC_TIMER_REGISTER->DIER |= TIM_DIER_CC1DE;
-    IC_TIMER_REGISTER->CCER |= IC_TIMER_CHANNEL;
-    IC_TIMER_REGISTER->BDTR |= TIM_BDTR_MOE;
-    IC_TIMER_REGISTER->CR1 |= TIM_CR1_CEN;
-}
+//     INPUT_TIMER->EGR |= TIM_EGR_UG;
+// #ifdef USE_TIMER_3_CHANNEL_1
+//     dma_channels[INPUT_TIMER_DMA_CHANNEL]->CMAR = (uint32_t)&gcr;
+//     dma_channels[INPUT_TIMER_DMA_CHANNEL]->CPAR = (uint32_t)&INPUT_TIMER->CCR1;
+//     dma_channels[INPUT_TIMER_DMA_CHANNEL]->CNDTR = 23 + buffer_padding;
+//     dma_channels[INPUT_TIMER_DMA_CHANNEL]->CCR = 0x99b;
+// #endif
+// #ifdef USE_TIMER_15_CHANNEL_1
+//     //		  LL_DMA_ConfigAddresses(DMA1, INPUT_DMA_CHANNEL,
+//     //(uint32_t)&gcr, (uint32_t)&INPUT_TIMER->CCR1,
+//     // LL_DMA_GetDataTransferDirection(DMA1,
+//     // INPUT_DMA_CHANNEL));
+//     DMA1_Channel5->CMAR = (uint32_t)&gcr;
+//     DMA1_Channel5->CPAR = (uint32_t)&INPUT_TIMER->CCR1;
+//     DMA1_Channel5->CNDTR = 23 + buffer_padding;
+//     DMA1_Channel5->CCR = 0x99b;
+// #endif
+//     INPUT_TIMER->DIER |= TIM_DIER_CC1DE;
+//     INPUT_TIMER->CCER |= IC_TIMER_CHANNEL;
+//     INPUT_TIMER->BDTR |= TIM_BDTR_MOE;
+//     INPUT_TIMER->CR1 |= TIM_CR1_CEN;
+// }
 
 uint8_t getInputPinState() { return (INPUT_PIN_PORT->IDR & INPUT_PIN); }
 
 void setInputPolarityRising()
 {
-    LL_TIM_IC_SetPolarity(IC_TIMER_REGISTER, IC_TIMER_CHANNEL,
+    LL_TIM_IC_SetPolarity(INPUT_TIMER, IC_TIMER_CHANNEL,
         LL_TIM_IC_POLARITY_RISING);
 }
 
@@ -111,7 +118,6 @@ void setInputPullUp()
     LL_GPIO_SetPinPull(INPUT_PIN_PORT, INPUT_PIN, LL_GPIO_PULL_UP);
 }
 
-void enableHalfTransferInt() { LL_DMA_EnableIT_HT(GPDMA1, INPUT_DMA_CHANNEL); }
 void setInputPullNone()
 {
     LL_GPIO_SetPinPull(INPUT_PIN_PORT, INPUT_PIN, LL_GPIO_PULL_NO);

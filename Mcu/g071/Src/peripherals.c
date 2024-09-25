@@ -40,7 +40,7 @@ void initCorePeripherals(void)
 #ifdef N_VARIANT
     MX_COMP1_Init();
 #endif
-    MX_TIM14_Init();
+    com_timer_initialize();
     MX_TIM17_Init();
     MX_TIM6_Init();
     telem_UART_Init();
@@ -599,7 +599,7 @@ void MX_TIM16_Init(void)
  * @param None
  * @retval None
  */
-void MX_TIM14_Init(void)
+void com_timer_initialize(void)
 {
     /* USER CODE BEGIN TIM14_Init 0 */
 

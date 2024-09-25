@@ -21,7 +21,6 @@ uint8_t getInputPinState();
 void setInputPolarityRising();
 void setInputPullDown();
 void setInputPullUp();
-void enableHalfTransferInt();
 void setInputPullNone();
 
 extern char bi_direction;

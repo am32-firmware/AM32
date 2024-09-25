@@ -33,11 +33,11 @@ void receiveDshotDma()
 
     INPUT_TIMER->CNT = 0;
 
-    dmaChannel_t* dmaCh = dmaChannels[INPUT_TIMER_DMA_CHANNEL];
+    dmaChannel_t* dmaCh = &dmaChannels[INPUT_TIMER_DMA_CHANNEL];
     dmaCh->ref->CDAR = (uint32_t)&dma_buffer;
     dmaCh->ref->CSAR = (uint32_t)&INPUT_TIMER->CCR1;
     dmaCh->ref->CBR1 = buffersize;
-    dmaCh->ref->CTR2 |
+    dmaCh->ref->CTR2 = LL_GPDMA1_REQUEST_TIM1_CH1;
     dmaCh->ref->CTR1 |=
         DMA_CTR1_DINC | // destination incrementing burst
         (0b10 << DMA_CTR1_DDW_LOG2_Pos) | // 32 bit destination
@@ -100,7 +100,7 @@ void receiveDshotDma()
 //     INPUT_TIMER->CR1 |= TIM_CR1_CEN;
 // }
 
-uint8_t getInputPinState() { return (INPUT_PIN_PORT->IDR & INPUT_PIN); }
+uint8_t getInputPinState() { return (INPUT_SIGNAL_PORT->IDR & INPUT_SIGNAL_LL_PIN); }
 
 void setInputPolarityRising()
 {
@@ -110,15 +110,15 @@ void setInputPolarityRising()
 
 void setInputPullDown()
 {
-    LL_GPIO_SetPinPull(INPUT_PIN_PORT, INPUT_PIN, LL_GPIO_PULL_DOWN);
+    LL_GPIO_SetPinPull(INPUT_SIGNAL_PORT, INPUT_SIGNAL_LL_PIN, LL_GPIO_PULL_DOWN);
 }
 
 void setInputPullUp()
 {
-    LL_GPIO_SetPinPull(INPUT_PIN_PORT, INPUT_PIN, LL_GPIO_PULL_UP);
+    LL_GPIO_SetPinPull(INPUT_SIGNAL_PORT, INPUT_SIGNAL_LL_PIN, LL_GPIO_PULL_UP);
 }
 
 void setInputPullNone()
 {
-    LL_GPIO_SetPinPull(INPUT_PIN_PORT, INPUT_PIN, LL_GPIO_PULL_NO);
+    LL_GPIO_SetPinPull(INPUT_SIGNAL_PORT, INPUT_SIGNAL_LL_PIN, LL_GPIO_PULL_NO);
 }

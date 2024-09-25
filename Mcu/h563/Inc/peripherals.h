@@ -41,6 +41,7 @@ void com_timer_initialize(void);
 void ten_khz_timer_initialize(void);
 // void MX_TIM17_Init(void);
 void utility_timer_initialize(void);
+void utility_timer_enable(void);
 // static void MX_USART1_UART_Init(void);
 void disableComTimerInt(void);
 void enableComTimerInt(void);

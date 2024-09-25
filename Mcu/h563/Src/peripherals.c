@@ -298,6 +298,12 @@ void utility_timer_initialize(void)
     LL_TIM_DisableARRPreload(UTILITY_TIMER);
 }
 
+void utility_timer_enable(void)
+{
+    LL_TIM_EnableCounter(UTILITY_TIMER);
+    LL_TIM_GenerateEvent_UPDATE(UTILITY_TIMER);
+}
+
 void MX_DMA_Init(void)
 {
     LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPDMA1);
@@ -571,8 +577,7 @@ void enableCorePeripherals()
     LL_TIM_EnableIT_UPDATE(COM_TIMER);
     COM_TIMER->DIER &= ~((0x1UL << (0U))); // disable for now.
 #endif
-    LL_TIM_EnableCounter(UTILITY_TIMER);
-    LL_TIM_GenerateEvent_UPDATE(UTILITY_TIMER);
+    utility_timer_enable();
     //
     LL_TIM_EnableCounter(INTERVAL_TIMER);
     LL_TIM_GenerateEvent_UPDATE(INTERVAL_TIMER);

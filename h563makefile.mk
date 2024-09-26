@@ -43,6 +43,7 @@ SRC_H563 := \
 	$(SRC_DIR_H563_SRC)/exti-stm32h5.c \
 	$(SRC_DIR_H563_SRC)/led-gpio-rgb.c \
 	$(SRC_DIR_H563_SRC)/commutation-timer.c \
+	$(SRC_DIR_H563_SRC)/ten-khz-timer.c \
 	$(SRC_DIR_H563_SRC)/bridge.c \
 	$(SRC_DIR_H563_SRC)/drv8323-spi.c \
 	$(SRC_DIR_H563_SRC)/usart.c \

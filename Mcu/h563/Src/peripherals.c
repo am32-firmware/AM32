@@ -261,13 +261,10 @@ void interval_timer_initialize(void)
     TIM2->ARR = 0xFFFF;
 }
 
-void ten_khz_timer_initialize(void)
+void interval_timer_enable(void)
 {
-    TEN_KHZ_TIMER_ENABLE_CLOCK();
-    NVIC_SetPriority(TEN_KHZ_TIMER_IRQn, 3);
-    NVIC_EnableIRQ(TEN_KHZ_TIMER_IRQn);
-    TEN_KHZ_TIMER->PSC = 47;
-    TEN_KHZ_TIMER->ARR = 1000000 / LOOP_FREQUENCY_HZ;
+    LL_TIM_EnableCounter(INTERVAL_TIMER);
+    LL_TIM_GenerateEvent_UPDATE(INTERVAL_TIMER);
 }
 
 void com_timer_initialize(void)
@@ -534,10 +531,10 @@ void enableCorePeripherals()
     LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH2N);
     LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH3N);
 
-#ifdef MCU_G071
-    LL_TIM_CC_EnableChannel(
-        TIM1, LL_TIM_CHANNEL_CH5); // timer used for comparator blanking
-#endif
+// #ifdef MCU_G071
+//     LL_TIM_CC_EnableChannel(
+//         TIM1, LL_TIM_CHANNEL_CH5); // timer used for comparator blanking
+// #endif
     LL_TIM_CC_EnableChannel(TIM1,
         LL_TIM_CHANNEL_CH4); // timer used for timing adc read
     TIM1->CCR4 = 100; // set in 10khz loop to match pwm cycle timed to end of pwm on
@@ -577,14 +574,14 @@ void enableCorePeripherals()
     LL_TIM_EnableIT_UPDATE(COM_TIMER);
     COM_TIMER->DIER &= ~((0x1UL << (0U))); // disable for now.
 #endif
-    utility_timer_enable();
-    //
-    LL_TIM_EnableCounter(INTERVAL_TIMER);
-    LL_TIM_GenerateEvent_UPDATE(INTERVAL_TIMER);
 
-    LL_TIM_EnableCounter(TEN_KHZ_TIMER); // 10khz timer
-    LL_TIM_GenerateEvent_UPDATE(TEN_KHZ_TIMER);
-    TEN_KHZ_TIMER->DIER |= (0x1UL << (0U)); // enable interrupt
+    utility_timer_enable();
+
+    interval_timer_enable();
+
+    ten_khz_timer_enable();
+    ten_khz_timer_interrupt_enable();
+
     // RCC->APB2ENR  &= ~(1 << 22);  // turn debug off
 #ifdef USE_ADC
     ADC_Init();
@@ -592,19 +589,8 @@ void enableCorePeripherals()
     activateADC();
 #endif
 
-// #ifndef MCU_F031
-//     __IO uint32_t wait_loop_index = 0;
-//     /* Enable comparator */
-//     LL_COMP_Enable(MAIN_COMP);
-// #ifdef N_VARIANT // needs comp 1 and 2
-//     LL_COMP_Enable(COMP1);
-// #endif
-//     wait_loop_index = ((LL_COMP_DELAY_STARTUP_US * (SystemCoreClock / (100000 * 2))) / 10);
-//     while (wait_loop_index != 0) {
-//         wait_loop_index--;
-//     }
-// #endif
-    NVIC_SetPriority(EXTI15_IRQn, 2);
-    NVIC_EnableIRQ(EXTI15_IRQn);
-    EXTI->IMR1 |= (1 << 15);
+    // comparator interrupt?
+    // NVIC_SetPriority(EXTI15_IRQn, 2);
+    // NVIC_EnableIRQ(EXTI15_IRQn);
+    // EXTI->IMR1 |= (1 << 15);
 }

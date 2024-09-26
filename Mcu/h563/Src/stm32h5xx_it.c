@@ -20,7 +20,7 @@
 
 /* Includes
  * ------------------------------------------------------------------*/
-#include "stm32f0xx_it.h"
+#include "stm32h5xx_it.h"
 
 #include "main.h"
 /* Private includes
@@ -225,7 +225,18 @@ void ADC1_COMP_IRQHandler(void)
  * @brief This function handles TIM6 global and DAC underrun error interrupts.
  */
 // TIM6 is used to trigger the tenKhzRoutine
+
+
 void TIM6_DAC_IRQHandler(void)
+{
+    if (LL_TIM_IsActiveFlag_UPDATE(TIM6) == 1) {
+        LL_TIM_ClearFlag_UPDATE(TIM6);
+        tenKhzRoutine();
+    }
+}
+
+
+void TIM6_IRQHandler(void)
 {
     if (LL_TIM_IsActiveFlag_UPDATE(TIM6) == 1) {
         LL_TIM_ClearFlag_UPDATE(TIM6);

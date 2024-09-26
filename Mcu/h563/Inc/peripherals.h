@@ -34,11 +34,15 @@ void MX_DMA_Init(void);
 void MX_COMP1_Init(void);
 // void MX_TIM1_Init(void);
 void interval_timer_initialize(void);
+void interval_timer_enable(void);
 void MX_IWDG_Init(void);
-// void MX_TIM16_Init(void);
 void com_timer_initialize(void);
-// void MX_TIM6_Init(void);
+
+// TIM6
 void ten_khz_timer_initialize(void);
+void ten_khz_timer_enable(void);
+void ten_khz_timer_interrupt_enable(void);
+
 // void MX_TIM17_Init(void);
 void utility_timer_initialize(void);
 void utility_timer_enable(void);

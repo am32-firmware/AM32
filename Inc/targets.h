@@ -81,6 +81,17 @@
 #define EEPROM_START_ADD (uint32_t)0x0800F800
 #endif
 
+#ifdef VIMDRONES_NANO_L431
+#define FIRMWARE_NAME "VM_NANO"
+#define FILE_NAME "VIMDRONES_NANO_L431"
+#define DEAD_TIME 45
+#define HARDWARE_GROUP_L4_B
+#define TARGET_VOLTAGE_DIVIDER 110
+#define MILLIVOLT_PER_AMP 20
+#define USE_SERIAL_TELEMETRY
+#define EEPROM_START_ADD (uint32_t)0x0800F800
+#endif
+
 #ifdef  REF_L431
 #define FILE_NAME				"REF_L431"
 #define FIRMWARE_NAME           "L431 Neutron"

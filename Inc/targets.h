@@ -432,6 +432,15 @@
 /***************************************End Generic
  * *****************************************/
 
+#ifdef BAYCKRC_S_55A_F421
+#define HARDWARE_GROUP_AT_C
+#define FIRMWARE_NAME "BAYCKRC S55A"
+#define FILE_NAME "BAYCKRC_S_55A_F421"
+#define DEAD_TIME 60
+#define HARDWARE_GROUP_AT_540
+#define USE_SERIAL_TELEMETRY
+#endif
+
 #ifdef GIPSY_F421
 #define FIRMWARE_NAME "GiPSy F421  "
 #define FILE_NAME "GIPSY_F421"

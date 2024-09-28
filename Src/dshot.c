@@ -15,7 +15,7 @@
 #include "DroneCAN/DroneCAN.h"
 #endif
 
-int dpulse[16] = { 0 };
+static uint8_t dpulse[16];
 
 const char gcr_encode_table[16] = {
     0b11001, 0b11011, 0b10010, 0b10011, 0b11101, 0b10101, 0b10110, 0b10111,
@@ -44,26 +44,25 @@ static dshot_telem_scheduler_t telem_scheduler = {0};
 
 char send_EDT_init;
 char send_EDT_deinit;
-char EDT_ARM_ENABLE = 0;
-char EDT_ARMED = 0;
-int shift_amount = 0;
+char EDT_ARM_ENABLE;
+char EDT_ARMED;
+static int shift_amount;
 volatile uint32_t gcrnumber;
 extern int zero_crosses;
 extern volatile char send_telemetry;
 extern uint8_t max_duty_cycle_change;
-int dshot_full_number;
+static uint32_t dshot_full_number;
 extern char play_tone_flag;
 extern char send_esc_info_flag;
-uint8_t command_count = 0;
-uint8_t last_command = 0;
-uint8_t high_pin_count = 0;
-uint32_t gcr[37] = { 0 };
-uint16_t dshot_frametime;
-uint16_t dshot_goodcounts;
-uint16_t dshot_badcounts;
-uint8_t dshot_extended_telemetry = 0;
-uint16_t processtime = 0;
-uint16_t halfpulsetime = 0;
+static uint8_t command_count;
+static uint8_t last_command;
+static uint8_t high_pin_count;
+uint32_t gcr[37];
+static uint16_t dshot_frametime;
+static uint16_t dshot_goodcounts;
+static uint16_t dshot_badcounts;
+static uint8_t dshot_extended_telemetry;
+static uint16_t halfpulsetime;
 
 uint8_t programming_mode;
 uint16_t position;
@@ -74,12 +73,15 @@ void computeDshotDMA()
     dshot_frametime = dma_buffer[31] - dma_buffer[0];
     halfpulsetime = dshot_frametime >> 5;
     if ((dshot_frametime > dshot_frametime_low) && (dshot_frametime < dshot_frametime_high)) {
-			signaltimeout = 0;
         for (int i = 0; i < 16; i++) {
-            // note that dma_buffer[] is uint32_t, we cast the difference to uint16_t to handle
-            // timer wrap correctly
-            const uint16_t pdiff = dma_buffer[(i << 1) + 1] - dma_buffer[(i << 1)];
-            dpulse[i] = (pdiff > halfpulsetime);
+            const uint16_t pwidth = dma_buffer[(i << 1) + 1] - dma_buffer[(i << 1)];
+            if (pwidth < (halfpulsetime >> 1) || pwidth > (halfpulsetime << 1)) {
+                // pulse width way off, bad frame
+                dshot_badcounts++;
+                programming_mode = 0;
+                return;
+            }
+            dpulse[i] = (pwidth > halfpulsetime);
         }
         uint8_t calcCRC = ((dpulse[0] ^ dpulse[4] ^ dpulse[8]) << 3 | (dpulse[1] ^ dpulse[5] ^ dpulse[9]) << 2 | (dpulse[2] ^ dpulse[6] ^ dpulse[10]) << 1 | (dpulse[3] ^ dpulse[7] ^ dpulse[11]));
         uint8_t checkCRC = (dpulse[12] << 3 | dpulse[13] << 2 | dpulse[14] << 1 | dpulse[15]);

@@ -1,4 +1,5 @@
 #include "ten-khz-timer.h"
+#include "cmsis_gcc.h"
 #include "stm32h563xx.h"
 #include "stm32h5xx_ll_bus.h"
 #include "stm32h5xx_ll_tim.h"
@@ -23,4 +24,8 @@ void ten_khz_timer_enable(void)
 void ten_khz_timer_interrupt_enable()
 {
     TEN_KHZ_TIMER->DIER |= (0x1UL << (0U)); // enable interrupt
+}
+
+__WEAK void tenKhzRoutine()
+{
 }

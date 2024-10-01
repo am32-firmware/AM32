@@ -12,6 +12,7 @@
 #include "gpio.h"
 #include "ADC.h"
 #include "serial_telemetry.h"
+#include "stm32h5xx_ll_bus.h"
 #include "targets.h"
 
 void msp_system_initialize()
@@ -92,7 +93,7 @@ void initCorePeripherals(void)
     ten_khz_timer_initialize();
     // MX_TIM17_Init();
     utility_timer_initialize();
-    UN_TIM_Init();
+    input_timer_initialize();
 #ifdef USE_SERIAL_TELEMETRY
     telem_UART_Init();
 #endif
@@ -105,153 +106,14 @@ void initAfterJump(void)
 
 void MX_IWDG_Init(void)
 {
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_WWDG);
     IWDG->KR = 0x0000CCCCU;
     IWDG->KR = 0x00005555U;
     IWDG->PR = LL_IWDG_PRESCALER_16;
     IWDG->RLR = 4000;
-    LL_IWDG_ReloadCounter(IWDG);
+    // while (IWDG->SR); // wait for the registers to be updated
+    IWDG->KR = 0x0000AAAA;
 }
-
-// void MX_TIM1_Init(void)
-// {
-//     LL_TIM_InitTypeDef TIM_InitStruct = { 0 };
-//     LL_TIM_OC_InitTypeDef TIM_OC_InitStruct = { 0 };
-//     LL_TIM_BDTR_InitTypeDef TIM_BDTRInitStruct = { 0 };
-//     LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
-//     LL_APB1_GRP2_EnableClock(LL_APB2_GRP1_PERIPH_TIM1);
-
-//     TIM_InitStruct.Prescaler = 0;
-//     TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
-//     TIM_InitStruct.Autoreload = 1999;
-//     TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
-//     TIM_InitStruct.RepetitionCounter = 0;
-//     LL_TIM_Init(TIM1, &TIM_InitStruct);
-//     LL_TIM_EnableARRPreload(TIM1);
-//     LL_TIM_SetClockSource(TIM1, LL_TIM_CLOCKSOURCE_INTERNAL);
-//     LL_TIM_OC_EnablePreload(TIM1, LL_TIM_CHANNEL_CH1);
-// #ifdef USE_SWAPPED_OUPUT
-//     TIM_OC_InitStruct.OCMode = LL_TIM_OCMODE_PWM2;
-// #else
-//     TIM_OC_InitStruct.OCMode = LL_TIM_OCMODE_PWM1;
-// #endif
-//     TIM_OC_InitStruct.OCState = LL_TIM_OCSTATE_DISABLE;
-//     TIM_OC_InitStruct.OCNState = LL_TIM_OCSTATE_DISABLE;
-//     TIM_OC_InitStruct.CompareValue = 0;
-// #ifdef USE_INVERTED_HIGH
-//     TIM_OC_InitStruct.OCPolarity = LL_TIM_OCPOLARITY_LOW;
-//     TIM_OC_InitStruct.OCIdleState = LL_TIM_OCIDLESTATE_HIGH;
-// #else
-//     TIM_OC_InitStruct.OCPolarity = LL_TIM_OCPOLARITY_HIGH;
-//     TIM_OC_InitStruct.OCIdleState = LL_TIM_OCIDLESTATE_LOW;
-// #endif
-// #ifdef USE_INVERTED_LOW
-//     TIM_OC_InitStruct.OCNPolarity = LL_TIM_OCPOLARITY_LOW;
-//     TIM_OC_InitStruct.OCNIdleState = LL_TIM_OCIDLESTATE_HIGH;
-// #else
-//     TIM_OC_InitStruct.OCNPolarity = LL_TIM_OCPOLARITY_HIGH;
-//     TIM_OC_InitStruct.OCNIdleState = LL_TIM_OCIDLESTATE_LOW;
-// #endif
-//     LL_TIM_OC_Init(TIM1, LL_TIM_CHANNEL_CH1, &TIM_OC_InitStruct);
-//     LL_TIM_OC_DisableFast(TIM1, LL_TIM_CHANNEL_CH1);
-//     LL_TIM_OC_EnablePreload(TIM1, LL_TIM_CHANNEL_CH2);
-//     TIM_OC_InitStruct.OCState = LL_TIM_OCSTATE_DISABLE;
-//     TIM_OC_InitStruct.OCNState = LL_TIM_OCSTATE_DISABLE;
-//     LL_TIM_OC_Init(TIM1, LL_TIM_CHANNEL_CH2, &TIM_OC_InitStruct);
-//     LL_TIM_OC_DisableFast(TIM1, LL_TIM_CHANNEL_CH2);
-//     LL_TIM_OC_EnablePreload(TIM1, LL_TIM_CHANNEL_CH3);
-//     TIM_OC_InitStruct.OCState = LL_TIM_OCSTATE_DISABLE;
-//     TIM_OC_InitStruct.OCNState = LL_TIM_OCSTATE_DISABLE;
-//     LL_TIM_OC_Init(TIM1, LL_TIM_CHANNEL_CH3, &TIM_OC_InitStruct);
-//     LL_TIM_OC_DisableFast(TIM1, LL_TIM_CHANNEL_CH3);
-//     LL_TIM_OC_EnablePreload(TIM1, LL_TIM_CHANNEL_CH4);
-//     TIM_OC_InitStruct.OCState = LL_TIM_OCSTATE_DISABLE;
-//     TIM_OC_InitStruct.OCNState = LL_TIM_OCSTATE_DISABLE;
-//     LL_TIM_OC_Init(TIM1, LL_TIM_CHANNEL_CH4, &TIM_OC_InitStruct);
-//     LL_TIM_OC_DisableFast(TIM1, LL_TIM_CHANNEL_CH4);
-//     LL_TIM_SetTriggerOutput(TIM1, LL_TIM_TRGO_RESET);
-//     LL_TIM_DisableMasterSlaveMode(TIM1);
-//     TIM_BDTRInitStruct.OSSRState = LL_TIM_OSSR_DISABLE;
-//     TIM_BDTRInitStruct.OSSIState = LL_TIM_OSSI_DISABLE;
-//     TIM_BDTRInitStruct.LockLevel = LL_TIM_LOCKLEVEL_OFF;
-//     TIM_BDTRInitStruct.DeadTime = DEAD_TIME;
-//     TIM_BDTRInitStruct.BreakState = LL_TIM_BREAK_DISABLE;
-//     TIM_BDTRInitStruct.BreakPolarity = LL_TIM_BREAK_POLARITY_HIGH;
-//     TIM_BDTRInitStruct.AutomaticOutput = LL_TIM_AUTOMATICOUTPUT_DISABLE;
-//     LL_TIM_BDTR_Init(TIM1, &TIM_BDTRInitStruct);
-
-//     LL_AHB1_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
-//     LL_AHB1_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
-// /**TIM1 GPIO Configuration
-// PA7   ------> TIM1_CH1N
-// PB0   ------> TIM1_CH2N
-// PB1   ------> TIM1_CH3N
-// PA8   ------> TIM1_CH1
-// PA9   ------> TIM1_CH2
-// PA10   ------> TIM1_CH3
-// */
-// #ifdef USE_OPEN_DRAIN_LOW
-// #pragma message("using open drain low side")
-// #define LOW_OUTPUT_TYPE LL_GPIO_OUTPUT_OPENDRAIN
-// #else
-// #define LOW_OUTPUT_TYPE LL_GPIO_OUTPUT_PUSHPULL
-// #endif
-// #ifdef USE_OPEN_DRAIN_HIGH
-// #pragma message("using open drain high side")
-// #define HIGH_OUTPUT_TYPE LL_GPIO_OUTPUT_OPENDRAIN
-// #else
-// #define HIGH_OUTPUT_TYPE LL_GPIO_OUTPUT_PUSHPULL
-// #endif
-//     GPIO_InitStruct.Pin = PHASE_A_GPIO_LOW;
-//     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
-//     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-//     GPIO_InitStruct.OutputType = LOW_OUTPUT_TYPE;
-//     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-//     GPIO_InitStruct.Alternate = LL_GPIO_AF_2;
-//     LL_GPIO_Init(PHASE_A_GPIO_PORT_LOW, &GPIO_InitStruct);
-
-//     GPIO_InitStruct.Pin = PHASE_B_GPIO_LOW;
-//     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
-//     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-//     GPIO_InitStruct.OutputType = LOW_OUTPUT_TYPE;
-//     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-//     GPIO_InitStruct.Alternate = LL_GPIO_AF_2;
-//     LL_GPIO_Init(PHASE_B_GPIO_PORT_LOW, &GPIO_InitStruct);
-
-//     GPIO_InitStruct.Pin = PHASE_C_GPIO_LOW;
-//     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
-//     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-//     GPIO_InitStruct.OutputType = LOW_OUTPUT_TYPE;
-//     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-//     GPIO_InitStruct.Alternate = LL_GPIO_AF_2;
-//     LL_GPIO_Init(PHASE_C_GPIO_PORT_LOW, &GPIO_InitStruct);
-
-//     GPIO_InitStruct.Pin = PHASE_A_GPIO_HIGH;
-//     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
-//     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-//     GPIO_InitStruct.OutputType = HIGH_OUTPUT_TYPE;
-//     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-//     GPIO_InitStruct.Alternate = LL_GPIO_AF_2;
-//     LL_GPIO_Init(PHASE_A_GPIO_PORT_HIGH, &GPIO_InitStruct);
-
-//     GPIO_InitStruct.Pin = PHASE_B_GPIO_HIGH;
-//     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
-//     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-//     GPIO_InitStruct.OutputType = HIGH_OUTPUT_TYPE;
-//     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-//     GPIO_InitStruct.Alternate = LL_GPIO_AF_2;
-//     LL_GPIO_Init(PHASE_B_GPIO_PORT_HIGH, &GPIO_InitStruct);
-
-//     GPIO_InitStruct.Pin = PHASE_C_GPIO_HIGH;
-//     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
-//     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-//     GPIO_InitStruct.OutputType = HIGH_OUTPUT_TYPE;
-//     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-//     GPIO_InitStruct.Alternate = LL_GPIO_AF_2;
-//     LL_GPIO_Init(PHASE_C_GPIO_PORT_HIGH, &GPIO_InitStruct);
-
-//     //  NVIC_SetPriority(TIM1_BRK_UP_TRG_COM_IRQn, 2);
-//     //  NVIC_EnableIRQ(TIM1_BRK_UP_TRG_COM_IRQn);
-// }
 
 // interval timer
 void interval_timer_initialize(void)
@@ -342,141 +204,13 @@ void input_timer_gpio_initialize(void)
     gpio_initialize(&gpioInput);
     gpio_set_speed(&gpioInput, GPIO_SPEED_VERYFAST);
 }
-void UN_TIM_Init(void)
+
+void input_timer_enable(void)
 {
-    // LL_TIM_InitTypeDef TIM_InitStruct = {0};
-
-    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
-
-    /* Peripheral clock enable */
-#ifdef USE_TIMER_15_CHANNEL_1
-    LL_APB1_GRP2_EnableClock(LL_APB1_GRP2_PERIPH_TIM15);
-    LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOA);
-    /**TIM16 GPIO Configuration
-    PA6   ------> TIM16_CH1
-    */
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_2;
-    GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
-    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
-    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    GPIO_InitStruct.Alternate = LL_GPIO_AF_0;
-    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-#endif
-
-#ifdef USE_TIMER_3_CHANNEL_1
-
-    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM3);
-    LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOB);
-    /**TIM16 GPIO Configuration
-    PA6   ------> TIM16_CH1
-    */
-    GPIO_InitStruct.Pin = INPUT_PIN;
-    GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
-    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    GPIO_InitStruct.Alternate = LL_GPIO_AF_1;
-    LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-#endif
-
-    /* TIM16 DMA Init */
-
-    /* TIM16_CH1_UP Init */
-    // LL_DMA_SetDataTransferDirection(DMA1, INPUT_DMA_CHANNEL,
-    // LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
-
-    // LL_DMA_SetChannelPriorityLevel(DMA1, INPUT_DMA_CHANNEL,
-    // LL_DMA_PRIORITY_LOW);
-
-    // LL_DMA_SetMode(DMA1, INPUT_DMA_CHANNEL, LL_DMA_MODE_NORMAL);
-
-    // LL_DMA_SetPeriphIncMode(DMA1, INPUT_DMA_CHANNEL,
-    // LL_DMA_PERIPH_NOINCREMENT);
-
-    // LL_DMA_SetMemoryIncMode(DMA1, INPUT_DMA_CHANNEL, LL_DMA_MEMORY_INCREMENT);
-
-    // LL_DMA_SetPeriphSize(DMA1, INPUT_DMA_CHANNEL, LL_DMA_PDATAALIGN_HALFWORD);
-
-    // LL_DMA_SetMemorySize(DMA1, INPUT_DMA_CHANNEL, LL_DMA_MDATAALIGN_WORD);
-
-    /* TIM16 interrupt Init */
-
-#ifdef USE_TIMER_15_CHANNEL_1
-    NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
-    NVIC_EnableIRQ(IC_DMA_IRQ_NAME);
-#endif
-#ifdef USE_TIMER_3_CHANNEL_1
-    NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
-    NVIC_EnableIRQ(IC_DMA_IRQ_NAME);
-#endif
-
-    // TIM_InitStruct.Prescaler = 0;
-    // TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
-    // TIM_InitStruct.Autoreload = 63;
-    // TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
-    // TIM_InitStruct.RepetitionCounter = 0;
-    //  LL_TIM_Init(INPUT_TIMER, &TIM_InitStruct);
-    INPUT_TIMER->PSC = 0;
-    INPUT_TIMER->ARR = 63;
-
-    // LL_TIM_DisableARRPreload(INPUT_TIMER);
-    // LL_TIM_IC_SetActiveInput(INPUT_TIMER, IC_TIMER_CHANNEL,
-    // LL_TIM_ACTIVEINPUT_DIRECTTI); LL_TIM_IC_SetPrescaler(INPUT_TIMER,
-    // IC_TIMER_CHANNEL, LL_TIM_ICPSC_DIV1);
-    // LL_TIM_IC_SetFilter(INPUT_TIMER, IC_TIMER_CHANNEL,
-    // LL_TIM_IC_FILTER_FDIV1); LL_TIM_IC_SetPolarity(INPUT_TIMER,
-    // IC_TIMER_CHANNEL, LL_TIM_IC_POLARITY_BOTHEDGE);
+    LL_TIM_CC_EnableChannel(INPUT_TIMER,
+        IC_TIMER_CHANNEL); // input capture and output compare
+    LL_TIM_EnableCounter(INPUT_TIMER);
 }
-
-#ifdef USE_RGB_LED // has 3 color led
-void LED_GPIO_init()
-{
-    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
-
-    /* GPIO Ports Clock Enable */
-    LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOB);
-
-    LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_8);
-    LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_5);
-    LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_3);
-
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_8;
-    GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
-    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_5;
-    GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
-    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_3;
-    GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
-    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-}
-
-#endif
-
-#ifdef USE_CUSTOM_LED
-void initLed()
-{
-    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_3;
-    GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
-    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-}
-#endif
 
 void reloadWatchDogCounter()
 {
@@ -531,13 +265,10 @@ void enableCorePeripherals()
     LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH2N);
     LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH3N);
 
-// #ifdef MCU_G071
-//     LL_TIM_CC_EnableChannel(
-//         TIM1, LL_TIM_CHANNEL_CH5); // timer used for comparator blanking
-// #endif
     LL_TIM_CC_EnableChannel(TIM1,
         LL_TIM_CHANNEL_CH4); // timer used for timing adc read
-    TIM1->CCR4 = 100; // set in 10khz loop to match pwm cycle timed to end of pwm on
+    TIM1->CCR4 = 100;    // max value for micros is 0xffff
+    // max value for millis is 0xffff/10 = 6553; // set in 10khz loop to match pwm cycle timed to end of pwm on
 
     /* Enable counter */
     LL_TIM_EnableCounter(TIM1);
@@ -545,28 +276,7 @@ void enableCorePeripherals()
     /* Force update generation */
     LL_TIM_GenerateEvent_UPDATE(TIM1);
 
-#ifdef USE_ADC_INPUT
-
-#else
-    LL_TIM_CC_EnableChannel(INPUT_TIMER,
-        IC_TIMER_CHANNEL); // input capture and output compare
-    LL_TIM_EnableCounter(INPUT_TIMER);
-#endif
-
-#ifdef USE_LED_STRIP
-    send_LED_RGB(255, 0, 0);
-#endif
-
-#ifdef USE_RGB_LED
-    LED_GPIO_init();
-    GPIOB->BRR = LL_GPIO_PIN_8; // turn on red
-    GPIOB->BSRR = LL_GPIO_PIN_5;
-    GPIOB->BSRR = LL_GPIO_PIN_3; //
-#endif
-
-#ifdef USE_CUSTOM_LED
-    initLed();
-#endif
+    input_timer_enable();
 
 #ifndef BRUSHED_MODE
     LL_TIM_EnableCounter(COM_TIMER); // commutation_timer priority 0

@@ -35,6 +35,11 @@ void MX_COMP1_Init(void);
 // void MX_TIM1_Init(void);
 void interval_timer_initialize(void);
 void interval_timer_enable(void);
+
+void input_timer_initialize(void);
+void input_timer_gpio_initialize(void);
+void input_timer_enable(void);
+
 void MX_IWDG_Init(void);
 void com_timer_initialize(void);
 
@@ -61,6 +66,5 @@ void setPWMCompare3(uint16_t comparethree);
 void enableCorePeripherals(void);
 void reloadWatchDogCounter(void);
 void generatePwmTimerEvent(void);
-void UN_TIM_Init(void);
 void LED_GPIO_init(void);
 void setPrescalerPWM(uint16_t presc);

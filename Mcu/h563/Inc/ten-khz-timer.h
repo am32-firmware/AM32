@@ -20,3 +20,4 @@
 void ten_khz_timer_initialize();
 void ten_khz_timer_enable();
 void ten_khz_timer_interrupt_enable();
+void tenKhzRoutine();

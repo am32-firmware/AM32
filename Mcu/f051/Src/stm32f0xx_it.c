@@ -105,86 +105,37 @@ void DMA1_Channel2_3_IRQHandler(void)
  */
 void DMA1_Channel4_5_IRQHandler(void)
 {
-    /* USER CODE BEGIN DMA1_Channel4_5_IRQn 0 */
-#ifdef USE_TIMER_15_CHANNEL_1
-    if (armed && dshot_telemetry) {
-        DMA1->IFCR |= DMA_IFCR_CGIF5;
-        DMA1_Channel5->CCR = 0x00;
-        if (out_put) {
-            receiveDshotDma();
-            compute_dshot_flag = 2;
-        } else {
-            sendDshotDma();
-            compute_dshot_flag = 1;
-        }
-        EXTI->SWIER |= LL_EXTI_LINE_15;
-        return;
-    }
+    // /* USER CODE BEGIN DMA1_Channel4_5_IRQn 0 */
+    // if (armed && dshot_telemetry) {
+    //     DMA1->IFCR |= DMA_IFCR_CGIF5;
+    //     DMA1_Channel5->CCR = 0x00;
+    //     if (out_put) {
+    //         receiveDshotDma();
+    //         compute_dshot_flag = 2;
+    //     } else {
+    //         sendDshotDma();
+    //         compute_dshot_flag = 1;
+    //     }
+    //     EXTI->SWIER |= LL_EXTI_LINE_15;
+    //     return;
+    // }
 
-    if (LL_DMA_IsActiveFlag_HT5(DMA1)) {
-        if (servoPwm) {
-            LL_TIM_IC_SetPolarity(IC_TIMER_REGISTER, IC_TIMER_CHANNEL,
-                LL_TIM_IC_POLARITY_FALLING);
-            LL_DMA_ClearFlag_HT5(DMA1);
-        }
-    }
-    if (LL_DMA_IsActiveFlag_TC5(DMA1) == 1) {
-        LL_DMA_ClearFlag_GI5(DMA1);
-        LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_5);
-        transfercomplete();
-        EXTI->SWIER |= LL_EXTI_LINE_15;
-        return;
-    } else if (LL_DMA_IsActiveFlag_TE5(DMA1) == 1) {
-        LL_DMA_ClearFlag_GI5(DMA1);
-    }
-#ifdef USE_PA14_TELEMETRY
-    if (LL_DMA_IsActiveFlag_TC4(DMA1)) {
-        LL_DMA_ClearFlag_GI4(DMA1);
-        LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_4);
-        /* Call function Transmission complete Callback */
-    } else if (LL_DMA_IsActiveFlag_TE4(DMA1)) {
-        LL_DMA_ClearFlag_GI4(DMA1);
-        LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_4);
-        /* Call Error function */
-        // USART_TransferError_Callback();
-    }
-#endif
-
-#endif
-
-    /* USER CODE END DMA1_Channel4_5_IRQn 0 */
-
-    /* USER CODE BEGIN DMA1_Channel4_5_IRQn 1 */
-#ifdef USE_TIMER_3_CHANNEL_1
-    if (armed && dshot_telemetry) {
-        DMA1->IFCR |= DMA_IFCR_CGIF4;
-        DMA1_Channel4->CCR = 0x00;
-        if (out_put) {
-            receiveDshotDma();
-            compute_dshot_flag = 2;
-        } else {
-            sendDshotDma();
-            compute_dshot_flag = 1;
-        }
-        EXTI->SWIER |= LL_EXTI_LINE_15;
-        return;
-    }
-    if (LL_DMA_IsActiveFlag_HT4(DMA1)) {
-        if (servoPwm) {
-            LL_TIM_IC_SetPolarity(IC_TIMER_REGISTER, IC_TIMER_CHANNEL,
-                LL_TIM_IC_POLARITY_FALLING);
-            LL_DMA_ClearFlag_HT4(DMA1);
-        }
-    }
-    if (LL_DMA_IsActiveFlag_TC4(DMA1) == 1) {
-        LL_DMA_ClearFlag_GI4(DMA1);
-        LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_4);
-        transfercomplete();
-        EXTI->SWIER |= LL_EXTI_LINE_15;
-    } else if (LL_DMA_IsActiveFlag_TE4(DMA1) == 1) {
-        LL_DMA_ClearFlag_GI4(DMA1);
-    }
-#endif
+    // if (LL_DMA_IsActiveFlag_HT5(DMA1)) {
+    //     if (servoPwm) {
+    //         LL_TIM_IC_SetPolarity(IC_TIMER_REGISTER, IC_TIMER_CHANNEL,
+    //             LL_TIM_IC_POLARITY_FALLING);
+    //         LL_DMA_ClearFlag_HT5(DMA1);
+    //     }
+    // }
+    // if (LL_DMA_IsActiveFlag_TC5(DMA1) == 1) {
+    //     LL_DMA_ClearFlag_GI5(DMA1);
+    //     LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_5);
+    //     transfercomplete();
+    //     EXTI->SWIER |= LL_EXTI_LINE_15;
+    //     return;
+    // } else if (LL_DMA_IsActiveFlag_TE5(DMA1) == 1) {
+    //     LL_DMA_ClearFlag_GI5(DMA1);
+    // }
 }
 
 /**

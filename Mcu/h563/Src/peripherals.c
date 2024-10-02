@@ -125,8 +125,10 @@ void input_timer_initialize(void)
     NVIC_EnableIRQ(IC_DMA_IRQ_NAME);
     // INPUT_TIMER->TISEL = TIM_TISEL_TI1SEL_1;
 
-    INPUT_TIMER->PSC = 249;
-    INPUT_TIMER->ARR = 0xffff;
+    // INPUT_TIMER->PSC = 249;
+    INPUT_TIMER->PSC = 63;
+    // INPUT_TIMER->ARR = 0xffff;
+    INPUT_TIMER->ARR = 10000;
     input_timer_gpio_initialize();
 }
 

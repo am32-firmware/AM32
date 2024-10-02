@@ -119,9 +119,7 @@ void GPDMA1_Channel2_IRQHandler(void)
     }
 }
 
-/**
- * @brief This function handles DMA1 channel 4 and 5 interrupts.
- */
+ // used for input capture interrupts
 void DMA1_Channel4_5_IRQHandler(void)
 {
     /* USER CODE BEGIN DMA1_Channel4_5_IRQn 0 */
@@ -147,6 +145,7 @@ void DMA1_Channel4_5_IRQHandler(void)
             LL_DMA_ClearFlag_HT5(DMA1);
         }
     }
+    // transfer complete
     if (LL_DMA_IsActiveFlag_TC5(DMA1) == 1) {
         LL_DMA_ClearFlag_GI5(DMA1);
         LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_5);
@@ -155,53 +154,6 @@ void DMA1_Channel4_5_IRQHandler(void)
         return;
     } else if (LL_DMA_IsActiveFlag_TE5(DMA1) == 1) {
         LL_DMA_ClearFlag_GI5(DMA1);
-    }
-#ifdef USE_PA14_TELEMETRY
-    if (LL_DMA_IsActiveFlag_TC4(DMA1)) {
-        LL_DMA_ClearFlag_GI4(DMA1);
-        LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_4);
-        /* Call function Transmission complete Callback */
-    } else if (LL_DMA_IsActiveFlag_TE4(DMA1)) {
-        LL_DMA_ClearFlag_GI4(DMA1);
-        LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_4);
-        /* Call Error function */
-        // USART_TransferError_Callback();
-    }
-#endif
-
-#endif
-
-    /* USER CODE END DMA1_Channel4_5_IRQn 0 */
-
-    /* USER CODE BEGIN DMA1_Channel4_5_IRQn 1 */
-#ifdef USE_TIMER_3_CHANNEL_1
-    if (armed && dshot_telemetry) {
-        DMA1->IFCR |= DMA_IFCR_CGIF4;
-        DMA1_Channel4->CCR = 0x00;
-        if (out_put) {
-            receiveDshotDma();
-            compute_dshot_flag = 2;
-        } else {
-            sendDshotDma();
-            compute_dshot_flag = 1;
-        }
-        EXTI->SWIER |= LL_EXTI_LINE_15;
-        return;
-    }
-    if (LL_DMA_IsActiveFlag_HT4(DMA1)) {
-        if (servoPwm) {
-            LL_TIM_IC_SetPolarity(IC_TIMER_REGISTER, IC_TIMER_CHANNEL,
-                LL_TIM_IC_POLARITY_FALLING);
-            LL_DMA_ClearFlag_HT4(DMA1);
-        }
-    }
-    if (LL_DMA_IsActiveFlag_TC4(DMA1) == 1) {
-        LL_DMA_ClearFlag_GI4(DMA1);
-        LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_4);
-        transfercomplete();
-        EXTI->SWIER |= LL_EXTI_LINE_15;
-    } else if (LL_DMA_IsActiveFlag_TE4(DMA1) == 1) {
-        LL_DMA_ClearFlag_GI4(DMA1);
     }
 #endif
 }
@@ -221,12 +173,7 @@ void ADC1_COMP_IRQHandler(void)
     //
 }
 
-/**
- * @brief This function handles TIM6 global and DAC underrun error interrupts.
- */
 // TIM6 is used to trigger the tenKhzRoutine
-
-
 void TIM6_IRQHandler(void)
 {
     if (LL_TIM_IsActiveFlag_UPDATE(TIM6) == 1) {
@@ -234,16 +181,6 @@ void TIM6_IRQHandler(void)
         tenKhzRoutine();
     }
 }
-
-/**
- * @brief This function handles TIM14 global interrupt.
- */
-// TIM14 is the COM_TIMER
-// void TIM14_IRQHandler(void)
-// {
-//     LL_TIM_ClearFlag_UPDATE(TIM14);
-//     PeriodElapsedCallback();
-// }
 
 /**
  * @brief This function handles TIM16 global interrupt.

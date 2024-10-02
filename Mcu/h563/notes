@@ -1,3 +1,23 @@
+// f051 // 
+TIMERS
+TIM15 input capture requires tif1, tif2
+TIM2 commutation (AKA interval)
+TIM1 bridge // used for bridge (motor 6x pwm) must be advanced control timer (TIM1 or TIM8)
+TIM6 tenkHz // used for loop
+TIM17 utility // used for delay()
+
+TIM3
+
+TIM16 unused
+
+DMA CHANNEL5 or 4?
+ADC DMA1CH1
+
+dma 1 ch5 input timer 15 ch1
+
+
+EXTI 15 dshot?
+
 /// NUCLEO H563 ///
 
 TIMERS

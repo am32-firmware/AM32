@@ -49,6 +49,7 @@ SRC_H563 := \
 	$(SRC_DIR_H563_SRC)/usart.c \
 	$(SRC_DIR_H563_SRC)/gpio.c \
 	$(SRC_DIR_H563_SRC)/serial_telemetry.c \
+	$(SRC_DIR_H563_SRC)/mcu.c \
 	$(SRC_DIR_H563_SRC)/stm32h5xx_it.c \
 	$(SRC_DIR_H563_SRC)/system_stm32h5xx.c \
 	$(SRC_DIR_H563_HAL)/stm32h5xx_ll_usart.c \

@@ -1,3 +1,37 @@
+/// NUCLEO H563 ///
+
+TIMERS
+TIM15 input capture requires tif1, tif2
+TIM2 commutation (AKA interval)
+TIM1 bridge // used for bridge (motor 6x pwm) must be advanced control timer (TIM1 or TIM8)
+TIM6 tenkHz // used for loop
+TIM17 utility // used for delay()
+
+input capture gpio
+GPIO C12 signal
+
+comparator gpio
+GPIO C9 A
+GPIO C11 B
+GPIO D2 C
+
+LED
+GPIO G4 R
+GPIO B0 G
+GPIO F4 B (yellow)
+
+Bridge gpio
+
+
+
+gate driver spi GPIO
+
+
+input capture pin (AKA signal)
+
+
+/// BLUEESC ///
+
 analog inputs
 
 Phase A current

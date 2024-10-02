@@ -1,9 +1,12 @@
 #include "led.h"
-// this tests blinking the led using the default clock frequency
-// h563 = 64MHz
+#include "mcu.h"
+// this tests blinking the led using the maximum clock frequency
+// h563 = 250MHz
 
 int main()
 {
+    mcu_setup();
+
     led_initialize();
     led_on();
 

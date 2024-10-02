@@ -188,10 +188,9 @@ void input_timer_initialize(void)
     NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
     NVIC_EnableIRQ(IC_DMA_IRQ_NAME);
 
-    input_timer_gpio_initialize();
     INPUT_TIMER->PSC = 0;
     INPUT_TIMER->ARR = 63;
-
+    input_timer_gpio_initialize();
 }
 
 void input_timer_gpio_initialize(void)

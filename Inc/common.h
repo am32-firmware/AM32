@@ -26,7 +26,8 @@ extern char output_timer_prescaler;
 extern uint8_t compute_dshot_flag;
 #ifdef STMICRO
 extern GPIO_TypeDef* current_GPIO_PORT;
-#ifndef MCU_F031
+
+#if !defined(MCU_F031) && !defined(MCU_H563)
 extern COMP_TypeDef* active_COMP;
 #endif
 #ifdef MCU_F031

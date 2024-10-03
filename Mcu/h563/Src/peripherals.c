@@ -127,8 +127,8 @@ void input_timer_initialize(void)
 
     // INPUT_TIMER->PSC = 249;
     INPUT_TIMER->PSC = 63;
-    // INPUT_TIMER->ARR = 0xffff;
-    INPUT_TIMER->ARR = 10000;
+    INPUT_TIMER->ARR = 0xffff;
+    // INPUT_TIMER->ARR = 10000;
     input_timer_gpio_initialize();
 }
 

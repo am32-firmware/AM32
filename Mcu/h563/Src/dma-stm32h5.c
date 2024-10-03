@@ -48,7 +48,7 @@ void DMA1_Channel5_IRQHandler(void)
     }
 }
 
-void dma_initialize(DMA_TypeDef dma)
+void dma_initialize(void)
 {
     RCC->AHB1ENR |= RCC_AHB1ENR_GPDMA1EN;
     RCC->AHB1ENR |= RCC_AHB1ENR_GPDMA2EN;

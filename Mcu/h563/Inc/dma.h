@@ -39,4 +39,4 @@ typedef struct dmaChannel_s
 
 extern dmaChannel_t dmaChannels[];
 
-void dma_initialize(DMA_TypeDef dma);
+void dma_initialize(void);

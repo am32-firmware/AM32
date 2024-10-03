@@ -3049,6 +3049,7 @@
 // eeprom address is 0x900a800 with one EDATA high cycle (6kB) page enabled
 // #define EEPROM_PAGE (0)
 // #define EEPROM_PAGE (0)
+// aka 0x0900a800
 #define EEPROM_START_ADD (uint32_t)(EEPROM_BASE + EEPROM_PAGE*EEPROM_PAGE_SIZE)
 // #define EEPROM_START_ADD (uint32_t)0x080FC000
 #define INTERVAL_TIMER TIM2

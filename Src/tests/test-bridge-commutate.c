@@ -82,7 +82,7 @@ int main()
 
 
     while(1) {
-        for (uint32_t i = 0; i < 3200000; i++)
+        for (uint32_t i = 0; i < 32000; i++)
         {
             asm("nop");
         }

@@ -2,27 +2,15 @@
 
 #include "stm32h563xx.h"
 #include "gpio.h"
+#include "exti.h"
 
 typedef struct {
-    // circular buffers
-    // buffer size MUST be 256
-    // implementation takes advantage of integer overflow
-    // uint8_t* _rx_buffer;
-    // uint8_t* _tx_buffer;
-    // uint16_t _rx_buffer_size;
-    // uint16_t _tx_buffer_size;
-    // uint8_t _rx_head;
-    // uint8_t _tx_head;
-    // uint8_t _tx_tail;
-    // uint8_t _dma_transfer_count;
-
-    // dmaChannel_t* rxDma;
-    // dmaChannel_t* txDma;
     gpio_t* phaseA;
     gpio_t* phaseB;
     gpio_t* phaseC;
-
-    uint8_t _irqn;
+    extiCallback_p phaseAcb;
+    extiCallback_p phaseBcb;
+    extiCallback_p phaseCcb;
 } comparator_t;
 
 extern comparator_t COMPARATOR;

@@ -53,7 +53,7 @@ void mcu_setup_clocks()
     RCC->CR |= RCC_CR_PLL1ON;
 
     // wait for pll to be ready
-    while (!RCC->CR & RCC_CR_PLL1RDY);
+    while (!(RCC->CR & RCC_CR_PLL1RDY));
 
     // switch system clock to pll1 p_clk
     RCC->CFGR1 |= 0b11 << RCC_CFGR1_SW_Pos;

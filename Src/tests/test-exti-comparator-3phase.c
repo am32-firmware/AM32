@@ -18,13 +18,6 @@ gpio_t gpioPhaseBLed = DEF_GPIO(LED_G_GPIO_PORT, LED_G_GPIO_PIN, 0, GPIO_OUTPUT)
 gpio_t gpioPhaseCLed = DEF_GPIO(LED_B_GPIO_PORT, LED_B_GPIO_PIN, 0, GPIO_OUTPUT);
 
 
-static comparator_t comp = {
-    .phaseA = &gpioCompPhaseA,
-    .phaseB = &gpioCompPhaseB,
-    .phaseC = &gpioCompPhaseC,
-};
-
-
 void phaseA_cb(extiChannel_t* exti)
 {
     uint32_t mask = 1 << exti->channel;
@@ -83,29 +76,19 @@ void phaseC_cb(extiChannel_t* exti)
 
 }
 
+
+comparator_t comp = {
+    .phaseA = &gpioCompPhaseA,
+    .phaseB = &gpioCompPhaseB,
+    .phaseC = &gpioCompPhaseC,
+    .phaseAcb = phaseA_cb,
+    .phaseBcb = phaseB_cb,
+    .phaseCcb = phaseC_cb
+};
+
 int main()
 {
-    exti_configure_port(&extiChannels[gpioCompPhaseA.pin], EXTI_CHANNEL_FROM_PORT(gpioCompPhaseA.port));
-    exti_configure_trigger(&extiChannels[gpioCompPhaseA.pin], EXTI_TRIGGER_RISING_FALLING);
-    exti_configure_cb(&extiChannels[gpioCompPhaseA.pin], phaseA_cb);
-    EXTI_NVIC_ENABLE(gpioCompPhaseA.pin);
-    // EXTI_INTERRUPT_ENABLE_MASK(1 << gpioCompPhaseA.pin);
-
-    exti_configure_port(&extiChannels[gpioCompPhaseB.pin], EXTI_CHANNEL_FROM_PORT(gpioCompPhaseB.port));
-    exti_configure_trigger(&extiChannels[gpioCompPhaseB.pin], EXTI_TRIGGER_RISING_FALLING);
-    exti_configure_cb(&extiChannels[gpioCompPhaseB.pin], phaseB_cb);
-    EXTI_NVIC_ENABLE(gpioCompPhaseB.pin);
-    // EXTI_INTERRUPT_ENABLE_MASK(1 << gpioCompPhaseB.pin);
-
-    exti_configure_port(&extiChannels[gpioCompPhaseC.pin], EXTI_CHANNEL_FROM_PORT(gpioCompPhaseC.port));
-    exti_configure_trigger(&extiChannels[gpioCompPhaseC.pin], EXTI_TRIGGER_RISING_FALLING);
-    exti_configure_cb(&extiChannels[gpioCompPhaseC.pin], phaseC_cb);
-    EXTI_NVIC_ENABLE(gpioCompPhaseC.pin);
-    // EXTI_INTERRUPT_ENABLE_MASK(1 << gpioCompPhaseC.pin);
-
-    gpio_initialize(&gpioCompPhaseA);
-    gpio_initialize(&gpioCompPhaseB);
-    gpio_initialize(&gpioCompPhaseC);
+    comparator_initialize(&comp);
 
     gpio_initialize(&gpioPhaseALed);
     gpio_reset(&gpioPhaseALed);
@@ -117,26 +100,8 @@ int main()
     gpio_initialize(&gpioPhaseCLed);
     gpio_reset(&gpioPhaseCLed);
 
-    EXTI_INTERRUPT_ENABLE_MASK(
-        (1 << gpioCompPhaseA.pin) |
-        (1 << gpioCompPhaseB.pin) |
-        (1 << gpioCompPhaseC.pin)
-    )
+    comparator_enable_interrupts(&comp);
+
     while(1) {
-        // if(gpio_read(&gpioCompPhaseA)) {
-        //     gpio_reset(&gpioPhaseALed);
-        // } else {
-        //     gpio_set(&gpioPhaseALed);
-        // }
-        // if(gpio_read(&gpioCompPhaseB)) {
-        //     gpio_reset(&gpioPhaseBLed);
-        // } else {
-        //     gpio_set(&gpioPhaseBLed);
-        // }
-        // if(gpio_read(&gpioCompPhaseC)) {
-        //     gpio_reset(&gpioPhaseCLed);
-        // } else {
-        //     gpio_set(&gpioPhaseCLed);
-        // }
     }
 }

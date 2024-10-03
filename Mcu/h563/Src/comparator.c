@@ -17,14 +17,22 @@
 void comparator_initialize(comparator_t* comp)
 {
     comparator_initialize_gpio_exti(comp->phaseA);
-    comparator_gpio_exti_nvic_enable(comp->phaseA);
-
+    if (comp->phaseAcb) {
+        exti_configure_cb(&extiChannels[comp->phaseA->pin], comp->phaseAcb);
+        comparator_gpio_exti_nvic_enable(comp->phaseA);
+    }
 
     comparator_initialize_gpio_exti(comp->phaseB);
-    comparator_gpio_exti_nvic_enable(comp->phaseB);
+    if (comp->phaseBcb) {
+        exti_configure_cb(&extiChannels[comp->phaseB->pin], comp->phaseBcb);
+        comparator_gpio_exti_nvic_enable(comp->phaseB);
+    }
 
     comparator_initialize_gpio_exti(comp->phaseC);
-    comparator_gpio_exti_nvic_enable(comp->phaseC);
+    if (comp->phaseCcb) {
+        exti_configure_cb(&extiChannels[comp->phaseC->pin], comp->phaseCcb);
+        comparator_gpio_exti_nvic_enable(comp->phaseC);
+    }
 
     comparator_initialize_gpio(comp->phaseA);
     comparator_initialize_gpio(comp->phaseB);
@@ -172,9 +180,14 @@ void comparator_enable_interrupts(comparator_t* comp)
 {
     // EXTI->IMR1 |= EXTI_IMR1_IM13;
 
-    EXTI_INTERRUPT_ENABLE_MASK(comp->phaseA->pin);
-    EXTI_INTERRUPT_ENABLE_MASK(comp->phaseB->pin);
-    EXTI_INTERRUPT_ENABLE_MASK(comp->phaseB->pin);
+    EXTI_INTERRUPT_ENABLE_MASK(
+        (1 << comp->phaseA->pin) |
+        (1 << comp->phaseB->pin) |
+        (1 << comp->phaseC->pin)
+    )
+    // EXTI_INTERRUPT_ENABLE_MASK(comp->phaseA->pin);
+    // EXTI_INTERRUPT_ENABLE_MASK(comp->phaseB->pin);
+    // EXTI_INTERRUPT_ENABLE_MASK(comp->phaseB->pin);
 
 }
 // reset value

@@ -1730,7 +1730,6 @@ void runBrushedLoop()
 }
 #endif
 
-/*
 int main(void)
 {
 
@@ -2021,15 +2020,15 @@ int main(void)
         }
 
 #ifndef MCU_F031
-        if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD)) {
-            NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
-            NVIC_SetPriority(COM_TIMER_IRQ, 1);
-            NVIC_SetPriority(COMPARATOR_IRQ, 1);
-        } else {
-            NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
-            NVIC_SetPriority(COM_TIMER_IRQ, 0);
-            NVIC_SetPriority(COMPARATOR_IRQ, 0);
-        }
+        // if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD)) {
+        //     NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
+        //     NVIC_SetPriority(COM_TIMER_IRQ, 1);
+        //     NVIC_SetPriority(COMPARATOR_IRQ, 1);
+        // } else {
+        //     NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
+        //     NVIC_SetPriority(COM_TIMER_IRQ, 0);
+        //     NVIC_SetPriority(COMPARATOR_IRQ, 0);
+        // }
 #endif
         if (send_telemetry) {
 #ifdef USE_SERIAL_TELEMETRY
@@ -2265,7 +2264,7 @@ int main(void)
 #endif
     }
 }
-*/
+
 #ifdef USE_FULL_ASSERT
 /**
  * @brief  Reports the name of the source file and the source line number

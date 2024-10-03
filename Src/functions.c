@@ -143,3 +143,31 @@ void gpio_mode_QUICK(gpio_type* gpio_periph, uint32_t mode,
 }
 #endif
 #endif
+
+
+#ifdef WCH
+
+void delayMicros(uint32_t micros)
+{
+    uint32_t i;
+    i = 24*micros;
+
+    do
+    {
+        __NOP();
+    }while(--i);
+}
+
+
+void delayMillis(uint32_t millis)
+{
+    do
+    {
+        delayMicros(1000);
+    }while( --millis );
+}
+
+#endif
+
+
+

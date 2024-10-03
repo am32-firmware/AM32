@@ -103,21 +103,21 @@ void SysTick_Handler(void) { }
  */
 
 // DMA1 Channel 2 is used for DSHOT serial telemetry (USART2)
-void GPDMA1_Channel2_IRQHandler(void)
-{
-    // disable DMA1 Channel 2
-    LL_DMA_DisableChannel(GPDMA1, LL_DMA_CHANNEL_2);
+// void GPDMA1_Channel2_IRQHandler(void)
+// {
+//     // disable DMA1 Channel 2
+//     LL_DMA_DisableChannel(GPDMA1, LL_DMA_CHANNEL_2);
 
-    // check DMA1 Channel 2 Transfer Complete flag
-    if (LL_DMA_IsActiveFlag_TC(GPDMA1, LL_DMA_CHANNEL_2)) {
-        // clear DMA1 Channel 2 Global Interrupt flag
-        LL_DMA_ClearFlag_TC(GPDMA1, LL_DMA_CHANNEL_2);
-    // check DMA1 Channel 2 Data Transfer Error flag
-    } else if (LL_DMA_IsActiveFlag_DTE(GPDMA1, LL_DMA_CHANNEL_2)) {
-        // clear DMA1 Channel 2 Global Interrupt flag
-        LL_DMA_ClearFlag_DTE(GPDMA1, LL_DMA_CHANNEL_2);
-    }
-}
+//     // check DMA1 Channel 2 Transfer Complete flag
+//     if (LL_DMA_IsActiveFlag_TC(GPDMA1, LL_DMA_CHANNEL_2)) {
+//         // clear DMA1 Channel 2 Global Interrupt flag
+//         LL_DMA_ClearFlag_TC(GPDMA1, LL_DMA_CHANNEL_2);
+//     // check DMA1 Channel 2 Data Transfer Error flag
+//     } else if (LL_DMA_IsActiveFlag_DTE(GPDMA1, LL_DMA_CHANNEL_2)) {
+//         // clear DMA1 Channel 2 Global Interrupt flag
+//         LL_DMA_ClearFlag_DTE(GPDMA1, LL_DMA_CHANNEL_2);
+//     }
+// }
 
  // used for input capture interrupts
 void DMA1_Channel4_5_IRQHandler(void)

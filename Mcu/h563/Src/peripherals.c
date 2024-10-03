@@ -15,6 +15,7 @@
 #include "stm32h563xx.h"
 #include "stm32h5xx_ll_bus.h"
 #include "targets.h"
+#include "dma.h"
 
 void initCorePeripherals(void)
 {
@@ -121,8 +122,11 @@ void input_timer_initialize(void)
 {
     INPUT_TIMER_ENABLE_CLOCK();
 
-    NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
-    NVIC_EnableIRQ(IC_DMA_IRQ_NAME);
+    
+    NVIC_SetPriority(dmaChannels[INPUT_TIMER_DMA_CHANNEL].irqn, 0);
+    NVIC_EnableIRQ(dmaChannels[INPUT_TIMER_DMA_CHANNEL].irqn);
+    // NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
+    // NVIC_EnableIRQ(IC_DMA_IRQ_NAME);
     // INPUT_TIMER->TISEL = TIM_TISEL_TI1SEL_1;
 
     // INPUT_TIMER->PSC = 249;

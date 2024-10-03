@@ -19,32 +19,39 @@ void GPDMA1_Channel0_IRQHandler(void)
         cb(&dmaChannels[0]);
     }
 }
-void DMA1_Channel2_IRQHandler(void)
+void GPDMA1_Channel1_IRQHandler(void)
 {
     dmaCallback_p cb = dmaChannels[1].callback;
     if (cb) {
         cb(&dmaChannels[1]);
     }
 }
-void DMA1_Channel3_IRQHandler(void)
+void GPDMA1_Channel2_IRQHandler(void)
 {
     dmaCallback_p cb = dmaChannels[2].callback;
     if (cb) {
         cb(&dmaChannels[2]);
     }
 }
-void DMA1_Channel4_IRQHandler(void)
+void GPDMA1_Channel3_IRQHandler(void)
 {
     dmaCallback_p cb = dmaChannels[3].callback;
     if (cb) {
         cb(&dmaChannels[3]);
     }
 }
-void DMA1_Channel5_IRQHandler(void)
+void GPDMA1_Channel4_IRQHandler(void)
 {
     dmaCallback_p cb = dmaChannels[4].callback;
     if (cb) {
         cb(&dmaChannels[4]);
+    }
+}
+void GPDMA1_Channel5_IRQHandler(void)
+{
+    dmaCallback_p cb = dmaChannels[5].callback;
+    if (cb) {
+        cb(&dmaChannels[5]);
     }
 }
 

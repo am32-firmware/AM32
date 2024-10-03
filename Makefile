@@ -46,7 +46,7 @@ FIRMWARE_VERSION := $(VERSION_MAJOR).$(VERSION_MINOR)
 
 # Compiler options
 CFLAGS_COMMON := -DUSE_MAKE -fsingle-precision-constant -fomit-frame-pointer -ffast-math
-CFLAGS_COMMON += -I$(MAIN_INC_DIR) -g -Wall -ffunction-sections
+CFLAGS_COMMON += -I$(MAIN_INC_DIR) -g -Wall -ffunction-sections -Wno-comment
 CFLAGS_COMMON += -D$(TARGET)
 
 # Linker options

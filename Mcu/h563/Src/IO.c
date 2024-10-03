@@ -21,19 +21,23 @@ uint32_t dma_buffer[64] = { 0 };
 char out_put = 0;
 uint8_t buffer_padding = 0;
 
-// extern void transfercomplete();
+extern void transfercomplete();
 
 void io_dma_cb(dmaChannel_t* dma)
 {
-    // transfercomplete();
+    dma->ref->CFCR |= DMA_CFCR_TCF;
+    transfercomplete();
 }
+
+void sendDshotDma()
+{}
 
 void receiveDshotDma()
 {
     out_put = 0;
     INPUT_TIMER_RESET();
     
-    // enable channedl as input mode
+    // enable channel as input mode
     INPUT_TIMER->CCMR1 = 0x01;
 
     INPUT_TIMER->CCER = 0xa;
@@ -47,7 +51,9 @@ void receiveDshotDma()
     dmaCh->callback = io_dma_cb;
     dmaCh->ref->CDAR = (uint32_t)&dma_buffer;
     dmaCh->ref->CSAR = (uint32_t)&INPUT_TIMER->CCR1;
-    dmaCh->ref->CBR1 = buffersize;
+    // for H5 BNDT = BYTEs to be transferred
+    // for other stm32 BNDT = number of transfers
+    dmaCh->ref->CBR1 = buffersize*2;
     // dmaCh->ref->CTR2 = DMA_REQ_INPUT_TIMER;
     dmaCh->ref->CTR2 = INPUT_TIMER_DMA_REQ;
     dmaCh->ref->CTR1 |=

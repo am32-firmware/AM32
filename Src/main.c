@@ -1730,6 +1730,7 @@ void runBrushedLoop()
 }
 #endif
 
+/*
 int main(void)
 {
 
@@ -2264,7 +2265,7 @@ int main(void)
 #endif
     }
 }
-
+*/
 #ifdef USE_FULL_ASSERT
 /**
  * @brief  Reports the name of the source file and the source line number

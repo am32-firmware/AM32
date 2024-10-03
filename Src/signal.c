@@ -148,10 +148,10 @@ void transfercomplete()
             }
         } else {
 
-            // if (dshot == 1) {
-            //     computeDshotDMA();
-            //     receiveDshotDma();
-            // }
+            if (dshot == 1) {
+                computeDshotDMA();
+                receiveDshotDma();
+            }
             if (servoPwm == 1) {
                 if (getInputPinState()) {
                     buffersize = 3;
@@ -163,14 +163,14 @@ void transfercomplete()
             }
         }
         if (!armed) {
-            // if (dshot && (average_count < 8) && (zero_input_count > 5)) {
-            //     average_count++;
-            //     average_packet_length = average_packet_length + (dma_buffer[31] - dma_buffer[0]);
-            //     if (average_count == 8) {
-            //         dshot_frametime_high = (average_packet_length >> 3) + (average_packet_length >> 7);
-            //         dshot_frametime_low = (average_packet_length >> 3) - (average_packet_length >> 7);
-            //     }
-            // }
+            if (dshot && (average_count < 8) && (zero_input_count > 5)) {
+                average_count++;
+                average_packet_length = average_packet_length + (dma_buffer[31] - dma_buffer[0]);
+                if (average_count == 8) {
+                    dshot_frametime_high = (average_packet_length >> 3) + (average_packet_length >> 7);
+                    dshot_frametime_low = (average_packet_length >> 3) - (average_packet_length >> 7);
+                }
+            }
             if (adjusted_input < 0) {
                 adjusted_input = 0;
             }
@@ -198,34 +198,34 @@ void transfercomplete()
     }
 }
 
-// void checkDshot()
-// {
-//     if ((smallestnumber >= 1) && (smallestnumber < 4) && (average_signal_pulse < 60)) {
-//         ic_timer_prescaler = 0;
-//         if (CPU_FREQUENCY_MHZ > 100) {
-//             output_timer_prescaler = 1;
-//         } else {
-//             output_timer_prescaler = 0;
-//         }
-//         //	dshot_runout_timer = 1000;
-//         dshot = 1;
-//         buffer_padding = 14;
-//         buffersize = 32;
-//         inputSet = 1;
-//     }
-//     if ((smallestnumber >= 4) && (smallestnumber <= 8) && (average_signal_pulse < 100)) {
-//         dshot = 1;
-//         ic_timer_prescaler = 1;
-//         if (CPU_FREQUENCY_MHZ > 100) {
-//             output_timer_prescaler = 3;
-//         } else {
-//             output_timer_prescaler = 1;
-//         }
-//         buffer_padding = 7;
-//         buffersize = 32;
-//         inputSet = 1;
-//     }
-// }
+void checkDshot()
+{
+    if ((smallestnumber >= 1) && (smallestnumber < 4) && (average_signal_pulse < 60)) {
+        ic_timer_prescaler = 0;
+        if (CPU_FREQUENCY_MHZ > 100) {
+            output_timer_prescaler = 1;
+        } else {
+            output_timer_prescaler = 0;
+        }
+        //	dshot_runout_timer = 1000;
+        dshot = 1;
+        buffer_padding = 14;
+        buffersize = 32;
+        inputSet = 1;
+    }
+    if ((smallestnumber >= 4) && (smallestnumber <= 8) && (average_signal_pulse < 100)) {
+        dshot = 1;
+        ic_timer_prescaler = 1;
+        if (CPU_FREQUENCY_MHZ > 100) {
+            output_timer_prescaler = 3;
+        } else {
+            output_timer_prescaler = 1;
+        }
+        buffer_padding = 7;
+        buffersize = 32;
+        inputSet = 1;
+    }
+}
 void checkServo()
 {
     if (smallestnumber > 200 && smallestnumber < 20000) {
@@ -252,15 +252,15 @@ void detectInput()
     }
     average_signal_pulse = average_signal_pulse / 32;
 
-    // if (dshot == 1) {
-    //     checkDshot();
-    // }
+    if (dshot == 1) {
+        checkDshot();
+    }
     if (servoPwm == 1) {
         checkServo();
     }
 
-    // if (!dshot && !servoPwm) {
-    //     checkDshot();
-    //     checkServo();
-    // }
+    if (!dshot && !servoPwm) {
+        checkDshot();
+        checkServo();
+    }
 }

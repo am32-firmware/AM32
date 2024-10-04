@@ -21,27 +21,34 @@ void gpio_initialize(gpio_t* gpio)
 #if defined(GPIOD)
         case GPIOD_BASE:
             RCC->AHB2ENR |= RCC_AHB2ENR_GPIODEN;
+            break;
 #endif
 #if defined(GPIOE)
         case GPIOE_BASE:
             RCC->AHB2ENR |= RCC_AHB2ENR_GPIOEEN;
+            break;
 #endif
 #if defined(GPIOF)
         case GPIOF_BASE:
             RCC->AHB2ENR |= RCC_AHB2ENR_GPIOFEN;
+            break;
 #endif
 #if defined(GPIOG)
         case GPIOG_BASE:
             RCC->AHB2ENR |= RCC_AHB2ENR_GPIOGEN;
+            break;
 #endif
 #if defined(GPIOH)
         case GPIOH_BASE:
             RCC->AHB2ENR |= RCC_AHB2ENR_GPIOHEN;
+            break;
 #endif
 #if defined(GPIOI)
         case GPIOI_BASE:
             RCC->AHB2ENR |= RCC_AHB2ENR_GPIOIEN;
+            break;
 #endif
+        default:
             break;
     }
 

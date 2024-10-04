@@ -329,8 +329,8 @@ void enableCorePeripherals()
 #ifndef BRUSHED_MODE
     LL_TIM_EnableCounter(COM_TIMER); // commutation_timer priority 0
     LL_TIM_GenerateEvent_UPDATE(COM_TIMER);
-    LL_TIM_EnableIT_UPDATE(COM_TIMER);
-    COM_TIMER->DIER &= ~((0x1UL << (0U))); // disable for now.
+    // LL_TIM_EnableIT_UPDATE(COM_TIMER);
+    // COM_TIMER->DIER &= ~((0x1UL << (0U))); // disable for now.
 #endif
 
     utility_timer_enable();

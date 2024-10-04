@@ -2960,16 +2960,14 @@
 // INLA PH13 TIM8_CH1N AF03
 
 // white wire // logic analyzer (ch0/1)
-// red wire // dev board
 // INLA PE8
 #define PHASE_A_GPIO_LOW LL_GPIO_PIN_8
 #define PHASE_A_GPIO_LOW_PIN 8
 #define PHASE_A_GPIO_PORT_LOW GPIOE
 #define PHASE_A_LOW_AF 1
-#define PHASE_A_LOW_Alternate LL_GPIO_AF_1
+// #define PHASE_A_LOW_Alternate LL_GPIO_AF_1
 
-// grey wire // logic analyzer
-// blue wire // dev board
+// grey wire // logic analyzer (ch1/2)
 // INHA PE9
 #define PHASE_A_GPIO_HIGH LL_GPIO_PIN_9
 #define PHASE_A_GPIO_HIGH_PIN 9
@@ -2984,14 +2982,14 @@
 #define BRIDGE_UH_PIN PHASE_A_GPIO_HIGH_PIN
 #define BRIDGE_UH_AF PHASE_A_HIGH_AF
 
-// purple wire
+// purple wire (ch2/3)
 // INLB PE10
-#define PHASE_B_GPIO_LOW LL_GPIO_PIN_13
-#define PHASE_B_GPIO_LOW_PIN 13
+#define PHASE_B_GPIO_LOW LL_GPIO_PIN_10
+#define PHASE_B_GPIO_LOW_PIN 10
 #define PHASE_B_GPIO_PORT_LOW GPIOE
 #define PHASE_B_LOW_AF 1
 
-// blue wire
+// blue wire (ch3/4)
 // INHB PE11
 #define PHASE_B_GPIO_HIGH LL_GPIO_PIN_11
 #define PHASE_B_GPIO_HIGH_PIN 11
@@ -3006,14 +3004,14 @@
 #define BRIDGE_VH_PIN PHASE_B_GPIO_HIGH_PIN
 #define BRIDGE_VH_AF PHASE_B_HIGH_AF
 
-// yellow wire
+// yellow wire (ch4/5)
 // INLC PE12
 #define PHASE_C_GPIO_LOW LL_GPIO_PIN_12
 #define PHASE_C_GPIO_LOW_PIN 12
 #define PHASE_C_GPIO_PORT_LOW GPIOE
 #define PHASE_C_LOW_AF 1
 
-// green wire
+// green wire (ch5/6)
 // INHC PE13
 #define PHASE_C_GPIO_HIGH LL_GPIO_PIN_13
 #define PHASE_C_GPIO_HIGH_PIN 13

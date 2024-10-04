@@ -122,7 +122,6 @@ void initCorePeripherals(void)
 #ifdef USE_SERIAL_TELEMETRY
     telem_UART_Init();
 #endif
-    drv8323_initialize(&DRV8323);
 }
 
 void initAfterJump(void)
@@ -293,6 +292,12 @@ void enableCorePeripherals()
 #endif
 
     utility_timer_enable();
+
+    LL_TIM_EnableCounter(UTILITY_TIMER);
+    LL_TIM_GenerateEvent_UPDATE(UTILITY_TIMER);
+
+    // depends on delay, so must come after utility timer counter enable
+    drv8323_initialize(&DRV8323);
 
     interval_timer_enable();
 

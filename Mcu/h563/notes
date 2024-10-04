@@ -55,6 +55,9 @@ GPIO F4 B (yellow)
 
 Bridge gpio
 
+DRV8323
+ENABLE GPIOF0, output
+
 
 
 gate driver spi GPIO

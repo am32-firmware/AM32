@@ -111,6 +111,8 @@ typedef struct {
     spi_t* spi;
 } drv8323_t;
 
+extern drv8323_t DRV8323;
+
 typedef enum
 {
     DRV8323_DEADTIME_50ns = 0b00,

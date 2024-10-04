@@ -1,15 +1,37 @@
 #include "drv8323-spi.h"
 #include "spi.h"
+#include "functions.h"
 
+
+gpio_t gpioDrv8323Enable = DEF_GPIO(
+    DRV_ENABLE_PORT,
+    DRV_ENABLE_PIN,
+    0,
+    GPIO_OUTPUT);
+
+drv8323_t DRV8323 = {
+    .gpioEnable = &gpioDrv8323Enable,
+    // .gpioFault = gpioFault
+    .gpioFault = 0,
+    .spi = 0,
+};
 
 void drv8323_reset(drv8323_t* drv)
 {
     drv8323_disable(drv);
-    // delay 1ms
-    for (int i = 0; i < 0x1ffff; i++) {
-        asm("nop");
-    }
+    // delay at least 1ms
+    delayMicros(1500);
     drv8323_enable(drv);
+}
+
+void drv_initialize_gpio(drv8323_t* drv)
+{
+    if (drv->gpioEnable) {
+        gpio_initialize(drv->gpioEnable);
+    }
+    if (drv->gpioFault) {
+        gpio_initialize(drv->gpioFault);
+    }
 }
 
 void drv8323_disable(drv8323_t* drv)
@@ -24,7 +46,10 @@ void drv8323_enable(drv8323_t* drv)
 
 void drv8323_initialize(drv8323_t* drv)
 {
-    spi_initialize(drv->spi);
+    if (drv->spi) {
+        spi_initialize(drv->spi);
+    }
+    drv_initialize_gpio(drv);
     drv8323_reset(drv);
 }
 

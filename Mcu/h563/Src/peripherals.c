@@ -12,7 +12,7 @@
 #include "dma.h"
 #include "comparator.h"
 #include "bridge.h"
-
+#include "drv8323-spi.h"
 void MX_TIM1_Init(void)
 {
     LL_TIM_InitTypeDef TIM_InitStruct = { 0 };
@@ -122,6 +122,7 @@ void initCorePeripherals(void)
 #ifdef USE_SERIAL_TELEMETRY
     telem_UART_Init();
 #endif
+    drv8323_initialize(&DRV8323);
 }
 
 void initAfterJump(void)

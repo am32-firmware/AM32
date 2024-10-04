@@ -59,11 +59,11 @@ void delayMicros(uint32_t micros)
 void delayMillis(uint32_t millis)
 {
     UTILITY_TIMER->CNT = 0;
-    UTILITY_TIMER->PSC = CPU_FREQUENCY_MHZ * 100;
+    UTILITY_TIMER->PSC = (CPU_FREQUENCY_MHZ * 100) - 1;
     LL_TIM_GenerateEvent_UPDATE(UTILITY_TIMER);
     while (UTILITY_TIMER->CNT < millis * 10) {
     }
-    UTILITY_TIMER->PSC = CPU_FREQUENCY_MHZ; // back to micros
+    UTILITY_TIMER->PSC = (CPU_FREQUENCY_MHZ - 1); // back to micros
     LL_TIM_GenerateEvent_UPDATE(UTILITY_TIMER);
 }
 

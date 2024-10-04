@@ -18,11 +18,13 @@ drv8323_t DRV8323 = {
 
 void drv8323_reset(drv8323_t* drv)
 {
+    delayMillis(2);
     drv8323_disable(drv);
     // delay at least 1ms
-    delayMicros(1500);
+    delayMillis(2);
     drv8323_enable(drv);
-    delayMicros(1500);
+    // delayMicros(3000);
+    delayMillis(2);
 }
 
 void drv_initialize_gpio(drv8323_t* drv)

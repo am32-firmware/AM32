@@ -116,3 +116,7 @@ DMA_HANDLE_TYPE_DEF in targets.h appears unused, despite being defined for every
 enableHalfTransferInt is unused
 
 why is TIM1.DMAR (DMAB) = 0x81 during playtune?
+
+in 
+delayMillis
+there is off - by one error (psc should be n-1)

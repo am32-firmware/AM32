@@ -1,14 +1,8 @@
-/*
- * peripherals.c
- *
- *  Created on: Sep. 26, 2020
- *      Author: Alka
- */
-
 // PERIPHERAL SETUP
 
 #include "peripherals.h"
 
+#include "comparator.h"
 #include "gpio.h"
 #include "ADC.h"
 #include "serial_telemetry.h"
@@ -16,19 +10,15 @@
 #include "stm32h5xx_ll_bus.h"
 #include "targets.h"
 #include "dma.h"
+#include "comparator.h"
 
 void initCorePeripherals(void)
 {
-    // LL_APB1_GRP2_EnableClock(LL_APB1_GRP2_PERIPH_SYSCFG);
-    // LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_PWR);
-    MX_GPIO_Init();
-    MX_DMA_Init();
-    // MX_TIM1_Init();
+    dma_initialize();
     interval_timer_initialize();
-    MX_COMP1_Init();
+    comparator_initialize(&COMPARATOR);
     com_timer_initialize();
     ten_khz_timer_initialize();
-    // MX_TIM17_Init();
     utility_timer_initialize();
     input_timer_initialize();
 #ifdef USE_SERIAL_TELEMETRY
@@ -52,11 +42,17 @@ void MX_IWDG_Init(void)
     IWDG->KR = 0x0000AAAA;
 }
 
+void reloadWatchDogCounter()
+{
+    LL_IWDG_ReloadCounter(IWDG);
+}
+
 // interval timer
 void interval_timer_initialize(void)
 {
     INTERVAL_TIMER_ENABLE_CLOCK();
-    TIM2->PSC = 23;
+    // 2MHz on f051
+    TIM2->PSC = (CPU_FREQUENCY_MHZ/2) - 1;
     TIM2->ARR = 0xFFFF;
 }
 
@@ -76,16 +72,6 @@ void com_timer_initialize(void)
     LL_TIM_EnableARRPreload(COM_TIMER);
 }
 
-void MX_TIM16_Init(void)
-{
-    LL_APB1_GRP2_EnableClock(LL_APB2_GRP1_PERIPH_TIM16);
-    //  NVIC_SetPriority(TIM16_IRQn, 2);
-    //  NVIC_EnableIRQ(TIM16_IRQn);
-    TIM16->PSC = 0;
-    TIM16->ARR = 9000;
-    LL_TIM_DisableARRPreload(TIM16);
-}
-
 void utility_timer_initialize(void)
 {
     UTILITY_TIMER_ENABLE_CLOCK();
@@ -98,24 +84,6 @@ void utility_timer_enable(void)
 {
     LL_TIM_EnableCounter(UTILITY_TIMER);
     LL_TIM_GenerateEvent_UPDATE(UTILITY_TIMER);
-}
-
-void MX_DMA_Init(void)
-{
-    LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPDMA1);
-    // NVIC_SetPriority(DMA1_Channel2_3_IRQn, 1);
-    // NVIC_EnableIRQ(DMA1_Channel2_3_IRQn);
-    // NVIC_SetPriority(DMA1_Channel4_5_IRQn, 1);
-    // NVIC_EnableIRQ(DMA1_Channel4_5_IRQn);
-}
-
-void MX_GPIO_Init(void)
-{
-    /* GPIO Ports Clock Enable */
-    LL_AHB1_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
-    LL_AHB1_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOB);
-
-    LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_15);
 }
 
 void input_timer_initialize(void)
@@ -152,11 +120,6 @@ void input_timer_enable(void)
     LL_TIM_CC_EnableChannel(INPUT_TIMER,
         IC_TIMER_CHANNEL); // input capture and output compare
     LL_TIM_EnableCounter(INPUT_TIMER);
-}
-
-void reloadWatchDogCounter()
-{
-    LL_IWDG_ReloadCounter(IWDG);
 }
 
 void disableComTimerInt() { COM_TIMER->DIER &= ~((0x1UL << (0U))); }
@@ -209,8 +172,7 @@ void enableCorePeripherals()
 
     LL_TIM_CC_EnableChannel(TIM1,
         LL_TIM_CHANNEL_CH4); // timer used for timing adc read
-    TIM1->CCR4 = 100;    // max value for micros is 0xffff
-    // max value for millis is 0xffff/10 = 6553; // set in 10khz loop to match pwm cycle timed to end of pwm on
+    TIM1->CCR4 = 100;
 
     /* Enable counter */
     LL_TIM_EnableCounter(TIM1);
@@ -241,7 +203,7 @@ void enableCorePeripherals()
     activateADC();
 #endif
 
-    // comparator interrupt?
+    // interrupt for processDshot on exti line 15
     // NVIC_SetPriority(EXTI15_IRQn, 2);
     // NVIC_EnableIRQ(EXTI15_IRQn);
     // EXTI->IMR1 |= (1 << 15);

@@ -6,7 +6,7 @@ int main()
 {
 
     // set a breakpoint here to observe that the watchdog DOES NOT trigger a system reset
-    watchdog_initialize();
+    MX_IWDG_Init();
 
     while(1) {
         reloadWatchDogCounter();

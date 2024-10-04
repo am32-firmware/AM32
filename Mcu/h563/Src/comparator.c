@@ -14,6 +14,19 @@
 #include "gpio.h"
 #include "exti.h"
 // void comparator_initialize(GPIO_TypeDef* phaseA, GPIO_TypeDef* phaseB, GPIO_TypeDef* phaseC)
+
+gpio_t gpioCompPhaseA = DEF_GPIO(COMPA_GPIO_PORT, COMPA_GPIO_PIN, 0, GPIO_INPUT);
+gpio_t gpioCompPhaseB = DEF_GPIO(COMPB_GPIO_PORT, COMPB_GPIO_PIN, 0, GPIO_INPUT);
+gpio_t gpioCompPhaseC = DEF_GPIO(COMPC_GPIO_PORT, COMPC_GPIO_PIN, 0, GPIO_INPUT);
+
+comparator_t COMPARATOR = {
+    .phaseA = &gpioCompPhaseA,
+    .phaseB = &gpioCompPhaseB,
+    .phaseC = &gpioCompPhaseC,
+    // .phaseAcb = phaseA_cb,
+    // .phaseBcb = phaseB_cb,
+    // .phaseCcb = phaseC_cb
+};
 void comparator_initialize(comparator_t* comp)
 {
     comparator_initialize_gpio_exti(comp->phaseA);
@@ -147,15 +160,14 @@ void comparator_initialize_gpio_exti(gpio_t* gpio)
     exti_configure_port(&extiChannels[gpio->pin], cr_value);
 }
 
-
 uint8_t getCompOutputLevel()
 {
     if (step == 1 || step == 4) { // c floating
-        return GPIOC->IDR & GPIO_IDR_ID14;
+        return gpio_read(COMPARATOR.phaseC);
     } else if (step == 2 || step == 5) { // a floating
-        return GPIOF->IDR & GPIO_IDR_ID4;
+        return gpio_read(COMPARATOR.phaseA);
     } else /*if (step == 3 || step == 6)*/ { // b floating
-        return GPIOC->IDR & GPIO_IDR_ID15;
+        return gpio_read(COMPARATOR.phaseB);
     }
 }
 
@@ -164,12 +176,13 @@ void maskPhaseInterrupts()
     comparator_disable_interrupts(&COMPARATOR);
 }
 
-void comoparator_disable_interrupts(comparator_t* comp)
+void comparator_disable_interrupts(comparator_t* comp)
 {
-    // EXTI->IMR1 &= ~EXTI_IMR1_IM13;
-    EXTI_INTERRUPT_DISABLE_MASK(comp->phaseA->pin);
-    EXTI_INTERRUPT_DISABLE_MASK(comp->phaseB->pin);
-    EXTI_INTERRUPT_DISABLE_MASK(comp->phaseC->pin);
+    EXTI_INTERRUPT_DISABLE_MASK(
+        (1 << comp->phaseA->pin) |
+        (1 << comp->phaseB->pin) |
+        (1 << comp->phaseC->pin)
+    )
 }
 
 void enableCompInterrupts()
@@ -178,17 +191,11 @@ void enableCompInterrupts()
 }
 void comparator_enable_interrupts(comparator_t* comp)
 {
-    // EXTI->IMR1 |= EXTI_IMR1_IM13;
-
     EXTI_INTERRUPT_ENABLE_MASK(
         (1 << comp->phaseA->pin) |
         (1 << comp->phaseB->pin) |
         (1 << comp->phaseC->pin)
     )
-    // EXTI_INTERRUPT_ENABLE_MASK(comp->phaseA->pin);
-    // EXTI_INTERRUPT_ENABLE_MASK(comp->phaseB->pin);
-    // EXTI_INTERRUPT_ENABLE_MASK(comp->phaseB->pin);
-
 }
 // reset value
 #define EXTI_IMR1_CLEAR_MASK 0xfffe0000
@@ -198,17 +205,24 @@ void changeCompInput()
 {
     EXTI->IMR1 &= EXTI_IMR1_CLEAR_MASK;
     if (step == 1 || step == 4) { // c floating
-        EXTI->IMR1 |= EXTI_IMR1_IM14;
+        EXTI_INTERRUPT_ENABLE_MASK(1 << COMPARATOR.phaseC->pin);
     } else if (step == 2 || step == 5) { // a floating
-        EXTI->IMR1 |= EXTI_IMR1_IM4;
+        EXTI_INTERRUPT_ENABLE_MASK(1 << COMPARATOR.phaseA->pin);
     } else /*if (step == 3 || step == 6)*/ { // b floating
-        EXTI->IMR1 |= EXTI_IMR1_IM15;
+        EXTI_INTERRUPT_ENABLE_MASK(1 << COMPARATOR.phaseB->pin);
     }
     if (rising) {
         EXTI->FTSR1 = 0;
-        EXTI->RTSR1 = EXTI_RTSR1_BITS;
+        // EXTI->RTSR1 = EXTI_RTSR1_BITS;
+        EXTI->RTSR1 = 
+            (1 << COMPARATOR.phaseA->pin) |
+            (1 << COMPARATOR.phaseB->pin) |
+            (1 << COMPARATOR.phaseC->pin);
     } else { // falling bemf
         EXTI->RTSR1 = 0;
-        EXTI->FTSR1 = EXTI_FTSR1_BITS;
+        EXTI->FTSR1 = 
+            (1 << COMPARATOR.phaseA->pin) |
+            (1 << COMPARATOR.phaseB->pin) |
+            (1 << COMPARATOR.phaseC->pin);
     }
 }

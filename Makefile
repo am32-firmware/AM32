@@ -64,7 +64,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom-erase.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-exti-3phase.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-exti-comparator-3phase.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-exti-comparator-3phase.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-phaseouts.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-bridge-audio.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-bridge-commutate.c

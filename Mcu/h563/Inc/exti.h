@@ -90,6 +90,7 @@ extern extiChannel_t extiChannels[];
 void exti_configure_port(extiChannel_t* exti, exticr_e port);
 void exti_configure_trigger(extiChannel_t* exti, extiTrigger_e trigger);
 void exti_configure_nvic(extiChannel_t* exti, bool enable);
+void exti_configure_imr(extiChannel_t* exti, bool enable);
 void exti_configure_cb(extiChannel_t* exti, extiCallback_p cb);
 void exti_initialize(EXTI_TypeDef exti);
 // void exti_

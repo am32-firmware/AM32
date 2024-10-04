@@ -28,11 +28,7 @@
 void initAfterJump(void);
 void initCorePeripherals(void);
 void SystemClock_Config(void);
-void MX_GPIO_Init(void);
-void MX_DMA_Init(void);
 // static void MX_ADC_Init(void);
-void MX_COMP1_Init(void);
-// void MX_TIM1_Init(void);
 void interval_timer_initialize(void);
 void interval_timer_enable(void);
 
@@ -40,18 +36,19 @@ void input_timer_initialize(void);
 void input_timer_gpio_initialize(void);
 void input_timer_enable(void);
 
+// called from main (can't be renamed)
 void MX_IWDG_Init(void);
+void reloadWatchDogCounter(void);
+
 void com_timer_initialize(void);
 
-// TIM6
 void ten_khz_timer_initialize(void);
 void ten_khz_timer_enable(void);
 void ten_khz_timer_interrupt_enable(void);
 
-// void MX_TIM17_Init(void);
 void utility_timer_initialize(void);
 void utility_timer_enable(void);
-// static void MX_USART1_UART_Init(void);
+
 void disableComTimerInt(void);
 void enableComTimerInt(void);
 void setAndEnableComInt(uint16_t time);
@@ -64,7 +61,6 @@ void setPWMCompare1(uint16_t compareone);
 void setPWMCompare2(uint16_t comparetwo);
 void setPWMCompare3(uint16_t comparethree);
 void enableCorePeripherals(void);
-void reloadWatchDogCounter(void);
 void generatePwmTimerEvent(void);
 void LED_GPIO_init(void);
 void setPrescalerPWM(uint16_t presc);

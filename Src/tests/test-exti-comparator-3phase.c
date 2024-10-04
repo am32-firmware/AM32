@@ -1,14 +1,11 @@
 // this is a test of the comparator.h interface
-
-// #include "stm32h563xx.h"
+// it will have the 3 leds reflect the state of the 3 phases
 
 #include "targets.h"
 #include "comparator.h"
 #include "exti.h"
-// #include "led.h"
 
 // IMR1 reset value is 0xfffe0000
-
 gpio_t gpioCompPhaseA = DEF_GPIO(COMPA_GPIO_PORT, COMPA_GPIO_PIN, 0, GPIO_INPUT);
 gpio_t gpioCompPhaseB = DEF_GPIO(COMPB_GPIO_PORT, COMPB_GPIO_PIN, 0, GPIO_INPUT);
 gpio_t gpioCompPhaseC = DEF_GPIO(COMPC_GPIO_PORT, COMPC_GPIO_PIN, 0, GPIO_INPUT);
@@ -22,15 +19,11 @@ void phaseA_cb(extiChannel_t* exti)
 {
     uint32_t mask = 1 << exti->channel;
     if (EXTI->RPR1 & mask) {
-        // gpio_set(&gpioPhaseALed);
         EXTI->RPR1 |= mask;
     } 
     if (EXTI->FPR1 & mask) {
-        // gpio_reset(&gpioPhaseALed);
         EXTI->FPR1 |= mask;
     }
-    // gpio_toggle(&gpioPhaseALed);
-
     if(gpio_read(&gpioCompPhaseA)) {
         gpio_reset(&gpioPhaseALed);
     } else {
@@ -42,11 +35,9 @@ void phaseB_cb(extiChannel_t* exti)
 {
     uint32_t mask = 1 << exti->channel;
     if (EXTI->RPR1 & mask) {
-        // gpio_set(&gpioPhaseBLed);
         EXTI->RPR1 |= mask;
     }
     if (EXTI->FPR1 & mask) {
-        // gpio_reset(&gpioPhaseBLed);
         EXTI->FPR1 |= mask;
     }
     if(gpio_read(&gpioCompPhaseB)) {
@@ -59,13 +50,10 @@ void phaseB_cb(extiChannel_t* exti)
 void phaseC_cb(extiChannel_t* exti)
 {
     uint32_t mask = 1 << exti->channel;
-    // EXTI->RPR1 |= mask
     if (EXTI->RPR1 & mask) {
-        // gpio_set(&gpioPhaseCLed);
         EXTI->RPR1 |= mask;
     }
     if (EXTI->FPR1 & mask) {
-        // gpio_reset(&gpioPhaseCLed);
         EXTI->FPR1 |= mask;
     }
     if(gpio_read(&gpioCompPhaseC)) {
@@ -73,9 +61,7 @@ void phaseC_cb(extiChannel_t* exti)
     } else {
         gpio_set(&gpioPhaseCLed);
     }
-
 }
-
 
 comparator_t comp = {
     .phaseA = &gpioCompPhaseA,
@@ -92,7 +78,6 @@ int main()
 
     gpio_initialize(&gpioPhaseALed);
     gpio_reset(&gpioPhaseALed);
-
 
     gpio_initialize(&gpioPhaseBLed);
     gpio_reset(&gpioPhaseBLed);

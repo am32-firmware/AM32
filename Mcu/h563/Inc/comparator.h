@@ -14,7 +14,6 @@ typedef struct {
 } comparator_t;
 
 extern comparator_t COMPARATOR;
-extern comparator_t comparatorChannels[];
 
 void comparator_initialize(comparator_t* comp);
 void comparator_initialize_gpio(gpio_t* gpio);

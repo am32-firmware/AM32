@@ -8,6 +8,7 @@
 #define OCM_ACTIVE 0b101
 
 void bridge_initialize();
+void bridge_gpio_initialize();
 
 typedef struct
 {

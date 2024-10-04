@@ -1908,6 +1908,7 @@ int main(void)
             tim1_arr = map(commutation_interval, 96, 200, TIMER1_MAX_ARR / 2,
                 TIMER1_MAX_ARR);
         }
+        // aka LOOP_FREQUENCY_HZ / 2 = 5000
         if (signaltimeout > (LOOP_FREQUENCY_HZ >> 1)) { // half second timeout when armed;
             if (armed) {
                 allOff();

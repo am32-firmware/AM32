@@ -81,6 +81,12 @@ void bridge_initialize()
 
     //TIM1->CR1 |= 0b11<<5;
 
+    bridge_gpio_initialize();
+
+}
+void bridge_gpio_initialize()
+{
+
     gpio_t gpioUh = DEF_GPIO(BRIDGE_UH_PORT, BRIDGE_UH_PIN, BRIDGE_UH_AF, GPIO_AF); 
     gpio_t gpioUl = DEF_GPIO(BRIDGE_UL_PORT, BRIDGE_UL_PIN, BRIDGE_UL_AF, GPIO_AF);
     gpio_t gpioVh = DEF_GPIO(BRIDGE_VH_PORT, BRIDGE_VH_PIN, BRIDGE_VH_AF, GPIO_AF);

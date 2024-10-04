@@ -11,6 +11,7 @@
 #include "targets.h"
 #include "dma.h"
 #include "comparator.h"
+#include "bridge.h"
 
 void MX_TIM1_Init(void)
 {
@@ -101,54 +102,7 @@ PA10   ------> TIM1_CH3
 #else
 #define HIGH_OUTPUT_TYPE LL_GPIO_OUTPUT_PUSHPULL
 #endif
-    GPIO_InitStruct.Pin = PHASE_A_GPIO_LOW;
-    GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
-    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.OutputType = LOW_OUTPUT_TYPE;
-    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    GPIO_InitStruct.Alternate = LL_GPIO_AF_2;
-    LL_GPIO_Init(PHASE_A_GPIO_PORT_LOW, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = PHASE_B_GPIO_LOW;
-    GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
-    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.OutputType = LOW_OUTPUT_TYPE;
-    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    GPIO_InitStruct.Alternate = LL_GPIO_AF_2;
-    LL_GPIO_Init(PHASE_B_GPIO_PORT_LOW, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = PHASE_C_GPIO_LOW;
-    GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
-    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.OutputType = LOW_OUTPUT_TYPE;
-    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    GPIO_InitStruct.Alternate = LL_GPIO_AF_2;
-    LL_GPIO_Init(PHASE_C_GPIO_PORT_LOW, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = PHASE_A_GPIO_HIGH;
-    GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
-    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.OutputType = HIGH_OUTPUT_TYPE;
-    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    GPIO_InitStruct.Alternate = LL_GPIO_AF_2;
-    LL_GPIO_Init(PHASE_A_GPIO_PORT_HIGH, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = PHASE_B_GPIO_HIGH;
-    GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
-    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.OutputType = HIGH_OUTPUT_TYPE;
-    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    GPIO_InitStruct.Alternate = LL_GPIO_AF_2;
-    LL_GPIO_Init(PHASE_B_GPIO_PORT_HIGH, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = PHASE_C_GPIO_HIGH;
-    GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
-    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.OutputType = HIGH_OUTPUT_TYPE;
-    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    GPIO_InitStruct.Alternate = LL_GPIO_AF_2;
-    LL_GPIO_Init(PHASE_C_GPIO_PORT_HIGH, &GPIO_InitStruct);
-
+    bridge_gpio_initialize();
     //  NVIC_SetPriority(TIM1_BRK_UP_TRG_COM_IRQn, 2);
     //  NVIC_EnableIRQ(TIM1_BRK_UP_TRG_COM_IRQn);
 }

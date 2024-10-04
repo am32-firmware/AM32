@@ -98,7 +98,8 @@ void playStartupTune()
 
     // error here on h563 because only 16bit access is allowed from high-cycle area
     // uint8_t value = *(uint8_t*)(eeprom_address + 48);
-    uint8_t value = *(uint16_t*)(eeprom_address + 48) & 0xff;
+    // uint8_t value = *(uint16_t*)(eeprom_address + 48) & 0xff;
+    uint8_t value = 0xff;
     if (value != 0xFF) {
         playBlueJayTune();
     } else {

@@ -111,3 +111,5 @@ when interval timer is tim2, the 32 bits could be used to give a finer resolutio
 DMA_HANDLE_TYPE_DEF in targets.h appears unused, despite being defined for every? target
 
 enableHalfTransferInt is unused
+
+why is TIM1.DMAR (DMAB) = 0x81 during playtune?

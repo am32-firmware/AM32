@@ -54,5 +54,6 @@ SRC_H563 := \
 	$(SRC_DIR_H563_SRC)/system_stm32h5xx.c \
 	$(SRC_DIR_H563_HAL)/stm32h5xx_ll_usart.c \
 	$(SRC_DIR_H563_HAL)/stm32h5xx_ll_rcc.c \
-	$(SRC_DIR_H563_HAL)/stm32h5xx_ll_gpio.c
+	$(SRC_DIR_H563_HAL)/stm32h5xx_ll_gpio.c \
+	$(SRC_DIR_H563_HAL)/stm32h5xx_ll_tim.c
 	

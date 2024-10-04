@@ -243,18 +243,6 @@ void DMA1_Channel1_IRQHandler(void) // ADC
     }
 }
 
-void TIM1_BRK_UP_TRG_COM_IRQHandler(void)
-{
-    if (LL_TIM_IsActiveFlag_CC1(TIM1) == 1) {
-        LL_TIM_ClearFlag_CC1(TIM1);
-    }
-
-    if (LL_TIM_IsActiveFlag_UPDATE(TIM1) == 1) {
-        LL_TIM_ClearFlag_UPDATE(TIM1);
-        //  doPWMChanges();
-    }
-}
-
 void EXTI4_15_IRQHandler(void)
 {
     LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_15);

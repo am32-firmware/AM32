@@ -15,7 +15,16 @@ ADC DMA1CH1
 
 dma 1 ch5 input timer 15 ch1
 
-processDshot is not defined for any target
+<!-- processDshot is not defined for any target -->
+
+TIM1_BRK_UP_TRG_COM_IRQHandler does nothing
+<!-- aka #ifndef BRUSHED_MODE
+    LL_TIM_EnableCounter(COM_TIMER); // commutation_timer priority 0
+    LL_TIM_GenerateEvent_UPDATE(COM_TIMER);
+    LL_TIM_EnableIT_UPDATE(COM_TIMER);
+    COM_TIMER->DIER &= ~((0x1UL << (0U))); // disable for now.
+#endif -->
+in peripherals.c ^^^
 
 
 EXTI 15 dshot?

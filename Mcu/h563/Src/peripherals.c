@@ -209,7 +209,9 @@ void interval_timer_enable(void)
 void com_timer_initialize(void)
 {
     COM_TIMER_ENABLE_CLOCK();
-    COM_TIMER->PSC = 23;
+
+    // 2MHz for f0
+    COM_TIMER->PSC = CPU_FREQUENCY_MHZ/2 - 1;
     COM_TIMER->ARR = 4000;
     NVIC_SetPriority(COM_TIMER_IRQ, 0);
     NVIC_EnableIRQ(COM_TIMER_IRQ);
@@ -329,8 +331,10 @@ void enableCorePeripherals()
 #ifndef BRUSHED_MODE
     LL_TIM_EnableCounter(COM_TIMER); // commutation_timer priority 0
     LL_TIM_GenerateEvent_UPDATE(COM_TIMER);
-    // LL_TIM_EnableIT_UPDATE(COM_TIMER);
-    // COM_TIMER->DIER &= ~((0x1UL << (0U))); // disable for now.
+    // these two lines negate each other, the result is to trigger an
+    // update event immediately
+    LL_TIM_EnableIT_UPDATE(COM_TIMER);
+    COM_TIMER->DIER &= ~((0x1UL << (0U))); // disable for now.
 #endif
 
     utility_timer_enable();

@@ -1,10 +1,12 @@
 // f051 // 
 TIMERS
 TIM15 input capture requires tif1, tif2
-TIM2 commutation (AKA interval)
+TIM2 interval timer // used for?
 TIM1 bridge // used for bridge (motor 6x pwm) must be advanced control timer (TIM1 or TIM8)
 TIM6 tenkHz // used for loop
 TIM17 utility // used for delay()
+TIM14 COM_TIMER // used for commutation scheduling
+// calls periodElapsedCallback(), which commutates
 
 TIM3
 

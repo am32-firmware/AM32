@@ -182,6 +182,12 @@ void TIM6_IRQHandler(void)
     }
 }
 
+void TIM14_IRQHandler(void)
+{
+    LL_TIM_ClearFlag_UPDATE(TIM14);
+    PeriodElapsedCallback();
+}
+
 /**
  * @brief This function handles TIM16 global interrupt.
  */

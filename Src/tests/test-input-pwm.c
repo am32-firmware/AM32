@@ -5,6 +5,8 @@
 #include "dma.h"
 #include "signal.h"
 
+// the pwm read code depends on a lot of variables defined in main
+// so I copy and pasted them all for expediency while testing
 //===========================================================================
 //=============================  Defaults =============================
 //===========================================================================

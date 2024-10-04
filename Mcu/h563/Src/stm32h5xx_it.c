@@ -46,6 +46,11 @@ extern char out_put;
 extern char compute_dshot_flag;
 /* USER CODE END EV */
 
+__WEAK void PeriodElapsedCallback()
+{
+    while(1);
+}
+
 int interrupt_time = 0;
 /******************************************************************************/
 /*           Cortex-M0 Processor Interruption and Exception Handlers */

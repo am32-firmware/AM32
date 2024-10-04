@@ -1732,13 +1732,6 @@ int main(void)
 
     loadEEpromSettings();
 
- //   EEPROM_VERSION = *(uint8_t*)(0x08000FFC);
-
-	  if((*(uint32_t*)(0x08000FE0)) == 0xf8){
-			eeprom_address = (uint32_t)0x0800F800;
-		}
-
-	
     if (VERSION_MAJOR != eepromBuffer[3] || VERSION_MINOR != eepromBuffer[4]) {
         eepromBuffer[3] = VERSION_MAJOR;
         eepromBuffer[4] = VERSION_MINOR;

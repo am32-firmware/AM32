@@ -551,7 +551,7 @@ int16_t phase_A_position;
 int16_t phase_B_position;
 int16_t phase_C_position;
 uint16_t step_delay = 100;
-char stepper_sine = 0;
+char stepper_sine = 1;
 char forward = 1;
 uint16_t gate_drive_offset = DEAD_TIME;
 
@@ -657,11 +657,13 @@ void loadEEpromSettings()
     if (eepromBuffer[19] == 0x01) {
         use_sin_start = 1;
         //	 min_startup_duty = sin_mode_min_s_d;
+    } else {
+        use_sin_start = 1;
     }
     if (eepromBuffer[20] == 0x01) {
         comp_pwm = 1;
     } else {
-        comp_pwm = 0;
+        comp_pwm = 1;
     }
     if (eepromBuffer[21] == 0x01) {
         VARIABLE_PWM = 1;
@@ -710,7 +712,8 @@ void loadEEpromSettings()
 #ifdef THREE_CELL_MAX
 		motor_kv =  motor_kv / 2;
 #endif
-    motor_poles = eepromBuffer[27];
+    // motor_poles = eepromBuffer[27];
+    motor_poles = 14;
     if (eepromBuffer[28] == 0x01) {
         brake_on_stop = 1;
     } else {
@@ -829,7 +832,7 @@ void loadEEpromSettings()
             };
         } else {
             dshot = 0;
-            servoPwm = 0;
+            servoPwm = 1;
             EDT_ARMED = 1;
         }
 
@@ -1901,7 +1904,7 @@ int main(void)
             input_ready = 0;
         }
 #endif
-
+        setInput();
         RELOAD_WATCHDOG_COUNTER();
         e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation_intervals[2] + commutation_intervals[3] + commutation_intervals[4] + commutation_intervals[5]) + 4) >> 1; // COMMUTATION INTERVAL IS 0.5US INCREMENTS
         if (VARIABLE_PWM) {
@@ -2250,7 +2253,7 @@ int main(void)
 #else
                     // todo add braking for PWM /enable style bridges.
 #endif
-                } else {
+                } else { // disarm
                     SET_DUTY_CYCLE_ALL(0);
                     allOff();
                 }

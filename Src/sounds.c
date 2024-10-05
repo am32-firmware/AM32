@@ -104,8 +104,8 @@ void playStartupTune()
         playBlueJayTune();
     } else {
         SET_AUTO_RELOAD_PWM(TIM1_AUTORELOAD);
-        // setCaptureCompare();
-        SET_DUTY_CYCLE_ALL(1000);
+        setCaptureCompare();
+        // SET_DUTY_CYCLE_ALL(1000);
         comStep(3); // activate a pwm channel
         SET_PRESCALER_PWM(55); // frequency of beep
         delayMillis(200); // duration of beep

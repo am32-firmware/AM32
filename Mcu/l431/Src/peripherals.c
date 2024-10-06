@@ -47,7 +47,6 @@ void initCorePeripherals(void)
 
 void initAfterJump()
 {
-    SCB->VTOR = 0x08001000;
     __enable_irq();
 }
 

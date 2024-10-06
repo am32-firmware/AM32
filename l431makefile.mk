@@ -6,7 +6,8 @@ TARGETS_$(MCU) := $(call get_targets,$(MCU))
 HAL_FOLDER_$(MCU) := $(HAL_FOLDER)/$(call lc,$(MCU))
 
 MCU_$(MCU) := -mcpu=cortex-m4 -mthumb
-LDSCRIPT_$(MCU) := $(wildcard $(HAL_FOLDER_$(MCU))/*.ld)
+
+LDSCRIPT_$(MCU) := $(HAL_FOLDER_$(MCU))/ldscript.ld
 
 SRC_BASE_DIR_$(MCU) := \
 	$(HAL_FOLDER_$(MCU))/Startup/gcc \
@@ -37,15 +38,20 @@ CFLAGS_$(MCU) += \
 	-DPREFETCH_ENABLE=1
 
 
-CFLAGS_$(MCU) += \
+SRC_$(MCU) := $(foreach dir,$(SRC_DIR_$(MCU)),$(wildcard $(dir)/*.[cs]))
+
+# optional CAN support
+CFLAGS_CAN_$(MCU) = \
 	-ISrc/DroneCAN \
 	-ISrc/DroneCAN/libcanard \
 	-ISrc/DroneCAN/libcanard/drivers/stm32 \
 	-ISrc/DroneCAN/dsdl_generated/include
 
-SRC_DIR_$(MCU) += Src/DroneCAN \
+SRC_DIR_CAN_$(MCU) = Src/DroneCAN \
 		Src/DroneCAN/dsdl_generated/src \
 		Src/DroneCAN/libcanard \
 		Src/DroneCAN/libcanard/drivers/stm32
 
-SRC_$(MCU) := $(foreach dir,$(SRC_DIR_$(MCU)),$(wildcard $(dir)/*.[cs]))
+SRC_CAN_$(MCU) := $(foreach dir,$(SRC_DIR_CAN_$(MCU)),$(wildcard $(dir)/*.[cs]))
+
+LDSCRIPT_CAN_$(MCU) := $(HAL_FOLDER_$(MCU))/ldscript_CAN.ld

@@ -59,6 +59,9 @@ SRC_COMMON := $(foreach dir,$(SRC_DIRS_COMMON),$(wildcard $(dir)/*.[cs]))
 OBJ := obj
 BIN_DIR := $(ROOT)/$(OBJ)
 
+# Function to check for _CAN suffix
+has_can_suffix = $(findstring _CAN,$1)
+
 # find the SVD files
 $(foreach MCU,$(MCU_TYPES),$(eval SVD_$(MCU) := $(wildcard $(HAL_FOLDER_$(MCU))/*.svd)))
 
@@ -90,15 +93,20 @@ $$($(2)_BASENAME).bin: $$($(2)_BASENAME).elf
 	$(QUIET)$(OBJCOPY) -O binary $$(<) $$@
 	$(QUIET)$(OBJCOPY) $$(<) -O ihex $$(@:.bin=.hex)
 
-CFLAGS_$(2) = $(MCU_$(1)) -D$(2) $(CFLAGS_$(1)) $(CFLAGS_COMMON)
-LDFLAGS_$(2) = $(LDFLAGS_COMMON) $(LDFLAGS_$(1)) -T$(LDSCRIPT_$(1))
+# check for CAN support
+$(eval xLDSCRIPT := $$(if $$(call has_can_suffix,$$(2)),$(LDSCRIPT_CAN_$(1)),$(LDSCRIPT_$(1))))
+$(eval xCFLAGS := $$(if $$(call has_can_suffix,$$(2)),$(CFLAGS_CAN_$(1))))
+$(eval xSRC := $$(if $$(call has_can_suffix,$$(2)),$(SRC_CAN_$(1))))
+
+CFLAGS_$(2) = $(MCU_$(1)) -D$(2) $(CFLAGS_$(1)) $(CFLAGS_COMMON) $(xCFLAGS)
+LDFLAGS_$(2) = $(LDFLAGS_COMMON) $(LDFLAGS_$(1)) -T$(xLDSCRIPT)
 
 -include $$($(2)_BASENAME).d
 
-$$($(2)_BASENAME).elf: $(SRC_COMMON) $$(SRC_$(1))
+$$($(2)_BASENAME).elf: $(SRC_COMMON) $$(SRC_$(1)) $(xSRC)
 	@$(ECHO) Compiling $$(notdir $$@)
 	$(QUIET)$(MKDIR) -p $(OBJ)
-	$(QUIET)$(CC) $$(CFLAGS_$(2)) $$(LDFLAGS_$(2)) -MMD -MP -MF $$(@:.elf=.d) -o $$(@) $(SRC_COMMON) $$(SRC_$(1))
+	$(QUIET)$(CC) $$(CFLAGS_$(2)) $$(LDFLAGS_$(2)) -MMD -MP -MF $$(@:.elf=.d) -o $$(@) $(SRC_COMMON) $$(SRC_$(1)) $(xSRC)
 # we copy debug.elf to give us a constant debug target for vscode
 # this means the debug button will always debug the last target built
 	$(QUIET)$(CP) -f $$(@) $(OBJ)$(DSEP)debug.elf > $(NUL)

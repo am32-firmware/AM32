@@ -13,6 +13,61 @@
 #include "comparator.h"
 #include "bridge.h"
 #include "drv8323-spi.h"
+
+extern void interruptRoutine();
+
+
+void phaseA_cb(extiChannel_t* exti)
+{
+    uint32_t mask = 1 << exti->channel;
+    if (EXTI->RPR1 & mask) {
+        EXTI->RPR1 |= mask;
+    } 
+    if (EXTI->FPR1 & mask) {
+        EXTI->FPR1 |= mask;
+    }
+    // if(gpio_read(&gpioCompPhaseA)) {
+    //     gpio_reset(&gpioPhaseALed);
+    // } else {
+    //     gpio_set(&gpioPhaseALed);
+    // }
+    interruptRoutine();
+}
+
+void phaseB_cb(extiChannel_t* exti)
+{
+    uint32_t mask = 1 << exti->channel;
+    if (EXTI->RPR1 & mask) {
+        EXTI->RPR1 |= mask;
+    }
+    if (EXTI->FPR1 & mask) {
+        EXTI->FPR1 |= mask;
+    }
+    // if(gpio_read(&gpioCompPhaseB)) {
+    //     gpio_reset(&gpioPhaseBLed);
+    // } else {
+    //     gpio_set(&gpioPhaseBLed);
+    // }
+    interruptRoutine();
+}
+
+void phaseC_cb(extiChannel_t* exti)
+{
+    uint32_t mask = 1 << exti->channel;
+    if (EXTI->RPR1 & mask) {
+        EXTI->RPR1 |= mask;
+    }
+    if (EXTI->FPR1 & mask) {
+        EXTI->FPR1 |= mask;
+    }
+    // if(gpio_read(&gpioCompPhaseC)) {
+    //     gpio_reset(&gpioPhaseCLed);
+    // } else {
+    //     gpio_set(&gpioPhaseCLed);
+    // }
+    interruptRoutine();
+}
+
 void MX_TIM1_Init(void)
 {
     LL_TIM_InitTypeDef TIM_InitStruct = { 0 };
@@ -114,6 +169,11 @@ void initCorePeripherals(void)
     // waiting to make sure of parity with am32 implementation
     // bridge_initialize();
     interval_timer_initialize();
+
+    COMPARATOR.phaseAcb = phaseA_cb;
+    COMPARATOR.phaseBcb = phaseB_cb;
+    COMPARATOR.phaseCcb = phaseC_cb;
+    
     comparator_initialize(&COMPARATOR);
     com_timer_initialize();
     ten_khz_timer_initialize();

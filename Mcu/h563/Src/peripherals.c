@@ -15,14 +15,26 @@
 #include "drv8323-spi.h"
 
 extern void interruptRoutine();
+extern void processDshot();
 
+void exti15cb(extiChannel_t* exti)
+{
+    uint32_t mask = 1 << exti->channel;
+    if (EXTI->RPR1 & mask) {
+        EXTI->RPR1 |= mask;
+    } 
+    if (EXTI->FPR1 & mask) {
+        EXTI->FPR1 |= mask;
+    }
+    processDshot();
+}
 
 void phaseA_cb(extiChannel_t* exti)
 {
     uint32_t mask = 1 << exti->channel;
     if (EXTI->RPR1 & mask) {
         EXTI->RPR1 |= mask;
-    } 
+    }
     if (EXTI->FPR1 & mask) {
         EXTI->FPR1 |= mask;
     }
@@ -371,8 +383,9 @@ void enableCorePeripherals()
     activateADC();
 #endif
 
+    exti_configure_cb(&extiChannels[15], exti15cb);
     // interrupt for processDshot on exti line 15
-    // NVIC_SetPriority(EXTI15_IRQn, 2);
-    // NVIC_EnableIRQ(EXTI15_IRQn);
-    // EXTI->IMR1 |= (1 << 15);
+    NVIC_SetPriority(EXTI15_IRQn, 2);
+    NVIC_EnableIRQ(EXTI15_IRQn);
+    EXTI->IMR1 |= (1 << 15);
 }

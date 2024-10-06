@@ -27,6 +27,7 @@ void io_dma_cb(dmaChannel_t* dma)
 {
     dma->ref->CFCR |= DMA_CFCR_TCF;
     transfercomplete();
+    EXTI->SWIER1 |= EXTI_SWIER1_SWI15;
 }
 
 void sendDshotDma()

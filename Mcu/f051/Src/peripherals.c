@@ -24,7 +24,7 @@ void initCorePeripherals(void)
     MX_TIM1_Init();
     MX_TIM2_Init();
     MX_COMP1_Init();
-    com_timer_initialize();
+    MX_TIM14_Init();
     MX_TIM6_Init();
     MX_TIM17_Init();
     UN_TIM_Init();
@@ -300,7 +300,7 @@ void MX_TIM6_Init(void)
     TIM6->ARR = 1000000 / LOOP_FREQUENCY_HZ;
 }
 
-void com_timer_initialize(void)
+void MX_TIM14_Init(void)
 {
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM14);
     TIM14->PSC = 23;
@@ -527,13 +527,13 @@ void setDutyCycleAll(uint16_t newdc)
     TIM1->CCR3 = newdc;
 }
 
-void inline setPWMCompare1(uint16_t compareone) { TIM1->CCR1 = compareone; }
-void inline setPWMCompare2(uint16_t comparetwo) { TIM1->CCR2 = comparetwo; }
-void inline setPWMCompare3(uint16_t comparethree) { TIM1->CCR3 = comparethree; }
+inline void setPWMCompare1(uint16_t compareone) { TIM1->CCR1 = compareone; }
+inline void setPWMCompare2(uint16_t comparetwo) { TIM1->CCR2 = comparetwo; }
+inline void setPWMCompare3(uint16_t comparethree) { TIM1->CCR3 = comparethree; }
 
-void inline generatePwmTimerEvent() { LL_TIM_GenerateEvent_UPDATE(TIM1); }
+inline void generatePwmTimerEvent() { LL_TIM_GenerateEvent_UPDATE(TIM1); }
 
-void inline resetInputCaptureTimer()
+inline void resetInputCaptureTimer()
 {
     IC_TIMER_REGISTER->PSC = 0;
     IC_TIMER_REGISTER->CNT = 0;

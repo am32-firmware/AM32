@@ -323,7 +323,7 @@ char bi_direction = 0;
 char stuck_rotor_protection = 1; // Turn off for Crawlers
 char brake_on_stop = 0;
 char stall_protection = 0;
-char use_sin_start = 0;
+char use_sin_start = 1;
 char TLM_ON_INTERVAL = 0;
 uint8_t telemetry_interval_ms = 30;
 uint8_t TEMPERATURE_LIMIT = 255; // degrees 255 to disable
@@ -551,7 +551,7 @@ int16_t phase_A_position;
 int16_t phase_B_position;
 int16_t phase_C_position;
 uint16_t step_delay = 100;
-char stepper_sine = 1;
+char stepper_sine = 0;
 char forward = 1;
 uint16_t gate_drive_offset = DEAD_TIME;
 
@@ -740,12 +740,18 @@ void loadEEpromSettings()
         } else {
             TLM_ON_INTERVAL = 0;
         }
-        servo_low_threshold = (eepromBuffer[32] * 2) + 750; // anything below this point considered 0
-        servo_high_threshold = (eepromBuffer[33] * 2) + 1750;
+        // servo_low_threshold = (eepromBuffer[32] * 2) + 750; // anything below this point considered 0
+        // servo_high_threshold = (eepromBuffer[33] * 2) + 1750;
+        // ; // anything above this point considered 2000 (max)
+        // servo_neutral = (eepromBuffer[34]) + 1374;
+        // servo_dead_band = eepromBuffer[35];
+        servo_low_threshold = 1000; // anything below this point considered 0
+        servo_high_threshold = 2000;
         ; // anything above this point considered 2000 (max)
-        servo_neutral = (eepromBuffer[34]) + 1374;
-        servo_dead_band = eepromBuffer[35];
+        servo_neutral = 1500;
+        servo_dead_band = 10;
 
+        
         if (eepromBuffer[36] == 0x01) {
             LOW_VOLTAGE_CUTOFF = 1;
         } else {
@@ -1742,7 +1748,8 @@ int main(void)
 
     enableCorePeripherals();
 
-    loadEEpromSettings();
+    // loadEEpromSettings();
+    setVolume(11);
 
  //   EEPROM_VERSION = *(uint8_t*)(0x08000FFC);
 

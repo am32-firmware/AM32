@@ -19,6 +19,7 @@
 #include <string.h>
 #include "sys_can.h"
 #include <canard.h>
+#include "phaseouts.h"
 
 // include the headers for the generated DroneCAN messages from the
 // dronecan_dsdlc compiler
@@ -356,6 +357,8 @@ static void handle_param_ExecuteOpcode(CanardInstance* ins, CanardRxTransfer* tr
 static void handle_RestartNode(CanardInstance* ins, CanardRxTransfer* transfer)
 {
     // reboot the ESC
+    allOff();
+    set_rtc_backup_register(0, 0);
     NVIC_SystemReset();
 }
 
@@ -483,7 +486,19 @@ static void handle_ArmingStatus(CanardInstance *ins, CanardRxTransfer *transfer)
  */
 static void handle_begin_firmware_update(CanardInstance* ins, CanardRxTransfer* transfer)
 {
-    // reboot and let bootloader handle the request
+    if (running) {
+        can_printf("No update while running");
+        return;
+    }
+
+    // tell the bootloader we are doing fw update
+    set_rtc_backup_register(0, (canardGetLocalNodeID(&canard)<<24) | RTC_BKUP0_FWUPDATE);
+
+    // reboot and let bootloader handle the request, this means the
+    // first request doesn't get a reply, and the client re-sends. We
+    // need this to get the path to the client. We could instead
+    // define a memory block which is not reset on boot and put the
+    // path there, but this is simpler
     NVIC_SystemReset();
 }
 
@@ -851,6 +866,12 @@ void DroneCAN_update()
     if (!done_startup) {
 	done_startup = true;
 	DroneCAN_Startup();
+        set_rtc_backup_register(0, RTC_BKUP0_BOOTED);
+    }
+
+    if (canstats.on_receive == 5) {
+        // indicate to bootloader that we were fully operational
+        set_rtc_backup_register(0, RTC_BKUP0_SIGNAL);
     }
 
     sys_can_disable_IRQ();

@@ -230,5 +230,17 @@ void sys_can_init(void)
     BXCAN->IER = CANARD_STM32_CAN_IER_FMPIE0 | CANARD_STM32_CAN_IER_FMPIE1 | CANARD_STM32_CAN_IER_TMEIE;
 }
 
+uint32_t get_rtc_backup_register(uint8_t idx)
+{
+    const volatile uint32_t *bkp = &RTC->BKP0R;
+    return bkp[idx];
+}
+
+void set_rtc_backup_register(uint8_t idx, uint32_t value)
+{
+    volatile uint32_t *bkp = &RTC->BKP0R;
+    bkp[idx] = value;
+}
+
 #endif // DRONECAN_SUPPORT && defined(MCU_L431)
 

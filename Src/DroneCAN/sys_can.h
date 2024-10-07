@@ -64,3 +64,16 @@ int16_t sys_can_transmit(const CanardCANFrame* txf);
   return 1 for success, 0 for no frame, -ve for error
  */
 int16_t sys_can_receive(CanardCANFrame *rx_frame);
+
+/*
+  get/set RTC backup registers. Used to detect firmware update state
+ */
+uint32_t get_rtc_backup_register(uint8_t idx);
+void set_rtc_backup_register(uint8_t idx, uint32_t value);
+
+/*
+  magic values for RTC backup registers
+ */
+#define RTC_BKUP0_FWUPDATE 0x8c42c7 // top byte is CAN node number
+#define RTC_BKUP0_BOOTED 0x8c42c8 // set when main started
+#define RTC_BKUP0_SIGNAL 0x8c42c9 // set on 5 DroneCAN messages processed

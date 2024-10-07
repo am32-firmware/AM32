@@ -12,10 +12,9 @@ MEMORY
 {
  RAM          (xrw)  : ORIGIN = 0x20000000, LENGTH = 64K
  FLASH1        (rx)  : ORIGIN = 0x08004000, LENGTH = 512
- FLASH_VERSION (rx)  : ORIGIN = ORIGIN(FLASH1)+LENGTH(FLASH1), LENGTH = 16
- FILE_NAME     (rx)  : ORIGIN = ORIGIN(FLASH_VERSION)+LENGTH(FLASH_VERSION), LENGTH = 32
+ FILE_NAME     (rx)  : ORIGIN = ORIGIN(FLASH1)+LENGTH(FLASH1), LENGTH = 32
  EEPROM        (rx)  : ORIGIN = 0x0801f800, LENGTH = 2K
- FLASH         (rx)  : ORIGIN = ORIGIN(FILE_NAME)+LENGTH(FILE_NAME), LENGTH = ORIGIN(EEPROM)-ORIGIN(FLASH1)
+ FLASH         (rx)  : ORIGIN = ORIGIN(FILE_NAME)+LENGTH(FILE_NAME), LENGTH = ORIGIN(EEPROM)-(ORIGIN(FILE_NAME)+LENGTH(FILE_NAME))
 }
 
 /* Sections */
@@ -27,11 +26,21 @@ SECTIONS
     . = ALIGN(4);
     KEEP(*(.isr_vector)) /* Startup code */
     . = ALIGN(4);
-  } >FLASH1
+    KEEP(*(.app_signature))
+    . = ALIGN(4);
+  } > FLASH1
+
+  .fill_flash1 :
+  {
+        FILL(0x00);
+        . = ORIGIN(FLASH1) + LENGTH(FLASH1) - 1;
+        BYTE(0x00)
+  } > FLASH1
 
   /* The program code and other data into "FLASH" Rom type memory */
   .text :
   {
+    FILL(0x00);
     . = ALIGN(4);
     *(.text)           /* .text sections (code) */
     *(.text*)          /* .text* sections (code) */
@@ -98,20 +107,25 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
-  .firmware_version :
+  .flash_fill :
   {
-    . = ALIGN(4);
-	KEEP (*(.firmware_info))
-    . = ALIGN(4);
-  } >FLASH_VERSION
+        . = ALIGN(4);
+        BYTE(0x00);
+  } > FLASH
 
   /* The file name */
   .file_name :
   {
+    FILL(0x00);
     . = ALIGN(4);
-	KEEP (*(.file_name))
-    . = ALIGN(4);
+    KEEP (*(.file_name))
+    BYTE(0x00)
   } >FILE_NAME
+
+  .filename_fill :
+  {
+        BYTE(0x00);
+  } > FILE_NAME
 
   /* Used by the startup to initialize data */
   _sidata = LOADADDR(.data);
@@ -119,6 +133,7 @@ SECTIONS
   /* Initialized data sections into "RAM" Ram type memory */
   .data :
   {
+    FILL(0x00);
     . = ALIGN(4);
     _sdata = .;        /* create a global symbol at data start */
     *(.data)           /* .data sections */

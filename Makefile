@@ -91,6 +91,7 @@ $$($(2)_BASENAME).bin: $$($(2)_BASENAME).elf
 	echo building BIN $$@
 	@$(ECHO) Generating $$(notdir $$@)
 	$(QUIET)$(OBJCOPY) -O binary $$(<) $$@
+	$(QUIET)python3 Src/DroneCAN/set_app_signature.py $$@ $$(<)
 	$(QUIET)$(OBJCOPY) $$(<) -O ihex $$(@:.bin=.hex)
 
 # check for CAN support
@@ -98,7 +99,7 @@ $(eval xLDSCRIPT := $$(if $$(call has_can_suffix,$$(2)),$(LDSCRIPT_CAN_$(1)),$(L
 $(eval xCFLAGS := $$(if $$(call has_can_suffix,$$(2)),$(CFLAGS_CAN_$(1))))
 $(eval xSRC := $$(if $$(call has_can_suffix,$$(2)),$(SRC_CAN_$(1))))
 
-CFLAGS_$(2) = $(MCU_$(1)) -D$(2) $(CFLAGS_$(1)) $(CFLAGS_COMMON) $(xCFLAGS)
+CFLAGS_$(2) = -DAM32_MCU=\"$(MCU)\" $(MCU_$(1)) -D$(2) $(CFLAGS_$(1)) $(CFLAGS_COMMON) $(xCFLAGS)
 LDFLAGS_$(2) = $(LDFLAGS_COMMON) $(LDFLAGS_$(1)) -T$(xLDSCRIPT)
 
 -include $$($(2)_BASENAME).d

@@ -74,6 +74,6 @@ void set_rtc_backup_register(uint8_t idx, uint32_t value);
 /*
   magic values for RTC backup registers
  */
-#define RTC_BKUP0_FWUPDATE 0x8c42c7 // top byte is CAN node number
+#define RTC_BKUP0_FWUPDATE 0x42c7 // top byte is CAN node number
 #define RTC_BKUP0_BOOTED 0x8c42c8 // set when main started
 #define RTC_BKUP0_SIGNAL 0x8c42c9 // set on 5 DroneCAN messages processed

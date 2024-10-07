@@ -20,6 +20,7 @@
 #include "sys_can.h"
 #include <canard.h>
 #include "phaseouts.h"
+#include "functions.h"
 
 // include the headers for the generated DroneCAN messages from the
 // dronecan_dsdlc compiler
@@ -39,6 +40,29 @@ static uint8_t canard_memory_pool[CANARD_POOL_SIZE];
 struct CANStats canstats;
 
 static bool dronecan_armed;
+
+#define APP_SIGNATURE_MAGIC1 0x68f058e6
+#define APP_SIGNATURE_MAGIC2 0xafcee5a0
+
+/*
+  application signature, filled in by set_app_signature.py
+ */
+const struct {
+    uint32_t magic1;
+    uint32_t magic2;
+    uint32_t fwlen; // total fw length in bytes
+    uint32_t crc1; // crc32 up to start of app_signature
+    uint32_t crc2; // crc32 from end of app_signature to end of fw
+    char mcu[16];
+    uint32_t unused[2];
+} app_signature __attribute__((section(".app_signature"))) = {
+        .magic1 = APP_SIGNATURE_MAGIC1,
+        .magic2 = APP_SIGNATURE_MAGIC2,
+        .fwlen = 0,
+        .crc1 = 0,
+        .crc2 = 0,
+        .mcu = AM32_MCU,
+};
 
 /*
   state of user settings. This will be saved in settings.dat. On a
@@ -79,7 +103,6 @@ extern char stuck_rotor_protection;
 
 extern void saveEEpromSettings(void);
 extern void loadEEpromSettings(void);
-
 
 /*
   the set of parameters to present to the user over DroneCAN
@@ -491,8 +514,51 @@ static void handle_begin_firmware_update(CanardInstance* ins, CanardRxTransfer* 
         return;
     }
 
+    struct uavcan_protocol_file_BeginFirmwareUpdateRequest req;
+    if (uavcan_protocol_file_BeginFirmwareUpdateRequest_decode(transfer, &req)) {
+        return;
+    }
+
+    sys_can_disable_IRQ();
+
+    uint32_t reg[2] = {0,0};
+    if (req.image_file_remote_path.path.len <= 8) {
+        // path is normally hashed and fits in 8 bytes, put in rtc backup registers 1 and 2
+        memcpy((uint8_t *)reg, req.image_file_remote_path.path.data, req.image_file_remote_path.path.len);
+
+        uint8_t buffer[UAVCAN_PROTOCOL_FILE_BEGINFIRMWAREUPDATE_RESPONSE_MAX_SIZE];
+        struct uavcan_protocol_file_BeginFirmwareUpdateResponse reply;
+        memset(&reply, 0, sizeof(reply));
+        reply.error = UAVCAN_PROTOCOL_FILE_BEGINFIRMWAREUPDATE_RESPONSE_ERROR_OK;
+
+        uint32_t total_size = uavcan_protocol_file_BeginFirmwareUpdateResponse_encode(&reply, buffer);
+
+        canardRequestOrRespond(ins,
+            transfer->source_node_id,
+            UAVCAN_PROTOCOL_FILE_BEGINFIRMWAREUPDATE_SIGNATURE,
+            UAVCAN_PROTOCOL_FILE_BEGINFIRMWAREUPDATE_ID,
+            &transfer->transfer_id,
+            transfer->priority,
+            CanardResponse,
+            &buffer[0],
+            total_size);
+
+        while (canardPeekTxQueue(&canard) != NULL) {
+            DroneCAN_processTxQueue();
+        }
+
+        // time to transmit
+        delayMillis(2);
+    }
+
+    set_rtc_backup_register(1, reg[0]);
+    set_rtc_backup_register(2, reg[1]);
+
     // tell the bootloader we are doing fw update
-    set_rtc_backup_register(0, (canardGetLocalNodeID(&canard)<<24) | RTC_BKUP0_FWUPDATE);
+    set_rtc_backup_register(0,
+        (canardGetLocalNodeID(&canard)<<24) |
+        (transfer->source_node_id<<16) |
+        RTC_BKUP0_FWUPDATE);
 
     // reboot and let bootloader handle the request, this means the
     // first request doesn't get a reply, and the client re-sends. We

@@ -21,6 +21,7 @@ void comparator_initialize_exti(gpio_t* gpio);
 
 void comparator_initialize_gpio_exti(gpio_t* gpio);
 void comparator_gpio_exti_nvic_enable(gpio_t* gpio);
+void comparator_nvic_set_priority(comparator_t* comp, uint32_t priority);
 
 void comparator_disable_interrupts(comparator_t* comp);
 void comparator_enable_interrupts(comparator_t* comp);

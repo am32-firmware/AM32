@@ -78,6 +78,13 @@ void comparator_gpio_exti_nvic_enable(gpio_t* gpio)
     EXTI_NVIC_ENABLE(gpio->pin);
 }
 
+void comparator_nvic_set_priority(comparator_t* comp, uint32_t priority)
+{
+    EXTI_NVIC_SET_PRIORITY(comp->phaseA->pin, priority);
+    EXTI_NVIC_SET_PRIORITY(comp->phaseB->pin, priority);
+    EXTI_NVIC_SET_PRIORITY(comp->phaseC->pin, priority);
+}
+
 void comparator_initialize_gpio_exti(gpio_t* gpio)
 {
     // // control register

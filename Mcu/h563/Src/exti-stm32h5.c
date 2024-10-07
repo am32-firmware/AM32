@@ -218,6 +218,11 @@ void exti_configure_trigger(extiChannel_t* exti, extiTrigger_e trigger)
     }
 }
 
+void exti_configure_nvic_priority(extiChannel_t* exti, uint32_t priority)
+{
+
+}
+
 void exti_configure_cb(extiChannel_t* exti, extiCallback_p cb)
 {
     exti->callback = cb;

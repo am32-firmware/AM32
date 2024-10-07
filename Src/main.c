@@ -551,7 +551,7 @@ int16_t phase_A_position;
 int16_t phase_B_position;
 int16_t phase_C_position;
 uint16_t step_delay = 100;
-char stepper_sine = 0;
+char stepper_sine = 1;
 char forward = 1;
 uint16_t gate_drive_offset = DEAD_TIME;
 
@@ -2035,10 +2035,12 @@ int main(void)
             NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
             NVIC_SetPriority(COM_TIMER_IRQ, 1);
             // NVIC_SetPriority(COMPARATOR_IRQ, 1);
+            comparator_nvic_set_priority(&COMPARATOR, 1);
         } else {
             NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
             NVIC_SetPriority(COM_TIMER_IRQ, 0);
             // NVIC_SetPriority(COMPARATOR_IRQ, 0);
+            comparator_nvic_set_priority(&COMPARATOR, 0);
         }
 #endif
         if (send_telemetry) {
@@ -2202,8 +2204,10 @@ int main(void)
             }
 #else
 
+            /// this is where the armed magic happens
             if (input > 48 && armed) {
 
+                // use sine wave mode for input (48, 137)
                 if (input > 48 && input < 137) { // sine wave stepper
 
                     if (do_once_sinemode) {

@@ -93,6 +93,7 @@ $$($(2)_BASENAME).bin: $$($(2)_BASENAME).elf
 	$(QUIET)$(OBJCOPY) -O binary $$(<) $$@
 	$(QUIET)python3 Src/DroneCAN/set_app_signature.py $$@ $$(<)
 	$(QUIET)$(OBJCOPY) $$(<) -O ihex $$(@:.bin=.hex)
+	$(QUIET)$(CP) -f $$(<) $(OBJ)$(DSEP)debug.elf > $(NUL)
 
 # check for CAN support
 $(eval xLDSCRIPT := $$(if $$(call has_can_suffix,$$(2)),$(LDSCRIPT_CAN_$(1)),$(LDSCRIPT_$(1))))
@@ -110,7 +111,6 @@ $$($(2)_BASENAME).elf: $(SRC_COMMON) $$(SRC_$(1)) $(xSRC)
 	$(QUIET)$(CC) $$(CFLAGS_$(2)) $$(LDFLAGS_$(2)) -MMD -MP -MF $$(@:.elf=.d) -o $$(@) $(SRC_COMMON) $$(SRC_$(1)) $(xSRC)
 # we copy debug.elf to give us a constant debug target for vscode
 # this means the debug button will always debug the last target built
-	$(QUIET)$(CP) -f $$(@) $(OBJ)$(DSEP)debug.elf > $(NUL)
 	$(QUIET)$(CP) -f $$(SVD_$(1)) $(OBJ)/debug.svd
 # also copy the openocd.cfg from the MCU directory to obj/openocd.cfg for auto config of Cortex-Debug
 # in vscode

@@ -109,6 +109,10 @@ extern char use_sin_start;
 extern char comp_pwm;
 extern char stuck_rotor_protection;
 static uint16_t last_can_input;
+static struct {
+    uint32_t sum;
+    uint32_t count;
+} current;
 
 extern void saveEEpromSettings(void);
 extern void loadEEpromSettings(void);
@@ -902,7 +906,11 @@ static void send_ESCStatus(void)
     // make up some synthetic status data
     pkt.error_count = 0;
     pkt.voltage = battery_voltage * 0.01;
-    pkt.current = actual_current * 0.01;
+
+    pkt.current = (current.sum/(float)current.count) * 0.01;
+    current.sum = 0;
+    current.count = 0;
+
     pkt.temperature = C_TO_KELVIN(degrees_celsius);
     pkt.rpm = (e_rpm * 100) / ((uint8_t)motor_poles);
     pkt.power_rating_pct = 0; // how do we get this?
@@ -1032,6 +1040,10 @@ void DroneCAN_update()
     }
 
     sys_can_enable_IRQ();
+
+    // keep summed current for averaging
+    current.sum += actual_current;
+    current.count++;
 }
 
 bool DroneCAN_active(void)

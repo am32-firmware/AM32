@@ -22,7 +22,7 @@
 ENTRY(Reset_Handler)
 
 /* Highest address of the user mode stack */
-_estack = 0x20008000;    /* end of RAM */
+_estack = 0x20004000;    /* end of RAM, assume 16k */
 
 /* Generate a link error if heap and stack don't fit into RAM */
 _Min_Heap_Size = 0x200;      /* required amount of heap  */
@@ -31,7 +31,7 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 /* Specify the memory areas */
 MEMORY
 {
- RAM          (xrw)  : ORIGIN = 0x20000000, LENGTH = 64K
+ RAM          (xrw)  : ORIGIN = 0x20000000, LENGTH = 16K
  FLASH         (rx)  : ORIGIN = 0x08001000, LENGTH = 57K
  EEPROM        (rx)  : ORIGIN = 0x0800f800, LENGTH = 2K
  FLASH_VERSION (rx)  : ORIGIN = ORIGIN(EEPROM) - 48, LENGTH = 16

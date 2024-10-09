@@ -90,7 +90,6 @@
 #define TARGET_VOLTAGE_DIVIDER 94
 #define MILLIVOLT_PER_AMP 100
 #define USE_SERIAL_TELEMETRY
-#define EEPROM_START_ADD (uint32_t)0x0801F800
 #endif
 
 #ifdef VIMDRONES_NANO_L431
@@ -126,7 +125,6 @@
 #define TARGET_VOLTAGE_DIVIDER 100
 #define MILLIVOLT_PER_AMP 100
 #define USE_SERIAL_TELEMETRY
-#define EEPROM_START_ADD (uint32_t)0x0801F800
 #endif
 
 #ifdef  REF_L431
@@ -3479,4 +3477,8 @@
 // default to no DroneCAN support
 #ifndef DRONECAN_SUPPORT
 #define DRONECAN_SUPPORT 0
+#elif DRONECAN_SUPPORT == 1
+// all DroneCAN ESCs use 128k flash layout
+#undef EEPROM_START_ADD
+#define EEPROM_START_ADD (uint32_t)0x0801F800
 #endif

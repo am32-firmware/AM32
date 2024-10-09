@@ -79,6 +79,7 @@ static struct
     uint8_t can_node;
     uint8_t esc_index;
     bool require_arming;
+    bool require_zero_throttle;
     uint8_t telem_rate;
 } settings;
 
@@ -108,6 +109,7 @@ extern char VARIABLE_PWM;
 extern char use_sin_start;
 extern char comp_pwm;
 extern char stuck_rotor_protection;
+extern char armed;
 static uint16_t last_can_input;
 static struct {
     uint32_t sum;
@@ -138,6 +140,7 @@ static struct parameter {
     { "MOTOR_POLES",            T_UINT8, 0, 64,  &motor_poles, 27 },
     { "REQUIRE_ARMING",         T_BOOL,  0, 1,   &settings.require_arming, 178 },
     { "TELEM_RATE",             T_UINT8, 0, 200, &settings.telem_rate, 179 },
+    { "REQUIRE_ZERO_THROTTLE",  T_BOOL,  0, 1,   &settings.require_zero_throttle, 180 },
     { "VARIABLE_PWM",           T_BOOL,  0, 1,   &VARIABLE_PWM, 0},
     { "USE_SIN_START",          T_BOOL,  0, 1,   &use_sin_start, 0},
     { "COMP_PWM",               T_BOOL,  0, 1,   &comp_pwm, 0},
@@ -159,6 +162,7 @@ static void load_settings(void)
     }
 
     settings.require_arming = eepromBuffer[178] == 0?false:true;
+    settings.require_zero_throttle = eepromBuffer[180] == 0?false:true;
 
     if (eepromBuffer[179] <= 200 && eepromBuffer[179] > 0) {
         settings.telem_rate = eepromBuffer[179];
@@ -176,6 +180,7 @@ static void save_settings(void)
     eepromBuffer[177] = settings.esc_index;
     eepromBuffer[178] = settings.require_arming;
     eepromBuffer[179] = settings.telem_rate;
+    eepromBuffer[180] = settings.require_zero_throttle;
     saveEEpromSettings();
     can_printf("saved settings");
 }
@@ -495,6 +500,11 @@ extern void setInput();
  */
 static void set_input(uint16_t input)
 {
+    if (!armed && input != 0 && settings.require_arming &&
+        dronecan_armed && !settings.require_zero_throttle) {
+        // allow restart if unexpected ESC reboot in flight
+        armed = 1;
+    }
     newinput = (dronecan_armed || !settings.require_arming)? input : 0;
     last_can_input = newinput;
     inputSet = 1;

@@ -116,6 +116,7 @@ static struct {
 
 extern void saveEEpromSettings(void);
 extern void loadEEpromSettings(void);
+static void set_input(uint16_t input);
 
 /*
   the set of parameters to present to the user over DroneCAN
@@ -283,6 +284,8 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
         p = &parameters[req.index];
     }
     if (p != NULL && req.name.len != 0 && req.value.union_tag != UAVCAN_PROTOCOL_PARAM_VALUE_EMPTY) {
+        const char last_dir_reversed = dir_reversed;
+
         /*
 	  a parameter set command
 	*/
@@ -322,8 +325,12 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
             return;
 	}
 
-	// make dir_reversed change work without reboot
-	forward = 1 - dir_reversed;
+        if (last_dir_reversed != dir_reversed) {
+            // make dir_reversed change work without reboot
+            forward = 1 - dir_reversed;
+            running = 0;
+            set_input(0);
+        }
     }
 
     /*

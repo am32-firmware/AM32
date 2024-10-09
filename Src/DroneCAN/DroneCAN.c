@@ -44,6 +44,7 @@ static uint8_t canard_memory_pool[CANARD_POOL_SIZE];
 struct CANStats canstats;
 
 static bool dronecan_armed;
+static bool done_startup;
 
 #define APP_SIGNATURE_MAGIC1 0x68f058e6
 #define APP_SIGNATURE_MAGIC2 0xafcee5a0
@@ -952,9 +953,6 @@ static void DroneCAN_Startup(void)
 {
     load_settings();
 
-    // initialise low level CAN peripheral hardware
-    sys_can_init();
-
     canardInit(&canard,
 	       canard_memory_pool,              // Raw memory chunk used for dynamic allocation
                sizeof(canard_memory_pool),
@@ -962,17 +960,23 @@ static void DroneCAN_Startup(void)
 	       shouldAcceptTransfer,              // Callback, see CanardShouldAcceptTransfer
 	       NULL);
 
-    canardSetLocalNodeID(&canard, settings.can_node);
+    if (settings.can_node != 0) {
+        canardSetLocalNodeID(&canard, settings.can_node);
+    }
+
+    // initialise low level CAN peripheral hardware
+    sys_can_init();
 }
 
 void DroneCAN_update()
 {
+    sys_can_disable_IRQ();
+
     static uint64_t next_1hz_service_at;
     static uint64_t next_telem_service_at;
-    static bool done_startup;
     if (!done_startup) {
-	done_startup = true;
-	DroneCAN_Startup();
+        DroneCAN_Startup();
+        done_startup = true;
         set_rtc_backup_register(0, RTC_BKUP0_BOOTED);
     }
 
@@ -980,8 +984,6 @@ void DroneCAN_update()
         // indicate to bootloader that we were fully operational
         set_rtc_backup_register(0, RTC_BKUP0_SIGNAL);
     }
-
-    sys_can_disable_IRQ();
 
     DroneCAN_processTxQueue();
 

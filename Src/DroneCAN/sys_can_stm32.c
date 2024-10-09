@@ -224,9 +224,6 @@ void sys_can_init(void)
     NVIC_SetPriority(CAN1_RX0_IRQn, 5);
     NVIC_SetPriority(CAN1_RX1_IRQn, 5);
     NVIC_SetPriority(CAN1_TX_IRQn, 5);
-    NVIC_EnableIRQ(CAN1_RX0_IRQn);
-    NVIC_EnableIRQ(CAN1_RX1_IRQn);
-    NVIC_EnableIRQ(CAN1_TX_IRQn);
     BXCAN->IER = CANARD_STM32_CAN_IER_FMPIE0 | CANARD_STM32_CAN_IER_FMPIE1 | CANARD_STM32_CAN_IER_TMEIE;
 }
 

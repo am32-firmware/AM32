@@ -39,9 +39,12 @@
 /** @addtogroup AT32F415_system_private_defines
  * @{
  */
-#define VECT_TAB_OFFSET                                                       \
-    0x1000 /*!< vector table base offset field. this value must be a multiple \
-              of 0x200. */
+/*!< vector table base offset field. this value must be a multiple of 0x200. */
+#if DRONECAN_SUPPORT
+#define VECT_TAB_OFFSET 0x4000
+#else
+#define VECT_TAB_OFFSET 0x1000
+#endif
 /**
  * @}
  */

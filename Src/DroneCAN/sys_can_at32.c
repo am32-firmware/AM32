@@ -14,7 +14,7 @@
 #include <at32f415_crm.h>
 
 
-#pragma GCC optimize("O0")
+//#pragma GCC optimize("O0")
 
 /*
   usleep is needed by canard_stm32.c startup code
@@ -43,24 +43,25 @@ static void can_gpio_config(void)
 {
     gpio_init_type gpio_init_struct;
 
-    crm_periph_clock_enable(CRM_GPIOB_PERIPH_CLOCK, TRUE);
+    crm_periph_clock_enable(CRM_GPIOA_PERIPH_CLOCK, TRUE);
     crm_periph_clock_enable(CRM_IOMUX_PERIPH_CLOCK, TRUE);
-    gpio_pin_remap_config(CAN1_GMUX_0010,TRUE);
+    gpio_pin_remap_config(CAN1_GMUX_0000,TRUE); // CAN_RX=PA11/CAN_TX=PA12
+    // gpio_pin_remap_config(CAN1_GMUX_0010,TRUE); // CAN_RX=PB8/CAN_TX=PB9
 
     gpio_default_para_init(&gpio_init_struct);
     /* can tx pin */
     gpio_init_struct.gpio_drive_strength = GPIO_DRIVE_STRENGTH_STRONGER;
     gpio_init_struct.gpio_out_type = GPIO_OUTPUT_PUSH_PULL;
     gpio_init_struct.gpio_mode = GPIO_MODE_MUX;
-    gpio_init_struct.gpio_pins = GPIO_PINS_9;
+    gpio_init_struct.gpio_pins = GPIO_PINS_12;
     gpio_init_struct.gpio_pull = GPIO_PULL_NONE;
-    gpio_init(GPIOB, &gpio_init_struct);
+    gpio_init(GPIOA, &gpio_init_struct);
     /* can rx pin */
     gpio_init_struct.gpio_drive_strength = GPIO_DRIVE_STRENGTH_STRONGER;
     gpio_init_struct.gpio_mode = GPIO_MODE_INPUT;
-    gpio_init_struct.gpio_pins = GPIO_PINS_8;
+    gpio_init_struct.gpio_pins = GPIO_PINS_11;
     gpio_init_struct.gpio_pull = GPIO_PULL_UP;
-    gpio_init(GPIOB, &gpio_init_struct);
+    gpio_init(GPIOA, &gpio_init_struct);
 }
 
 /*
@@ -111,9 +112,6 @@ void sys_can_init(void)
     can_filter_init_struct.filter_fifo = CAN_FILTER_FIFO1;
     can_filter_init_struct.filter_number = 1;
     can_filter_init(CAN1, &can_filter_init_struct);
-
-    /* can interrupt config */
-    sys_can_enable_IRQ();
 
     /* interrupt enable */
     can_interrupt_enable(CAN1, CAN_TCIEN_INT, TRUE);

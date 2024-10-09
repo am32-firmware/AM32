@@ -108,6 +108,7 @@ extern char VARIABLE_PWM;
 extern char use_sin_start;
 extern char comp_pwm;
 extern char stuck_rotor_protection;
+static uint16_t last_can_input;
 
 extern void saveEEpromSettings(void);
 extern void loadEEpromSettings(void);
@@ -178,6 +179,11 @@ static void save_settings(void)
   hold our node status as a static variable. It will be updated on any errors
 */
 static struct uavcan_protocol_NodeStatus node_status;
+
+static bool safe_to_write_settings(void)
+{
+    return !running || newinput == 0;
+}
 
 /*
   simple 16 bit random number generator
@@ -381,19 +387,20 @@ static void handle_param_ExecuteOpcode(CanardInstance* ins, CanardRxTransfer* tr
     pkt.ok = false;
 
     if (req.opcode == UAVCAN_PROTOCOL_PARAM_EXECUTEOPCODE_REQUEST_OPCODE_ERASE) {
-	if (running) {
+        if (!safe_to_write_settings()) {
 	    can_printf("No erase while running");
 	} else {
 	    can_printf("resetting to defaults");
 	    memset(eepromBuffer, 0xff, sizeof(eepromBuffer));
 	    memcpy(eepromBuffer, default_settings, sizeof(default_settings));
 	    save_flash_nolib(eepromBuffer, sizeof(eepromBuffer), eeprom_address);
-	    loadEEpromSettings();
+            loadEEpromSettings();
+            load_settings();
 	    pkt.ok = true;
 	}
     }
     if (req.opcode == UAVCAN_PROTOCOL_PARAM_EXECUTEOPCODE_REQUEST_OPCODE_SAVE) {
-	if (running) {
+        if (!safe_to_write_settings()) {
 	    can_printf("No save while running");
 	} else {
 	    save_settings();
@@ -478,6 +485,7 @@ extern void setInput();
 static void set_input(uint16_t input)
 {
     newinput = (dronecan_armed || !settings.require_arming)? input : 0;
+    last_can_input = newinput;
     inputSet = 1;
     transfercomplete();
     setInput();
@@ -551,7 +559,7 @@ static void handle_ArmingStatus(CanardInstance *ins, CanardRxTransfer *transfer)
  */
 static void handle_begin_firmware_update(CanardInstance* ins, CanardRxTransfer* transfer)
 {
-    if (running) {
+    if (!safe_to_write_settings()) {
         can_printf("No update while running");
         return;
     }
@@ -1016,6 +1024,11 @@ void DroneCAN_update()
          */
         canstats.last_raw_command_us = 0;
         set_input(0);
+    }
+    if (last_can_input != 0 &&
+        ts - canstats.last_raw_command_us > 1000U) {
+        // ensure at least 1kHz signal is seen by main code
+        set_input(last_can_input);
     }
 
     sys_can_enable_IRQ();

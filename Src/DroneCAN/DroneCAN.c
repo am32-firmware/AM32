@@ -146,7 +146,7 @@ static struct parameter {
     { "COMP_PWM",               T_BOOL,  0, 1,   &comp_pwm, 0},
     { "STUCK_ROTOR_PROTECTION", T_BOOL,  0, 1,   &stuck_rotor_protection, 0},
     { "ADVANCE_LEVEL",          T_UINT8, 0, 4,   &advance_level, 0},
-    { "TUNE",                   T_STRING,0, 4,   NULL, EEPROM_TUNE_INDEX},
+    { "STARTUP_TUNE",           T_STRING,0, 4,   NULL, EEPROM_TUNE_INDEX},
 };
 
 /*

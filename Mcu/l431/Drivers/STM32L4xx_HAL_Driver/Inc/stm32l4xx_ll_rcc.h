@@ -19,6 +19,11 @@
 #ifndef STM32L4xx_LL_RCC_H
 #define STM32L4xx_LL_RCC_H
 
+/*
+  AM32 hack to allow HSE_VALUE define in targets.h
+ */
+#include <targets.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

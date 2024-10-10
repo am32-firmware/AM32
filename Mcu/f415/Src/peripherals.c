@@ -230,11 +230,14 @@ void TIM11_Init(void)
     NVIC_EnableIRQ(TMR1_TRG_HALL_TMR11_IRQn);
 }
 
+/*
+  16 bit 1MHz utility timer
+ */
 void TIM10_Init(void)
 {
     crm_periph_clock_enable(CRM_TMR10_PERIPH_CLOCK, TRUE);
     TMR10->pr = 0xFFFF;
-    TMR10->div = 75;
+    TMR10->div = 143;
     TMR10->ctrl1_bit.prben = TRUE;
 }
 

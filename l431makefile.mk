@@ -33,7 +33,8 @@ CFLAGS_$(MCU) += \
 	-DLSI_VALUE=32000 \
 	-DHSI_VALUE=16000000 \
 	-DUSE_FULL_LL_DRIVER \
-	-DPREFETCH_ENABLE=1
+	-DPREFETCH_ENABLE=1 \
+	-mfloat-abi=hard
 
 
 SRC_$(MCU) := $(foreach dir,$(SRC_DIR_$(MCU)),$(wildcard $(dir)/*.[cs]))

@@ -21,6 +21,7 @@
 #include <canard.h>
 #include "phaseouts.h"
 #include "functions.h"
+#include "filter.h"
 
 // include the headers for the generated DroneCAN messages from the
 // dronecan_dsdlc compiler
@@ -33,6 +34,9 @@
 #ifndef CANARD_POOL_SIZE
 #define CANARD_POOL_SIZE 4096
 #endif
+
+// use set input at 1kHz
+#define TARGET_PERIOD_US 1000U
 
 #define EEPROM_MOTOR_KV_INDEX 26
 #define EEPROM_TUNE_INDEX 48
@@ -70,6 +74,19 @@ const struct {
 };
 
 /*
+  DroneCAN uses a chunk of eeprom storage starting at offset 176
+  for DroneCAN specific settings
+ */
+enum eeprom_offset {
+        EEPROM_CAN_NODE = 176,
+        EEPROM_ESC_INDEX = 177,
+        EEPROM_REQUIRE_ARMING = 178,
+        EEPROM_TELEM_RATE = 179,
+        EEPROM_REQUIRE_ZERO_THROTTLE = 180,
+        EEPROM_FILTER_HZ = 181,
+};
+
+/*
   state of user settings. This will be saved in settings.dat. On a
   real device a better storage system will be needed
   For simplicity we store all parameters as floats in this example
@@ -81,6 +98,7 @@ static struct
     bool require_arming;
     bool require_zero_throttle;
     uint8_t telem_rate;
+    uint8_t filter_hz;
 } settings;
 
 enum VarType {
@@ -132,21 +150,22 @@ static struct parameter {
     uint8_t eeprom_index;
 } parameters[] = {
     // list of settable parameters
-    { "CAN_NODE",               T_UINT8, 0, 127, &settings.can_node, 176},
-    { "ESC_INDEX",              T_UINT8, 0, 32,  &settings.esc_index, 177},
+    { "CAN_NODE",               T_UINT8, 0, 127, &settings.can_node, EEPROM_CAN_NODE},
+    { "ESC_INDEX",              T_UINT8, 0, 32,  &settings.esc_index, EEPROM_ESC_INDEX},
     { "DIR_REVERSED",           T_BOOL,  0, 1,   &dir_reversed, 0 },
     { "MOTOR_KV",               T_UINT16,0, 10220, &motor_kv, EEPROM_MOTOR_KV_INDEX},
     { "BI_DIRECTIONAL",         T_BOOL,  0, 1,   &bi_direction, 0 },
     { "MOTOR_POLES",            T_UINT8, 0, 64,  &motor_poles, 27 },
-    { "REQUIRE_ARMING",         T_BOOL,  0, 1,   &settings.require_arming, 178 },
-    { "TELEM_RATE",             T_UINT8, 0, 200, &settings.telem_rate, 179 },
-    { "REQUIRE_ZERO_THROTTLE",  T_BOOL,  0, 1,   &settings.require_zero_throttle, 180 },
+    { "REQUIRE_ARMING",         T_BOOL,  0, 1,   &settings.require_arming, EEPROM_REQUIRE_ARMING},
+    { "TELEM_RATE",             T_UINT8, 0, 200, &settings.telem_rate, EEPROM_TELEM_RATE },
+    { "REQUIRE_ZERO_THROTTLE",  T_BOOL,  0, 1,   &settings.require_zero_throttle, EEPROM_REQUIRE_ZERO_THROTTLE },
     { "VARIABLE_PWM",           T_BOOL,  0, 1,   &VARIABLE_PWM, 0},
     { "USE_SIN_START",          T_BOOL,  0, 1,   &use_sin_start, 0},
     { "COMP_PWM",               T_BOOL,  0, 1,   &comp_pwm, 0},
     { "STUCK_ROTOR_PROTECTION", T_BOOL,  0, 1,   &stuck_rotor_protection, 0},
     { "ADVANCE_LEVEL",          T_UINT8, 0, 4,   &advance_level, 0},
     { "STARTUP_TUNE",           T_STRING,0, 4,   NULL, EEPROM_TUNE_INDEX},
+    { "INPUT_FILTER_HZ",        T_UINT8, 0, 100, &settings.filter_hz, EEPROM_FILTER_HZ},
 };
 
 /*
@@ -154,20 +173,23 @@ static struct parameter {
 */
 static void load_settings(void)
 {
-    if (eepromBuffer[176] <= 127) {
-	settings.can_node = eepromBuffer[176];
+    if (eepromBuffer[EEPROM_CAN_NODE] <= 127) {
+        settings.can_node = eepromBuffer[EEPROM_CAN_NODE];
     }
-    if (eepromBuffer[177] <= 32) {
-	settings.esc_index = eepromBuffer[177];
+    if (eepromBuffer[EEPROM_ESC_INDEX] <= 32) {
+        settings.esc_index = eepromBuffer[EEPROM_ESC_INDEX];
     }
 
-    settings.require_arming = eepromBuffer[178] == 0?false:true;
-    settings.require_zero_throttle = eepromBuffer[180] == 0?false:true;
+    settings.require_arming = eepromBuffer[EEPROM_REQUIRE_ARMING] == 0?false:true;
+    settings.require_zero_throttle = eepromBuffer[EEPROM_REQUIRE_ZERO_THROTTLE] == 0?false:true;
 
-    if (eepromBuffer[179] <= 200 && eepromBuffer[179] > 0) {
-        settings.telem_rate = eepromBuffer[179];
+    if (eepromBuffer[EEPROM_TELEM_RATE] <= 200 && eepromBuffer[EEPROM_TELEM_RATE] > 0) {
+        settings.telem_rate = eepromBuffer[EEPROM_TELEM_RATE];
     } else {
         settings.telem_rate = 25;
+    }
+    if (eepromBuffer[EEPROM_FILTER_HZ] <= 100) {
+        settings.filter_hz = eepromBuffer[EEPROM_FILTER_HZ];
     }
 }
 
@@ -176,11 +198,12 @@ static void load_settings(void)
  */
 static void save_settings(void)
 {
-    eepromBuffer[176] = settings.can_node;
-    eepromBuffer[177] = settings.esc_index;
-    eepromBuffer[178] = settings.require_arming;
-    eepromBuffer[179] = settings.telem_rate;
-    eepromBuffer[180] = settings.require_zero_throttle;
+    eepromBuffer[EEPROM_CAN_NODE] = settings.can_node;
+    eepromBuffer[EEPROM_ESC_INDEX] = settings.esc_index;
+    eepromBuffer[EEPROM_REQUIRE_ARMING] = settings.require_arming;
+    eepromBuffer[EEPROM_TELEM_RATE] = settings.telem_rate;
+    eepromBuffer[EEPROM_REQUIRE_ZERO_THROTTLE] = settings.require_zero_throttle;
+    eepromBuffer[EEPROM_FILTER_HZ] = settings.filter_hz;
     saveEEpromSettings();
     can_printf("saved settings");
 }
@@ -509,11 +532,17 @@ static void set_input(uint16_t input)
         // allow restart if unexpected ESC reboot in flight
         armed = 1;
     }
-    newinput = (dronecan_armed || !settings.require_arming)? input : 0;
-    last_can_input = newinput;
+
+    const uint16_t unfiltered_input = (dronecan_armed || !settings.require_arming)? input : 0;
+    const uint16_t filtered_input = Filter2P_apply(unfiltered_input, settings.filter_hz, 1000);
+
+    newinput = filtered_input;
+    last_can_input = unfiltered_input;
     inputSet = 1;
     transfercomplete();
     setInput();
+
+    canstats.num_input++;
 }
 
 /*
@@ -555,9 +584,10 @@ static void handle_RawCommand(CanardInstance *ins, CanardRxTransfer *transfer)
         this_input = (uint16_t)(47 + scaled_value);
     }
 
+    const uint64_t ts = micros64();
     canstats.num_commands++;
     canstats.total_commands++;
-    canstats.last_raw_command_us = micros64();
+    canstats.last_raw_command_us = ts;
 
     set_input(this_input);
 }
@@ -574,7 +604,7 @@ static void handle_ArmingStatus(CanardInstance *ins, CanardRxTransfer *transfer)
 
     dronecan_armed = (cmd.status == UAVCAN_EQUIPMENT_SAFETY_ARMINGSTATUS_STATUS_FULLY_ARMED);
     if (!dronecan_armed && settings.require_arming && canstats.last_raw_command_us != 0) {
-	set_input(0);
+        set_input(0);
     }
 }
 
@@ -1054,10 +1084,10 @@ void DroneCAN_update()
         canstats.last_raw_command_us = 0;
         set_input(0);
     }
-    if (last_can_input != 0 &&
-        ts - canstats.last_raw_command_us > 1000U) {
+    if (ts - canstats.last_raw_command_us > TARGET_PERIOD_US) {
         // ensure at least 1kHz signal is seen by main code
         set_input(last_can_input);
+        canstats.last_raw_command_us = ts;
     }
 
     sys_can_enable_IRQ();

@@ -11,6 +11,7 @@
  */
 struct CANStats {
     uint32_t num_commands;
+    uint32_t num_input;
     uint32_t total_commands;
     uint32_t num_receive;
     uint32_t num_tx_interrupts;

@@ -67,6 +67,7 @@ void mcu_setup_core_voltage()
     while (!(PWR->VOSSR & PWR_VOSSR_ACTVOSRDY));
 }
 
+
 void mcu_enable_prefetch()
 {
     // set flash latency to 5 wait states for 250MHz SYSCLK

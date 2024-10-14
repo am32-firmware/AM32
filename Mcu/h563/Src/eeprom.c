@@ -20,11 +20,15 @@ uint32_t FLASH_FKEY2 = 0xCDEF89AB;
 
 void save_flash_nolib(uint8_t* data, int length, uint32_t add)
 {
+    // copy submitted data to native data width array
+    // TODO this copy is slow
     uint16_t data_to_FLASH[length / 2];
     memset(data_to_FLASH, 0, length / 2);
     for (int i = 0; i < length / 2; i++) {
         data_to_FLASH[i] = data[i * 2 + 1] << 8 | data[i * 2]; // make 16 bit
     }
+
+    // iterate by 16 bit words
     volatile uint32_t data_length = length / 2;
 
     while (flash_busy());

@@ -120,3 +120,21 @@ why is TIM1.DMAR (DMAB) = 0x81 during playtune?
 in 
 delayMillis
 there is off - by one error (psc should be n-1)
+
+
+
+void setDutyCycleAll(uint16_t newdc);
+in peripherals.h is not used, see SET_DUTY_CYCLE_ALL macro
+
+in tenkhz routine:
+        if ((armed && running) && input > 47) {
+            if (VARIABLE_PWM) {
+            }
+
+VARIABLE_PWM clause not used
+
+
+duty_cycle_setpoint -> duty_cycle -> adjusted_duty_cycle -> SET_DUTY_CYCLE_ALL(adjusted_duty_cycle) (in tenkhzroutine)
+
+
+drivers should be submodules

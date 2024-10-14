@@ -46,7 +46,6 @@ void setAndEnableComInt(uint16_t time);
 uint16_t getintervaTimerCount();
 void setintervaTimerCount(uint16_t intertime);
 void setAutoReloadPWM(uint16_t relval);
-void setDutyCycleAll(uint16_t newdc);
 void resetInputCaptureTimer();
 void setPWMCompare1(uint16_t compareone);
 void setPWMCompare2(uint16_t comparetwo);

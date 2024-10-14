@@ -1,6 +1,9 @@
 // this test writes some bytes to eeprom
 // use a memory inspection tool to verify the results
 
+// the flash sector is erased, then:
+// then the elements of data are written to flash
+
 // for h563 with option bytes configuration as
 // EDATA1 = 1 (enabled)
 // ESTART = 0x0 (1 page remapped)
@@ -14,22 +17,21 @@
 #include "targets.h"
 #include "eeprom.h"
 
-uint8_t data[10] = {
-    0xff,
-    0x00,
-    0x55,
-    0xae,
-    0xab,
-    0xcd,
-    0xef,
-    0x12,
-    0x55,
-    0x34,
-};
+#define DATA_SIZE 0x100
+uint8_t data[DATA_SIZE];
+
+void fill_data()
+{
+    for (int i = 0 ; i < DATA_SIZE; i++)
+    {
+        data[i] = i;
+    }
+}
 
 int main()
 {
-    save_flash_nolib(data, 10, EEPROM_START_ADD);
+    fill_data();
+    save_flash_nolib(data, sizeof(data), EEPROM_START_ADD);
 
     while(1) {
     }

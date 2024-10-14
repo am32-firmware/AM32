@@ -18,7 +18,7 @@
 
         ],
         "svdFile": "svd/stm32h5/STM32H563.svd"
-    },
+      },
       {
         "name": "AM32 STLink",
         "cwd": "${workspaceFolder}",

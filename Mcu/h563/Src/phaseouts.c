@@ -221,6 +221,7 @@ void fullBrake()
     phaseCLOW();
 }
 
+// this is being called after arm
 void allpwm()
 { // for stepper_sine
     phaseAPWM();

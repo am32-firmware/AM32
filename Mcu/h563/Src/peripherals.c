@@ -310,20 +310,13 @@ uint16_t getintervaTimerCount() { return INTERVAL_TIMER->CNT; }
 
 void setintervaTimerCount(uint16_t intertime) { INTERVAL_TIMER->CNT = 0; }
 
-void setPrescalerPWM(uint16_t presc) { COM_TIMER->PSC = presc; }
+void setPrescalerPWM(uint16_t presc) { TIM1->PSC = presc; }
 
-void setAutoReloadPWM(uint16_t relval) { COM_TIMER->ARR = relval; }
+void setAutoReloadPWM(uint16_t relval) { TIM1->ARR = relval; }
 
-void setDutyCycleAll(uint16_t newdc)
-{
-    TIM1->CCR1 = newdc;
-    TIM1->CCR2 = newdc;
-    TIM1->CCR3 = newdc;
-}
-
-void inline setPWMCompare1(uint16_t compareone) { COM_TIMER->CCR1 = compareone; }
-void inline setPWMCompare2(uint16_t comparetwo) { COM_TIMER->CCR2 = comparetwo; }
-void inline setPWMCompare3(uint16_t comparethree) { COM_TIMER->CCR3 = comparethree; }
+void inline setPWMCompare1(uint16_t compareone) { TIM1->CCR1 = compareone; }
+void inline setPWMCompare2(uint16_t comparetwo) { TIM1->CCR2 = comparetwo; }
+void inline setPWMCompare3(uint16_t comparethree) { TIM1->CCR3 = comparethree; }
 
 void inline generatePwmTimerEvent() { LL_TIM_GenerateEvent_UPDATE(TIM1); }
 

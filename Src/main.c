@@ -551,7 +551,8 @@ int16_t phase_A_position;
 int16_t phase_B_position;
 int16_t phase_C_position;
 uint16_t step_delay = 100;
-char stepper_sine = 1;
+// char stepper_sine = 1;
+char stepper_sine = 0;
 char forward = 1;
 uint16_t gate_drive_offset = DEAD_TIME;
 
@@ -2218,6 +2219,9 @@ int main(void)
                         allpwm();
                         do_once_sinemode = 0;
                     }
+
+                    // advances bridge timer pwm compare values (CCRn)
+                    // for all three channels according to sin lookup table
                     advanceincrement();
                     step_delay = map(input, 48, 120, 7000 / motor_poles, 810 / motor_poles);
                     delayMicros(step_delay);

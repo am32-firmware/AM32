@@ -78,7 +78,7 @@ extern void tenKhzRoutine();
 extern void processDshot();
 
 extern char send_telemetry;
-int interrupt_time = 0;
+uint16_t interrupt_time = 0;
 extern char servoPwm;
 extern char dshot_telemetry;
 extern char armed;
@@ -324,7 +324,7 @@ void TIM14_IRQHandler(void)
     interrupt_time = UTILITY_TIMER->CNT;
     PeriodElapsedCallback();
     LL_TIM_ClearFlag_UPDATE(TIM14);
-    interrupt_time = UTILITY_TIMER->CNT - interrupt_time;
+    interrupt_time = ((uint16_t)UTILITY_TIMER->CNT) - interrupt_time;
 }
 
 /* USER CODE BEGIN 1 */

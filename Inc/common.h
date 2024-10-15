@@ -2,7 +2,7 @@
 
 
 extern uint32_t eeprom_address;
-extern uint8_t eepromBuffer[176];
+extern uint8_t eepromBuffer[184];
 extern uint16_t TIMER1_MAX_ARR;
 extern uint16_t dshot_frametime_high;
 extern uint16_t dshot_frametime_low;
@@ -24,6 +24,11 @@ extern char ic_timer_prescaler;
 extern uint8_t buffersize;
 extern char output_timer_prescaler;
 extern uint8_t compute_dshot_flag;
+extern uint16_t battery_voltage;
+extern int16_t actual_current;
+extern uint16_t e_rpm;
+
+
 #ifdef STMICRO
 extern GPIO_TypeDef* current_GPIO_PORT;
 #ifndef MCU_F031

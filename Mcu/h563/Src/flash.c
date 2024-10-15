@@ -11,10 +11,10 @@ void flash_erase_sector(uint8_t sector)
     if (sector > FLASH_MAX_SECTORS - 1) {
         return;
     }
-    // sector must be aligned to page size
-    if (sector%EEPROM_PAGE_SIZE) {
-        return;
-    }
+    // // sector must be aligned to page size
+    // if (sector%EEPROM_PAGE_SIZE) {
+    //     return;
+    // }
 
     while (flash_busy());
     while (flash_dbne());

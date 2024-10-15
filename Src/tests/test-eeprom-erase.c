@@ -10,12 +10,12 @@
 
 #include "stm32h563xx.h"
 #include "targets.h"
-#include "eeprom.h"
+#include "flash.h"
 
 int main()
 {
 
-    flash_erase_sector(127);
+    flash_erase_sector(EEPROM_PAGE);
 
     while(1) {
     }

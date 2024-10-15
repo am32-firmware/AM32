@@ -1,8 +1,5 @@
 #include "targets.h"
-#include "eeprom.h"
-#include "flash.h"
-#include "stm32h563xx.h"
-
+#include "eeprom-hc.h"
 #include <string.h>
 // !!!!!!!!!!!!!!!!!!!
 // Per reference manual:
@@ -11,10 +8,9 @@
 // register remains locked until the next system reset.
 // !!!!!!!!!!!!!!!!!!!!
 
-void save_flash_nolib(uint8_t* data, int length, uint32_t add)
+void save_flash_nolib_hc(uint8_t* data, int length, uint32_t add)
 {
     // copy submitted data to native data width array
-    // ie we can only program 16 bit data to flash
     // TODO this copy is slow
     uint16_t data_to_FLASH[length / 2];
     memset(data_to_FLASH, 0, length / 2);
@@ -27,11 +23,8 @@ void save_flash_nolib(uint8_t* data, int length, uint32_t add)
 
     while (flash_busy());
 
-    // erase page if address even divisable by page size
-    if ((add % EEPROM_PAGE_SIZE) == 0) {
-        flash_erase_sector(126);
-    }
-    
+    flash_erase_sector(126);
+
     volatile uint32_t write_cnt = 0, index = 0;
     while (index < data_length) {
         flash_program_word(data_to_FLASH[index], (add + write_cnt));
@@ -43,7 +36,7 @@ void save_flash_nolib(uint8_t* data, int length, uint32_t add)
 // see https://community.st.com/t5/stm32-mcus-products/stm32h5-high-cycle-data-read-more-than-16bit-at-once/td-p/584258
 // "If the application reads an OTP data or flash high-cycle data not previously written,
 // a double ECC error is reported and only a word full of set bits is returned"
-void read_flash_bin(uint8_t* data, uint32_t add, int out_buff_len)
+void read_flash_bin_hc(uint8_t* data, uint32_t add, int out_buff_len)
 {
     // FLASH->EDATA1R_CUR |= 1 << 15;
 

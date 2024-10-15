@@ -11,13 +11,15 @@
 // register remains locked until the next system reset.
 // !!!!!!!!!!!!!!!!!!!!
 
+// FLASH is only committed after an internal 128bit write buffer is
+// filled (16 bytes)
 void save_flash_nolib(uint8_t* data, int length, uint32_t add)
 {
     // copy submitted data to native data width array
     // ie we can only program 16 bit data to flash
     // TODO this copy is slow
     uint16_t data_to_FLASH[length / 2];
-    memset(data_to_FLASH, 0, length / 2);
+    // memset(data_to_FLASH, 0, length / 2);
     for (int i = 0; i < length / 2; i++) {
         data_to_FLASH[i] = data[i * 2 + 1] << 8 | data[i * 2]; // make 16 bit
     }

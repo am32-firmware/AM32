@@ -8,7 +8,9 @@
 #include "targets.h"
 #include "eeprom.h"
 
-#define DATA_SIZE 0x100
+// FLASH is only committed after an internal 128bit write buffer is
+// filled (16 bytes)
+#define DATA_SIZE 16
 uint8_t data[DATA_SIZE];
 
 int main()

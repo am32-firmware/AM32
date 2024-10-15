@@ -54,6 +54,8 @@ void flash_unlock()
         FLASH->NSKEYR = FLASH_FKEY1;
         FLASH->NSKEYR = FLASH_FKEY2;
     }
+    while (FLASH->NSCR & FLASH_CR_LOCK)
+    {};
 }
 
 void flash_lock()

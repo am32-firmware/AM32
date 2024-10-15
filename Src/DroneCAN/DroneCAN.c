@@ -146,26 +146,27 @@ static struct parameter {
     enum VarType vtype;
     uint16_t min_value;
     uint16_t max_value;
+    uint16_t default_value;
     void *ptr;
     uint8_t eeprom_index;
 } parameters[] = {
-    // list of settable parameters
-    { "CAN_NODE",               T_UINT8, 0, 127, &settings.can_node, EEPROM_CAN_NODE},
-    { "ESC_INDEX",              T_UINT8, 0, 32,  &settings.esc_index, EEPROM_ESC_INDEX},
-    { "DIR_REVERSED",           T_BOOL,  0, 1,   &dir_reversed, 0 },
-    { "MOTOR_KV",               T_UINT16,0, 10220, &motor_kv, EEPROM_MOTOR_KV_INDEX},
-    { "BI_DIRECTIONAL",         T_BOOL,  0, 1,   &bi_direction, 0 },
-    { "MOTOR_POLES",            T_UINT8, 0, 64,  &motor_poles, 27 },
-    { "REQUIRE_ARMING",         T_BOOL,  0, 1,   &settings.require_arming, EEPROM_REQUIRE_ARMING},
-    { "TELEM_RATE",             T_UINT8, 0, 200, &settings.telem_rate, EEPROM_TELEM_RATE },
-    { "REQUIRE_ZERO_THROTTLE",  T_BOOL,  0, 1,   &settings.require_zero_throttle, EEPROM_REQUIRE_ZERO_THROTTLE },
-    { "VARIABLE_PWM",           T_BOOL,  0, 1,   &VARIABLE_PWM, 0},
-    { "USE_SIN_START",          T_BOOL,  0, 1,   &use_sin_start, 0},
-    { "COMP_PWM",               T_BOOL,  0, 1,   &comp_pwm, 0},
-    { "STUCK_ROTOR_PROTECTION", T_BOOL,  0, 1,   &stuck_rotor_protection, 0},
-    { "ADVANCE_LEVEL",          T_UINT8, 0, 4,   &advance_level, 0},
-    { "STARTUP_TUNE",           T_STRING,0, 4,   NULL, EEPROM_TUNE_INDEX},
-    { "INPUT_FILTER_HZ",        T_UINT8, 0, 100, &settings.filter_hz, EEPROM_FILTER_HZ},
+        // list of settable parameters
+        { "CAN_NODE",               T_UINT8, 0, 127, 0, &settings.can_node, EEPROM_CAN_NODE},
+        { "ESC_INDEX",              T_UINT8, 0, 32,  0, &settings.esc_index, EEPROM_ESC_INDEX},
+        { "DIR_REVERSED",           T_BOOL,  0, 1,   0, &dir_reversed, 0 },
+        { "MOTOR_KV",               T_UINT16,0, 10220, 2000, &motor_kv, EEPROM_MOTOR_KV_INDEX},
+        { "BI_DIRECTIONAL",         T_BOOL,  0, 1,   0, &bi_direction, 0 },
+        { "MOTOR_POLES",            T_UINT8, 0, 64,  14, &motor_poles, 27 },
+        { "REQUIRE_ARMING",         T_BOOL,  0, 1,   1, &settings.require_arming, EEPROM_REQUIRE_ARMING},
+        { "TELEM_RATE",             T_UINT8, 0, 200, 25, &settings.telem_rate, EEPROM_TELEM_RATE },
+        { "REQUIRE_ZERO_THROTTLE",  T_BOOL,  0, 1,   1, &settings.require_zero_throttle, EEPROM_REQUIRE_ZERO_THROTTLE },
+        { "VARIABLE_PWM",           T_BOOL,  0, 1,   1, &VARIABLE_PWM, 0},
+        { "USE_SIN_START",          T_BOOL,  0, 1,   0, &use_sin_start, 0},
+        { "COMP_PWM",               T_BOOL,  0, 1,   1, &comp_pwm, 0},
+        { "STUCK_ROTOR_PROTECTION", T_BOOL,  0, 1,   1, &stuck_rotor_protection, 0},
+        { "ADVANCE_LEVEL",          T_UINT8, 0, 4,   2, &advance_level, 0},
+        { "INPUT_FILTER_HZ",        T_UINT8, 0, 100, 0, &settings.filter_hz, EEPROM_FILTER_HZ},
+        { "STARTUP_TUNE",           T_STRING,0, 4,   0, NULL, EEPROM_TUNE_INDEX},
 };
 
 /*
@@ -375,11 +376,23 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
 	switch (p->vtype) {
 	case T_UINT8:
 	    pkt.value.union_tag = UAVCAN_PROTOCOL_PARAM_VALUE_INTEGER_VALUE;
-	    pkt.value.integer_value = *(uint8_t *)p->ptr;
+            pkt.value.integer_value = *(uint8_t *)p->ptr;
+            pkt.default_value.union_tag = UAVCAN_PROTOCOL_PARAM_VALUE_INTEGER_VALUE;
+            pkt.default_value.integer_value = p->default_value;
+            pkt.max_value.union_tag = UAVCAN_PROTOCOL_PARAM_NUMERICVALUE_INTEGER_VALUE;
+            pkt.max_value.integer_value = p->max_value;
+            pkt.min_value.union_tag = UAVCAN_PROTOCOL_PARAM_NUMERICVALUE_INTEGER_VALUE;
+            pkt.min_value.integer_value = p->min_value;
             break;
 	case T_UINT16:
 	    pkt.value.union_tag = UAVCAN_PROTOCOL_PARAM_VALUE_INTEGER_VALUE;
 	    pkt.value.integer_value = *(uint16_t *)p->ptr;
+            pkt.default_value.union_tag = UAVCAN_PROTOCOL_PARAM_VALUE_INTEGER_VALUE;
+            pkt.default_value.integer_value = p->default_value;
+            pkt.max_value.union_tag = UAVCAN_PROTOCOL_PARAM_NUMERICVALUE_INTEGER_VALUE;
+            pkt.max_value.integer_value = p->max_value;
+            pkt.min_value.union_tag = UAVCAN_PROTOCOL_PARAM_NUMERICVALUE_INTEGER_VALUE;
+            pkt.min_value.integer_value = p->min_value;
             break;
 	case T_STRING:
 	    pkt.value.union_tag = UAVCAN_PROTOCOL_PARAM_VALUE_STRING_VALUE;
@@ -393,6 +406,8 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
 	case T_BOOL:
 	    pkt.value.union_tag = UAVCAN_PROTOCOL_PARAM_VALUE_BOOLEAN_VALUE;
 	    pkt.value.boolean_value = (*(uint8_t *)p->ptr)?true:false;
+            pkt.default_value.union_tag = UAVCAN_PROTOCOL_PARAM_VALUE_BOOLEAN_VALUE;
+            pkt.default_value.boolean_value = p->default_value;
             break;
 	default:
             return;

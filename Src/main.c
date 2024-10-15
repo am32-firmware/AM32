@@ -2001,11 +2001,11 @@ int main(void)
         if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD)) {
             NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
             NVIC_SetPriority(COM_TIMER_IRQ, 1);
-            NVIC_SetPriority(COMPARATOR_IRQ, 1);
+            // NVIC_SetPriority(COMPARATOR_IRQ, 1);
         } else {
             NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
             NVIC_SetPriority(COM_TIMER_IRQ, 0);
-            NVIC_SetPriority(COMPARATOR_IRQ, 0);
+            // NVIC_SetPriority(COMPARATOR_IRQ, 0);
         }
 #endif
         if (send_telemetry) {

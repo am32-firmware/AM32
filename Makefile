@@ -62,7 +62,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-drv8323-spi.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-drv8323-spi-setup.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom-erase.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom-write.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-exti-3phase.c
@@ -73,7 +73,7 @@ SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-delay.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-ten-khz-timer.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-watchdog-pass.c
-# SRC_MAIN := $(SRC_DIRS_COMMON)/main.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/main.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-maxfrequency.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-input-pwm.c

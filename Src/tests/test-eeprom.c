@@ -8,18 +8,21 @@
 #include "targets.h"
 #include "eeprom.h"
 
-uint8_t data[10];
+#define DATA_SIZE 0x100
+uint8_t data[DATA_SIZE];
 
-// first bank of high-cycle flash
-// #define EEPROM_START_ADD 0x09000000;
 int main()
 {
-    read_flash_bin(data, EEPROM_START_ADD, 10);
-    for (uint8_t i = 0; i < 10; i++) {
+    // read eeprom
+    read_flash_bin(data, EEPROM_START_ADD, sizeof(data));
+
+    // modify the data
+    for (int i = 0; i < DATA_SIZE; i++) {
         data[i] += i;
     }
 
-    save_flash_nolib(data, 10, EEPROM_START_ADD);
+    // update eeprom with modified data
+    save_flash_nolib(data, DATA_SIZE, EEPROM_START_ADD);
 
     while(1) {
     }

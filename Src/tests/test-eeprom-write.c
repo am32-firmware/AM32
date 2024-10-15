@@ -31,7 +31,7 @@ void fill_data()
 int main()
 {
     fill_data();
-    save_flash_nolib(data, sizeof(data), EEPROM_START_ADD);
+    save_flash_nolib(data, DATA_SIZE, EEPROM_START_ADD);
 
     while(1) {
     }

@@ -62,8 +62,8 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-drv8323-spi.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-drv8323-spi-setup.c
-# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom-erase.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom-erase.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom-write.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-exti-3phase.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-exti-comparator-3phase.c

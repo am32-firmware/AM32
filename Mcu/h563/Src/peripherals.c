@@ -196,9 +196,39 @@ void initCorePeripherals(void)
 #endif
 }
 
+
+static inline void hsi_config(void)
+{
+    // at startup, system clock is HSI = 64MHz / 2 = 32MHz
+    // the HSI divider at startup is 2
+    // here we switch it to 1 so that the system clock is 64MHz
+    RCC->CR &= ~(RCC_CR_HSIDIV_Msk);
+    while (!(RCC->CR & RCC_CR_HSIDIVF))
+    {
+        // wait for hsi to switch over
+    }
+}
+
+static inline void flash_enable_prefetch(void)
+{
+    // enable prefetch buffer
+    FLASH->ACR |= FLASH_ACR_PRFTEN;
+}
+static inline void icache_config(void)
+{
+    // // wait for any ongoing cache invalidation
+    while (ICACHE->CR & ICACHE_SR_BUSYF);
+    // enable icache miss monitor, hit monitor, and icache itself
+    ICACHE->CR |= ICACHE_CR_MISSMEN | ICACHE_CR_HITMEN | ICACHE_CR_EN;
+
+}
+
 void initAfterJump(void)
 {
     __enable_irq();
+    flash_enable_prefetch(); 
+    hsi_config();
+    // icache_config();
 }
 
 void MX_IWDG_Init(void)

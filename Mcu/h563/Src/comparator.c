@@ -28,12 +28,11 @@ comparator_t COMPARATOR = {
     // .phaseB = &gpioCompPhaseA,
     // .phaseC = &gpioCompPhaseB,
 
-    // this works pretty well
-    // .phaseA = &gpioCompPhaseC,
-    // .phaseB = &gpioCompPhaseB,
-    // .phaseC = &gpioCompPhaseA,
+    .phaseA = &gpioCompPhaseB,
+    .phaseB = &gpioCompPhaseC,
+    .phaseC = &gpioCompPhaseA,
 
-    // this works the best
+    // this spins, but doesn't close the loop
     // .phaseA = &gpioCompPhaseC,
     // .phaseB = &gpioCompPhaseB,
     // .phaseC = &gpioCompPhaseA,
@@ -42,9 +41,9 @@ comparator_t COMPARATOR = {
     // .phaseB = &gpioCompPhaseC,
     // .phaseC = &gpioCompPhaseB,
 
-    .phaseA = &gpioCompPhaseB,
-    .phaseB = &gpioCompPhaseA,
-    .phaseC = &gpioCompPhaseC,
+    // .phaseA = &gpioCompPhaseB,
+    // .phaseB = &gpioCompPhaseA,
+    // .phaseC = &gpioCompPhaseC,
 
     // .phaseAcb = phaseA_cb,
     // .phaseBcb = phaseB_cb,
@@ -243,13 +242,13 @@ void changeCompInput()
     }
     if (rising) {
         EXTI->FTSR1 = 0;
-        // EXTI->RTSR1 = EXTI_RTSR1_BITS;
         EXTI->RTSR1 = 
             (1 << COMPARATOR.phaseA->pin) |
             (1 << COMPARATOR.phaseB->pin) |
             (1 << COMPARATOR.phaseC->pin);
     } else { // falling bemf
         EXTI->RTSR1 = 0;
+        // EXTI->RTSR1 = EXTI_RTSR1_BITS;
         EXTI->FTSR1 = 
             (1 << COMPARATOR.phaseA->pin) |
             (1 << COMPARATOR.phaseB->pin) |

@@ -646,6 +646,8 @@ void loadEEpromSettings()
         use_sin_start = 1;
         //	 min_startup_duty = sin_mode_min_s_d;
     }
+    use_sin_start = 1;
+
     if (eepromBuffer[20] == 0x01) {
         comp_pwm = 1;
     } else {

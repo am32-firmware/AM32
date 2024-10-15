@@ -20,9 +20,32 @@ gpio_t gpioCompPhaseB = DEF_GPIO(COMPB_GPIO_PORT, COMPB_GPIO_PIN, 0, GPIO_INPUT)
 gpio_t gpioCompPhaseC = DEF_GPIO(COMPC_GPIO_PORT, COMPC_GPIO_PIN, 0, GPIO_INPUT);
 
 comparator_t COMPARATOR = {
-    .phaseA = &gpioCompPhaseA,
-    .phaseB = &gpioCompPhaseB,
+    // .phaseA = &gpioCompPhaseA,
+    // .phaseB = &gpioCompPhaseB,
+    // .phaseC = &gpioCompPhaseC,
+
+    // .phaseA = &gpioCompPhaseC,
+    // .phaseB = &gpioCompPhaseA,
+    // .phaseC = &gpioCompPhaseB,
+
+    // this works pretty well
+    // .phaseA = &gpioCompPhaseC,
+    // .phaseB = &gpioCompPhaseB,
+    // .phaseC = &gpioCompPhaseA,
+
+    // this works the best
+    // .phaseA = &gpioCompPhaseC,
+    // .phaseB = &gpioCompPhaseB,
+    // .phaseC = &gpioCompPhaseA,
+
+    // .phaseA = &gpioCompPhaseA,
+    // .phaseB = &gpioCompPhaseC,
+    // .phaseC = &gpioCompPhaseB,
+
+    .phaseA = &gpioCompPhaseB,
+    .phaseB = &gpioCompPhaseA,
     .phaseC = &gpioCompPhaseC,
+
     // .phaseAcb = phaseA_cb,
     // .phaseBcb = phaseB_cb,
     // .phaseCcb = phaseC_cb

@@ -11,6 +11,10 @@
         "executable": "${workspaceFolder}/obj/debug.elf",
         "request": "launch",
         "type": "cortex-debug",
+        "liveWatch": {
+          "enabled": true,
+          "samplesPerSecond": 10,
+        },
         "servertype": "openocd",
         "configFiles": [
             "board/st_nucleo_h5.cfg"

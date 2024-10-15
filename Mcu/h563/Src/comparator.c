@@ -204,8 +204,8 @@ void comparator_enable_interrupts(comparator_t* comp)
         (1 << comp->phaseC->pin)
     )
 }
-// reset value
-#define EXTI_IMR1_CLEAR_MASK 0xfffe0000
+// reset value | exti 15 used for setInput
+#define EXTI_IMR1_CLEAR_MASK (0xfffe0000 | 1<<15)
 #define EXTI_RTSR1_BITS (EXTI_RTSR1_RT4 | EXTI_RTSR1_RT14 | EXTI_RTSR1_RT15)
 #define EXTI_FTSR1_BITS (EXTI_FTSR1_FT4 | EXTI_FTSR1_FT14 | EXTI_FTSR1_FT15)
 void changeCompInput()

@@ -229,6 +229,8 @@ an settings option)
 #include "sounds.h"
 #include "targets.h"
 #include <stdint.h>
+#include <string.h>
+#include <assert.h>
 
 #ifdef USE_LED_STRIP
 #include "WS2812.h"
@@ -323,7 +325,7 @@ char bi_direction = 0;
 char stuck_rotor_protection = 1; // Turn off for Crawlers
 char brake_on_stop = 0;
 char stall_protection = 0;
-char use_sin_start = 1;
+char use_sin_start = 0;
 char TLM_ON_INTERVAL = 0;
 uint8_t telemetry_interval_ms = 30;
 uint8_t TEMPERATURE_LIMIT = 255; // degrees 255 to disable
@@ -356,22 +358,8 @@ uint16_t low_cell_volt_cutoff = 330; // 3.3volts per cell
 
 //=========================== END EEPROM Defaults ===========================
 
-#ifdef USE_MAKE
-typedef struct __attribute__((packed)) {
-    uint8_t version_major;
-    uint8_t version_minor;
-    char device_name[12];
-} firmware_info_s;
-
-firmware_info_s __attribute__((section(".firmware_info"))) firmware_info = {
-    version_major : VERSION_MAJOR,
-    version_minor : VERSION_MINOR,
-    device_name : FIRMWARE_NAME
-};
-#endif
 const char filename[30] __attribute__((section(".file_name"))) = FILE_NAME;
-
-char firmware_name[12] = FIRMWARE_NAME;
+_Static_assert(sizeof(FIRMWARE_NAME) <=13,"Firmware name too long");   // max 12 character firmware name plus NULL 
 
 uint8_t EEPROM_VERSION;
 // move these to targets folder or peripherals for each mcu
@@ -551,7 +539,6 @@ int16_t phase_A_position;
 int16_t phase_B_position;
 int16_t phase_C_position;
 uint16_t step_delay = 100;
-// char stepper_sine = 1;
 char stepper_sine = 0;
 char forward = 1;
 uint16_t gate_drive_offset = DEAD_TIME;
@@ -658,13 +645,11 @@ void loadEEpromSettings()
     if (eepromBuffer[19] == 0x01) {
         use_sin_start = 1;
         //	 min_startup_duty = sin_mode_min_s_d;
-    } else {
-        use_sin_start = 1;
     }
     if (eepromBuffer[20] == 0x01) {
         comp_pwm = 1;
     } else {
-        comp_pwm = 1;
+        comp_pwm = 0;
     }
     if (eepromBuffer[21] == 0x01) {
         VARIABLE_PWM = 1;
@@ -713,8 +698,7 @@ void loadEEpromSettings()
 #ifdef THREE_CELL_MAX
 		motor_kv =  motor_kv / 2;
 #endif
-    // motor_poles = eepromBuffer[27];
-    motor_poles = 14;
+    motor_poles = eepromBuffer[27];
     if (eepromBuffer[28] == 0x01) {
         brake_on_stop = 1;
     } else {
@@ -741,18 +725,12 @@ void loadEEpromSettings()
         } else {
             TLM_ON_INTERVAL = 0;
         }
-        // servo_low_threshold = (eepromBuffer[32] * 2) + 750; // anything below this point considered 0
-        // servo_high_threshold = (eepromBuffer[33] * 2) + 1750;
-        // ; // anything above this point considered 2000 (max)
-        // servo_neutral = (eepromBuffer[34]) + 1374;
-        // servo_dead_band = eepromBuffer[35];
-        servo_low_threshold = 1000; // anything below this point considered 0
-        servo_high_threshold = 2000;
+        servo_low_threshold = (eepromBuffer[32] * 2) + 750; // anything below this point considered 0
+        servo_high_threshold = (eepromBuffer[33] * 2) + 1750;
         ; // anything above this point considered 2000 (max)
-        servo_neutral = 1500;
-        servo_dead_band = 10;
+        servo_neutral = (eepromBuffer[34]) + 1374;
+        servo_dead_band = eepromBuffer[35];
 
-        
         if (eepromBuffer[36] == 0x01) {
             LOW_VOLTAGE_CUTOFF = 1;
         } else {
@@ -766,7 +744,6 @@ void loadEEpromSettings()
             RC_CAR_REVERSE = 0;
         }
         if (eepromBuffer[39] == 0x01) {
-					auto_advance = 1;
 #ifdef HAS_HALL_SENSORS
             USE_HALL_SENSOR = 1;
 #else
@@ -815,7 +792,7 @@ void loadEEpromSettings()
             sine_mode_power = eepromBuffer[45];
         }
 
-        if (eepromBuffer[46] >= 0 && eepromBuffer[46] < 10) {
+        if (eepromBuffer[46] < 10) {
             switch (eepromBuffer[46]) {
             case AUTO_IN:
                 dshot = 0;
@@ -839,10 +816,14 @@ void loadEEpromSettings()
             };
         } else {
             dshot = 0;
-            servoPwm = 1;
+            servoPwm = 0;
             EDT_ARMED = 1;
         }
-
+        if (eepromBuffer[47] == 0x01) {
+            auto_advance = 1;
+        } else {
+            auto_advance = 0;
+        }
         if (motor_kv < 300) {
             low_rpm_throttle_limit = 0;
         }
@@ -1350,7 +1331,7 @@ void setInput()
             }
         }
         if (!prop_brake_active) {
-            if (input >= 47 && (zero_crosses < (30 >> stall_protection))) {
+            if (input >= 47 && (zero_crosses < (30U >> stall_protection))) {
                 if (duty_cycle_setpoint < min_startup_duty) {
                     duty_cycle_setpoint = min_startup_duty;
                 }
@@ -1749,8 +1730,7 @@ int main(void)
 
     enableCorePeripherals();
 
-    // loadEEpromSettings();
-    setVolume(11);
+    loadEEpromSettings();
 
  //   EEPROM_VERSION = *(uint8_t*)(0x08000FFC);
 
@@ -1759,25 +1739,12 @@ int main(void)
 		}
 
 	
-#ifdef USE_MAKE
-    if (firmware_info.version_major != eepromBuffer[3] || firmware_info.version_minor != eepromBuffer[4]) {
-        eepromBuffer[3] = firmware_info.version_major;
-        eepromBuffer[4] = firmware_info.version_minor;
-        for (int i = 0; i < 12; i++) {
-            eepromBuffer[5 + i] = firmware_info.device_name[i];
-        }
-        saveEEpromSettings();
-    }
-#else
     if (VERSION_MAJOR != eepromBuffer[3] || VERSION_MINOR != eepromBuffer[4]) {
         eepromBuffer[3] = VERSION_MAJOR;
         eepromBuffer[4] = VERSION_MINOR;
-        for (int i = 0; i < 12; i++) {
-            eepromBuffer[5 + i] = (uint8_t)FIRMWARE_NAME[i];
-        }
+        strncpy((char *)&eepromBuffer[5], FIRMWARE_NAME, 12);
         saveEEpromSettings();
     }
-#endif
 
     if (use_sin_start) {
         //    min_startup_duty = sin_mode_min_s_d;
@@ -1912,14 +1879,13 @@ int main(void)
             input_ready = 0;
         }
 #endif
-        // setInput();
+
         RELOAD_WATCHDOG_COUNTER();
         e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation_intervals[2] + commutation_intervals[3] + commutation_intervals[4] + commutation_intervals[5]) + 4) >> 1; // COMMUTATION INTERVAL IS 0.5US INCREMENTS
         if (VARIABLE_PWM) {
             tim1_arr = map(commutation_interval, 96, 200, TIMER1_MAX_ARR / 2,
                 TIMER1_MAX_ARR);
         }
-        // aka LOOP_FREQUENCY_HZ / 2 = 5000
         if (signaltimeout > (LOOP_FREQUENCY_HZ >> 1)) { // half second timeout when armed;
             if (armed) {
                 allOff();
@@ -2035,13 +2001,11 @@ int main(void)
         if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD)) {
             NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
             NVIC_SetPriority(COM_TIMER_IRQ, 1);
-            // NVIC_SetPriority(COMPARATOR_IRQ, 1);
-            comparator_nvic_set_priority(&COMPARATOR, 1);
+            NVIC_SetPriority(COMPARATOR_IRQ, 1);
         } else {
             NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
             NVIC_SetPriority(COM_TIMER_IRQ, 0);
-            // NVIC_SetPriority(COMPARATOR_IRQ, 0);
-            comparator_nvic_set_priority(&COMPARATOR, 0);
+            NVIC_SetPriority(COMPARATOR_IRQ, 0);
         }
 #endif
         if (send_telemetry) {
@@ -2205,10 +2169,8 @@ int main(void)
             }
 #else
 
-            /// this is where the armed magic happens
             if (input > 48 && armed) {
 
-                // use sine wave mode for input (48, 137)
                 if (input > 48 && input < 137) { // sine wave stepper
 
                     if (do_once_sinemode) {
@@ -2219,9 +2181,6 @@ int main(void)
                         allpwm();
                         do_once_sinemode = 0;
                     }
-
-                    // advances bridge timer pwm compare values (CCRn)
-                    // for all three channels according to sin lookup table
                     advanceincrement();
                     step_delay = map(input, 48, 120, 7000 / motor_poles, 810 / motor_poles);
                     delayMicros(step_delay);
@@ -2268,7 +2227,7 @@ int main(void)
 #else
                     // todo add braking for PWM /enable style bridges.
 #endif
-                } else { // disarm
+                } else {
                     SET_DUTY_CYCLE_ALL(0);
                     allOff();
                 }

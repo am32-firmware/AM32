@@ -243,6 +243,8 @@ an settings option)
 
 #include <version.h>
 
+extern comparator_t COMPARATOR;
+
 void zcfoundroutine(void);
 
 // firmware build options !! fixed speed and duty cycle modes are not to be used
@@ -647,7 +649,7 @@ void loadEEpromSettings()
         use_sin_start = 1;
         //	 min_startup_duty = sin_mode_min_s_d;
     }
-    use_sin_start = 1;
+    // use_sin_start = 1;
 
     if (eepromBuffer[20] == 0x01) {
         comp_pwm = 1;
@@ -2006,10 +2008,12 @@ int main(void)
         if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD)) {
             NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
             NVIC_SetPriority(COM_TIMER_IRQ, 1);
+            comparator_nvic_set_priority(&COMPARATOR, 1);
             // NVIC_SetPriority(COMPARATOR_IRQ, 1);
         } else {
             NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
             NVIC_SetPriority(COM_TIMER_IRQ, 0);
+            comparator_nvic_set_priority(&COMPARATOR, 0);
             // NVIC_SetPriority(COMPARATOR_IRQ, 0);
         }
 #endif

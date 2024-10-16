@@ -161,11 +161,19 @@ void enableCompInterrupts()
 }
 void comparator_enable_interrupts(comparator_t* comp)
 {
-    EXTI_INTERRUPT_ENABLE_MASK(
-        (1 << comp->phaseA->pin) |
-        (1 << comp->phaseB->pin) |
-        (1 << comp->phaseC->pin)
-    )
+    // EXTI_INTERRUPT_ENABLE_MASK(
+    //     (1 << comp->phaseA->pin) |
+    //     (1 << comp->phaseB->pin) |
+    //     (1 << comp->phaseC->pin)
+    // )
+
+    if (step == 1 || step == 4) { // c floating
+        EXTI_INTERRUPT_ENABLE_MASK(1 << COMPARATOR.phaseC->pin);
+    } else if (step == 2 || step == 5) { // a floating
+        EXTI_INTERRUPT_ENABLE_MASK(1 << COMPARATOR.phaseA->pin);
+    } else /*if (step == 3 || step == 6)*/ { // b floating
+        EXTI_INTERRUPT_ENABLE_MASK(1 << COMPARATOR.phaseB->pin);
+    }
 }
 // reset value | exti 15 used for setInput
 #define EXTI_IMR1_CLEAR_MASK (0xfffe0000 | 1<<15)
@@ -174,6 +182,7 @@ void comparator_enable_interrupts(comparator_t* comp)
 void changeCompInput()
 {
     EXTI->IMR1 &= EXTI_IMR1_CLEAR_MASK;
+    // comparator_disable_interrupts(&COMPARATOR);
     if (step == 1 || step == 4) { // c floating
         EXTI_INTERRUPT_ENABLE_MASK(1 << COMPARATOR.phaseC->pin);
     } else if (step == 2 || step == 5) { // a floating

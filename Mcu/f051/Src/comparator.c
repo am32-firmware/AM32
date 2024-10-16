@@ -36,6 +36,8 @@ void changeCompInput()
     if (step == 3 || step == 6) { // b floating
         COMP->CSR = PHASE_B_COMP;
     }
+    // ie 1<<21 EXTI line 21 cooresponds to comparator
+    // interrupt
     if (rising) {
         EXTI->RTSR = 0x0;
         EXTI->FTSR = 0x200000;

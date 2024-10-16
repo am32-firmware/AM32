@@ -80,7 +80,7 @@ typedef struct extiChannel_s
     EXTI->IMR1 |= (mask); \
 }
 #define EXTI_INTERRUPT_DISABLE_MASK(mask) { \
-    EXTI->IMR1 &= ~mask; \
+    EXTI->IMR1 &= ~(mask); \
 }
 #define EXTI_NVIC_ENABLE(channel) { \
     NVIC_EnableIRQ(EXTI0_IRQn + channel); \

@@ -176,8 +176,9 @@ void comparator_enable_interrupts(comparator_t* comp)
 #define EXTI_FTSR1_BITS (EXTI_FTSR1_FT4 | EXTI_FTSR1_FT14 | EXTI_FTSR1_FT15)
 void changeCompInput()
 {
-    EXTI->IMR1 &= EXTI_IMR1_CLEAR_MASK;
-    // comparator_disable_interrupts(&COMPARATOR);
+    // clear existing interrupt configuration
+    EXTI->IMR1 &= EXTI_IMR1_CLEAR_MASK;getCompOutputLevel
+    // configure interrupt according to current step
     if (step == 1 || step == 4) { // c floating
         EXTI_INTERRUPT_ENABLE_MASK(1 << COMPARATOR.phaseC->pin);
     } else if (step == 2 || step == 5) { // a floating
@@ -186,19 +187,14 @@ void changeCompInput()
         EXTI_INTERRUPT_ENABLE_MASK(1 << COMPARATOR.phaseB->pin);
     }
     if (rising) {
-        EXTI->FTSR1 = 0;
-        // EXTI->FPR1  = 0;
-        EXTI->RTSR1 = 
-        // EXTI->RTSR1 |= 
+        EXTI->RTSR1 = 0;
+        EXTI->FTSR1 = 
             (1 << COMPARATOR.phaseA->pin) |
             (1 << COMPARATOR.phaseB->pin) |
             (1 << COMPARATOR.phaseC->pin);
     } else { // falling bemf
-        EXTI->RTSR1 = 0;
-        // EXTI->RPR1 = 0;
-        // EXTI->RTSR1 = EXTI_RTSR1_BITS;
-        EXTI->FTSR1 = 
-        // EXTI->FTSR1 |= 
+        EXTI->FTSR1 = 0;
+        EXTI->RTSR1 = 
             (1 << COMPARATOR.phaseA->pin) |
             (1 << COMPARATOR.phaseB->pin) |
             (1 << COMPARATOR.phaseC->pin);

@@ -129,13 +129,15 @@ void comparator_initialize_gpio_exti(gpio_t* gpio)
 
 uint8_t getCompOutputLevel()
 {
+    uint8_t ret = 0;
     if (step == 1 || step == 4) { // c floating
-        return gpio_read(COMPARATOR.phaseC);
+        ret = gpio_read(COMPARATOR.phaseC);
     } else if (step == 2 || step == 5) { // a floating
-        return gpio_read(COMPARATOR.phaseA);
+        ret = gpio_read(COMPARATOR.phaseA);
     } else /*if (step == 3 || step == 6)*/ { // b floating
-        return gpio_read(COMPARATOR.phaseB);
+        ret = gpio_read(COMPARATOR.phaseB);
     }
+    return ret;
 }
 
 void maskPhaseInterrupts()

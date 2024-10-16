@@ -18,6 +18,7 @@ gpio_t gpioCompPhaseA = DEF_GPIO(COMPA_GPIO_PORT, COMPA_GPIO_PIN, 0, GPIO_INPUT)
 gpio_t gpioCompPhaseB = DEF_GPIO(COMPB_GPIO_PORT, COMPB_GPIO_PIN, 0, GPIO_INPUT);
 gpio_t gpioCompPhaseC = DEF_GPIO(COMPC_GPIO_PORT, COMPC_GPIO_PIN, 0, GPIO_INPUT);
 
+gpio_t* currentPhase = 0;
 comparator_t COMPARATOR = {
     .phaseA = &gpioCompPhaseA,
     .phaseB = &gpioCompPhaseB,
@@ -130,13 +131,14 @@ void comparator_initialize_gpio_exti(gpio_t* gpio)
 uint8_t getCompOutputLevel()
 {
     uint8_t ret = 0;
-    if (step == 1 || step == 4) { // c floating
-        ret = gpio_read(COMPARATOR.phaseC);
-    } else if (step == 2 || step == 5) { // a floating
-        ret = gpio_read(COMPARATOR.phaseA);
-    } else /*if (step == 3 || step == 6)*/ { // b floating
-        ret = gpio_read(COMPARATOR.phaseB);
-    }
+    // if (step == 1 || step == 4) { // c floating
+    //     ret = gpio_read(COMPARATOR.phaseC);
+    // } else if (step == 2 || step == 5) { // a floating
+    //     ret = gpio_read(COMPARATOR.phaseA);
+    // } else /*if (step == 3 || step == 6)*/ { // b floating
+    //     ret = gpio_read(COMPARATOR.phaseB);
+    // }
+    ret = gpio_read(currentPhase);
     return ret;
 }
 
@@ -158,18 +160,21 @@ void comparator_disable_interrupts(comparator_t* comp)
 
 void enableCompInterrupts()
 {
-    comparator_enable_interrupts(&COMPARATOR);
+    EXTI_INTERRUPT_ENABLE_MASK(1 << currentPhase->pin);
+    // comparator_enable_interrupts(&COMPARATOR);
 }
-void comparator_enable_interrupts(comparator_t* comp)
-{
-    if (step == 1 || step == 4) { // c floating
-        EXTI_INTERRUPT_ENABLE_MASK(1 << COMPARATOR.phaseC->pin);
-    } else if (step == 2 || step == 5) { // a floating
-        EXTI_INTERRUPT_ENABLE_MASK(1 << COMPARATOR.phaseA->pin);
-    } else /*if (step == 3 || step == 6)*/ { // b floating
-        EXTI_INTERRUPT_ENABLE_MASK(1 << COMPARATOR.phaseB->pin);
-    }
-}
+
+
+// void comparator_enable_interrupts(comparator_t* comp)
+// {
+//     if (step == 1 || step == 4) { // c floating
+//         EXTI_INTERRUPT_ENABLE_MASK(1 << COMPARATOR.phaseC->pin);
+//     } else if (step == 2 || step == 5) { // a floating
+//         EXTI_INTERRUPT_ENABLE_MASK(1 << COMPARATOR.phaseA->pin);
+//     } else /*if (step == 3 || step == 6)*/ { // b floating
+//         EXTI_INTERRUPT_ENABLE_MASK(1 << COMPARATOR.phaseB->pin);
+//     }
+// }
 // reset value | exti 15 used for setInput
 #define EXTI_IMR1_CLEAR_MASK (0xfffe0000 | 1<<15)
 #define EXTI_RTSR1_BITS (EXTI_RTSR1_RT4 | EXTI_RTSR1_RT14 | EXTI_RTSR1_RT15)
@@ -177,14 +182,17 @@ void comparator_enable_interrupts(comparator_t* comp)
 void changeCompInput()
 {
     // clear existing interrupt configuration
-    EXTI->IMR1 &= EXTI_IMR1_CLEAR_MASK;getCompOutputLevel
+    // EXTI->IMR1 &= EXTI_IMR1_CLEAR_MASK;getCompOutputLevel
     // configure interrupt according to current step
     if (step == 1 || step == 4) { // c floating
-        EXTI_INTERRUPT_ENABLE_MASK(1 << COMPARATOR.phaseC->pin);
+        currentPhase = COMPARATOR.phaseC;
+        // EXTI_INTERRUPT_ENABLE_MASK(1 << COMPARATOR.phaseC->pin);
     } else if (step == 2 || step == 5) { // a floating
-        EXTI_INTERRUPT_ENABLE_MASK(1 << COMPARATOR.phaseA->pin);
+        currentPhase = COMPARATOR.phaseA;
+        // EXTI_INTERRUPT_ENABLE_MASK(1 << COMPARATOR.phaseA->pin);
     } else /*if (step == 3 || step == 6)*/ { // b floating
-        EXTI_INTERRUPT_ENABLE_MASK(1 << COMPARATOR.phaseB->pin);
+        currentPhase = COMPARATOR.phaseB;
+        // EXTI_INTERRUPT_ENABLE_MASK(1 << COMPARATOR.phaseB->pin);
     }
     if (rising) {
         EXTI->RTSR1 = 0;

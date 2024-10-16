@@ -20,17 +20,17 @@ gpio_t gpioCompPhaseB = DEF_GPIO(COMPB_GPIO_PORT, COMPB_GPIO_PIN, 0, GPIO_INPUT)
 gpio_t gpioCompPhaseC = DEF_GPIO(COMPC_GPIO_PORT, COMPC_GPIO_PIN, 0, GPIO_INPUT);
 
 comparator_t COMPARATOR = {
-    // .phaseA = &gpioCompPhaseA,
-    // .phaseB = &gpioCompPhaseB,
-    // .phaseC = &gpioCompPhaseC,
+    .phaseA = &gpioCompPhaseA,
+    .phaseB = &gpioCompPhaseB,
+    .phaseC = &gpioCompPhaseC,
 
     // .phaseA = &gpioCompPhaseC,
     // .phaseB = &gpioCompPhaseA,
     // .phaseC = &gpioCompPhaseB,
 
-    .phaseA = &gpioCompPhaseB,
-    .phaseB = &gpioCompPhaseC,
-    .phaseC = &gpioCompPhaseA,
+    // .phaseA = &gpioCompPhaseB,
+    // .phaseB = &gpioCompPhaseC,
+    // .phaseC = &gpioCompPhaseA,
 
     // this spins, but doesn't close the loop
     // .phaseA = &gpioCompPhaseC,

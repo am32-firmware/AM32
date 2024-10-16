@@ -144,7 +144,8 @@ uint8_t getCompOutputLevel()
 
 void maskPhaseInterrupts()
 {
-    comparator_disable_interrupts(&COMPARATOR);
+    // comparator_disable_interrupts(&COMPARATOR);
+    EXTI->IMR1 &= ~(1 << currentPhase->pin);
     EXTI->FPR1 = 0xffffffff;
     EXTI->RPR1 = 0xffffffff;
 }
@@ -195,16 +196,10 @@ void changeCompInput()
         // EXTI_INTERRUPT_ENABLE_MASK(1 << COMPARATOR.phaseB->pin);
     }
     if (rising) {
-        EXTI->RTSR1 = 0;
-        EXTI->FTSR1 = 
-            (1 << COMPARATOR.phaseA->pin) |
-            (1 << COMPARATOR.phaseB->pin) |
-            (1 << COMPARATOR.phaseC->pin);
+        EXTI->RTSR1 |= (1 << currentPhase->pin);
+        EXTI->FTSR1 &= ~(1 << currentPhase->pin);
     } else { // falling bemf
-        EXTI->FTSR1 = 0;
-        EXTI->RTSR1 = 
-            (1 << COMPARATOR.phaseA->pin) |
-            (1 << COMPARATOR.phaseB->pin) |
-            (1 << COMPARATOR.phaseC->pin);
+        EXTI->FTSR1 |= (1 << currentPhase->pin);
+        EXTI->RTSR1 &= ~(1 << currentPhase->pin);
     }
 }

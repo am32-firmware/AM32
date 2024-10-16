@@ -227,6 +227,7 @@ an settings option)
 #include "serial_telemetry.h"
 #include "signal.h"
 #include "sounds.h"
+#include "system_stm32h5xx.h"
 #include "targets.h"
 #include <stdint.h>
 #include <string.h>
@@ -1726,7 +1727,9 @@ void runBrushedLoop()
 int main(void)
 {
 
+    // SystemCoreClockUpdate();
     initAfterJump();
+    // SystemCoreClockUpdate();
 
     initCorePeripherals();
 

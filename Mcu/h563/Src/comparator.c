@@ -13,7 +13,6 @@
 #include "targets.h"
 #include "gpio.h"
 #include "exti.h"
-// void comparator_initialize(GPIO_TypeDef* phaseA, GPIO_TypeDef* phaseB, GPIO_TypeDef* phaseC)
 
 gpio_t gpioCompPhaseA = DEF_GPIO(COMPA_GPIO_PORT, COMPA_GPIO_PIN, 0, GPIO_INPUT);
 gpio_t gpioCompPhaseB = DEF_GPIO(COMPB_GPIO_PORT, COMPB_GPIO_PIN, 0, GPIO_INPUT);
@@ -79,24 +78,9 @@ void comparator_initialize_gpio(gpio_t* gpio)
     gpio_initialize(gpio);
 }
 
-// void comparator_gpio_initialize()
-// {
-//     gpio_initialize(&gpioCompPhaseA);
-//     gpio_initialize(&gpioCompPhaseB);
-//     gpio_initialize(&gpioCompPhaseC);
-
-//     // gpio_t gpioButton = DEF_GPIO(GPIOC, 13, 0, GPIO_INPUT);
-//     // gpio_initialize(&gpioButton);
-// }
-
 void comparator_gpio_exti_nvic_enable(gpio_t* gpio)
 {
-
-    // EXTI->RTSR1 |= 1 << gpio->pin;
-    // EXTI->FTSR1 |= 1 << gpio->pin;
-
     exti_configure_trigger(&extiChannels[gpio->pin], EXTI_TRIGGER_RISING_FALLING);
-    // NVIC_EnableIRQ(EXTI0_IRQn + gpio->pin);
     EXTI_NVIC_ENABLE(gpio->pin);
 }
 
@@ -109,45 +93,6 @@ void comparator_nvic_set_priority(comparator_t* comp, uint32_t priority)
 
 void comparator_initialize_gpio_exti(gpio_t* gpio)
 {
-    // // control register
-    // __IO uint32_t* cr;
-    // // find the control register (0-3) (CR1-CR4)
-    // switch (gpio->pin) 
-    // {
-    //     case 0:
-    //     case 1:
-    //     case 2:
-    //     case 3:
-    //     {
-    //         cr = &EXTI->EXTICR[0];
-    //         break;
-    //     }
-    //     case 4:
-    //     case 5:
-    //     case 6:
-    //     case 7:
-    //     {
-    //         cr = &EXTI->EXTICR[1];
-    //         break;
-    //     }
-    //     case 8:
-    //     case 9:
-    //     case 10:
-    //     case 11:
-    //     {
-    //         cr = &EXTI->EXTICR[2];
-    //         break;
-    //     }
-    //     case 12:
-    //     case 13:
-    //     case 14:
-    //     case 15:
-    //     {
-    //         cr = &EXTI->EXTICR[3];
-    //         break;
-    //     }
-    // }
-
     uint32_t cr_value;
     switch ((uint32_t)gpio->port) {
         case GPIOA_BASE:
@@ -182,10 +127,6 @@ void comparator_initialize_gpio_exti(gpio_t* gpio)
             break;
     }
 
-    // uint32_t cr_shift = gpio->pin % 4;
-
-    // // modify the register
-    // *cr |= cr_value << cr_shift;
     exti_configure_port(&extiChannels[gpio->pin], cr_value);
 }
 

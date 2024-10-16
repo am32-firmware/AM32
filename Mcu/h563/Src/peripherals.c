@@ -20,24 +20,24 @@ extern void processDshot();
 void exti15cb(extiChannel_t* exti)
 {
     uint32_t mask = 1 << exti->channel;
-    if (EXTI->RPR1 & mask) {
+    // if (EXTI->RPR1 & mask) {
         EXTI->RPR1 |= mask;
-    } 
-    if (EXTI->FPR1 & mask) {
+    // } 
+    // if (EXTI->FPR1 & mask) {
         EXTI->FPR1 |= mask;
-    }
+    // }
     processDshot();
 }
 
 void phaseA_cb(extiChannel_t* exti)
 {
     uint32_t mask = 1 << exti->channel;
-    if (EXTI->RPR1 & mask) {
+    // if (EXTI->RPR1 & mask) {
         EXTI->RPR1 |= mask;
-    }
-    if (EXTI->FPR1 & mask) {
+    // }
+    // if (EXTI->FPR1 & mask) {
         EXTI->FPR1 |= mask;
-    }
+    // }
     // if(gpio_read(&gpioCompPhaseA)) {
     //     gpio_reset(&gpioPhaseALed);
     // } else {
@@ -49,12 +49,12 @@ void phaseA_cb(extiChannel_t* exti)
 void phaseB_cb(extiChannel_t* exti)
 {
     uint32_t mask = 1 << exti->channel;
-    if (EXTI->RPR1 & mask) {
+    // if (EXTI->RPR1 & mask) {
         EXTI->RPR1 |= mask;
-    }
-    if (EXTI->FPR1 & mask) {
+    // }
+    // if (EXTI->FPR1 & mask) {
         EXTI->FPR1 |= mask;
-    }
+    // }
     // if(gpio_read(&gpioCompPhaseB)) {
     //     gpio_reset(&gpioPhaseBLed);
     // } else {
@@ -66,12 +66,12 @@ void phaseB_cb(extiChannel_t* exti)
 void phaseC_cb(extiChannel_t* exti)
 {
     uint32_t mask = 1 << exti->channel;
-    if (EXTI->RPR1 & mask) {
+    // if (EXTI->RPR1 & mask) {
         EXTI->RPR1 |= mask;
-    }
-    if (EXTI->FPR1 & mask) {
+    // }
+    // if (EXTI->FPR1 & mask) {
         EXTI->FPR1 |= mask;
-    }
+    // }
     // if(gpio_read(&gpioCompPhaseC)) {
     //     gpio_reset(&gpioPhaseCLed);
     // } else {

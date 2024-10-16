@@ -193,6 +193,7 @@ void changeCompInput()
         EXTI->FTSR1 = 0;
         // EXTI->FPR1  = 0;
         EXTI->RTSR1 = 
+        // EXTI->RTSR1 |= 
             (1 << COMPARATOR.phaseA->pin) |
             (1 << COMPARATOR.phaseB->pin) |
             (1 << COMPARATOR.phaseC->pin);
@@ -201,6 +202,7 @@ void changeCompInput()
         // EXTI->RPR1 = 0;
         // EXTI->RTSR1 = EXTI_RTSR1_BITS;
         EXTI->FTSR1 = 
+        // EXTI->FTSR1 |= 
             (1 << COMPARATOR.phaseA->pin) |
             (1 << COMPARATOR.phaseB->pin) |
             (1 << COMPARATOR.phaseC->pin);

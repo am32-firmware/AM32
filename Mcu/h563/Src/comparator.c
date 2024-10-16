@@ -139,7 +139,7 @@ uint8_t getCompOutputLevel()
     //     ret = gpio_read(COMPARATOR.phaseB);
     // }
     ret = gpio_read(currentPhase);
-    return ret;
+    return !ret;
 }
 
 void maskPhaseInterrupts()

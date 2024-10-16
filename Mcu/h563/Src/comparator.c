@@ -241,15 +241,15 @@ void changeCompInput()
         EXTI_INTERRUPT_ENABLE_MASK(1 << COMPARATOR.phaseB->pin);
     }
     if (rising) {
-        EXTI->FTSR1 = 0;
-        EXTI->RTSR1 = 
+        EXTI->RTSR1 = 0;
+        EXTI->FTSR1 = 
             (1 << COMPARATOR.phaseA->pin) |
             (1 << COMPARATOR.phaseB->pin) |
             (1 << COMPARATOR.phaseC->pin);
     } else { // falling bemf
-        EXTI->RTSR1 = 0;
+        EXTI->FTSR1 = 0;
         // EXTI->RTSR1 = EXTI_RTSR1_BITS;
-        EXTI->FTSR1 = 
+        EXTI->RTSR1 = 
             (1 << COMPARATOR.phaseA->pin) |
             (1 << COMPARATOR.phaseB->pin) |
             (1 << COMPARATOR.phaseC->pin);

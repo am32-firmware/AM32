@@ -699,6 +699,9 @@ void loadEEpromSettings()
         min_startup_duty = 150;
         minimum_duty_cycle = (min_startup_duty / 2) + 10;
     }
+    min_startup_duty = 150;
+    minimum_duty_cycle = (eepromBuffer[25] / 3);
+    stall_protect_minimum_duty = minimum_duty_cycle + 10;
     motor_kv = (eepromBuffer[26] * 40) + 20;
 #ifdef THREE_CELL_MAX
 		motor_kv =  motor_kv / 2;

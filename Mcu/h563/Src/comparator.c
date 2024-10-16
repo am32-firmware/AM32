@@ -44,9 +44,6 @@ comparator_t COMPARATOR = {
     // .phaseB = &gpioCompPhaseA,
     // .phaseC = &gpioCompPhaseC,
 
-    // .phaseAcb = phaseA_cb,
-    // .phaseBcb = phaseB_cb,
-    // .phaseCcb = phaseC_cb
 };
 void comparator_initialize(comparator_t* comp)
 {

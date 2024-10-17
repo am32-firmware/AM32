@@ -14,23 +14,23 @@
 #include "sounds.h"
 #include "targets.h"
 
-int max_servo_deviation = 250;
-int servorawinput;
-uint16_t smallestnumber = 20000;
-uint8_t enter_calibration_count = 0;
-uint8_t calibration_required = 0;
-uint8_t high_calibration_counts = 0;
-uint8_t high_calibration_set = 0;
-uint16_t last_high_threshold = 0;
-uint8_t low_calibration_counts = 0;
-uint16_t last_input = 0;
+static int max_servo_deviation = 250;
+static int servorawinput;
+static uint16_t smallestnumber = 20000;
+static uint8_t enter_calibration_count;
+static uint8_t calibration_required;
+static uint8_t high_calibration_counts;
+static uint8_t high_calibration_set;
+static uint16_t last_high_threshold;
+static uint8_t low_calibration_counts;
+static uint16_t last_input;
 char output_timer_prescaler;
 uint8_t buffersize = 32;
-uint32_t average_signal_pulse;
-uint8_t average_count;
-uint32_t average_packet_length;
+static uint32_t average_signal_pulse;
+static uint8_t average_count;
+static uint32_t average_packet_length;
 uint16_t dshot_frametime_high = 50000;
-uint16_t dshot_frametime_low = 0;
+uint16_t dshot_frametime_low;
 
 void computeMSInput()
 {

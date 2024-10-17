@@ -60,8 +60,6 @@ extern void PeriodElapsedCallback();
 extern void tenKhzRoutine();
 extern char servoPwm;
 
-// extern uint32_t gcr[];
-// extern uint8_t gcr_size;
 char input_ready = 0;
 int update_interupt = 0;
 uint8_t update_count = 0;

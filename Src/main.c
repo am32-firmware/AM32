@@ -1722,10 +1722,48 @@ void runBrushedLoop()
 }
 #endif
 
+
+/*
+  check device info from the bootloader, confirming pin code and eeprom location
+ */
+static void checkDeviceInfo(void)
+{
+#define DEVINFO_MAGIC1 0x5925e3da
+#define DEVINFO_MAGIC2 0x4eb863d9
+
+    const struct devinfo {
+        uint32_t magic1;
+        uint32_t magic2;
+        const uint8_t deviceInfo[9];
+    } *devinfo = (struct devinfo *)(0x1000 - 32);
+    if (devinfo->magic1 != DEVINFO_MAGIC1 ||
+        devinfo->magic2 != DEVINFO_MAGIC2) {
+        // bootloader does not support this feature, nothing to do
+        return;
+    }
+    // change eeprom_address based on the code in the bootloaders device info
+    switch (devinfo->deviceInfo[4]) {
+        case 0x1f:
+            eeprom_address = 0x08007c00;
+            break;
+        case 0x35:
+            eeprom_address = 0x0800f800;
+            break;
+        case 0x2b:
+            eeprom_address = 0x0801f800;
+            break;
+    }
+
+    // TODO: check pin code and reboot to bootloader if incorrect
+
+}
+
 int main(void)
 {
 
     initAfterJump();
+
+    checkDeviceInfo();
 
     initCorePeripherals();
 
@@ -1733,13 +1771,6 @@ int main(void)
 
     loadEEpromSettings();
 
- //   EEPROM_VERSION = *(uint8_t*)(0x08000FFC);
-
-	  if((*(uint32_t*)(0x08000FE0)) == 0xf8){
-			eeprom_address = (uint32_t)0x0800F800;
-		}
-
-	
     if (VERSION_MAJOR != eepromBuffer[3] || VERSION_MINOR != eepromBuffer[4]) {
         eepromBuffer[3] = VERSION_MAJOR;
         eepromBuffer[4] = VERSION_MINOR;

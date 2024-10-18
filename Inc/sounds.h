@@ -19,7 +19,6 @@ void playDuskingTune(void);
 void playDefaultTone(void);
 void playChangedTone(void);
 
-void saveEEpromSettings(void);
 void setVolume(uint8_t volume);
 
 extern void delayMillis(uint32_t millis);

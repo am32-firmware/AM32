@@ -120,8 +120,14 @@ void spi_initialize(spi_t* spi)
     // SS is pulsed inactive between data frames
     // spi->ref->CFG2 |= SPI_CFG2_SSOM;
 
-    spi->ref->CFG2 |= SPI_CFG2_SSM;
-    spi->ref->CR1 |= SPI_CR1_SSI; // software set NSS signal
+    // configure software management of SS signal input
+    // 0: SS input value is determined by the SS PAD
+    // 1: SS input value is determined by the SSI bit
+    // When master uses hardware SS output (SSM = 0 and SSOE = 1) the SS signal input is
+    // forced to not active state internally to prevent master mode fault error.
+    // spi->ref->CFG2 |= SPI_CFG2_SSM;
+
+    // spi->ref->CR1 |= SPI_CR1_SSI; // software set NSS signal
 
     // set clock polarity
     // spi->ref->CFG2 |= SPI_CFG2_CPOL;

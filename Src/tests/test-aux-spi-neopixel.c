@@ -98,28 +98,7 @@ int main()
     for (int i = 50; i < 50 + 12; i++) {
         data[i] = word1;
     }
-    // {
-    //     word0,
-    //     word0,
-    //     word0,
-    //     word0,
-    //     word0,
-    //     word0,
-    //     word0,
-    //     word0,
- 
-    //     word0,
-    //     word0,
-    //     word0,
-    //     word0,
-
-        
-    // };
-    // for (int i = 0; i < 12; i++) {
-    //     data[i] = word;
-    // }
-
-
+    
     spi_write(&spi, data, DL);
     // arbitrary delay
 

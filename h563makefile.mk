@@ -39,6 +39,7 @@ SRC_H563 := \
 	$(SRC_DIR_H563_SRC)/comparator.c \
 	$(SRC_DIR_H563_SRC)/ADC.c \
 	$(SRC_DIR_H563_SRC)/spi.c \
+	$(SRC_DIR_H563_SRC)/clock.c \
 	$(SRC_DIR_H563_SRC)/flash.c \
 	$(SRC_DIR_H563_SRC)/dma-stm32h5.c \
 	$(SRC_DIR_H563_SRC)/exti-stm32h5.c \

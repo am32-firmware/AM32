@@ -30,6 +30,17 @@ void spi_dma_cb(dmaChannel_t* dma)
     spi_dma_transfer_complete_isr((spi_t*)dma->userParam);
 }
 
+void spi_configure_rcc_clock_selection(spi_t* spi, uint8_t selection)
+{
+    switch ((uint32_t)spi->ref)
+    {
+        case SPI4_BASE:
+            RCC->CCIPR3 |= selection << RCC_CCIPR3_SPI4SEL_Pos;
+            break;
+        default:
+            break;
+    }
+}
 void spi_initialize(spi_t* spi)
 {
     // set the channel destination address
@@ -93,7 +104,7 @@ void spi_initialize(spi_t* spi)
     // spi->ref->CR2 = 1;
 
     // master baud rate prescaler = 32
-    spi->ref->CFG1 |= 0b100 << SPI_CFG1_MBR_Pos;
+    spi->ref->CFG1 |= spi->CFG1_MBR << SPI_CFG1_MBR_Pos;
 
     // // master baud rate prescaler = 256
     // spi->ref->CFG1 |= 0b111 << SPI_CFG1_MBR_Pos;

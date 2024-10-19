@@ -57,10 +57,12 @@ typedef struct {
 
     uint8_t txDmaRequest;
     uint8_t rxDmaRequest;
+    uint8_t CFG1_MBR;
     uint8_t _irqn;
 } spi_t;
 
 void spi_dma_transfer_complete_isr(spi_t* spi);
+void spi_configure_rcc_clock_selection(spi_t* spi, uint8_t selection);
 void spi_initialize(spi_t* spi);
 uint8_t spi_read(spi_t* spi, uint16_t* word, uint8_t length);
 uint8_t spi_rx_waiting(spi_t* spi);

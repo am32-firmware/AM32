@@ -217,8 +217,8 @@ void spi_start_tx_dma_transfer(spi_t* spi)
 
     if (spi->_dma_transfer_count) {
 
-        // disable the spi
-        spi_disable(spi);
+        // // disable the spi
+        // spi_disable(spi);
 
         // spi->ref->IFCR = 0xffffffff;
         spi->ref->IFCR |= SPI_IFCR_TXTFC;
@@ -242,6 +242,9 @@ void spi_start_tx_dma_transfer(spi_t* spi)
 
         // spi->ref->TXDR = (uint32_t)(spi->_tx_buffer + spi->_tx_tail);
         spi->ref->CR1 |= SPI_CR1_CSTART;
+    } else {
+        // disable the spi
+        spi_disable(spi);
     }
 
 }
@@ -284,7 +287,7 @@ void spi_write_dma(spi_t* spi, const uint16_t* data, uint8_t length) {
     // }
 
     // disable the spi
-    spi_disable(spi);
+    // spi_disable(spi);
 
     // spi->ref->IFCR = 0xffffffff;
     spi->ref->IFCR |= SPI_IFCR_TXTFC;

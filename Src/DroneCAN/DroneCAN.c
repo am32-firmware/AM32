@@ -128,6 +128,9 @@ extern char use_sin_start;
 extern char comp_pwm;
 extern char stuck_rotor_protection;
 extern char armed;
+extern char drag_brake_strength;
+extern uint8_t driving_brake_strength;
+extern char brake_on_stop;
 static uint16_t last_can_input;
 static struct {
     uint32_t sum;
@@ -165,6 +168,9 @@ static struct parameter {
         { "COMP_PWM",               T_BOOL,  0, 1,   1, &comp_pwm, 0},
         { "STUCK_ROTOR_PROTECTION", T_BOOL,  0, 1,   1, &stuck_rotor_protection, 0},
         { "ADVANCE_LEVEL",          T_UINT8, 0, 4,   2, &advance_level, 0},
+        { "BRAKE_ON_STOP",          T_BOOL,  0, 1,   1, &brake_on_stop, 28},
+        { "DRIVING_BRAKE_STRENGTH", T_UINT8, 1, 10,  10, &driving_brake_strength, 42},
+        { "DRAG_BRAKE_STRENGTH",    T_UINT8, 1, 10,  10, &drag_brake_strength, 41},
         { "INPUT_FILTER_HZ",        T_UINT8, 0, 100, 0, &settings.filter_hz, EEPROM_FILTER_HZ},
         { "STARTUP_TUNE",           T_STRING,0, 4,   0, NULL, EEPROM_TUNE_INDEX},
 };

@@ -118,15 +118,20 @@ int main()
     // for (int i = 0; i < 12; i++) {
     //     data[i] = word;
     // }
+
+
+    spi_write(&spi, data, DL);
+    // arbitrary delay
+
     while(1) {
         // spi_write_word(&spi, word);
         // for (int i = 0; i < 0xfffff; i++) {
         //     asm("nop");
         // }
-        spi_write(&spi, data, DL);
-        // arbitrary delay
-        for (int i = 0; i < 0xffff; i++) {
-            asm("nop");
-        }
+        // spi_write(&spi, data, DL);
+        // // arbitrary delay
+        // for (int i = 0; i < 0xffff; i++) {
+        //     asm("nop");
+        // }
     }
 }

@@ -111,7 +111,7 @@ void spi_initialize(spi_t* spi)
 
     // spi always controls the state of the gpios,
     // even when disabled (SPE = 0)
-    spi->ref->CFG2 |= SPI_CFG2_AFCNTR;
+    // spi->ref->CFG2 |= SPI_CFG2_AFCNTR;
 
     // enable hardware SS output
     spi->ref->CFG2 |= SPI_CFG2_SSOE;
@@ -125,7 +125,7 @@ void spi_initialize(spi_t* spi)
     
     // set clock phase
     // data is captured on the falling edge of SCK
-    // spi->ref->CFG2 |= SPI_CFG2_CPHA;
+    spi->ref->CFG2 |= SPI_CFG2_CPHA;
 
     // spi master mode
     spi->ref->CFG2 |= SPI_CFG2_MASTER;

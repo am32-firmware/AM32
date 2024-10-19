@@ -20,6 +20,9 @@ typedef struct {
 #define GPIO_SPEED_FAST 0b10
 #define GPIO_SPEED_VERYFAST 0b11
 
+#define GPIO_PULL_NONE 0b00
+#define GPIO_PULL_UP 0b01
+#define GPIO_PULL_DOWN 0b10
 
 #define GPIOA_CLOCK_ENABLE() do { \
     RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN; \
@@ -46,4 +49,4 @@ void gpio_reset(gpio_t* gpio);
 void gpio_toggle(gpio_t* gpio);
 bool gpio_read(gpio_t* gpio);
 void gpio_set_speed(gpio_t* gpio, uint8_t speed);
-
+void gpio_configure_pupdr(gpio_t* gpio, uint8_t config);

@@ -80,6 +80,7 @@ int main()
     gpio_initialize(&gpioSpiMISO);
     gpio_initialize(&gpioSpiMOSI);
 
+    gpio_configure_pupdr(&gpioSpiMOSI, GPIO_PULL_DOWN);
     gpio_set_speed(&gpioSpiNSS, 0b11);
     gpio_set_speed(&gpioSpiSCK, 0b11);
     gpio_set_speed(&gpioSpiMISO, 0b11);

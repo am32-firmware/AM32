@@ -103,3 +103,8 @@ void gpio_set_speed(gpio_t* gpio, uint8_t speed)
 {
     gpio->port->OSPEEDR |= (speed & 0b11) << (2*gpio->pin);
 }
+
+void gpio_configure_pupdr(gpio_t* gpio, uint8_t config)
+{
+    gpio->port->PUPDR |= config << gpio->pin*2;
+}

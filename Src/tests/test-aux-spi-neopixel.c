@@ -18,7 +18,7 @@ spi_t spi;
 
 int main()
 {
-    clock_hsi_config_divider(0b00);
+    // clock_hsi_config_divider(0b00);
     clock_hse_enable();
     // enable dma clocks
     dma_initialize();
@@ -98,5 +98,8 @@ int main()
         //     asm("nop");
         // }
         spi_write(&spi, data, 6);
+        for (int i = 0; i < 0xffff; i++) {
+            asm("nop");
+        }
     }
 }

@@ -109,29 +109,36 @@ void spi_initialize(spi_t* spi)
     // // master baud rate prescaler = 256
     // spi->ref->CFG1 |= 0b111 << SPI_CFG1_MBR_Pos;
 
+    // spi always controls the state of the gpios,
+    // even when disabled (SPE = 0)
+    spi->ref->CFG2 |= SPI_CFG2_AFCNTR;
 
     // enable hardware SS output
     spi->ref->CFG2 |= SPI_CFG2_SSOE;
 
     // SSOM = 1, SP = 000, MIDI > 1
     // SS is pulsed inactive between data frames
-    spi->ref->CFG2 |= SPI_CFG2_SSOM;
+    // spi->ref->CFG2 |= SPI_CFG2_SSOM;
 
+    // set clock polarity
+    // spi->ref->CFG2 |= SPI_CFG2_CPOL;
+    
     // set clock phase
     // data is captured on the falling edge of SCK
-    spi->ref->CFG2 |= SPI_CFG2_CPHA;
+    // spi->ref->CFG2 |= SPI_CFG2_CPHA;
 
     // spi master mode
     spi->ref->CFG2 |= SPI_CFG2_MASTER;
 
     // 15 clock cycle periods delay inserted between two consecutive data frames
-    spi->ref->CFG2 |= 0b1111 << SPI_CFG2_MIDI_Pos;
+    // spi->ref->CFG2 |= 0b1111 << SPI_CFG2_MIDI_Pos;
 
     // set MSSI to 15
     // insert 15 clock cycle periods delay between SS opening
     // a session and the beginning of the first data frame
-    spi->ref->CFG2 |= 0b1111;
+    // spi->ref->CFG2 |= 0b1111;
 
+    // enable DMA requests on transmission
     spi->ref->CFG1 |= SPI_CFG1_TXDMAEN;
     // spi->ref->CFG1 |= SPI_CFG1_RXDMAEN;
 

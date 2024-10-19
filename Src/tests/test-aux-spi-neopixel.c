@@ -122,11 +122,15 @@ int main()
     // while(spi_rx_waiting(&spi) < 7);
     // spi_read(&spi, readData, 7);
     uint16_t word = (LED_T1 << 8) | LED_T0;
+    uint16_t data[12];
+    for (int i = 0; i < 12; i++) {
+        data[i] = word;
+    }
     while(1) {
-        spi_write_word(&spi, word);
-        for (int i = 0; i < 0xfffff; i++) {
-            asm("nop");
-        }
-        // spi_write(&spi, data, 5);
+        // spi_write_word(&spi, word);
+        // for (int i = 0; i < 0xfffff; i++) {
+        //     asm("nop");
+        // }
+        spi_write(&spi, data, 6);
     }
 }

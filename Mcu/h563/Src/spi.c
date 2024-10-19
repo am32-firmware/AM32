@@ -120,6 +120,9 @@ void spi_initialize(spi_t* spi)
     // SS is pulsed inactive between data frames
     // spi->ref->CFG2 |= SPI_CFG2_SSOM;
 
+    spi->ref->CFG2 |= SPI_CFG2_SSM;
+    spi->ref->CR1 |= SPI_CR1_SSI; // software set NSS signal
+
     // set clock polarity
     // spi->ref->CFG2 |= SPI_CFG2_CPOL;
     

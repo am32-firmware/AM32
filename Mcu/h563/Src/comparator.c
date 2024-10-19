@@ -139,15 +139,17 @@ uint8_t getCompOutputLevel()
     //     ret = gpio_read(COMPARATOR.phaseB);
     // }
     ret = gpio_read(currentPhase);
-    return !ret;
+    return ret;
 }
 
 void maskPhaseInterrupts()
 {
     // comparator_disable_interrupts(&COMPARATOR);
     EXTI->IMR1 &= ~(1 << currentPhase->pin);
-    EXTI->FPR1 = 0xffffffff;
-    EXTI->RPR1 = 0xffffffff;
+    LL_EXTI_ClearRisingFlag_0_31(1 << currentPhase->pin);
+    LL_EXTI_ClearFallingFlag_0_31(1 << currentPhase->pin);
+    // EXTI->FPR1 = 0xffffffff;
+    // EXTI->RPR1 = 0xffffffff;
 }
 
 void comparator_disable_interrupts(comparator_t* comp)

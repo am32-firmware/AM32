@@ -1,5 +1,6 @@
 #pragma once
 #include "stm32h563xx.h"
+#include "stm32h5xx_ll_dma.h"
 
 #define DEFINE_DMA_CHANNEL(i, j) { \
     .dma = GPDMA ## i, \

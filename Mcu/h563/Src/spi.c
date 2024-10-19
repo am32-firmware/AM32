@@ -40,7 +40,7 @@ void spi_initialize(spi_t* spi)
     // set source incrementing burst
     spi->txDma->ref->CTR1 |= DMA_CTR1_SINC;
     // set the peripheral hardware request selection
-    spi->txDma->ref->CTR2 |= LL_GPDMA1_REQUEST_SPI5_TX;
+    spi->txDma->ref->CTR2 |= spi->txDmaRequest;
     // enable transfer complete interrupt
     spi->txDma->ref->CCR |= DMA_CCR_TCIE;
     spi->txDma->callback = spi_dma_cb;
@@ -65,7 +65,7 @@ void spi_initialize(spi_t* spi)
     // set destination incrementing burst
     spi->rxDma->ref->CTR1 |= DMA_CTR1_DINC;
     // set the peripheral hardware request selection
-    spi->rxDma->ref->CTR2 |= LL_GPDMA1_REQUEST_SPI5_RX;
+    spi->rxDma->ref->CTR2 |= spi->rxDmaRequest;
 
     // set the transfer length
     spi->rxDma->ref->CBR1 = 256;
@@ -90,41 +90,47 @@ void spi_initialize(spi_t* spi)
 
 
     // // set TSIZE - transfer length in words
-    // SPI5->CR2 = 1;
+    // spi->ref->CR2 = 1;
 
     // master baud rate prescaler = 32
-    SPI5->CFG1 |= 0b100 << SPI_CFG1_MBR_Pos;
+    spi->ref->CFG1 |= 0b100 << SPI_CFG1_MBR_Pos;
+
+    // // master baud rate prescaler = 256
+    // spi->ref->CFG1 |= 0b111 << SPI_CFG1_MBR_Pos;
+
 
     // enable hardware SS output
-    SPI5->CFG2 |= SPI_CFG2_SSOE;
+    spi->ref->CFG2 |= SPI_CFG2_SSOE;
 
     // SSOM = 1, SP = 000, MIDI > 1
     // SS is pulsed inactive between data frames
-    SPI5->CFG2 |= SPI_CFG2_SSOM;
+    spi->ref->CFG2 |= SPI_CFG2_SSOM;
 
     // set clock phase
     // data is captured on the falling edge of SCK
-    SPI5->CFG2 |= SPI_CFG2_CPHA;
+    spi->ref->CFG2 |= SPI_CFG2_CPHA;
 
     // spi master mode
-    SPI5->CFG2 |= SPI_CFG2_MASTER;
+    spi->ref->CFG2 |= SPI_CFG2_MASTER;
 
     // 15 clock cycle periods delay inserted between two consecutive data frames
-    SPI5->CFG2 |= 0b1111 << SPI_CFG2_MIDI_Pos;
+    spi->ref->CFG2 |= 0b1111 << SPI_CFG2_MIDI_Pos;
 
     // set MSSI to 15
     // insert 15 clock cycle periods delay between SS opening
     // a session and the beginning of the first data frame
-    SPI5->CFG2 |= 0b1111;
+    spi->ref->CFG2 |= 0b1111;
 
-    SPI5->CFG1 |= SPI_CFG1_TXDMAEN;
-    // SPI5->CFG1 |= SPI_CFG1_RXDMAEN;
+    spi->ref->CFG1 |= SPI_CFG1_TXDMAEN;
+    // spi->ref->CFG1 |= SPI_CFG1_RXDMAEN;
 
     // set DSIZE (frame width) to 16 bits
-    SPI5->CFG1 |= 0b01111;
+    spi->ref->CFG1 |= 0b01111;
 
-    // SPI5->TXDR = DRV8323_WRITE | DRV8323_REG_CSA_CONTROL | DRV8323_REG_CSA_CONTROL_VALUE;
-    // SPI5->TXDR = DRV8323_WRITE | DRV8323_REG_CSA_CONTROL | DRV8323_REG_CSA_CONTROL_VALUE;
+
+
+    // spi->ref->TXDR = DRV8323_WRITE | DRV8323_REG_CSA_CONTROL | DRV8323_REG_CSA_CONTROL_VALUE;
+    // spi->ref->TXDR = DRV8323_WRITE | DRV8323_REG_CSA_CONTROL | DRV8323_REG_CSA_CONTROL_VALUE;
 
 // spi_enable(spi);
 
@@ -201,7 +207,7 @@ void spi_start_tx_dma_transfer(spi_t* spi)
         // set TSIZE - transfer length in words
         // spi must be disabled to set TSIZE
         spi->ref->CR2 = spi->_dma_transfer_count;
-        // SPI5->CR2 = 1;
+        // spi->ref->CR2 = 1;
         
 
         spi->txDma->ref->CBR1 = spi->_dma_transfer_count*2;

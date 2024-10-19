@@ -15,6 +15,7 @@
 
 uint8_t beep_volume;
 
+#define PRESCALER_MIN 1
 void pause(uint16_t ms)
 {
     SET_DUTY_CYCLE_ALL(0);
@@ -86,7 +87,7 @@ void playBlueJayTune()
         }
     }
     allOff(); // turn all channels low again
-    SET_PRESCALER_PWM(0); // set prescaler back to 0.
+    SET_PRESCALER_PWM(PRESCALER_MIN); // set prescaler back to 0.
     SET_AUTO_RELOAD_PWM(TIMER1_MAX_ARR);
     signaltimeout = 0;
     RELOAD_WATCHDOG_COUNTER();
@@ -119,7 +120,7 @@ void playStartupTune()
         delayMillis(200);
 
         allOff(); // turn all channels low again
-        SET_PRESCALER_PWM(0); // set prescaler back to 0.
+        SET_PRESCALER_PWM(PRESCALER_MIN); // set prescaler back to 0.
         signaltimeout = 0;
     }
 
@@ -145,7 +146,7 @@ void playBrushedStartupTune()
     SET_PRESCALER_PWM(20); // higher again..
     delayMillis(300);
     allOff(); // turn all channels low again
-    SET_PRESCALER_PWM(0); // set prescaler back to 0.
+    SET_PRESCALER_PWM(PRESCALER_MIN); // set prescaler back to 0.
     signaltimeout = 0;
     SET_AUTO_RELOAD_PWM(TIMER1_MAX_ARR);
     __enable_irq();
@@ -173,7 +174,7 @@ void playDuskingTune()
     SET_PRESCALER_PWM(55); // higher again..
     delayMillis(150);
     allOff(); // turn all channels low again
-    SET_PRESCALER_PWM(0); // set prescaler back to 0.
+    SET_PRESCALER_PWM(PRESCALER_MIN); // set prescaler back to 0.
     SET_AUTO_RELOAD_PWM(TIMER1_MAX_ARR);
 }
 
@@ -192,7 +193,7 @@ void playInputTune2()
     RELOAD_WATCHDOG_COUNTER();
     delayMillis(75);
     allOff();
-    SET_PRESCALER_PWM(0);
+    SET_PRESCALER_PWM(PRESCALER_MIN);
     signaltimeout = 0;
     SET_AUTO_RELOAD_PWM(TIMER1_MAX_ARR);
     __enable_irq();
@@ -212,7 +213,7 @@ void playInputTune()
     SET_PRESCALER_PWM(40);
     delayMillis(100);
     allOff();
-    SET_PRESCALER_PWM(0);
+    SET_PRESCALER_PWM(PRESCALER_MIN);
     signaltimeout = 0;
     SET_AUTO_RELOAD_PWM(TIMER1_MAX_ARR);
     __enable_irq();
@@ -229,7 +230,7 @@ void playDefaultTone()
     SET_PRESCALER_PWM(30);
     delayMillis(150);
     allOff();
-    SET_PRESCALER_PWM(0);
+    SET_PRESCALER_PWM(PRESCALER_MIN);
     signaltimeout = 0;
     SET_AUTO_RELOAD_PWM(TIMER1_MAX_ARR);
 }
@@ -245,7 +246,7 @@ void playChangedTone()
     SET_PRESCALER_PWM(80);
     delayMillis(150);
     allOff();
-    SET_PRESCALER_PWM(0);
+    SET_PRESCALER_PWM(PRESCALER_MIN);
     signaltimeout = 0;
     SET_AUTO_RELOAD_PWM(TIMER1_MAX_ARR);
 }
@@ -262,7 +263,7 @@ void playBeaconTune3()
         delayMillis(10);
     }
     allOff();
-    SET_PRESCALER_PWM(0);
+    SET_PRESCALER_PWM(PRESCALER_MIN);
     signaltimeout = 0;
     SET_AUTO_RELOAD_PWM(TIMER1_MAX_ARR);
     __enable_irq();

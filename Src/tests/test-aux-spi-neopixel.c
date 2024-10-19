@@ -18,6 +18,7 @@ spi_t spi;
 
 int main()
 {
+    clock_hsi_config_divider(0b00);
     clock_hse_enable();
     // enable dma clocks
     dma_initialize();
@@ -86,42 +87,6 @@ int main()
     gpio_set_speed(&gpioSpiMISO, 0b11);
     gpio_set_speed(&gpioSpiMOSI, 0b11);
     
-
-    // for (uint16_t i = 0; i < 200; i++) {
-    //     spi_write(&spi, &i, 1);
-    // }
-    // uint16_t data = 0xf550;
-    // spi_write(&spi, &data, 1);
-    // spi_write(&spi, &data, 1);
-    // spi_write(&spi, &data, 1);
-    
-    // uint16_t data[] = {
-    //     0xff00,
-    //     0x5555,
-    //     0x0550,
-    //     0x5555,
-    //     0x00ff,
-    //     0x5555,
-    //     0x5555,
-    //     0x5555,
-    //     0x5555,
-    //     0x5555,
-    // };
-
-    // uint16_t data[] = {
-    //     DRV8323_READ | DRV8323_REG_FAULT_STATUS_1,
-    //     DRV8323_READ | DRV8323_REG_VGS_STATUS_2,
-    //     DRV8323_READ | DRV8323_REG_DRIVER_CONTROL,
-    //     DRV8323_READ | DRV8323_REG_GATE_DRIVE_HS,
-    //     DRV8323_READ | DRV8323_REG_GATE_DRIVE_LS,
-    //     DRV8323_READ | DRV8323_REG_OCP_CONTROL,
-    //     DRV8323_READ | DRV8323_REG_CSA_CONTROL,
-    // };
-
-    // spi_write(&spi, data, 7);
-    // uint16_t readData[10];
-    // while(spi_rx_waiting(&spi) < 7);
-    // spi_read(&spi, readData, 7);
     uint16_t word = (LED_T1 << 8) | LED_T0;
     uint16_t data[12];
     for (int i = 0; i < 12; i++) {

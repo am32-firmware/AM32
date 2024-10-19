@@ -275,48 +275,6 @@ void spi_write(spi_t* spi, const uint16_t* data, uint8_t length)
     spi_start_tx_dma_transfer(spi);
 }
 
-// void spi_write_dma(spi_t* spi, const uint16_t* data, uint8_t length) {
-//     // copy data to tx buffer
-//     // for (uint8_t i = 0; i < length; i++) {
-//     //     spi->_tx_buffer[spi->_tx_head++] = data[i];
-//     // }
-
-//     // disable the spi
-//     // spi_disable(spi);
-
-//     // spi->ref->IFCR = 0xffffffff;
-//     spi->ref->IFCR |= SPI_IFCR_TXTFC;
-//     // set TSIZE - transfer length in words
-//     // spi must be disabled to set TSIZE
-//     // spi->ref->CR2 = length+2;
-//     // spi->ref->CR2 = 100;
-//     spi->ref->CR2 = length;
-    
-//     // if (length > 1) {
-
-//         spi->txDma->ref->CBR1 = length*2;
-//         spi->txDma->ref->CSAR = (uint32_t)(&data[0]);
-//         //spi->ref->ICR |= spi_ICR_TCCF; // maybe not necessary
-//         spi->txDma->ref->CCR |= DMA_CCR_EN;
-//     // }
-//     // enable the spi
-//     spi_enable(spi);
-
-//     // while (spi->txDma->ref->CBR1 == spi->_dma_transfer_count);
-
-//     // spi->ref->TXDR = 0x5555;
-//     // spi->ref->TXDR = 0x5555;
-//     // spi->ref->TXDR = 0x5555;
-//     // spi->ref->TXDR = 0x5555;
-//     // spi->ref->TXDR = 0x5555;
-//     // spi->ref->TXDR = 0x5555;
-//     // spi->ref->TXDR = 0x5555;
-//     // spi->ref->TXDR = 0x5555;
-//     spi->ref->CR1 |= SPI_CR1_CSTART;
-
-// }
-
-
 uint16_t spi_write_word(spi_t* spi, uint16_t word)
 {
     spi_disable(spi);
@@ -340,18 +298,10 @@ void spi_enable(spi_t* spi)
 
 void spi_disable(spi_t* spi)
 {
-    // these above don't work?
     spi->ref->CR1 &= ~(SPI_CR1_SPE);
-    // spi->ref->CR1 &= 0xfffffffe;
-    // spi->ref->CR1 = spi->ref->CR1 & 0xfffffffe;
-    // spi->ref->CR1 = 0;
 }
 
 void spi_start_transfer(spi_t* spi)
 {
     spi->ref->CR1 |= SPI_CR1_CSTART; // spi must be enabled
 }
-// void spi_transfer_complete_cb(SPI_TypeDef* spi)
-// {
-    
-// }

@@ -18,7 +18,7 @@ spi_t spi;
 
 int main()
 {
-    // clock_hsi_config_divider(0b00);
+    clock_hsi_config_divider(0b00);
     clock_hse_enable();
     // enable dma clocks
     dma_initialize();
@@ -87,17 +87,36 @@ int main()
     gpio_set_speed(&gpioSpiMISO, 0b11);
     gpio_set_speed(&gpioSpiMOSI, 0b11);
     
-    uint16_t word = (LED_T1 << 8) | LED_T0;
-    uint16_t data[12];
-    for (int i = 0; i < 12; i++) {
-        data[i] = word;
-    }
+    uint16_t word0 = (LED_T0 << 8) | LED_T0;
+    uint16_t word1 = (LED_T0 << 8) | LED_T1;
+    uint16_t word2 = (LED_T1 << 8) | LED_T0;
+    uint16_t word3 = (LED_T1 << 8) | LED_T1;
+    uint16_t data[12] = {
+        word0,
+        word0,
+        word0,
+        word0,
+        word0,
+        word0,
+        word0,
+        word0,
+ 
+        word0,
+        word0,
+        word0,
+        word0,
+
+        
+    };
+    // for (int i = 0; i < 12; i++) {
+    //     data[i] = word;
+    // }
     while(1) {
         // spi_write_word(&spi, word);
         // for (int i = 0; i < 0xfffff; i++) {
         //     asm("nop");
         // }
-        spi_write(&spi, data, 6);
+        spi_write(&spi, data, 12);
         for (int i = 0; i < 0xffff; i++) {
             asm("nop");
         }

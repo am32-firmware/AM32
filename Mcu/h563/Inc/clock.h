@@ -25,3 +25,7 @@ void clock_pll1_set_source(uint8_t source);
 #define CLOCK_SYS_SRC_PLL1 (0b11)
 void clock_system_set_source(uint8_t source);
 bool clock_system_switch_complete();
+
+// updates the global HCLK variable according
+// to the current system clock
+void clock_update_hclk_frequency();

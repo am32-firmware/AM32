@@ -13,9 +13,14 @@ static usart_t usart;
 int main()
 {
     clock_hse_enable();
-    clock_system_set_source(CLOCK_SYS_SRC_HSE);
+
+    // clock_system_set_source(CLOCK_SYS_SRC_HSE);
+
     // set system clock frequency to 64MHz
     clock_hsi_config_divider(CLOCK_HSI_DIV1);
+
+    clock_update_hclk_frequency();
+
     dma_initialize();
     AUX_UART_ENABLE_CLOCK();
 

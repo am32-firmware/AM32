@@ -43,6 +43,26 @@ void clock_system_set_source(uint8_t source)
     {
         // do nothing
     }
+    
+}
+
+bool clock_system_switch_complete()
+{
+    uint32_t cfgr1 = RCC->CFGR1;
+    uint32_t sw = cfgr1 & RCC_CFGR1_SW_Msk;
+    uint32_t sws = (cfgr1 & RCC_CFGR1_SWS_Msk) >> RCC_CFGR1_SWS_Pos;
+    return (sw == sws);
+}
+void clock_pll1_set_source(uint8_t source)
+{
+    // // set pll clock source to HSE
+    RCC->PLL1CFGR |= source << RCC_PLL1CFGR_PLL1SRC_Pos;
+}
+
+void clock_update_hclk_frequency()
+{
+
+    uint8_t source = (RCC->CFGR1 & RCC_CFGR1_SWS_Msk) >> RCC_CFGR1_SWS_Pos;
     switch (source)
     {
         case (CLOCK_SYS_SRC_HSI):
@@ -85,17 +105,4 @@ void clock_system_set_source(uint8_t source)
             break;
         }
     }
-}
-
-bool clock_system_switch_complete()
-{
-    uint32_t cfgr1 = RCC->CFGR1;
-    uint32_t sw = cfgr1 & RCC_CFGR1_SW_Msk;
-    uint32_t sws = (cfgr1 & RCC_CFGR1_SWS_Msk) >> RCC_CFGR1_SWS_Pos;
-    return (sw == sws);
-}
-void clock_pll1_set_source(uint8_t source)
-{
-    // // set pll clock source to HSE
-    RCC->PLL1CFGR |= source << RCC_PLL1CFGR_PLL1SRC_Pos;
 }

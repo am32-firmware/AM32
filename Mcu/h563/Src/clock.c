@@ -162,7 +162,7 @@ void clock_pll1_set_multiplier(uint8_t multiplier)
     // RCC->PLL1DIVR = pll1divr | ((250-1) << RCC_PLL1DIVR_PLL1N_Pos);
     // pll1divr |= ((SYSCLK_FREQUENCY/1000000 - 1) << RCC_PLL1DIVR_PLL1N_Pos);
     // RCC->PLL1DIVR = pll1divr | (249 << RCC_PLL1DIVR_PLL1N_Pos);
-    RCC->PLL1DIVR = pll1divr | ((multiplier - 1) << RCC_PLL1DIVR_PLL1N_Pos);
+    RCC->PLL1DIVR = pll1divr | (((multiplier*2)- 1) << RCC_PLL1DIVR_PLL1N_Pos);
 
 }
 
@@ -171,7 +171,7 @@ uint8_t clock_pll1_get_multiplier()
     // get pll multiplier
     uint32_t pll1divr = RCC->PLL1DIVR;
     uint32_t ret = (pll1divr & RCC_PLL1DIVR_PLL1N_Msk) >> RCC_PLL1DIVR_PLL1N_Pos;
-    return ret + 1;
+    return (ret + 1)/2;
 }
 
 uint8_t clock_pll1_get_prescaler()

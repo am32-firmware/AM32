@@ -4,6 +4,7 @@
 #include "usart.h"
 #include "gpio.h"
 #include "dma.h"
+#include "power.h"
 
 #include "clock.h"
 static uint8_t usart_rx_buffer[256];
@@ -12,6 +13,7 @@ static usart_t usart;
 
 int main()
 {
+    power_set_core_voltage(POWER_VOSCR_0);
     clock_hse_enable();
 
     clock_pll1_set_source(CLOCK_PLL1_SRC_HSE);
@@ -20,9 +22,9 @@ int main()
     // set prescaler to 25 for 1MHz input clock
     clock_pll1_set_prescaler(25);
     clock_pll1_enable_pclk();
-    clock_pll1_set_multiplier(250);
+    clock_pll1_set_multiplier(200);
     clock_pll1_enable();
-    // clock_system_set_source(CLOCK_SYS_SRC_PLL1);
+    clock_system_set_source(CLOCK_SYS_SRC_PLL1);
     // clock_system_set_source(CLOCK_SYS_SRC_HSE);
 
     // set system clock frequency to 64MHz

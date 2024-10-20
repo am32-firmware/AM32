@@ -1,5 +1,5 @@
 #include "mcu.h"
-
+#include "clock.h"
 #include "stm32h563xx.h"
 
 void mcu_setup()

@@ -29,3 +29,9 @@ void clock_hsi_config_divider(uint8_t hsidiv)
         // wait for hsi to switch over
     }
 }
+
+void clock_pll1_set_source(uint8_t source)
+{
+    // // set pll clock source to HSE
+    RCC->PLL1CFGR |= source << RCC_PLL1CFGR_PLL1SRC_Pos;
+}

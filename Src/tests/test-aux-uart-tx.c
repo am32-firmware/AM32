@@ -35,7 +35,7 @@ int main()
     gpio_initialize(&gpioUsartTx);
 
     while(1) {
-        usart_write(&usart, "U", 1);
-        // usart_write_string(&usart, "hello world\n");
+        // usart_write(&usart, "U", 1);
+        usart_write_string(&usart, "hello world\n");
     }
 }

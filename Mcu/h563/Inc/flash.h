@@ -15,6 +15,6 @@ void flash_disable_write();
 
 void flash_enable_prefetch();
 void flash_set_latency(uint8_t ws);
-
+void flash_set_wrhfreq(uint8_t wrhf);
 
 

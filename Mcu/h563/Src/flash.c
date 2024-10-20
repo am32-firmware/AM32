@@ -111,9 +111,37 @@ static bool flash_compare_latency(uint8_t ws)
 
 void flash_set_latency(uint8_t ws)
 {
+    uint8_t wrhf = 0;
+    switch(ws) {
+        case (0):
+        case (1):
+            wrhf = 0b00;
+            break;
+        case (2):
+        case (3):
+            wrhf = 0b01;
+            break;
+        case (4):
+        case (5):
+            wrhf = 0b10;
+            break;
+        default:
+            break;
+    }
+
     uint32_t acr = FLASH->ACR;
-    acr &= ~(FLASH_ACR_LATENCY_Msk);
+    acr &= ~(FLASH_ACR_WRHIGHFREQ_Msk | FLASH_ACR_LATENCY_Msk);
     acr |= ws << FLASH_ACR_LATENCY_Pos;
+    acr |= wrhf << FLASH_ACR_WRHIGHFREQ_Pos;
     FLASH->ACR = acr;
     while (!flash_compare_latency(ws));
 }
+
+// void flash_set_wrhfreq(uint8_t wrhf)
+// {
+//     uint32_t acr = FLASH->ACR;
+//     acr &= ~(FLASH_ACR_LATENCY_Msk);
+//     acr |= ws << FLASH_ACR_LATENCY_Pos;
+//     FLASH->ACR = acr;
+//     while (!flash_compare_latency(ws));
+// }

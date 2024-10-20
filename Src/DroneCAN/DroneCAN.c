@@ -4,7 +4,7 @@
 
 #include "targets.h"
 
-//#pragma GCC optimize("O0")
+// #pragma GCC optimize("O0")
 
 #if DRONECAN_SUPPORT
 
@@ -145,7 +145,7 @@ static void set_input(uint16_t input);
 /*
   the set of parameters to present to the user over DroneCAN
 */
-static struct parameter {
+static const struct parameter {
     char *name;
     enum VarType vtype;
     uint16_t min_value;
@@ -169,7 +169,7 @@ static struct parameter {
         { "COMP_PWM",               T_BOOL,  0, 1,   1, &comp_pwm, 0},
         { "STUCK_ROTOR_PROTECTION", T_BOOL,  0, 1,   1, &stuck_rotor_protection, 0},
         { "ADVANCE_LEVEL",          T_UINT8, 0, 4,   2, &advance_level, 0},
-        { "AUTO_ADVANCE",           T_BOOL,  0, 1,   1, &auto_advance, 47},
+        { "AUTO_ADVANCE",           T_BOOL,  0, 1,   0, &auto_advance, 47},
         { "BRAKE_ON_STOP",          T_BOOL,  0, 1,   1, &brake_on_stop, 28},
         { "DRIVING_BRAKE_STRENGTH", T_UINT8, 1, 10,  10, &driving_brake_strength, 42},
         { "DRAG_BRAKE_STRENGTH",    T_UINT8, 1, 10,  10, &drag_brake_strength, 41},
@@ -312,7 +312,7 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
         return;
     }
 
-    struct parameter *p = NULL;
+    volatile const struct parameter *p = NULL;
     if (req.name.len != 0) {
         for (uint16_t i=0; i<ARRAY_SIZE(parameters); i++) {
             if (req.name.len == strlen(parameters[i].name) &&
@@ -386,7 +386,11 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
 	    pkt.value.union_tag = UAVCAN_PROTOCOL_PARAM_VALUE_INTEGER_VALUE;
             pkt.value.integer_value = *(uint8_t *)p->ptr;
             pkt.default_value.union_tag = UAVCAN_PROTOCOL_PARAM_VALUE_INTEGER_VALUE;
-            pkt.default_value.integer_value = p->default_value;
+            if (p->eeprom_index != 0 && p->eeprom_index < sizeof(default_settings)) {
+                pkt.default_value.integer_value = default_settings[p->eeprom_index];
+            } else {
+                pkt.default_value.integer_value = p->default_value;
+            }
             pkt.max_value.union_tag = UAVCAN_PROTOCOL_PARAM_NUMERICVALUE_INTEGER_VALUE;
             pkt.max_value.integer_value = p->max_value;
             pkt.min_value.union_tag = UAVCAN_PROTOCOL_PARAM_NUMERICVALUE_INTEGER_VALUE;
@@ -413,9 +417,13 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
             break;
 	case T_BOOL:
 	    pkt.value.union_tag = UAVCAN_PROTOCOL_PARAM_VALUE_BOOLEAN_VALUE;
-	    pkt.value.boolean_value = (*(uint8_t *)p->ptr)?true:false;
+            pkt.value.boolean_value = (*(uint8_t *)p->ptr)?true:false;
             pkt.default_value.union_tag = UAVCAN_PROTOCOL_PARAM_VALUE_BOOLEAN_VALUE;
-            pkt.default_value.boolean_value = p->default_value;
+            if (p->eeprom_index != 0 && p->eeprom_index < sizeof(default_settings)) {
+                pkt.default_value.boolean_value = !!default_settings[p->eeprom_index];
+            } else {
+                pkt.default_value.boolean_value = !!p->default_value;
+            }
             break;
 	default:
             return;

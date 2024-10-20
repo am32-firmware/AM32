@@ -1,6 +1,7 @@
 #include "clock.h"
 #include "stm32h563xx.h"
 #include <stdint.h>
+#include "targets.h"
 
 uint32_t HCLK_FREQUENCY = 32000000;
 
@@ -59,7 +60,13 @@ void clock_pll1_set_source(uint8_t source)
     // // set pll clock source to HSE
     RCC->PLL1CFGR |= source << RCC_PLL1CFGR_PLL1SRC_Pos;
 }
-void clock_pll1_configure_prescaler(uint8_t prescaler)
+
+uint8_t clock_pll1_get_source()
+{
+    return (RCC->PLL1CFGR & RCC_PLL1CFGR_PLL1SRC_Msk) >> RCC_PLL1CFGR_PLL1SRC_Pos;
+}
+
+void clock_pll1_set_prescaler(uint8_t prescaler)
 {
     // The frequency of the reference clock provided to the PLLs (refx_ck) must range from 1 to
     // 16 MHz. The DIVMx dividers of the RCC PLL clock source selection register
@@ -83,33 +90,33 @@ void clock_update_hclk_frequency()
         case (CLOCK_SYS_SRC_HSI):
         {
             uint8_t hsidiv = ((RCC->CR & RCC_CR_HSIDIV_Msk) >> RCC_CR_HSIDIV_Pos);
-            uint8_t divider = 0;
-            switch (hsidiv) {
-                case 0b00:
-                {
-                    divider = 1;
-                    break;
-                }
-                case 0b01:
-                {
-                    divider = 2;
-                    break;
-                }
-                case 0b10:
-                {
-                    divider = 4;
-                    break;
-                }
-                case 0b11:
-                {
-                    divider = 8;
-                    break;
-                }
-                default:
-                {
-                    while(1);
-                }
-            }
+            uint8_t divider = 1 << hsidiv;
+            // switch (hsidiv) {
+            //     case 0b00:
+            //     {
+            //         divider = 1;
+            //         break;
+            //     }
+            //     case 0b01:
+            //     {
+            //         divider = 2;
+            //         break;
+            //     }
+            //     case 0b10:
+            //     {
+            //         divider = 4;
+            //         break;
+            //     }
+            //     case 0b11:
+            //     {
+            //         divider = 8;
+            //         break;
+            //     }
+            //     default:
+            //     {
+            //         while(1);
+            //     }
+            // }
 
             HCLK_FREQUENCY = 64000000 / divider;
             break;
@@ -117,6 +124,24 @@ void clock_update_hclk_frequency()
         case (CLOCK_SYS_SRC_HSE):
         {
             HCLK_FREQUENCY = 25000000;
+            break;
+        }
+        case (CLOCK_SYS_SRC_PLL1):
+        {
+            uint8_t source = clock_pll1_get_source();
+            uint8_t multiplier = clock_pll1_get_multiplier();
+            uint8_t prescaler = clock_pll1_get_prescaler();
+
+            uint32_t base_clk = 0;
+            switch (source) {
+                case (CLOCK_PLL1_SRC_HSE):
+                    {
+                        base_clk = AM32_HSE_VALUE;
+                        HCLK_FREQUENCY = (base_clk / prescaler) * (multiplier + 1);
+                        break;
+                    }
+            }
+
             break;
         }
     }
@@ -141,6 +166,19 @@ void clock_pll1_set_multiplier(uint8_t multiplier)
 
 }
 
+uint8_t clock_pll1_get_multiplier()
+{
+    // get pll multiplier
+    uint32_t pll1divr = RCC->PLL1DIVR;
+    uint32_t ret = (pll1divr & RCC_PLL1DIVR_PLL1N_Msk) >> RCC_PLL1DIVR_PLL1N_Pos;
+    return ret;
+}
+
+uint8_t clock_pll1_get_prescaler()
+{
+    uint8_t prescaler = (RCC->PLL1CFGR & RCC_PLL1CFGR_PLL1M_Msk) >> RCC_PLL1CFGR_PLL1M_Pos;
+    return prescaler;
+}
 void clock_pll1_enable()
 {
     // turn the pll on

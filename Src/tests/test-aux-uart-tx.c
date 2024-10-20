@@ -20,9 +20,9 @@ int main()
     // set prescaler to 25 for 1MHz input clock
     clock_pll1_set_prescaler(25);
     clock_pll1_enable_pclk();
-    clock_pll1_set_multiplier(249);
+    clock_pll1_set_multiplier(250);
     clock_pll1_enable();
-    clock_system_set_source(CLOCK_SYS_SRC_PLL1);
+    // clock_system_set_source(CLOCK_SYS_SRC_PLL1);
     // clock_system_set_source(CLOCK_SYS_SRC_HSE);
 
     // set system clock frequency to 64MHz

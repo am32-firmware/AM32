@@ -17,6 +17,7 @@ typedef struct {
     uint8_t _tx_head;
     uint8_t _tx_tail;
     uint8_t _dma_transfer_count;
+    uint32_t _baudrate;
 
     dmaChannel_t* rxDma;
     dmaChannel_t* txDma;

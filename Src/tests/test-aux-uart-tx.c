@@ -24,6 +24,7 @@ int main()
     usart.txDma = &dmaChannels[0];
     usart.txDmaRequest = LL_GPDMA1_REQUEST_UART8_TX;
 
+    usart._baudrate = 1000000;
     usart_initialize(&usart);
 
     gpio_t gpioUsartTx = DEF_GPIO(
@@ -34,6 +35,7 @@ int main()
     gpio_initialize(&gpioUsartTx);
 
     while(1) {
-        usart_write_string(&usart, "hello world\n");
+        usart_write(&usart, "U", 1);
+        // usart_write_string(&usart, "hello world\n");
     }
 }

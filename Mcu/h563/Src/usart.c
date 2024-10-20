@@ -105,17 +105,14 @@ void usart_initialize(usart_t* usart)
 
     // enable transmitter, receiver, and oversampling by 8
     // NOTE: oversampling by 8 must be used for max baud rate
-    //usart->ref->CR1 |= USART_CR1_TE | USART_CR1_RE /*| USART_CR1_OVER8*/;
-    usart->ref->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_OVER8;
+    usart->ref->CR1 |= USART_CR1_TE | USART_CR1_RE /*| USART_CR1_OVER8*/;
+    // usart->ref->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_OVER8;
 
     // set baudrate
-    uint32_t baudrate = 1000000;
-
-
     // for oversampling by 16
-    //usart->ref->BRR = HCLK_FREQUENCY/baudrate;
+    usart->ref->BRR = 32000000/usart->_baudrate;
     // for oversampling by 8
-    usart->ref->BRR = 2*64000000/baudrate;
+    // usart->ref->BRR = 2*64000000/usart->_baudrate;
 
     // uint32_t usartdiv = 2*170000000 / baudrate;
     // uint16_t brr = (usartdiv & 0xfffffff0) | ((usartdiv & 0x0000000f) >> 1);

@@ -37,7 +37,7 @@ void mcu_setup_core_voltage()
 
 void mcu_setup_flash()
 {
-    flash_set_latency(4);
+    flash_set_latency(5);
     flash_enable_prefetch();
 }
 

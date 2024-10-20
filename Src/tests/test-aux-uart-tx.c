@@ -1,5 +1,3 @@
-#include "stm32h563xx.h"
-
 #include "targets.h"
 #include "usart.h"
 #include "gpio.h"

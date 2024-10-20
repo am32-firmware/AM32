@@ -2,7 +2,7 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
-// uint32_t HCLK_FREQUENCY = 32000000;
+extern uint32_t HCLK_FREQUENCY;
 
 void clock_hse_enable();
 // 00: division by 1, hsi_ck, hsi_ker_ck = 64 MHz

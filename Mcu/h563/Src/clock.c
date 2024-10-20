@@ -1,6 +1,8 @@
 #include "clock.h"
 #include "stm32h563xx.h"
 
+uint32_t HCLK_FREQUENCY = 32000000;
+
 void clock_hse_enable()
 {
     // turn the HSE on
@@ -40,6 +42,48 @@ void clock_system_set_source(uint8_t source)
     while (!clock_system_switch_complete())
     {
         // do nothing
+    }
+    switch (source)
+    {
+        case (CLOCK_SYS_SRC_HSI):
+        {
+            uint8_t hsidiv = ((RCC->CR & RCC_CR_HSIDIV_Msk) >> RCC_CR_HSIDIV_Pos);
+            uint8_t divider = 0;
+            switch (hsidiv) {
+                case 0b00:
+                {
+                    divider = 1;
+                    break;
+                }
+                case 0b01:
+                {
+                    divider = 2;
+                    break;
+                }
+                case 0b10:
+                {
+                    divider = 4;
+                    break;
+                }
+                case 0b11:
+                {
+                    divider = 8;
+                    break;
+                }
+                default:
+                {
+                    while(1);
+                }
+            }
+
+            HCLK_FREQUENCY = 64000000 / divider;
+            break;
+        }
+        case (CLOCK_SYS_SRC_HSE):
+        {
+            HCLK_FREQUENCY = 25000000;
+            break;
+        }
     }
 }
 

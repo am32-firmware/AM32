@@ -2,6 +2,9 @@
 #include "stm32h563xx.h"
 // #include "vector.h"
 #include <string.h>
+#include "clock.h"
+
+extern uint32_t HCLK_FREQUENCY;
 
 void usart_dma_cb(dmaChannel_t* dma)
 {
@@ -110,7 +113,7 @@ void usart_initialize(usart_t* usart)
 
     // set baudrate
     // for oversampling by 16
-    usart->ref->BRR = 25000000/usart->_baudrate;
+    usart->ref->BRR = HCLK_FREQUENCY/usart->_baudrate;
     // for oversampling by 8
     // usart->ref->BRR = 2*64000000/usart->_baudrate;
 

@@ -2,6 +2,7 @@
 #include "stm32h563xx.h"
 #include "targets.h"
 #include "gpio.h"
+#include "clock.h"
 
 commutationStep_e bridgeComStep = 0;
 

@@ -1,5 +1,6 @@
 #pragma once
 #include <inttypes.h>
+#include <stdbool.h>
 
 // uint32_t HCLK_FREQUENCY = 32000000;
 
@@ -17,3 +18,10 @@ void clock_hse_enable();
 void clock_hsi_config_divider(uint8_t hsidiv);
 #define CLOCK_PLL1_SRC_HSE (0b11)
 void clock_pll1_set_source(uint8_t source);
+
+#define CLOCK_SYS_SRC_HSI (0b00)
+#define CLOCK_SYS_SRC_CSI (0b01)
+#define CLOCK_SYS_SRC_HSE (0b10)
+#define CLOCK_SYS_SRC_PLL1 (0b11)
+void clock_system_set_source(uint8_t source);
+bool clock_system_switch_complete();

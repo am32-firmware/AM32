@@ -30,6 +30,26 @@ void clock_hsi_config_divider(uint8_t hsidiv)
     }
 }
 
+void clock_system_set_source(uint8_t source)
+{
+    uint32_t cfgr1 = RCC->CFGR1;
+    cfgr1 &= ~(RCC_CFGR1_SW_Msk);
+    cfgr1 |= source << RCC_CFGR1_SW_Pos;
+    RCC->CFGR1 = cfgr1;
+
+    while (!clock_system_switch_complete())
+    {
+        // do nothing
+    }
+}
+
+bool clock_system_switch_complete()
+{
+    uint32_t cfgr1 = RCC->CFGR1;
+    uint32_t sw = cfgr1 & RCC_CFGR1_SW_Msk;
+    uint32_t sws = (cfgr1 & RCC_CFGR1_SWS_Msk) >> RCC_CFGR1_SWS_Pos;
+    return (sw == sws);
+}
 void clock_pll1_set_source(uint8_t source)
 {
     // // set pll clock source to HSE

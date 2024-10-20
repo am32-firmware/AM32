@@ -5,6 +5,7 @@
 #include "gpio.h"
 #include "dma.h"
 #include "power.h"
+#include "flash.h"
 
 #include "clock.h"
 static uint8_t usart_rx_buffer[256];
@@ -13,6 +14,8 @@ static usart_t usart;
 
 int main()
 {
+    flash_set_latency(4);
+    flash_enable_prefetch();
     power_set_core_voltage(POWER_VOSCR_0);
     clock_hse_enable();
 

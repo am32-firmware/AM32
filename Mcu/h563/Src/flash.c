@@ -1,4 +1,5 @@
 #include "flash.h"
+#include "stm32h563xx.h"
 #include "stm32h5xx.h"
 
 static const uint32_t FLASH_FKEY1 = 0x45670123;
@@ -93,4 +94,26 @@ bool flash_wbne()
 {
     // return FLASH->NSSR & FLASH_SR_WBNE;
     return false;
+}
+
+void flash_enable_prefetch()
+{
+    // enable prefetch buffer
+    FLASH->ACR |= FLASH_ACR_PRFTEN;
+}
+
+static bool flash_compare_latency(uint8_t ws)
+{
+    uint32_t acr = FLASH->ACR;
+
+    return ws == ((acr & FLASH_ACR_LATENCY_Msk) >> FLASH_ACR_LATENCY_Pos);
+}
+
+void flash_set_latency(uint8_t ws)
+{
+    uint32_t acr = FLASH->ACR;
+    acr &= ~(FLASH_ACR_LATENCY_Msk);
+    acr |= ws << FLASH_ACR_LATENCY_Pos;
+    FLASH->ACR = acr;
+    while (!flash_compare_latency(ws));
 }

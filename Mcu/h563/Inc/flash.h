@@ -13,5 +13,8 @@ bool flash_wbne();
 void flash_enable_write();
 void flash_disable_write();
 
+void flash_enable_prefetch();
+void flash_set_latency(uint8_t ws);
+
 
 

@@ -110,7 +110,7 @@ void usart_initialize(usart_t* usart)
 
     // set baudrate
     // for oversampling by 16
-    usart->ref->BRR = 64000000/usart->_baudrate;
+    usart->ref->BRR = 25000000/usart->_baudrate;
     // for oversampling by 8
     // usart->ref->BRR = 2*64000000/usart->_baudrate;
 

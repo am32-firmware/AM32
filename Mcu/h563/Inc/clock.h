@@ -8,10 +8,10 @@ void clock_hse_enable();
 // 01: division by 2, hsi_ck, hsi_ker_ck = 32 MHz (default after reset)
 // 10: division by 4, hsi_ck, hsi_ker_ck = 16 MHz
 // 11: division by 8, hsi_ck, hsi_ker_ck = 8 MHz
-#define CLOCK_HSE_DIV1 (0b00)
-#define CLOCK_HSE_DIV2 (0b01)
-#define CLOCK_HSE_DIV4 (0b10)
-#define CLOCK_HSE_DIV8 (0b11)
+#define CLOCK_HSI_DIV1 (0b00)
+#define CLOCK_HSI_DIV2 (0b01)
+#define CLOCK_HSI_DIV4 (0b10)
+#define CLOCK_HSI_DIV8 (0b11)
 
 
 void clock_hsi_config_divider(uint8_t hsidiv);

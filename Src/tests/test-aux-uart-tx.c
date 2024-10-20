@@ -14,6 +14,12 @@ int main()
 {
     clock_hse_enable();
 
+    clock_pll1_set_source(CLOCK_PLL1_SRC_HSE);
+
+    // HSE frequency is 25MHz
+    // set prescaler to 25 for 1MHz input clock
+    clock_pll1_configure_prescaler(25);
+    
     // clock_system_set_source(CLOCK_SYS_SRC_HSE);
 
     // set system clock frequency to 64MHz

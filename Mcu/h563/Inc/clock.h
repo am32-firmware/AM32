@@ -13,11 +13,14 @@ void clock_hse_enable();
 #define CLOCK_HSI_DIV2 (0b01)
 #define CLOCK_HSI_DIV4 (0b10)
 #define CLOCK_HSI_DIV8 (0b11)
-
-
 void clock_hsi_config_divider(uint8_t hsidiv);
+
 #define CLOCK_PLL1_SRC_HSE (0b11)
 void clock_pll1_set_source(uint8_t source);
+
+// prescaler is an integer, straight up
+void clock_pll1_configure_prescaler(uint8_t prescaler)
+
 
 #define CLOCK_SYS_SRC_HSI (0b00)
 #define CLOCK_SYS_SRC_CSI (0b01)

@@ -58,6 +58,20 @@ void clock_pll1_set_source(uint8_t source)
     // // set pll clock source to HSE
     RCC->PLL1CFGR |= source << RCC_PLL1CFGR_PLL1SRC_Pos;
 }
+void clock_pll1_configure_prescaler(uint8_t prescaler)
+{
+    // The frequency of the reference clock provided to the PLLs (refx_ck) must range from 1 to
+    // 16 MHz. The DIVMx dividers of the RCC PLL clock source selection register
+    // (RCC_PLL1CFGR) must be properly programmed in order to match this condition.
+    // divide by 12, 2MHz for a 24MHz HSE
+
+    // uint8_t prescaler = 25;
+    // set the prescaler for pll1 (PLL1M)
+    uint32_t pll1cfgr = RCC->PLL1CFGR;
+    pll1cfgr &= ~RCC_PLL1CFGR_PLL1M_Msk;
+    RCC->PLL1CFGR |= pll1cfgr | (prescaler << RCC_PLL1CFGR_PLL1M_Pos);
+
+}
 
 void clock_update_hclk_frequency()
 {

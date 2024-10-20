@@ -21,6 +21,8 @@ typedef struct {
     dmaChannel_t* rxDma;
     dmaChannel_t* txDma;
 
+    uint8_t txDmaRequest;
+
     uint8_t _irqn;
 } usart_t;
 

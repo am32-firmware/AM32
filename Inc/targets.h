@@ -1497,10 +1497,29 @@
 #define AUX_SPI_MOSI_AF 5
 
 #define AUX_SPI_PERIPH SPI4
-
 #define AUX_SPI_ENABLE_CLOCK() { \
     RCC->APB2ENR |= RCC_APB2ENR_SPI4EN; \
 }
+
+////////////
+// option 1
+////////////
+#define AUX_UART_TX_PORT GPIOE
+#define AUX_UART_TX_PIN 2
+#define AUX_UART_TX_AF 8
+#define AUX_UART_PERIPH UART8
+
+#define AUX_UART_ENABLE_CLOCK() { \
+    RCC->APB1LENR |= RCC_APB1LENR_UART8EN; \
+}
+////////////
+// option 2
+////////////
+// #define AUX_UART_TX_PORT GPIOE
+// #define AUX_UART_TX_PIN 2
+// #define AUX_UART_TX_AF 8
+// #define AUX_UART_PERIPH UART4
+
 ///////////////
 // blueESC
 ///////////////

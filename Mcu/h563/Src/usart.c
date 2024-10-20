@@ -1,6 +1,5 @@
 #include "usart.h"
 #include "stm32h563xx.h"
-#include "stm32h5xx_ll_dma.h"
 // #include "vector.h"
 #include <string.h>
 
@@ -43,8 +42,8 @@ void usart_initialize(usart_t* usart)
         break;
 #endif
         default:
-            // assert_not_reached();
-            return;
+            // assume clock has already been configured
+            break;
     }
     
 //     switch((uint32_t)usart->txDma->dma)
@@ -71,7 +70,7 @@ void usart_initialize(usart_t* usart)
     // set source incrementing burst
     usart->txDma->ref->CTR1 |= DMA_CTR1_SINC;
     // set the peripheral hardware request selection
-    usart->txDma->ref->CTR2 |= LL_GPDMA1_REQUEST_USART3_TX;
+    usart->txDma->ref->CTR2 |= usart->txDmaRequest;
     // enable transfer complete interrupt
     usart->txDma->ref->CCR |= DMA_CCR_TCIE;
     usart->txDma->callback = usart_dma_cb;

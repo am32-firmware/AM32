@@ -86,7 +86,7 @@ int main()
     gpio_set_speed(&gpioSpiSCK, 0b11);
     gpio_set_speed(&gpioSpiMISO, 0b11);
     gpio_set_speed(&gpioSpiMOSI, 0b11);
-    #define DL (50 + 12)
+    #define DL (50 + 20)
     uint16_t word0 = (LED_T0 << 8) | LED_T0;
     uint16_t word1 = (LED_T0 << 8) | LED_T1;
     uint16_t word2 = (LED_T1 << 8) | LED_T0;

@@ -1,5 +1,6 @@
 #include "clock.h"
 #include "stm32h563xx.h"
+#include <stdint.h>
 
 uint32_t HCLK_FREQUENCY = 32000000;
 
@@ -119,4 +120,32 @@ void clock_update_hclk_frequency()
             break;
         }
     }
+}
+
+void clock_pll1_enable_pclk()
+{
+    // enable PLL1 p_clk output for use as SYSCLK
+    RCC->PLL1CFGR |= 1 << RCC_PLL1CFGR_PLL1PEN_Pos;
+}
+
+void clock_pll1_set_multiplier(uint8_t multiplier)
+{
+    // set pll multiplier
+    uint32_t pll1divr = RCC->PLL1DIVR;
+    // pll1divr &= ~(RCC_PLL1DIVR_PLL1N_Msk);
+    pll1divr &= ~(RCC_PLL1DIVR_PLL1N_Msk);
+    // RCC->PLL1DIVR = pll1divr | ((250-1) << RCC_PLL1DIVR_PLL1N_Pos);
+    // pll1divr |= ((SYSCLK_FREQUENCY/1000000 - 1) << RCC_PLL1DIVR_PLL1N_Pos);
+    // RCC->PLL1DIVR = pll1divr | (249 << RCC_PLL1DIVR_PLL1N_Pos);
+    RCC->PLL1DIVR = pll1divr | (multiplier << RCC_PLL1DIVR_PLL1N_Pos);
+
+}
+
+void clock_pll1_enable()
+{
+    // turn the pll on
+    RCC->CR |= RCC_CR_PLL1ON;
+
+    // wait for pll to be ready
+    while (!(RCC->CR & RCC_CR_PLL1RDY));
 }

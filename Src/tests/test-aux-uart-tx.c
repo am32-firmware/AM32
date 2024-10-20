@@ -4,36 +4,14 @@
 #include "usart.h"
 #include "gpio.h"
 #include "dma.h"
-#include "power.h"
-#include "flash.h"
-
-#include "clock.h"
+#include "mcu.h"
 static uint8_t usart_rx_buffer[256];
 static uint8_t usart_tx_buffer[256];
 static usart_t usart;
 
 int main()
 {
-    flash_set_latency(4);
-    flash_enable_prefetch();
-    power_set_core_voltage(POWER_VOSCR_0);
-    clock_hse_enable();
-
-    clock_pll1_set_source(CLOCK_PLL1_SRC_HSE);
-
-    // HSE frequency is 25MHz
-    // set prescaler to 25 for 1MHz input clock
-    clock_pll1_set_prescaler(25);
-    clock_pll1_enable_pclk();
-    clock_pll1_set_multiplier(200);
-    clock_pll1_enable();
-    clock_system_set_source(CLOCK_SYS_SRC_PLL1);
-    // clock_system_set_source(CLOCK_SYS_SRC_HSE);
-
-    // set system clock frequency to 64MHz
-    clock_hsi_config_divider(CLOCK_HSI_DIV1);
-
-    clock_update_hclk_frequency();
+    mcu_setup();
 
     dma_initialize();
     AUX_UART_ENABLE_CLOCK();

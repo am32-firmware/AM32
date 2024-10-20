@@ -1512,6 +1512,16 @@
 #define AUX_UART_ENABLE_CLOCK() { \
     RCC->APB1LENR |= RCC_APB1LENR_UART8EN; \
 }
+
+
+#define AUX_LPUART_TX_PORT GPIOB
+#define AUX_LPUART_TX_PIN 6
+#define AUX_LPUART_TX_AF 8
+#define AUX_LPUART_PERIPH LPUART1
+
+#define AUX_LPLUART_ENABLE_CLOCK() { \
+    RCC->APB1LENR |= RCC_APB1LENR_UART8EN; \
+}
 ////////////
 // option 2
 ////////////

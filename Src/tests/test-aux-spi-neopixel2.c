@@ -99,15 +99,14 @@ int main()
         data[i] = word1;
     }
     
-    // spi_write(&spi, data, DL);
+    spi_write(&spi, data, DL);
     // arbitrary delay
 
     while(1) {
-        spi_write(&spi, data, DL);
         // spi_write_word(&spi, word);
-        for (int i = 0; i < 0xfffff; i++) {
-            asm("nop");
-        }
+        // for (int i = 0; i < 0xfffff; i++) {
+        //     asm("nop");
+        // }
         // spi_write(&spi, data, DL);
         // // arbitrary delay
         // for (int i = 0; i < 0xffff; i++) {

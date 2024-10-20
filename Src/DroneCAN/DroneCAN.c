@@ -131,6 +131,7 @@ extern char armed;
 extern char drag_brake_strength;
 extern uint8_t driving_brake_strength;
 extern char brake_on_stop;
+extern char auto_advance;
 static uint16_t last_can_input;
 static struct {
     uint32_t sum;
@@ -168,6 +169,7 @@ static struct parameter {
         { "COMP_PWM",               T_BOOL,  0, 1,   1, &comp_pwm, 0},
         { "STUCK_ROTOR_PROTECTION", T_BOOL,  0, 1,   1, &stuck_rotor_protection, 0},
         { "ADVANCE_LEVEL",          T_UINT8, 0, 4,   2, &advance_level, 0},
+        { "AUTO_ADVANCE",           T_BOOL,  0, 1,   1, &auto_advance, 47},
         { "BRAKE_ON_STOP",          T_BOOL,  0, 1,   1, &brake_on_stop, 28},
         { "DRIVING_BRAKE_STRENGTH", T_UINT8, 1, 10,  10, &driving_brake_strength, 42},
         { "DRAG_BRAKE_STRENGTH",    T_UINT8, 1, 10,  10, &drag_brake_strength, 41},

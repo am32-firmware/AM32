@@ -153,6 +153,9 @@ void clock_pll1_enable_pclk()
     RCC->PLL1CFGR |= 1 << RCC_PLL1CFGR_PLL1PEN_Pos;
 }
 
+// to set multiplier higher than 420MHz,
+// PLL1VCOSEL must be configured to wide range
+// 192 to 836 MHz (default after reset)
 void clock_pll1_set_multiplier(uint8_t multiplier)
 {
     // set pll multiplier

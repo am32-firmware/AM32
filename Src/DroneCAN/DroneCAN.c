@@ -115,6 +115,20 @@ enum VarType {
     T_STRING,
 };
 
+#define PACKED __attribute__((__packed__))
+
+/*
+  structure sent with FlexDebug
+ */
+static struct PACKED {
+    uint32_t commutation_interval;
+    uint16_t num_commands;
+    uint16_t num_input;
+    uint16_t rx_errors;
+    uint16_t rxframe_error;
+    uint8_t auto_advance_level;
+} debug1;
+
 static void can_printf(const char *fmt, ...);
 
 // some convenience macros
@@ -139,6 +153,9 @@ extern char drag_brake_strength;
 extern uint8_t driving_brake_strength;
 extern char brake_on_stop;
 extern char auto_advance;
+extern uint32_t commutation_interval;
+extern uint8_t auto_advance_level;
+
 static uint16_t last_can_input;
 static struct {
     uint32_t sum;
@@ -1009,7 +1026,6 @@ static void process1HzTasks(uint64_t timestamp_usec)
 static void send_ESCStatus(void)
 {
     struct uavcan_equipment_esc_Status pkt;
-    memset(&pkt, 0, sizeof(pkt));
     uint8_t buffer[UAVCAN_EQUIPMENT_ESC_STATUS_MAX_SIZE];
 
     // make up some synthetic status data
@@ -1035,6 +1051,47 @@ static void send_ESCStatus(void)
     canardBroadcast(&canard,
                     UAVCAN_EQUIPMENT_ESC_STATUS_SIGNATURE,
                     UAVCAN_EQUIPMENT_ESC_STATUS_ID,
+                    &transfer_id,
+                    CANARD_TRANSFER_PRIORITY_LOW,
+                    buffer,
+                    len);
+}
+
+/*
+  send FlexDebug at DEBUG_RATE Hz
+*/
+static void send_FlexDebug(void)
+{
+    static struct {
+        uint32_t total_commands;
+        uint32_t num_input;
+    } last;
+    /*
+      popupate debug1
+     */
+    debug1.commutation_interval = commutation_interval;
+    debug1.auto_advance_level = auto_advance_level;
+    debug1.num_commands = canstats.total_commands - last.total_commands;
+    debug1.num_input = canstats.num_input - last.num_input;
+    debug1.num_input = canstats.rx_errors;
+    debug1.num_input = canstats.rxframe_error;
+
+    last.num_input = canstats.num_input;
+    last.total_commands = canstats.total_commands;
+
+    struct dronecan_protocol_FlexDebug pkt;
+    uint8_t buffer[DRONECAN_PROTOCOL_FLEXDEBUG_MAX_SIZE];
+
+    pkt.id = DRONECAN_PROTOCOL_FLEXDEBUG_AM32_RESERVE_START+0;
+    pkt.u8.len = sizeof(debug1);
+    memcpy(pkt.u8.data, (const uint8_t *)&debug1, sizeof(debug1));
+    uint32_t len = dronecan_protocol_FlexDebug_encode(&pkt, buffer);
+
+    static uint8_t transfer_id;
+
+    canardBroadcast(&canard,
+                    DRONECAN_PROTOCOL_FLEXDEBUG_SIGNATURE,
+                    DRONECAN_PROTOCOL_FLEXDEBUG_ID,
                     &transfer_id,
                     CANARD_TRANSFER_PRIORITY_LOW,
                     buffer,
@@ -1117,6 +1174,7 @@ void DroneCAN_update()
 
     static uint64_t next_1hz_service_at;
     static uint64_t next_telem_service_at;
+    static uint64_t next_flexdebug_at;
     if (!done_startup) {
         DroneCAN_Startup();
         done_startup = true;
@@ -1146,9 +1204,13 @@ void DroneCAN_update()
 	next_1hz_service_at += 1000000ULL;
 	process1HzTasks(ts);
     }
-    if (ts >= next_telem_service_at) {
+    if (settings.telem_rate > 0 && ts >= next_telem_service_at) {
         next_telem_service_at += 1000000ULL/settings.telem_rate;
 	send_ESCStatus();
+    }
+    if (settings.debug_rate > 0 && ts >= next_flexdebug_at) {
+        next_flexdebug_at += 1000000ULL/settings.debug_rate;
+        send_FlexDebug();
     }
 
     DroneCAN_processTxQueue();

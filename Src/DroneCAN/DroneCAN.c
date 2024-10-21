@@ -121,6 +121,7 @@ enum VarType {
   structure sent with FlexDebug
  */
 static struct PACKED {
+    uint8_t version;
     uint32_t commutation_interval;
     uint16_t num_commands;
     uint16_t num_input;
@@ -1073,6 +1074,7 @@ static void send_FlexDebug(void)
     /*
       popupate debug1
      */
+    debug1.version = 1;
     debug1.commutation_interval = commutation_interval;
     debug1.auto_advance_level = auto_advance_level;
     debug1.num_commands = canstats.total_commands - last.total_commands;

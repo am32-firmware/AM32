@@ -105,6 +105,7 @@ static struct
     uint8_t filter_hz;
     uint8_t debug_rate;
     uint8_t input_type;
+    uint8_t pwm_frequency;
 } settings;
 
 enum VarType {
@@ -171,6 +172,7 @@ static const struct parameter {
         { "TELEM_RATE",             T_UINT8, 0, 200, 25, &settings.telem_rate, EEPROM_TELEM_RATE },
         { "REQUIRE_ZERO_THROTTLE",  T_BOOL,  0, 1,   1, &settings.require_zero_throttle, EEPROM_REQUIRE_ZERO_THROTTLE },
         { "VARIABLE_PWM",           T_BOOL,  0, 1,   1, &VARIABLE_PWM, 0},
+        { "PWM_FREQUENCY",          T_UINT8, 0, 48,  0, &settings.pwm_frequency, 24},
         { "USE_SIN_START",          T_BOOL,  0, 1,   0, &use_sin_start, 0},
         { "COMP_PWM",               T_BOOL,  0, 1,   1, &comp_pwm, 0},
         { "STUCK_ROTOR_PROTECTION", T_BOOL,  0, 1,   1, &stuck_rotor_protection, 0},

@@ -300,16 +300,7 @@ fastPID stallPid = { // 1khz loop time
     .output_limit = 50000
 };
 
-enum inputType {
-    AUTO_IN,
-    DSHOT_IN,
-    SERVO_IN,
-    SERIAL_IN,
-    EDTARM,
-};
-
-EEprom_t eepromBuffer;
-uint32_t eeprom_address = EEPROM_START_ADD; 
+uint32_t eeprom_address = EEPROM_START_ADD;
 char set_hysteris = 0;
 uint16_t prop_brake_duty_cycle = 0;
 uint16_t ledcounter = 0;
@@ -735,7 +726,7 @@ void loadEEpromSettings()
                 break;
             case SERIAL_IN:
                 break;
-            case EDTARM:
+            case EDTARM_IN:
                 EDT_ARM_ENABLE = 1;
                 EDT_ARMED = 0;
                 dshot = 1;

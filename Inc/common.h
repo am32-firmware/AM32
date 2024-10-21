@@ -78,3 +78,15 @@ typedef struct fastPID {
     int32_t integral_limit;
     int32_t output_limit;
 } fastPID;
+
+/*
+  input signal types
+ */
+enum inputType {
+    AUTO_IN = 0,
+    DSHOT_IN = 1,
+    SERVO_IN = 2,
+    SERIAL_IN = 3,
+    EDTARM_IN = 4,
+    DRONECAN_IN = 5,
+};

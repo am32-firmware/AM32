@@ -1,4 +1,5 @@
 #pragma once
+#include "dronecan.protocol.FlexDebug.h"
 #include "uavcan.equipment.esc.RawCommand.h"
 #include "uavcan.equipment.esc.RPMCommand.h"
 #include "uavcan.equipment.esc.StatusExtended.h"

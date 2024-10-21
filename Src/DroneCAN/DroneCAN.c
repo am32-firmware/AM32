@@ -78,12 +78,15 @@ const struct {
   for DroneCAN specific settings
  */
 enum eeprom_offset {
+        EEPROM_FIRST_CAN = 176,
         EEPROM_CAN_NODE = 176,
         EEPROM_ESC_INDEX = 177,
         EEPROM_REQUIRE_ARMING = 178,
         EEPROM_TELEM_RATE = 179,
         EEPROM_REQUIRE_ZERO_THROTTLE = 180,
         EEPROM_FILTER_HZ = 181,
+        EEPROM_DEBUG_RATE = 182,
+        EEPROM_LAST_CAN,
 };
 
 /*
@@ -99,6 +102,7 @@ static struct
     bool require_zero_throttle;
     uint8_t telem_rate;
     uint8_t filter_hz;
+    uint8_t debug_rate;
 } settings;
 
 enum VarType {
@@ -174,6 +178,7 @@ static const struct parameter {
         { "DRIVING_BRAKE_STRENGTH", T_UINT8, 1, 10,  10, &driving_brake_strength, 42},
         { "DRAG_BRAKE_STRENGTH",    T_UINT8, 1, 10,  10, &drag_brake_strength, 41},
         { "INPUT_FILTER_HZ",        T_UINT8, 0, 100, 0, &settings.filter_hz, EEPROM_FILTER_HZ},
+        { "DEBUG_RATE",             T_UINT8, 0, 200, 0, &settings.debug_rate, EEPROM_DEBUG_RATE},
         { "STARTUP_TUNE",           T_STRING,0, 4,   0, NULL, EEPROM_TUNE_INDEX},
 };
 
@@ -182,23 +187,40 @@ static const struct parameter {
 */
 static void load_settings(void)
 {
-    if (eepromBuffer[EEPROM_CAN_NODE] <= 127) {
-        settings.can_node = eepromBuffer[EEPROM_CAN_NODE];
-    }
-    if (eepromBuffer[EEPROM_ESC_INDEX] <= 32) {
-        settings.esc_index = eepromBuffer[EEPROM_ESC_INDEX];
-    }
-
-    settings.require_arming = eepromBuffer[EEPROM_REQUIRE_ARMING] == 0?false:true;
-    settings.require_zero_throttle = eepromBuffer[EEPROM_REQUIRE_ZERO_THROTTLE] == 0?false:true;
-
-    if (eepromBuffer[EEPROM_TELEM_RATE] <= 200 && eepromBuffer[EEPROM_TELEM_RATE] > 0) {
-        settings.telem_rate = eepromBuffer[EEPROM_TELEM_RATE];
-    } else {
-        settings.telem_rate = 25;
-    }
-    if (eepromBuffer[EEPROM_FILTER_HZ] <= 100) {
-        settings.filter_hz = eepromBuffer[EEPROM_FILTER_HZ];
+    for (uint8_t i=0; i<ARRAY_SIZE(parameters); i++) {
+        const struct parameter *p = &parameters[i];
+        const uint8_t eidx = p->eeprom_index;
+        if (eidx < EEPROM_FIRST_CAN || eidx >= EEPROM_LAST_CAN) {
+            continue;
+        }
+        /*
+          only accept settings in range
+         */
+        switch (p->vtype) {
+            case T_UINT8: {
+                uint8_t *pvalue = (uint8_t *)p->ptr;
+                const uint8_t evalue = eepromBuffer[eidx];
+                if (evalue >= p->min_value && evalue <= p->max_value) {
+                    *pvalue = evalue;
+                } else {
+                    *pvalue = p->default_value;
+                }
+                break;
+            }
+            case T_BOOL: {
+                bool *pvalue = (bool *)p->ptr;
+                const uint8_t evalue = eepromBuffer[eidx];
+                if (evalue >= p->min_value && evalue <= p->max_value) {
+                    *pvalue = (bool)evalue;
+                } else {
+                    *pvalue = (bool)p->default_value;
+                }
+                break;
+            }
+            case T_UINT16:
+            case T_STRING:
+                break;
+        }
     }
 }
 
@@ -397,8 +419,8 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
             pkt.min_value.integer_value = p->min_value;
             break;
 	case T_UINT16:
-	    pkt.value.union_tag = UAVCAN_PROTOCOL_PARAM_VALUE_INTEGER_VALUE;
-	    pkt.value.integer_value = *(uint16_t *)p->ptr;
+            pkt.value.union_tag = UAVCAN_PROTOCOL_PARAM_VALUE_INTEGER_VALUE;
+            pkt.value.integer_value = *(uint16_t *)p->ptr;
             pkt.default_value.union_tag = UAVCAN_PROTOCOL_PARAM_VALUE_INTEGER_VALUE;
             pkt.default_value.integer_value = p->default_value;
             pkt.max_value.union_tag = UAVCAN_PROTOCOL_PARAM_NUMERICVALUE_INTEGER_VALUE;

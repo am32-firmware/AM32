@@ -39,6 +39,7 @@
 #define TARGET_PERIOD_US 1000U
 
 #define EEPROM_MOTOR_KV_INDEX 26
+#define EEPROM_INPUT_TYPE_INDEX 26
 #define EEPROM_TUNE_INDEX 48
 #define EEPROM_TUNE_MAX_LEN 128
 
@@ -103,6 +104,7 @@ static struct
     uint8_t telem_rate;
     uint8_t filter_hz;
     uint8_t debug_rate;
+    uint8_t input_type;
 } settings;
 
 enum VarType {
@@ -179,6 +181,7 @@ static const struct parameter {
         { "DRAG_BRAKE_STRENGTH",    T_UINT8, 1, 10,  10, &drag_brake_strength, 41},
         { "INPUT_FILTER_HZ",        T_UINT8, 0, 100, 0, &settings.filter_hz, EEPROM_FILTER_HZ},
         { "DEBUG_RATE",             T_UINT8, 0, 200, 0, &settings.debug_rate, EEPROM_DEBUG_RATE},
+        { "INPUT_SIGNAL_TYPE",      T_UINT8, 0, 5,   0, &settings.input_type, 46},
         { "STARTUP_TUNE",           T_STRING,0, 4,   0, NULL, EEPROM_TUNE_INDEX},
 };
 
@@ -1086,6 +1089,24 @@ static void DroneCAN_Startup(void)
 
     // initialise low level CAN peripheral hardware
     sys_can_init();
+
+    if (settings.input_type == DRONECAN_IN) {
+        /*
+          disable interrupts for DShot and PWM
+         */
+#ifdef MCU_L431
+        NVIC_DisableIRQ(DMA1_Channel5_IRQn);
+        NVIC_DisableIRQ(EXTI15_10_IRQn);
+        EXTI->IMR1 &= ~(1U << 15);
+#elif defined(MCU_F415)
+        NVIC_DisableIRQ(DMA1_Channel6_IRQn);
+        NVIC_DisableIRQ(EXINT15_10_IRQn);
+        EXINT->inten &= ~EXINT_LINE_15;
+#else
+        #error "unsupported MCU"
+#endif
+    }
+
 }
 
 void DroneCAN_update()

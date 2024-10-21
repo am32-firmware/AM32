@@ -95,7 +95,7 @@ enum eeprom_offset {
   real device a better storage system will be needed
   For simplicity we store all parameters as floats in this example
 */
-static struct
+static struct Settings
 {
     uint8_t can_node;
     uint8_t esc_index;
@@ -212,7 +212,11 @@ static void load_settings(void)
     for (uint8_t i=0; i<ARRAY_SIZE(parameters); i++) {
         const struct parameter *p = &parameters[i];
         const uint8_t eidx = p->eeprom_index;
-        if (eidx < EEPROM_FIRST_CAN || eidx >= EEPROM_LAST_CAN) {
+        const uint8_t *ptr = (const uint8_t *)p->ptr;
+        const struct Settings *s = &settings;
+        if (eidx == 0 || ptr == NULL ||
+            ptr < (const uint8_t *)s || ptr >= (const uint8_t *)(s+1)) {
+            // only do settings in Settings structure
             continue;
         }
         /*
@@ -1073,8 +1077,8 @@ static void send_FlexDebug(void)
     debug1.auto_advance_level = auto_advance_level;
     debug1.num_commands = canstats.total_commands - last.total_commands;
     debug1.num_input = canstats.num_input - last.num_input;
-    debug1.num_input = canstats.rx_errors;
-    debug1.num_input = canstats.rxframe_error;
+    debug1.rx_errors = canstats.rx_errors;
+    debug1.rxframe_error = canstats.rxframe_error;
 
     last.num_input = canstats.num_input;
     last.total_commands = canstats.total_commands;

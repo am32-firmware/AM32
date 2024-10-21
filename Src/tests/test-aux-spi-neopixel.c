@@ -86,7 +86,7 @@ int main()
     gpio_set_speed(&gpioSpiSCK, 0b11);
     gpio_set_speed(&gpioSpiMISO, 0b11);
     gpio_set_speed(&gpioSpiMOSI, 0b11);
-    #define DL (50 + 20)
+    #define DL (50 + 12)
     uint16_t word0 = (LED_T0 << 8) | LED_T0;
     uint16_t word1 = (LED_T0 << 8) | LED_T1;
     uint16_t word2 = (LED_T1 << 8) | LED_T0;
@@ -95,8 +95,14 @@ int main()
     for (int i = 0; i < 50; i++) {
         data[i] = 0;
     }
-    for (int i = 50; i < 50 + 12; i++) {
+    for (int i = 50; i < 50 + 4; i++) {
+        data[i] = word0;
+    }
+    for (int i = 54; i < 58; i++) {
         data[i] = word1;
+    }
+    for (int i = 58; i < 50 + 12; i++) {
+        data[i] = word0;
     }
     
     // spi_write(&spi, data, DL);
@@ -105,7 +111,7 @@ int main()
     while(1) {
         spi_write(&spi, data, DL);
         // spi_write_word(&spi, word);
-        for (int i = 0; i < 0xfffff; i++) {
+        for (uint32_t i = 0; i < 0xffffff; i++) {
             asm("nop");
         }
         // spi_write(&spi, data, DL);

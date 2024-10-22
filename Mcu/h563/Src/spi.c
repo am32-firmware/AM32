@@ -179,7 +179,7 @@ void spi_initialize(spi_t* spi)
             NVIC_EnableIRQ(SPI4_IRQn);
             break;
     }
-    // spi->ref->CFG1 |= SPI_CFG1_RXDMAEN;
+    spi->ref->CFG1 |= SPI_CFG1_RXDMAEN;
 
     // set DSIZE (frame width) to 16 bits
     spi->ref->CFG1 |= 0b01111;
@@ -323,9 +323,8 @@ uint16_t spi_write_word(spi_t* spi, uint16_t word)
     spi_disable(spi);
     spi->ref->IFCR |= SPI_IFCR_TXTFC;
     spi->ref->CR2 = 1;
-    spi_enable(spi);
-
     spi->ref->TXDR = word;
+    spi_enable(spi);
     spi_start_transfer(spi);
     // while (!(spi->ref->SR & SPI_SR_EOT));
     while (!(spi->ref->SR & SPI_SR_TXC));

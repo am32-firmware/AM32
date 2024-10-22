@@ -61,6 +61,15 @@ void clock_pll1_set_source(uint8_t source)
     RCC->PLL1CFGR |= source << RCC_PLL1CFGR_PLL1SRC_Pos;
 }
 
+void clock_per_set_source(uint8_t source)
+{
+    uint32_t ccipr5 = RCC->CCIPR5;
+    // this is misspelled!!
+    ccipr5 &= ~(RCC_CCIPR5_CKERPSEL_Msk);
+    ccipr5 |= source << RCC_CCIPR5_CKERPSEL_Pos;
+    RCC->CCIPR5 = ccipr5;
+}
+
 uint8_t clock_pll1_get_source()
 {
     return (RCC->PLL1CFGR & RCC_PLL1CFGR_PLL1SRC_Msk) >> RCC_PLL1CFGR_PLL1SRC_Pos;

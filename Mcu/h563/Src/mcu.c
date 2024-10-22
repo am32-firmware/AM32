@@ -26,6 +26,8 @@ void mcu_setup_clocks()
     clock_pll1_enable();
     clock_system_set_source(CLOCK_SYS_SRC_PLL1);
     clock_update_hclk_frequency();
+
+    clock_per_set_source(CLOCK_PER_SRC_HSE);
 }
 
 void mcu_setup_core_voltage()

@@ -1479,7 +1479,6 @@
 #define VREG_5V_ENABLE_PORT GPIOI
 #define VREG_5V_ENABLE_PIN 2
 
-// purple wire
 #define AUX_SPI_SCK_PORT GPIOE
 #define AUX_SPI_SCK_PIN 2
 #define AUX_SPI_SCK_AF 5
@@ -1487,11 +1486,11 @@
 #define AUX_SPI_NSS_PORT GPIOE
 #define AUX_SPI_NSS_PIN 4
 #define AUX_SPI_NSS_AF 5
-// grey wire
+
 #define AUX_SPI_MISO_PORT GPIOE
 #define AUX_SPI_MISO_PIN 5
 #define AUX_SPI_MISO_AF 5
-// blue wire
+
 #define AUX_SPI_MOSI_PORT GPIOE
 #define AUX_SPI_MOSI_PIN 6
 #define AUX_SPI_MOSI_AF 5
@@ -1499,6 +1498,15 @@
 #define AUX_SPI_PERIPH SPI4
 #define AUX_SPI_ENABLE_CLOCK() { \
     RCC->APB2ENR |= RCC_APB2ENR_SPI4EN; \
+}
+
+#define LED_SPI_MOSI_PORT GPIOI
+#define LED_SPI_MOSI_PIN 3
+#define LED_SPI_MOSI_AF 5
+
+#define LED_SPI_PERIPH SPI2
+#define LED_SPI_ENABLE_CLOCK() { \
+    RCC->APB1LENR |= RCC_APB1LENR_SPI2EN; \
 }
 
 ////////////

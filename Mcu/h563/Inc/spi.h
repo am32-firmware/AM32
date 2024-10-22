@@ -74,6 +74,7 @@ uint16_t spi_write_word(spi_t* spi, uint16_t word);
 void spi_enable(spi_t* spi);
 void spi_disable(spi_t* spi);
 void spi_start_transfer(spi_t* spi);
+void spi_reset_buffers(spi_t* spi);
 // void spi_dma_transfer_complete_isr(spi_t* spi);
 // void spi_start_transfer(spi_t* spi);
 // void spi_queue_transfer(spi_t* spi, uint16_t word);

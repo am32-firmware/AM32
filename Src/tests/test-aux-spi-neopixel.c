@@ -29,6 +29,7 @@ void rgb_write(uint32_t rgb)
             data[i] = LED_T0;
         }
     }
+    spi_reset_buffers(&spi);
     spi_write(&spi, (uint16_t*)data, 13);
 }
 
@@ -153,17 +154,17 @@ int main()
     while(1) {
         rgb_write(0x00040000);
         // spi_write_word(&spi, word);
-        for (uint32_t i = 0; i < 0xffffff; i++) {
+        for (uint32_t i = 0; i < 0x8fffff; i++) {
             asm("nop");
         }
         rgb_write(0x00000400);
         // spi_write_word(&spi, word);
-        for (uint32_t i = 0; i < 0xffffff; i++) {
+        for (uint32_t i = 0; i < 0x8fffff; i++) {
             asm("nop");
         }
         rgb_write(0x00000004);
         // spi_write_word(&spi, word);
-        for (uint32_t i = 0; i < 0xffffff; i++) {
+        for (uint32_t i = 0; i < 0x8fffff; i++) {
             asm("nop");
         }
         // spi_write(&spi, data, DL);

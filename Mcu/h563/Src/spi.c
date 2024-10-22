@@ -37,6 +37,15 @@ void spi_txc_cb(spi_t* spi)
 
 }
 
+void spi_reset_buffers(spi_t* spi)
+{
+    while (spi->txDma->ref->CCR & DMA_CCR_EN)
+    {}; // wait for current transfer to complete
+    spi->_tx_head = 0;
+    spi->_tx_tail = 0;
+    spi->_rx_head = 0;
+}
+
 void spi_configure_rcc_clock_selection(spi_t* spi, uint8_t selection)
 {
     switch ((uint32_t)spi->ref)
@@ -230,15 +239,20 @@ uint8_t spi_tx_available(spi_t* spi)
 
 void spi_start_tx_dma_transfer(spi_t* spi)
 {
-    if (spi->txDma->ref->CCR & DMA_CCR_EN) {
-        // dma busy doing transfer
+    // if (spi->txDma->ref->CCR & DMA_CCR_EN) {
+    //     // dma busy doing transfer
+    //     return;
+    // }
+    if (spi->ref->CR1 & SPI_CR1_SPE) {
+        // spi busy doing transfer
         return;
     }
+
 
     spi->_dma_transfer_count = spi_tx_dma_waiting(spi);
 
 
-    spi_disable(spi);
+    // spi_disable(spi);
     if (spi->_dma_transfer_count) {
 
         // // disable the spi
@@ -331,6 +345,7 @@ void spi_start_transfer(spi_t* spi)
 void SPI4_IRQHandler(void)
 {
     spi.ref->IFCR |= SPI_IFCR_EOTC;
+    spi_disable(&spi);
     spi_start_tx_dma_transfer(&spi);
     // spi_dma_transfer_complete_isr(&spi);
 }

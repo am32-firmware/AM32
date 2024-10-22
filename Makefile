@@ -73,10 +73,10 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-delay.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-ten-khz-timer.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-watchdog-pass.c
-# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-spi-gpio.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-spi.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-spi-neopixel.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-spi-neopixel.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-uart-tx.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-uart-sk6812.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/main.c

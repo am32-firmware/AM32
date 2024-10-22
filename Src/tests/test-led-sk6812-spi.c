@@ -58,7 +58,6 @@ int main()
         LED_SPI_MOSI_PIN,
         LED_SPI_MOSI_AF,
         GPIO_AF);
-    
 
     spi.ref = LED_SPI_PERIPH;
 
@@ -82,6 +81,9 @@ int main()
     gpio_configure_pupdr(&gpioSpiMOSI, GPIO_PULL_DOWN);
     gpio_set_speed(&gpioSpiMOSI, 0b11);
     
+    spi_write_word(&spi, 0x5555);
+    while(1);
+
     while(1) {
         rgb_write(0x00040000);
         for (uint32_t i = 0; i < 0xffffff; i++) {

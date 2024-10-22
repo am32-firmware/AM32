@@ -29,6 +29,7 @@ void rgb_write(uint32_t rgb)
             data[i] = LED_T0;
         }
     }
+    spi_reset_buffers(&spi);
     spi_write(&spi, (uint16_t*)data, 13);
 }
 
@@ -53,6 +54,12 @@ int main()
     // gpio_set_speed(&gpioVreg5VEnable, 0b11);
     gpio_set(&gpioVreg5VEnable);
 
+    gpio_t gpioSpiSCK = DEF_GPIO(
+        LED_SPI_SCK_PORT,
+        LED_SPI_SCK_PIN,
+        LED_SPI_SCK_AF,
+        GPIO_AF);
+
     gpio_t gpioSpiMOSI = DEF_GPIO(
         LED_SPI_MOSI_PORT,
         LED_SPI_MOSI_PIN,
@@ -76,13 +83,14 @@ int main()
     // configure spi kernel clock as HSE via per_ck (25MHz)
     spi_configure_rcc_clock_selection(&spi, 0b100);
 
+    gpio_initialize(&gpioSpiSCK);
     gpio_initialize(&gpioSpiMOSI);
 
     gpio_configure_pupdr(&gpioSpiMOSI, GPIO_PULL_DOWN);
     gpio_set_speed(&gpioSpiMOSI, 0b11);
     
-    spi_write_word(&spi, 0x5555);
-    while(1);
+    // spi_write_word(&spi, 0x5555);
+    // while(1);
 
     while(1) {
         rgb_write(0x00040000);

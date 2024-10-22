@@ -1,12 +1,10 @@
 // Test the gpio pins used for auxilliary
 // spi port
 // (just toggle gpio pins, not the spi peripheral)
-#include "stm32h563xx.h"
 #include "targets.h"
 #include "spi.h"
 #include "gpio.h"
 #include "dma.h"
-#include "clock.h"
 #include "mcu.h"
 
 
@@ -35,9 +33,6 @@ void rgb_write(uint32_t rgb)
 
 int main()
 {
-    // clock_hsi_config_divider(0b00);
-    // clock_hse_enable();
-
     mcu_setup();
     // enable dma clocks
     dma_initialize();
@@ -51,7 +46,6 @@ int main()
         0,
         GPIO_OUTPUT);
     gpio_initialize(&gpioVreg5VEnable);
-    // gpio_set_speed(&gpioVreg5VEnable, 0b11);
     gpio_set(&gpioVreg5VEnable);
 
 
@@ -75,7 +69,6 @@ int main()
         AUX_SPI_MOSI_PIN,
         AUX_SPI_MOSI_AF,
         GPIO_AF);
-    
 
     spi.ref = AUX_SPI_PERIPH;
 
@@ -89,15 +82,14 @@ int main()
     spi.txDmaRequest = LL_GPDMA1_REQUEST_SPI4_TX;
     spi.rxDmaRequest = LL_GPDMA1_REQUEST_SPI4_RX;
 
-    // spi.CFG1_MBR = 0b111;
     spi.CFG1_MBR = 0b001; // kernel clock / 4
     spi_initialize(&spi);
     // configure spi kernel clock as HSE (25MHz)
     spi_configure_rcc_clock_selection(&spi, 0b101);
 
-    gpio_initialize(&gpioSpiNSS);
+    // gpio_initialize(&gpioSpiNSS);
     gpio_initialize(&gpioSpiSCK);
-    gpio_initialize(&gpioSpiMISO);
+    // gpio_initialize(&gpioSpiMISO);
     gpio_initialize(&gpioSpiMOSI);
 
     gpio_configure_pupdr(&gpioSpiMOSI, GPIO_PULL_DOWN);
@@ -105,72 +97,19 @@ int main()
     gpio_set_speed(&gpioSpiSCK, 0b11);
     gpio_set_speed(&gpioSpiMISO, 0b11);
     gpio_set_speed(&gpioSpiMOSI, 0b11);
-    #define DL (50 + 12)
-    uint16_t word0 = (LED_T0 << 8) | LED_T0;
-    uint16_t word1 = (LED_T0 << 8) | LED_T1;
-    uint16_t word2 = (LED_T1 << 8) | LED_T0;
-    uint16_t word3 = (LED_T1 << 8) | LED_T1;
-    // uint16_t data[DL];
-    // for (int i = 0; i < DL - 12; i++) {
-    //     data[i] = 0;
-    // }
-    // for (int i = DL-12; i < DL-8; i++) {
-    //     data[i] = word0;
-    // }
-    // for (int i = DL-8; i < DL-4; i++) {
-    //     data[i] = word1;
-    // }
-    // for (int i = DL-4; i < DL; i++) {
-    //     data[i] = word0;
-    // }
     
-    uint16_t data[16] =
-    {
-        0,
-        0,
-
-
-        word0,
-        word0,
-        word0,
-        word0,
-
-        word0,
-        word0,
-        word0,
-        word0,
-
-        word1,
-        word1,
-        word1,
-        word1,
-        0,
-        0
-
-    };
-    // spi_write(&spi, data, DL);
-    // arbitrary delay
-
     while(1) {
         rgb_write(0x00040000);
-        // spi_write_word(&spi, word);
         for (uint32_t i = 0; i < 0x8fffff; i++) {
             asm("nop");
         }
         rgb_write(0x00000400);
-        // spi_write_word(&spi, word);
         for (uint32_t i = 0; i < 0x8fffff; i++) {
             asm("nop");
         }
         rgb_write(0x00000004);
-        // spi_write_word(&spi, word);
         for (uint32_t i = 0; i < 0x8fffff; i++) {
             asm("nop");
         }
-        // spi_write(&spi, data, DL);
-        // // arbitrary delay
-        // for (int i = 0; i < 0xffff; i++) {
-        //     asm("nop");
-        // }
     }
 }

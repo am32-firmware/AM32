@@ -127,6 +127,7 @@ static struct PACKED {
     uint16_t num_input;
     uint16_t rx_errors;
     uint16_t rxframe_error;
+    int32_t  rx_ecode;
     uint8_t auto_advance_level;
 } debug1;
 
@@ -1081,6 +1082,7 @@ static void send_FlexDebug(void)
     debug1.num_input = canstats.num_input - last.num_input;
     debug1.rx_errors = canstats.rx_errors;
     debug1.rxframe_error = canstats.rxframe_error;
+    debug1.rx_ecode = canstats.rx_ecode;
 
     last.num_input = canstats.num_input;
     last.total_commands = canstats.total_commands;
@@ -1114,7 +1116,7 @@ void DroneCAN_receiveFrame(void)
     while (sys_can_receive(&rx_frame) > 0) {
 	canstats.num_receive++;
 	int ecode = canardHandleRxFrame(&canard, &rx_frame, micros64());
-	if (ecode != CANARD_OK) {
+        if (ecode != CANARD_OK && ecode != -CANARD_ERROR_RX_NOT_WANTED) {
 	    canstats.rx_ecode = ecode;
 	    canstats.rxframe_error++;
 	}

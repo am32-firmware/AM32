@@ -1165,7 +1165,7 @@ static void DroneCAN_Startup(void)
         NVIC_DisableIRQ(DMA1_Channel5_IRQn);
         NVIC_DisableIRQ(EXTI15_10_IRQn);
         EXTI->IMR1 &= ~(1U << 15);
-#elif defined(MCU_F415)
+#elif defined(MCU_AT415)
         NVIC_DisableIRQ(DMA1_Channel6_IRQn);
         NVIC_DisableIRQ(EXINT15_10_IRQn);
         EXINT->inten &= ~EXINT_LINE_15;

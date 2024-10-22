@@ -328,5 +328,6 @@ void spi_start_transfer(spi_t* spi)
 void SPI4_IRQHandler(void)
 {
     spi.ref->IFCR |= SPI_IFCR_EOTC;
-    spi_dma_transfer_complete_isr(&spi);
+    spi_start_tx_dma_transfer(&spi);
+    // spi_dma_transfer_complete_isr(&spi);
 }

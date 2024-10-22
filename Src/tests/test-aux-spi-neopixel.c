@@ -134,9 +134,10 @@ int main()
     };
     // spi_write(&spi, data, DL);
     // arbitrary delay
-        spi_write(&spi, data, 16);
 
     while(1) {
+        spi_write(&spi, data, 16);
+
         // spi_write_word(&spi, word);
         for (uint32_t i = 0; i < 0xfff; i++) {
             asm("nop");

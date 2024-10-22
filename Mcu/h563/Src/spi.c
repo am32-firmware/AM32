@@ -224,6 +224,7 @@ void spi_start_tx_dma_transfer(spi_t* spi)
     spi->_dma_transfer_count = spi_tx_dma_waiting(spi);
 
 
+    spi_disable(spi);
     if (spi->_dma_transfer_count) {
 
         // // disable the spi
@@ -247,9 +248,6 @@ void spi_start_tx_dma_transfer(spi_t* spi)
         spi_enable(spi);
         spi_start_transfer(spi);
         // spi->ref->CR1 |= SPI_CR1_CSTART; // spi must be enabled
-    } else {
-        // disable the spi
-        spi_disable(spi);
     }
 
 }

@@ -111,7 +111,7 @@ int main()
     while(1) {
         spi_write(&spi, data, DL);
         // spi_write_word(&spi, word);
-        for (uint32_t i = 0; i < 0xffffff; i++) {
+        for (uint32_t i = 0; i < 0xfffff; i++) {
             asm("nop");
         }
         // spi_write(&spi, data, DL);

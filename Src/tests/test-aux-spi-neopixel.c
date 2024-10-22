@@ -17,6 +17,21 @@ uint16_t spi_rx_buffer[256];
 uint16_t spi_tx_buffer[256];
 spi_t spi;
 
+void rgb_write(uint32_t rgb)
+{
+    uint8_t data[26];
+    data[0] = 0;
+    data[1] = 0;
+    for (int i = 2; i < 26; i++) {
+        if (rgb & (1<<i)) {
+            data[i] = LED_T1;
+        } else {
+            data[i] = LED_T0;
+        }
+    }
+    spi_write(&spi, (uint16_t*)data, 13);
+}
+
 int main()
 {
     // clock_hsi_config_divider(0b00);
@@ -136,10 +151,19 @@ int main()
     // arbitrary delay
 
     while(1) {
-        spi_write(&spi, data, 16);
-
+        rgb_write(0x00040000);
         // spi_write_word(&spi, word);
-        for (uint32_t i = 0; i < 0xfff; i++) {
+        for (uint32_t i = 0; i < 0xffffff; i++) {
+            asm("nop");
+        }
+        rgb_write(0x00000400);
+        // spi_write_word(&spi, word);
+        for (uint32_t i = 0; i < 0xffffff; i++) {
+            asm("nop");
+        }
+        rgb_write(0x00000004);
+        // spi_write_word(&spi, word);
+        for (uint32_t i = 0; i < 0xffffff; i++) {
             asm("nop");
         }
         // spi_write(&spi, data, DL);

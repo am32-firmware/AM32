@@ -7,6 +7,7 @@
 #include "gpio.h"
 #include "dma.h"
 #include "clock.h"
+#include "mcu.h"
 
 
 #define LED_T0 (0b11000000)
@@ -18,8 +19,10 @@ spi_t spi;
 
 int main()
 {
-    clock_hsi_config_divider(0b00);
-    clock_hse_enable();
+    // clock_hsi_config_divider(0b00);
+    // clock_hse_enable();
+
+    mcu_setup();
     // enable dma clocks
     dma_initialize();
     // enable spi clock
@@ -111,7 +114,7 @@ int main()
     while(1) {
         spi_write(&spi, data, DL);
         // spi_write_word(&spi, word);
-        for (uint32_t i = 0; i < 0xfffff; i++) {
+        for (uint32_t i = 0; i < 0xfff; i++) {
             asm("nop");
         }
         // spi_write(&spi, data, DL);

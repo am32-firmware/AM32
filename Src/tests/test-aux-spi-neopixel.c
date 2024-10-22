@@ -94,25 +94,49 @@ int main()
     uint16_t word1 = (LED_T0 << 8) | LED_T1;
     uint16_t word2 = (LED_T1 << 8) | LED_T0;
     uint16_t word3 = (LED_T1 << 8) | LED_T1;
-    uint16_t data[DL];
-    for (int i = 0; i < DL - 12; i++) {
-        data[i] = 0;
-    }
-    for (int i = DL-12; i < DL-8; i++) {
-        data[i] = word0;
-    }
-    for (int i = DL-8; i < DL-4; i++) {
-        data[i] = word1;
-    }
-    for (int i = DL-4; i < DL; i++) {
-        data[i] = word0;
-    }
+    // uint16_t data[DL];
+    // for (int i = 0; i < DL - 12; i++) {
+    //     data[i] = 0;
+    // }
+    // for (int i = DL-12; i < DL-8; i++) {
+    //     data[i] = word0;
+    // }
+    // for (int i = DL-8; i < DL-4; i++) {
+    //     data[i] = word1;
+    // }
+    // for (int i = DL-4; i < DL; i++) {
+    //     data[i] = word0;
+    // }
     
+    uint16_t data[16] =
+    {
+        0,
+        0,
+
+
+        word0,
+        word0,
+        word0,
+        word0,
+
+        word0,
+        word0,
+        word0,
+        word0,
+
+        word1,
+        word1,
+        word1,
+        word1,
+        0,
+        0
+
+    };
     // spi_write(&spi, data, DL);
     // arbitrary delay
+        spi_write(&spi, data, 16);
 
     while(1) {
-        spi_write(&spi, data, DL);
         // spi_write_word(&spi, word);
         for (uint32_t i = 0; i < 0xfff; i++) {
             asm("nop");

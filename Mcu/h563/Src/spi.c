@@ -23,11 +23,18 @@ is ignored.
 the 5-bit command data.
 */
 
+extern spi_t spi;
+
 void spi_dma_cb(dmaChannel_t* dma)
 {
     // dma->ref->CFCR |= DMA_IT_TCIF << dma->flagsShift;
     dma->ref->CFCR |= DMA_CFCR_TCF;
     spi_dma_transfer_complete_isr((spi_t*)dma->userParam);
+}
+
+void spi_txc_cb(spi_t* spi)
+{
+
 }
 
 void spi_configure_rcc_clock_selection(spi_t* spi, uint8_t selection)
@@ -149,6 +156,10 @@ void spi_initialize(spi_t* spi)
 
     // enable DMA requests on transmission
     spi->ref->CFG1 |= SPI_CFG1_TXDMAEN;
+
+    // enable TXC interrupt
+    spi->ref->IER |= SPI_IER_EOTIE;
+    NVIC_EnableIRQ(SPI4_IRQn);
     // spi->ref->CFG1 |= SPI_CFG1_RXDMAEN;
 
     // set DSIZE (frame width) to 16 bits
@@ -262,7 +273,7 @@ void spi_dma_transfer_complete_isr(spi_t* spi)
     spi->_tx_tail += spi->_dma_transfer_count;
 
     // start transferring fresh data
-    spi_start_tx_dma_transfer(spi);
+    // spi_start_tx_dma_transfer(spi);
 }
 
 // if there is not space in the buffer, this function will return
@@ -312,4 +323,10 @@ void spi_disable(spi_t* spi)
 void spi_start_transfer(spi_t* spi)
 {
     spi->ref->CR1 |= SPI_CR1_CSTART; // spi must be enabled
+}
+
+void SPI4_IRQHandler(void)
+{
+    spi.ref->IFCR |= SPI_IFCR_EOTC;
+    spi_dma_transfer_complete_isr(&spi);
 }

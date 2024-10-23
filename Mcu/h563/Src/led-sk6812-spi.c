@@ -1,73 +1,90 @@
 #include "led.h"
-#include "target.h"
+#include "targets.h"
 #include "gpio.h"
 #include "dma.h"
+#include "spi.h"
 
-#define LED_AF 2
-#define LED_SK6812
-#define OCM_PWM1 0b110
 
-// nanoseconds
-#if defined(LED_WS2812)
-#define BIT0_TH_NS 400
-#define BIT1_TH_NS 800
-#define BIT_PERIOD_NS 1250 // symbol duration
-#elif defined(LED_SK6812)
-#define BIT0_TH_NS 300
-#define BIT1_TH_NS 600
-#define BIT_PERIOD_NS 1200 // symbol duration
-#endif
+// 2 bytes for leading 0 to prevent glitch on mosi line
+// (MOSI line is pulled to the value of the first bit) for
+// a moment before data transfer commences after spi
+// is enabled
+// 24 bytes for 24bit brg data
+uint8_t data[26];
 
-// 24 for 8-bit rgb and 1 byte for a trailing 0 (to pull the wire low between frames)
-uint16_t pulses[25];
+#define LED_T0 (0b11000000)
+#define LED_T1 (0b11110000)
 
-#define LED_TIMER_NS_PER_TICK (1000000000 / HCLK_FREQUENCY)
-#define BIT0_TICKS (BIT0_TH_NS / LED_TIMER_NS_PER_TICK)
-#define BIT1_TICKS (BIT1_TH_NS / LED_TIMER_NS_PER_TICK)
-#define BIT_PERIOD_TICKS (BIT_PERIOD_NS / LED_TIMER_NS_PER_TICK)
-static dmaChannel_t *ledDma;
-void led_initialize(void)
+uint16_t spi_rx_buffer[256];
+uint16_t spi_tx_buffer[256];
+spi_t spi;
+
+void led_initialize()
 {
-    __HAL_RCC_DMA1_CLK_ENABLE();
-    __HAL_RCC_TIM16_CLK_ENABLE();
+    
+    // enable dma clocks
+    dma_initialize();
+    // enable spi clock
+    LED_SPI_ENABLE_CLOCK();
 
-    LED_TIMER->ARR = BIT_PERIOD_TICKS;
-    LED_TIMER->CCMR1 |= (OCM_PWM1 << 4) | TIM_CCMR1_OC1PE;
-    LED_TIMER->CCER |= TIM_CCER_CC1E;
-    LED_TIMER->BDTR |= TIM_BDTR_MOE;
-    LED_TIMER->CR1 |= TIM_CR1_CEN;
+    // enable 5V regulator
+    gpio_t gpioVreg5VEnable = DEF_GPIO(
+        VREG_5V_ENABLE_PORT,
+        VREG_5V_ENABLE_PIN,
+        0,
+        GPIO_OUTPUT);
+    gpio_initialize(&gpioVreg5VEnable);
+    // gpio_set_speed(&gpioVreg5VEnable, 0b11);
+    gpio_set(&gpioVreg5VEnable);
 
-    LED_TIMER->DIER |= TIM_DIER_UDE;
+    gpio_t gpioSpiSCK = DEF_GPIO(
+        LED_SPI_SCK_PORT,
+        LED_SPI_SCK_PIN,
+        LED_SPI_SCK_AF,
+        GPIO_AF);
 
-    ledDma = &dmaChannels[3 - 1];
-    ledDma->ref->CPAR = (uint32_t)&LED_TIMER->CCR1;
-    ledDma->ref->CMAR = (uint32_t)&pulses[0];
-    // 16 bit data size for memory
-    ledDma->ref->CCR |= 0b01 << DMA_CCR_MSIZE_Pos;
-    // 16 bit data size for peripheral
-    ledDma->ref->CCR |= 0b01 << DMA_CCR_PSIZE_Pos;
-    // read from memory
-    ledDma->ref->CCR |= DMA_CCR_DIR;
-    // memory increment
-    ledDma->ref->CCR |= DMA_CCR_MINC;
+    gpio_t gpioSpiMOSI = DEF_GPIO(
+        LED_SPI_MOSI_PORT,
+        LED_SPI_MOSI_PIN,
+        LED_SPI_MOSI_AF,
+        GPIO_AF);
 
-    gpio_t gpioLed = DEF_GPIO(LED_PORT, LED_PIN, LED_AF, GPIO_AF);
-    gpio_initialize(&gpioLed);
+    spi.ref = LED_SPI_PERIPH;
 
-    led_write(0);
+    spi._rx_buffer = spi_rx_buffer;
+    spi._tx_buffer = spi_tx_buffer;
+    spi._rx_buffer_size = 256;
+    spi._tx_buffer_size = 256;
+    spi.rxDma = &dmaChannels[7];
+    spi.txDma = &dmaChannels[0];
+
+    spi.txDmaRequest = LL_GPDMA1_REQUEST_SPI2_TX;
+    spi.rxDmaRequest = LL_GPDMA1_REQUEST_SPI2_RX;
+
+    spi.CFG1_MBR = 0b001; // kernel clock / 2
+    spi_initialize(&spi);
+    // configure spi kernel clock as HSE via per_ck (25MHz)
+    spi_configure_rcc_clock_selection(&spi, 0b100);
+
+    gpio_initialize(&gpioSpiSCK);
+    gpio_initialize(&gpioSpiMOSI);
+
+    gpio_configure_pupdr(&gpioSpiMOSI, GPIO_PULL_DOWN);
+    gpio_set_speed(&gpioSpiMOSI, 0b11);
+
+    data[0] = 0;
+    data[1] = 0;
 }
 
 void led_write(uint32_t brg)
 {
-    for (int i = 0; i < 24; i++)
-    {
-        pulses[i] = brg & (1 << i) ? BIT1_TICKS : BIT0_TICKS;
+    for (int i = 0; i < 24; i++) {
+        if (brg & (1<<i)) {
+            data[i+2] = LED_T1;
+        } else {
+            data[i+2] = LED_T0;
+        }
     }
-    // disable channel
-    ledDma->ref->CCR &= ~DMA_CCR_EN;
-    // setup number of data to transfer
-    ledDma->ref->CNDTR = sizeof(pulses) / 2;
-    // enable channel
-    ledDma->ref->CCR |= DMA_CCR_EN;
-    LED_TIMER->CNT = 0;
+    spi_reset_buffers(&spi);
+    spi_write(&spi, (uint16_t*)data, 13);
 }

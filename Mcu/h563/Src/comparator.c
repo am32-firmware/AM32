@@ -1,13 +1,4 @@
 #include "stm32h563xx.h"
-// #define COMPA_GPIO_PORT GPIOF
-// #define COMPA_GPIO_PIN 4
-
-// #define COMPB_GPIO_PORT GPIOC
-// #define COMPB_GPIO_PIN 15
-
-// #define COMPC_GPIO_PORT GPIOC
-// #define COMPC_GPIO_PIN 14
-
 #include "comparator.h"
 #include "stm32h5xx_ll_gpio.h"
 #include "targets.h"
@@ -168,6 +159,14 @@ void enableCompInterrupts()
 }
 
 
+void comparator_enable_interrupts(comparator_t* comp)
+{
+    EXTI_INTERRUPT_ENABLE_MASK(
+        1 << COMPARATOR.phaseA->pin |
+        1 << COMPARATOR.phaseB->pin |
+        1 << COMPARATOR.phaseC->pin
+        );
+}
 // void comparator_enable_interrupts(comparator_t* comp)
 // {
 //     if (step == 1 || step == 4) { // c floating

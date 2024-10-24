@@ -1591,6 +1591,14 @@
 #define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_5
 #define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_7
 
+// nucleo
+// #define USART_RX_PORT GPIOD
+// #define USART_RX_PIN 9
+// #define USART_RX_AF 7
+
+// #define USART_TX_PORT GPIOD
+// #define USART_TX_PIN 8
+// #define USART_TX_AF 7
 
 #define STMICRO
 #define CPU_FREQUENCY_MHZ 64
@@ -1812,40 +1820,7 @@
     RCC->APB1LENR |= RCC_APB1LENR_SPI2EN; \
 }
 
-////////////
-// option 1
-////////////
-#define AUX_UART_TX_PORT GPIOE
-#define AUX_UART_TX_PIN 2
-#define AUX_UART_TX_AF 8
-#define AUX_UART_PERIPH UART8
 
-#define AUX_UART_ENABLE_CLOCK() { \
-    RCC->APB1LENR |= RCC_APB1LENR_UART8EN; \
-}
-
-
-#define AUX_LPUART_TX_PORT GPIOB
-#define AUX_LPUART_TX_PIN 6
-#define AUX_LPUART_TX_AF 8
-#define AUX_LPUART_PERIPH LPUART1
-
-#define AUX_LPLUART_ENABLE_CLOCK() { \
-    RCC->APB1LENR |= RCC_APB1LENR_UART8EN; \
-}
-////////////
-// option 2
-////////////
-// #define AUX_UART_TX_PORT GPIOE
-// #define AUX_UART_TX_PIN 2
-// #define AUX_UART_TX_AF 8
-// #define AUX_UART_PERIPH UART4
-
-///////////////
-// blueESC
-///////////////
-
-// // blueesc
 #define COMPA_GPIO_PORT GPIOF
 #define COMPA_GPIO_PIN 4
 
@@ -1882,11 +1857,22 @@
 /////////////////////////////////////////
 // Debug USART control
 /////////////////////////////////////////
+#define DEBUG_USART_RX_PORT GPIOC
+#define DEBUG_USART_RX_PIN 11
+#define DEBUG_USART_RX_AF 8
+
+#define DEBUG_USART_TX_PORT GPIOC
+#define DEBUG_USART_TX_PIN 10
+#define DEBUG_USART_TX_AF 8
+
+#define DEBUG_USART_REF UART4
+
+#define DEBUG_USART_BAUDRATE 1000000
+#define DEBUG_USART_DMA_REQ LL_GPDMA1_REQUEST_UART4_TX
 
 #define DEBUG_USART_ENABLE_CLOCK() { \
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_UART4); \
 }
-
 /////////////////////////////////////////
 // Debug USART control
 /////////////////////////////////////////
@@ -1895,6 +1881,36 @@
 // Aux USART/UART/LPUART control
 /////////////////////////////////////////
 
+////////////
+// option 1
+////////////
+#define AUX_USART_TX_PORT GPIOE
+#define AUX_USART_TX_PIN 2
+#define AUX_USART_TX_AF 8
+#define AUX_USART_PERIPH UART8
+
+#define AUX_USART_ENABLE_CLOCK() { \
+    RCC->APB1LENR |= RCC_APB1LENR_UART8EN; \
+}
+
+
+#define AUX_LPUART_TX_PORT GPIOB
+#define AUX_LPUART_TX_PIN 6
+#define AUX_LPUART_TX_AF 8
+#define AUX_LPUART_PERIPH LPUART1
+
+#define AUX_LPLUART_ENABLE_CLOCK() { \
+    RCC->APB1LENR |= RCC_APB1LENR_UART8EN; \
+}
+
+////////////
+// option 2
+////////////
+// #define AUX_UART_TX_PORT GPIOE
+// #define AUX_UART_TX_PIN 2
+// #define AUX_UART_TX_AF 8
+// #define AUX_UART_PERIPH UART4
+
 // #define AUX_USART_ENABLE_CLOCK() { \
 //     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM2); \
 // }
@@ -1902,6 +1918,28 @@
 /////////////////////////////////////////
 // Aux USART/UART/LPUART control
 /////////////////////////////////////////
+
+/////////////////////////////////////////
+// Main USART control
+/////////////////////////////////////////
+
+#define MAIN_USART_RX_PORT GPIOD
+#define MAIN_USART_RX_PIN 9
+#define MAIN_USART_RX_AF 7
+#define MAIN_USART_TX_PORT GPIOD
+#define MAIN_USART_TX_PIN 8
+#define MAIN_USART_TX_AF 7
+#define MAIN_USART_REF USART3
+#define MAIN_USART_BAUDRATE 1000000
+#define MAIN_USART_DMA_REQ LL_GPDMA1_REQUEST_USART3_TX
+#define MAIN_USART_ENABLE_CLOCK() { \
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_USART3); \
+}
+/////////////////////////////////////////
+// Main USART control
+/////////////////////////////////////////
+
+
 #define DRV_ENABLE_PORT GPIOH
 #define DRV_ENABLE_PIN 3
 

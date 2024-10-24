@@ -1,49 +1,8 @@
-#include "stm32h563xx.h"
-// nucleo
-// #define USART_RX_PORT GPIOD
-// #define USART_RX_PIN 9
-// #define USART_RX_AF 7
-
-// #define USART_TX_PORT GPIOD
-// #define USART_TX_PIN 8
-// #define USART_TX_AF 7
-
-// AUX, MAIN, DEBUG
-#define DEBUG_USART_RX_PORT GPIOC
-#define DEBUG_USART_RX_PIN 11
-#define DEBUG_USART_RX_AF 8
-
-#define TEST_USART_RX_PORT DEBUG_USART_RX_PORT
-#define TEST_USART_RX_PIN DEBUG_USART_RX_PIN
-#define TEST_USART_RX_AF DEBUG_USART_RX_AF
-
-#define DEBUG_USART_TX_PORT GPIOC
-#define DEBUG_USART_TX_PIN 10
-#define DEBUG_USART_TX_AF 8
-
-#define TEST_USART_TX_PORT DEBUG_USART_TX_PORT
-#define TEST_USART_TX_PIN DEBUG_USART_TX_PIN
-#define TEST_USART_TX_AF DEBUG_USART_TX_AF
-
-#define DEBUG_USART_REF UART4
-
-#define TEST_USART_REF DEBUG_USART_REF
-
-#define DEBUG_USART_BAUDRATE 1000000
-
-#define TEST_USART_BAUDRATE DEBUG_USART_BAUDRATE
-
-#define DEBUG_USART_DMA_REQ LL_GPDMA1_REQUEST_UART4_TX
-
-#define TEST_USART_DMA_REQ DEBUG_USART_DMA_REQ
-#define TEST_USART_SWAP_IO 0
-
-#include "dma.h"
-#include "gpio.h"
-#include "mcu.h"
-#include "usart.h"
 #include "targets.h"
-
+#include "usart.h"
+#include "gpio.h"
+#include "dma.h"
+#include "mcu.h"
 static uint8_t usart_rx_buffer[256];
 static uint8_t usart_tx_buffer[256];
 static usart_t usart;
@@ -51,13 +10,11 @@ static usart_t usart;
 int main()
 {
     mcu_setup();
-    DEBUG_USART_ENABLE_CLOCK();
-    gpio_t gpioUsartRx = DEF_GPIO(TEST_USART_RX_PORT, TEST_USART_RX_PIN, TEST_USART_RX_AF, GPIO_AF);
-    gpio_t gpioUsartTx = DEF_GPIO(TEST_USART_TX_PORT, TEST_USART_TX_PIN, TEST_USART_TX_AF, GPIO_AF);
-    gpio_initialize(&gpioUsartRx);
-    gpio_initialize(&gpioUsartTx);
 
-    usart.ref = TEST_USART_REF;
+    dma_initialize();
+    AUX_UART_ENABLE_CLOCK();
+
+    usart.ref = AUX_UART_PERIPH;
 
     usart._rx_buffer = usart_rx_buffer;
     usart._tx_buffer = usart_tx_buffer;
@@ -65,13 +22,20 @@ int main()
     usart._tx_buffer_size = 256;
     usart.rxDma = &dmaChannels[7];
     usart.txDma = &dmaChannels[0];
-    usart.txDmaRequest = TEST_USART_DMA_REQ;
+    usart.txDmaRequest = LL_GPDMA1_REQUEST_UART8_TX;
 
     usart._baudrate = 1000000;
-    usart.swap = TEST_USART_SWAP_IO;
     usart_initialize(&usart);
 
+    gpio_t gpioUsartTx = DEF_GPIO(
+        AUX_UART_TX_PORT,
+        AUX_UART_TX_PIN,
+        AUX_UART_TX_AF,
+        GPIO_AF);
+    gpio_initialize(&gpioUsartTx);
+
     while(1) {
+        // usart_write(&usart, "U", 1);
         usart_write_string(&usart, "hello world\n");
     }
 }

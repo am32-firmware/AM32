@@ -8,32 +8,20 @@
 // #define USART_TX_PIN 8
 // #define USART_TX_AF 7
 
-// AUX, MAIN, DEBUG
-#define DEBUG_USART_RX_PORT GPIOC
-#define DEBUG_USART_RX_PIN 11
-#define DEBUG_USART_RX_AF 8
-
 #define TEST_USART_RX_PORT DEBUG_USART_RX_PORT
 #define TEST_USART_RX_PIN DEBUG_USART_RX_PIN
 #define TEST_USART_RX_AF DEBUG_USART_RX_AF
-
-#define DEBUG_USART_TX_PORT GPIOC
-#define DEBUG_USART_TX_PIN 10
-#define DEBUG_USART_TX_AF 8
 
 #define TEST_USART_TX_PORT DEBUG_USART_TX_PORT
 #define TEST_USART_TX_PIN DEBUG_USART_TX_PIN
 #define TEST_USART_TX_AF DEBUG_USART_TX_AF
 
-#define DEBUG_USART_REF UART4
-
 #define TEST_USART_REF DEBUG_USART_REF
-
-#define DEBUG_USART_BAUDRATE 1000000
 
 #define TEST_USART_BAUDRATE DEBUG_USART_BAUDRATE
 
-#define TEST_USART_SWAP_IO 1
+#define TEST_USART_DMA_REQ DEBUG_USART_DMA_REQ
+#define TEST_USART_SWAP_IO 0
 
 #include "dma.h"
 #include "gpio.h"
@@ -62,9 +50,9 @@ int main()
     usart._tx_buffer_size = 256;
     usart.rxDma = &dmaChannels[7];
     usart.txDma = &dmaChannels[0];
+    usart.txDmaRequest = TEST_USART_DMA_REQ;
 
-    usart._baudrate = TEST_USART_BAUDRATE;
-
+    usart._baudrate = 1000000;
     usart.swap = TEST_USART_SWAP_IO;
     usart_initialize(&usart);
 

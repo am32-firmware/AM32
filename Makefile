@@ -91,7 +91,8 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-ten-khz-timer.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-aux.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-aux.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-main.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-watchdog-fail.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-watchdog-pass.c
 

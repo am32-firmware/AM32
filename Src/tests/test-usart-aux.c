@@ -33,7 +33,10 @@
 
 #define TEST_USART_BAUDRATE DEBUG_USART_BAUDRATE
 
-#define TEST_USART_SWAP_IO 1
+#define DEBUG_USART_DMA_REQ LL_GPDMA1_REQUEST_UART4_TX
+
+#define TEST_USART_DMA_REQ DEBUG_USART_DMA_REQ
+#define TEST_USART_SWAP_IO 0
 
 #include "dma.h"
 #include "gpio.h"
@@ -62,9 +65,9 @@ int main()
     usart._tx_buffer_size = 256;
     usart.rxDma = &dmaChannels[7];
     usart.txDma = &dmaChannels[0];
+    usart.txDmaRequest = TEST_USART_DMA_REQ;
 
-    usart._baudrate = TEST_USART_BAUDRATE;
-
+    usart._baudrate = 1000000;
     usart.swap = TEST_USART_SWAP_IO;
     usart_initialize(&usart);
 

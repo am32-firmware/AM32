@@ -1,9 +1,11 @@
-#include "mcu.h"
-#include "clock.h"
 #include "stm32h563xx.h"
 
-#include "power.h"
+#include "mcu.h"
+
+#include "clock.h"
+#include "dma.h"
 #include "flash.h"
+#include "power.h"
 
 void mcu_setup()
 {
@@ -11,6 +13,9 @@ void mcu_setup()
     mcu_setup_core_voltage();
     mcu_setup_clocks();
     mcu_enable_icache();
+    // comment if you don't need it,
+    // most applications use dma
+    dma_initialize();
 }
 
 void mcu_setup_clocks()

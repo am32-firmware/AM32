@@ -1712,6 +1712,7 @@
 #endif
 
 #ifdef BLUEESC_H563
+#include "stm32h5xx_ll_bus.h"
 #define FILE_NAME "BLUEESC_H563"
 #define FIRMWARE_NAME "BlueESC H563"
 #define DEAD_TIME 60
@@ -1882,9 +1883,9 @@
 // Debug USART control
 /////////////////////////////////////////
 
-// #define DEBUG_USART_ENABLE_CLOCK() { \
-//     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_UART4); \
-// }
+#define DEBUG_USART_ENABLE_CLOCK() { \
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_UART4); \
+}
 
 /////////////////////////////////////////
 // Debug USART control

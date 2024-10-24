@@ -38,10 +38,14 @@ void receiveDshotDma()
     out_put = 0;
     INPUT_TIMER_RESET();
     
-    // enable channel as input mode
-    INPUT_TIMER->CCMR1 = 0x01;
+    // configure channel as input mode
+    // can only be done while channel is disabled
+    // INPUT_TIMER->CCMR1 = 0x01;
+    INPUT_TIMER_CCMR_CONFIG();
 
-    INPUT_TIMER->CCER = 0xa;
+    // enable channel
+    // INPUT_TIMER->CCER = 0xa;
+    INPUT_TIMER_CCER_CONFIG();
     INPUT_TIMER->PSC = ic_timer_prescaler;
     INPUT_TIMER->ARR = 0xFFFF;
     INPUT_TIMER->EGR |= TIM_EGR_UG;
@@ -51,7 +55,7 @@ void receiveDshotDma()
     dmaChannel_t* dmaCh = &dmaChannels[INPUT_TIMER_DMA_CHANNEL];
     dmaCh->callback = io_dma_cb;
     dmaCh->ref->CDAR = (uint32_t)&dma_buffer;
-    dmaCh->ref->CSAR = (uint32_t)&INPUT_TIMER->CCR1;
+    dmaCh->ref->CSAR = INPUT_TIMER_CCR;
     // for H5 BNDT = BYTEs to be transferred
     // for other stm32 BNDT = number of transfers
     dmaCh->ref->CBR1 = buffersize*2;
@@ -74,7 +78,7 @@ void receiveDshotDma()
     // teie
     // tcie
     // enable
-    INPUT_TIMER->DIER |= TIM_DIER_CC1DE;
+    INPUT_TIMER->DIER |= INPUT_TIMER_DIER_CCDE;
     INPUT_TIMER->CCER |= IC_TIMER_CHANNEL;
     INPUT_TIMER->CR1 |= TIM_CR1_CEN;
 }

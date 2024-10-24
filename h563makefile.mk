@@ -43,7 +43,6 @@ SRC_H563 := \
 	$(SRC_DIR_H563_SRC)/flash.c \
 	$(SRC_DIR_H563_SRC)/dma-stm32h5.c \
 	$(SRC_DIR_H563_SRC)/exti-stm32h5.c \
-	$(SRC_DIR_H563_SRC)/led-sk6812-spi.c \
 	$(SRC_DIR_H563_SRC)/commutation-timer.c \
 	$(SRC_DIR_H563_SRC)/ten-khz-timer.c \
 	$(SRC_DIR_H563_SRC)/bridge.c \
@@ -53,6 +52,7 @@ SRC_H563 := \
 	$(SRC_DIR_H563_SRC)/power.c \
 	$(SRC_DIR_H563_SRC)/serial_telemetry.c \
 	$(SRC_DIR_H563_SRC)/mcu.c \
+	$(SRC_DIR_H563_SRC)/vreg.c \
 	$(SRC_DIR_H563_SRC)/stm32h5xx_it.c \
 	$(SRC_DIR_H563_SRC)/system_stm32h5xx.c \
 	$(SRC_DIR_H563_HAL)/stm32h5xx_ll_usart.c \

@@ -1444,10 +1444,10 @@
 
 //
 
+#ifdef NUCLEO
+#define FILE_NAME "NUCLEO"
+#define FIRMWARE_NAME "NUCLEO"
 
-#ifdef BLUEESC_H563
-#define FILE_NAME "BLUEESC_H563"
-#define FIRMWARE_NAME "BlueESC H563"
 #define DEAD_TIME 60
 #define HARDWARE_GROUP_H563
 #define TARGET_STALL_PROTECTION_INTERVAL 8000
@@ -1470,6 +1470,297 @@
 // MB1404 nucleo yellow user LED2
 #define LED_B_GPIO_PORT GPIOF
 #define LED_B_GPIO_PIN 4
+
+
+// nucleo
+#define COMPA_GPIO_PORT GPIOC
+#define COMPA_GPIO_PIN 9
+
+#define COMPB_GPIO_PORT GPIOC
+#define COMPB_GPIO_PIN 11
+
+#define COMPC_GPIO_PORT GPIOD
+#define COMPC_GPIO_PIN 2
+
+#define DRV_ENABLE_PORT GPIOF
+#define DRV_ENABLE_PIN 0
+
+
+#define DSHOT_PRIORITY_THRESHOLD 70
+
+// #define HCLK_FREQUENCY 25000000
+
+#define AM32_HSE_VALUE (25000000)
+
+#define INPUT_DMA_CHANNEL LL_DMA_CHANNEL_4
+#define IC_DMA_IRQ_NAME GPDMA1_Channel4_IRQn
+
+#define DRV_FAULT_PORT GPIOH
+#define DRV_FAULT_PIN 5
+// INLB PH14 TIM8_CH1N AF03
+// INLC PH15 TIM8_CH1N AF03
+
+// INHA PC6 TIM8_CH1 AF03
+// INHB PI6 TIM8_CH2 AF03
+// INHC PI7 TIM8_CH3 AF03
+
+// INLA PH13 TIM8_CH1N AF03
+
+
+//////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+///!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// a and b are switched!!!!!!!!!!!!!!!
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~```
+// white wire // logic analyzer (ch0/1)
+// INLA PE8
+#define PHASE_B_GPIO_LOW LL_GPIO_PIN_8
+#define PHASE_B_GPIO_LOW_PIN 8
+#define PHASE_B_GPIO_PORT_LOW GPIOE
+#define PHASE_B_LOW_AF 1
+// #define PHASE_B_LOW_Alternate LL_GPIO_AF_1
+
+// grey wire // logic analyzer (ch1/2)
+// INHA PE9
+#define PHASE_B_GPIO_HIGH LL_GPIO_PIN_9
+#define PHASE_B_GPIO_HIGH_PIN 9
+#define PHASE_B_GPIO_PORT_HIGH GPIOE
+#define PHASE_B_HIGH_AF 1
+
+#define BRIDGE_UL_PORT PHASE_A_GPIO_PORT_LOW
+#define BRIDGE_UL_PIN PHASE_A_GPIO_LOW_PIN
+#define BRIDGE_UL_AF PHASE_A_LOW_AF
+
+#define BRIDGE_UH_PORT PHASE_A_GPIO_PORT_HIGH
+#define BRIDGE_UH_PIN PHASE_A_GPIO_HIGH_PIN
+#define BRIDGE_UH_AF PHASE_A_HIGH_AF
+
+
+//////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+///!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// a and b are switched!!!!!!!!!!!!!!!
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~```
+// purple wire (ch2/3)
+// INLB PE10
+#define PHASE_A_GPIO_LOW LL_GPIO_PIN_10
+#define PHASE_A_GPIO_LOW_PIN 10
+#define PHASE_A_GPIO_PORT_LOW GPIOE
+#define PHASE_A_LOW_AF 1
+
+// blue wire (ch3/4)
+// INHB PE11
+#define PHASE_A_GPIO_HIGH LL_GPIO_PIN_11
+#define PHASE_A_GPIO_HIGH_PIN 11
+#define PHASE_A_GPIO_PORT_HIGH GPIOE
+#define PHASE_A_HIGH_AF 1
+
+#define BRIDGE_VL_PORT PHASE_B_GPIO_PORT_LOW
+#define BRIDGE_VL_PIN PHASE_B_GPIO_LOW_PIN
+#define BRIDGE_VL_AF PHASE_B_LOW_AF
+
+#define BRIDGE_VH_PORT PHASE_B_GPIO_PORT_HIGH
+#define BRIDGE_VH_PIN PHASE_B_GPIO_HIGH_PIN
+#define BRIDGE_VH_AF PHASE_B_HIGH_AF
+
+// yellow wire (ch4/5)
+// INLC PE12
+#define PHASE_C_GPIO_LOW LL_GPIO_PIN_12
+#define PHASE_C_GPIO_LOW_PIN 12
+#define PHASE_C_GPIO_PORT_LOW GPIOE
+#define PHASE_C_LOW_AF 1
+
+// green wire (ch5/6)
+// INHC PE13
+#define PHASE_C_GPIO_HIGH LL_GPIO_PIN_13
+#define PHASE_C_GPIO_HIGH_PIN 13
+#define PHASE_C_GPIO_PORT_HIGH GPIOE
+#define PHASE_C_HIGH_AF 1
+
+#define BRIDGE_WL_PORT PHASE_C_GPIO_PORT_LOW
+#define BRIDGE_WL_PIN PHASE_C_GPIO_LOW_PIN
+#define BRIDGE_WL_AF PHASE_C_LOW_AF
+#define BRIDGE_WH_PORT PHASE_C_GPIO_PORT_HIGH
+#define BRIDGE_WH_PIN PHASE_C_GPIO_HIGH_PIN
+#define BRIDGE_WH_AF PHASE_C_HIGH_AF
+
+
+#define CURRENT_SENSE_ADC_PIN LL_GPIO_PIN_5
+#define VOLTAGE_SENSE_ADC_PIN LL_GPIO_PIN_7
+
+#define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_5
+#define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_7
+
+
+#define STMICRO
+#define CPU_FREQUENCY_MHZ 64
+
+///////////////////
+// high-cycle flash
+///////////////////
+// // first bank of high-cycle flash
+// #define FLASH_MAX_SECTORS 64
+// #define FLASH_PAGE_SIZE (0x2000)
+// #define EEPROM_PAGE_SIZE (0x1800)
+// // 0x080f0000 does not read when EDATAEN = 1 and EDATASTR = 7
+// // it does read when these bits in the option bytes are cleared
+// // the inverse is true of 0x09000000
+// #define EEPROM_BASE (0x09000000)
+// #define EEPROM_PAGE (7)
+// // eeprom address is 0x900a800 with one EDATA high cycle (6kB) page enabled
+// #define EEPROM_START_ADD (uint32_t)(EEPROM_BASE + EEPROM_PAGE*EEPROM_PAGE_SIZE)
+
+// first bank of high-cycle flash
+#define FLASH_MAX_SECTORS 64
+#define FLASH_PAGE_SIZE (0x2000)
+#define EEPROM_PAGE_SIZE (0x2000)
+// 0x080f0000 does not read when EDATAEN = 1 and EDATASTR = 7
+// it does read when these bits in the option bytes are cleared
+// the inverse is true of 0x09000000
+#define EEPROM_BASE (0x08000000)
+#define EEPROM_PAGE (126)
+// eeprom address is 0x900a800 with one EDATA high cycle (6kB) page enabled
+#define EEPROM_START_ADD (uint32_t)(EEPROM_BASE + EEPROM_PAGE*EEPROM_PAGE_SIZE)
+
+
+
+
+#define INTERVAL_TIMER TIM2
+#define INTERVAL_TIMER_ENABLE_CLOCK() { \
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM2); \
+}
+#define TEN_KHZ_TIMER TIM6
+#define TEN_KHZ_TIMER_IRQn TIM6_IRQn
+#define TEN_KHZ_TIMER_ENABLE_CLOCK() { \
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM6); \
+}
+
+#define UTILITY_TIMER TIM17
+#define UTILITY_TIMER_ENABLE_CLOCK() { \
+    LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM17); \
+}
+// utility timer frequency is 1MHz
+#define UTILITY_TIMER_PSC (CPU_FREQUENCY_MHZ/1 - 1)
+#define COM_TIMER_ENABLE_CLOCK() { \
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM14); \
+}
+#define COM_TIMER TIM14
+#define COM_TIMER_IRQ TIM14_IRQn
+
+// blueesc
+// #define INPUT_SIGNAL_PORT GPIOA
+// #define INPUT_SIGNAL_PIN 8
+// #define INPUT_SIGNAL_LL_PIN LL_GPIO_PIN_8
+// #define INPUT_SIGNAL_AF 1
+
+#define INPUT_SIGNAL_PORT GPIOC
+#define INPUT_SIGNAL_PIN 12
+#define INPUT_SIGNAL_LL_PIN LL_GPIO_PIN_12
+#define INPUT_SIGNAL_AF 2
+
+// blueesc
+// #define INPUT_TIMER TIM1
+// #define INPUT_TIMER_CH TIM1_CH1
+
+#define INPUT_TIMER TIM15
+// #define INPUT_TIMER_CH
+
+// blueesc
+// #define INPUT_TIMER_DMA_REQ LL_GPDMA1_REQUEST_TIM1_CH1
+#define INPUT_TIMER_DMA_REQ LL_GPDMA1_REQUEST_TIM15_CH1
+
+#define INPUT_TIMER_DMA_CHANNEL 4
+
+/* blueesc
+#define INPUT_TIMER_RESET() { \
+    RCC->APB2RSTR |= RCC_APB2RSTR_TIM1RST; \
+    RCC->APB2RSTR &= ~RCC_APB2RSTR_TIM1RST; \
+}
+*/
+
+#define INPUT_TIMER_RESET() { \
+    RCC->APB2RSTR |= RCC_APB2RSTR_TIM15RST; \
+    RCC->APB2RSTR &= ~RCC_APB2RSTR_TIM15RST; \
+}
+
+// blueesc
+// #define DMA_REQ_INPUT_TIMER LL_GPDMA1_REQUEST_TIM1_CH1
+
+// nucleo
+#define DMA_REQ_INPUT_TIMER LL_GPDMA1_REQUEST_TIM15_CH1
+
+
+#define IC_TIMER_CHANNEL LL_TIM_CHANNEL_CH1
+
+
+/* blueesc
+#define INPUT_TIMER_ENABLE_CLOCK() { \
+    LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM1); \
+}
+*/
+#define INPUT_TIMER_ENABLE_CLOCK() { \
+    LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM15); \
+}
+
+#define TIM1_AUTORELOAD 1999
+#define APPLICATION_ADDRESS 0x08001000
+#define TARGET_MIN_BEMF_COUNTS 3
+// #define USE_SERIAL_TELEMETRY // moved to individual ESCs
+#define USE_ADC
+#define LOOP_FREQUENCY_HZ 10000
+
+#endif
+
+#ifdef BLUEESC_H563
+#define FILE_NAME "BLUEESC_H563"
+#define FIRMWARE_NAME "BlueESC H563"
+#define DEAD_TIME 60
+#define HARDWARE_GROUP_H563
+#define TARGET_STALL_PROTECTION_INTERVAL 8000
+#define MILLIVOLT_PER_AMP 28
+#define USE_SERIAL_TELEMETRY
+
+#define PHASEA_CURRENT_PORT GPIOF
+#define PHASEA_CURRENT_PIN LL_GPIO_PIN_14
+#define PHASEA_CURRENT_ADC ADC2
+#define PHASEA_CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_6
+
+#define PHASEB_CURRENT_PORT GPIOA
+#define PHASEB_CURRENT_PIN LL_GPIO_PIN_6
+// ADC12_INP3
+#define PHASEB_CURRENT_ADC ADC1
+// #define PHASEB_CURRENT_ADC ADC2
+#define PHASEB_CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_3
+
+#define PHASEC_CURRENT_PORT GPIOF
+#define PHASEC_CURRENT_PIN LL_GPIO_PIN_12
+#define PHASEC_CURRENT_ADC ADC1
+#define PHASEC_CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_6
+
+#define CURRENT_SENSE_ADC_PORT PHASEB_CURRENT_PORT
+#define CURRENT_SENSE_ADC_PIN PHASEB_CURRENT_PIN
+// there is only support for one current measurment,
+// so use phase B for now
+#define CURRENT_ADC_CHANNEL PHASEB_CURRENT_ADC_CHANNEL
+
+#define VOLTAGE_SENSE_ADC_PORT GPIOB
+#define VOLTAGE_SENSE_ADC_PIN LL_GPIO_PIN_0
+// ADC12_INP9
+#define VOLTAGE_ADC ADC1
+// #define VOLTAGE_ADC ADC2
+#define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_9
+
+// MB1404 nucleo red user LED3
+// #define LED_R_GPIO_PORT GPIOG
+// #define LED_R_GPIO_PIN 4
+
+// // MB1404 nucleo green user LED1
+// #define LED_G_GPIO_PORT GPIOB
+// #define LED_G_GPIO_PIN 0
+
+// // MB1404 nucleo yellow user LED2
+// #define LED_B_GPIO_PORT GPIOF
+// #define LED_B_GPIO_PIN 4
 
 
 ///////////////
@@ -1563,44 +1854,202 @@
 #define COMPC_GPIO_PORT GPIOC
 #define COMPC_GPIO_PIN 14
 
-// nucleo
-// #define COMPA_GPIO_PORT GPIOC
-// #define COMPA_GPIO_PIN 9
-
-// #define COMPB_GPIO_PORT GPIOC
-// #define COMPB_GPIO_PIN 11
-
-// #define COMPC_GPIO_PORT GPIOD
-// #define COMPC_GPIO_PIN 2
 
 
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+/////////////////////////////////////////
+// 5V voltage regulator control
+/////////////////////////////////////////
+
+#define VREG5V_ENABLE_PORT GPIOI
+#define VREG5V_ENABLE_PIN 2
+
+#define VREG5V_PGOOD_PORT GPIOI
+#define VREG5V_PGOOD_PIN 1
+
+#define VREG5V_SYNC_PORT GPIOI
+#define VREG5V_SYNC_PIN 0
+#define VREG5V_SYNC_AF 2
+
+/////////////////////////////////////////
+// 5V voltage regulator control
+/////////////////////////////////////////
 
 
-// blueesc
-// #define COMPB_GPIO_PORT GPIOC
-// #define COMPB_GPIO_PIN 15
-// #define COMPB_EXTI_IMR EXTI_IMR1_IM15
-// #define COMPB_EXTI_RTSR EXTI_RTSR1_RT13
-// #define COMPB_EXTI_FTSR EXTI_FTSR1_T13
-// #define COMPB_NVIC_IRQ EXTI15_IRQn
-// #define COMPB_EXTICR
-// #define COMPB_EXTI_CR_POS
+#define DRV_ENABLE_PORT GPIOH
+#define DRV_ENABLE_PIN 3
 
 
-// PC9 'comp out a'
-// PC11 'comp out b'
-// PD2 'comp oug c'
+#define DSHOT_PRIORITY_THRESHOLD 70
+
+// #define HCLK_FREQUENCY 25000000
+
+#define AM32_HSE_VALUE (25000000)
+
+#define INPUT_DMA_CHANNEL LL_DMA_CHANNEL_4
+#define IC_DMA_IRQ_NAME GPDMA1_Channel4_IRQn
+
+#define DRV_FAULT_PORT GPIOH
+#define DRV_FAULT_PIN 5
 
 
+// INLA H13
+#define PHASE_A_GPIO_LOW LL_GPIO_PIN_13
+#define PHASE_A_GPIO_LOW_PIN 13
+#define PHASE_A_GPIO_PORT_LOW GPIOH
+#define PHASE_A_LOW_AF 3
 
-// pcba defs
-// #define COMPA_GPIO_PORT GPIOF
-// #define COMPA_GPIO_PIN 4
+// INHA C6
+#define PHASE_A_GPIO_HIGH LL_GPIO_PIN_6
+#define PHASE_A_GPIO_HIGH_PIN 6
+#define PHASE_A_GPIO_PORT_HIGH GPIOC
+#define PHASE_A_HIGH_AF 3
 
-// #define COMPB_GPIO_PORT GPIOC
-// #define COMPB_GPIO_PIN 15
-// #define COMPC_GPIO_PORT GPIOC
-// #define COMPC_GPIO_PIN 14
+// INLB H14
+#define PHASE_B_GPIO_LOW LL_GPIO_PIN_14
+#define PHASE_B_GPIO_LOW_PIN 14
+#define PHASE_B_GPIO_PORT_LOW GPIOE
+#define PHASE_B_LOW_AF 3
+
+// INHB I6
+#define PHASE_B_GPIO_HIGH LL_GPIO_PIN_6
+#define PHASE_B_GPIO_HIGH_PIN 6
+#define PHASE_B_GPIO_PORT_HIGH GPIOI
+#define PHASE_B_HIGH_AF 3
+
+// INLC H15
+#define PHASE_C_GPIO_LOW LL_GPIO_PIN_15
+#define PHASE_C_GPIO_LOW_PIN 15
+#define PHASE_C_GPIO_PORT_LOW GPIOH
+#define PHASE_C_LOW_AF 3
+
+// INHC I7
+#define PHASE_C_GPIO_HIGH LL_GPIO_PIN_7
+#define PHASE_C_GPIO_HIGH_PIN 7
+#define PHASE_C_GPIO_PORT_HIGH GPIOI
+#define PHASE_C_HIGH_AF 3
+
+#define BRIDGE_UL_PORT PHASE_A_GPIO_PORT_LOW
+#define BRIDGE_UL_PIN PHASE_A_GPIO_LOW_PIN
+#define BRIDGE_UL_AF PHASE_A_LOW_AF
+
+#define BRIDGE_UH_PORT PHASE_A_GPIO_PORT_HIGH
+#define BRIDGE_UH_PIN PHASE_A_GPIO_HIGH_PIN
+#define BRIDGE_UH_AF PHASE_A_HIGH_AF
+
+#define BRIDGE_VL_PORT PHASE_B_GPIO_PORT_LOW
+#define BRIDGE_VL_PIN PHASE_B_GPIO_LOW_PIN
+#define BRIDGE_VL_AF PHASE_B_LOW_AF
+
+#define BRIDGE_VH_PORT PHASE_B_GPIO_PORT_HIGH
+#define BRIDGE_VH_PIN PHASE_B_GPIO_HIGH_PIN
+#define BRIDGE_VH_AF PHASE_B_HIGH_AF
+
+#define BRIDGE_WL_PORT PHASE_C_GPIO_PORT_LOW
+#define BRIDGE_WL_PIN PHASE_C_GPIO_LOW_PIN
+#define BRIDGE_WL_AF PHASE_C_LOW_AF
+#define BRIDGE_WH_PORT PHASE_C_GPIO_PORT_HIGH
+#define BRIDGE_WH_PIN PHASE_C_GPIO_HIGH_PIN
+#define BRIDGE_WH_AF PHASE_C_HIGH_AF
+
+#define STMICRO
+#define CPU_FREQUENCY_MHZ 250
+
+///////////////////
+// high-cycle flash
+///////////////////
+// // first bank of high-cycle flash
+// #define FLASH_MAX_SECTORS 64
+// #define FLASH_PAGE_SIZE (0x2000)
+// #define EEPROM_PAGE_SIZE (0x1800)
+// // 0x080f0000 does not read when EDATAEN = 1 and EDATASTR = 7
+// // it does read when these bits in the option bytes are cleared
+// // the inverse is true of 0x09000000
+// #define EEPROM_BASE (0x09000000)
+// #define EEPROM_PAGE (7)
+// // eeprom address is 0x900a800 with one EDATA high cycle (6kB) page enabled
+// #define EEPROM_START_ADD (uint32_t)(EEPROM_BASE + EEPROM_PAGE*EEPROM_PAGE_SIZE)
+
+// first bank of high-cycle flash
+#define FLASH_MAX_SECTORS 64
+#define FLASH_PAGE_SIZE (0x2000)
+#define EEPROM_PAGE_SIZE (0x2000)
+// 0x080f0000 does not read when EDATAEN = 1 and EDATASTR = 7
+// it does read when these bits in the option bytes are cleared
+// the inverse is true of 0x09000000
+#define EEPROM_BASE (0x08000000)
+#define EEPROM_PAGE (126)
+// eeprom address is 0x900a800 with one EDATA high cycle (6kB) page enabled
+#define EEPROM_START_ADD (uint32_t)(EEPROM_BASE + EEPROM_PAGE*EEPROM_PAGE_SIZE)
+
+
+#define INTERVAL_TIMER TIM2
+#define INTERVAL_TIMER_ENABLE_CLOCK() { \
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM2); \
+}
+#define TEN_KHZ_TIMER TIM6
+#define TEN_KHZ_TIMER_IRQn TIM6_IRQn
+#define TEN_KHZ_TIMER_ENABLE_CLOCK() { \
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM6); \
+}
+
+#define UTILITY_TIMER TIM17
+#define UTILITY_TIMER_ENABLE_CLOCK() { \
+    LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM17); \
+}
+// utility timer frequency is 1MHz
+#define UTILITY_TIMER_PSC (CPU_FREQUENCY_MHZ/1 - 1)
+#define COM_TIMER_ENABLE_CLOCK() { \
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM14); \
+}
+#define COM_TIMER TIM14
+#define COM_TIMER_IRQ TIM14_IRQn
+
+////////////////////////////////
+// PWM/DSHOT INPUT PIN AND TIMER
+////////////////////////////////
+#define INPUT_SIGNAL_PORT GPIOB
+#define INPUT_SIGNAL_PIN 8
+#define INPUT_SIGNAL_LL_PIN LL_GPIO_PIN_8
+#define INPUT_SIGNAL_AF 2
+
+#define INPUT_TIMER TIM4
+#define INPUT_TIMER_DMA_REQ LL_GPDMA1_REQUEST_TIM4_CH3
+#define INPUT_TIMER_DMA_CHANNEL 4
+
+#define DMA_REQ_INPUT_TIMER LL_GPDMA1_REQUEST_TIM4_CH3
+#define IC_TIMER_CHANNEL LL_TIM_CHANNEL_CH3
+
+#define INPUT_TIMER_CCMR_CONFIG() { \
+    INPUT_TIMER->CCMR2 = 0b01 << TIM_CCMR2_CC3S_Pos; \
+}
+
+#define INPUT_TIMER_CCER_CONFIG() { \
+    INPUT_TIMER->CCER = 0xa << TIM_CCER_CC3E_Pos; \
+}
+
+#define INPUT_TIMER_CCR ((uint32_t)&TIM4->CCR3)
+
+#define INPUT_TIMER_DIER_CCDE TIM_DIER_CC3DE
+#define INPUT_TIMER_ENABLE_CLOCK() { \
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM4); \
+}
+#define INPUT_TIMER_RESET() { \
+    RCC->APB1LRSTR |= RCC_APB1LRSTR_TIM4RST; \
+    RCC->APB1LRSTR &= ~RCC_APB1LRSTR_TIM4RST; \
+}
+
+
+#define TIM1_AUTORELOAD 1999
+#define APPLICATION_ADDRESS 0x08001000
+#define TARGET_MIN_BEMF_COUNTS 3
+// #define USE_SERIAL_TELEMETRY // moved to individual ESCs
+#define USE_ADC
+#define LOOP_FREQUENCY_HZ 10000
+
 #endif
 
 #ifndef FIRMWARE_NAME
@@ -2996,220 +3445,6 @@
 
 #ifdef MCU_H563
 
-#define DRV_ENABLE_PORT GPIOF
-#define DRV_ENABLE_PIN 0
-
-
-#define DSHOT_PRIORITY_THRESHOLD 70
-
-// #define HCLK_FREQUENCY 25000000
-
-#define AM32_HSE_VALUE (25000000)
-
-#define INPUT_DMA_CHANNEL LL_DMA_CHANNEL_4
-#define IC_DMA_IRQ_NAME GPDMA1_Channel4_IRQn
-
-#define DRV_FAULT_PORT GPIOH
-#define DRV_FAULT_PIN 5
-// INLB PH14 TIM8_CH1N AF03
-// INLC PH15 TIM8_CH1N AF03
-
-// INHA PC6 TIM8_CH1 AF03
-// INHB PI6 TIM8_CH2 AF03
-// INHC PI7 TIM8_CH3 AF03
-
-// INLA PH13 TIM8_CH1N AF03
-
-// white wire // logic analyzer (ch0/1)
-// INLA PE8
-#define PHASE_B_GPIO_LOW LL_GPIO_PIN_8
-#define PHASE_B_GPIO_LOW_PIN 8
-#define PHASE_B_GPIO_PORT_LOW GPIOE
-#define PHASE_B_LOW_AF 1
-// #define PHASE_B_LOW_Alternate LL_GPIO_AF_1
-
-// grey wire // logic analyzer (ch1/2)
-// INHA PE9
-#define PHASE_B_GPIO_HIGH LL_GPIO_PIN_9
-#define PHASE_B_GPIO_HIGH_PIN 9
-#define PHASE_B_GPIO_PORT_HIGH GPIOE
-#define PHASE_B_HIGH_AF 1
-
-#define BRIDGE_UL_PORT PHASE_A_GPIO_PORT_LOW
-#define BRIDGE_UL_PIN PHASE_A_GPIO_LOW_PIN
-#define BRIDGE_UL_AF PHASE_A_LOW_AF
-
-#define BRIDGE_UH_PORT PHASE_A_GPIO_PORT_HIGH
-#define BRIDGE_UH_PIN PHASE_A_GPIO_HIGH_PIN
-#define BRIDGE_UH_AF PHASE_A_HIGH_AF
-
-// purple wire (ch2/3)
-// INLB PE10
-#define PHASE_A_GPIO_LOW LL_GPIO_PIN_10
-#define PHASE_A_GPIO_LOW_PIN 10
-#define PHASE_A_GPIO_PORT_LOW GPIOE
-#define PHASE_A_LOW_AF 1
-
-// blue wire (ch3/4)
-// INHB PE11
-#define PHASE_A_GPIO_HIGH LL_GPIO_PIN_11
-#define PHASE_A_GPIO_HIGH_PIN 11
-#define PHASE_A_GPIO_PORT_HIGH GPIOE
-#define PHASE_A_HIGH_AF 1
-
-#define BRIDGE_VL_PORT PHASE_B_GPIO_PORT_LOW
-#define BRIDGE_VL_PIN PHASE_B_GPIO_LOW_PIN
-#define BRIDGE_VL_AF PHASE_B_LOW_AF
-
-#define BRIDGE_VH_PORT PHASE_B_GPIO_PORT_HIGH
-#define BRIDGE_VH_PIN PHASE_B_GPIO_HIGH_PIN
-#define BRIDGE_VH_AF PHASE_B_HIGH_AF
-
-// yellow wire (ch4/5)
-// INLC PE12
-#define PHASE_C_GPIO_LOW LL_GPIO_PIN_12
-#define PHASE_C_GPIO_LOW_PIN 12
-#define PHASE_C_GPIO_PORT_LOW GPIOE
-#define PHASE_C_LOW_AF 1
-
-// green wire (ch5/6)
-// INHC PE13
-#define PHASE_C_GPIO_HIGH LL_GPIO_PIN_13
-#define PHASE_C_GPIO_HIGH_PIN 13
-#define PHASE_C_GPIO_PORT_HIGH GPIOE
-#define PHASE_C_HIGH_AF 1
-
-#define BRIDGE_WL_PORT PHASE_C_GPIO_PORT_LOW
-#define BRIDGE_WL_PIN PHASE_C_GPIO_LOW_PIN
-#define BRIDGE_WL_AF PHASE_C_LOW_AF
-#define BRIDGE_WH_PORT PHASE_C_GPIO_PORT_HIGH
-#define BRIDGE_WH_PIN PHASE_C_GPIO_HIGH_PIN
-#define BRIDGE_WH_AF PHASE_C_HIGH_AF
-
-
-#define CURRENT_SENSE_ADC_PIN LL_GPIO_PIN_5
-#define VOLTAGE_SENSE_ADC_PIN LL_GPIO_PIN_7
-
-#define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_5
-#define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_7
-
-
-#define STMICRO
-#define CPU_FREQUENCY_MHZ 64
-
-///////////////////
-// high-cycle flash
-///////////////////
-// // first bank of high-cycle flash
-// #define FLASH_MAX_SECTORS 64
-// #define FLASH_PAGE_SIZE (0x2000)
-// #define EEPROM_PAGE_SIZE (0x1800)
-// // 0x080f0000 does not read when EDATAEN = 1 and EDATASTR = 7
-// // it does read when these bits in the option bytes are cleared
-// // the inverse is true of 0x09000000
-// #define EEPROM_BASE (0x09000000)
-// #define EEPROM_PAGE (7)
-// // eeprom address is 0x900a800 with one EDATA high cycle (6kB) page enabled
-// #define EEPROM_START_ADD (uint32_t)(EEPROM_BASE + EEPROM_PAGE*EEPROM_PAGE_SIZE)
-
-// first bank of high-cycle flash
-#define FLASH_MAX_SECTORS 64
-#define FLASH_PAGE_SIZE (0x2000)
-#define EEPROM_PAGE_SIZE (0x2000)
-// 0x080f0000 does not read when EDATAEN = 1 and EDATASTR = 7
-// it does read when these bits in the option bytes are cleared
-// the inverse is true of 0x09000000
-#define EEPROM_BASE (0x08000000)
-#define EEPROM_PAGE (126)
-// eeprom address is 0x900a800 with one EDATA high cycle (6kB) page enabled
-#define EEPROM_START_ADD (uint32_t)(EEPROM_BASE + EEPROM_PAGE*EEPROM_PAGE_SIZE)
-
-
-
-
-#define INTERVAL_TIMER TIM2
-#define INTERVAL_TIMER_ENABLE_CLOCK() { \
-    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM2); \
-}
-#define TEN_KHZ_TIMER TIM6
-#define TEN_KHZ_TIMER_IRQn TIM6_IRQn
-#define TEN_KHZ_TIMER_ENABLE_CLOCK() { \
-    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM6); \
-}
-
-#define UTILITY_TIMER TIM17
-#define UTILITY_TIMER_ENABLE_CLOCK() { \
-    LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM17); \
-}
-// utility timer frequency is 1MHz
-#define UTILITY_TIMER_PSC (CPU_FREQUENCY_MHZ/1 - 1)
-#define COM_TIMER_ENABLE_CLOCK() { \
-    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM14); \
-}
-#define COM_TIMER TIM14
-#define COM_TIMER_IRQ TIM14_IRQn
-
-// blueesc
-// #define INPUT_SIGNAL_PORT GPIOA
-// #define INPUT_SIGNAL_PIN 8
-// #define INPUT_SIGNAL_LL_PIN LL_GPIO_PIN_8
-// #define INPUT_SIGNAL_AF 1
-
-#define INPUT_SIGNAL_PORT GPIOC
-#define INPUT_SIGNAL_PIN 12
-#define INPUT_SIGNAL_LL_PIN LL_GPIO_PIN_12
-#define INPUT_SIGNAL_AF 2
-
-// blueesc
-// #define INPUT_TIMER TIM1
-// #define INPUT_TIMER_CH TIM1_CH1
-
-#define INPUT_TIMER TIM15
-// #define INPUT_TIMER_CH
-
-// blueesc
-// #define INPUT_TIMER_DMA_REQ LL_GPDMA1_REQUEST_TIM1_CH1
-#define INPUT_TIMER_DMA_REQ LL_GPDMA1_REQUEST_TIM15_CH1
-
-#define INPUT_TIMER_DMA_CHANNEL 4
-
-/* blueesc
-#define INPUT_TIMER_RESET() { \
-    RCC->APB2RSTR |= RCC_APB2RSTR_TIM1RST; \
-    RCC->APB2RSTR &= ~RCC_APB2RSTR_TIM1RST; \
-}
-*/
-
-#define INPUT_TIMER_RESET() { \
-    RCC->APB2RSTR |= RCC_APB2RSTR_TIM15RST; \
-    RCC->APB2RSTR &= ~RCC_APB2RSTR_TIM15RST; \
-}
-
-// blueesc
-// #define DMA_REQ_INPUT_TIMER LL_GPDMA1_REQUEST_TIM1_CH1
-
-// nucleo
-#define DMA_REQ_INPUT_TIMER LL_GPDMA1_REQUEST_TIM15_CH1
-
-
-#define IC_TIMER_CHANNEL LL_TIM_CHANNEL_CH1
-
-
-/* blueesc
-#define INPUT_TIMER_ENABLE_CLOCK() { \
-    LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM1); \
-}
-*/
-#define INPUT_TIMER_ENABLE_CLOCK() { \
-    LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM15); \
-}
-
-#define TIM1_AUTORELOAD 1999
-#define APPLICATION_ADDRESS 0x08001000
-#define TARGET_MIN_BEMF_COUNTS 3
-// #define USE_SERIAL_TELEMETRY // moved to individual ESCs
-#define USE_ADC
-#define LOOP_FREQUENCY_HZ 10000
 #endif
 
 #ifdef MCU_F031

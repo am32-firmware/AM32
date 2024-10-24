@@ -25,8 +25,12 @@ typedef struct {
     uint8_t txDmaRequest;
 
     uint8_t _irqn;
+
+    // swap the rx/tx signals and pads
+    uint8_t swap;
 } usart_t;
 
+extern usart_t usarts[];
 
 void usart_dma_transfer_complete_isr(usart_t* usart);
 void usart_initialize(usart_t* usart);

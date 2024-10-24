@@ -19,8 +19,6 @@ void usart_initialize(usart_t* usart)
     //     return;
     // }
 
-    
-
     // set the channel destination address
     usart->txDma->ref->CDAR = (uint32_t)&usart->ref->TDR;
     // set the channel source address
@@ -81,6 +79,11 @@ void usart_initialize(usart_t* usart)
     // enable usart dma requests for receive and transmit
     usart->ref->CR3 |= USART_CR3_DMAR | USART_CR3_DMAT;
     //usart->ref->PRESC |= 0b0101;
+
+    if (usart->swap) {
+        // swap the physical RX/TX mapping
+        usart->ref->CR2 |= USART_CR2_SWAP;
+    }
     // enable usart
     usart->ref->CR1 |= USART_CR1_UE;
 }

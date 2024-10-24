@@ -348,18 +348,18 @@ void spi_start_transfer(spi_t* spi)
     spi->ref->CR1 |= SPI_CR1_CSTART; // spi must be enabled
 }
 
-void SPI4_IRQHandler(void)
-{
-    spi.ref->IFCR |= SPI_IFCR_EOTC;
-    spi_disable(&spi);
-    spi_start_tx_dma_transfer(&spi);
-    // spi_dma_transfer_complete_isr(&spi);
-}
+// void SPI4_IRQHandler(void)
+// {
+//     spi.ref->IFCR |= SPI_IFCR_EOTC;
+//     spi_disable(&spi);
+//     spi_start_tx_dma_transfer(&spi);
+//     // spi_dma_transfer_complete_isr(&spi);
+// }
 
-void SPI2_IRQHandler(void)
-{
-    spi.ref->IFCR |= SPI_IFCR_EOTC;
-    spi_disable(&spi);
-    spi_start_tx_dma_transfer(&spi);
-    // spi_dma_transfer_complete_isr(&spi);
-}
+// void SPI2_IRQHandler(void)
+// {
+//     spi.ref->IFCR |= SPI_IFCR_EOTC;
+//     spi_disable(&spi);
+//     spi_start_tx_dma_transfer(&spi);
+//     // spi_dma_transfer_complete_isr(&spi);
+// }

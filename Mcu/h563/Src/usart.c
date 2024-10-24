@@ -15,54 +15,11 @@ void usart_dma_cb(dmaChannel_t* dma)
 
 void usart_initialize(usart_t* usart)
 {
-    if (!usart) {
-        return;
-    }
+    // if (!usart) {
+    //     return;
+    // }
 
-    switch((uint32_t)usart->ref)
-    {
-        case USART1_BASE:
-#if defined(STM32G4)
-            muxReqIdRx = DMA_REQUEST_USART1_RX;
-            muxReqIdTx = DMA_REQUEST_USART1_TX;
-#endif
-            break;
-#if defined(USART2)
-        case USART2_BASE:
-#if defined(STM32G4)
-            muxReqIdRx = DMA_REQUEST_USART2_RX;
-            muxReqIdTx = DMA_REQUEST_USART2_TX;
-#endif
-        break;
-#endif
-#if defined(USART3)
-        case USART3_BASE:
-            RCC->APB1LENR |= RCC_APB1LENR_USART3EN;
- #if defined(STM32G4)
-            muxReqIdRx = DMA_REQUEST_USART3_RX;
-            muxReqIdTx = DMA_REQUEST_USART3_TX;
- #endif
-        break;
-#endif
-        default:
-            // assume clock has already been configured
-            break;
-    }
     
-//     switch((uint32_t)usart->txDma->dma)
-//     {
-//         case GPDMA1_BASE:
-//             __HAL_RCC_DMA1_CLK_ENABLE();
-//             break;
-// #if defined(DMA2)
-//         case DMA2_BASE:
-//             __HAL_RCC_DMA2_CLK_ENABLE();
-//             break;
-// #endif
-//         default:
-//             // assert_not_reached();
-//             return;
-//     }
 
     // set the channel destination address
     usart->txDma->ref->CDAR = (uint32_t)&usart->ref->TDR;

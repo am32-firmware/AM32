@@ -21,7 +21,7 @@ uint32_t dma_buffer[64] = { 0 };
 char out_put = 0;
 uint8_t buffer_padding = 0;
 
-extern void transfercomplete();
+extern void transfercomplete(); // defined in signal.c
 
 void io_dma_cb(dmaChannel_t* dma)
 {

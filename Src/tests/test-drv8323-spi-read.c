@@ -70,9 +70,9 @@ int main()
     spi.txDmaRequest = LL_GPDMA1_REQUEST_SPI5_TX;
     spi.rxDmaRequest = LL_GPDMA1_REQUEST_SPI5_RX;
     // spi.CFG1_MBR = 0b100; // prescaler = 32 // this does not work on blueesc
-    // spi.CFG1_MBR = 0b101; // prescaler = 64 // this works on blueesc
+    spi.CFG1_MBR = 0b101; // prescaler = 64 // this works on blueesc
     // spi.CFG1_MBR = 0b100; // prescaler = 128 // this works on blueesc
-    spi.CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
+    // spi.CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
     spi_initialize(&spi);
 
     gpio_initialize(&gpioSpiNSS);

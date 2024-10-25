@@ -332,8 +332,8 @@ uint16_t spi_write_word(spi_t* spi, uint16_t word)
     spi->ref->TXDR = word;
     while (!(spi->ref->SR & SPI_SR_TXTF));
     spi_start_transfer(spi);
-    // while (!(spi->ref->SR & SPI_SR_EOT));
-    while (!(spi->ref->SR & SPI_SR_TXC));
+    while (!(spi->ref->SR & SPI_SR_EOT));
+    // while (!(spi->ref->SR & SPI_SR_TXC));
     while (!(spi->ref->SR & SPI_SR_RXP));
     // asm("nop");
     return (uint16_t)spi->ref->RXDR;

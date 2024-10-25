@@ -1,3 +1,6 @@
+// This example configures a couple
+// of registers on the drv8323
+
 #include "stm32h563xx.h"
 #include "targets.h"
 #include "spi.h"
@@ -11,6 +14,7 @@ uint16_t spi_rx_buffer[256];
 uint16_t spi_tx_buffer[256];
 spi_t spi;
 drv8323_t drv;
+
 int main()
 {
     mcu_setup();
@@ -30,15 +34,6 @@ int main()
     // GPIO_OUTPUT);
     gpio_initialize(&gpioDrv8323Enable);
     gpio_set_speed(&gpioDrv8323Enable, 0b11);
-    // gpio_reset(&gpioDrv8323Enable);
-    // for (int i = 0; i < 0xfffff; i++) {
-    //     asm("nop");
-    // }
-    // gpio_set(&gpioDrv8323Enable);
-
-    // for (int i = 0; i < 0xfffff; i++) {
-    //     asm("nop");
-    // }
 
     gpio_t gpioSpiNSS = DEF_GPIO(
         GATE_DRIVER_SPI_NSS_PORT,
@@ -60,7 +55,6 @@ int main()
         GATE_DRIVER_SPI_MOSI_PIN,
         GATE_DRIVER_SPI_MOSI_AF,
         GPIO_AF);
-    
 
     spi.ref = SPI5;
 
@@ -86,7 +80,6 @@ int main()
     spi.CFG1_MBR = 0b101; // prescaler = 64 // this works on blueesc
     // spi.CFG1_MBR = 0b100; // prescaler = 128 // this works on blueesc
     // spi.CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
-    // spi_initialize(&spi);
 
     drv.spi = &spi;
     drv.gpioEnable = &gpioDrv8323Enable;
@@ -99,7 +92,6 @@ int main()
     gpio_initialize(&gpioSpiMOSI);
     gpio_set_speed(&gpioSpiMOSI, GPIO_SPEED_VERYFAST);
 
-    // drv8323_read_reg(&drv, DRV8323_REG_CSA_CONTROL);
     while (!drv8323_write_reg(&drv,
         DRV8323_REG_CSA_CONTROL |
         DRV8323_CSA_VREF_DIV |
@@ -108,54 +100,12 @@ int main()
     ));
 
     while (!drv8323_write_reg(&drv,
-    DRV8323_REG_OCP_CONTROL |
-    DRV8323_OCP_DEADTIME_400ns |
-    DRV8323_OCP_DEGLITCH_6us |
-    DRV8323_OCP_VDSLVL_600mV));
-
-    // while (!drv8323_write_reg(&drv,
-    //     DRV8323_REG_DRIVER_CONTROL |
-    //     DRV8323_DRIVER_CONTROL_COAST
-    // ));
-
-
-    // for (uint16_t i = 0; i < 200; i++) {
-    //     spi_write(&spi, &i, 1);
-    // }
-    // uint16_t data = 0xf550;
-    // spi_write(&spi, &data, 1);
-    // spi_write(&spi, &data, 1);
-    // spi_write(&spi, &data, 1);
-    
-    // uint16_t data[] = {
-    //     0xff00,
-    //     0x5555,
-    //     0x0550,
-    //     0x5555,
-    //     0x00ff,
-    //     0x5555,
-    //     0x5555,
-    //     0x5555,
-    //     0x5555,
-    //     0x5555,
-    // };
-
-    // uint16_t data[] = {
-    //     DRV8323_READ | DRV8323_REG_FAULT_STATUS_1,
-    //     DRV8323_READ | DRV8323_REG_VGS_STATUS_2,
-    //     DRV8323_READ | DRV8323_REG_DRIVER_CONTROL,
-    //     DRV8323_READ | DRV8323_REG_GATE_DRIVE_HS,
-    //     DRV8323_READ | DRV8323_REG_GATE_DRIVE_LS,
-    //     DRV8323_READ | DRV8323_REG_OCP_CONTROL,
-    //     DRV8323_READ | DRV8323_REG_CSA_CONTROL,
-    // };
-
-    // spi_write(&spi, data, 7);
-    // uint16_t readData[10];
-    // while(spi_rx_waiting(&spi) < 7);
-    // spi_read(&spi, readData, 7);
+        DRV8323_REG_OCP_CONTROL |
+        DRV8323_OCP_DEADTIME_400ns |
+        DRV8323_OCP_DEGLITCH_6us |
+        DRV8323_OCP_VDSLVL_600mV
+    ));
 
     while(1) {
-        // spi_write(&spi, data, 5);
     }
 }

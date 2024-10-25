@@ -1506,6 +1506,24 @@
 
 // INLA PH13 TIM8_CH1N AF03
 
+#define GATE_DRIVER_SPI_NSS_PORT GPIOF
+#define GATE_DRIVER_SPI_NSS_PIN 6
+#define GATE_DRIVER_SPI_NSS_AF 5
+
+// purple wire
+#define GATE_DRIVER_SPI_SCK_PORT GPIOF
+#define GATE_DRIVER_SPI_SCK_PIN 7
+#define GATE_DRIVER_SPI_SCK_AF 5
+// grey wire
+#define GATE_DRIVER_SPI_MISO_PORT GPIOF
+#define GATE_DRIVER_SPI_MISO_PIN 8
+#define GATE_DRIVER_SPI_MISO_AF 5
+// blue wire
+#define GATE_DRIVER_SPI_MOSI_PORT GPIOF
+#define GATE_DRIVER_SPI_MOSI_PIN 9
+#define GATE_DRIVER_SPI_MOSI_AF 5
+
+#define GATE_DRIVER_SPI_PERIPH SPI5
 
 //////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ///!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1547,6 +1565,24 @@
 #define PHASE_A_GPIO_LOW_PIN 10
 #define PHASE_A_GPIO_PORT_LOW GPIOE
 #define PHASE_A_LOW_AF 1
+#define GATE_DRIVER_SPI_NSS_PORT GPIOF
+#define GATE_DRIVER_SPI_NSS_PIN 6
+#define GATE_DRIVER_SPI_NSS_AF 5
+
+// purple wire
+#define GATE_DRIVER_SPI_SCK_PORT GPIOF
+#define GATE_DRIVER_SPI_SCK_PIN 7
+#define GATE_DRIVER_SPI_SCK_AF 5
+// grey wire
+#define GATE_DRIVER_SPI_MISO_PORT GPIOF
+#define GATE_DRIVER_SPI_MISO_PIN 8
+#define GATE_DRIVER_SPI_MISO_AF 5
+// blue wire
+#define GATE_DRIVER_SPI_MOSI_PORT GPIOF
+#define GATE_DRIVER_SPI_MOSI_PIN 9
+#define GATE_DRIVER_SPI_MOSI_AF 5
+
+#define GATE_DRIVER_SPI_PERIPH SPI5
 
 // blue wire (ch3/4)
 // INHB PE11
@@ -1919,6 +1955,24 @@
 // Aux USART/UART/LPUART control
 /////////////////////////////////////////
 
+#define GATE_DRIVER_SPI_NSS_PORT GPIOF
+#define GATE_DRIVER_SPI_NSS_PIN 6
+#define GATE_DRIVER_SPI_NSS_AF 5
+
+// purple wire
+#define GATE_DRIVER_SPI_SCK_PORT GPIOF
+#define GATE_DRIVER_SPI_SCK_PIN 7
+#define GATE_DRIVER_SPI_SCK_AF 5
+// grey wire
+#define GATE_DRIVER_SPI_MISO_PORT GPIOF
+#define GATE_DRIVER_SPI_MISO_PIN 8
+#define GATE_DRIVER_SPI_MISO_AF 5
+// blue wire
+#define GATE_DRIVER_SPI_MOSI_PORT GPIOF
+#define GATE_DRIVER_SPI_MOSI_PIN 9
+#define GATE_DRIVER_SPI_MOSI_AF 5
+
+#define GATE_DRIVER_SPI_PERIPH SPI5
 /////////////////////////////////////////
 // Main USART control
 /////////////////////////////////////////
@@ -1940,22 +1994,34 @@
 /////////////////////////////////////////
 
 
+/////////////////////////////////////////
+// Gate driver control
+/////////////////////////////////////////
+
 #define DRV_ENABLE_PORT GPIOH
 #define DRV_ENABLE_PIN 3
-
-
-#define DSHOT_PRIORITY_THRESHOLD 70
-
-// #define HCLK_FREQUENCY 25000000
-
-#define AM32_HSE_VALUE (25000000)
-
-#define INPUT_DMA_CHANNEL LL_DMA_CHANNEL_4
-#define IC_DMA_IRQ_NAME GPDMA1_Channel4_IRQn
 
 #define DRV_FAULT_PORT GPIOH
 #define DRV_FAULT_PIN 5
 
+#define GATE_DRIVER_SPI_NSS_PORT GPIOF
+#define GATE_DRIVER_SPI_NSS_PIN 6
+#define GATE_DRIVER_SPI_NSS_AF 5
+
+// purple wire
+#define GATE_DRIVER_SPI_SCK_PORT GPIOF
+#define GATE_DRIVER_SPI_SCK_PIN 7
+#define GATE_DRIVER_SPI_SCK_AF 5
+// grey wire
+#define GATE_DRIVER_SPI_MISO_PORT GPIOF
+#define GATE_DRIVER_SPI_MISO_PIN 8
+#define GATE_DRIVER_SPI_MISO_AF 5
+// blue wire
+#define GATE_DRIVER_SPI_MOSI_PORT GPIOF
+#define GATE_DRIVER_SPI_MOSI_PIN 9
+#define GATE_DRIVER_SPI_MOSI_AF 5
+
+#define GATE_DRIVER_SPI_PERIPH SPI5
 
 // INLA H13
 #define PHASE_A_GPIO_LOW LL_GPIO_PIN_13
@@ -1972,7 +2038,7 @@
 // INLB H14
 #define PHASE_B_GPIO_LOW LL_GPIO_PIN_14
 #define PHASE_B_GPIO_LOW_PIN 14
-#define PHASE_B_GPIO_PORT_LOW GPIOE
+#define PHASE_B_GPIO_PORT_LOW GPIOH
 #define PHASE_B_LOW_AF 3
 
 // INHB I6
@@ -2015,6 +2081,20 @@
 #define BRIDGE_WH_PORT PHASE_C_GPIO_PORT_HIGH
 #define BRIDGE_WH_PIN PHASE_C_GPIO_HIGH_PIN
 #define BRIDGE_WH_AF PHASE_C_HIGH_AF
+
+
+/////////////////////////////////////////
+// Gate driver control
+/////////////////////////////////////////
+
+#define DSHOT_PRIORITY_THRESHOLD 70
+
+// #define HCLK_FREQUENCY 25000000
+
+#define AM32_HSE_VALUE (25000000)
+
+#define INPUT_DMA_CHANNEL LL_DMA_CHANNEL_4
+#define IC_DMA_IRQ_NAME GPDMA1_Channel4_IRQn
 
 #define STMICRO
 #define CPU_FREQUENCY_MHZ 250

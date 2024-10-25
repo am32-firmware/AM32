@@ -72,6 +72,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-delay.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-drv8323-spi.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-drv8323-spi-read.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-drv8323-spi-setup.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom-erase.c

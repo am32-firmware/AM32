@@ -6,7 +6,7 @@
 
 static uint16_t spi_rx_buffer[256];
 static uint16_t spi_tx_buffer[256];
-static spi_t spi;
+spi_t spi;
 
 int main()
 {
@@ -16,10 +16,15 @@ int main()
     RCC->APB3ENR |= RCC_APB3ENR_SPI5EN;
 
     gpio_t gpioDrv8323Enable = DEF_GPIO(
-        GPIOF,
+        DRV_ENABLE_PORT,
+        DRV_ENABLE_PIN,
         0,
-        0,
-        GPIO_OUTPUT    );
+        GPIO_OUTPUT);
+    // gpio_t gpioDrv8323Enable = DEF_GPIO(
+    // GPIOF,
+    // 0,
+    // 0,
+    // GPIO_OUTPUT);
     gpio_initialize(&gpioDrv8323Enable);
     gpio_set_speed(&gpioDrv8323Enable, 0b11);
     gpio_reset(&gpioDrv8323Enable);
@@ -62,7 +67,9 @@ int main()
     spi._tx_buffer_size = 256;
     spi.rxDma = &dmaChannels[7];
     spi.txDma = &dmaChannels[0];
-
+    spi.txDmaRequest = LL_GPDMA1_REQUEST_SPI5_TX;
+    spi.rxDmaRequest = LL_GPDMA1_REQUEST_SPI5_RX;
+    spi.CFG1_MBR = 0b111; // prescaler = 256
     spi_initialize(&spi);
 
     gpio_initialize(&gpioSpiNSS);

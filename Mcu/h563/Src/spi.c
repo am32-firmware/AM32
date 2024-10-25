@@ -178,6 +178,9 @@ void spi_initialize(spi_t* spi)
         case SPI4_BASE:
             NVIC_EnableIRQ(SPI4_IRQn);
             break;
+        case SPI5_BASE:
+            NVIC_EnableIRQ(SPI5_IRQn);
+            break;
     }
     spi->ref->CFG1 |= SPI_CFG1_RXDMAEN;
 
@@ -348,6 +351,14 @@ void spi_start_transfer(spi_t* spi)
     spi->ref->CR1 |= SPI_CR1_CSTART; // spi must be enabled
 }
 
+// void SPI2_IRQHandler(void)
+// {
+//     spi.ref->IFCR |= SPI_IFCR_EOTC;
+//     spi_disable(&spi);
+//     spi_start_tx_dma_transfer(&spi);
+//     // spi_dma_transfer_complete_isr(&spi);
+// }
+
 // void SPI4_IRQHandler(void)
 // {
 //     spi.ref->IFCR |= SPI_IFCR_EOTC;
@@ -356,10 +367,10 @@ void spi_start_transfer(spi_t* spi)
 //     // spi_dma_transfer_complete_isr(&spi);
 // }
 
-// void SPI2_IRQHandler(void)
-// {
-//     spi.ref->IFCR |= SPI_IFCR_EOTC;
-//     spi_disable(&spi);
-//     spi_start_tx_dma_transfer(&spi);
-//     // spi_dma_transfer_complete_isr(&spi);
-// }
+void SPI5_IRQHandler(void)
+{
+    spi.ref->IFCR |= SPI_IFCR_EOTC;
+    spi_disable(&spi);
+    spi_start_tx_dma_transfer(&spi);
+    // spi_dma_transfer_complete_isr(&spi);
+}

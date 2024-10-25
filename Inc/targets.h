@@ -1955,24 +1955,6 @@
 // Aux USART/UART/LPUART control
 /////////////////////////////////////////
 
-#define GATE_DRIVER_SPI_NSS_PORT GPIOF
-#define GATE_DRIVER_SPI_NSS_PIN 6
-#define GATE_DRIVER_SPI_NSS_AF 5
-
-// purple wire
-#define GATE_DRIVER_SPI_SCK_PORT GPIOF
-#define GATE_DRIVER_SPI_SCK_PIN 7
-#define GATE_DRIVER_SPI_SCK_AF 5
-// grey wire
-#define GATE_DRIVER_SPI_MISO_PORT GPIOF
-#define GATE_DRIVER_SPI_MISO_PIN 8
-#define GATE_DRIVER_SPI_MISO_AF 5
-// blue wire
-#define GATE_DRIVER_SPI_MOSI_PORT GPIOF
-#define GATE_DRIVER_SPI_MOSI_PIN 9
-#define GATE_DRIVER_SPI_MOSI_AF 5
-
-#define GATE_DRIVER_SPI_PERIPH SPI5
 /////////////////////////////////////////
 // Main USART control
 /////////////////////////////////////////

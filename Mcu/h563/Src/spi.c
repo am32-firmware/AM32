@@ -169,24 +169,24 @@ void spi_initialize(spi_t* spi)
     // a session and the beginning of the first data frame
     spi->ref->CFG2 |= 0b1111 << SPI_CFG2_MSSI_Pos;
 
-    // enable DMA requests on transmission
-    spi->ref->CFG1 |= SPI_CFG1_TXDMAEN;
+    // // enable DMA requests on transmission
+    // spi->ref->CFG1 |= SPI_CFG1_TXDMAEN;
 
-    // enable TXC TxFIFO transmission complete interrupt
-    spi->ref->IER |= SPI_IER_EOTIE;
-    switch((uint32_t)spi->ref) {
-        case SPI2_BASE:
-            NVIC_EnableIRQ(SPI2_IRQn);
-            break;
-        case SPI4_BASE:
-            NVIC_EnableIRQ(SPI4_IRQn);
-            break;
-        case SPI5_BASE:
-            NVIC_EnableIRQ(SPI5_IRQn);
-            break;
-    }
-    // enable rx dma requests
-    spi->ref->CFG1 |= SPI_CFG1_RXDMAEN;
+    // // enable TXC TxFIFO transmission complete interrupt
+    // spi->ref->IER |= SPI_IER_EOTIE;
+    // switch((uint32_t)spi->ref) {
+    //     case SPI2_BASE:
+    //         NVIC_EnableIRQ(SPI2_IRQn);
+    //         break;
+    //     case SPI4_BASE:
+    //         NVIC_EnableIRQ(SPI4_IRQn);
+    //         break;
+    //     case SPI5_BASE:
+    //         NVIC_EnableIRQ(SPI5_IRQn);
+    //         break;
+    // }
+    // // enable rx dma requests
+    // spi->ref->CFG1 |= SPI_CFG1_RXDMAEN;
 
     // set DSIZE (frame width) to 16 bits
     spi->ref->CFG1 |= 0b01111 << SPI_CFG1_DSIZE_Pos;
@@ -319,18 +319,22 @@ void spi_write(spi_t* spi, const uint16_t* data, uint8_t length)
 
 uint16_t spi_write_word(spi_t* spi, uint16_t word)
 {
-    while (spi->ref->CR1 & SPI_CR1_SPE) {
-        // spi busy doing transfer
-    }
+    // while (spi->ref->CR1 & SPI_CR1_SPE) {
+    //     // spi busy doing transfer
+    // }
     spi_disable(spi);
-    spi->ref->IFCR |= SPI_IFCR_TXTFC;
+    // for some reason these flags must be cleared here
+    // even though they are (at least externally) cleared
+    // automatically when disable and enable are called
+    spi->ref->IFCR |= SPI_IFCR_TXTFC | SPI_IFCR_EOTC;
     spi->ref->CR2 = 1;
     spi_enable(spi);
     spi->ref->TXDR = word;
+    while (!(spi->ref->SR & SPI_SR_TXTF));
     spi_start_transfer(spi);
     // while (!(spi->ref->SR & SPI_SR_EOT));
     while (!(spi->ref->SR & SPI_SR_TXC));
-    // while (!(spi->ref->SR & SPI_SR_RXP));
+    while (!(spi->ref->SR & SPI_SR_RXP));
     // asm("nop");
     return (uint16_t)spi->ref->RXDR;
 }

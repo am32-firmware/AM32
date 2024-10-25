@@ -15,16 +15,16 @@ int main()
     // enable spi clock
     RCC->APB3ENR |= RCC_APB3ENR_SPI5EN;
 
-    // gpio_t gpioDrv8323Enable = DEF_GPIO(
-    //     DRV_ENABLE_PORT,
-    //     DRV_ENABLE_PIN,
-    //     0,
-    //     GPIO_OUTPUT);
     gpio_t gpioDrv8323Enable = DEF_GPIO(
-    GPIOF,
-    0,
-    0,
-    GPIO_OUTPUT);
+        DRV_ENABLE_PORT,
+        DRV_ENABLE_PIN,
+        0,
+        GPIO_OUTPUT);
+    // gpio_t gpioDrv8323Enable = DEF_GPIO(
+    // GPIOF,
+    // 0,
+    // 0,
+    // GPIO_OUTPUT);
     gpio_initialize(&gpioDrv8323Enable);
     gpio_set_speed(&gpioDrv8323Enable, 0b11);
     gpio_reset(&gpioDrv8323Enable);
@@ -69,12 +69,14 @@ int main()
     spi.txDma = &dmaChannels[0];
     spi.txDmaRequest = LL_GPDMA1_REQUEST_SPI5_TX;
     spi.rxDmaRequest = LL_GPDMA1_REQUEST_SPI5_RX;
-    spi.CFG1_MBR = 0b100; // prescaler = 256
+    // spi.CFG1_MBR = 0b100; // prescaler = 32
+    spi.CFG1_MBR = 0b111; // prescaler = 256
     spi_initialize(&spi);
 
     gpio_initialize(&gpioSpiNSS);
     gpio_initialize(&gpioSpiSCK);
     gpio_initialize(&gpioSpiMISO);
+    gpio_configure_pupdr(&gpioSpiMISO, GPIO_PULL_UP);
     gpio_initialize(&gpioSpiMOSI);
 
     // for (uint16_t i = 0; i < 200; i++) {
@@ -109,7 +111,7 @@ int main()
     };
 
     spi_write(&spi, data, 7);
-    uint16_t readData[10];
+    uint16_t readData[7];
     while(spi_rx_waiting(&spi) < 7);
     spi_read(&spi, readData, 7);
 

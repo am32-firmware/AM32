@@ -69,7 +69,7 @@ int main()
     spi.txDma = &dmaChannels[0];
     spi.txDmaRequest = LL_GPDMA1_REQUEST_SPI5_TX;
     spi.rxDmaRequest = LL_GPDMA1_REQUEST_SPI5_RX;
-    spi.CFG1_MBR = 0b111; // prescaler = 256
+    spi.CFG1_MBR = 0b100; // prescaler = 256
     spi_initialize(&spi);
 
     gpio_initialize(&gpioSpiNSS);

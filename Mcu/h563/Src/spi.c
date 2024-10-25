@@ -56,6 +56,9 @@ void spi_configure_rcc_clock_selection(spi_t* spi, uint8_t selection)
         case SPI4_BASE:
             RCC->CCIPR3 |= selection << RCC_CCIPR3_SPI4SEL_Pos;
             break;
+        case SPI5_BASE:
+            RCC->CCIPR3 |= selection << RCC_CCIPR3_SPI5SEL_Pos;
+            break;
         default:
             break;
     }

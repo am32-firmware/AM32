@@ -11,16 +11,19 @@ spi_t spi;
 drv8323_t drv;
 int main()
 {
-    // enable dma clock
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPDMA1EN;
+    mcu_setup();
     // enable spi clock
-    RCC->APB3ENR |= RCC_APB3ENR_SPI5EN;
-
+    GADE_DRIVER_SPI_ENABLE_CLOCK();
     gpio_t gpioDrv8323Enable = DEF_GPIO(
-        GPIOF,
-        0,
+        DRV_ENABLE_PORT,
+        DRV_ENABLE_PIN,
         0,
         GPIO_OUTPUT);
+    // gpio_t gpioDrv8323Enable = DEF_GPIO( // nucleo
+    // GPIOF,
+    // 0,
+    // 0,
+    // GPIO_OUTPUT);
     gpio_initialize(&gpioDrv8323Enable);
     gpio_set_speed(&gpioDrv8323Enable, 0b11);
     // gpio_reset(&gpioDrv8323Enable);
@@ -63,7 +66,13 @@ int main()
     spi._tx_buffer_size = 256;
     spi.rxDma = &dmaChannels[7];
     spi.txDma = &dmaChannels[0];
-
+    spi.txDmaRequest = LL_GPDMA1_REQUEST_SPI5_TX;
+    spi.rxDmaRequest = LL_GPDMA1_REQUEST_SPI5_RX;
+    // spi.CFG1_MBR = 0b011; // prescaler = 16 // this DOES NOT work on blueesc
+    // spi.CFG1_MBR = 0b100; // prescaler = 32 // this works on blueesc
+    spi.CFG1_MBR = 0b101; // prescaler = 64 // this works on blueesc
+    // spi.CFG1_MBR = 0b100; // prescaler = 128 // this works on blueesc
+    // spi.CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
     // spi_initialize(&spi);
 
     drv.spi = &spi;

@@ -52,8 +52,6 @@ bool compare()
 int main()
 {
     mcu_setup();
-
-
     // enable spi clock
     GADE_DRIVER_SPI_ENABLE_CLOCK();
     gpio_t gpioDrv8323Enable = DEF_GPIO(

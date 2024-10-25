@@ -1,3 +1,24 @@
+// This example resets the drv8323
+// then reads all of the registers after reset
+// then the read values are compared with the
+// expected (default) values
+// if a difference is found then the program stops
+// transmitting and spins in a loop
+// to catch the error
+
+// SPI5 is used, because it is used for the gate
+// driver on both the blueesc and the nucleo prototype
+
+// it is found that the blueesc will only operate with the
+// internal pullup enabled, because the gate driver MISO is
+// open-drain
+
+// there is no external pullup, and the spi speeds can only reach a few
+// hundred kilohertz before the data is not correct
+
+// a stronger external pullup should be added to the next revision
+// if higher bitrates are needed
+
 #include "stm32h563xx.h"
 #include "targets.h"
 #include "spi.h"
@@ -26,7 +47,6 @@ bool compare()
         }
     }
 }
-
 
 int main()
 {

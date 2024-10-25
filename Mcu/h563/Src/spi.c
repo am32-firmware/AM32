@@ -137,7 +137,7 @@ void spi_initialize(spi_t* spi)
 
     // SSOM = 1, SP = 000, MIDI > 1
     // SS is pulsed inactive between data frames
-    // spi->ref->CFG2 |= SPI_CFG2_SSOM;
+    spi->ref->CFG2 |= SPI_CFG2_SSOM;
 
     // configure software management of SS signal input
     // 0: SS input value is determined by the SS PAD
@@ -159,12 +159,12 @@ void spi_initialize(spi_t* spi)
     spi->ref->CFG2 |= SPI_CFG2_MASTER;
 
     // 15 clock cycle periods delay inserted between two consecutive data frames
-    // spi->ref->CFG2 |= 0b1111 << SPI_CFG2_MIDI_Pos;
+    spi->ref->CFG2 |= 0b1111 << SPI_CFG2_MIDI_Pos;
 
     // set MSSI to 15
     // insert 15 clock cycle periods delay between SS opening
     // a session and the beginning of the first data frame
-    // spi->ref->CFG2 |= 0b1111;
+    spi->ref->CFG2 |= 0b1111;
 
     // enable DMA requests on transmission
     spi->ref->CFG1 |= SPI_CFG1_TXDMAEN;

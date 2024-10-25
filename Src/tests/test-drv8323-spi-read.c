@@ -15,16 +15,16 @@ int main()
     // enable spi clock
     RCC->APB3ENR |= RCC_APB3ENR_SPI5EN;
 
-    gpio_t gpioDrv8323Enable = DEF_GPIO(
-        DRV_ENABLE_PORT,
-        DRV_ENABLE_PIN,
-        0,
-        GPIO_OUTPUT);
     // gpio_t gpioDrv8323Enable = DEF_GPIO(
-    // GPIOF,
-    // 0,
-    // 0,
-    // GPIO_OUTPUT);
+    //     DRV_ENABLE_PORT,
+    //     DRV_ENABLE_PIN,
+    //     0,
+    //     GPIO_OUTPUT);
+    gpio_t gpioDrv8323Enable = DEF_GPIO(
+    GPIOF,
+    0,
+    0,
+    GPIO_OUTPUT);
     gpio_initialize(&gpioDrv8323Enable);
     gpio_set_speed(&gpioDrv8323Enable, 0b11);
     gpio_reset(&gpioDrv8323Enable);

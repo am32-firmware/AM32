@@ -98,9 +98,9 @@ void spi_initialize(spi_t* spi)
     spi->rxDma->ref->CTR2 |= spi->rxDmaRequest;
 
     // set the transfer length
-    spi->rxDma->ref->CBR1 = 256;
+    spi->rxDma->ref->CBR1 = 2*256;
     // set the block repeated destination address offset
-    spi->rxDma->ref->CBR2 |= 256 << DMA_CBR2_BRDAO_Pos;
+    spi->rxDma->ref->CBR2 |= 2*256 << DMA_CBR2_BRDAO_Pos;
     spi->rxDma->ref->CBR1 |= DMA_CBR1_BRDDEC;
     // configure single LLI to run repeatedly
     spi->rxDma->ref->CLLR = 0x08000004 & DMA_CLLR_LA_Msk;
@@ -221,7 +221,7 @@ uint8_t spi_read(spi_t* spi, uint16_t* word, uint8_t length) {
 // rxhead = 0 CNDTR=255 = 1 data waiting
 // rxhead = CNDTR-256 = rx empty
 uint8_t spi_rx_waiting(spi_t* spi) {
-    return 256 - (spi->rxDma->ref->CBR1 & DMA_CBR1_BNDT_Msk) - spi->_rx_head;
+    return 256 - (spi->rxDma->ref->CBR1/2 & DMA_CBR1_BNDT_Msk) - spi->_rx_head;
 }
 
 // how many bytes are waiting to be shifted out

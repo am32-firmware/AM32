@@ -54,6 +54,8 @@ int main()
     mcu_setup();
     // enable spi clock
     GADE_DRIVER_SPI_ENABLE_CLOCK();
+
+
     gpio_t gpioDrv8323Enable = DEF_GPIO(
         DRV_ENABLE_PORT,
         DRV_ENABLE_PIN,
@@ -101,6 +103,17 @@ int main()
 
     spi.ref = SPI5;
 
+
+    // 000: rcc_pclk3 selected as kernel clock (default after reset)
+    // 001: pll2_q_ck selected as kernel clock
+    // 010: pll3_q_ck selected as kernel clock
+    // 011: hsi_ker_ck selected as kernel clock
+    // 100: csi_ker_ck selected as kernel clock
+    // 101: hse_ck selected as kernel clock
+    // others: reserved, the kernel clock is disabled
+    spi_configure_rcc_clock_selection(&spi, 0b101);
+
+
     spi._rx_buffer = spi_rx_buffer;
     spi._tx_buffer = spi_tx_buffer;
     spi._rx_buffer_size = 256;
@@ -116,14 +129,6 @@ int main()
     // spi.CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
     spi_initialize(&spi);
 
-    // 000: rcc_pclk3 selected as kernel clock (default after reset)
-    // 001: pll2_q_ck selected as kernel clock
-    // 010: pll3_q_ck selected as kernel clock
-    // 011: hsi_ker_ck selected as kernel clock
-    // 100: csi_ker_ck selected as kernel clock
-    // 101: hse_ck selected as kernel clock
-    // others: reserved, the kernel clock is disabled
-    spi_configure_rcc_clock_selection(&spi, 0b101);
 
 
     gpio_initialize(&gpioSpiNSS);

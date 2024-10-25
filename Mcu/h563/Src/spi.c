@@ -370,10 +370,10 @@ void spi_start_transfer(spi_t* spi)
 //     // spi_dma_transfer_complete_isr(&spi);
 // }
 
-void SPI5_IRQHandler(void)
-{
-    spi.ref->IFCR |= SPI_IFCR_EOTC;
-    spi_disable(&spi);
-    spi_start_tx_dma_transfer(&spi);
-    // spi_dma_transfer_complete_isr(&spi);
-}
+// void SPI5_IRQHandler(void)
+// {
+//     spi.ref->IFCR |= SPI_IFCR_EOTC;
+//     spi_disable(&spi);
+//     spi_start_tx_dma_transfer(&spi);
+//     // spi_dma_transfer_complete_isr(&spi);
+// }

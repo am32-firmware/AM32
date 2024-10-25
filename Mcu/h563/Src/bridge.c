@@ -49,38 +49,41 @@ timComStepChannelConfig comSteps[] =
 
 void bridge_initialize()
 {
-    // __HAL_RCC_TIM1_CLK_ENABLE();
-    RCC->APB2ENR |= RCC_APB2ENR_TIM1EN;
+    // __HAL_RCC_BRIDGE_TIMER_CLK_ENABLE();
+    // RCC->APB2ENR |= RCC_APB2ENR_BRIDGE_TIMEREN;
+
+    BRIDGE_TIMER_ENABLE_CLOCK();
 
     bridge_set_run_frequency(24000);
-    //TIM1->BDTR |= 0x40;
-    TIM1->CCR1 = 0;
-    TIM1->CCR2 = 0;
-    TIM1->CCR3 = 0;
-    TIM1->CCR4 = 1600;
+    BRIDGE_TIMER->BDTR |= 0x40;
+    BRIDGE_TIMER->CCR1 = 0;
+    BRIDGE_TIMER->CCR2 = 0;
+    BRIDGE_TIMER->CCR3 = 0;
+    BRIDGE_TIMER->CCR4 = 1600;
 
     // 2048 counts period, 2048 steps of throttle resolution
-    TIM1->ARR = 2047;
+    BRIDGE_TIMER->ARR = 2047;
 
-    TIM1->CCMR1 = comSteps[bridgeComStep].ccmr1; // set channel 1 pwm mode 1
-    TIM1->CCMR2 = comSteps[bridgeComStep].ccmr2; // channel3
+    BRIDGE_TIMER->CCMR1 = comSteps[bridgeComStep].ccmr1; // set channel 1 pwm mode 1
+    BRIDGE_TIMER->CCMR2 = comSteps[bridgeComStep].ccmr2; // channel3
     // enable channel + channeln
-    TIM1->CCER = comSteps[bridgeComStep].ccer;
+    BRIDGE_TIMER->CCER = comSteps[bridgeComStep].ccer;
 
     // enable TRGO2 on rising edge of channel 4 for adc trigger
-    // TIM1->CR2 |= 0b0111 << TIM_CR2_MMS2_Pos;
+    // BRIDGE_TIMER->CR2 |= 0b0111 << TIM_CR2_MMS2_Pos;
     // enable TRGO on OC4REF for adc trigger
-    TIM1->CR2 |= 0b111 << TIM_CR2_MMS_Pos;
+    BRIDGE_TIMER->CR2 |= 0b111 << TIM_CR2_MMS_Pos;
 
-    TIM1->BDTR |= TIM_BDTR_OSSR | TIM_BDTR_OSSI;
-    bridge_set_deadtime_ns(2000);
-    TIM1->CR2 |= TIM_CR2_CCPC;
-    TIM1->CR1 |= TIM_CR1_CEN;
+    BRIDGE_TIMER->BDTR |= TIM_BDTR_OSSR | TIM_BDTR_OSSI;
+    // bridge_set_deadtime_ns(2000);
+    // BRIDGE_TIMER->BDTR = (BRIDGE_TIMER->BDTR & ~0xf) | 127;
+    BRIDGE_TIMER->CR2 |= TIM_CR2_CCPC;
+    BRIDGE_TIMER->CR1 |= TIM_CR1_CEN;
 
     // get preload aligned with bridgeComStep
     bridge_commutate();
 
-    //TIM1->CR1 |= 0b11<<5;
+    //BRIDGE_TIMER->CR1 |= 0b11<<5;
 
     bridge_gpio_initialize();
 
@@ -106,30 +109,30 @@ void bridge_gpio_initialize()
 void bridge_set_mode_audio(void)
 {
     bridge_set_audio_duty(0);
-    TIM1->ARR = 0xff;
-    TIM1->CCR4 = 0x80;
+    BRIDGE_TIMER->ARR = 0xff;
+    BRIDGE_TIMER->CCR4 = 0x80;
     bridge_set_audio_frequency(2000);
 }
 
 void bridge_set_mode_run(void)
 {
     bridge_set_run_duty(0);
-    TIM1->ARR = 2047;
-    TIM1->CCR4 = 1600;
+    BRIDGE_TIMER->ARR = 2047;
+    BRIDGE_TIMER->CCR4 = 1600;
     bridge_set_run_frequency(16000);
 }
 
 void bridge_set_audio_frequency(uint16_t frequency)
 {
-    uint16_t psc = HCLK_FREQUENCY / TIM1->ARR / frequency;
-    TIM1->PSC = psc;
+    uint16_t psc = HCLK_FREQUENCY / BRIDGE_TIMER->ARR / frequency;
+    BRIDGE_TIMER->PSC = psc;
 }
 
 void bridge_set_run_frequency(uint32_t f)
 {
     // f = HCLK/(PSC * 2048)
     // PSC = HCLK/(F*2048)
-    TIM1->PSC = HCLK_FREQUENCY/(f*2048) - 1;
+    BRIDGE_TIMER->PSC = HCLK_FREQUENCY/(f*2048) - 1;
     // TODO update event to load the prescaler into the shadow register
 }
 
@@ -141,9 +144,9 @@ void bridge_set_audio_duty(uint8_t duty)
     // if (duty > 0xf) {
     //     duty = 0xf;
     // }
-    TIM1->CCR1 = duty;
-    TIM1->CCR2 = duty;
-    TIM1->CCR3 = duty;
+    BRIDGE_TIMER->CCR1 = duty;
+    BRIDGE_TIMER->CCR2 = duty;
+    BRIDGE_TIMER->CCR3 = duty;
 }
 
 void bridge_set_run_duty(uint16_t duty)
@@ -151,40 +154,41 @@ void bridge_set_run_duty(uint16_t duty)
     if (duty > 800) {
         duty = 800;
     }
-    TIM1->CCR1 = duty;
-    TIM1->CCR2 = duty;
-    TIM1->CCR3 = duty;
-    TIM1->CCR4 = duty + 1000;
+    BRIDGE_TIMER->CCR1 = duty;
+    BRIDGE_TIMER->CCR2 = duty;
+    BRIDGE_TIMER->CCR3 = duty;
+    BRIDGE_TIMER->CCR4 = duty + 1000;
 }
 
 void bridge_set_com_step(uint8_t step)
 {
     bridgeComStep = step%6;
-    TIM1->CCMR1 = comSteps[bridgeComStep].ccmr1;
-    TIM1->CCMR2 = comSteps[bridgeComStep].ccmr2;
-    TIM1->CCER = comSteps[bridgeComStep].ccer;
-    TIM1->EGR |= TIM_EGR_COMG;
+    BRIDGE_TIMER->CCMR1 = comSteps[bridgeComStep].ccmr1;
+    BRIDGE_TIMER->CCMR2 = comSteps[bridgeComStep].ccmr2;
+    BRIDGE_TIMER->CCER = comSteps[bridgeComStep].ccer;
+    BRIDGE_TIMER->EGR |= TIM_EGR_COMG;
 }
 
 void bridge_commutate(void)
 {
-    TIM1->EGR |= TIM_EGR_COMG;
+    BRIDGE_TIMER->EGR |= TIM_EGR_COMG;
     bridgeComStep++;
     bridgeComStep = bridgeComStep % 6;
-    TIM1->CCMR1 = comSteps[bridgeComStep].ccmr1;
-    TIM1->CCMR2 = comSteps[bridgeComStep].ccmr2;
-    TIM1->CCER = comSteps[bridgeComStep].ccer;
+    BRIDGE_TIMER->CCMR1 = comSteps[bridgeComStep].ccmr1;
+    BRIDGE_TIMER->CCMR2 = comSteps[bridgeComStep].ccmr2;
+    BRIDGE_TIMER->CCER = comSteps[bridgeComStep].ccer;
 }
 
 void bridge_enable(void)
 {
+    BRIDGE_TIMER->EGR |= TIM_EGR_UG;
     // enable main output
-    TIM1->BDTR |= TIM_BDTR_MOE;
+    BRIDGE_TIMER->BDTR |= TIM_BDTR_MOE;
 }
 
 void bridge_disable(void)
 {
-    TIM1->BDTR &= ~TIM_BDTR_MOE;
+    BRIDGE_TIMER->BDTR &= ~TIM_BDTR_MOE;
     bridge_set_run_duty(0);
     bridge_set_audio_duty(0);
 }
@@ -216,6 +220,6 @@ void bridge_set_deadtime_ns(uint32_t deadtime)
         dtg = 0xe0 | deadtime_ticks;
     }
     
-    TIM1->BDTR = (TIM1->BDTR & ~0xf) | dtg;
-    // TIM1->BDTR = (TIM1->BDTR & ~0xf);
+    BRIDGE_TIMER->BDTR = (BRIDGE_TIMER->BDTR & ~0xf) | dtg;
+    // BRIDGE_TIMER->BDTR = (BRIDGE_TIMER->BDTR & ~0xf);
 }

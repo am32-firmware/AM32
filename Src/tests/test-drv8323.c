@@ -21,7 +21,7 @@ int main()
     utility_timer_initialize();
     utility_timer_enable();
     // enable spi clock
-    GADE_DRIVER_SPI_ENABLE_CLOCK();
+    GATE_DRIVER_SPI_ENABLE_CLOCK();
     gpio_t gpioDrv8323Enable = DEF_GPIO(
         DRV_ENABLE_PORT,
         DRV_ENABLE_PIN,

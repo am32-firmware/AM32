@@ -97,7 +97,7 @@ void spi_initialize(spi_t* spi)
     // set the peripheral hardware request selection
     spi->rxDma->ref->CTR2 |= spi->rxDmaRequest;
 
-    // set the transfer length
+    // set the transfer length in bytes (not words!)
     spi->rxDma->ref->CBR1 = 2*256;
     // set the block repeated destination address offset
     spi->rxDma->ref->CBR2 |= 2*256 << DMA_CBR2_BRDAO_Pos;
@@ -130,7 +130,7 @@ void spi_initialize(spi_t* spi)
 
     // spi always controls the state of the gpios,
     // even when disabled (SPE = 0)
-    spi->ref->CFG2 |= SPI_CFG2_AFCNTR;
+    // spi->ref->CFG2 |= SPI_CFG2_AFCNTR;
 
     // enable hardware SS output
     spi->ref->CFG2 |= SPI_CFG2_SSOE;
@@ -164,12 +164,12 @@ void spi_initialize(spi_t* spi)
     // set MSSI to 15
     // insert 15 clock cycle periods delay between SS opening
     // a session and the beginning of the first data frame
-    spi->ref->CFG2 |= 0b1111;
+    spi->ref->CFG2 |= 0b1111 << SPI_CFG2_MSSI_Pos;
 
     // enable DMA requests on transmission
     spi->ref->CFG1 |= SPI_CFG1_TXDMAEN;
 
-    // enable TXC interrupt
+    // enable TXC TxFIFO transmission complete interrupt
     spi->ref->IER |= SPI_IER_EOTIE;
     switch((uint32_t)spi->ref) {
         case SPI2_BASE:
@@ -182,18 +182,11 @@ void spi_initialize(spi_t* spi)
             NVIC_EnableIRQ(SPI5_IRQn);
             break;
     }
+    // enable rx dma requests
     spi->ref->CFG1 |= SPI_CFG1_RXDMAEN;
 
     // set DSIZE (frame width) to 16 bits
-    spi->ref->CFG1 |= 0b01111;
-
-
-
-    // spi->ref->TXDR = DRV8323_WRITE | DRV8323_REG_CSA_CONTROL | DRV8323_REG_CSA_CONTROL_VALUE;
-    // spi->ref->TXDR = DRV8323_WRITE | DRV8323_REG_CSA_CONTROL | DRV8323_REG_CSA_CONTROL_VALUE;
-
-// spi_enable(spi);
-
+    spi->ref->CFG1 |= 0b01111 << SPI_CFG1_DSIZE_Pos;
 }
 
 // NOTE overruns will result in lost data + corruption

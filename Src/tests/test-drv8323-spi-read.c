@@ -7,6 +7,26 @@
 static uint16_t spi_rx_buffer[256];
 static uint16_t spi_tx_buffer[256];
 spi_t spi;
+uint16_t readData[7];
+const uint16_t defaultData[7] = {
+    0,
+    0,
+    0,
+    1023,
+    2047,
+    345,
+    643
+};
+
+bool compare()
+{
+    for (int i = 0; i < 7; i++) {
+        if (readData[i] != defaultData[i]) {
+            for (;;); // spin forever
+        }
+    }
+}
+
 
 int main()
 {
@@ -52,6 +72,7 @@ int main()
         GATE_DRIVER_SPI_MISO_PIN,
         GATE_DRIVER_SPI_MISO_AF,
         GPIO_AF);
+
     gpio_t gpioSpiMOSI = DEF_GPIO(
         GATE_DRIVER_SPI_MOSI_PORT,
         GATE_DRIVER_SPI_MOSI_PIN,
@@ -69,11 +90,11 @@ int main()
     spi.txDma = &dmaChannels[0];
     spi.txDmaRequest = LL_GPDMA1_REQUEST_SPI5_TX;
     spi.rxDmaRequest = LL_GPDMA1_REQUEST_SPI5_RX;
-    spi.CFG1_MBR = 0b011; // prescaler = 16 // this DOES NOT work on blueesc
+    // spi.CFG1_MBR = 0b011; // prescaler = 16 // this DOES NOT work on blueesc
     // spi.CFG1_MBR = 0b100; // prescaler = 32 // this DOES NOT work on blueesc
     // spi.CFG1_MBR = 0b101; // prescaler = 64 // this works on blueesc
     // spi.CFG1_MBR = 0b100; // prescaler = 128 // this DOES NOT work on blueesc
-    // spi.CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
+    spi.CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
     spi_initialize(&spi);
 
     gpio_initialize(&gpioSpiNSS);
@@ -81,27 +102,7 @@ int main()
     gpio_initialize(&gpioSpiMISO);
     gpio_configure_pupdr(&gpioSpiMISO, GPIO_PULL_UP);
     gpio_initialize(&gpioSpiMOSI);
-
-    // for (uint16_t i = 0; i < 200; i++) {
-    //     spi_write(&spi, &i, 1);
-    // }
-    // uint16_t data = 0xf550;
-    // spi_write(&spi, &data, 1);
-    // spi_write(&spi, &data, 1);
-    // spi_write(&spi, &data, 1);
-    
-    // uint16_t data[] = {
-    //     0xff00,
-    //     0x5555,
-    //     0x0550,
-    //     0x5555,
-    //     0x00ff,
-    //     0x5555,
-    //     0x5555,
-    //     0x5555,
-    //     0x5555,
-    //     0x5555,
-    // };
+    gpio_set_speed(&gpioSpiMOSI, GPIO_SPEED_VERYFAST);
 
     uint16_t data[] = {
         DRV8323_READ | DRV8323_REG_FAULT_STATUS_1,
@@ -114,11 +115,13 @@ int main()
     };
 
     spi_write(&spi, data, 7);
-    uint16_t readData[7];
     while(spi_rx_waiting(&spi) < 7);
     spi_read(&spi, readData, 7);
 
     while(1) {
-        // spi_write(&spi, data, 5);
+        spi_write(&spi, data, 7);
+        while(spi_rx_waiting(&spi) < 7);
+        spi_read(&spi, readData, 7);
+        compare();
     }
 }

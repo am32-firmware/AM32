@@ -319,11 +319,14 @@ void spi_write(spi_t* spi, const uint16_t* data, uint8_t length)
 
 uint16_t spi_write_word(spi_t* spi, uint16_t word)
 {
+    while (spi->ref->CR1 & SPI_CR1_SPE) {
+        // spi busy doing transfer
+    }
     spi_disable(spi);
     spi->ref->IFCR |= SPI_IFCR_TXTFC;
     spi->ref->CR2 = 1;
-    spi->ref->TXDR = word;
     spi_enable(spi);
+    spi->ref->TXDR = word;
     spi_start_transfer(spi);
     // while (!(spi->ref->SR & SPI_SR_EOT));
     while (!(spi->ref->SR & SPI_SR_TXC));

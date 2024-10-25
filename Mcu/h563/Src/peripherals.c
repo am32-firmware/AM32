@@ -13,6 +13,7 @@
 #include "comparator.h"
 #include "bridge.h"
 #include "drv8323-spi.h"
+#include "utility-timer.h"
 
 extern void interruptRoutine();
 extern void processDshot();
@@ -272,20 +273,6 @@ void com_timer_initialize(void)
     NVIC_SetPriority(COM_TIMER_IRQ, 0);
     NVIC_EnableIRQ(COM_TIMER_IRQ);
     LL_TIM_EnableARRPreload(COM_TIMER);
-}
-
-void utility_timer_initialize(void)
-{
-    UTILITY_TIMER_ENABLE_CLOCK();
-    UTILITY_TIMER->PSC = UTILITY_TIMER_PSC;
-    UTILITY_TIMER->ARR = 0XFFFF;
-    LL_TIM_DisableARRPreload(UTILITY_TIMER);
-}
-
-void utility_timer_enable(void)
-{
-    LL_TIM_EnableCounter(UTILITY_TIMER);
-    LL_TIM_GenerateEvent_UPDATE(UTILITY_TIMER);
 }
 
 void input_timer_initialize(void)

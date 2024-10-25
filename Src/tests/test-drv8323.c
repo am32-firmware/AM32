@@ -4,6 +4,8 @@
 #include "gpio.h"
 #include "dma.h"
 #include "drv8323-spi.h"
+#include "mcu.h"
+#include "utility-timer.h"
 
 uint16_t spi_rx_buffer[256];
 uint16_t spi_tx_buffer[256];
@@ -12,6 +14,8 @@ drv8323_t drv;
 int main()
 {
     mcu_setup();
+    utility_timer_initialize();
+    utility_timer_enable();
     // enable spi clock
     GADE_DRIVER_SPI_ENABLE_CLOCK();
     gpio_t gpioDrv8323Enable = DEF_GPIO(
@@ -60,6 +64,15 @@ int main()
 
     spi.ref = SPI5;
 
+    // 000: rcc_pclk3 selected as kernel clock (default after reset)
+    // 001: pll2_q_ck selected as kernel clock
+    // 010: pll3_q_ck selected as kernel clock
+    // 011: hsi_ker_ck selected as kernel clock
+    // 100: csi_ker_ck selected as kernel clock
+    // 101: hse_ck selected as kernel clock
+    // others: reserved, the kernel clock is disabled
+    spi_configure_rcc_clock_selection(&spi, 0b101);
+
     spi._rx_buffer = spi_rx_buffer;
     spi._tx_buffer = spi_tx_buffer;
     spi._rx_buffer_size = 256;
@@ -70,9 +83,9 @@ int main()
     spi.rxDmaRequest = LL_GPDMA1_REQUEST_SPI5_RX;
     // spi.CFG1_MBR = 0b011; // prescaler = 16 // this DOES NOT work on blueesc
     // spi.CFG1_MBR = 0b100; // prescaler = 32 // this works on blueesc
-    spi.CFG1_MBR = 0b101; // prescaler = 64 // this works on blueesc
+    // spi.CFG1_MBR = 0b101; // prescaler = 64 // this works on blueesc
     // spi.CFG1_MBR = 0b100; // prescaler = 128 // this works on blueesc
-    // spi.CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
+    spi.CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
     // spi_initialize(&spi);
 
     drv.spi = &spi;
@@ -82,7 +95,9 @@ int main()
     gpio_initialize(&gpioSpiNSS);
     gpio_initialize(&gpioSpiSCK);
     gpio_initialize(&gpioSpiMISO);
+    gpio_configure_pupdr(&gpioSpiMISO, GPIO_PULL_UP);
     gpio_initialize(&gpioSpiMOSI);
+    gpio_set_speed(&gpioSpiMOSI, GPIO_SPEED_VERYFAST);
 
     // drv8323_read_reg(&drv, DRV8323_REG_CSA_CONTROL);
     while (!drv8323_write_reg(&drv,

@@ -81,6 +81,7 @@ int main()
     // 0,
     // 0,
     // GPIO_OUTPUT);
+    gpio_initialize(&gpioDrv8323Enable);
     gpio_set_speed(&gpioDrv8323Enable, 0b11);
     gpio_reset(&gpioDrv8323Enable);
     for (uint32_t i = 0; i < 25000000; i++) {

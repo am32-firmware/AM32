@@ -1,6 +1,8 @@
+#include "utility-timer.h"
+
+#include "stm32h563xx.h"
 #include "stm32h5xx_ll_tim.h"
 
-#include "utility-timer.h"
 #include "targets.h"
 
 void utility_timer_initialize()

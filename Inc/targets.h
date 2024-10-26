@@ -1444,9 +1444,11 @@
 
 //
 
-#ifdef NUCLEO
-#define FILE_NAME "NUCLEO"
-#define FIRMWARE_NAME "NUCLEO"
+#define NUCLEO_H563
+#ifdef NUCLEO_H563
+#include "stm32h5xx_ll_bus.h"
+#define FILE_NAME "NUCLEO_H563"
+#define FIRMWARE_NAME "NUCLEO H563"
 
 #define DEAD_TIME 60
 #define HARDWARE_GROUP_H563
@@ -1482,9 +1484,25 @@
 #define COMPC_GPIO_PORT GPIOD
 #define COMPC_GPIO_PIN 2
 
-#define DRV_ENABLE_PORT GPIOF
-#define DRV_ENABLE_PIN 0
 
+/////////////////////////////////////////
+// 5V voltage regulator control
+/////////////////////////////////////////
+
+// use empty pins
+#define VREG5V_ENABLE_PORT GPIOC
+#define VREG5V_ENABLE_PIN 4
+
+#define VREG5V_PGOOD_PORT GPIOC
+#define VREG5V_PGOOD_PIN 6
+
+#define VREG5V_SYNC_PORT GPIOC
+#define VREG5V_SYNC_PIN 8
+#define VREG5V_SYNC_AF 1 // empty function
+
+/////////////////////////////////////////
+// 5V voltage regulator control
+/////////////////////////////////////////
 
 #define DSHOT_PRIORITY_THRESHOLD 70
 
@@ -1495,14 +1513,25 @@
 #define INPUT_DMA_CHANNEL LL_DMA_CHANNEL_4
 #define IC_DMA_IRQ_NAME GPDMA1_Channel4_IRQn
 
+/////////////////////////////////////////
+// Gate driver control
+/////////////////////////////////////////
+
+#define DRV_ENABLE_PORT GPIOF
+#define DRV_ENABLE_PIN 0
+
+// use an open pin
 #define DRV_FAULT_PORT GPIOH
 #define DRV_FAULT_PIN 5
 
+// use an open pin
+#define DRV_CAL_PORT GPIOH
+#define DRV_CAL_PIN 4
 
+// black/white wire
 #define GATE_DRIVER_SPI_NSS_PORT GPIOF
 #define GATE_DRIVER_SPI_NSS_PIN 6
 #define GATE_DRIVER_SPI_NSS_AF 5
-
 // purple wire
 #define GATE_DRIVER_SPI_SCK_PORT GPIOF
 #define GATE_DRIVER_SPI_SCK_PIN 7
@@ -1517,80 +1546,44 @@
 #define GATE_DRIVER_SPI_MOSI_AF 5
 
 #define GATE_DRIVER_SPI_PERIPH SPI5
+#define GATE_DRIVER_SPI_ENABLE_CLOCK() { \
+    RCC->APB3ENR |= RCC_APB3ENR_SPI5EN; \
+}
 
-//////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-///!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// a and b are switched!!!!!!!!!!!!!!!
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~```
+#define BRIDGE_TIMER TIM1
+
+#define BRIDGE_TIMER_ENABLE_CLOCK() { \
+    RCC->APB2ENR |= RCC_APB2ENR_TIM1EN; \
+}
+
 // white wire // logic analyzer (ch0/1)
 // INLA PE8
-#define PHASE_B_GPIO_LOW LL_GPIO_PIN_8
-#define PHASE_B_GPIO_LOW_PIN 8
-#define PHASE_B_GPIO_PORT_LOW GPIOE
-#define PHASE_B_LOW_AF 1
+#define PHASE_A_GPIO_LOW LL_GPIO_PIN_8
+#define PHASE_A_GPIO_LOW_PIN 8
+#define PHASE_A_GPIO_PORT_LOW GPIOE
+#define PHASE_A_LOW_AF 1
 // #define PHASE_B_LOW_Alternate LL_GPIO_AF_1
 
 // grey wire // logic analyzer (ch1/2)
 // INHA PE9
-#define PHASE_B_GPIO_HIGH LL_GPIO_PIN_9
-#define PHASE_B_GPIO_HIGH_PIN 9
-#define PHASE_B_GPIO_PORT_HIGH GPIOE
-#define PHASE_B_HIGH_AF 1
-
-#define BRIDGE_UL_PORT PHASE_A_GPIO_PORT_LOW
-#define BRIDGE_UL_PIN PHASE_A_GPIO_LOW_PIN
-#define BRIDGE_UL_AF PHASE_A_LOW_AF
-
-#define BRIDGE_UH_PORT PHASE_A_GPIO_PORT_HIGH
-#define BRIDGE_UH_PIN PHASE_A_GPIO_HIGH_PIN
-#define BRIDGE_UH_AF PHASE_A_HIGH_AF
-
-
-//////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-///!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// a and b are switched!!!!!!!!!!!!!!!
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~```
-// purple wire (ch2/3)
-// INLB PE10
-#define PHASE_A_GPIO_LOW LL_GPIO_PIN_10
-#define PHASE_A_GPIO_LOW_PIN 10
-#define PHASE_A_GPIO_PORT_LOW GPIOE
-#define PHASE_A_LOW_AF 1
-#define GATE_DRIVER_SPI_NSS_PORT GPIOF
-#define GATE_DRIVER_SPI_NSS_PIN 6
-#define GATE_DRIVER_SPI_NSS_AF 5
-
-// purple wire
-#define GATE_DRIVER_SPI_SCK_PORT GPIOF
-#define GATE_DRIVER_SPI_SCK_PIN 7
-#define GATE_DRIVER_SPI_SCK_AF 5
-// grey wire
-#define GATE_DRIVER_SPI_MISO_PORT GPIOF
-#define GATE_DRIVER_SPI_MISO_PIN 8
-#define GATE_DRIVER_SPI_MISO_AF 5
-// blue wire
-#define GATE_DRIVER_SPI_MOSI_PORT GPIOF
-#define GATE_DRIVER_SPI_MOSI_PIN 9
-#define GATE_DRIVER_SPI_MOSI_AF 5
-
-#define GATE_DRIVER_SPI_PERIPH SPI5
-
-// blue wire (ch3/4)
-// INHB PE11
-#define PHASE_A_GPIO_HIGH LL_GPIO_PIN_11
-#define PHASE_A_GPIO_HIGH_PIN 11
+#define PHASE_A_GPIO_HIGH LL_GPIO_PIN_9
+#define PHASE_A_GPIO_HIGH_PIN 9
 #define PHASE_A_GPIO_PORT_HIGH GPIOE
 #define PHASE_A_HIGH_AF 1
 
-#define BRIDGE_VL_PORT PHASE_B_GPIO_PORT_LOW
-#define BRIDGE_VL_PIN PHASE_B_GPIO_LOW_PIN
-#define BRIDGE_VL_AF PHASE_B_LOW_AF
+// purple wire (ch2/3)
+// INLB PE10
+#define PHASE_B_GPIO_LOW LL_GPIO_PIN_10
+#define PHASE_B_GPIO_LOW_PIN 10
+#define PHASE_B_GPIO_PORT_LOW GPIOE
+#define PHASE_B_LOW_AF 1
 
-#define BRIDGE_VH_PORT PHASE_B_GPIO_PORT_HIGH
-#define BRIDGE_VH_PIN PHASE_B_GPIO_HIGH_PIN
-#define BRIDGE_VH_AF PHASE_B_HIGH_AF
+// blue wire (ch3/4)
+// INHB PE11
+#define PHASE_B_GPIO_HIGH LL_GPIO_PIN_11
+#define PHASE_B_GPIO_HIGH_PIN 11
+#define PHASE_B_GPIO_PORT_HIGH GPIOE
+#define PHASE_B_HIGH_AF 1
 
 // yellow wire (ch4/5)
 // INLC PE12
@@ -1606,6 +1599,22 @@
 #define PHASE_C_GPIO_PORT_HIGH GPIOE
 #define PHASE_C_HIGH_AF 1
 
+#define BRIDGE_UL_PORT PHASE_A_GPIO_PORT_LOW
+#define BRIDGE_UL_PIN PHASE_A_GPIO_LOW_PIN
+#define BRIDGE_UL_AF PHASE_A_LOW_AF
+
+#define BRIDGE_UH_PORT PHASE_A_GPIO_PORT_HIGH
+#define BRIDGE_UH_PIN PHASE_A_GPIO_HIGH_PIN
+#define BRIDGE_UH_AF PHASE_A_HIGH_AF
+
+#define BRIDGE_VL_PORT PHASE_B_GPIO_PORT_LOW
+#define BRIDGE_VL_PIN PHASE_B_GPIO_LOW_PIN
+#define BRIDGE_VL_AF PHASE_B_LOW_AF
+
+#define BRIDGE_VH_PORT PHASE_B_GPIO_PORT_HIGH
+#define BRIDGE_VH_PIN PHASE_B_GPIO_HIGH_PIN
+#define BRIDGE_VH_AF PHASE_B_HIGH_AF
+
 #define BRIDGE_WL_PORT PHASE_C_GPIO_PORT_LOW
 #define BRIDGE_WL_PIN PHASE_C_GPIO_LOW_PIN
 #define BRIDGE_WL_AF PHASE_C_LOW_AF
@@ -1613,12 +1622,28 @@
 #define BRIDGE_WH_PIN PHASE_C_GPIO_HIGH_PIN
 #define BRIDGE_WH_AF PHASE_C_HIGH_AF
 
+#define GATE_DRIVER_SPI_NSS_PORT GPIOF
+#define GATE_DRIVER_SPI_NSS_PIN 6
+#define GATE_DRIVER_SPI_NSS_AF 5
 
-#define CURRENT_SENSE_ADC_PIN LL_GPIO_PIN_5
-#define VOLTAGE_SENSE_ADC_PIN LL_GPIO_PIN_7
+// purple wire
+#define GATE_DRIVER_SPI_SCK_PORT GPIOF
+#define GATE_DRIVER_SPI_SCK_PIN 7
+#define GATE_DRIVER_SPI_SCK_AF 5
+// grey wire
+#define GATE_DRIVER_SPI_MISO_PORT GPIOF
+#define GATE_DRIVER_SPI_MISO_PIN 8
+#define GATE_DRIVER_SPI_MISO_AF 5
+// blue wire
+#define GATE_DRIVER_SPI_MOSI_PORT GPIOF
+#define GATE_DRIVER_SPI_MOSI_PIN 9
+#define GATE_DRIVER_SPI_MOSI_AF 5
 
-#define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_5
-#define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_7
+#define GATE_DRIVER_SPI_PERIPH SPI5
+
+/////////////////////////////////////////
+// Gate driver control
+/////////////////////////////////////////
 
 // nucleo
 // #define USART_RX_PORT GPIOD
@@ -1629,8 +1654,17 @@
 // #define USART_TX_PIN 8
 // #define USART_TX_AF 7
 
+#define DSHOT_PRIORITY_THRESHOLD 70
+
+// #define HCLK_FREQUENCY 25000000
+
+#define AM32_HSE_VALUE (25000000)
+
+#define INPUT_DMA_CHANNEL LL_DMA_CHANNEL_4
+#define IC_DMA_IRQ_NAME GPDMA1_Channel4_IRQn
+
 #define STMICRO
-#define CPU_FREQUENCY_MHZ 64
+#define CPU_FREQUENCY_MHZ 250
 
 ///////////////////
 // high-cycle flash
@@ -1662,6 +1696,44 @@
 
 
 
+////////////////////////////////
+// PWM/DSHOT INPUT PIN AND TIMER
+////////////////////////////////
+#define INPUT_SIGNAL_PORT GPIOC
+#define INPUT_SIGNAL_PIN 12
+#define INPUT_SIGNAL_LL_PIN LL_GPIO_PIN_12
+#define INPUT_SIGNAL_AF 2
+
+#define INPUT_TIMER TIM15
+#define INPUT_TIMER_DMA_REQ LL_GPDMA1_REQUEST_TIM15_CH1
+#define INPUT_TIMER_DMA_CHANNEL 4
+
+#define IC_TIMER_CHANNEL LL_TIM_CHANNEL_CH1
+
+#define INPUT_TIMER_CCMR_CONFIG() { \
+    INPUT_TIMER->CCMR1 = 0b01 << TIM_CCMR1_CC1S_Pos; \
+}
+
+#define INPUT_TIMER_CCER_CONFIG() { \
+    INPUT_TIMER->CCER = 0xa << TIM_CCER_CC1E_Pos; \
+}
+
+#define INPUT_TIMER_CCR ((uint32_t)&TIM15->CCR1)
+
+#define INPUT_TIMER_DIER_CCDE TIM_DIER_CC1DE
+#define INPUT_TIMER_ENABLE_CLOCK() { \
+    LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM15); \
+}
+#define INPUT_TIMER_RESET() { \
+    RCC->APB2RSTR |= RCC_APB2RSTR_TIM15RST; \
+    RCC->APB2RSTR &= ~RCC_APB2RSTR_TIM15RST; \
+}
+
+////////////////////////////////
+// PWM/DSHOT INPUT PIN AND TIMER
+////////////////////////////////
+
+
 #define INTERVAL_TIMER TIM2
 #define INTERVAL_TIMER_ENABLE_CLOCK() { \
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM2); \
@@ -1684,60 +1756,7 @@
 #define COM_TIMER TIM14
 #define COM_TIMER_IRQ TIM14_IRQn
 
-// blueesc
-// #define INPUT_SIGNAL_PORT GPIOA
-// #define INPUT_SIGNAL_PIN 8
-// #define INPUT_SIGNAL_LL_PIN LL_GPIO_PIN_8
-// #define INPUT_SIGNAL_AF 1
 
-#define INPUT_SIGNAL_PORT GPIOC
-#define INPUT_SIGNAL_PIN 12
-#define INPUT_SIGNAL_LL_PIN LL_GPIO_PIN_12
-#define INPUT_SIGNAL_AF 2
-
-// blueesc
-// #define INPUT_TIMER TIM1
-// #define INPUT_TIMER_CH TIM1_CH1
-
-#define INPUT_TIMER TIM15
-// #define INPUT_TIMER_CH
-
-// blueesc
-// #define INPUT_TIMER_DMA_REQ LL_GPDMA1_REQUEST_TIM1_CH1
-#define INPUT_TIMER_DMA_REQ LL_GPDMA1_REQUEST_TIM15_CH1
-
-#define INPUT_TIMER_DMA_CHANNEL 4
-
-/* blueesc
-#define INPUT_TIMER_RESET() { \
-    RCC->APB2RSTR |= RCC_APB2RSTR_TIM1RST; \
-    RCC->APB2RSTR &= ~RCC_APB2RSTR_TIM1RST; \
-}
-*/
-
-#define INPUT_TIMER_RESET() { \
-    RCC->APB2RSTR |= RCC_APB2RSTR_TIM15RST; \
-    RCC->APB2RSTR &= ~RCC_APB2RSTR_TIM15RST; \
-}
-
-// blueesc
-// #define DMA_REQ_INPUT_TIMER LL_GPDMA1_REQUEST_TIM1_CH1
-
-// nucleo
-#define DMA_REQ_INPUT_TIMER LL_GPDMA1_REQUEST_TIM15_CH1
-
-
-#define IC_TIMER_CHANNEL LL_TIM_CHANNEL_CH1
-
-
-/* blueesc
-#define INPUT_TIMER_ENABLE_CLOCK() { \
-    LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM1); \
-}
-*/
-#define INPUT_TIMER_ENABLE_CLOCK() { \
-    LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM15); \
-}
 
 #define TIM1_AUTORELOAD 1999
 #define APPLICATION_ADDRESS 0x08001000
@@ -1748,15 +1767,17 @@
 
 #endif
 
-#ifdef BLUEESC_H563
+#ifdef BLUEESC
 #include "stm32h5xx_ll_bus.h"
-#define FILE_NAME "BLUEESC_H563"
-#define FIRMWARE_NAME "BlueESC H563"
+#define FILE_NAME "BLUEESC"
+#define FIRMWARE_NAME "BlueESC"
+
 #define DEAD_TIME 60
 #define HARDWARE_GROUP_H563
 #define TARGET_STALL_PROTECTION_INTERVAL 8000
 #define MILLIVOLT_PER_AMP 28
 #define USE_SERIAL_TELEMETRY
+
 
 #define PHASEA_CURRENT_PORT GPIOF
 #define PHASEA_CURRENT_PIN LL_GPIO_PIN_14
@@ -1859,11 +1880,6 @@
 #define COMPC_GPIO_PORT GPIOC
 #define COMPC_GPIO_PIN 14
 
-
-
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 /////////////////////////////////////////
 // 5V voltage regulator control
@@ -1986,15 +2002,14 @@
 #define GATE_DRIVER_SPI_NSS_PIN 6
 #define GATE_DRIVER_SPI_NSS_AF 5
 
-// purple wire
 #define GATE_DRIVER_SPI_SCK_PORT GPIOF
 #define GATE_DRIVER_SPI_SCK_PIN 7
 #define GATE_DRIVER_SPI_SCK_AF 5
-// grey wire
+
 #define GATE_DRIVER_SPI_MISO_PORT GPIOF
 #define GATE_DRIVER_SPI_MISO_PIN 8
 #define GATE_DRIVER_SPI_MISO_AF 5
-// blue wire
+
 #define GATE_DRIVER_SPI_MOSI_PORT GPIOF
 #define GATE_DRIVER_SPI_MOSI_PIN 9
 #define GATE_DRIVER_SPI_MOSI_AF 5
@@ -2176,6 +2191,9 @@
     RCC->APB1LRSTR &= ~RCC_APB1LRSTR_TIM4RST; \
 }
 
+////////////////////////////////
+// PWM/DSHOT INPUT PIN AND TIMER
+////////////////////////////////
 
 #define TIM1_AUTORELOAD 1999
 #define APPLICATION_ADDRESS 0x08001000

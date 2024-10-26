@@ -376,6 +376,7 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
     }
     if (p != NULL && req.name.len != 0 && req.value.union_tag != UAVCAN_PROTOCOL_PARAM_VALUE_EMPTY) {
         const char last_dir_reversed = dir_reversed;
+        const char last_bi_direction = bi_direction;
 
         /*
 	  a parameter set command
@@ -416,10 +417,13 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
             return;
 	}
 
-        if (last_dir_reversed != dir_reversed) {
-            // make dir_reversed change work without reboot
+        if (last_dir_reversed != dir_reversed ||
+            last_bi_direction != bi_direction) {
+            // make dir_reversed and bi_direction change work without
+            // reboot
             forward = 1 - dir_reversed;
             running = 0;
+            armed = 0;
             set_input(0);
         }
     }
@@ -620,6 +624,10 @@ static void set_input(uint16_t input)
     newinput = filtered_input;
     last_can_input = unfiltered_input;
     inputSet = 1;
+
+    // we must set dshot for bi_direction to work
+    dshot = bi_direction;
+
     transfercomplete();
     setInput();
 

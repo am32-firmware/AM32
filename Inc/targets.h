@@ -1444,11 +1444,10 @@
 
 //
 
-#define NUCLEO_H563
-#ifdef NUCLEO_H563
+#ifdef NUCLEO
 #include "stm32h5xx_ll_bus.h"
-#define FILE_NAME "NUCLEO_H563"
-#define FIRMWARE_NAME "NUCLEO H563"
+#define FILE_NAME "NUCLEO"
+#define FIRMWARE_NAME "NUCLEO"
 
 #define DEAD_TIME 60
 #define HARDWARE_GROUP_H563
@@ -1765,10 +1764,10 @@
 
 #endif
 
-#ifdef BLUEESC
+#ifdef BLUEESC_H563
 #include "stm32h5xx_ll_bus.h"
-#define FILE_NAME "BLUEESC"
-#define FIRMWARE_NAME "BlueESC"
+#define FILE_NAME "BLUEESC_H563"
+#define FIRMWARE_NAME "BlueESC H563"
 
 #define DEAD_TIME 60
 #define HARDWARE_GROUP_H563

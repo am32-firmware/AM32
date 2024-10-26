@@ -32,8 +32,8 @@ int main()
     // 0,
     // 0,
     // GPIO_OUTPUT);
-    gpio_initialize(&gpioDrv8323Enable);
-    gpio_set_speed(&gpioDrv8323Enable, 0b11);
+    // gpio_initialize(&gpioDrv8323Enable);
+    // gpio_set_speed(&gpioDrv8323Enable, 0b11);
 
     gpio_t gpioSpiNSS = DEF_GPIO(
         GATE_DRIVER_SPI_NSS_PORT,
@@ -82,9 +82,35 @@ int main()
     // spi.CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
 
     drv.spi = &spi;
+
+    gpio_t gpioDrv8323nFault = DEF_GPIO(
+        DRV_FAULT_PORT,
+        DRV_FAULT_PIN,
+        0,
+        GPIO_INPUT);
+    // gpio_initialize(&gpioDrv8323nFault);
+    // gpio_configure_pupdr(&gpioDrv8323nFault, GPIO_PULL_UP);
+
+
+    gpio_t gpioDrv8323Cal = DEF_GPIO(
+        DRV_CAL_PORT,
+        DRV_CAL_PIN,
+        0,
+        GPIO_OUTPUT);
+    // gpio_initialize(&gpioDrv8323Cal);
+    // gpio_reset(&gpioDrv8323Cal);
+
+
+
     drv.gpioEnable = &gpioDrv8323Enable;
+    drv.gpioNFault = &gpioDrv8323nFault;
+    drv.gpioCal = &gpioDrv8323Cal;
+
+
 
     drv8323_initialize(&drv);
+
+
     gpio_initialize(&gpioSpiNSS);
     gpio_initialize(&gpioSpiSCK);
     gpio_initialize(&gpioSpiMISO);

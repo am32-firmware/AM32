@@ -1520,13 +1520,12 @@
 #define DRV_ENABLE_PORT GPIOF
 #define DRV_ENABLE_PIN 0
 
-// use an open pin
-#define DRV_FAULT_PORT GPIOH
-#define DRV_FAULT_PIN 5
+#define DRV_FAULT_PORT GPIOF
+#define DRV_FAULT_PIN 1
 
 // use an open pin
-#define DRV_CAL_PORT GPIOH
-#define DRV_CAL_PIN 4
+#define DRV_CAL_PORT GPIOF
+#define DRV_CAL_PIN 2
 
 // black/white wire
 #define GATE_DRIVER_SPI_NSS_PORT GPIOF
@@ -1562,7 +1561,6 @@
 #define PHASE_A_GPIO_LOW_PIN 8
 #define PHASE_A_GPIO_PORT_LOW GPIOE
 #define PHASE_A_LOW_AF 1
-// #define PHASE_B_LOW_Alternate LL_GPIO_AF_1
 
 // grey wire // logic analyzer (ch1/2)
 // INHA PE9

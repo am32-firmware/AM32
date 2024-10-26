@@ -108,9 +108,10 @@ int main()
 
     for (uint32_t i = 0; i < 25000000; i++)
     {
-        // if (!gpio_read(&gpioDrv8323nFault)) {
-        //     for (;;);
-        // }
+        if (!gpio_read(&gpioDrv8323nFault)) {
+            bridge_disable();
+            for (;;);
+        }
     }
 
     bridge_disable();

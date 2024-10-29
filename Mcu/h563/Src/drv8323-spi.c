@@ -1,3 +1,4 @@
+#include "stm32h563xx.h"
 #include "drv8323-spi.h"
 #include "exti.h"
 #include "spi.h"
@@ -25,9 +26,9 @@ gpio_t gpioDrv8323Cal = DEF_GPIO(
 
 drv8323_t DRV8323 = {
     .gpioEnable = &gpioDrv8323Enable,
-    .gpioNFault = 0,
-    .gpioCal = 0,
-    .spi = 0,
+    .gpioNFault = &gpioDrv8323nFault,
+    .gpioCal = &gpioDrv8323Cal,
+    .spi = SPI5,
 };
 
 
@@ -56,7 +57,40 @@ void drv8323_reset(drv8323_t* drv)
     delayMillis(2);
 }
 
-void drv_initialize_gpio(drv8323_t* drv)
+// this is hard coded for now
+void drv8323_initialize_gpio_spi(drv8323_t* drv)
+{
+    gpio_t gpioSpiNSS = DEF_GPIO(
+        GATE_DRIVER_SPI_NSS_PORT,
+        GATE_DRIVER_SPI_NSS_PIN,
+        GATE_DRIVER_SPI_NSS_AF,
+        GPIO_AF);
+    gpio_t gpioSpiSCK = DEF_GPIO(
+        GATE_DRIVER_SPI_SCK_PORT,
+        GATE_DRIVER_SPI_SCK_PIN,
+        GATE_DRIVER_SPI_SCK_AF,
+        GPIO_AF);
+    gpio_t gpioSpiMISO = DEF_GPIO(
+        GATE_DRIVER_SPI_MISO_PORT,
+        GATE_DRIVER_SPI_MISO_PIN,
+        GATE_DRIVER_SPI_MISO_AF,
+        GPIO_AF);
+    gpio_t gpioSpiMOSI = DEF_GPIO(
+        GATE_DRIVER_SPI_MOSI_PORT,
+        GATE_DRIVER_SPI_MOSI_PIN,
+        GATE_DRIVER_SPI_MOSI_AF,
+        GPIO_AF);
+    
+
+    gpio_initialize(&gpioSpiNSS);
+    gpio_initialize(&gpioSpiSCK);
+    gpio_initialize(&gpioSpiMISO);
+    gpio_configure_pupdr(&gpioSpiMISO, GPIO_PULL_UP);
+    gpio_initialize(&gpioSpiMOSI);
+    gpio_set_speed(&gpioSpiMOSI, GPIO_SPEED_VERYFAST);
+}
+
+void drv8323_initialize_gpio(drv8323_t* drv)
 {
     if (drv->gpioEnable) {
         gpio_initialize(drv->gpioEnable);
@@ -65,12 +99,13 @@ void drv_initialize_gpio(drv8323_t* drv)
     if (drv->gpioNFault) {
         gpio_initialize(drv->gpioNFault);
         gpio_configure_pupdr(drv->gpioNFault, GPIO_PULL_UP);
-        exti_configure_cb(&extiChannels[drv->gpioNFault->pin], drv8323_fault_cb)
+        exti_configure_cb(&extiChannels[drv->gpioNFault->pin], drv8323_fault_cb);
     }
     if (drv->gpioCal) {
         gpio_initialize(drv->gpioCal);
         gpio_reset(drv->gpioCal);
     }
+    drv8323_initialize_gpio_spi(drv);
 }
 
 void drv8323_disable(drv8323_t* drv)
@@ -85,11 +120,16 @@ void drv8323_enable(drv8323_t* drv)
 
 void drv8323_initialize(drv8323_t* drv)
 {
-    if (drv->spi) {
-        spi_initialize(drv->spi);
-    }
 
-    drv_initialize_gpio(drv);
+
+    drv8323_configure_spi(drv);
+
+    // drv8323_configure_spi(drv);
+    // if (drv->spi) {
+        spi_initialize(drv->spi);
+    // }
+
+    drv8323_initialize_gpio(drv);
 
     // drv8323_setup_fault_callback(drv, int (*)(void))
     drv8323_reset(drv);
@@ -123,4 +163,40 @@ void drv8323_read_all(drv8323_t* drv)
     reg = drv8323_read_reg(drv, DRV8323_REG_GATE_DRIVE_LS);
     reg = drv8323_read_reg(drv, DRV8323_REG_OCP_CONTROL);
     reg = drv8323_read_reg(drv, DRV8323_REG_CSA_CONTROL);
+}
+uint16_t spi_rx_buffer[256];
+uint16_t spi_tx_buffer[256];
+spi_t spi;
+
+void drv8323_configure_spi(drv8323_t* drv)
+{
+    // enable spi clock
+    GATE_DRIVER_SPI_ENABLE_CLOCK();
+
+    spi.ref = SPI5;
+
+    // 000: rcc_pclk3 selected as kernel clock (default after reset)
+    // 001: pll2_q_ck selected as kernel clock
+    // 010: pll3_q_ck selected as kernel clock
+    // 011: hsi_ker_ck selected as kernel clock
+    // 100: csi_ker_ck selected as kernel clock
+    // 101: hse_ck selected as kernel clock
+    // others: reserved, the kernel clock is disabled
+    spi_configure_rcc_clock_selection(&spi, 0b101);
+
+    spi._rx_buffer = spi_rx_buffer;
+    spi._tx_buffer = spi_tx_buffer;
+    spi._rx_buffer_size = 256;
+    spi._tx_buffer_size = 256;
+    spi.rxDma = &dmaChannels[7];
+    spi.txDma = &dmaChannels[0];
+    spi.txDmaRequest = LL_GPDMA1_REQUEST_SPI5_TX;
+    spi.rxDmaRequest = LL_GPDMA1_REQUEST_SPI5_RX;
+    // spi.CFG1_MBR = 0b011; // prescaler = 16 // this DOES NOT work on blueesc
+    // spi.CFG1_MBR = 0b100; // prescaler = 32 // this works on blueesc
+    spi.CFG1_MBR = 0b101; // prescaler = 64 // this works on blueesc
+    // spi.CFG1_MBR = 0b100; // prescaler = 128 // this works on blueesc
+    // spi.CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
+
+    drv->spi = &spi;
 }

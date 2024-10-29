@@ -128,6 +128,9 @@ void drv8323_disable_offset_calibration();
 void drv8323_set_tdrive(drv8323TDrive_e tdrive);
 void drv8323_set_deadtime(drv8323Deadtime_e deadtime);
 
+void drv8323_configure_spi(drv8323_t* drv);
+void drv8323_initialize_gpio(drv8323_t* drv);
+
 // void drv8323_setup_fault_callback(drv8323_t* drv, callback);
 
 void drv8323_read_all(drv8323_t* drv);

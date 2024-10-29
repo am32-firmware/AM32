@@ -15,6 +15,7 @@ MKDIR:=tools\\windows\\make\\bin\\mkdir
 RM:=tools\\windows\\make\\bin\\rm
 CUT:=tools\\windows\\make\\bin\\cut
 FGREP:=tools\\windows\\make\\bin\\fgrep
+OSDIR:=windows
 
 else
 # MacOS and Linux
@@ -28,6 +29,7 @@ MKDIR:=mkdir
 RM:=rm
 CUT:=cut
 FGREP:=fgrep
+OSDIR:=macos
 else
 # assume Linux
 ARM_SDK_PREFIX:=tools/linux/xpack-arm-none-eabi-gcc-10.3.1-2.3/bin/arm-none-eabi-
@@ -38,6 +40,7 @@ MKDIR:=mkdir
 RM:=rm
 CUT:=cut
 FGREP:=fgrep
+OSDIR:=linux
 endif
 endif
 

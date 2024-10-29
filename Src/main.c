@@ -580,6 +580,9 @@ uint16_t waitTime = 0;
 uint16_t signaltimeout = 0;
 uint8_t ubAnalogWatchdogStatus = RESET;
 
+#ifdef MCU_CH32V203
+volatile char input_ready = 0;
+#endif
 // void checkForHighSignal(){
 // changeToInput();
 
@@ -777,6 +780,9 @@ void loadEEpromSettings()
 #endif
 #ifdef GIGADEVICES
             TIMER_CCHP(TIMER0) |= dead_time_override;
+#endif
+#ifdef WCH
+            TIM1->BDTR |= dead_time_override;
 #endif
         }
 
@@ -1758,7 +1764,6 @@ static void checkDeviceInfo(void)
 
 int main(void)
 {
-
     initAfterJump();
 
     checkDeviceInfo();
@@ -1903,7 +1908,8 @@ int main(void)
 #ifdef FIXED_DUTY_MODE
         setInput();
 #endif
-#ifdef MCU_F031
+
+#ifdef NEED_INPUT_READY
         if (input_ready) {
             processDshot();
             input_ready = 0;
@@ -2028,15 +2034,17 @@ int main(void)
         }
 
 #ifndef MCU_F031
+#ifndef WCH
         if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD)) {
-            NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
-            NVIC_SetPriority(COM_TIMER_IRQ, 1);
-            NVIC_SetPriority(COMPARATOR_IRQ, 1);
-        } else {
-            NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
-            NVIC_SetPriority(COM_TIMER_IRQ, 0);
-            NVIC_SetPriority(COMPARATOR_IRQ, 0);
-        }
+             NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
+             NVIC_SetPriority(COM_TIMER_IRQ, 1);
+             NVIC_SetPriority(COMPARATOR_IRQ, 1);
+         } else {
+             NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
+             NVIC_SetPriority(COM_TIMER_IRQ, 0);
+             NVIC_SetPriority(COMPARATOR_IRQ, 0);
+         }
+#endif
 #endif
         if (send_telemetry) {
 #ifdef USE_SERIAL_TELEMETRY
@@ -2061,6 +2069,11 @@ int main(void)
 #ifdef ARTERY
             ADC_DMA_Callback();
             adc_ordinary_software_trigger_enable(ADC1, TRUE);
+            converted_degrees = getConvertedDegrees(ADC_raw_temp);
+#endif
+#ifdef WCH
+//            ADC_DMA_Callback( ); //  Called in an interrupt, the first value is the initialized value
+            startADCConversion( );
             converted_degrees = getConvertedDegrees(ADC_raw_temp);
 #endif
             degrees_celsius = converted_degrees;
@@ -2164,7 +2177,6 @@ int main(void)
 #endif
             if (INTERVAL_TIMER_COUNT > 45000 && running == 1) {
                 bemf_timeout_happened++;
-
                 maskPhaseInterrupts();
                 old_routine = 1;
                 if (input < 48) {

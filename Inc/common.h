@@ -45,7 +45,9 @@ extern char dshot_extended_telemetry;
 extern char EDT_ARM_ENABLE;
 extern char EDT_ARMED;
 extern uint16_t send_extended_dshot;
-
+#ifdef MCU_CH32V203
+extern volatile char input_ready;
+#endif
 // typedef struct PID{
 //	float error;
 //	float Kp;

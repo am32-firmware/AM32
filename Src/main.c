@@ -998,7 +998,6 @@ void interruptRoutine()
             return;
         }
     }
-//    if (rising) {
         for (int i = 0; i < filter_level; i++) {
 #ifdef MCU_F031
             if (((current_GPIO_PORT->IDR & current_GPIO_PIN) == !(rising))) {
@@ -1221,8 +1220,8 @@ void setInput()
     }
 #endif
 #ifndef BRUSHED_MODE
-    if (!stepper_sine) {
-        if (input >= 47 + (80 * use_sin_start) && armed) {
+if (!stepper_sine && armed) {
+        if (input >= 47 + (80 * use_sin_start)) {
             if (running == 0) {
                 allOff();
                 if (!old_routine) {

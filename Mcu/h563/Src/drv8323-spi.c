@@ -28,7 +28,6 @@ drv8323_t DRV8323 = {
     .gpioEnable = &gpioDrv8323Enable,
     .gpioNFault = &gpioDrv8323nFault,
     .gpioCal = &gpioDrv8323Cal,
-    .spi = SPI5,
 };
 
 

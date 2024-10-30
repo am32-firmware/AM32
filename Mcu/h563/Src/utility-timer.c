@@ -1,5 +1,6 @@
 #include "utility-timer.h"
 
+#include "clock.h"
 #include "stm32h563xx.h"
 #include "stm32h5xx_ll_tim.h"
 
@@ -8,7 +9,8 @@
 void utility_timer_initialize()
 {
     UTILITY_TIMER_ENABLE_CLOCK();
-    UTILITY_TIMER->PSC = UTILITY_TIMER_PSC;
+    clock_update_hclk_frequency();
+    UTILITY_TIMER->PSC = (HCLK_FREQUENCY / 1000000) - 1;
     UTILITY_TIMER->ARR = 0XFFFF;
     LL_TIM_DisableARRPreload(UTILITY_TIMER);
 }

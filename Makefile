@@ -60,13 +60,14 @@ SRC_COMMON := $(filter-out $(SRC_MAIN), $(SRC_COMMON))
 $(info    $(SRC_COMMON))
 
 # SRC_MAIN := $(SRC_DIRS_COMMON)/main.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-adc.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-input-pwm.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-spi-gpio.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-spi.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-spi-neopixel.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-uart-tx.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-uart-sk6812.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-bridge-audio.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-bridge-audio.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-bridge-commutate.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator-3phase.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator.c

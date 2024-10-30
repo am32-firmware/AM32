@@ -10,6 +10,14 @@ dmaChannel_t dmaChannels[] = {
     DEFINE_DMA_CHANNEL(1, 5),
     DEFINE_DMA_CHANNEL(1, 6),
     DEFINE_DMA_CHANNEL(1, 7),
+    DEFINE_DMA_CHANNEL(2, 0),
+    DEFINE_DMA_CHANNEL(2, 1),
+    DEFINE_DMA_CHANNEL(2, 2),
+    DEFINE_DMA_CHANNEL(2, 3),
+    DEFINE_DMA_CHANNEL(2, 4),
+    DEFINE_DMA_CHANNEL(2, 5),
+    DEFINE_DMA_CHANNEL(2, 6),
+    DEFINE_DMA_CHANNEL(2, 7),
 };
 
 void GPDMA1_Channel0_IRQHandler(void)
@@ -54,7 +62,27 @@ void GPDMA1_Channel5_IRQHandler(void)
         cb(&dmaChannels[5]);
     }
 }
-
+void GPDMA1_Channel6_IRQHandler(void)
+{
+    dmaCallback_p cb = dmaChannels[6].callback;
+    if (cb) {
+        cb(&dmaChannels[6]);
+    }
+}
+void GPDMA1_Channel7_IRQHandler(void)
+{
+    dmaCallback_p cb = dmaChannels[7].callback;
+    if (cb) {
+        cb(&dmaChannels[7]);
+    }
+}
+void GPDMA2_Channel7_IRQHandler(void)
+{
+    dmaCallback_p cb = dmaChannels[15].callback;
+    if (cb) {
+        cb(&dmaChannels[15]);
+    }
+}
 void dma_initialize(void)
 {
     RCC->AHB1ENR |= RCC_AHB1ENR_GPDMA1EN;

@@ -2,15 +2,17 @@
 #include "targets.h"
 #include "ADC.h"
 #include "functions.h"
+#include "mcu.h"
 #include "utility-timer.h"
 #include "vref.h"
 
-char comp_pwm = 1;
-uint8_t i = 0;
-
+uint16_t ADC_raw_temp;
+uint16_t ADC_raw_volts;
+uint16_t ADC_raw_current;
 
 int main()
 {
+    mcu_setup();
     vref_enable();
     utility_timer_initialize();
     utility_timer_enable();
@@ -19,7 +21,8 @@ int main()
     uint8_t channels[] = {
         CURRENT_ADC_CHANNEL,
         VOLTAGE_ADC_CHANNEL,
-        DIE_TEMPERATURE_ADC_CHANNEL};
+        DIE_TEMPERATURE_ADC_CHANNEL
+    };
     adc_set_regular_sequence(VOLTAGE_ADC, channels, sizeof(channels));
 
     adc_set_sample_time(VOLTAGE_ADC, CURRENT_ADC_CHANNEL, ADC_SAMPLE_TIME_640_5);

@@ -204,13 +204,15 @@ void exti_configure_trigger(extiChannel_t* exti, extiTrigger_e trigger)
         case EXTI_TRIGGER_NONE:
             EXTI->RTSR1 &= ~(1 << exti->channel);
             EXTI->FTSR1 &= ~(1 << exti->channel);
+            break;
         case EXTI_TRIGGER_RISING:
-            EXTI->FTSR1 &= ~(1 << exti->channel);
             EXTI->RTSR1 |= 1 << exti->channel;
+            EXTI->FTSR1 &= ~(1 << exti->channel);
             break;
         case EXTI_TRIGGER_FALLING:
-            EXTI->RTSR1 |= 1 << exti->channel;
-            EXTI->FTSR1 &= ~(1 << exti->channel);
+            EXTI->RTSR1 &= ~(1 << exti->channel);
+            EXTI->FTSR1 |= 1 << exti->channel;
+            break;
         case EXTI_TRIGGER_RISING_FALLING:
             EXTI->RTSR1 |= 1 << exti->channel;
             EXTI->FTSR1 |= 1 << exti->channel;

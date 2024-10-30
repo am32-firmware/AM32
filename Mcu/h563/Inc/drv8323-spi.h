@@ -134,3 +134,4 @@ void drv8323_initialize_gpio(drv8323_t* drv);
 // void drv8323_setup_fault_callback(drv8323_t* drv, callback);
 
 void drv8323_read_all(drv8323_t* drv);
+bool drv8323_get_fault_status(drv8323_t* drv);

@@ -42,12 +42,12 @@ void drv8323_fault_cb(extiChannel_t* exti)
     if (EXTI->FPR1 & mask) {
         EXTI->FPR1 |= mask;
     }
-
     drv8323_read_all(&DRV8323);
 }
 
 void drv8323_reset(drv8323_t* drv)
 {
+    EXTI_INTERRUPT_DISABLE_MASK(1 << drv->gpioNFault->pin);
     delayMillis(2);
     drv8323_disable(drv);
     // delay at least 1ms
@@ -55,6 +55,7 @@ void drv8323_reset(drv8323_t* drv)
     drv8323_enable(drv);
     // delayMicros(3000);
     delayMillis(2);
+    EXTI_INTERRUPT_ENABLE_MASK(1 << drv->gpioNFault->pin);
 }
 
 // this is hard coded for now
@@ -94,12 +95,17 @@ void drv8323_initialize_gpio(drv8323_t* drv)
 {
     if (drv->gpioEnable) {
         gpio_initialize(drv->gpioEnable);
+        gpio_reset(drv->gpioEnable);
         // gpio_set_speed(&gpioDrv8323Enable, 0b11);
     }
     if (drv->gpioNFault) {
         gpio_initialize(drv->gpioNFault);
         gpio_configure_pupdr(drv->gpioNFault, GPIO_PULL_UP);
         exti_configure_cb(&extiChannels[drv->gpioNFault->pin], drv8323_fault_cb);
+        exti_configure_port(&extiChannels[drv->gpioNFault->pin], EXTI_CHANNEL_FROM_PORT(drv->gpioNFault->port));
+        exti_configure_trigger(&extiChannels[drv->gpioNFault->pin], EXTI_TRIGGER_FALLING);
+        EXTI_NVIC_ENABLE(drv->gpioNFault->pin);
+        // EXTI_INTERRUPT_ENABLE_MASK(1 << drv->gpioNFault->pin);
     }
     if (drv->gpioCal) {
         gpio_initialize(drv->gpioCal);
@@ -199,4 +205,9 @@ void drv8323_configure_spi(drv8323_t* drv)
     // spi.CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
 
     drv->spi = &spi;
+}
+
+bool drv8323_get_fault_status(drv8323_t* drv)
+{
+    return !gpio_read(drv->gpioNFault);
 }

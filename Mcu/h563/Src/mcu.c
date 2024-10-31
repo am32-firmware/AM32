@@ -1,7 +1,7 @@
 #include "stm32h563xx.h"
 
 #include "mcu.h"
-
+#include "stm32h5xx_ll_cortex.h"
 #include "clock.h"
 #include "dma.h"
 #include "flash.h"
@@ -12,6 +12,7 @@ void mcu_setup()
     mcu_setup_flash();
     mcu_setup_core_voltage();
     mcu_setup_clocks();
+    mcu_setup_mpu();
     mcu_enable_icache();
     // comment if you don't need it,
     // most applications use dma
@@ -54,4 +55,22 @@ void mcu_enable_icache()
     while (ICACHE->CR & ICACHE_SR_BUSYF);
     // enable icache miss monitor, hit monitor, and icache itself
     ICACHE->CR |= ICACHE_CR_MISSMEN | ICACHE_CR_HITMEN | ICACHE_CR_EN;
+}
+
+void mcu_setup_mpu()
+{
+    // see also https://community.st.com/t5/stm32-mcus/how-to-avoid-a-hardfault-when-icache-is-enabled-on-the-stm32h5/ta-p/630085
+    LL_MPU_Disable();
+    LL_MPU_ConfigRegion(
+        LL_MPU_REGION_NUMBER0,
+        LL_MPU_REGION_ALL_RW,
+        LL_MPU_ATTRIBUTES_NUMBER0,
+        // 0x0900a800,
+        // 0x0900c000
+        0x08fff800,
+        0x08ffffff
+        // EEPROM_BASE,
+        // EEPROM_BASE + EEPROM_PAGE_SIZE
+    );
+    LL_MPU_Enable(LL_MPU_CTRL_PRIVILEGED_DEFAULT);
 }

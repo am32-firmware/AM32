@@ -20,10 +20,10 @@
     (COM_TIMER->CNT = 0, COM_TIMER->ARR = time, COM_TIMER->SR = 0x00, \
         COM_TIMER->DIER |= (0x1UL << (0U)))
 #define SET_INTERVAL_TIMER_COUNT(intertime) (INTERVAL_TIMER->CNT = intertime)
-#define SET_PRESCALER_PWM(presc) (TIM1->PSC = presc)
-#define SET_AUTO_RELOAD_PWM(relval) (TIM1->ARR = relval)
+#define SET_PRESCALER_PWM(presc) (BRIDGE_TIMER->PSC = presc)
+#define SET_AUTO_RELOAD_PWM(relval) (BRIDGE_TIMER->ARR = relval)
 #define SET_DUTY_CYCLE_ALL(newdc) \
-    (TIM1->CCR1 = newdc, TIM1->CCR2 = newdc, TIM1->CCR3 = newdc)
+    (BRIDGE_TIMER->CCR1 = newdc, BRIDGE_TIMER->CCR2 = newdc, BRIDGE_TIMER->CCR3 = newdc)
 
 void initAfterJump(void);
 void initCorePeripherals(void);

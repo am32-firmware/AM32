@@ -292,10 +292,6 @@ void setAndEnableComInt(uint16_t time)
     COM_TIMER->DIER |= (0x1UL << (0U));
 }
 
-uint16_t getintervaTimerCount() { return INTERVAL_TIMER->CNT; }
-
-void setintervaTimerCount(uint16_t intertime) { INTERVAL_TIMER->CNT = 0; }
-
 void setPrescalerPWM(uint16_t presc) { BRIDGE_TIMER->PSC = presc; }
 
 void setAutoReloadPWM(uint16_t relval) { BRIDGE_TIMER->ARR = relval; }

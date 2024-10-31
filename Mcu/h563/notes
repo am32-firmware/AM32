@@ -140,3 +140,6 @@ duty_cycle_setpoint -> duty_cycle -> adjusted_duty_cycle -> SET_DUTY_CYCLE_ALL(a
 drivers should be submodules
 
 setPrescalerPWM is not called
+
+getintervaTimerCount is spelled wrong (and unused)
+same with setintervaTimerCount

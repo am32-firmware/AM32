@@ -9,13 +9,19 @@ gpio_t gpioVreg5VSync = DEF_GPIO(VREG5V_SYNC_PORT, VREG5V_SYNC_PIN, VREG5V_SYNC_
 void vreg5V_initialize()
 {
     gpio_initialize(&gpioVreg5VEnable);
+    gpio_reset(&gpioVreg5VEnable);
+    gpio_configure_pupdr(&gpioVreg5VEnable, GPIO_PULL_DOWN);
     gpio_initialize(&gpioVreg5VPgood);
+    gpio_configure_pupdr(&gpioVreg5VPgood, GPIO_PULL_UP);
     // gpio_initialize(&gpioVreg5VSync);
 }
 
 void vreg5V_enable()
 {
     gpio_set(&gpioVreg5VEnable);
+    // pgood won't pass if powered only by 5V through diode
+    // on main 4-pin connector
+    while (!vreg5V_pgood());
 }
 
 void vreg5V_disable()

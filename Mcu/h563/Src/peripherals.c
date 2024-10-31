@@ -17,6 +17,7 @@
 #include "ten-khz-timer.h"
 #include "utility-timer.h"
 #include "clock.h"
+#include "vreg.h"
 
 extern void interruptRoutine();
 extern void processDshot();
@@ -361,4 +362,7 @@ void enableCorePeripherals()
     NVIC_SetPriority(EXTI15_IRQn, 2);
     NVIC_EnableIRQ(EXTI15_IRQn);
     EXTI->IMR1 |= (1 << 15);
+
+    vreg5V_initialize();
+    vreg5V_enable();
 }

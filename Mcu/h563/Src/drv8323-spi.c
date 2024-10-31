@@ -42,6 +42,7 @@ void drv8323_fault_cb(extiChannel_t* exti)
         EXTI->FPR1 |= mask;
     }
     drv8323_read_all(&DRV8323);
+    while(1);
 }
 
 void drv8323_reset(drv8323_t* drv)

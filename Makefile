@@ -59,7 +59,7 @@ SRC_MAIN := $(SRC_DIRS_COMMON)/main.c
 SRC_COMMON := $(filter-out $(SRC_MAIN), $(SRC_COMMON))
 $(info    $(SRC_COMMON))
 
-# SRC_MAIN := $(SRC_DIRS_COMMON)/main.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/main.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-adc.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-input-pwm.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-spi-gpio.c
@@ -76,7 +76,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-drv8323-spi-read.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom-erase.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom-read.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom-read.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom-write.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-exti-button.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-exti-button-led.c

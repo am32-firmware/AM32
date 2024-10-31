@@ -305,46 +305,39 @@ enum inputType {
 };
 
 
-uint32_t eeprom_address = EEPROM_START_ADD; 
-char set_hysteris = 0;
-uint16_t prop_brake_duty_cycle = 0;
-uint16_t ledcounter = 0;
-uint32_t process_time = 0;
-uint32_t start_process = 0;
-uint16_t one_khz_loop_counter = 0;
-uint16_t target_e_com_time_high;
-uint16_t target_e_com_time_low;
+uint32_t eeprom_address = EEPROM_START_ADD;
+static uint16_t prop_brake_duty_cycle = 0;
+static uint16_t ledcounter = 0;
+static uint16_t one_khz_loop_counter = 0;
 uint8_t compute_dshot_flag = 0;
-uint8_t crsf_input_channel = 1;
-uint8_t crsf_output_PWM_channel = 2;
-char eeprom_layout_version = 2;
-char dir_reversed = 0;
+static char eeprom_layout_version = 2;
+char dir_reversed;
 char comp_pwm = 1;
-char VARIABLE_PWM = 1;
-char bi_direction = 0;
-char stuck_rotor_protection = 1; // Turn off for Crawlers
-char brake_on_stop = 0;
-char stall_protection = 0;
-char use_sin_start = 0;
-char TLM_ON_INTERVAL = 0;
-uint8_t telemetry_interval_ms = 30;
-uint8_t TEMPERATURE_LIMIT = 255; // degrees 255 to disable
-char advance_level = 2; // 7.5 degree increments 0 , 7.5, 15, 22.5)
-char temp_advance = 1;
-uint16_t motor_kv = 2000;
-char motor_poles = 14;
-uint16_t CURRENT_LIMIT = 202;
-uint8_t sine_mode_power = 5;
-char drag_brake_strength = 10; // Drag Brake Power when brake on stop is enabled
-uint8_t driving_brake_strength = 10;
-uint8_t dead_time_override = DEAD_TIME;
-char sine_mode_changeover_thottle_level = 5; // Sine Startup Range
-uint16_t stall_protect_target_interval = TARGET_STALL_PROTECTION_INTERVAL;
-char USE_HALL_SENSOR = 0;
-uint16_t enter_sine_angle = 180;
-char do_once_sinemode = 0;
-uint8_t auto_advance_level;
-char auto_advance = 0;
+static char VARIABLE_PWM = 1;
+char bi_direction;
+static char stuck_rotor_protection = 1; // Turn off for Crawlers
+static char brake_on_stop;
+static char stall_protection;
+static char use_sin_start;
+static char TLM_ON_INTERVAL;
+static uint8_t telemetry_interval_ms = 30;
+static uint8_t TEMPERATURE_LIMIT = 255; // degrees 255 to disable
+static char advance_level = 2; // 7.5 degree increments 0 , 7.5, 15, 22.5)
+static char temp_advance = 1;
+static uint16_t motor_kv = 2000;
+static char motor_poles = 14;
+static uint16_t CURRENT_LIMIT = 202;
+static uint8_t sine_mode_power = 5;
+static char drag_brake_strength = 10; // Drag Brake Power when brake on stop is enabled
+static uint8_t driving_brake_strength = 10;
+static uint8_t dead_time_override = DEAD_TIME;
+static char sine_mode_changeover_thottle_level = 5; // Sine Startup Range
+static uint16_t stall_protect_target_interval = TARGET_STALL_PROTECTION_INTERVAL;
+static char USE_HALL_SENSOR;
+static uint16_t enter_sine_angle = 180;
+static char do_once_sinemode;
+static uint8_t auto_advance_level;
+static char auto_advance;
 
 //============================= Servo Settings ==============================
 uint16_t servo_low_threshold = 1100; // anything below this point considered 0
@@ -353,7 +346,7 @@ uint16_t servo_neutral = 1500;
 uint8_t servo_dead_band = 100;
 
 //========================= Battery Cuttoff Settings ========================
-char LOW_VOLTAGE_CUTOFF = 0; // Turn Low Voltage CUTOFF on or off
+static char LOW_VOLTAGE_CUTOFF; // Turn Low Voltage CUTOFF on or off
 uint16_t low_cell_volt_cutoff = 330; // 3.3volts per cell
 
 //=========================== END EEPROM Defaults ===========================
@@ -361,126 +354,106 @@ uint16_t low_cell_volt_cutoff = 330; // 3.3volts per cell
 const char filename[30] __attribute__((section(".file_name"))) = FILE_NAME;
 _Static_assert(sizeof(FIRMWARE_NAME) <=13,"Firmware name too long");   // max 12 character firmware name plus NULL 
 
-uint8_t EEPROM_VERSION;
 // move these to targets folder or peripherals for each mcu
-char RC_CAR_REVERSE = 0; // have to set bidirectional, comp_pwm off and stall
+static char RC_CAR_REVERSE; // have to set bidirectional, comp_pwm off and stall
                          // protection off, no sinusoidal startup
-uint16_t ADC_CCR = 30;
-uint16_t current_angle = 90;
-uint16_t desired_angle = 90;
-char return_to_center = 0;
-uint16_t target_e_com_time = 0;
-int16_t Speed_pid_output;
-char use_speed_control_loop = 0;
-float input_override = 0;
+#ifdef GIMBAL_MODE
+static uint16_t current_angle = 90;
+#endif
+static char return_to_center;
+uint16_t target_e_com_time;
+static char use_speed_control_loop;
+static float input_override;
 int16_t use_current_limit_adjust = 2000;
-char use_current_limit = 0;
-float stall_protection_adjust = 0;
+static char use_current_limit;
+static float stall_protection_adjust;
 
-uint32_t MCU_Id = 0;
-uint32_t REV_Id = 0;
+static uint16_t armed_timeout_count;
+static uint16_t reverse_speed_threshold = 1500;
+static uint8_t desync_happened;
+static char maximum_throttle_change_ramp = 1;
 
-uint16_t armed_timeout_count;
-uint16_t reverse_speed_threshold = 1500;
-uint8_t desync_happened = 0;
-char maximum_throttle_change_ramp = 1;
+static char low_rpm_throttle_limit = 1;
 
-char crawler_mode = 0; // no longer used //
-uint16_t velocity_count = 0;
-uint16_t velocity_count_threshold = 75;
+static uint16_t low_voltage_count = 0;
+static uint16_t telem_ms_count;
 
-char low_rpm_throttle_limit = 1;
+static uint16_t VOLTAGE_DIVIDER = TARGET_VOLTAGE_DIVIDER; // 100k upper and 10k lower resistor in divider
+static uint16_t
+    battery_voltage; // scale in volts * 100.  1260 is a battery voltage of 12.60
+static char cell_count;
+static char brushed_direction_set;
 
-uint16_t low_voltage_count = 0;
-uint16_t telem_ms_count;
+static uint16_t tenkhzcounter;
+static float consumed_current;
+static int32_t smoothed_raw_current;
+static int16_t actual_current;
 
-uint16_t VOLTAGE_DIVIDER = TARGET_VOLTAGE_DIVIDER; // 100k upper and 10k lower resistor in divider
-uint16_t
-    battery_voltage; // scale in volts * 10.  1260 is a battery voltage of 12.60
-char cell_count = 0;
-char brushed_direction_set = 0;
+static uint16_t min_startup_duty = 120;
+static char bemf_timeout = 10;
 
-uint16_t tenkhzcounter = 0;
-float consumed_current = 0;
-int32_t smoothed_raw_current = 0;
-int16_t actual_current = 0;
+static char reversing_dead_band = 1;
 
-char lowkv = 0;
-
-uint16_t min_startup_duty = 120;
-uint16_t sin_mode_min_s_d = 120;
-char bemf_timeout = 10;
-
-char startup_boost = 50;
-char reversing_dead_band = 1;
-
-uint16_t low_pin_count = 0;
-
-uint8_t max_duty_cycle_change = 2;
-char fast_accel = 1;
-char fast_deccel = 0;
-uint16_t last_duty_cycle = 0;
-uint16_t duty_cycle_setpoint = 0;
-char play_tone_flag = 0;
+static uint8_t max_duty_cycle_change = 2;
+static char fast_accel = 1;
+static uint16_t last_duty_cycle;
+static uint16_t duty_cycle_setpoint;
+char play_tone_flag;
 
 typedef enum { GPIO_PIN_RESET = 0U,
     GPIO_PIN_SET } GPIO_PinState;
 
-uint16_t startup_max_duty_cycle = 200;
-uint16_t minimum_duty_cycle = DEAD_TIME;
-uint16_t stall_protect_minimum_duty = DEAD_TIME;
-char desync_check = 0;
-char low_kv_filter_level = 20;
+static uint16_t startup_max_duty_cycle = 200;
+static uint16_t minimum_duty_cycle = DEAD_TIME;
+static uint16_t stall_protect_minimum_duty = DEAD_TIME;
+static char desync_check;
 
-uint16_t tim1_arr = TIM1_AUTORELOAD; // current auto reset value
+static uint16_t tim1_arr = TIM1_AUTORELOAD; // current auto reset value
 uint16_t TIMER1_MAX_ARR = TIM1_AUTORELOAD; // maximum auto reset register value
-uint16_t duty_cycle_maximum = 2000; // restricted by temperature or low rpm throttle protect
-uint16_t low_rpm_level = 20; // thousand erpm used to set range for throttle resrictions
-uint16_t high_rpm_level = 70; //
-uint16_t throttle_max_at_low_rpm = 400;
-uint16_t throttle_max_at_high_rpm = 2000;
+static uint16_t duty_cycle_maximum = 2000; // restricted by temperature or low rpm throttle protect
+static uint16_t low_rpm_level = 20; // thousand erpm used to set range for throttle resrictions
+static uint16_t high_rpm_level = 70; //
+static uint16_t throttle_max_at_low_rpm = 400;
+static uint16_t throttle_max_at_high_rpm = 2000;
 
-uint16_t commutation_intervals[6] = { 0 };
-uint32_t average_interval = 0;
-uint32_t last_average_interval;
+static uint16_t commutation_intervals[6];
+static uint32_t average_interval;
+static uint32_t last_average_interval;
 int e_com_time;
 
-uint16_t ADC_smoothed_input = 0;
 uint8_t degrees_celsius;
-int16_t converted_degrees;
-uint8_t temperature_offset;
+static int16_t converted_degrees;
 uint16_t ADC_raw_temp;
 uint16_t ADC_raw_volts;
 uint16_t ADC_raw_current;
 uint16_t ADC_raw_input;
-uint8_t adc_counter = 0;
-char send_telemetry = 0;
-char telemetry_done = 0;
-char prop_brake_active = 0;
+uint8_t adc_counter;
+char send_telemetry;
+char telemetry_done;
+static char prop_brake_active;
 
-uint8_t eepromBuffer[176] = { 0 };
+uint8_t eepromBuffer[176];
 
-char dshot_telemetry = 0;
+char dshot_telemetry;
 
-uint8_t last_dshot_command = 0;
-char old_routine = 1;
-uint16_t adjusted_input = 0;
+uint8_t last_dshot_command;
+static char old_routine = 1;
+uint16_t adjusted_input;
 
 #define TEMP30_CAL_VALUE ((uint16_t*)((uint32_t)0x1FFFF7B8))
 #define TEMP110_CAL_VALUE ((uint16_t*)((uint32_t)0x1FFFF7C2))
 
-uint16_t smoothedcurrent = 0;
+static uint16_t smoothedcurrent;
 const uint8_t numReadings = 100; // the readings from the analog input
-uint8_t readIndex = 0; // the index of the current reading
-uint32_t total = 0;
-uint16_t readings[100];
+static uint8_t readIndex; // the index of the current reading
+static uint32_t total;
+static uint16_t readings[100];
 
-uint8_t bemf_timeout_happened = 0;
-uint8_t changeover_step = 5;
-uint8_t filter_level = 5;
-uint8_t running = 0;
-uint16_t advance = 0;
-uint8_t advancedivisor = 6;
+static uint8_t bemf_timeout_happened;
+static uint8_t changeover_step = 5;
+static uint8_t filter_level = 5;
+uint8_t running;
+static uint16_t advance;
 char rising = 1;
 
 ////Space Vector PWM ////////////////
@@ -507,7 +480,7 @@ char rising = 1;
 // 82, 86, 90, 94, 97, 101, 105, 109, 113, 116, 120, 124};
 
 ////Sine Wave PWM ///////////////////
-int16_t pwmSin[] = {
+static int16_t pwmSin[] = {
     180, 183, 186, 189, 193, 196, 199, 202, 205, 208, 211, 214, 217, 220, 224,
     227, 230, 233, 236, 239, 242, 245, 247, 250, 253, 256, 259, 262, 265, 267,
     270, 273, 275, 278, 281, 283, 286, 288, 291, 293, 296, 298, 300, 303, 305,
@@ -535,50 +508,48 @@ int16_t pwmSin[] = {
 };
 
 // int sin_divider = 2;
-int16_t phase_A_position;
-int16_t phase_B_position;
-int16_t phase_C_position;
-uint16_t step_delay = 100;
-char stepper_sine = 0;
+static int16_t phase_A_position;
+static int16_t phase_B_position;
+static int16_t phase_C_position;
+static uint16_t step_delay = 100;
+static char stepper_sine;
 char forward = 1;
 uint16_t gate_drive_offset = DEAD_TIME;
 
-uint8_t stuckcounter = 0;
-uint16_t k_erpm;
-uint16_t e_rpm; // electrical revolution /100 so,  123 is 12300 erpm
+static uint8_t stuckcounter;
+static uint16_t k_erpm;
+static uint16_t e_rpm; // electrical revolution /100 so,  123 is 12300 erpm
 
-uint16_t adjusted_duty_cycle;
+static uint16_t adjusted_duty_cycle;
 
-uint8_t bad_count = 0;
-uint8_t bad_count_threshold = CPU_FREQUENCY_MHZ / 24;
+static uint8_t bad_count;
+static uint8_t bad_count_threshold = CPU_FREQUENCY_MHZ / 24;
 uint8_t dshotcommand;
 uint16_t armed_count_threshold = 1000;
 
-char armed = 0;
-uint16_t zero_input_count = 0;
+char armed;
+uint16_t zero_input_count;
 
-uint16_t input = 0;
-uint16_t newinput = 0;
-char inputSet = 0;
-char dshot = 0;
-char servoPwm = 0;
+uint16_t input;
+uint16_t newinput;
+char inputSet;
+char dshot;
+char servoPwm;
 uint32_t zero_crosses;
 
-uint8_t zcfound = 0;
+static uint8_t zcfound;
 
-uint8_t bemfcounter;
-uint8_t min_bemf_counts_up = TARGET_MIN_BEMF_COUNTS;
-uint8_t min_bemf_counts_down = TARGET_MIN_BEMF_COUNTS;
+static uint8_t bemfcounter;
+static uint8_t min_bemf_counts_up = TARGET_MIN_BEMF_COUNTS;
+static uint8_t min_bemf_counts_down = TARGET_MIN_BEMF_COUNTS;
 
-uint16_t lastzctime;
-uint16_t thiszctime;
+static uint16_t thiszctime;
 
-uint16_t duty_cycle = 0;
+static uint16_t duty_cycle;
 char step = 1;
 uint32_t commutation_interval = 12500;
-uint16_t waitTime = 0;
-uint16_t signaltimeout = 0;
-uint8_t ubAnalogWatchdogStatus = RESET;
+static uint16_t waitTime;
+uint16_t signaltimeout;
 
 // void checkForHighSignal(){
 // changeToInput();
@@ -1876,17 +1847,6 @@ int main(void)
 #endif // end fixed duty mode ifdef
 #endif // end crsf input
 
-#ifdef MCU_F051
-    MCU_Id = DBGMCU->IDCODE &= 0xFFF;
-    REV_Id = DBGMCU->IDCODE >> 16;
-
-    if (REV_Id >= 4096) {
-        temperature_offset = 0;
-    } else {
-        temperature_offset = 230;
-    }
-
-#endif
 #ifdef NEUTRONRC_G071
     setInputPullDown();
 #else
@@ -1995,16 +1955,10 @@ int main(void)
             bemf_timeout_happened = 0;
         }
 
-        if (crawler_mode) {
-            if (adjusted_input < 400) {
-                bemf_timeout_happened = 0;
-            }
+        if (adjusted_input < 150) { // startup duty cycle should be low enough to not burn motor
+            bemf_timeout = 100;
         } else {
-            if (adjusted_input < 150) { // startup duty cycle should be low enough to not burn motor
-                bemf_timeout = 100;
-            } else {
-                bemf_timeout = 10;
-            }
+            bemf_timeout = 10;
         }
 #endif
 
@@ -2180,6 +2134,7 @@ int main(void)
             step_delay = 300;
             maskPhaseInterrupts();
             allpwm();
+            uint16_t desired_angle;
             if (newinput > 1000) {
                 desired_angle = map(newinput, 1000, 2000, 180, 360);
             } else {

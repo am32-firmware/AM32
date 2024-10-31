@@ -1,4 +1,5 @@
 #include "stm32h563xx.h"
+#include "stm32h5xx_ll_adc.h"
 #include "targets.h"
 #include "ADC.h"
 #include "functions.h"
@@ -6,40 +7,40 @@
 #include "utility-timer.h"
 #include "vref.h"
 
-uint16_t ADC_raw_temp;
+uint16_t ADC_raw_temp = 900;
 uint16_t ADC_raw_volts;
 uint16_t ADC_raw_current;
+int32_t converted_degrees;
+
+
+
+#define __LL_ADC_CALC_TEMPERATURE(__VREFANALOG_VOLTAGE__,\
+                                  __TEMPSENSOR_ADC_DATA__,\
+                                  __ADC_RESOLUTION__)\
+((((int32_t)*TEMPSENSOR_CAL2_ADDR - (int32_t)*TEMPSENSOR_CAL1_ADDR) != 0) ?       \
+ (((( ((int32_t)((__LL_ADC_CONVERT_DATA_RESOLUTION((__TEMPSENSOR_ADC_DATA__),     \
+                                                   (__ADC_RESOLUTION__),          \
+                                                   LL_ADC_RESOLUTION_12B)         \
+                  * (__VREFANALOG_VOLTAGE__))                                     \
+                 / TEMPSENSOR_CAL_VREFANALOG)                                     \
+       - (int32_t) *TEMPSENSOR_CAL1_ADDR)                                         \
+    ) * (int32_t)(TEMPSENSOR_CAL2_TEMP - TEMPSENSOR_CAL1_TEMP)                    \
+   ) / (int32_t)((int32_t)*TEMPSENSOR_CAL2_ADDR - (int32_t)*TEMPSENSOR_CAL1_ADDR) \
+  ) + TEMPSENSOR_CAL1_TEMP                                                        \
+ )                                                                                \
+ :                                                                                \
+ ((int32_t)LL_ADC_TEMPERATURE_CALC_ERROR)                                         \
+)
 
 int main()
 {
     mcu_setup();
-    vref_enable();
     utility_timer_initialize();
     utility_timer_enable();
-    adc_initialize(VOLTAGE_ADC);
-
-    uint8_t channels[] = {
-        CURRENT_ADC_CHANNEL,
-        VOLTAGE_ADC_CHANNEL,
-        DIE_TEMPERATURE_ADC_CHANNEL
-    };
-    adc_set_regular_sequence(VOLTAGE_ADC, channels, sizeof(channels));
-
-    adc_set_sample_time(VOLTAGE_ADC, CURRENT_ADC_CHANNEL, ADC_SAMPLE_TIME_640_5);
-    adc_set_sample_time(VOLTAGE_ADC, VOLTAGE_ADC_CHANNEL, ADC_SAMPLE_TIME_640_5);
-    adc_set_sample_time(VOLTAGE_ADC, DIE_TEMPERATURE_ADC_CHANNEL, ADC_SAMPLE_TIME_640_5);
-    adc_set_continuous_mode(VOLTAGE_ADC, true);
-    adc_enable(VOLTAGE_ADC);
-    adc_start(VOLTAGE_ADC);
+    ADC_setup();
+    int32_t a = (int32_t)((int32_t)*TEMPSENSOR_CAL2_ADDR - (int32_t)*TEMPSENSOR_CAL1_ADDR);
     while(1) {
-        // while (!(VOLTAGE_ADC->ISR & ADC_ISR_EOS))
-        // {
-        //     // wait
-        // }
-        // volatile uint32_t d = VOLTAGE_ADC->DR;
-
-        // // clear end of sequence (EOS) flag
-        // VOLTAGE_ADC->ISR |= ADC_ISR_EOS;
-        // adc_start(VOLTAGE_ADC);
+        int32_t a = __LL_ADC_CONVERT_DATA_RESOLUTION(ADC_raw_temp, LL_ADC_RESOLUTION_12B, LL_ADC_RESOLUTION_12B);
+        converted_degrees = __LL_ADC_CALC_TEMPERATURE(3300, ADC_raw_temp, LL_ADC_RESOLUTION_12B);
     }
 }

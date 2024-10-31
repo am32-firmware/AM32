@@ -4,6 +4,8 @@
 #include "stm32h563xx.h"
 #include "stm32h5xx_ll_dma.h"
 #include "targets.h"
+#include "vref.h"
+
 #define ADC_DMA_LENGTH 3
 uint16_t ADCDataDMA[ADC_DMA_LENGTH];
 
@@ -23,6 +25,23 @@ void ADC_DMA_Callback()
   ADC_raw_current = ADCDataDMA[0];
 }
 
+void ADC_setup()
+{
+  vref_enable();
+  adc_initialize(VOLTAGE_ADC);
+  uint8_t channels[] = {
+      CURRENT_ADC_CHANNEL,
+      VOLTAGE_ADC_CHANNEL,
+      DIE_TEMPERATURE_ADC_CHANNEL
+  };
+  adc_set_regular_sequence(VOLTAGE_ADC, channels, sizeof(channels));
+  adc_set_sample_time(VOLTAGE_ADC, CURRENT_ADC_CHANNEL, ADC_SAMPLE_TIME_640_5);
+  adc_set_sample_time(VOLTAGE_ADC, VOLTAGE_ADC_CHANNEL, ADC_SAMPLE_TIME_640_5);
+  adc_set_sample_time(VOLTAGE_ADC, DIE_TEMPERATURE_ADC_CHANNEL, ADC_SAMPLE_TIME_640_5);
+  adc_set_continuous_mode(VOLTAGE_ADC, true);
+  adc_enable(VOLTAGE_ADC);
+  adc_start(VOLTAGE_ADC);
+}
 void adc_dma_cb(dmaChannel_t* dma)
 {
     dma->ref->CFCR |= DMA_CFCR_TCF;
@@ -30,7 +49,7 @@ void adc_dma_cb(dmaChannel_t* dma)
 }
 void adc_dma_initialize(ADC_TypeDef* adc)
 {
-    dmaChannel_t* dma = &dmaChannels[15];
+    dmaChannel_t* dma = &dmaChannels[ADC_DMA_CHANNEL];
     
     NVIC_SetPriority(dma->irqn, 0);
     NVIC_EnableIRQ(dma->irqn);
@@ -121,7 +140,11 @@ void adc_initialize(ADC_TypeDef* adc)
   ADC12_COMMON->CCR |= 0b11 << ADC_CCR_CKMODE_Pos;
   // // select the adc clock as HCLK/2
   // ADC12_COMMON->CCR |= 0b10 << ADC_CCR_CKMODE_Pos;
-  
+
+  // set adc input clock divider as 2
+  // giving a final divider of 8 with the CKMODE configuration
+  ADC12_COMMON->CCR |= 0b0001 << ADC_CCR_PRESC_Pos;
+
   // exit deep power down
   adc->CR &= ~ADC_CR_DEEPPWD;
 

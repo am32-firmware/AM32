@@ -1812,6 +1812,8 @@
 
 // ADC1 INP16
 #define DIE_TEMPERATURE_ADC_CHANNEL 16
+
+#define ADC_DMA_CHANNEL 15
 // MB1404 nucleo red user LED3
 // #define LED_R_GPIO_PORT GPIOG
 // #define LED_R_GPIO_PIN 4

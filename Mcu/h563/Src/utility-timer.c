@@ -10,6 +10,7 @@ void utility_timer_initialize()
 {
     UTILITY_TIMER_ENABLE_CLOCK();
     clock_update_hclk_frequency();
+    // 1MHz clock frequency
     UTILITY_TIMER->PSC = (HCLK_FREQUENCY / 1000000) - 1;
     UTILITY_TIMER->ARR = 0XFFFF;
     LL_TIM_DisableARRPreload(UTILITY_TIMER);

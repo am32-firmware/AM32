@@ -6,6 +6,7 @@
 
 void ADC_DMA_Callback();
 
+void ADC_setup();
 void adc_initialize(ADC_TypeDef* adc);
 void adc_set_regular_sequence(ADC_TypeDef* adc, uint8_t* channels, uint8_t length);
 void adc_enable(ADC_TypeDef* adc);

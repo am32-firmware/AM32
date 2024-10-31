@@ -2,6 +2,7 @@
 
 #include "peripherals.h"
 
+#include "mcu.h"
 #include "comparator.h"
 #include "gpio.h"
 #include "ADC.h"
@@ -13,7 +14,9 @@
 #include "comparator.h"
 #include "bridge.h"
 #include "drv8323-spi.h"
+#include "ten-khz-timer.h"
 #include "utility-timer.h"
+#include "clock.h"
 
 extern void interruptRoutine();
 extern void processDshot();
@@ -87,16 +90,16 @@ void MX_TIM1_Init(void)
     LL_TIM_OC_InitTypeDef TIM_OC_InitStruct = { 0 };
     LL_TIM_BDTR_InitTypeDef TIM_BDTRInitStruct = { 0 };
     LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
-    LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM1);
+    BRIDGE_TIMER_ENABLE_CLOCK();
     TIM_InitStruct.Prescaler = 0;
     TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
     TIM_InitStruct.Autoreload = 1999;
     TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
     TIM_InitStruct.RepetitionCounter = 0;
-    LL_TIM_Init(TIM1, &TIM_InitStruct);
-    LL_TIM_EnableARRPreload(TIM1);
-    LL_TIM_SetClockSource(TIM1, LL_TIM_CLOCKSOURCE_INTERNAL);
-    LL_TIM_OC_EnablePreload(TIM1, LL_TIM_CHANNEL_CH1);
+    LL_TIM_Init(BRIDGE_TIMER, &TIM_InitStruct);
+    LL_TIM_EnableARRPreload(BRIDGE_TIMER);
+    LL_TIM_SetClockSource(BRIDGE_TIMER, LL_TIM_CLOCKSOURCE_INTERNAL);
+    LL_TIM_OC_EnablePreload(BRIDGE_TIMER, LL_TIM_CHANNEL_CH1);
 #ifdef USE_SWAPPED_OUPUT
     TIM_OC_InitStruct.OCMode = LL_TIM_OCMODE_PWM2;
 #else
@@ -119,25 +122,25 @@ void MX_TIM1_Init(void)
     TIM_OC_InitStruct.OCNPolarity = LL_TIM_OCPOLARITY_HIGH;
     TIM_OC_InitStruct.OCNIdleState = LL_TIM_OCIDLESTATE_LOW;
 #endif
-    LL_TIM_OC_Init(TIM1, LL_TIM_CHANNEL_CH1, &TIM_OC_InitStruct);
-    LL_TIM_OC_DisableFast(TIM1, LL_TIM_CHANNEL_CH1);
-    LL_TIM_OC_EnablePreload(TIM1, LL_TIM_CHANNEL_CH2);
+    LL_TIM_OC_Init(BRIDGE_TIMER, LL_TIM_CHANNEL_CH1, &TIM_OC_InitStruct);
+    LL_TIM_OC_DisableFast(BRIDGE_TIMER, LL_TIM_CHANNEL_CH1);
+    LL_TIM_OC_EnablePreload(BRIDGE_TIMER, LL_TIM_CHANNEL_CH2);
     TIM_OC_InitStruct.OCState = LL_TIM_OCSTATE_DISABLE;
     TIM_OC_InitStruct.OCNState = LL_TIM_OCSTATE_DISABLE;
-    LL_TIM_OC_Init(TIM1, LL_TIM_CHANNEL_CH2, &TIM_OC_InitStruct);
-    LL_TIM_OC_DisableFast(TIM1, LL_TIM_CHANNEL_CH2);
-    LL_TIM_OC_EnablePreload(TIM1, LL_TIM_CHANNEL_CH3);
+    LL_TIM_OC_Init(BRIDGE_TIMER, LL_TIM_CHANNEL_CH2, &TIM_OC_InitStruct);
+    LL_TIM_OC_DisableFast(BRIDGE_TIMER, LL_TIM_CHANNEL_CH2);
+    LL_TIM_OC_EnablePreload(BRIDGE_TIMER, LL_TIM_CHANNEL_CH3);
     TIM_OC_InitStruct.OCState = LL_TIM_OCSTATE_DISABLE;
     TIM_OC_InitStruct.OCNState = LL_TIM_OCSTATE_DISABLE;
-    LL_TIM_OC_Init(TIM1, LL_TIM_CHANNEL_CH3, &TIM_OC_InitStruct);
-    LL_TIM_OC_DisableFast(TIM1, LL_TIM_CHANNEL_CH3);
-    LL_TIM_OC_EnablePreload(TIM1, LL_TIM_CHANNEL_CH4);
+    LL_TIM_OC_Init(BRIDGE_TIMER, LL_TIM_CHANNEL_CH3, &TIM_OC_InitStruct);
+    LL_TIM_OC_DisableFast(BRIDGE_TIMER, LL_TIM_CHANNEL_CH3);
+    LL_TIM_OC_EnablePreload(BRIDGE_TIMER, LL_TIM_CHANNEL_CH4);
     TIM_OC_InitStruct.OCState = LL_TIM_OCSTATE_DISABLE;
     TIM_OC_InitStruct.OCNState = LL_TIM_OCSTATE_DISABLE;
-    LL_TIM_OC_Init(TIM1, LL_TIM_CHANNEL_CH4, &TIM_OC_InitStruct);
-    LL_TIM_OC_DisableFast(TIM1, LL_TIM_CHANNEL_CH4);
-    LL_TIM_SetTriggerOutput(TIM1, LL_TIM_TRGO_RESET);
-    LL_TIM_DisableMasterSlaveMode(TIM1);
+    LL_TIM_OC_Init(BRIDGE_TIMER, LL_TIM_CHANNEL_CH4, &TIM_OC_InitStruct);
+    LL_TIM_OC_DisableFast(BRIDGE_TIMER, LL_TIM_CHANNEL_CH4);
+    LL_TIM_SetTriggerOutput(BRIDGE_TIMER, LL_TIM_TRGO_RESET);
+    LL_TIM_DisableMasterSlaveMode(BRIDGE_TIMER);
     TIM_BDTRInitStruct.OSSRState = LL_TIM_OSSR_DISABLE;
     TIM_BDTRInitStruct.OSSIState = LL_TIM_OSSI_DISABLE;
     TIM_BDTRInitStruct.LockLevel = LL_TIM_LOCKLEVEL_OFF;
@@ -145,19 +148,11 @@ void MX_TIM1_Init(void)
     TIM_BDTRInitStruct.BreakState = LL_TIM_BREAK_DISABLE;
     TIM_BDTRInitStruct.BreakPolarity = LL_TIM_BREAK_POLARITY_HIGH;
     TIM_BDTRInitStruct.AutomaticOutput = LL_TIM_AUTOMATICOUTPUT_DISABLE;
-    LL_TIM_BDTR_Init(TIM1, &TIM_BDTRInitStruct);
+    LL_TIM_BDTR_Init(BRIDGE_TIMER, &TIM_BDTRInitStruct);
 
     // LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOA);
     // LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOB);
 
-/**TIM1 GPIO Configuration
-PA7   ------> TIM1_CH1N
-PB0   ------> TIM1_CH2N
-PB1   ------> TIM1_CH3N
-PA8   ------> TIM1_CH1
-PA9   ------> TIM1_CH2
-PA10   ------> TIM1_CH3
-*/
 #ifdef USE_OPEN_DRAIN_LOW
 #pragma message("using open drain low side")
 #define LOW_OUTPUT_TYPE LL_GPIO_OUTPUT_OPENDRAIN
@@ -197,39 +192,10 @@ void initCorePeripherals(void)
 #endif
 }
 
-
-static inline void hsi_config(void)
-{
-    // at startup, system clock is HSI = 64MHz / 2 = 32MHz
-    // the HSI divider at startup is 2
-    // here we switch it to 1 so that the system clock is 64MHz
-    RCC->CR &= ~(RCC_CR_HSIDIV_Msk);
-    while (!(RCC->CR & RCC_CR_HSIDIVF))
-    {
-        // wait for hsi to switch over
-    }
-}
-
-static inline void flash_enable_prefetch(void)
-{
-    // enable prefetch buffer
-    FLASH->ACR |= FLASH_ACR_PRFTEN;
-}
-static inline void icache_config(void)
-{
-    // // wait for any ongoing cache invalidation
-    while (ICACHE->CR & ICACHE_SR_BUSYF);
-    // enable icache miss monitor, hit monitor, and icache itself
-    ICACHE->CR |= ICACHE_CR_MISSMEN | ICACHE_CR_HITMEN | ICACHE_CR_EN;
-
-}
-
 void initAfterJump(void)
 {
     __enable_irq();
-    flash_enable_prefetch(); 
-    hsi_config();
-    // icache_config();
+    mcu_setup();
 }
 
 void MX_IWDG_Init(void)
@@ -253,7 +219,8 @@ void interval_timer_initialize(void)
 {
     INTERVAL_TIMER_ENABLE_CLOCK();
     // 2MHz on f051
-    TIM2->PSC = (CPU_FREQUENCY_MHZ/2) - 1;
+    clock_update_hclk_frequency();
+    TIM2->PSC = ((HCLK_FREQUENCY/1000000)/2) - 1;
     TIM2->ARR = 0xFFFF;
 }
 
@@ -280,14 +247,15 @@ void input_timer_initialize(void)
     INPUT_TIMER_ENABLE_CLOCK();
 
     
-    NVIC_SetPriority(dmaChannels[INPUT_TIMER_DMA_CHANNEL].irqn, 0);
+    NVIC_SetPriority(dmaChannels[INPUT_TIMER_DMA_CHANNEL].irqn, 1);
     NVIC_EnableIRQ(dmaChannels[INPUT_TIMER_DMA_CHANNEL].irqn);
     // NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
     // NVIC_EnableIRQ(IC_DMA_IRQ_NAME);
     // INPUT_TIMER->TISEL = TIM_TISEL_TI1SEL_1;
 
-    // INPUT_TIMER->PSC = 249;
-    INPUT_TIMER->PSC = 63;
+    clock_update_hclk_frequency();
+    // 1MHz clock frequency
+    INPUT_TIMER->PSC = (HCLK_FREQUENCY/1000000) - 1;
     INPUT_TIMER->ARR = 0xffff;
     // INPUT_TIMER->ARR = 10000;
     input_timer_gpio_initialize();
@@ -327,15 +295,15 @@ uint16_t getintervaTimerCount() { return INTERVAL_TIMER->CNT; }
 
 void setintervaTimerCount(uint16_t intertime) { INTERVAL_TIMER->CNT = 0; }
 
-void setPrescalerPWM(uint16_t presc) { TIM1->PSC = presc; }
+void setPrescalerPWM(uint16_t presc) { BRIDGE_TIMER->PSC = presc; }
 
-void setAutoReloadPWM(uint16_t relval) { TIM1->ARR = relval; }
+void setAutoReloadPWM(uint16_t relval) { BRIDGE_TIMER->ARR = relval; }
 
-void inline setPWMCompare1(uint16_t compareone) { TIM1->CCR1 = compareone; }
-void inline setPWMCompare2(uint16_t comparetwo) { TIM1->CCR2 = comparetwo; }
-void inline setPWMCompare3(uint16_t comparethree) { TIM1->CCR3 = comparethree; }
+void inline setPWMCompare1(uint16_t compareone) { BRIDGE_TIMER->CCR1 = compareone; }
+void inline setPWMCompare2(uint16_t comparetwo) { BRIDGE_TIMER->CCR2 = comparetwo; }
+void inline setPWMCompare3(uint16_t comparethree) { BRIDGE_TIMER->CCR3 = comparethree; }
 
-void inline generatePwmTimerEvent() { LL_TIM_GenerateEvent_UPDATE(TIM1); }
+void inline generatePwmTimerEvent() { LL_TIM_GenerateEvent_UPDATE(BRIDGE_TIMER); }
 
 void inline resetInputCaptureTimer()
 {
@@ -345,22 +313,22 @@ void inline resetInputCaptureTimer()
 
 void enableCorePeripherals()
 {
-    LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH1);
-    LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH2);
-    LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH3);
-    LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH1N);
-    LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH2N);
-    LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH3N);
+    LL_TIM_CC_EnableChannel(BRIDGE_TIMER, LL_TIM_CHANNEL_CH1);
+    LL_TIM_CC_EnableChannel(BRIDGE_TIMER, LL_TIM_CHANNEL_CH2);
+    LL_TIM_CC_EnableChannel(BRIDGE_TIMER, LL_TIM_CHANNEL_CH3);
+    LL_TIM_CC_EnableChannel(BRIDGE_TIMER, LL_TIM_CHANNEL_CH1N);
+    LL_TIM_CC_EnableChannel(BRIDGE_TIMER, LL_TIM_CHANNEL_CH2N);
+    LL_TIM_CC_EnableChannel(BRIDGE_TIMER, LL_TIM_CHANNEL_CH3N);
 
-    LL_TIM_CC_EnableChannel(TIM1,
+    LL_TIM_CC_EnableChannel(BRIDGE_TIMER,
         LL_TIM_CHANNEL_CH4); // timer used for timing adc read
-    TIM1->CCR4 = 100;
+    BRIDGE_TIMER->CCR4 = 100;
 
     /* Enable counter */
-    LL_TIM_EnableCounter(TIM1);
-    LL_TIM_EnableAllOutputs(TIM1);
+    LL_TIM_EnableCounter(BRIDGE_TIMER);
+    LL_TIM_EnableAllOutputs(BRIDGE_TIMER);
     /* Force update generation */
-    LL_TIM_GenerateEvent_UPDATE(TIM1);
+    LL_TIM_GenerateEvent_UPDATE(BRIDGE_TIMER);
 
     input_timer_enable();
 
@@ -375,9 +343,6 @@ void enableCorePeripherals()
 
     utility_timer_enable();
 
-    LL_TIM_EnableCounter(UTILITY_TIMER);
-    LL_TIM_GenerateEvent_UPDATE(UTILITY_TIMER);
-
     // depends on delay, so must come after utility timer counter enable
     drv8323_initialize(&DRV8323);
 
@@ -388,9 +353,7 @@ void enableCorePeripherals()
 
     // RCC->APB2ENR  &= ~(1 << 22);  // turn debug off
 #ifdef USE_ADC
-    ADC_Init();
-    enableADC_DMA();
-    activateADC();
+    ADC_setup();
 #endif
 
     exti_configure_cb(&extiChannels[15], exti15cb);

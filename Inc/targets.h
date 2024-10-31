@@ -2137,6 +2137,7 @@
 #define EEPROM_BASE (0x08000000)
 #define EEPROM_PAGE (126)
 // eeprom address is 0x900a800 with one EDATA high cycle (6kB) page enabled
+// EEPROM_START_ADD = 0x080fc000 when regulare flash is used
 #define EEPROM_START_ADD (uint32_t)(EEPROM_BASE + EEPROM_PAGE*EEPROM_PAGE_SIZE)
 
 

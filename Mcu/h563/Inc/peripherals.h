@@ -1,14 +1,4 @@
-/*
- * peripherals.h
- *
- *  Created on: Sep. 26, 2020
- *      Author: Alka
- */
-
-#ifndef PERIPHERALS_H_
-#define PERIPHERALS_H_
-
-#endif /* PERIPHERALS_H_ */
+#pragma once
 
 #include "main.h"
 
@@ -46,9 +36,6 @@ void ten_khz_timer_initialize(void);
 void ten_khz_timer_enable(void);
 void ten_khz_timer_interrupt_enable(void);
 
-void utility_timer_initialize(void);
-void utility_timer_enable(void);
-
 void disableComTimerInt(void);
 void enableComTimerInt(void);
 void setAndEnableComInt(uint16_t time);
@@ -62,5 +49,4 @@ void setPWMCompare2(uint16_t comparetwo);
 void setPWMCompare3(uint16_t comparethree);
 void enableCorePeripherals(void);
 void generatePwmTimerEvent(void);
-void LED_GPIO_init(void);
 void setPrescalerPWM(uint16_t presc);

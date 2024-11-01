@@ -85,7 +85,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-exti-comparator-3phase.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-input-pwm.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi2.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi2.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi2.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-maxfrequency.c
@@ -93,7 +93,7 @@ SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi2.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-phaseouts.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma-single.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma.c
-# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-ten-khz-timer.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-ten-khz-timer.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-aux.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-main.c

@@ -24,6 +24,7 @@ void tenKhzRoutine()
 
 int main()
 {
+    mcu_setup();
     led_initialize();
     led_off();
 

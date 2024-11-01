@@ -28,7 +28,7 @@ DEBUG_USART_ENABLE_CLOCK();
     usartDebug.txDma = &dmaChannels[DEBUG_USART_TX_DMA_CHANNEL];
     usartDebug.txDmaRequest = DEBUG_USART_DMA_REQ;
 
-    usartDebug._baudrate = 1000000;
+    usartDebug._baudrate = 3000000;
     usartDebug.swap = DEBUG_USART_SWAP_IO;
     usart_initialize(&usartDebug);
 }

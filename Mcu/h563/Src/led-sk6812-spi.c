@@ -3,6 +3,7 @@
 #include "gpio.h"
 #include "dma.h"
 #include "spi.h"
+#include "vreg.h"
 
 
 // 2 bytes for leading 0 to prevent glitch on mosi line
@@ -21,21 +22,13 @@ spi_t spi;
 
 void led_initialize()
 {
-    
+    vreg5V_initialize();
+    vreg5V_enable();
+
     // enable dma clocks
     dma_initialize();
     // enable spi clock
     LED_SPI_ENABLE_CLOCK();
-
-    // enable 5V regulator
-    gpio_t gpioVreg5VEnable = DEF_GPIO(
-        VREG_5V_ENABLE_PORT,
-        VREG_5V_ENABLE_PIN,
-        0,
-        GPIO_OUTPUT);
-    gpio_initialize(&gpioVreg5VEnable);
-    // gpio_set_speed(&gpioVreg5VEnable, 0b11);
-    gpio_set(&gpioVreg5VEnable);
 
     gpio_t gpioSpiSCK = DEF_GPIO(
         LED_SPI_SCK_PORT,
@@ -51,6 +44,9 @@ void led_initialize()
 
     spi.ref = LED_SPI_PERIPH;
 
+    // configure spi kernel clock as HSE via per_ck (25MHz)
+    spi_configure_rcc_clock_selection(&spi, 0b100);
+
     spi._rx_buffer = spi_rx_buffer;
     spi._tx_buffer = spi_tx_buffer;
     spi._rx_buffer_size = 256;
@@ -63,8 +59,6 @@ void led_initialize()
 
     spi.CFG1_MBR = 0b001; // kernel clock / 2
     spi_initialize(&spi);
-    // configure spi kernel clock as HSE via per_ck (25MHz)
-    spi_configure_rcc_clock_selection(&spi, 0b100);
 
     gpio_initialize(&gpioSpiSCK);
     gpio_initialize(&gpioSpiMOSI);
@@ -74,6 +68,11 @@ void led_initialize()
 
     data[0] = 0;
     data[1] = 0;
+}
+
+void led_off(void)
+{
+    led_write(0);
 }
 
 void led_write(uint32_t brg)

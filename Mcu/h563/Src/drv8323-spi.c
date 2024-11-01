@@ -170,16 +170,16 @@ void drv8323_read_all(drv8323_t* drv)
     reg = drv8323_read_reg(drv, DRV8323_REG_OCP_CONTROL);
     reg = drv8323_read_reg(drv, DRV8323_REG_CSA_CONTROL);
 }
-uint16_t spi_rx_buffer[256];
-uint16_t spi_tx_buffer[256];
-spi_t spi;
+uint16_t drv8323SpiRxBuffer[256];
+uint16_t drv8323SpiTxBuffer[256];
+spi_t spiDrv8323;
 
 void drv8323_configure_spi(drv8323_t* drv)
 {
     // enable spi clock
     GATE_DRIVER_SPI_ENABLE_CLOCK();
 
-    spi.ref = SPI5;
+    spiDrv8323.ref = SPI5;
 
     // 000: rcc_pclk3 selected as kernel clock (default after reset)
     // 001: pll2_q_ck selected as kernel clock
@@ -188,23 +188,23 @@ void drv8323_configure_spi(drv8323_t* drv)
     // 100: csi_ker_ck selected as kernel clock
     // 101: hse_ck selected as kernel clock
     // others: reserved, the kernel clock is disabled
-    spi_configure_rcc_clock_selection(&spi, 0b101);
+    spi_configure_rcc_clock_selection(&spiDrv8323, 0b101);
 
-    spi._rx_buffer = spi_rx_buffer;
-    spi._tx_buffer = spi_tx_buffer;
-    spi._rx_buffer_size = 256;
-    spi._tx_buffer_size = 256;
-    spi.rxDma = &dmaChannels[7];
-    spi.txDma = &dmaChannels[0];
-    spi.txDmaRequest = LL_GPDMA1_REQUEST_SPI5_TX;
-    spi.rxDmaRequest = LL_GPDMA1_REQUEST_SPI5_RX;
-    // spi.CFG1_MBR = 0b011; // prescaler = 16 // this DOES NOT work on blueesc
-    // spi.CFG1_MBR = 0b100; // prescaler = 32 // this works on blueesc
-    spi.CFG1_MBR = 0b101; // prescaler = 64 // this works on blueesc
-    // spi.CFG1_MBR = 0b100; // prescaler = 128 // this works on blueesc
-    // spi.CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
+    spiDrv8323._rx_buffer = drv8323SpiRxBuffer;
+    spiDrv8323._tx_buffer = drv8323SpiTxBuffer;
+    spiDrv8323._rx_buffer_size = 256;
+    spiDrv8323._tx_buffer_size = 256;
+    spiDrv8323.rxDma = &dmaChannels[7];
+    spiDrv8323.txDma = &dmaChannels[0];
+    spiDrv8323.txDmaRequest = LL_GPDMA1_REQUEST_SPI5_TX;
+    spiDrv8323.rxDmaRequest = LL_GPDMA1_REQUEST_SPI5_RX;
+    // spiDrv8323.CFG1_MBR = 0b011; // prescaler = 16 // this DOES NOT work on blueesc
+    // spiDrv8323.CFG1_MBR = 0b100; // prescaler = 32 // this works on blueesc
+    spiDrv8323.CFG1_MBR = 0b101; // prescaler = 64 // this works on blueesc
+    // spiDrv8323.CFG1_MBR = 0b100; // prescaler = 128 // this works on blueesc
+    // spiDrv8323.CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
 
-    drv->spi = &spi;
+    drv->spi = &spiDrv8323;
 }
 
 bool drv8323_get_fault_status(drv8323_t* drv)

@@ -65,12 +65,9 @@ void mcu_setup_mpu()
         LL_MPU_REGION_NUMBER0,
         LL_MPU_REGION_ALL_RW,
         LL_MPU_ATTRIBUTES_NUMBER0,
-        // 0x0900a800,
-        // 0x0900c000
+        // enable the region where temperature sensor calibrations are stored
         0x08fff800,
         0x08ffffff
-        // EEPROM_BASE,
-        // EEPROM_BASE + EEPROM_PAGE_SIZE
     );
     LL_MPU_Enable(LL_MPU_CTRL_PRIVILEGED_DEFAULT);
 }

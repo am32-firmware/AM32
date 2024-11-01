@@ -1,6 +1,5 @@
-// Test the gpio pins used for auxilliary
-// spi port
-// (just toggle gpio pins, not the spi peripheral)
+// This program tests the functions
+// in "led.h"
 #include "targets.h"
 #include "mcu.h"
 #include "led.h"

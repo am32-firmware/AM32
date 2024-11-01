@@ -1933,6 +1933,46 @@
 /////////////////////////////////////////
 
 /////////////////////////////////////////
+// Debug GPIO (flag) control
+/////////////////////////////////////////
+// debug gpio 1 is pin 2 on the 6-pin JST-GH
+// connector
+// it is connected to:
+// GPIO C3
+// GPIO E0
+// GPIO E4
+#define DEBUG_GPIO1_PORT GPIOC
+#define DEBUG_GPIO1_PIN 3
+// #define DEBUG_GPIO1_PORT GPIOE
+// #define DEBUG_GPIO1_PIN 0
+// #define DEBUG_GPIO1_PORT GPIOE
+// #define DEBUG_GPIO1_PIN 4
+
+// debug gpio 2 is pin 3 on the 6-pin JST-GH
+// connector
+// it is connected to:
+// GPIO B6
+// GPIO E6
+#define DEBUG_GPIO2_PORT GPIOB
+#define DEBUG_GPIO2_PIN 6
+// #define DEBUG_GPIO2_PORT GPIOE
+// #define DEBUG_GPIO2_PIN 6
+
+// debug gpio 3 is pin 4 on the 6-pin JST-GH
+// connector
+// it is connected to:
+// GPIO B7
+// GPIO E5
+#define DEBUG_GPIO3_PORT GPIOB
+#define DEBUG_GPIO3_PIN 7
+// #define DEBUG_GPIO3_PORT GPIOE
+// #define DEBUG_GPIO3_PIN 5
+
+/////////////////////////////////////////
+// Debug GPIO (flag) control
+/////////////////////////////////////////
+
+/////////////////////////////////////////
 // Aux USART/UART/LPUART control
 /////////////////////////////////////////
 

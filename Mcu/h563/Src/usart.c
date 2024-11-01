@@ -188,7 +188,7 @@ void usart_write(usart_t* usart, const uint8_t* data, uint8_t length)
 
 void usart_write_string(usart_t* usart, const char* string)
 {
-    usart_write(usart, string, strlen(string));
+    usart_write(usart, (const uint8_t*)string, strlen(string));
 }
 
 void usart_write_int(usart_t* usart, uint32_t i)

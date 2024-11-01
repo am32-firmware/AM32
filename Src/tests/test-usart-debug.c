@@ -1,12 +1,7 @@
+// This example transmits some data ("hello world\n")
+// on the debug usart interface
+// (programming connector)
 #include "stm32h563xx.h"
-// nucleo
-// #define USART_RX_PORT GPIOD
-// #define USART_RX_PIN 9
-// #define USART_RX_AF 7
-
-// #define USART_TX_PORT GPIOD
-// #define USART_TX_PIN 8
-// #define USART_TX_AF 7
 
 #define TEST_USART_RX_PORT DEBUG_USART_RX_PORT
 #define TEST_USART_RX_PIN DEBUG_USART_RX_PIN

@@ -33,6 +33,10 @@ void debug_initialize()
     usartDebug._baudrate = 3000000;
     usartDebug.swap = DEBUG_USART_SWAP_IO;
     usart_initialize(&usartDebug);
+
+    gpio_initialize(&gpioDebug1);
+    gpio_initialize(&gpioDebug2);
+    gpio_initialize(&gpioDebug3);
 }
 
 void debug_write_string(const char* string)

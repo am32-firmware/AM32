@@ -1,4 +1,5 @@
 // #include "functions.h"
+#include "debug.h"
 #include "led.h"
 // #include "peripherals.h"
 // #include "debug.h"
@@ -9,7 +10,7 @@ uint32_t count = 0; // loop counter
 uint8_t prescaler = 20; // loop trigger (ie prescaler)
 void tenKhzRoutine()
 {
-    // debug_toggle_1();
+    debug_set_1();
     if ((count++ % prescaler) == 0)
     {
         i = i<<1;
@@ -19,7 +20,7 @@ void tenKhzRoutine()
         led_write(i);
         count = 1;
     }
-
+    debug_reset_1();
 }
 
 int main()

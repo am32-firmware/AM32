@@ -1,7 +1,7 @@
 #pragma once
 
 void debug_initialize();
-void debug_write_string();
+void debug_write_string(const char* string);
 
 void debug_set_1();
 void debug_set_2();

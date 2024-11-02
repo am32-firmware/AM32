@@ -30,8 +30,6 @@ void input_timer_enable(void);
 void MX_IWDG_Init(void);
 void reloadWatchDogCounter(void);
 
-void com_timer_initialize(void);
-
 void ten_khz_timer_initialize(void);
 void ten_khz_timer_enable(void);
 void ten_khz_timer_interrupt_enable(void);

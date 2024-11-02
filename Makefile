@@ -59,7 +59,7 @@ SRC_MAIN := $(SRC_DIRS_COMMON)/main.c
 SRC_COMMON := $(filter-out $(SRC_MAIN), $(SRC_COMMON))
 $(info    $(SRC_COMMON))
 
-# SRC_MAIN := $(SRC_DIRS_COMMON)/main.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/main.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-adc.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-input-pwm.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-spi-gpio.c
@@ -93,7 +93,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-phaseouts.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma-single.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-ten-khz-timer.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-ten-khz-timer.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-aux.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-main.c

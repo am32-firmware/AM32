@@ -3,6 +3,7 @@
 #include "peripherals.h"
 
 #include "mcu.h"
+#include "commutation-timer.h"
 #include "comparator.h"
 #include "gpio.h"
 #include "ADC.h"
@@ -184,7 +185,7 @@ void initCorePeripherals(void)
     COMPARATOR.phaseCcb = phaseC_cb;
     
     comparator_initialize(&COMPARATOR);
-    com_timer_initialize();
+    commutation_timer_initialize();
     ten_khz_timer_initialize();
     utility_timer_initialize();
     input_timer_initialize();
@@ -231,18 +232,6 @@ void interval_timer_enable(void)
     LL_TIM_GenerateEvent_UPDATE(INTERVAL_TIMER);
 }
 
-void com_timer_initialize(void)
-{
-    COM_TIMER_ENABLE_CLOCK();
-
-    // 2MHz for f0
-    COM_TIMER->PSC = CPU_FREQUENCY_MHZ/2 - 1;
-    COM_TIMER->ARR = 4000;
-    NVIC_SetPriority(COM_TIMER_IRQ, 0);
-    NVIC_EnableIRQ(COM_TIMER_IRQ);
-    LL_TIM_EnableARRPreload(COM_TIMER);
-}
-
 void input_timer_initialize(void)
 {
     INPUT_TIMER_ENABLE_CLOCK();
@@ -278,18 +267,6 @@ void input_timer_enable(void)
     LL_TIM_CC_EnableChannel(INPUT_TIMER,
         IC_TIMER_CHANNEL); // input capture and output compare
     LL_TIM_EnableCounter(INPUT_TIMER);
-}
-
-void disableComTimerInt() { COM_TIMER->DIER &= ~((0x1UL << (0U))); }
-
-void enableComTimerInt() { COM_TIMER->DIER |= (0x1UL << (0U)); }
-
-void setAndEnableComInt(uint16_t time)
-{
-    COM_TIMER->CNT = 0;
-    COM_TIMER->ARR = time;
-    COM_TIMER->SR = 0x00;
-    COM_TIMER->DIER |= (0x1UL << (0U));
 }
 
 void setPrescalerPWM(uint16_t presc) { BRIDGE_TIMER->PSC = presc; }

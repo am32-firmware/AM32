@@ -27,10 +27,6 @@ void input_timer_enable(void);
 void MX_IWDG_Init(void);
 void reloadWatchDogCounter(void);
 
-void ten_khz_timer_initialize(void);
-void ten_khz_timer_enable(void);
-void ten_khz_timer_interrupt_enable(void);
-
 void setAutoReloadPWM(uint16_t relval);
 void setDutyCycleAll(uint16_t newdc);
 void resetInputCaptureTimer();

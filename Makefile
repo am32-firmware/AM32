@@ -99,6 +99,7 @@ SRC_MAIN := $(SRC_DIRS_COMMON)/main.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-main.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-watchdog-fail.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-watchdog-pass.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-watchdog-period.c
 
 TARGET_FNAME = $(IDENTIFIER)_$(TARGET)_$(FIRMWARE_VERSION)
 TARGET_BASENAME = $(BIN_DIR)/$(TARGET_FNAME)

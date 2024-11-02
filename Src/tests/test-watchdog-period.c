@@ -1,4 +1,3 @@
-#include "gpio.h"
 #include "mcu.h"
 #include "watchdog.h"
 

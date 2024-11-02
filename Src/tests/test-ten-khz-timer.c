@@ -11,21 +11,22 @@ uint8_t prescaler = 20; // loop trigger (ie prescaler)
 void tenKhzRoutine()
 {
     debug_set_1();
-    if ((count++ % prescaler) == 0)
-    {
-        i = i<<1;
-        if (i & 0x800000) {
-            i = 1;
-        }
-        led_write(i);
-        count = 1;
-    }
+    // if ((count++ % prescaler) == 0)
+    // {
+        // i = i<<1;
+        i += prescaler;
+        i = i % (1 << 24);
+
+        // led_write(i);
+        // count = 1;
+    // }
     debug_reset_1();
 }
 
 int main()
 {
     mcu_setup();
+    debug_initialize();
     led_initialize();
     led_off();
 

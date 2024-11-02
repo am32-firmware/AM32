@@ -51,8 +51,8 @@ void led_initialize()
     spi._tx_buffer = spi_tx_buffer;
     spi._rx_buffer_size = 256;
     spi._tx_buffer_size = 256;
-    spi.rxDma = &dmaChannels[7];
-    spi.txDma = &dmaChannels[0];
+    spi.rxDma = &dmaChannels[LED_RX_DMA_CHANNEL];
+    spi.txDma = &dmaChannels[LED_TX_DMA_CHANNEL];
 
     spi.txDmaRequest = LL_GPDMA1_REQUEST_SPI2_TX;
     spi.rxDmaRequest = LL_GPDMA1_REQUEST_SPI2_RX;

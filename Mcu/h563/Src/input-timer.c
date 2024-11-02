@@ -49,7 +49,7 @@ void input_timer_enable(void)
     LL_TIM_EnableCounter(INPUT_TIMER);
 }
 
-void resetInputCaptureTimer()
+void inline resetInputCaptureTimer()
 {
     INPUT_TIMER->PSC = 0;
     INPUT_TIMER->CNT = 0;

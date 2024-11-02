@@ -11,7 +11,8 @@ int main()
     mcu_setup();
     debug_initialize();
     debug_set_1();
-    watchdog_initialize_period(3000);
+    // set watchdog to trigger after 500ms
+    watchdog_initialize_period(500);
     watchdog_enable();
     debug_reset_1();
     while(1) {

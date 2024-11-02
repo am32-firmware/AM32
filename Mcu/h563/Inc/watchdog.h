@@ -21,7 +21,7 @@ void watchdog_initialize(
     iwdgPrescaler_e prescaler,
     uint16_t reload);
 
-void watchdog_initialize_period(uint32_t period_us);
+void watchdog_initialize_period(uint16_t period_ms);
 void watchdog_enable();
 void watchdog_goodboy_pat();
 void watchdog_set_prescaler(iwdgPrescaler_e prescaler);

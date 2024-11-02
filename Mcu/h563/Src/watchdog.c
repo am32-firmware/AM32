@@ -47,19 +47,19 @@ void watchdog_enable()
 #define IWDG_RLR_MAX (0xfff - 1)
 
 #define LSI_CLOCK_FREQUENCY 32000
-void watchdog_initialize_period(uint32_t period_us)
+void watchdog_initialize_period(uint16_t period_ms)
 {
     clock_update_hclk_frequency();
 
     uint8_t PR = 0;
     uint32_t prescaler = 1 << (PR + 2);
 
-    uint32_t reload_value = ((period_us * (HCLK_FREQUENCY/1000000)) / prescaler);
+    uint32_t reload_value = (period_ms * (LSI_CLOCK_FREQUENCY/1000) / prescaler);
     while (reload_value > IWDG_RLR_MAX)
     {
         PR++;
         prescaler = 1 << (PR + 2);
-        reload_value = ((period_us * (HCLK_FREQUENCY/1000000)) / prescaler);
+        reload_value = ((period_ms * (LSI_CLOCK_FREQUENCY/1000)) / prescaler);
     }
 
     watchdog_initialize(PR, reload_value);

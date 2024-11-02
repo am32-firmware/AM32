@@ -19,6 +19,7 @@
 #include "utility-timer.h"
 #include "clock.h"
 #include "vreg.h"
+// #include "input-timer.h"
 
 extern void interruptRoutine();
 extern void processDshot();
@@ -173,7 +174,7 @@ void MX_TIM1_Init(void)
 }
 void initCorePeripherals(void)
 {
-    dma_initialize();
+    // dma_initialize(); // this is done in mcu_setup
     MX_TIM1_Init();
 
     // waiting to make sure of parity with am32 implementation
@@ -198,22 +199,6 @@ void initAfterJump(void)
 {
     __enable_irq();
     mcu_setup();
-}
-
-void MX_IWDG_Init(void)
-{
-    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_WWDG);
-    IWDG->KR = 0x0000CCCCU;
-    IWDG->KR = 0x00005555U;
-    IWDG->PR = LL_IWDG_PRESCALER_16;
-    IWDG->RLR = 4000;
-    // while (IWDG->SR); // wait for the registers to be updated
-    IWDG->KR = 0x0000AAAA;
-}
-
-void reloadWatchDogCounter()
-{
-    LL_IWDG_ReloadCounter(IWDG);
 }
 
 // interval timer

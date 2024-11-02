@@ -57,6 +57,7 @@ SRC_H563 := \
 	$(SRC_DIR_H563_SRC)/input-timer.c \
 	$(SRC_DIR_H563_SRC)/vref.c \
 	$(SRC_DIR_H563_SRC)/vreg.c \
+	$(SRC_DIR_H563_SRC)/watchdog.c \
 	$(SRC_DIR_H563_SRC)/utility-timer.c \
 	$(SRC_DIR_H563_SRC)/stm32h5xx_it.c \
 	$(SRC_DIR_H563_SRC)/system_stm32h5xx.c \

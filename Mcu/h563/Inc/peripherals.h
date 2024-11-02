@@ -20,7 +20,6 @@ void interval_timer_enable(void);
 
 // called from main (can't be renamed)
 void MX_IWDG_Init(void);
-void reloadWatchDogCounter(void);
 
 void setAutoReloadPWM(uint16_t relval);
 void setDutyCycleAll(uint16_t newdc);

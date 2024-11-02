@@ -83,11 +83,6 @@ void watchdog_initialize(
 
 }
 
-void reloadWatchDogCounter()
-{
-    LL_IWDG_ReloadCounter(IWDG);
-}
-
 
 void MX_IWDG_Init(void)
 {

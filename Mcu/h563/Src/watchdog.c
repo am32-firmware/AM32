@@ -54,7 +54,7 @@ void watchdog_initialize_period(uint32_t period_us)
         reload_value = ((period_us * (HCLK_FREQUENCY/1000000)) / prescaler);
     }
 
-    watchdog_initialize(prescaler, 0);
+    watchdog_initialize(prescaler, reload_value);
     // reload value is 12 bit max
     // prescaler goes to 1024
 

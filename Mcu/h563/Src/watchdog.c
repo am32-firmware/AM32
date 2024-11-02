@@ -35,7 +35,7 @@ void watchdog_unlock()
     IWDG->KR = 0x00005555U;
 }
 
-#define IWDG_RLR_MAX 0xfff 
+#define IWDG_RLR_MAX (0xfff - 1)
 
 
 void watchdog_initialize_period(uint32_t period_us)
@@ -43,18 +43,15 @@ void watchdog_initialize_period(uint32_t period_us)
 
     clock_update_hclk_frequency();
 
+    uint8_t PR = 0;
+    uint32_t prescaler = 1 << (PR + 2);
 
-    uint32_t reload = 0;
-    uint32_t prescaler = 0x000;
-    uint16_t divider = (prescaler + 2) << 1;
-
-
-    uint32_t reload_value = ((period_us * (HCLK_FREQUENCY/1000000)) / divider);
+    uint32_t reload_value = ((period_us * (HCLK_FREQUENCY/1000000)) / prescaler);
     while (reload_value > IWDG_RLR_MAX)
     {
-        prescaler++;
-        divider = (prescaler + 2) << 1;
-        reload_value = ((period_us * (HCLK_FREQUENCY/1000000)) / divider);
+        PR++;
+        prescaler = 1 << (PR + 2);
+        reload_value = ((period_us * (HCLK_FREQUENCY/1000000)) / prescaler);
     }
 
     watchdog_initialize(prescaler, 0);

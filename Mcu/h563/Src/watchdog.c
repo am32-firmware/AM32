@@ -74,7 +74,7 @@ void watchdog_initialize(
     // set prescaler
     IWDG->PR = LL_IWDG_PRESCALER_16;
     // set reload register
-    IWDG->RLR = 4000;
+    IWDG->RLR = reload;
     // while (IWDG->SR); // wait for the registers to be updated
     IWDG->KR = 0x0000AAAA;
 

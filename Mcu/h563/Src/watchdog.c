@@ -53,8 +53,8 @@ void watchdog_initialize_period(uint16_t period_ms)
 
     uint8_t PR = 0;
     uint32_t prescaler = 1 << (PR + 2);
-
     uint32_t reload_value = (period_ms * (LSI_CLOCK_FREQUENCY/1000) / prescaler);
+
     while (reload_value > IWDG_RLR_MAX)
     {
         PR++;

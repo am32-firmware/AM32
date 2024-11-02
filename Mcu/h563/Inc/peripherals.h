@@ -2,12 +2,10 @@
 
 #include "main.h"
 #include "commutation-timer.h"
-// #include "input-timer.h"
+#include "interval-timer.h"
 
-#define INTERVAL_TIMER_COUNT (INTERVAL_TIMER->CNT)
 #define RELOAD_WATCHDOG_COUNTER() (LL_IWDG_ReloadCounter(IWDG))
 
-#define SET_INTERVAL_TIMER_COUNT(intertime) (INTERVAL_TIMER->CNT = intertime)
 #define SET_PRESCALER_PWM(presc) (BRIDGE_TIMER->PSC = presc)
 #define SET_AUTO_RELOAD_PWM(relval) (BRIDGE_TIMER->ARR = relval)
 #define SET_DUTY_CYCLE_ALL(newdc) \

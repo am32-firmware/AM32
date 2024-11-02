@@ -46,7 +46,7 @@ void watchdog_enable()
 
 #define IWDG_RLR_MAX (0xfff - 1)
 
-
+#define LSI_CLOCK_FREQUENCY 32000
 void watchdog_initialize_period(uint32_t period_us)
 {
     clock_update_hclk_frequency();
@@ -77,7 +77,8 @@ void watchdog_initialize(
     watchdog_unlock();
 
     // set prescaler
-    IWDG->PR = prescaler;
+    // IWDG->PR = prescaler;
+    watchdog_set_prescaler(prescaler);
     // IWDG->PR = LL_IWDG_PRESCALER_16;
     // set reload register
     IWDG->RLR = reload;

@@ -5,6 +5,7 @@
 #include "stm32h5xx_ll_bus.h"
 #include "stm32h5xx_ll_iwdg.h"
 
+#include "clock.h"
 
 
 // Bits 15:0 KEY[15:0]: Key value (write only, read 0x0000)
@@ -34,8 +35,52 @@ void watchdog_unlock()
     IWDG->KR = 0x00005555U;
 }
 
-void watchdog_initialize(iwdgPrescaler_e prescaler, uint16_t reload)
+#define IWDG_RLR_MAX 0xfff 
+
+
+void watchdog_initialize_period(uint32_t period_us)
 {
+
+    clock_update_hclk_frequency();
+
+
+    uint32_t reload = 0;
+    uint32_t prescaler = 0x000;
+    uint16_t divider = (prescaler + 2) << 1;
+
+
+    uint32_t reload_value = ((period_us * (HCLK_FREQUENCY/1000000)) / divider);
+    while (reload_value > IWDG_RLR_MAX)
+    {
+        prescaler++;
+        divider = (prescaler + 2) << 1;
+        reload_value = ((period_us * (HCLK_FREQUENCY/1000000)) / divider);
+    }
+
+    watchdog_initialize(prescaler, 0);
+    // reload value is 12 bit max
+    // prescaler goes to 1024
+
+
+
+}
+
+void watchdog_initialize(
+    iwdgPrescaler_e prescaler,
+    uint16_t reload)
+{
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_WWDG);
+
+    // unlock watchdog via key register
+    watchdog_unlock();
+
+    // set prescaler
+    IWDG->PR = LL_IWDG_PRESCALER_16;
+    // set reload register
+    IWDG->RLR = 4000;
+    // while (IWDG->SR); // wait for the registers to be updated
+    IWDG->KR = 0x0000AAAA;
+
 
     watchdog_unlock();
 
@@ -49,21 +94,26 @@ void reloadWatchDogCounter()
 
 void MX_IWDG_Init(void)
 {
-    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_WWDG);
-    // unlock watchdog via key register
-    IWDG->KR = 0x0000CCCCU;
-    IWDG->KR = 0x00005555U;
-    // set prescaler
-    IWDG->PR = LL_IWDG_PRESCALER_16;
-    // set reload register
-    IWDG->RLR = 4000;
-    // while (IWDG->SR); // wait for the registers to be updated
-    IWDG->KR = 0x0000AAAA;
+
 }
 
 // RLR is a 12 bit value
 // reset value is 0xfff
-void watchdog_set_rlr(uint32_t rlr)
+void watchdog_set_reload(uint32_t reload)
 {
-    IWDG->RLR = rlr;
+    while (IWDG->SR & IWDG_SR_RVU)
+    {
+        // reload value can only be updated
+        // when RVU bit is reset
+    }
+    IWDG->RLR = reload;
+}
+
+void watchdog_set_prescaler(iwdgPrescaler_e prescaler)
+{
+    while (IWDG->SR & IWDG_SR_PVU)
+    {
+        // The prescaler value can be updated only when PVU bit is reset.
+    }
+    IWDG->PR = prescaler;
 }

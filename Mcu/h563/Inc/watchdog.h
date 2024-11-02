@@ -17,10 +17,12 @@ typedef enum
     IWDG_PRESCALER_1024,
 } iwdgPrescaler_e;
 
-void watchdog_set_prescaler();
 void watchdog_initialize(
     iwdgPrescaler_e prescaler,
     uint16_t reload);
+
+void watchdog_initialize_period(uint32_t period_us);
 void watchdog_enable();
 void watchdog_goodboy_pat();
-void watchdog_set_rlr(uint32_t rlr);
+void watchdog_set_prescaler(iwdgPrescaler_e prescaler);
+void watchdog_set_reload(uint32_t reload);

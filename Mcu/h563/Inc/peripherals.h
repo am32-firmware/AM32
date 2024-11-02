@@ -1,14 +1,11 @@
 #pragma once
 
 #include "main.h"
+#include "commutation-timer.h"
 
 #define INTERVAL_TIMER_COUNT (INTERVAL_TIMER->CNT)
 #define RELOAD_WATCHDOG_COUNTER() (LL_IWDG_ReloadCounter(IWDG))
-#define DISABLE_COM_TIMER_INT() (COM_TIMER->DIER &= ~((0x1UL << (0U))))
-#define ENABLE_COM_TIMER_INT() (COM_TIMER->DIER |= (0x1UL << (0U)))
-#define SET_AND_ENABLE_COM_INT(time)                                  \
-    (COM_TIMER->CNT = 0, COM_TIMER->ARR = time, COM_TIMER->SR = 0x00, \
-        COM_TIMER->DIER |= (0x1UL << (0U)))
+
 #define SET_INTERVAL_TIMER_COUNT(intertime) (INTERVAL_TIMER->CNT = intertime)
 #define SET_PRESCALER_PWM(presc) (BRIDGE_TIMER->PSC = presc)
 #define SET_AUTO_RELOAD_PWM(relval) (BRIDGE_TIMER->ARR = relval)
@@ -34,9 +31,6 @@ void ten_khz_timer_initialize(void);
 void ten_khz_timer_enable(void);
 void ten_khz_timer_interrupt_enable(void);
 
-void disableComTimerInt(void);
-void enableComTimerInt(void);
-void setAndEnableComInt(uint16_t time);
 void setAutoReloadPWM(uint16_t relval);
 void setDutyCycleAll(uint16_t newdc);
 void resetInputCaptureTimer();

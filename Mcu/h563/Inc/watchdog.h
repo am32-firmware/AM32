@@ -26,3 +26,8 @@ void watchdog_enable();
 void watchdog_goodboy_pat();
 void watchdog_set_prescaler(iwdgPrescaler_e prescaler);
 void watchdog_set_reload(uint32_t reload);
+
+#define IWDG_KEY_RELOAD (0xAAAA)
+#define IWDG_KEY_WRITE (0x5555)
+#define IWDG_KEY_ENABLE (0xCCCC)
+void watchdog_write_key(uint16_t key);

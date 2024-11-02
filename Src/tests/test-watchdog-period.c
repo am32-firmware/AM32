@@ -8,9 +8,9 @@
 
 int main()
 {
+    mcu_setup();
     debug_initialize();
     debug_set_1();
-    mcu_setup();
     watchdog_initialize_period(3000);
     watchdog_enable();
     debug_reset_1();

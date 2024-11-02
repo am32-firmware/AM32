@@ -14,6 +14,16 @@ void clock_hse_enable()
     while (!(RCC->CR & RCC_CR_HSERDY));
 }
 
+
+void clock_lsi_enable()
+{
+    RCC->BDCR |= RCC_BDCR_LSION;
+    while (!(RCC->BDCR & RCC_BDCR_LSIRDY))
+    {
+        // wait for lsi ready flag
+    }
+}
+
 // hsi divider can only be configured when HSI
 // is NOT selected for any pll input
 void clock_hsi_config_divider(uint8_t hsidiv)
@@ -45,7 +55,7 @@ void clock_system_set_source(uint8_t source)
     {
         // do nothing
     }
-    
+
 }
 
 bool clock_system_switch_complete()

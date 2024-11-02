@@ -1,5 +1,6 @@
 #include "watchdog.h"
 
+#include "stm32h563xx.h"
 #include "stm32h5xx.h"
 
 #include "stm32h5xx_ll_bus.h"
@@ -72,10 +73,17 @@ void watchdog_initialize(
     iwdgPrescaler_e prescaler,
     uint16_t reload)
 {
-    while (!LL_RCC_LSI_IsReady())
-    {
-        // wait for lsi clock
-    }
+    // If an independent watchdog is started by either hardware option or software access, the LSI
+    // is forced ON and cannot be disabled. After the LSI oscillator setup delay, the clock is
+    // provided to the IWDG.
+
+    // .. etc you can run this driver without running clock_lsi_enable, it is enabled when
+    // the IWDG registers are accessed anyway
+
+    clock_lsi_enable();
+
+
+    // enable IWDG clock
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_WWDG);
 
     // unlock watchdog via key register

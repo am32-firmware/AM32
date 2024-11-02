@@ -5,6 +5,7 @@
 extern uint32_t HCLK_FREQUENCY;
 
 void clock_hse_enable();
+void clock_lsi_enable();
 // 00: division by 1, hsi_ck, hsi_ker_ck = 64 MHz
 // 01: division by 2, hsi_ck, hsi_ker_ck = 32 MHz (default after reset)
 // 10: division by 4, hsi_ck, hsi_ker_ck = 16 MHz

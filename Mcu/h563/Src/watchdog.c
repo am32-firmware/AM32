@@ -6,6 +6,7 @@
 #include "stm32h5xx_ll_iwdg.h"
 
 #include "clock.h"
+#include "stm32h5xx_ll_rcc.h"
 
 #define WATCHDOG_KEY_RELOAD (0xAAAA)
 #define WATCHDOG_KEY_WRITE (0x5555)
@@ -71,6 +72,10 @@ void watchdog_initialize(
     iwdgPrescaler_e prescaler,
     uint16_t reload)
 {
+    while (!LL_RCC_LSI_IsReady())
+    {
+        // wait for lsi clock
+    }
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_WWDG);
 
     // unlock watchdog via key register

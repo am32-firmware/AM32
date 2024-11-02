@@ -13,6 +13,16 @@
 #define WATCHDOG_KEY_WRITE (0x5555)
 #define WATCHDOG_KEY_ENABLE (0xCCCC)
 
+
+void MX_IWDG_Init(void)
+{
+    IWDG->KR = 0x0000CCCCU;
+    IWDG->KR = 0x00005555U;
+    IWDG->PR = LL_IWDG_PRESCALER_16;
+    IWDG->RLR = 4000;
+    LL_IWDG_ReloadCounter(IWDG);
+}
+
 // Bits 15:0 KEY[15:0]: Key value (write only, read 0x0000)
 // These bits can be used for several functions, depending upon the value written by the
 // application:
@@ -51,22 +61,20 @@ void watchdog_enable()
 #define LSI_CLOCK_FREQUENCY 32000
 void watchdog_initialize_period(uint16_t period_ms)
 {
-    clock_update_hclk_frequency();
-
     uint8_t PR = 0;
     uint32_t prescaler = 1 << (PR + 2);
-    uint32_t reload_value = (period_ms * LSI_CLOCK_FREQUENCY / prescaler);
+    uint32_t reload_value = (((period_ms * LSI_CLOCK_FREQUENCY) / 1000) / prescaler);
 
     while (reload_value > IWDG_RLR_MAX)
     {
         PR++;
         prescaler = 1 << (PR + 2);
-        reload_value = (period_ms * LSI_CLOCK_FREQUENCY / prescaler);
+        reload_value = ((period_ms/1000) * LSI_CLOCK_FREQUENCY / prescaler);
     }
 
-    watchdog_initialize(PR, reload_value);
     // reload value is 12 bit max
     // prescaler goes to 1024
+    watchdog_initialize(PR, reload_value);
 }
 
 void watchdog_initialize(
@@ -80,11 +88,11 @@ void watchdog_initialize(
     // .. etc you can run this driver without running clock_lsi_enable, it is enabled when
     // the IWDG registers are accessed anyway
 
+    // enable 32kHz lsi clock
+    // (the only clock source for IWDG)
     clock_lsi_enable();
-
-
     // enable IWDG clock
-    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_WWDG);
+    // LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_WWDG);
 
     // unlock watchdog via key register
     watchdog_unlock();
@@ -94,17 +102,12 @@ void watchdog_initialize(
     watchdog_set_prescaler(prescaler);
     // IWDG->PR = LL_IWDG_PRESCALER_16;
     // set reload register
-    IWDG->RLR = reload;
+    watchdog_set_reload(reload);
+    // IWDG->RLR = reload;
     // while (IWDG->SR); // wait for the registers to be updated
     watchdog_reload();
 
     watchdog_unlock();
-
-}
-
-
-void MX_IWDG_Init(void)
-{
 
 }
 

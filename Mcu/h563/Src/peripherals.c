@@ -232,43 +232,6 @@ void interval_timer_enable(void)
     LL_TIM_GenerateEvent_UPDATE(INTERVAL_TIMER);
 }
 
-void input_timer_initialize(void)
-{
-    INPUT_TIMER_ENABLE_CLOCK();
-
-    
-    NVIC_SetPriority(dmaChannels[INPUT_TIMER_DMA_CHANNEL].irqn, 1);
-    NVIC_EnableIRQ(dmaChannels[INPUT_TIMER_DMA_CHANNEL].irqn);
-    // NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
-    // NVIC_EnableIRQ(IC_DMA_IRQ_NAME);
-    // INPUT_TIMER->TISEL = TIM_TISEL_TI1SEL_1;
-
-    clock_update_hclk_frequency();
-    // 1MHz clock frequency
-    INPUT_TIMER->PSC = (HCLK_FREQUENCY/1000000) - 1;
-    INPUT_TIMER->ARR = 0xffff;
-    // INPUT_TIMER->ARR = 10000;
-    input_timer_gpio_initialize();
-}
-
-void input_timer_gpio_initialize(void)
-{
-    gpio_t gpioInput = DEF_GPIO(
-        INPUT_SIGNAL_PORT,
-        INPUT_SIGNAL_PIN,
-        INPUT_SIGNAL_AF,
-        GPIO_AF);
-    gpio_initialize(&gpioInput);
-    gpio_set_speed(&gpioInput, GPIO_SPEED_VERYFAST);
-}
-
-void input_timer_enable(void)
-{
-    LL_TIM_CC_EnableChannel(INPUT_TIMER,
-        IC_TIMER_CHANNEL); // input capture and output compare
-    LL_TIM_EnableCounter(INPUT_TIMER);
-}
-
 void setPrescalerPWM(uint16_t presc) { BRIDGE_TIMER->PSC = presc; }
 
 void setAutoReloadPWM(uint16_t relval) { BRIDGE_TIMER->ARR = relval; }
@@ -278,12 +241,6 @@ void inline setPWMCompare2(uint16_t comparetwo) { BRIDGE_TIMER->CCR2 = comparetw
 void inline setPWMCompare3(uint16_t comparethree) { BRIDGE_TIMER->CCR3 = comparethree; }
 
 void inline generatePwmTimerEvent() { LL_TIM_GenerateEvent_UPDATE(BRIDGE_TIMER); }
-
-void inline resetInputCaptureTimer()
-{
-    INPUT_TIMER->PSC = 0;
-    INPUT_TIMER->CNT = 0;
-}
 
 void enableCorePeripherals()
 {

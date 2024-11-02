@@ -2,6 +2,7 @@
 
 #include "main.h"
 #include "commutation-timer.h"
+// #include "input-timer.h"
 
 #define INTERVAL_TIMER_COUNT (INTERVAL_TIMER->CNT)
 #define RELOAD_WATCHDOG_COUNTER() (LL_IWDG_ReloadCounter(IWDG))
@@ -19,17 +20,12 @@ void SystemClock_Config(void);
 void interval_timer_initialize(void);
 void interval_timer_enable(void);
 
-void input_timer_initialize(void);
-void input_timer_gpio_initialize(void);
-void input_timer_enable(void);
-
 // called from main (can't be renamed)
 void MX_IWDG_Init(void);
 void reloadWatchDogCounter(void);
 
 void setAutoReloadPWM(uint16_t relval);
 void setDutyCycleAll(uint16_t newdc);
-void resetInputCaptureTimer();
 void setPWMCompare1(uint16_t compareone);
 void setPWMCompare2(uint16_t comparetwo);
 void setPWMCompare3(uint16_t comparethree);

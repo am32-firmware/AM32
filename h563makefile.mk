@@ -54,6 +54,7 @@ SRC_H563 := \
 	$(SRC_DIR_H563_SRC)/power.c \
 	$(SRC_DIR_H563_SRC)/serial_telemetry.c \
 	$(SRC_DIR_H563_SRC)/mcu.c \
+	$(SRC_DIR_H563_SRC)/input-timer.c \
 	$(SRC_DIR_H563_SRC)/vref.c \
 	$(SRC_DIR_H563_SRC)/vreg.c \
 	$(SRC_DIR_H563_SRC)/utility-timer.c \

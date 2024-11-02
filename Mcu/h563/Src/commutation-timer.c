@@ -1,11 +1,8 @@
 #include "commutation-timer.h"
+
 #include "stm32h5xx_ll_tim.h"
 
 #include "clock.h"
-// this is wrong
-
-// #define COMM_TIMEN (RCC_APB2ENR_TIM1EN)
-// #define COMM_TIM TIM1
 
 void commutation_timer_initialize(void)
 {

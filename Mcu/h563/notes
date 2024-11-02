@@ -150,3 +150,5 @@ enableComTimerInt()
 setAndEnableComInt()
 
 are all unused
+
+neither is ENABLE_COM_TIMER_INT

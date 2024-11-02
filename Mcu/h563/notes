@@ -143,3 +143,10 @@ setPrescalerPWM is not called
 
 getintervaTimerCount is spelled wrong (and unused)
 same with setintervaTimerCount
+
+
+disableComTimerInt()
+enableComTimerInt()
+setAndEnableComInt()
+
+are all unused

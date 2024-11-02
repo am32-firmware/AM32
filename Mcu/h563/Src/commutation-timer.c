@@ -19,21 +19,3 @@ void commutation_timer_initialize(void)
     NVIC_EnableIRQ(COM_TIMER_IRQ);
     LL_TIM_EnableARRPreload(COM_TIMER);
 }
-
-void disableComTimerInt()
-{
-    COM_TIMER->DIER &= ~((0x1UL << (0U)));
-}
-
-void enableComTimerInt()
-{
-    COM_TIMER->DIER |= (0x1UL << (0U));
-}
-
-void setAndEnableComInt(uint16_t time)
-{
-    COM_TIMER->CNT = 0;
-    COM_TIMER->ARR = time;
-    COM_TIMER->SR = 0x00;
-    COM_TIMER->DIER |= (0x1UL << (0U));
-}

@@ -49,8 +49,18 @@ typedef union EEprom_u {
         uint8_t auto_advance; // 47
         uint8_t reserved_2[4]; //48-51
         uint8_t tune[124]; // 52-175
+        struct {
+            uint8_t can_node; // 176
+            uint8_t esc_index; // 177
+            uint8_t require_arming; // 178
+            uint8_t telem_rate; // 179
+            uint8_t require_zero_throttle; // 180
+            uint8_t filter_hz; // 181
+            uint8_t debug_rate; // 182
+            uint8_t reserved[9]; // 183-191
+        } can;
     };
-    uint8_t buffer[184];
+    uint8_t buffer[192];
 } EEprom_t;
 
 extern EEprom_t eepromBuffer;

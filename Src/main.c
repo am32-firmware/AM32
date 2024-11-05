@@ -300,6 +300,7 @@ fastPID stallPid = { // 1khz loop time
     .output_limit = 50000
 };
 
+EEprom_t eepromBuffer;
 uint32_t eeprom_address = EEPROM_START_ADD;
 char set_hysteris = 0;
 uint16_t prop_brake_duty_cycle = 0;

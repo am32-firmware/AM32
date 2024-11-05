@@ -38,11 +38,6 @@
 // use set input at 1kHz
 #define TARGET_PERIOD_US 1000U
 
-#define EEPROM_MOTOR_KV_INDEX 26
-#define EEPROM_INPUT_TYPE_INDEX 26
-#define EEPROM_TUNE_INDEX 48
-#define EEPROM_TUNE_MAX_LEN 128
-
 static CanardInstance canard;
 static uint8_t canard_memory_pool[CANARD_POOL_SIZE];
 
@@ -73,40 +68,6 @@ const struct {
         .crc2 = 0,
         .mcu = AM32_MCU,
 };
-
-/*
-  DroneCAN uses a chunk of eeprom storage starting at offset 176
-  for DroneCAN specific settings
- */
-enum eeprom_offset {
-        EEPROM_FIRST_CAN = 176,
-        EEPROM_CAN_NODE = 176,
-        EEPROM_ESC_INDEX = 177,
-        EEPROM_REQUIRE_ARMING = 178,
-        EEPROM_TELEM_RATE = 179,
-        EEPROM_REQUIRE_ZERO_THROTTLE = 180,
-        EEPROM_FILTER_HZ = 181,
-        EEPROM_DEBUG_RATE = 182,
-        EEPROM_LAST_CAN,
-};
-
-/*
-  state of user settings. This will be saved in settings.dat. On a
-  real device a better storage system will be needed
-  For simplicity we store all parameters as floats in this example
-*/
-static struct Settings
-{
-    uint8_t can_node;
-    uint8_t esc_index;
-    bool require_arming;
-    bool require_zero_throttle;
-    uint8_t telem_rate;
-    uint8_t filter_hz;
-    uint8_t debug_rate;
-    uint8_t input_type;
-    uint8_t pwm_frequency;
-} settings;
 
 enum VarType {
     T_BOOL = 0,
@@ -141,22 +102,11 @@ static void can_printf(const char *fmt, ...);
 /*
   access to settings from main.c
  */
-extern char dir_reversed;
-extern char bi_direction;
-extern char advance_level;
-extern char motor_poles;
 extern uint16_t motor_kv;
-extern char VARIABLE_PWM;
-extern char use_sin_start;
-extern char comp_pwm;
-extern char stuck_rotor_protection;
 extern char armed;
-extern char drag_brake_strength;
-extern uint8_t driving_brake_strength;
-extern char brake_on_stop;
-extern char auto_advance;
 extern uint32_t commutation_interval;
 extern uint8_t auto_advance_level;
+extern uint16_t low_cell_volt_cutoff;
 
 static uint16_t last_can_input;
 static struct {
@@ -178,32 +128,46 @@ static const struct parameter {
     uint16_t max_value;
     uint16_t default_value;
     void *ptr;
-    uint8_t eeprom_index;
 } parameters[] = {
         // list of settable parameters
-        { "CAN_NODE",               T_UINT8, 0, 127, 0, &settings.can_node, EEPROM_CAN_NODE},
-        { "ESC_INDEX",              T_UINT8, 0, 32,  0, &settings.esc_index, EEPROM_ESC_INDEX},
-        { "DIR_REVERSED",           T_BOOL,  0, 1,   0, &dir_reversed, 0 },
-        { "MOTOR_KV",               T_UINT16,0, 10220, 2000, &motor_kv, EEPROM_MOTOR_KV_INDEX},
-        { "BI_DIRECTIONAL",         T_BOOL,  0, 1,   0, &bi_direction, 0 },
-        { "MOTOR_POLES",            T_UINT8, 0, 64,  14, &motor_poles, 27 },
-        { "REQUIRE_ARMING",         T_BOOL,  0, 1,   1, &settings.require_arming, EEPROM_REQUIRE_ARMING},
-        { "TELEM_RATE",             T_UINT8, 0, 200, 25, &settings.telem_rate, EEPROM_TELEM_RATE },
-        { "REQUIRE_ZERO_THROTTLE",  T_BOOL,  0, 1,   1, &settings.require_zero_throttle, EEPROM_REQUIRE_ZERO_THROTTLE },
-        { "VARIABLE_PWM",           T_BOOL,  0, 1,   1, &VARIABLE_PWM, 0},
-        { "PWM_FREQUENCY",          T_UINT8, 0, 48,  0, &settings.pwm_frequency, 24},
-        { "USE_SIN_START",          T_BOOL,  0, 1,   0, &use_sin_start, 0},
-        { "COMP_PWM",               T_BOOL,  0, 1,   1, &comp_pwm, 0},
-        { "STUCK_ROTOR_PROTECTION", T_BOOL,  0, 1,   1, &stuck_rotor_protection, 0},
-        { "ADVANCE_LEVEL",          T_UINT8, 0, 4,   2, &advance_level, 0},
-        { "AUTO_ADVANCE",           T_BOOL,  0, 1,   0, &auto_advance, 47},
-        { "BRAKE_ON_STOP",          T_BOOL,  0, 1,   1, &brake_on_stop, 28},
-        { "DRIVING_BRAKE_STRENGTH", T_UINT8, 1, 10,  10, &driving_brake_strength, 42},
-        { "DRAG_BRAKE_STRENGTH",    T_UINT8, 1, 10,  10, &drag_brake_strength, 41},
-        { "INPUT_FILTER_HZ",        T_UINT8, 0, 100, 0, &settings.filter_hz, EEPROM_FILTER_HZ},
-        { "DEBUG_RATE",             T_UINT8, 0, 200, 0, &settings.debug_rate, EEPROM_DEBUG_RATE},
-        { "INPUT_SIGNAL_TYPE",      T_UINT8, 0, 5,   0, &settings.input_type, 46},
-        { "STARTUP_TUNE",           T_STRING,0, 4,   0, NULL, EEPROM_TUNE_INDEX},
+        // dronecan specific parameters
+        { "CAN_NODE",               T_UINT8, 0, 127, 0, &eepromBuffer.can.can_node},
+        { "ESC_INDEX",              T_UINT8, 0, 32,  0, &eepromBuffer.can.esc_index},
+        { "TELEM_RATE",             T_UINT8, 0, 200, 25, &eepromBuffer.can.telem_rate},
+        { "DEBUG_RATE",             T_UINT8, 0, 200, 0, &eepromBuffer.can.debug_rate},
+        { "REQUIRE_ARMING",         T_BOOL,  0, 1,   1, &eepromBuffer.can.require_arming},
+        { "REQUIRE_ZERO_THROTTLE",  T_BOOL,  0, 1,   1, &eepromBuffer.can.require_zero_throttle},
+        { "MOTOR_KV",               T_UINT16,20, 10220, 2000, &motor_kv},
+        { "MOTOR_POLES",            T_UINT8, 2, 64,  14, &eepromBuffer.motor_poles},
+
+        // motor_kv, low_cell_volt_cutoff, STARTUP_TUNE, CURRENT_LIMIT value need to adjust to dronecan gui tool
+        // motor_kv 1k/V
+        // CURRENT_LIMIT A, range 0 ~ 200, 0 to disable
+        // TEMPERATURE_LIMIT degrees celsius, range 70 ~ 141, 0 to disable
+        // low_cell_volt_cutoff 10mV, range 250 ~ 350
+        // STARTUP_TUNE RTTTL string
+
+        { "DIR_REVERSED",           T_BOOL,  0, 1,   0, &eepromBuffer.dir_reversed},
+        { "BI_DIRECTIONAL",         T_BOOL,  0, 1,   0, &eepromBuffer.bi_direction},
+        { "BEEP_VOLUME",            T_UINT8, 0, 11,  5, &eepromBuffer.beep_volume},
+        { "VARIABLE_PWM",           T_BOOL,  0, 1,   1, &eepromBuffer.variable_pwm},
+        { "PWM_FREQUENCY",          T_UINT8, 8, 48,  24, &eepromBuffer.pwm_frequency},
+        { "USE_SIN_START",          T_BOOL,  0, 1,   0, &eepromBuffer.use_sine_start},
+        { "COMP_PWM",               T_BOOL,  0, 1,   1, &eepromBuffer.comp_pwm},
+        { "STUCK_ROTOR_PROTECTION", T_BOOL,  0, 1,   1, &eepromBuffer.stuck_rotor_protection},
+        { "ADVANCE_LEVEL",          T_UINT8, 0, 4,   2, &eepromBuffer.advance_level},
+        { "AUTO_ADVANCE",           T_BOOL,  0, 1,   0, &eepromBuffer.auto_advance},
+        { "STARTUP_POWER",          T_UINT8, 50,150, 10, &eepromBuffer.startup_power},
+        { "CURRENT_LIMIT",          T_UINT8, 0, 200, 0, &eepromBuffer.limits.current},
+        { "TEMPERATURE_LIMIT",      T_UINT8, 70,255, 255,&eepromBuffer.limits.temperature},
+        { "LOW_VOLTAGE_CUTOFF",     T_BOOL,  0, 1,   0,  &eepromBuffer.low_voltage_cut_off},
+        { "CELL_VOLTAGE_THRESHOLD", T_UINT16, 250, 350, 300, &low_cell_volt_cutoff},
+        { "BRAKE_ON_STOP",          T_BOOL,  0, 1,   1, &eepromBuffer.brake_on_stop},
+        { "DRIVING_BRAKE_STRENGTH", T_UINT8, 1, 10,  10, &eepromBuffer.driving_brake_strength},
+        { "DRAG_BRAKE_STRENGTH",    T_UINT8, 1, 10,  10, &eepromBuffer.drag_brake_strength},
+        { "INPUT_SIGNAL_TYPE",      T_UINT8, 0, 5,   5, &eepromBuffer.input_type},
+        { "INPUT_FILTER_HZ",        T_UINT8, 0, 100, 0, &eepromBuffer.can.filter_hz},
+        { "STARTUP_TUNE",           T_STRING,0, 4,   0, &eepromBuffer.tune},
 };
 
 /*
@@ -211,37 +175,27 @@ static const struct parameter {
 */
 static void load_settings(void)
 {
+    /*
+      run through parameters checking for those in the eepromBuffer
+      structure. For those parameters reset to default if out of
+      range. This allows the use of a defaults array that does not
+      include the CAN parameters
+     */
     for (uint8_t i=0; i<ARRAY_SIZE(parameters); i++) {
         const struct parameter *p = &parameters[i];
-        const uint8_t eidx = p->eeprom_index;
-        const uint8_t *ptr = (const uint8_t *)p->ptr;
-        const struct Settings *s = &settings;
-        if (eidx == 0 || ptr == NULL ||
-            ptr < (const uint8_t *)s || ptr >= (const uint8_t *)(s+1)) {
-            // only do settings in Settings structure
-            continue;
-        }
         /*
           only accept settings in range
          */
         switch (p->vtype) {
+            case T_BOOL:
             case T_UINT8: {
                 uint8_t *pvalue = (uint8_t *)p->ptr;
-                const uint8_t evalue = eepromBuffer[eidx];
-                if (evalue >= p->min_value && evalue <= p->max_value) {
-                    *pvalue = evalue;
-                } else {
-                    *pvalue = p->default_value;
+                uint8_t max_value = p->max_value;
+                if (pvalue == &eepromBuffer.limits.current) {
+                    max_value = max_value / 2;
                 }
-                break;
-            }
-            case T_BOOL: {
-                bool *pvalue = (bool *)p->ptr;
-                const uint8_t evalue = eepromBuffer[eidx];
-                if (evalue >= p->min_value && evalue <= p->max_value) {
-                    *pvalue = (bool)evalue;
-                } else {
-                    *pvalue = (bool)p->default_value;
+                if (*pvalue < p->min_value || *pvalue > max_value) {
+                    *pvalue = p->default_value;
                 }
                 break;
             }
@@ -257,12 +211,6 @@ static void load_settings(void)
  */
 static void save_settings(void)
 {
-    eepromBuffer[EEPROM_CAN_NODE] = settings.can_node;
-    eepromBuffer[EEPROM_ESC_INDEX] = settings.esc_index;
-    eepromBuffer[EEPROM_REQUIRE_ARMING] = settings.require_arming;
-    eepromBuffer[EEPROM_TELEM_RATE] = settings.telem_rate;
-    eepromBuffer[EEPROM_REQUIRE_ZERO_THROTTLE] = settings.require_zero_throttle;
-    eepromBuffer[EEPROM_FILTER_HZ] = settings.filter_hz;
     saveEEpromSettings();
     can_printf("saved settings");
 }
@@ -375,53 +323,57 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
         p = &parameters[req.index];
     }
     if (p != NULL && req.name.len != 0 && req.value.union_tag != UAVCAN_PROTOCOL_PARAM_VALUE_EMPTY) {
-        const char last_dir_reversed = dir_reversed;
-        const char last_bi_direction = bi_direction;
+        const char last_dir_reversed = eepromBuffer.dir_reversed;
+        const char last_bi_direction = eepromBuffer.bi_direction;
 
         /*
 	  a parameter set command
 	*/
 	switch (p->vtype) {
-	case T_UINT8:
-	    *(uint8_t *)p->ptr = req.value.integer_value;
-	    if (p->eeprom_index != 0) {
-		eepromBuffer[p->eeprom_index] = *(uint8_t *)p->ptr;
-	    }
-            break;
-	case T_UINT16:
-	    *(uint16_t *)p->ptr = req.value.integer_value;
-	    if (p->eeprom_index == EEPROM_MOTOR_KV_INDEX) {
-	        eepromBuffer[EEPROM_MOTOR_KV_INDEX] = (uint8_t)((*(uint16_t *)p->ptr - 20) / 40);
-	    }
-            break;
-	case T_BOOL:
-	    *(uint8_t *)p->ptr = req.value.boolean_value?1:0;
-	    if (p->eeprom_index != 0) {
-		eepromBuffer[p->eeprom_index] = *(uint8_t *)p->ptr;
-	    }
-            break;
-	case T_STRING:
-	    if (req.value.union_tag == UAVCAN_PROTOCOL_PARAM_VALUE_STRING_VALUE) {
-	        if (p->eeprom_index == EEPROM_TUNE_INDEX) {
-	            for (size_t i = 0; i < EEPROM_TUNE_MAX_LEN; i++) {
-	                if (i < req.value.string_value.len) {
-	                    eepromBuffer[EEPROM_TUNE_INDEX + i] = req.value.string_value.data[i];
-	                }  else {
-	                    eepromBuffer[EEPROM_TUNE_INDEX + i] = 0xFF;
-	                }
-	            }
-	        }
-	    }
-            break;
-	default:
-            return;
+            case T_UINT8: {
+                uint8_t *ptr8 = (uint8_t *)p->ptr;
+                if (ptr8 == &eepromBuffer.limits.current) {
+                    *ptr8 = req.value.integer_value / 2;
+                } else {
+                    *ptr8 = req.value.integer_value;
+                }
+                break;
+            }
+            case T_UINT16: {
+                uint16_t *ptr16 = (uint16_t *)p->ptr;
+                *ptr16 = req.value.integer_value;
+                if (ptr16 == &motor_kv) {
+                    eepromBuffer.motor_kv = (uint8_t)((*(uint16_t *)p->ptr - 20) / 40);
+                } else if (ptr16 == &low_cell_volt_cutoff) {
+                    eepromBuffer.low_cell_volt_cutoff = (uint8_t)(*ptr16 - 250);
+                }
+                break;
+            }
+            case T_BOOL:
+                *(uint8_t *)p->ptr = req.value.boolean_value?1:0;
+                break;
+            case T_STRING:
+                if (req.value.union_tag == UAVCAN_PROTOCOL_PARAM_VALUE_STRING_VALUE) {
+                    if (p->ptr == (void*)eepromBuffer.tune) {
+                        for (size_t i = 0; i < sizeof(eepromBuffer.tune); i++) {
+                            if (i < req.value.string_value.len) {
+                                eepromBuffer.tune[i] = req.value.string_value.data[i];
+                            } else {
+                                eepromBuffer.tune[i] = 0xFF;
+                            }
+                        }
+                    }
+                }
+                break;
+            default:
+                return;
 	}
 
-        if (last_dir_reversed != dir_reversed ||
-            last_bi_direction != bi_direction) {
+        if (last_dir_reversed != eepromBuffer.dir_reversed ||
+            last_bi_direction != eepromBuffer.bi_direction) {
             // make dir_reversed and bi_direction change work without
             // reboot
-            forward = 1 - dir_reversed;
+            forward = 1 - eepromBuffer.dir_reversed;
             running = 0;
             armed = 0;
             set_input(0);
@@ -434,14 +386,16 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
     struct uavcan_protocol_param_GetSetResponse pkt;
     memset(&pkt, 0, sizeof(pkt));
 
+    const uint32_t eindex = (uint32_t)(((const uint8_t *)p->ptr) - &eepromBuffer.buffer[0]);
+
     if (p != NULL) {
-	switch (p->vtype) {
-	case T_UINT8:
-	    pkt.value.union_tag = UAVCAN_PROTOCOL_PARAM_VALUE_INTEGER_VALUE;
+        switch (p->vtype) {
+        case T_UINT8:
+            pkt.value.union_tag = UAVCAN_PROTOCOL_PARAM_VALUE_INTEGER_VALUE;
             pkt.value.integer_value = *(uint8_t *)p->ptr;
             pkt.default_value.union_tag = UAVCAN_PROTOCOL_PARAM_VALUE_INTEGER_VALUE;
-            if (p->eeprom_index != 0 && p->eeprom_index < sizeof(default_settings)) {
-                pkt.default_value.integer_value = default_settings[p->eeprom_index];
+            if (eindex < sizeof(default_settings)) {
+                pkt.default_value.integer_value = default_settings[eindex];
             } else {
                 pkt.default_value.integer_value = p->default_value;
             }
@@ -449,8 +403,14 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
             pkt.max_value.integer_value = p->max_value;
             pkt.min_value.union_tag = UAVCAN_PROTOCOL_PARAM_NUMERICVALUE_INTEGER_VALUE;
             pkt.min_value.integer_value = p->min_value;
+
+            // special case scaling
+            if ((uint8_t *)p->ptr == &eepromBuffer.limits.current) {
+                pkt.default_value.integer_value *= 2;
+                pkt.value.integer_value *= 2;
+            }
             break;
-	case T_UINT16:
+        case T_UINT16:
             pkt.value.union_tag = UAVCAN_PROTOCOL_PARAM_VALUE_INTEGER_VALUE;
             pkt.value.integer_value = *(uint16_t *)p->ptr;
             pkt.default_value.union_tag = UAVCAN_PROTOCOL_PARAM_VALUE_INTEGER_VALUE;
@@ -462,24 +422,27 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
             break;
 	case T_STRING:
 	    pkt.value.union_tag = UAVCAN_PROTOCOL_PARAM_VALUE_STRING_VALUE;
-	    if (p->eeprom_index == EEPROM_TUNE_INDEX) {
-	        pkt.value.string_value.len = EEPROM_TUNE_MAX_LEN;
-	        for (size_t i=0; i < EEPROM_TUNE_MAX_LEN; i++) {
-	            pkt.value.string_value.data[i] = eepromBuffer[EEPROM_TUNE_INDEX + i];
-	        }
-	    }
+            if (p->ptr == (void*)eepromBuffer.tune) {
+                pkt.value.string_value.len = sizeof(eepromBuffer.tune);
+                if (pkt.value.string_value.len > sizeof(pkt.value.string_value.data)) {
+                    pkt.value.string_value.len = sizeof(pkt.value.string_value.data);
+                }
+                for (size_t i=0; i < pkt.value.string_value.len; i++) {
+                    pkt.value.string_value.data[i] = eepromBuffer.tune[i];
+                }
+            }
             break;
-	case T_BOOL:
-	    pkt.value.union_tag = UAVCAN_PROTOCOL_PARAM_VALUE_BOOLEAN_VALUE;
+        case T_BOOL:
+            pkt.value.union_tag = UAVCAN_PROTOCOL_PARAM_VALUE_BOOLEAN_VALUE;
             pkt.value.boolean_value = (*(uint8_t *)p->ptr)?true:false;
             pkt.default_value.union_tag = UAVCAN_PROTOCOL_PARAM_VALUE_BOOLEAN_VALUE;
-            if (p->eeprom_index != 0 && p->eeprom_index < sizeof(default_settings)) {
-                pkt.default_value.boolean_value = !!default_settings[p->eeprom_index];
+            if (eindex < sizeof(default_settings)) {
+                pkt.default_value.boolean_value = !!default_settings[eindex];
             } else {
                 pkt.default_value.boolean_value = !!p->default_value;
             }
             break;
-	default:
+        default:
             return;
         }
         pkt.name.len = strlen(p->name);
@@ -519,9 +482,9 @@ static void handle_param_ExecuteOpcode(CanardInstance* ins, CanardRxTransfer* tr
 	    can_printf("No erase while running");
 	} else {
 	    can_printf("resetting to defaults");
-	    memset(eepromBuffer, 0xff, sizeof(eepromBuffer));
-	    memcpy(eepromBuffer, default_settings, sizeof(default_settings));
-	    save_flash_nolib(eepromBuffer, sizeof(eepromBuffer), eeprom_address);
+            memset(eepromBuffer.buffer, 0xff, sizeof(eepromBuffer.buffer));
+            memcpy(eepromBuffer.buffer, default_settings, sizeof(default_settings));
+            save_flash_nolib(eepromBuffer.buffer, sizeof(eepromBuffer.buffer), eeprom_address);
             loadEEpromSettings();
             load_settings();
 	    pkt.ok = true;
@@ -612,21 +575,21 @@ extern void setInput();
  */
 static void set_input(uint16_t input)
 {
-    if (!armed && input != 0 && settings.require_arming &&
-        dronecan_armed && !settings.require_zero_throttle) {
+    if (!armed && input != 0 && eepromBuffer.can.require_arming &&
+        dronecan_armed && !eepromBuffer.can.require_zero_throttle) {
         // allow restart if unexpected ESC reboot in flight
         armed = 1;
     }
 
-    const uint16_t unfiltered_input = (dronecan_armed || !settings.require_arming)? input : 0;
-    const uint16_t filtered_input = Filter2P_apply(unfiltered_input, settings.filter_hz, 1000);
+    const uint16_t unfiltered_input = (dronecan_armed || !eepromBuffer.can.require_arming)? input : 0;
+    const uint16_t filtered_input = Filter2P_apply(unfiltered_input, eepromBuffer.can.filter_hz, 1000);
 
     newinput = filtered_input;
     last_can_input = unfiltered_input;
     inputSet = 1;
 
     // we must set dshot for bi_direction to work
-    dshot = bi_direction;
+    dshot = eepromBuffer.bi_direction;
 
     transfercomplete();
     setInput();
@@ -644,13 +607,13 @@ static void handle_RawCommand(CanardInstance *ins, CanardRxTransfer *transfer)
         return;
     }
     // see if it is for us
-    if (cmd.cmd.len <= settings.esc_index) {
+    if (cmd.cmd.len <= eepromBuffer.can.esc_index) {
         return;
     }
 
     // throttle demand is a value from -8191 to 8191. Negative values
     // are for reverse throttle
-    const int16_t input_can = cmd.cmd.data[(unsigned)settings.esc_index];
+    const int16_t input_can = cmd.cmd.data[(unsigned)eepromBuffer.can.esc_index];
 
     /*
       we need to map onto the AM32 expected range, which is a 11 bit number, where:
@@ -661,7 +624,7 @@ static void handle_RawCommand(CanardInstance *ins, CanardRxTransfer *transfer)
     uint16_t this_input = 0;
     if (input_can == 0) {
         this_input = 0;
-    } else if (bi_direction) {
+    } else if (eepromBuffer.bi_direction) {
         const float scaled_value = input_can * (1000.0 / 8192);
         if (scaled_value >= 0) {
             this_input = (uint16_t)(47 + scaled_value);
@@ -692,7 +655,7 @@ static void handle_ArmingStatus(CanardInstance *ins, CanardRxTransfer *transfer)
     }
 
     dronecan_armed = (cmd.status == UAVCAN_EQUIPMENT_SAFETY_ARMINGSTATUS_STATUS_FULLY_ARMED);
-    if (!dronecan_armed && settings.require_arming && canstats.last_raw_command_us != 0) {
+    if (!dronecan_armed && eepromBuffer.can.require_arming && canstats.last_raw_command_us != 0) {
         set_input(0);
     }
 }
@@ -1051,9 +1014,9 @@ static void send_ESCStatus(void)
     current.count = 0;
 
     pkt.temperature = C_TO_KELVIN(degrees_celsius);
-    pkt.rpm = (e_rpm * 200) / ((uint8_t)motor_poles);
+    pkt.rpm = (e_rpm * 200) / eepromBuffer.motor_poles;
     pkt.power_rating_pct = 0; // how do we get this?
-    pkt.esc_index = settings.esc_index;
+    pkt.esc_index = eepromBuffer.can.esc_index;
 
     uint32_t len = uavcan_equipment_esc_Status_encode(&pkt, buffer);
 
@@ -1158,14 +1121,14 @@ static void DroneCAN_Startup(void)
 	       shouldAcceptTransfer,              // Callback, see CanardShouldAcceptTransfer
 	       NULL);
 
-    if (settings.can_node != 0) {
-        canardSetLocalNodeID(&canard, settings.can_node);
+    if (eepromBuffer.can.can_node != 0) {
+        canardSetLocalNodeID(&canard, eepromBuffer.can.can_node);
     }
 
     // initialise low level CAN peripheral hardware
     sys_can_init();
 
-    if (settings.input_type == DRONECAN_IN) {
+    if (eepromBuffer.input_type == DRONECAN_IN) {
         /*
           disable interrupts for DShot and PWM
          */
@@ -1220,12 +1183,12 @@ void DroneCAN_update()
 	next_1hz_service_at += 1000000ULL;
 	process1HzTasks(ts);
     }
-    if (settings.telem_rate > 0 && ts >= next_telem_service_at) {
-        next_telem_service_at += 1000000ULL/settings.telem_rate;
+    if (eepromBuffer.can.telem_rate > 0 && ts >= next_telem_service_at) {
+        next_telem_service_at += 1000000ULL/eepromBuffer.can.telem_rate;
 	send_ESCStatus();
     }
-    if (settings.debug_rate > 0 && ts >= next_flexdebug_at) {
-        next_flexdebug_at += 1000000ULL/settings.debug_rate;
+    if (eepromBuffer.can.debug_rate > 0 && ts >= next_flexdebug_at) {
+        next_flexdebug_at += 1000000ULL/eepromBuffer.can.debug_rate;
         send_FlexDebug();
     }
 

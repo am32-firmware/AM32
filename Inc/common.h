@@ -26,6 +26,11 @@ extern char ic_timer_prescaler;
 extern uint8_t buffersize;
 extern char output_timer_prescaler;
 extern uint8_t compute_dshot_flag;
+extern uint16_t battery_voltage;
+extern int16_t actual_current;
+extern uint16_t e_rpm;
+
+
 #ifdef STMICRO
 extern GPIO_TypeDef* current_GPIO_PORT;
 #ifndef MCU_F031
@@ -73,3 +78,15 @@ typedef struct fastPID {
     int32_t integral_limit;
     int32_t output_limit;
 } fastPID;
+
+/*
+  input signal types
+ */
+enum inputType {
+    AUTO_IN = 0,
+    DSHOT_IN = 1,
+    SERVO_IN = 2,
+    SERIAL_IN = 3,
+    EDTARM_IN = 4,
+    DRONECAN_IN = 5,
+};

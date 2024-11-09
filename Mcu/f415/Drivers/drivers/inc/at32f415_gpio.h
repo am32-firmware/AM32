@@ -168,6 +168,7 @@ extern "C" {
   * @{
   */
 
+#define CAN1_GMUX_0000                   IOMUX_MAKE_VALUE(0x2C, 0, 4, 0x00)  /*!< can_rx(pa11),  can_tx(pa12) */
 #define CAN1_GMUX_0010                   IOMUX_MAKE_VALUE(0x2C, 0, 4, 0x02)  /*!< can_rx(pb8),   can_tx(pb9) */
 #define SDIO1_GMUX_0100                  IOMUX_MAKE_VALUE(0x2C, 8, 4, 0x04)  /*!< sdio1_ck(pc4), sdio1_cmd(pc5), sdio1_d0(pc0), sdio1_d1(pc1), sdio1_d2(pc2), sdio1_d3(pc3), sdio1_d4(pa4), sdio1_d5(pa5), sdio1_d6(pa6), sdio1_d7(pa7) */
 #define SDIO1_GMUX_0101                  IOMUX_MAKE_VALUE(0x2C, 8, 4, 0x05)  /*!< sdio1_ck(pc4), sdio1_cmd(pc5), sdio1_d0(pa4), sdio1_d1(pa5), sdio1_d2(pa6), sdio1_d3(pa7) */

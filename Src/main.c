@@ -240,6 +240,10 @@ an settings option)
 #include "crsf.h"
 #endif
 
+#if DRONECAN_SUPPORT
+#include "DroneCAN/DroneCAN.h"
+#endif
+
 #include <version.h>
 
 void zcfoundroutine(void);
@@ -296,16 +300,8 @@ fastPID stallPid = { // 1khz loop time
     .output_limit = 50000
 };
 
-enum inputType {
-    AUTO_IN,
-    DSHOT_IN,
-    SERVO_IN,
-    SERIAL_IN,
-    EDTARM,
-};
-
 EEprom_t eepromBuffer;
-uint32_t eeprom_address = EEPROM_START_ADD; 
+uint32_t eeprom_address = EEPROM_START_ADD;
 char set_hysteris = 0;
 uint16_t prop_brake_duty_cycle = 0;
 uint16_t ledcounter = 0;
@@ -606,7 +602,7 @@ float doPidCalculations(struct fastPID* pidnow, int actual, int target)
 
 void loadEEpromSettings()
 {
-		//*eepromBuffer = *(EEprom_t*)(eeprom_address);
+                //*eepromBuffer = *(EEprom_t*)(eeprom_address);
     read_flash_bin(eepromBuffer.buffer, eeprom_address, sizeof(eepromBuffer.buffer));
 
     if (eepromBuffer.advance_level > 3) {
@@ -731,7 +727,7 @@ void loadEEpromSettings()
                 break;
             case SERIAL_IN:
                 break;
-            case EDTARM:
+            case EDTARM_IN:
                 EDT_ARM_ENABLE = 1;
                 EDT_ARMED = 0;
                 dshot = 1;
@@ -2176,6 +2172,9 @@ int main(void)
 
 #ifdef BRUSHED_MODE
         runBrushedLoop();
+#endif
+#if DRONECAN_SUPPORT
+	DroneCAN_update();
 #endif
     }
 }

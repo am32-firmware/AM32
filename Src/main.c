@@ -837,7 +837,7 @@ void commutate()
     }
     __enable_irq();
     changeCompInput();
-	if (average_interval > 1700) {
+	if (average_interval > 2500) {
       old_routine = 1;
    }
     bemfcounter = 0;
@@ -1804,7 +1804,7 @@ int main(void)
 
 
     while (1) {
-#ifdef FIXED_DUTY_MODE
+#if defined(FIXED_DUTY_MODE) || defined(FIXED_SPEED_MODE)
         setInput();
 #endif
 #ifdef MCU_F031

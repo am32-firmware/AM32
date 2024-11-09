@@ -1,8 +1,10 @@
+#include <stdint.h>
+#include "eeprom.h"
+
 #pragma once
 
-
+extern EEprom_t eepromBuffer;
 extern uint32_t eeprom_address;
-extern uint8_t eepromBuffer[176];
 extern uint16_t TIMER1_MAX_ARR;
 extern uint16_t dshot_frametime_high;
 extern uint16_t dshot_frametime_low;

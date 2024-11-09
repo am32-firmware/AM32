@@ -39,8 +39,8 @@ uint32_t current_EXTI_LINE = LL_EXTI_LINE_22;
 
 uint8_t getCompOutputLevel()
 {
-    return (active_COMP->CSR >> 30 & 1);
-    //	  return LL_COMP_ReadOutputLevel(active_COMP);
+  //  return (active_COMP->CSR >> 30 & 1);
+    	  return LL_COMP_ReadOutputLevel(active_COMP);
 }
 
 void maskPhaseInterrupts()
@@ -60,7 +60,7 @@ void changeCompInput()
         current_EXTI_LINE = PHASE_C_EXTI_LINE;
         active_COMP = PHASE_C_COMP_NUMBER;
 
-        LL_COMP_ConfigInputs(active_COMP, PHASE_C_COMP, LL_COMP_INPUT_PLUS_IO1);
+        LL_COMP_ConfigInputs(active_COMP, PHASE_C_COMP, PHASE_C_INPUT_PLUS);
     }
 
     if (step == 2 || step == 5) { // a floating
@@ -68,7 +68,7 @@ void changeCompInput()
         current_EXTI_LINE = PHASE_A_EXTI_LINE;
         active_COMP = PHASE_A_COMP_NUMBER;
 
-        LL_COMP_ConfigInputs(active_COMP, PHASE_A_COMP, LL_COMP_INPUT_PLUS_IO2);
+        LL_COMP_ConfigInputs(active_COMP, PHASE_A_COMP, PHASE_A_INPUT_PLUS);
     }
 
     if (step == 3 || step == 6) { // b floating
@@ -76,7 +76,7 @@ void changeCompInput()
         current_EXTI_LINE = PHASE_B_EXTI_LINE;
         active_COMP = PHASE_B_COMP_NUMBER;
 
-        LL_COMP_ConfigInputs(active_COMP, PHASE_B_COMP, LL_COMP_INPUT_PLUS_IO1);
+        LL_COMP_ConfigInputs(active_COMP, PHASE_B_COMP, PHASE_B_INPUT_PLUS);
     }
     if (rising) {
         LL_EXTI_DisableRisingTrig_0_31(LL_EXTI_LINE_22);

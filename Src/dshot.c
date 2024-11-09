@@ -129,24 +129,24 @@ void computeDshotDMA()
                         play_tone_flag = 5;
                         break;
                     case 7:
-                        dir_reversed = 0;
-                        forward = 1 - dir_reversed;
+                        eepromBuffer.dir_reversed = 0;
+                        forward = 1 - eepromBuffer.dir_reversed;
                         //	play_tone_flag = 1;
                         break;
                     case 8:
-                        dir_reversed = 1;
-                        forward = 1 - dir_reversed;
+                        eepromBuffer.dir_reversed = 1;
+                        forward = 1 - eepromBuffer.dir_reversed;
                         //	play_tone_flag = 2;
                         break;
                     case 9:
-                        bi_direction = 0;
+                        eepromBuffer.bi_direction = 0;
                         break;
                     case 10:
-                        bi_direction = 1;
+                        eepromBuffer.bi_direction = 1;
                         break;
                     case 12:
                         saveEEpromSettings();
-                        play_tone_flag = 1 + dir_reversed;
+                        play_tone_flag = 1 + eepromBuffer.dir_reversed;
                         //	NVIC_SystemReset();
                         break;
                     case 13:
@@ -162,10 +162,10 @@ void computeDshotDMA()
                         //	make_dshot_package();
                         break;
                     case 20:
-                        forward = 1 - dir_reversed;
+                        forward = 1 - eepromBuffer.dir_reversed;
                         break;
                     case 21:
-                        forward = dir_reversed;
+                        forward = eepromBuffer.dir_reversed;
                         break;
                     }
                     last_dshot_command = dshotcommand;

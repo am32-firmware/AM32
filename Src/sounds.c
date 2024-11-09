@@ -52,7 +52,7 @@ void playBJNote(uint16_t freq, uint16_t bduration)
 
 uint16_t getBlueJayNoteFrequency(uint8_t bjarrayfreq)
 {
-    return 10000000 / (bjarrayfreq * 247 + 4000);
+    return 11000000 / (bjarrayfreq * 247 + 4000);
 }
 
 void playBlueJayTune()

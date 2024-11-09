@@ -25,7 +25,10 @@ Select the build target from the drop down box and build project
 
 The latest release of the firmware can be found [here](https://am32.ca/downloads).
 
-To configure AM32 and upload firmware you can use the Multi_ESC config tool using Betaflight passthrough. They can be downloaded from here:
+The primary configurator is the [AM32 Configurator](https://am32.ca)
+which supports web browser based configuration and firmware update.
+
+You can also use a desktop configurator which you can download from here:
 
 [WINDOWS](https://drive.google.com/file/d/1qw2f7nM6OZftIE5GTgMPWB5zXCELxYG9/view?usp=sharing),
 [LINUX](https://drive.google.com/file/d/1QtSKwp3RT6sncPADsPkmdasGqNIk68HH/view?usp=sharing)
@@ -37,18 +40,18 @@ Alternately you can use the [Online-ESC Configurator](https://esc-configurator.c
 ## Hardware
 AM32 currently has support for STSPIN32F0, STM32F051, STM32G071, GD32E230, AT32F415 and AT32F421.
 The CKS32F051 is not recommended due to too many random issues.
-Target compatibility List can be found [here](https://github.com/AlkaMotors/AM32-MultiRotor-ESC-firmware/wiki/List-of-Supported-Hardware) (APR 2021)
+Target compatibility List can be found [here](https://github.com/am32-firmware/AM32/blob/main/Inc/targets.h)
 
 
 ## Installation & Bootloader
 
 To use AM32 firmware on a blank ESC, a bootloader must first be installed using an ST-LINK, GD-LINK , CMIS-DAP or AT-LINK.  THe bootloader will be dependant on the MCU used ont he esc . Choose the bootloader that matches the MCU type and signal input pin of the ESC.
 The compatibility chart has the bootloader pinouts listed.
-Current bootloaders can be found [here](https://github.com/AlkaMotors/AM32_Bootloader_F051/tree/main/Bootloaders).
+Current bootloaders can be found [here](https://github.com/am32-firmware/AM32-bootloader).
 
 After the bootloader has been installed the main firmware from can be installed either with the configuration tools and a Betaflight flight controller or a direct connection with a usb serial adapter modified for one wire.
 
-To update an existing AM32 bootloader an update tool can be found [here](https://github.com/AlkaMotors/F051_Bootloader_Updater/releases).
+To update an existing AM32 bootloader an update tool can be found [here](https://github.com/am32-firmware/AM32-unlocker).
 
 ## Support and Developers Channel
 There are two ways you can get support or participate in improving am32.

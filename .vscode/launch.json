@@ -12,7 +12,8 @@
         "liveWatch": {
             "enabled": true,
             "samplesPerSecond": 4,
-        },
+	},
+	"svdFile": "obj/debug.svd",
         "request": "launch",
         "type": "cortex-debug",
         "servertype": "openocd",
@@ -39,7 +40,8 @@
         "type": "cortex-debug",
         "request": "launch",
         "name": "AM32 JLink",
-        "cwd": "${workspaceRoot}",
+	"svdFile": "obj/debug.svd",
+	"cwd": "${workspaceRoot}",
 	      "device" : "-AT32F421K8U7",
         "osx": {
             "gdbPath": "${workspaceRoot}/tools/macos/xpack-arm-none-eabi-gcc-10.3.1-2.3/bin/arm-none-eabi-gdb"

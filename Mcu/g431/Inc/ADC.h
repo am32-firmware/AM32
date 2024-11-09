@@ -22,4 +22,8 @@ void Configure_ADC();
 
 void Activate_ADC();
 
+#ifndef USE_TIMEOUT
+#define USE_TIMEOUT 0
+#endif
+
 #endif /* ADC_H_ */

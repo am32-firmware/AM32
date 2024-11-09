@@ -225,7 +225,7 @@ void TIMER16_Init(void)
 {
     rcu_periph_clock_enable(RCU_TIMER16);
     TIMER_CAR(TIMER16) = 0xFFFF;
-    TIMER_PSC(TIMER16) = 35;
+    TIMER_PSC(TIMER16) = 71;
     timer_auto_reload_shadow_enable(TIMER16);
     timer_enable(TIMER16);
 }

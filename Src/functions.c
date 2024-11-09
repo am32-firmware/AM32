@@ -48,65 +48,39 @@ uint32_t getAbsDif(int number1, int number2)
     return (uint32_t)result;
 }
 
-#ifdef STMICRO
-void delayMicros(uint32_t micros)
-{
-    UTILITY_TIMER->CNT = 0;
-    while (UTILITY_TIMER->CNT < micros) {
-    }
-}
-
-void delayMillis(uint32_t millis)
-{
-    UTILITY_TIMER->CNT = 0;
-    UTILITY_TIMER->PSC = CPU_FREQUENCY_MHZ * 100;
-    LL_TIM_GenerateEvent_UPDATE(UTILITY_TIMER);
-    while (UTILITY_TIMER->CNT < millis * 10) {
-    }
-    UTILITY_TIMER->PSC = CPU_FREQUENCY_MHZ; // back to micros
-    LL_TIM_GenerateEvent_UPDATE(UTILITY_TIMER);
-}
-
+/*
+  get current value of UTILITY_TIMER timer as 16bit microseconds
+ */
+static inline uint16_t get_timer_us16(void) {
+#if defined(STMICRO)
+    return UTILITY_TIMER->CNT;
+#elif defined(GIGADEVICES)
+    return TIMER_CNT(UTILITY_TIMER);
+#elif defined(ARTERY)
+    return UTILITY_TIMER->cval;
+#else
+    #error unsupported MCU
 #endif
+}
 
-#ifdef GIGADEVICES
+/*
+  delay by microseconds, max 65535
+ */
 void delayMicros(uint32_t micros)
 {
-    TIMER_CNT(UTILITY_TIMER) = 0;
-    while (TIMER_CNT(UTILITY_TIMER) < micros) {
+    const uint16_t cval_start = get_timer_us16();
+    while ((uint16_t)(get_timer_us16() - cval_start) < (uint16_t)micros) {
     }
 }
 
+/*
+  delay in millis, convenience wrapper around delayMicros
+ */
 void delayMillis(uint32_t millis)
 {
-    TIMER_CNT(UTILITY_TIMER) = 0;
-    timer_prescaler_config(UTILITY_TIMER, 50000, TIMER_PSC_RELOAD_NOW);
-    while (TIMER_CNT(UTILITY_TIMER) < (millis * 2)) {
+    while (millis-- > 0) {
+        delayMicros(1000UL);
     }
-    TIMER_PSC(UTILITY_TIMER) = CPU_FREQUENCY_MHZ; // back to micros
-    timer_prescaler_config(UTILITY_TIMER, CPU_FREQUENCY_MHZ,
-        TIMER_PSC_RELOAD_NOW);
-}
-#endif
-
-#ifdef ARTERY
-void delayMicros(uint32_t micros)
-{
-    UTILITY_TIMER->cval = 0;
-
-    while (UTILITY_TIMER->cval < micros) {
-    }
-}
-
-void delayMillis(uint32_t millis)
-{
-    UTILITY_TIMER->cval = 0;
-    UTILITY_TIMER->div = (CPU_FREQUENCY_MHZ * 100);
-    UTILITY_TIMER->swevt |= TMR_OVERFLOW_SWTRIG;
-    while (UTILITY_TIMER->cval < (millis * 10)) {
-    }
-    UTILITY_TIMER->div = CPU_FREQUENCY_MHZ;
-    UTILITY_TIMER->swevt |= TMR_OVERFLOW_SWTRIG;
 }
 
 #ifdef MCU_AT421
@@ -122,6 +96,7 @@ void gpio_mode_set(gpio_type* gpio_periph, uint32_t mode, uint32_t pull_up_down,
     gpio_periph->pull = ((((((gpio_periph->pull))) & (~(((pin * pin) * (0x3UL << (0U)))))) | (((pin * pin) * pull_up_down))));
 }
 #endif
+
 #ifdef MCU_AT415
 void gpio_mode_QUICK(gpio_type* gpio_periph, uint32_t mode,
     uint32_t pull_up_down, uint32_t pin)
@@ -141,5 +116,4 @@ void gpio_mode_QUICK(gpio_type* gpio_periph, uint32_t mode,
 
     __enable_irq();
 }
-#endif
 #endif

@@ -178,7 +178,6 @@ void TIM16_Init(void)
     crm_periph_clock_enable(CRM_TMR16_PERIPH_CLOCK, TRUE);
     TMR16->pr = 500;
     TMR16->div = 59;
-    TMR16->ctrl1_bit.prben = TRUE;
     NVIC_SetPriority(TMR16_GLOBAL_IRQn, 0);
     NVIC_EnableIRQ(TMR16_GLOBAL_IRQn);
 }

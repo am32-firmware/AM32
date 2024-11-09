@@ -26,9 +26,7 @@ uint8_t buffer_padding = 0;
 void changeToOutput()
 {
     LL_DMA_SetDataTransferDirection(DMA1, INPUT_DMA_CHANNEL,
-        LL_DMA_DIRECTION_MEMORY_TO_PERIPH);
-    //	LL_TIM_DeInit(IC_TIMER_REGISTER);
-    // MX_TIM2_Init(
+    LL_DMA_DIRECTION_MEMORY_TO_PERIPH);
 
 #ifdef USE_TIMER_2_CHANNEL_3
 

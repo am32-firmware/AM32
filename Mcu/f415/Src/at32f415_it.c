@@ -129,8 +129,6 @@ void DMA1_Channel4_IRQHandler(void)
     if (dma_flag_get(DMA1_FDT4_FLAG) == SET) {
         DMA1->clr = DMA1_GL4_FLAG;
         DMA1_CHANNEL4->ctrl_bit.chen = FALSE;
-        //	USART1->ctrl1_bit.ren = TRUE;
-        //	USART1->ctrl1_bit.ten = FALSE;
     }
     if (dma_flag_get(DMA1_DTERR2_FLAG) == SET) {
         DMA1->clr = DMA1_GL4_FLAG;
@@ -140,31 +138,24 @@ void DMA1_Channel4_IRQHandler(void)
 
 void DMA1_Channel6_IRQHandler(void)
 {
-#ifdef USE_TIMER_3_CHANNEL_1
-    // if(DMA_GetFlagStatus(DMA1_FLAG_HT4) == SET){
     if (dma_flag_get(DMA1_HDT6_FLAG) == SET) {
         if (servoPwm) {
             IC_TIMER_REGISTER->cctrl_bit.c1p = TMR_INPUT_FALLING_EDGE;
-            //	IC_TIMER_REGISTER->CTRL2 |= TMR_ICPolarity_Rising;
             DMA1->clr = DMA1_HDT6_FLAG;
         }
     }
 
     if (dma_flag_get(DMA1_FDT6_FLAG) == SET) {
-        //		dma_reset(INPUT_DMA_CHANNEL);
-
         DMA1->clr = DMA1_GL6_FLAG;
         INPUT_DMA_CHANNEL->ctrl_bit.chen = FALSE;
         transfercomplete();
         EXINT->swtrg = EXINT_LINE_15;
     }
     if (dma_flag_get(DMA1_DTERR6_FLAG) == SET) {
-        // dma_reset(INPUT_DMA_CHANNEL);
         DMA1->clr = DMA1_GL6_FLAG;
         INPUT_DMA_CHANNEL->ctrl_bit.chen = FALSE;
         transfercomplete();
     }
-#endif
 }
 
 /**

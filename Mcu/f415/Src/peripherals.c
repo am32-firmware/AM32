@@ -101,12 +101,8 @@ void AT_COMP_Init(void)
     crm_periph_clock_enable(CRM_GPIOA_PERIPH_CLOCK, TRUE);
     crm_periph_clock_enable(CRM_CMP_PERIPH_CLOCK, TRUE);
 
-    // rcu_periph_clock_enable(RCU_GPIOA);
-
     /* configure PA1 as comparator input */
     gpio_mode_QUICK(GPIOA, GPIO_MODE_ANALOG, GPIO_PULL_NONE, GPIO_PINS_1);
-    //  rcu_periph_clock_enable(RCU_CFGCMP);
-
     gpio_mode_QUICK(GPIOA, GPIO_MODE_ANALOG, GPIO_PULL_NONE, GPIO_PINS_5);
     /* configure comparator channel0 */
     //  cmp_mode_init(CMP_HIGHSPEED, CMP_PA5, CMP_HYSTERESIS_NO);
@@ -142,8 +138,6 @@ void AT_COMP_Init(void)
 
     NVIC_SetPriority(CMP1_IRQn, 0);
     NVIC_EnableIRQ(CMP1_IRQn);
-
-    //	COMP_Cmd(COMP1_Selection, ENABLE);
     cmp_enable(CMP1_SELECTION, TRUE);
 }
 
@@ -269,59 +263,24 @@ void MX_GPIO_Init(void)
 
 void UN_TIM_Init(void)
 {
+		crm_periph_clock_enable(CRM_IOMUX_PERIPH_CLOCK, TRUE);
 #ifdef USE_TIMER_3_CHANNEL_1
-    //	RCC_AHBPeriphClockCmd(RCC_AHBPERIPH_GPIOB,ENABLE);
-    //	RCC_APB1PeriphClockCmd(RCC_APB1PERIPH_TMR3, ENABLE);
     crm_periph_clock_enable(CRM_GPIOB_PERIPH_CLOCK, TRUE);
     crm_periph_clock_enable(CRM_TMR3_PERIPH_CLOCK, TRUE);
-#endif
-#ifdef USE_TIMER_15_CHANNEL_1
-    //	RCC_AHBPeriphClockCmd(RCC_AHBPERIPH_GPIOA,ENABLE);
-    //	RCC_APB2PeriphClockCmd(RCC_APB2PERIPH_TMR15, ENABLE);
-    crm_periph_clock_enable(CRM_GPIOA_PERIPH_CLOCK, TRUE);
-    crm_periph_clock_enable(CRM_TMR15_PERIPH_CLOCK, TRUE);
-#endif
-
-    crm_periph_clock_enable(CRM_IOMUX_PERIPH_CLOCK, TRUE);
-
-    // GPIO_PinsRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
-    gpio_pin_remap_config(SWJTAG_MUX_010, TRUE);
+	  gpio_pin_remap_config(SWJTAG_MUX_010, TRUE);
     gpio_pin_remap_config(TMR3_MUX_10, TRUE);
-
-    // GPIO_PinsRemapConfig(GPIO_PartialRemap_TMR3, ENABLE);
-
-    //	RCC_AHBPeriphClockCmd(RCC_AHBPERIPH_DMA1,ENABLE);
-
+	  dma_flexible_config(DMA1,FLEX_CHANNEL6,DMA_FLEXIBLE_TMR3_CH1);
+#endif
+#ifdef USE_TIMER_2_CHANNEL_3
+    crm_periph_clock_enable(CRM_GPIOA_PERIPH_CLOCK, TRUE);
+    crm_periph_clock_enable(CRM_TMR2_PERIPH_CLOCK, TRUE);
+	  gpio_pin_remap_config(SWJTAG_MUX_010, TRUE);
+    gpio_pin_remap_config(TMR2_MUX_01, TRUE);
+	  dma_flexible_config(DMA1,FLEX_CHANNEL6,DMA_FLEXIBLE_TMR2_CH3);
+#endif
     crm_periph_clock_enable(CRM_DMA1_PERIPH_CLOCK, TRUE);
     gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_INPUT, GPIO_PULL_NONE, INPUT_PIN);
-
-    // GPIO_PinAFConfig(INPUT_PIN_PORT, GPIO_PinsSource4, GPIO_AF_1);
-    //	gpio_pin_mux_config(INPUT_PIN_PORT, INPUT_PIN, GPIO_MUX_1);
-
-    //	 dma_periph_address_config(INPUT_DMA_CHANNEL,
-    //(uint32_t)&TIMER_CH0CV(IC_TIMER_REGISTER));
-    //   dma_memory_address_config(INPUT_DMA_CHANNEL, (uint32_t)&dma_buffer);
-    //	 INPUT_DMA_CHANNEL->CPBA = (uint32_t)&IC_TIMER_REGISTER->CC1;
-    //	 INPUT_DMA_CHANNEL->CMBA = (uint32_t)&dma_buffer;
-    //   INPUT_DMA_CHANNEL->CHCTRL |= DMA_DIR_PERIPHERALSRC;
-
-    //   DMA_Reset(INPUT_DMA_CHANNEL);
-    //  DMA_DefaultInitParaConfig(&DMA_InitStructure);
-
-    //  DMA_InitStructure.DMA_PeripheralBaseAddr =
-    //  (uint32_t)&IC_TIMER_REGISTER->CC1; DMA_InitStructure.DMA_MemoryBaseAddr =
-    //  (uint32_t)&dma_buffer; DMA_InitStructure.DMA_Direction =
-    //  DMA_DIR_PERIPHERALSRC; DMA_InitStructure.DMA_BufferSize = 32;
-    //  DMA_InitStructure.DMA_PeripheralInc = DMA_PERIPHERALINC_DISABLE;
-    //  DMA_InitStructure.DMA_MemoryInc = DMA_MEMORYINC_ENABLE;
-    //  DMA_InitStructure.DMA_PeripheralDataWidth =
-    //  DMA_PERIPHERALDATAWIDTH_HALFWORD; DMA_InitStructure.DMA_MemoryDataWidth =
-    //  DMA_MEMORYDATAWIDTH_WORD; DMA_InitStructure.DMA_Mode = DMA_MODE_NORMAL;
-    //  DMA_InitStructure.DMA_Priority = DMA_PRIORITY_LOW;
-    //  DMA_InitStructure.DMA_MTOM = DMA_MEMTOMEM_DISABLE;
-    //  DMA_Init(INPUT_DMA_CHANNEL, &DMA_InitStructure);
-
-    INPUT_DMA_CHANNEL->ctrl = 0X98a; //  PERIPHERAL HALF WORD, MEMROY WORD ,
+    INPUT_DMA_CHANNEL->ctrl = 0X98a; //  PERIPHERAL HALF WORD, MEMORY WORD ,
                                      //  MEMORY INC ENABLE , TC AND ERROR INTS
 
     NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
@@ -329,14 +288,8 @@ void UN_TIM_Init(void)
 
     IC_TIMER_REGISTER->pr = 0xFFFF;
     IC_TIMER_REGISTER->div = 16;
-
-    // TMR_ARPreloadConfig(IC_TIMER_REGISTER, ENABLE);
     IC_TIMER_REGISTER->ctrl1_bit.prben = TRUE;
-
-    //	NVIC_SetPriority(TMR3_GLOBAL_IRQn, 0);
-    //  NVIC_EnableIRQ(TMR3_GLOBAL_IRQn);
-    gpio_mode_QUICK(GPIOB, GPIO_MODE_INPUT, GPIO_PULL_NONE, INPUT_PIN);
-    // TMR_Cmd(IC_TIMER_REGISTER, ENABLE);
+    gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_INPUT, GPIO_PULL_NONE, INPUT_PIN);
     IC_TIMER_REGISTER->ctrl1_bit.tmren = TRUE;
 }
 

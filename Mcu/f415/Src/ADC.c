@@ -44,6 +44,7 @@ void ADC_Init(void)
 {
     dma_init_type dma_init_struct;
     crm_periph_clock_enable(CRM_DMA1_PERIPH_CLOCK, TRUE);
+	dma_flexible_config(DMA1,FLEX_CHANNEL1,DMA_FLEXIBLE_ADC1);
     nvic_irq_enable(DMA1_Channel1_IRQn, 2, 0);
     dma_reset(DMA1_CHANNEL1);
     dma_default_para_init(&dma_init_struct);

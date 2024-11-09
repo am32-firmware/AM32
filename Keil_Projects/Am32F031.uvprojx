@@ -89,7 +89,7 @@
             <nStopA1X>0</nStopA1X>
             <nStopA2X>0</nStopA2X>
           </AfterMake>
-          <SelectedForBatchBuild>0</SelectedForBatchBuild>
+          <SelectedForBatchBuild>1</SelectedForBatchBuild>
           <SVCSIdString></SVCSIdString>
         </TargetCommonOption>
         <CommonProperty>
@@ -314,7 +314,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
+            <Optim>5</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -338,7 +338,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>STM32F031x6,USE_FULL_LL_DRIVER, REF_F031</Define>
+              <Define>STM32F031x6,USE_FULL_LL_DRIVER, REF_F031,</Define>
               <Undefine></Undefine>
               <IncludePath>..\mcu\f031\Drivers\CMSIS\Include;..\mcu\f031\Drivers\CMSIS\Device\ST\STM32F0xx\Include;..\mcu\f031\Drivers\STM32F0xx_HAL_Driver\Inc;..\mcu\f031\Inc;..\inc</IncludePath>
             </VariousControls>

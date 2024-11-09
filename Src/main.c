@@ -247,9 +247,9 @@ void zcfoundroutine(void);
 // firmware build options !! fixed speed and duty cycle modes are not to be used
 // with sinusoidal startup !!
 
-//#define FIXED_DUTY_MODE  // bypasses signal input and arming, uses a set duty
+#define FIXED_DUTY_MODE  // bypasses signal input and arming, uses a set duty
 // cycle. For pumps, slot cars etc 
-//#define FIXED_DUTY_MODE_POWER 100     //
+#define FIXED_DUTY_MODE_POWER 5     //
 // 0-100 percent not used in fixed speed mode
 
 // #define FIXED_SPEED_MODE  // bypasses input signal and runs at a fixed rpm
@@ -305,6 +305,8 @@ enum inputType {
 };
 
 
+uint16_t debug;
+uint16_t these_zc_times[6] = {0};
 uint32_t eeprom_address = EEPROM_START_ADD; 
 char set_hysteris = 0;
 uint16_t prop_brake_duty_cycle = 0;
@@ -948,12 +950,13 @@ void commutate()
     }
     __enable_irq();
     changeCompInput();
-	if (average_interval > 1700) {
+	if (average_interval > 2000) {
       old_routine = 1;
    }
     bemfcounter = 0;
     zcfound = 0;
    commutation_intervals[step - 1] = commutation_interval; // just used to calulate average
+	 these_zc_times[step - 1] = thiszctime;
 #ifdef USE_PULSE_OUT
 		if(rising){
 			GPIOB->scr = GPIO_PINS_8;
@@ -1200,7 +1203,7 @@ void setInput()
                         }
                     }
                 } else {
-
+                    debug++;
                     input = (uint16_t)input_override; // speed control pid override
                     if (input_override > 2047) {
                         input = 2047;
@@ -1653,7 +1656,7 @@ void zcfoundroutine()
             enableCompInterrupts(); // enable interrupt
         }
     } else {
-        if (commutation_interval < 1300) {
+        if (commutation_interval < 1500) {
             old_routine = 0;
             enableCompInterrupts(); // enable interrupt
         }
@@ -1867,7 +1870,7 @@ int main(void)
 
 
     while (1) {
-#ifdef FIXED_DUTY_MODE
+#if defined(FIXED_DUTY_MODE) || defined(FIXED_SPEED_MODE)
         setInput();
 #endif
 #ifdef MCU_F031

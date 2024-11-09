@@ -72,7 +72,7 @@ void telem_UART_Init(void)
     // gpio_pin_mux_config(GPIOB, GPIO_PINS_SOURCE6, GPIO_MUX_0);
 
     dma_reset(DMA1_CHANNEL4);
-
+    dma_flexible_config(DMA1,FLEX_CHANNEL4,DMA_FLEXIBLE_UART1_TX);
     dma_init_type dma_init_struct;
     dma_default_para_init(&dma_init_struct);
     dma_init_struct.buffer_size = nbDataToTransmit;

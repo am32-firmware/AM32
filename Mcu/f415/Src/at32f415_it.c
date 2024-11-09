@@ -140,7 +140,7 @@ void DMA1_Channel4_IRQHandler(void)
 
 void DMA1_Channel6_IRQHandler(void)
 {
-#ifdef USE_TIMER_3_CHANNEL_1
+
     // if(DMA_GetFlagStatus(DMA1_FLAG_HT4) == SET){
     if (dma_flag_get(DMA1_HDT6_FLAG) == SET) {
         if (servoPwm) {
@@ -164,7 +164,7 @@ void DMA1_Channel6_IRQHandler(void)
         INPUT_DMA_CHANNEL->ctrl_bit.chen = FALSE;
         transfercomplete();
     }
-#endif
+
 }
 
 /**

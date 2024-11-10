@@ -213,6 +213,7 @@ an settings option)
 				 - todo fix signal detection
 *2.16    - add L431 
 				 - add variable auto timing
+				 - add droneCAN
 */
 #include "main.h"
 #include "ADC.h"
@@ -306,7 +307,6 @@ enum inputType {
 
 EEprom_t eepromBuffer;
 uint32_t eeprom_address = EEPROM_START_ADD; 
-char set_hysteris = 0;
 uint16_t prop_brake_duty_cycle = 0;
 uint16_t ledcounter = 0;
 uint32_t process_time = 0;

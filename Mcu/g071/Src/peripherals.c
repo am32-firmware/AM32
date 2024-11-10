@@ -704,36 +704,6 @@ void MX_GPIO_Init(void)
 
 void reloadWatchDogCounter() { LL_IWDG_ReloadCounter(IWDG); }
 
-void disableComTimerInt() { COM_TIMER->DIER &= ~((0x1UL << (0U))); }
-
-void enableComTimerInt() { COM_TIMER->DIER |= (0x1UL << (0U)); }
-
-void setAndEnableComInt(uint16_t time)
-{
-    COM_TIMER->CNT = 0;
-    COM_TIMER->ARR = time;
-    COM_TIMER->SR = 0x00;
-    COM_TIMER->DIER |= (0x1UL << (0U));
-}
-
-uint16_t getintervaTimerCount() { return INTERVAL_TIMER->CNT; }
-
-void setintervaTimerCount(uint16_t intertime)
-{
-    INTERVAL_TIMER->CNT = intertime;
-}
-
-void setPrescalerPWM(uint16_t presc) { TIM1->PSC = presc; }
-
-void setAutoReloadPWM(uint16_t relval) { TIM1->ARR = relval; }
-
-void setDutyCycleAll(uint16_t newdc)
-{
-    TIM1->CCR1 = newdc;
-    TIM1->CCR2 = newdc;
-    TIM1->CCR3 = newdc;
-}
-
 void setPWMCompare1(uint16_t compareone) { TIM1->CCR1 = compareone; }
 void setPWMCompare2(uint16_t comparetwo) { TIM1->CCR2 = comparetwo; }
 void setPWMCompare3(uint16_t comparethree) { TIM1->CCR3 = comparethree; }

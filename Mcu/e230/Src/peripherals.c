@@ -328,39 +328,6 @@ void LED_GPIO_init()
 
 #endif
 
-void disableComTimerInt()
-{
-    TIMER_DMAINTEN(COM_TIMER) &= (~(uint32_t)TIMER_INT_UP);
-}
-
-void enableComTimerInt()
-{
-    TIMER_DMAINTEN(COM_TIMER) |= (uint32_t)TIMER_INT_UP;
-}
-
-void setAndEnableComInt(uint16_t time)
-{
-    TIMER_CNT(COM_TIMER) = 0;
-    TIMER_CAR(COM_TIMER) = time;
-    TIMER_INTF(COM_TIMER) = 0x00;
-    TIMER_DMAINTEN(COM_TIMER) |= (uint32_t)TIMER_INT_UP;
-}
-
-uint16_t getintervaTimerCount() { return TIMER_CNT(INTERVAL_TIMER); }
-
-void setintervaTimerCount(uint16_t intertime) { TIMER_CNT(INTERVAL_TIMER) = 0; }
-
-void setPrescalerPWM(uint16_t presc) { TIMER_PSC(TIMER0) = presc; }
-
-void setAutoReloadPWM(uint16_t relval) { TIMER_CAR(TIMER0) = relval; }
-
-void setDutyCycleAll(uint16_t newdc)
-{
-    TIMER_CH0CV(TIMER0) = newdc;
-    TIMER_CH1CV(TIMER0) = newdc;
-    TIMER_CH2CV(TIMER0) = newdc;
-}
-
 void setPWMCompare1(uint16_t compareone) { TIMER_CH0CV(TIMER0) = compareone; }
 void setPWMCompare2(uint16_t comparetwo) { TIMER_CH1CV(TIMER0) = comparetwo; }
 void setPWMCompare3(uint16_t comparethree)

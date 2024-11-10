@@ -870,18 +870,6 @@ void interruptRoutine()
 		maskPhaseInterrupts();
 		thiszctime = INTERVAL_TIMER_COUNT;  
     SET_INTERVAL_TIMER_COUNT(0);
-//		if(thiszctime < (commutation_interval - (commutation_interval>>2))){
-//			send_LED_RGB(0, 0, 255);
-//				//	waitTime = waitTime + commutation_interval - thiszctime;
-//			    waitTime = waitTime + (commutation_interval>>2);
-//			  //  thiszctime = commutation_interval + (commutation_interval>>2);
-//		}else if(thiszctime > (commutation_interval + (commutation_interval>>2))){
-//			send_LED_RGB(255, 0, 0);
-//			 //   waitTime = waitTime - thiszctime - commutation_interval; 
-//			    waitTime = waitTime - (commutation_interval>>2);
-//			 //   thiszctime = commutation_interval - (commutation_interval>>2);
-//		}
-   // waitTime = waitTime >> fast_accel;
     SET_AND_ENABLE_COM_INT(waitTime+1); // enable COM_TIMER interrupt
     __enable_irq();
 }

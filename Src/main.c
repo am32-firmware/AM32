@@ -556,27 +556,6 @@ uint16_t waitTime = 0;
 uint16_t signaltimeout = 0;
 uint8_t ubAnalogWatchdogStatus = RESET;
 
-// void checkForHighSignal(){
-// changeToInput();
-
-// setInputPullDown();
-// delayMicros(1000);
-// for(int i = 0 ; i < 1000; i ++){
-//	 if( !(getInputPinState())){  // if the pin is low for 5 checks out of
-// 100 in  100ms or more its either no signal or signal. jump to application
-//		 low_pin_count++;
-//	 }
-//      delayMicros(10);
-// }
-
-// setInputPullUp();
-//	 if(low_pin_count > 5){
-//		 return;      // its either a signal or a disconnected pin
-//	 }else{
-//		allOff();
-//		NVIC_SystemReset();
-//	 }
-// }
 
 float doPidCalculations(struct fastPID* pidnow, int actual, int target)
 {
@@ -606,7 +585,6 @@ float doPidCalculations(struct fastPID* pidnow, int actual, int target)
 
 void loadEEpromSettings()
 {
-		//*eepromBuffer = *(EEprom_t*)(eeprom_address);
     read_flash_bin(eepromBuffer.buffer, eeprom_address, sizeof(eepromBuffer.buffer));
 
     if (eepromBuffer.advance_level > 3) {
@@ -625,8 +603,6 @@ void loadEEpromSettings()
                 TIM1_AUTORELOAD / 2 * 3);
         }
         SET_AUTO_RELOAD_PWM(TIMER1_MAX_ARR);
-     //   throttle_max_at_high_rpm = TIMER1_MAX_ARR;
-     //   duty_cycle_maximum = TIMER1_MAX_ARR;
     } else {
         tim1_arr = TIM1_AUTORELOAD;
         SET_AUTO_RELOAD_PWM(tim1_arr);
@@ -750,10 +726,6 @@ void loadEEpromSettings()
         high_rpm_level = motor_kv / 12 / (32 / eepromBuffer.motor_poles);				
     }
     reverse_speed_threshold = map(motor_kv, 300, 3000, 1000, 500);
-    //   reverse_speed_threshold = 200;
-//    if (!eepromBuffer.comp_pwm) {
-//        eepromBuffer.bi_direction = 0;
-//    }
 }
 
 void saveEEpromSettings()

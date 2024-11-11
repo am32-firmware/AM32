@@ -160,7 +160,7 @@ void TIM1_Init(void)
 
     gpio_pin_remap_config(TMR1_GMUX_0001, TRUE);
 
-    TMR1->pr = 3000;
+    TMR1->pr = TIM1_AUTORELOAD;
     TMR1->div = 0;
 
     TMR1->cm1 = 0x6868; // Channel 1 and 2 in PWM output mode

@@ -90,7 +90,7 @@ void MX_IWDG_Init(void)
 void TIM1_Init(void)
 {
     crm_periph_clock_enable(CRM_TMR1_PERIPH_CLOCK, TRUE);
-    TMR1->pr = 3000;
+    TMR1->pr = TIM1_AUTORELOAD;
     TMR1->div = 0;
 
     TMR1->cm1 = 0x6868; // Channel 1 and 2 in PWM output mode

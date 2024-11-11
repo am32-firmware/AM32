@@ -386,9 +386,8 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
     struct uavcan_protocol_param_GetSetResponse pkt;
     memset(&pkt, 0, sizeof(pkt));
 
-    const uint32_t eindex = (uint32_t)(((const uint8_t *)p->ptr) - &eepromBuffer.buffer[0]);
-
     if (p != NULL) {
+        const uint32_t eindex = (uint32_t)(((const uint8_t *)p->ptr) - &eepromBuffer.buffer[0]);
         switch (p->vtype) {
         case T_UINT8:
             pkt.value.union_tag = UAVCAN_PROTOCOL_PARAM_VALUE_INTEGER_VALUE;

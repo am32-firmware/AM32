@@ -152,6 +152,7 @@ static const struct parameter {
         { "BEEP_VOLUME",            T_UINT8, 0, 11,  5, &eepromBuffer.beep_volume},
         { "VARIABLE_PWM",           T_BOOL,  0, 1,   1, &eepromBuffer.variable_pwm},
         { "PWM_FREQUENCY",          T_UINT8, 8, 48,  24, &eepromBuffer.pwm_frequency},
+        { "PWM_DITHERING",          T_UINT8, 0, 200, 0, &eepromBuffer.pwm_dithering},
         { "USE_SIN_START",          T_BOOL,  0, 1,   0, &eepromBuffer.use_sine_start},
         { "COMP_PWM",               T_BOOL,  0, 1,   1, &eepromBuffer.comp_pwm},
         { "STUCK_ROTOR_PROTECTION", T_BOOL,  0, 1,   1, &eepromBuffer.stuck_rotor_protection},

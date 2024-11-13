@@ -36,6 +36,9 @@
 // #define GD32SKYSTARS40
 #endif
 
+// used to hold a port/pin in a single 16 bit integer
+#define GPIO_PORT_PIN(portnum, pinnum) ((portnum)<<8|(pinnum))
+
 // GLOBAL
 // #define USE_ADC_INPUT
 // #define USE_ALKAS_DEBUG_LED
@@ -695,6 +698,8 @@
 #define HARDWARE_GROUP_AT_D
 #define HARDWARE_GROUP_AT_045
 #define DRONECAN_SUPPORT 1
+#define CAN_TERM_PIN GPIO_PORT_PIN(1, 3) // PB3
+#define CAN_TERM_POLARITY 1 // active high
 #define USE_SERIAL_TELEMETRY
 #define ADC_CHANNEL_VOLTAGE ADC_CHANNEL_6
 #define ADC_CHANNEL_CURRENT ADC_CHANNEL_3

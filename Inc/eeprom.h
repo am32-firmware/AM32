@@ -57,7 +57,8 @@ typedef union EEprom_u {
             uint8_t require_zero_throttle; // 180
             uint8_t filter_hz; // 181
             uint8_t debug_rate; // 182
-            uint8_t reserved[9]; // 183-191
+            uint8_t term_enable; // 183
+            uint8_t reserved[8]; // 184-191
         } can;
     };
     uint8_t buffer[192];

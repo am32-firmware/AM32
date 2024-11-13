@@ -167,6 +167,9 @@ static const struct parameter {
         { "DRAG_BRAKE_STRENGTH",    T_UINT8, 1, 10,  10, &eepromBuffer.drag_brake_strength},
         { "INPUT_SIGNAL_TYPE",      T_UINT8, 0, 5,   5, &eepromBuffer.input_type},
         { "INPUT_FILTER_HZ",        T_UINT8, 0, 100, 0, &eepromBuffer.can.filter_hz},
+#ifdef CAN_TERM_PIN
+        { "CAN_TERM_ENABLE",        T_BOOL,  0, 1,   0, &eepromBuffer.can.term_enable},
+#endif
         { "STARTUP_TUNE",           T_STRING,0, 4,   0, &eepromBuffer.tune},
 };
 
@@ -994,6 +997,10 @@ static void process1HzTasks(uint64_t timestamp_usec)
       Transmit the node status message
     */
     send_NodeStatus();
+
+#ifdef CAN_TERM_PIN
+    setup_portpin(CAN_TERM_PIN, eepromBuffer.can.term_enable? CAN_TERM_POLARITY : !CAN_TERM_POLARITY);
+#endif
 }
 
 /*

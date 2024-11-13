@@ -253,5 +253,31 @@ void set_rtc_backup_register(uint8_t idx, uint32_t value)
     ertc_bpr_data_write(idx, value);
 }
 
+/*
+  setup a static port/pin
+ */
+void setup_portpin(uint16_t portpin, bool enable)
+{
+    const uint8_t port = portpin >> 8;
+    const uint8_t pin = portpin & 0xff;
+    const uint32_t pinshift = 1U<<pin;
+    gpio_type *pport = port==0?GPIOA:GPIOB;
+
+    if (enable) {
+        pport->scr = pinshift;
+    } else {
+        pport->clr = pinshift;
+    }
+    
+    gpio_init_type gpio_init_struct;
+
+    gpio_init_struct.gpio_drive_strength = GPIO_DRIVE_STRENGTH_STRONGER;
+    gpio_init_struct.gpio_out_type = GPIO_OUTPUT_PUSH_PULL;
+    gpio_init_struct.gpio_mode = GPIO_MODE_OUTPUT;
+    gpio_init_struct.gpio_pins = pinshift;
+    gpio_init_struct.gpio_pull = GPIO_PULL_NONE;
+    gpio_init(pport, &gpio_init_struct);
+}
+
 #endif // DRONECAN_SUPPORT && defined(ARTERY)
 

@@ -16,11 +16,11 @@
 
 void MX_IWDG_Init(void)
 {
-    IWDG->KR = 0x0000CCCCU;
-    IWDG->KR = 0x00005555U;
-    IWDG->PR = LL_IWDG_PRESCALER_16;
-    IWDG->RLR = 4000;
-    LL_IWDG_ReloadCounter(IWDG);
+    // IWDG->KR = 0x0000CCCCU;
+    // IWDG->KR = 0x00005555U;
+    // IWDG->PR = LL_IWDG_PRESCALER_16;
+    // IWDG->RLR = 4000;
+    // LL_IWDG_ReloadCounter(IWDG);
 }
 
 // Bits 15:0 KEY[15:0]: Key value (write only, read 0x0000)
@@ -35,6 +35,8 @@ void MX_IWDG_Init(void)
 // - values different from 0x5555: write-protects registers.
 // Note that only IWDG_PR, IWDG_RLR, IWDG_EWCR and IWDG_WINR registers have a
 // write-protection mechanism.
+
+
 void watchdog_unlock()
 {
     // unlock watchdog via key register
@@ -49,6 +51,10 @@ void watchdog_reload()
     IWDG->KR = WATCHDOG_KEY_RELOAD;
 }
 
+
+// The Software watchdog mode is the default working mode. The independent watchdog is
+// started by writing the value 0x0000 CCCC into the IWDG key register (IWDG_KR), and the
+// IWDCNT starts counting down from the reset value (0xFFF).
 void watchdog_enable()
 {
     // - 0xCCCC: enables the watchdog (except if the hardware watchdog

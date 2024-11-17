@@ -680,9 +680,11 @@ void loadEEpromSettings()
             eepromBuffer.driving_brake_strength = 10;
         }
 
-        dead_time_override = DEAD_TIME + (150 - (eepromBuffer.driving_brake_strength * 10));
-        if (dead_time_override > 200) {
-            dead_time_override = 200;
+        if(eepromBuffer.driving_brake_strength < 10){
+            dead_time_override = DEAD_TIME + (150 - (eepromBuffer.driving_brake_strength * 10));
+            if (dead_time_override > 200) {
+                dead_time_override = 200;
+            }
         }
         min_startup_duty = eepromBuffer.startup_power + dead_time_override;
         minimum_duty_cycle = eepromBuffer.startup_power / 2 + dead_time_override;

@@ -247,9 +247,9 @@ void zcfoundroutine(void);
 // firmware build options !! fixed speed and duty cycle modes are not to be used
 // with sinusoidal startup !!
 
-#define FIXED_DUTY_MODE  // bypasses signal input and arming, uses a set duty
+//#define FIXED_DUTY_MODE  // bypasses signal input and arming, uses a set duty
 // cycle. For pumps, slot cars etc 
-#define FIXED_DUTY_MODE_POWER 5     //
+//#define FIXED_DUTY_MODE_POWER 5     //
 // 0-100 percent not used in fixed speed mode
 
 // #define FIXED_SPEED_MODE  // bypasses input signal and runs at a fixed rpm

@@ -94,12 +94,13 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma-single.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-ten-khz-timer.c
-# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-aux.c
-# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-main.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-debug.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-main.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-main-rs485.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-watchdog-fail.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-watchdog-pass.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-watchdog-period.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-watchdog-period.c
 
 TARGET_FNAME = $(IDENTIFIER)_$(TARGET)_$(FIRMWARE_VERSION)
 TARGET_BASENAME = $(BIN_DIR)/$(TARGET_FNAME)
@@ -151,10 +152,10 @@ $(TARGETS_E230) :
 	@$(MAKE) -s MCU_TYPE=E230 TARGET=$@ binary
 
 $(TARGETS_F421) :
-	@$(MAKE) -s MCU_TYPE=F421 TARGET=$@ binary	
+	@$(MAKE) -s MCU_TYPE=F421 TARGET=$@ binary
 
 $(TARGETS_F415) :
-	@$(MAKE) -s MCU_TYPE=F415 TARGET=$@ binary		
+	@$(MAKE) -s MCU_TYPE=F415 TARGET=$@ binary
 
 $(TARGETS_H563) :
 	@$(MAKE) -s MCU_TYPE=H563 TARGET=$@ binary

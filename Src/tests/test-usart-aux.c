@@ -14,7 +14,7 @@ int main()
     dma_initialize();
     AUX_UART_ENABLE_CLOCK();
 
-    usart.ref = AUX_UART_PERIPH;
+    usart.ref = AUX_USART_TX_PERIPH;
 
     usart._rx_buffer = usart_rx_buffer;
     usart._tx_buffer = usart_tx_buffer;
@@ -23,14 +23,15 @@ int main()
     usart.rxDma = &dmaChannels[7];
     usart.txDma = &dmaChannels[0];
     usart.txDmaRequest = LL_GPDMA1_REQUEST_UART8_TX;
+    usart.rxDmaRequest = LL_GPDMA1_REQUEST_UART8_TX;
 
     usart._baudrate = 1000000;
     usart_initialize(&usart);
 
     gpio_t gpioUsartTx = DEF_GPIO(
-        AUX_UART_TX_PORT,
-        AUX_UART_TX_PIN,
-        AUX_UART_TX_AF,
+        AUX_USART_TX_PORT,
+        AUX_USART_TX_PIN,
+        AUX_USART_TX_AF,
         GPIO_AF);
     gpio_initialize(&gpioUsartTx);
 

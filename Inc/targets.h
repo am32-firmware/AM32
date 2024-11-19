@@ -1980,26 +1980,45 @@
 /////////////////////////////////////////
 
 ////////////
-// option 1
+// option 0
 ////////////
-#define AUX_USART_TX_PORT GPIOE
-#define AUX_USART_TX_PIN 2
-#define AUX_USART_TX_AF 8
-#define AUX_USART_PERIPH UART8
 
 #define AUX_USART_ENABLE_CLOCK() { \
+    RCC->APB1LENR |= RCC_APB1LENR_USART1EN; \
     RCC->APB1LENR |= RCC_APB1LENR_UART8EN; \
 }
 
+#define AUX_USART_TX_PORT GPIOB
+#define AUX_USART_TX_PIN 6
+#define AUX_USART_TX_AF 7
+#define AUX_USART_TX_PERIPH USART1
 
-#define AUX_LPUART_TX_PORT GPIOB
-#define AUX_LPUART_TX_PIN 6
-#define AUX_LPUART_TX_AF 8
-#define AUX_LPUART_PERIPH LPUART1
+#define AUX_USART_RX_PORT GPIOE
+#define AUX_USART_RX_PIN 0
+#define AUX_USART_RX_AF 8
+#define AUX_USART_RX_PERIPH UART8
 
-#define AUX_LPLUART_ENABLE_CLOCK() { \
-    RCC->APB1LENR |= RCC_APB1LENR_UART8EN; \
-}
+////////////
+// option 1
+////////////
+// #define AUX_USART_TX_PORT GPIOE
+// #define AUX_USART_TX_PIN 2
+// #define AUX_USART_TX_AF 8
+// #define AUX_USART_PERIPH UART8
+
+// #define AUX_USART_ENABLE_CLOCK() { \
+//     RCC->APB1LENR |= RCC_APB1LENR_UART8EN; \
+// }
+
+
+// #define AUX_LPUART_TX_PORT GPIOB
+// #define AUX_LPUART_TX_PIN 6
+// #define AUX_LPUART_TX_AF 8
+// #define AUX_LPUART_PERIPH LPUART1
+
+// #define AUX_LPLUART_ENABLE_CLOCK() { \
+//     RCC->APB1LENR |= RCC_APB1LENR_UART8EN; \
+// }
 
 ////////////
 // option 2

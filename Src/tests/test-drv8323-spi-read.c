@@ -26,9 +26,9 @@
 #include "dma.h"
 #include "mcu.h"
 
-static uint16_t spi_rx_buffer[256];
-static uint16_t spi_tx_buffer[256];
-spi_t spi;
+// static uint16_t spi_rx_buffer[256];
+// static uint16_t spi_tx_buffer[256];
+// spi_t spi;
 uint16_t readData[7];
 const uint16_t defaultData[7] = {
     0,
@@ -53,7 +53,7 @@ int main()
 {
     mcu_setup();
     // enable spi clock
-    GADE_DRIVER_SPI_ENABLE_CLOCK();
+    GATE_DRIVER_SPI_ENABLE_CLOCK();
 
 
     gpio_t gpioDrv8323Enable = DEF_GPIO(
@@ -99,7 +99,7 @@ int main()
         GATE_DRIVER_SPI_MOSI_PIN,
         GATE_DRIVER_SPI_MOSI_AF,
         GPIO_AF);
-    
+
 
     spi.ref = SPI5;
 

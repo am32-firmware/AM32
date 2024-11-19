@@ -305,6 +305,7 @@ enum inputType {
 };
 
 
+uint8_t no_stick_calibration;
 uint16_t debug;
 uint16_t these_zc_times[6] = {0};
 uint32_t eeprom_address = EEPROM_START_ADD; 
@@ -653,6 +654,7 @@ void loadEEpromSettings()
         comp_pwm = 1;
     } else {
         comp_pwm = 0;
+			  startup_max_duty_cycle = startup_max_duty_cycle + 200;
     }
     if (eepromBuffer[21] == 0x01) {
         VARIABLE_PWM = 1;
@@ -690,9 +692,15 @@ void loadEEpromSettings()
     }
 
     if (eepromBuffer[25] < 151 && eepromBuffer[25] > 49) {
+			if(comp_pwm == 0){
+				min_startup_duty = (eepromBuffer[25])*2;
+        minimum_duty_cycle = (eepromBuffer[25] / 2);
+        stall_protect_minimum_duty = minimum_duty_cycle + 10;
+			}else{
         min_startup_duty = (eepromBuffer[25]);
         minimum_duty_cycle = (eepromBuffer[25] / 3);
         stall_protect_minimum_duty = minimum_duty_cycle + 10;
+			}
     } else {
         min_startup_duty = 150;
         minimum_duty_cycle = (min_startup_duty / 2) + 10;
@@ -950,19 +958,21 @@ void commutate()
     }
     __enable_irq();
     changeCompInput();
-	if (average_interval > 2000) {
-      old_routine = 1;
-   }
+//	if (average_interval > 2500) {
+//      old_routine = 1;
+//   }
     bemfcounter = 0;
     zcfound = 0;
    commutation_intervals[step - 1] = commutation_interval; // just used to calulate average
 	 these_zc_times[step - 1] = thiszctime;
 #ifdef USE_PULSE_OUT
-		if(rising){
-			GPIOB->scr = GPIO_PINS_8;
+		if(step == 1 ){
+		if(GPIOB->ODR == 1){
+			GPIOB->BSRR = RPM_PULSE_PIN;
 		}else{
-			GPIOB->clr = GPIO_PINS_8;
+			GPIOB->BRR = RPM_PULSE_PIN;
 		}
+	}
 #endif
 }
 
@@ -1282,7 +1292,7 @@ if (!stepper_sine && armed) {
                 if (RC_CAR_REVERSE && prop_brake_active) {
 #ifndef PWM_ENABLE_BRIDGE
                     prop_brake_duty_cycle = (getAbsDif(1000, newinput) + 1000);
-                    if (prop_brake_duty_cycle >= (TIMER1_MAX_ARR - 1)) {
+                    if (prop_brake_duty_cycle >= 1999) {
                         fullBrake();
                     } else {
                         proportionalBrake();
@@ -1648,7 +1658,6 @@ void zcfoundroutine()
     commutate();
     bemfcounter = 0;
     bad_count = 0;
-
     zero_crosses++;
     if (stall_protection || RC_CAR_REVERSE) {
         if (zero_crosses >= 20 && commutation_interval <= 2000) {
@@ -1656,7 +1665,7 @@ void zcfoundroutine()
             enableCompInterrupts(); // enable interrupt
         }
     } else {
-        if (commutation_interval < 1500) {
+       if (zero_crosses > 30) {
             old_routine = 0;
             enableCompInterrupts(); // enable interrupt
         }
@@ -1863,7 +1872,8 @@ int main(void)
     setInputPullUp();
 #endif
 
-#ifdef USE_INVERTED_HIGH
+
+#if defined(USE_INVERTED_HIGH) || defined(GEPRC_F421)
   min_startup_duty = min_startup_duty + 100;
   minimum_duty_cycle = minimum_duty_cycle + 100;
 #endif
@@ -1879,7 +1889,13 @@ int main(void)
             input_ready = 0;
         }
 #endif
-
+if(zero_crosses < 5){
+	  min_bemf_counts_up = TARGET_MIN_BEMF_COUNTS * 2;
+		min_bemf_counts_down = TARGET_MIN_BEMF_COUNTS * 2;
+}else{
+	 min_bemf_counts_up = TARGET_MIN_BEMF_COUNTS;
+	min_bemf_counts_down = TARGET_MIN_BEMF_COUNTS;
+}
         RELOAD_WATCHDOG_COUNTER();
         e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation_intervals[2] + commutation_intervals[3] + commutation_intervals[4] + commutation_intervals[5]) + 4) >> 1; // COMMUTATION INTERVAL IS 0.5US INCREMENTS
         if (VARIABLE_PWM) {
@@ -1981,16 +1997,18 @@ int main(void)
         average_interval = e_com_time / 3;
         if (desync_check && zero_crosses > 10) {
             if ((getAbsDif(last_average_interval, average_interval) > average_interval >> 1) && (average_interval < 2000)) { // throttle resitricted before zc 20.
-                zero_crosses = 0;
-                desync_happened++;
-                if ((!bi_direction && (input > 47)) || commutation_interval > 1000) {
-                    running = 0;
-                }
-                old_routine = 1;
-                if (zero_crosses > 100) {
-                    average_interval = 5000;
-                }
-                last_duty_cycle = min_startup_duty / 2;
+                 allOff();
+//							zero_crosses = 0;
+//                desync_happened++;
+//                if ((!bi_direction && (input > 47)) || commutation_interval > 1000) {
+//									  
+//                    running = 0;
+//                }
+//                old_routine = 1;
+//                if (zero_crosses > 100) {
+//                    average_interval = 5000;
+//                }
+//                last_duty_cycle = min_startup_duty / 2;
             }
             desync_check = 0;
             //	}

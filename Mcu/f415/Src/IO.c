@@ -70,9 +70,11 @@ void receiveDshotDma()
 	  INPUT_DMA_CHANNEL->paddr = (uint32_t)&IC_TIMER_REGISTER->c3dt;
     IC_TIMER_REGISTER->iden |= TMR_C3_DMA_REQUEST;
 #endif
-	  INPUT_DMA_CHANNEL->maddr = (uint32_t)&dma_buffer;
+
+	INPUT_DMA_CHANNEL->maddr = (uint32_t)&dma_buffer;
     INPUT_DMA_CHANNEL->dtcnt = buffersize;
-	  IC_TIMER_REGISTER->ctrl1_bit.tmren = TRUE;
+	IC_TIMER_REGISTER->ctrl1_bit.tmren = TRUE;
+
     INPUT_DMA_CHANNEL->ctrl = 0x0000098b;
 }
 
@@ -87,7 +89,7 @@ void sendDshotDma()
 	  INPUT_DMA_CHANNEL->paddr = (uint32_t)&IC_TIMER_REGISTER->c3dt;
     IC_TIMER_REGISTER->iden |= TMR_C3_DMA_REQUEST;
 #endif
-	  INPUT_DMA_CHANNEL->maddr = (uint32_t)&gcr;
+	INPUT_DMA_CHANNEL->maddr = (uint32_t)&gcr;
     INPUT_DMA_CHANNEL->dtcnt = 23 + buffer_padding;
     INPUT_DMA_CHANNEL->ctrl |= DMA_FDT_INT;
     INPUT_DMA_CHANNEL->ctrl |= DMA_DTERR_INT;

@@ -617,7 +617,6 @@ void init_OPAMP(void)
 }
 
 
-
 void reloadWatchDogCounter()
 {
     LL_IWDG_ReloadCounter(IWDG);

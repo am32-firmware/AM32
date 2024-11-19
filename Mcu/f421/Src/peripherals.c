@@ -363,6 +363,6 @@ void enableCorePeripherals()
     EXINT->inten |= EXINT_LINE_15;
 		
 #ifdef USE_PULSE_OUT
- gpio_mode_QUICK(GPIOB, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, GPIO_PINS_8);
+ gpio_mode_QUICK(RPM_PULSE_PORT, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, RPM_PULSE_PIN);
 #endif
 }

@@ -18,6 +18,8 @@ int main()
     gpio_t gpioUsartTx = DEF_GPIO(AUX_USART_TX_PORT, AUX_USART_TX_PIN, AUX_USART_TX_AF, GPIO_AF);
     gpio_initialize(&gpioUsartRx);
     gpio_initialize(&gpioUsartTx);
+    gpio_set_speed(&gpioUsartRx, GPIO_SPEED_VERYFAST);
+    gpio_set_speed(&gpioUsartTx, GPIO_SPEED_VERYFAST);
 
     usart.ref = AUX_USART_TX_PERIPH;
 

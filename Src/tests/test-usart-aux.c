@@ -32,7 +32,7 @@ int main()
     usart.txDmaRequest = AUX_USART_TX_DMA_REQ;
     usart.rxDmaRequest = AUX_USART_RX_DMA_REQ;
 
-    usart._baudrate = 115200;
+    usart._baudrate = 921600;
     usart.swap = 0;
     usart_initialize(&usart);
 

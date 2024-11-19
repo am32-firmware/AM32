@@ -14,8 +14,8 @@ int main()
 {
     mcu_setup();
     AUX_USART_ENABLE_CLOCK();
-    gpio_t gpioUsartRx = DEF_GPIO(MAIN_USART_RX_PORT, MAIN_USART_RX_PIN, MAIN_USART_RX_AF, GPIO_AF);
-    gpio_t gpioUsartTx = DEF_GPIO(MAIN_USART_TX_PORT, MAIN_USART_TX_PIN, MAIN_USART_TX_AF, GPIO_AF);
+    gpio_t gpioUsartRx = DEF_GPIO(AUX_USART_RX_PORT, AUX_USART_RX_PIN, AUX_USART_RX_AF, GPIO_AF);
+    gpio_t gpioUsartTx = DEF_GPIO(AUX_USART_TX_PORT, AUX_USART_TX_PIN, AUX_USART_TX_AF, GPIO_AF);
     gpio_initialize(&gpioUsartRx);
     gpio_initialize(&gpioUsartTx);
 

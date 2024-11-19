@@ -1998,6 +1998,8 @@
 #define AUX_USART_RX_PIN 0
 #define AUX_USART_RX_AF 8
 #define AUX_USART_RX_PERIPH UART8
+#define AUX_USART_RX_DMA_REQ LL_GPDMA1_REQUEST_UART8_RX
+
 ////////////
 // option 1
 ////////////

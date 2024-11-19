@@ -28,6 +28,7 @@ int main()
     usart.rxDma = &dmaChannels[7];
     usart.txDma = &dmaChannels[0];
     usart.txDmaRequest = AUX_USART_TX_DMA_REQ;
+    usart.rxDmaRequest = AUX_USART_RX_DMA_REQ;
 
     usart._baudrate = 1000000;
     usart.swap = 0;

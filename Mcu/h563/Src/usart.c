@@ -55,7 +55,7 @@ void usart_initialize(usart_t* usart)
 
 
     // set the hardware request selections
-    usart->rxDma->ref->CTR2 |= 25;
+    usart->rxDma->ref->CTR2 |= usart->rxDmaRequest;
 
 
     // lastly enable the dma channel

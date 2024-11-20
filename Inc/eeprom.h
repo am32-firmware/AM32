@@ -47,7 +47,8 @@ typedef union EEprom_u {
         uint8_t sine_mode_power; // 45
         uint8_t input_type; // 46
         uint8_t auto_advance; // 47
-        uint8_t reserved_2[4]; //48-51
+        uint8_t pwm_dithering; // 48
+        uint8_t reserved_2[3]; //49-51
         uint8_t tune[124]; // 52-175
         struct {
             uint8_t can_node; // 176

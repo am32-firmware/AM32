@@ -752,6 +752,9 @@ void loadEEpromSettings()
 //    if (!eepromBuffer.comp_pwm) {
 //        eepromBuffer.bi_direction = 0;
 //    }
+    if (eepromBuffer.pwm_dithering > 128) {
+        eepromBuffer.pwm_dithering = 0;
+    }
 }
 
 void saveEEpromSettings()
@@ -1242,6 +1245,18 @@ if (!stepper_sine && armed) {
 #endif
 }
 
+/*
+  calculate a PWM dithering value
+ */
+static uint16_t pwmDither(uint16_t reload, uint16_t dithering)
+{
+    // simple LCG random number generator
+    static uint8_t seed;
+    seed = (((uint32_t)seed) * 1103515245U + 12345U);
+    int16_t r = (seed % (dithering * 2)) - dithering;
+    return reload + r;
+}
+
 void tenKhzRoutine()
 { // 20khz as of 2.00 to be renamed
     duty_cycle = duty_cycle_setpoint;
@@ -1410,10 +1425,19 @@ void tenKhzRoutine()
                 fast_accel = 0;
             }
         }
+
+        /*
+          possibly add PWM dithering to reduce impact of harmonics
+         */
+        uint16_t tim1_arr_used = tim1_arr;
+        if (eepromBuffer.pwm_dithering > 0) {
+            tim1_arr_used = pwmDither(tim1_arr, eepromBuffer.pwm_dithering);
+        }
+
         if ((armed && running) && input > 47) {
             if (eepromBuffer.variable_pwm) {
             }
-            adjusted_duty_cycle = ((duty_cycle * tim1_arr) / 2000) + 1;
+            adjusted_duty_cycle = ((duty_cycle * tim1_arr_used) / 2000) + 1;
 
         } else {
 
@@ -1424,7 +1448,7 @@ void tenKhzRoutine()
             }
         }
         last_duty_cycle = duty_cycle;
-        SET_AUTO_RELOAD_PWM(tim1_arr);
+        SET_AUTO_RELOAD_PWM(tim1_arr_used);
         SET_DUTY_CYCLE_ALL(adjusted_duty_cycle);
     }
 #endif // ndef brushed_mode

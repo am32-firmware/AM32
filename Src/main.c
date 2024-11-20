@@ -605,9 +605,15 @@ void loadEEpromSettings()
     }
 
     if (eepromBuffer.startup_power < 151 && eepromBuffer.startup_power > 49) {
-        min_startup_duty = (eepromBuffer.startup_power);
-        minimum_duty_cycle = (eepromBuffer.startup_power / 3);
-        stall_protect_minimum_duty = minimum_duty_cycle + 10;
+        if(!eepromBuffer.comp_pwm){        // higher startup power for non-complementary pwm
+            min_startup_duty = (eepromBuffer.startup_power) *2 ;
+            minimum_duty_cycle = (eepromBuffer.startup_power / 2);
+            stall_protect_minimum_duty = minimum_duty_cycle + 10;
+			}else{
+            min_startup_duty = (eepromBuffer.startup_power);
+            minimum_duty_cycle = (eepromBuffer.startup_power / 3);
+            stall_protect_minimum_duty = minimum_duty_cycle + 10;
+			}
     } else {
         min_startup_duty = 150;
         minimum_duty_cycle = (min_startup_duty / 2) + 10;

@@ -69,7 +69,6 @@ static void can_gpio_config(void)
  */
 void sys_can_init(void)
 {
-    nvic_priority_group_config(NVIC_PRIORITY_GROUP_4);
     can_gpio_config();
 
     can_base_type can_base_struct;
@@ -113,6 +112,13 @@ void sys_can_init(void)
     can_filter_init_struct.filter_number = 1;
     can_filter_init(CAN1, &can_filter_init_struct);
 
+    // interrupt priorities, needs to be a higher number (lower priority) than
+    // motor control interrupts
+    NVIC_SetPriority(CAN1_SE_IRQn, 5);
+    NVIC_SetPriority(CAN1_RX0_IRQn, 5);
+    NVIC_SetPriority(CAN1_RX1_IRQn, 5);
+    NVIC_SetPriority(CAN1_TX_IRQn, 5);
+
     /* interrupt enable */
     can_interrupt_enable(CAN1, CAN_TCIEN_INT, TRUE);
     can_interrupt_enable(CAN1, CAN_RF0MIEN_INT, TRUE);
@@ -123,18 +129,18 @@ void sys_can_init(void)
 
 void sys_can_enable_IRQ(void)
 {
-    nvic_irq_enable(CAN1_SE_IRQn, 0x00, 0x00);
-    nvic_irq_enable(CAN1_RX0_IRQn, 0x00, 0x00);
-    nvic_irq_enable(CAN1_RX1_IRQn, 0x00, 0x00);
-    nvic_irq_enable(CAN1_TX_IRQn, 0x00, 0x00);
+    NVIC_EnableIRQ(CAN1_SE_IRQn);
+    NVIC_EnableIRQ(CAN1_RX0_IRQn);
+    NVIC_EnableIRQ(CAN1_RX1_IRQn);
+    NVIC_EnableIRQ(CAN1_TX_IRQn);
 }
 
 void sys_can_disable_IRQ(void)
 {
-    nvic_irq_disable(CAN1_SE_IRQn);
-    nvic_irq_disable(CAN1_RX0_IRQn);
-    nvic_irq_disable(CAN1_RX1_IRQn);
-    nvic_irq_disable(CAN1_TX_IRQn);
+    NVIC_DisableIRQ(CAN1_SE_IRQn);
+    NVIC_DisableIRQ(CAN1_RX0_IRQn);
+    NVIC_DisableIRQ(CAN1_RX1_IRQn);
+    NVIC_DisableIRQ(CAN1_TX_IRQn);
 }
 
 /*
@@ -245,6 +251,32 @@ uint32_t get_rtc_backup_register(uint8_t idx)
 void set_rtc_backup_register(uint8_t idx, uint32_t value)
 {
     ertc_bpr_data_write(idx, value);
+}
+
+/*
+  setup a static port/pin
+ */
+void setup_portpin(uint16_t portpin, bool enable)
+{
+    const uint8_t port = portpin >> 8;
+    const uint8_t pin = portpin & 0xff;
+    const uint32_t pinshift = 1U<<pin;
+    gpio_type *pport = port==0?GPIOA:GPIOB;
+
+    if (enable) {
+        pport->scr = pinshift;
+    } else {
+        pport->clr = pinshift;
+    }
+    
+    gpio_init_type gpio_init_struct;
+
+    gpio_init_struct.gpio_drive_strength = GPIO_DRIVE_STRENGTH_STRONGER;
+    gpio_init_struct.gpio_out_type = GPIO_OUTPUT_PUSH_PULL;
+    gpio_init_struct.gpio_mode = GPIO_MODE_OUTPUT;
+    gpio_init_struct.gpio_pins = pinshift;
+    gpio_init_struct.gpio_pull = GPIO_PULL_NONE;
+    gpio_init(pport, &gpio_init_struct);
 }
 
 #endif // DRONECAN_SUPPORT && defined(ARTERY)

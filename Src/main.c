@@ -656,9 +656,11 @@ void loadEEpromSettings()
             eepromBuffer.driving_brake_strength = 10;
         }
 
-        dead_time_override = DEAD_TIME + (150 - (eepromBuffer.driving_brake_strength * 10));
-        if (dead_time_override > 200) {
-            dead_time_override = 200;
+        if(eepromBuffer.driving_brake_strength < 10){
+            dead_time_override = DEAD_TIME + (150 - (eepromBuffer.driving_brake_strength * 10));
+            if (dead_time_override > 200) {
+                dead_time_override = 200;
+            }
         }
         min_startup_duty = eepromBuffer.startup_power + dead_time_override;
         minimum_duty_cycle = eepromBuffer.startup_power / 2 + dead_time_override;
@@ -805,9 +807,9 @@ void commutate()
     }
     __enable_irq();
     changeCompInput();
-	if (average_interval > 2500) {
-      old_routine = 1;
-   }
+//	if (average_interval > 2500) {
+//      old_routine = 1;
+//   }
     bemfcounter = 0;
     zcfound = 0;
    commutation_intervals[step - 1] = commutation_interval; // just used to calulate average
@@ -1498,7 +1500,7 @@ void zcfoundroutine()
             enableCompInterrupts(); // enable interrupt
         }
     } else {
-        if (commutation_interval < 1300) {
+       if (zero_crosses > 30) {
             old_routine = 0;
             enableCompInterrupts(); // enable interrupt
         }
@@ -1769,7 +1771,13 @@ int main(void)
             input_ready = 0;
         }
 #endif
-
+if(zero_crosses < 5){
+	  min_bemf_counts_up = TARGET_MIN_BEMF_COUNTS * 2;
+		min_bemf_counts_down = TARGET_MIN_BEMF_COUNTS * 2;
+}else{
+	 min_bemf_counts_up = TARGET_MIN_BEMF_COUNTS;
+	min_bemf_counts_down = TARGET_MIN_BEMF_COUNTS;
+}
         RELOAD_WATCHDOG_COUNTER();
         e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation_intervals[2] + commutation_intervals[3] + commutation_intervals[4] + commutation_intervals[5]) + 4) >> 1; // COMMUTATION INTERVAL IS 0.5US INCREMENTS
         if (eepromBuffer.variable_pwm) {

@@ -134,7 +134,7 @@ void MX_COMP1_Init(void)
     COMP_InitStruct.OutputPolarity = LL_COMP_OUTPUTPOL_NONINVERTED;
     COMP_InitStruct.OutputBlankingSource = LL_COMP_BLANKINGSRC_TIM1_OC5;
     LL_COMP_Init(COMP1, &COMP_InitStruct);
-    LL_COMP_SetPowerMode(COMP1, LL_COMP_POWERMODE_HIGHSPEED);
+    LL_COMP_SetPowerMode(COMP1, LL_COMP_POWERMODE_MEDIUMSPEED);
     LL_COMP_SetCommonWindowMode(__LL_COMP_COMMON_INSTANCE(COMP1),
         LL_COMP_WINDOWMODE_DISABLE);
     LL_COMP_SetCommonWindowOutput(__LL_COMP_COMMON_INSTANCE(COMP1),
@@ -202,7 +202,7 @@ void MX_COMP2_Init(void)
     COMP_InitStruct.OutputPolarity = LL_COMP_OUTPUTPOL_NONINVERTED;
     COMP_InitStruct.OutputBlankingSource = LL_COMP_BLANKINGSRC_TIM1_OC5;
     LL_COMP_Init(COMP2, &COMP_InitStruct);
-    LL_COMP_SetPowerMode(COMP2, LL_COMP_POWERMODE_HIGHSPEED);
+    LL_COMP_SetPowerMode(COMP2, LL_COMP_POWERMODE_MEDIUMSPEED);
     LL_COMP_SetCommonWindowMode(__LL_COMP_COMMON_INSTANCE(COMP2),
         LL_COMP_WINDOWMODE_DISABLE);
     LL_COMP_SetCommonWindowOutput(__LL_COMP_COMMON_INSTANCE(COMP2),
@@ -822,4 +822,7 @@ void enableCorePeripherals()
     NVIC_SetPriority(EXTI4_15_IRQn, 2);
     NVIC_EnableIRQ(EXTI4_15_IRQn);
     EXTI->IMR1 |= (1 << 15);
+		#ifdef USE_PULSE_OUT
+		 LL_GPIO_SetPinMode(RPM_PULSE_PORT, RPM_PULSE_PIN, LL_GPIO_MODE_OUTPUT);
+		#endif
 }

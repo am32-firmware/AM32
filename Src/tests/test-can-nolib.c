@@ -7,11 +7,11 @@
 #include "vreg.h"
 
 #include "gpio.h"
-#include "mcu.h"
+
 
 int main()
 {
-    mcu_setup(24);
+
     vreg5V_initialize();
     vreg5V_enable();
 
@@ -38,18 +38,15 @@ int main()
         CAN_TX_GPIO_PORT,
         CAN_TX_GPIO_PIN,
         CAN_TX_GPIO_AF,
-        GPIO_OUTPUT
+        GPIO_AF
     );
 
     gpio_initialize(&gpioCanRx);
     gpio_initialize(&gpioCanTx);
 
-    gpio_set_speed(&gpioCanTx, GPIO_SPEED_VERYFAST);
+
 
     while(1) {
-        CAN_TX_GPIO_PORT->BSRR |= 1<<CAN_TX_GPIO_PIN;
-        CAN_TX_GPIO_PORT->BRR |= 1<<CAN_TX_GPIO_PIN;
-        // gpio_set(&gpioCanTx);
-        // gpio_reset(&gpioCanTx);
+
     }
 }

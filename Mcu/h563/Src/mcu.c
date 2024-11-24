@@ -7,11 +7,12 @@
 #include "flash.h"
 #include "power.h"
 
-void mcu_setup()
+
+void mcu_setup(uint16_t coreFrequencyMHz)
 {
     mcu_setup_flash();
     mcu_setup_core_voltage();
-    mcu_setup_clocks();
+    mcu_setup_clocks(coreFrequencyMHz);
     mcu_setup_mpu();
     mcu_enable_icache();
     // comment if you don't need it,
@@ -19,7 +20,7 @@ void mcu_setup()
     dma_initialize();
 }
 
-void mcu_setup_clocks()
+void mcu_setup_clocks(uint16_t coreFrequencyMHz)
 {
     clock_hse_enable();
 
@@ -28,7 +29,7 @@ void mcu_setup_clocks()
     // set prescaler to 25 for 1MHz input clock
     clock_pll1_set_prescaler(25);
     clock_pll1_enable_pclk();
-    clock_pll1_set_multiplier(250);
+    clock_pll1_set_multiplier(coreFrequencyMHz);
     clock_pll1_enable();
     clock_system_set_source(CLOCK_SYS_SRC_PLL1);
     clock_update_hclk_frequency();

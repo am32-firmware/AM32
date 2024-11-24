@@ -197,7 +197,7 @@ void initCorePeripherals(void)
 void initAfterJump(void)
 {
     __enable_irq();
-    mcu_setup();
+    mcu_setup(250);
 }
 
 // interval timer

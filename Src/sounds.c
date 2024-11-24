@@ -120,6 +120,7 @@ void playStartupTune()
     __enable_irq();
 }
 
+#ifndef DISABLE_ROTOR_SENSE
 void playReversedTune()
 {
     __disable_irq();
@@ -188,6 +189,7 @@ void playNonReversedTune()
     
     __enable_irq();
 }
+#endif
 
 void playBrushedStartupTune()
 {

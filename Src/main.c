@@ -396,6 +396,9 @@ char fast_deccel = 0;
 uint16_t last_duty_cycle = 0;
 uint16_t duty_cycle_setpoint = 0;
 char play_tone_flag = 0;
+#ifndef DISABLE_ROTOR_SENSE
+uint8_t times_tone_played = 0;
+#endif
 
 typedef enum { GPIO_PIN_RESET = 0U,
     GPIO_PIN_SET } GPIO_PinState;
@@ -577,6 +580,13 @@ float doPidCalculations(struct fastPID* pidnow, int actual, int target)
         pidnow->pid_output = -pidnow->output_limit;
     }
     return pidnow->pid_output;
+}
+
+void migrateEEpromSettings(void)
+{
+    if (eepromBuffer.eeprom_version == 2 && EEPROM_VERSION == 3) {
+        eepromBuffer.flags = (uint16_t)0x0;
+    }
 }
 
 void loadEEpromSettings()
@@ -1095,6 +1105,9 @@ if (!stepper_sine && armed) {
 
         if (input < 47 + (80 * eepromBuffer.use_sine_start)) {
             if (play_tone_flag != 0) {
+                #ifndef DISABLE_ROTOR_SENSE
+                times_tone_played++;
+                #endif
                 switch (play_tone_flag) {
 									
                 case 1:
@@ -1115,6 +1128,16 @@ if (!stepper_sine && armed) {
                 }
                 play_tone_flag = 0;
             }
+            #ifndef DISABLE_ROTOR_SENSE
+            else {
+                times_tone_played = 0;
+            }
+
+            if (times_tone_played > 9 && (eepromBuffer.flags & ROTOR_SENSE_DONE) == AM32_FLAG_SET) {
+                eepromBuffer.flags &= ~ROTOR_SENSE_DONE;
+                playRotorSenseSaveTune();
+            }
+            #endif
 
             if (!eepromBuffer.comp_pwm) {
                 duty_cycle_setpoint = 0;
@@ -1208,6 +1231,7 @@ if (!stepper_sine && armed) {
 #endif
 }
 
+#ifndef DISABLE_ROTOR_SENSE
 uint8_t rotorSenseValue = 0;
 uint8_t rotorSenseValueLast = 0;
 uint8_t rotorSenseFalseDetected = 0;
@@ -1215,6 +1239,7 @@ uint8_t rotorSenseSequence[6] = {5, 4, 6, 2, 3, 1};
 uint8_t rotorSenseReversedSequence[6] = {1, 3, 2, 6, 4, 5};
 uint8_t rotorSenseDetectedSequence[6] = {0, 0, 0, 0, 0, 0};
 uint8_t rotorSenseDetectedSequenceIndex = 0;
+#endif
 
 void tenKhzRoutine()
 { // 20khz as of 2.00 to be renamed
@@ -1267,20 +1292,22 @@ void tenKhzRoutine()
                 }
             }
         }
-    } else if (!running && (eepromBuffer.flags & ROTOR_SENSE_DONE) == AM32_FLAG_UNSET) {
+    }
+#ifndef DISABLE_ROTOR_SENSE
+    if (!running && (eepromBuffer.flags & ROTOR_SENSE_DONE) == AM32_FLAG_UNSET) {
         step = 1;
         changeCompInput();
-        delayMicros(1);
+        delayMicros(5);
         RELOAD_WATCHDOG_COUNTER();
         rotorSenseValue = getCompOutputLevel();
         step = 2;
         changeCompInput();
-        delayMicros(1);
+        delayMicros(5);
         RELOAD_WATCHDOG_COUNTER();
         rotorSenseValue = getCompOutputLevel() << 1 | rotorSenseValue;
         step = 3;
         changeCompInput();
-        delayMicros(1);
+        delayMicros(5);
         RELOAD_WATCHDOG_COUNTER();
         rotorSenseValue = getCompOutputLevel() << 2 | rotorSenseValue;
     
@@ -1289,16 +1316,16 @@ void tenKhzRoutine()
             
             if (rotorSenseDetectedSequenceIndex > 5) {
                 if (searchSequence(rotorSenseDetectedSequence, 6, rotorSenseSequence, 6)) {
-                    playNonReversedTune();
-                    if (dir_reversed == 1) {
+                    if (eepromBuffer.dir_reversed == 1) {
+                        playNonReversedTune();
                         rotorSenseFalseDetected++;
                     } else {
                         rotorSenseFalseDetected = 0;
                     }
                 } else {
                     if (searchSequence(rotorSenseDetectedSequence, 6, rotorSenseReversedSequence, 6)) {
-                        playReversedTune();
-                        if (dir_reversed == 0) {
+                        if (eepromBuffer.dir_reversed == 0) {
+                            playReversedTune();
                             rotorSenseFalseDetected++;
                         } else {
                             rotorSenseFalseDetected = 0;
@@ -1307,7 +1334,8 @@ void tenKhzRoutine()
                 }
                 
                 if (rotorSenseFalseDetected == 2) {
-                    dir_reversed = (dir_reversed + 1) % 2;
+                    eepromBuffer.dir_reversed = (eepromBuffer.dir_reversed + 1) % 2;
+                    eepromBuffer.flags |= ROTOR_SENSE_DONE;
                     saveEEpromSettings();
                     playRotorSenseSaveTune();
                     rotorSenseFalseDetected = 0;
@@ -1323,6 +1351,7 @@ void tenKhzRoutine()
             rotorSenseValueLast = rotorSenseValue;
         }
     }
+#endif
 
     if (eepromBuffer.telementry_on_interval) {
         telem_ms_count++;
@@ -1683,6 +1712,11 @@ int main(void)
 
     loadEEpromSettings();
 
+    if (eepromBuffer.eeprom_version < EEPROM_VERSION) {
+        migrateEEpromSettings();
+        saveEEpromSettings();
+    }
+
 #ifdef USE_MAKE
     if (
         firmware_info.version_major != eepromBuffer.version.major ||
@@ -1784,8 +1818,10 @@ int main(void)
 	#endif
 #endif
     zero_input_count = 0;
+#ifndef DISABLE_WATCHDOG
     MX_IWDG_Init();
     RELOAD_WATCHDOG_COUNTER();
+#endif
 #ifdef GIMBAL_MODE
     eepromBuffer.bi_direction = 1;
     eepromBuffer.use_sine_start = 1;

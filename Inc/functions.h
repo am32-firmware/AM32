@@ -9,6 +9,7 @@
 #define FUNCTIONS_H_
 
 #include "main.h"
+#include "targets.h"
 #include <stdbool.h>
 
 int findIndex(uint8_t *array, uint8_t size, uint8_t target);

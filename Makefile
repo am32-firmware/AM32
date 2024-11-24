@@ -69,6 +69,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-uart-sk6812.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-bridge-audio.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-bridge-commutate.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-can-io.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator-3phase.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-debug.c
@@ -88,15 +89,17 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi2.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-maxfrequency.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-nothing.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-rng.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-phaseouts.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma-single.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-ten-khz-timer.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-aux.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-aux.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-debug.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-main.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-main-rs485.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-vreg-5V.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-watchdog-fail.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-watchdog-pass.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-watchdog-period.c

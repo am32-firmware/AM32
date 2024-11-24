@@ -29,7 +29,7 @@ void exti15cb(extiChannel_t* exti)
     uint32_t mask = 1 << exti->channel;
     // if (EXTI->RPR1 & mask) {
         EXTI->RPR1 |= mask;
-    // } 
+    // }
     // if (EXTI->FPR1 & mask) {
         EXTI->FPR1 |= mask;
     // }
@@ -92,7 +92,6 @@ void MX_TIM1_Init(void)
     LL_TIM_InitTypeDef TIM_InitStruct = { 0 };
     LL_TIM_OC_InitTypeDef TIM_OC_InitStruct = { 0 };
     LL_TIM_BDTR_InitTypeDef TIM_BDTRInitStruct = { 0 };
-    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
     BRIDGE_TIMER_ENABLE_CLOCK();
     TIM_InitStruct.Prescaler = 0;
     TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
@@ -184,7 +183,7 @@ void initCorePeripherals(void)
     COMPARATOR.phaseAcb = phaseA_cb;
     COMPARATOR.phaseBcb = phaseB_cb;
     COMPARATOR.phaseCcb = phaseC_cb;
-    
+
     comparator_initialize(&COMPARATOR);
     commutation_timer_initialize();
     ten_khz_timer_initialize();

@@ -2178,6 +2178,31 @@
 // Gate driver control
 /////////////////////////////////////////
 
+/////////////////////////////////////////
+// CAN transceiver (MCP2542) control
+/////////////////////////////////////////
+
+#define CAN_RX_GPIO_PORT GPIOD
+#define CAN_RX_GPIO_PIN 0
+#define CAN_RX_GPIO_AF 9
+
+#define CAN_TX_GPIO_PORT GPIOD
+#define CAN_TX_GPIO_PIN 5
+#define CAN_TX_GPIO_AF 9
+
+// MCP2542 CAN transceiver standby mode pin (STBY)
+#define CAN_STBY_GPIO_PORT GPIOA
+#define CAN_STBY_GPIO_PIN 15
+
+
+/////////////////////////////////////////
+// CAN transceiver (MCP2542) control
+/////////////////////////////////////////
+
+
+
+
+
 #define DSHOT_PRIORITY_THRESHOLD 70
 
 // #define HCLK_FREQUENCY 25000000

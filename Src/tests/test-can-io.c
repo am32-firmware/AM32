@@ -3,6 +3,11 @@
 // This test configures gpio to turn on
 // the 5V regulator, and to control the MCP2542
 // CAN transceiver standby mode pin (STBY)
+// The example also toggles the CAN TX pin
+// to verify the can tranceiver functionality with
+// an oscilloscope
+// the cpu core frequency can be changed to change
+// the 'bitrate'
 #include "targets.h"
 #include "vreg.h"
 
@@ -26,14 +31,6 @@ int main()
     // out of standby
     gpio_reset(&gpioMcp2542Enable);
 
-
-    gpio_t gpioCanRx = DEF_GPIO(
-        CAN_RX_GPIO_PORT,
-        CAN_RX_GPIO_PIN,
-        CAN_RX_GPIO_AF,
-        GPIO_AF
-    );
-
     gpio_t gpioCanTx = DEF_GPIO(
         CAN_TX_GPIO_PORT,
         CAN_TX_GPIO_PIN,
@@ -41,7 +38,6 @@ int main()
         GPIO_OUTPUT
     );
 
-    gpio_initialize(&gpioCanRx);
     gpio_initialize(&gpioCanTx);
 
     gpio_set_speed(&gpioCanTx, GPIO_SPEED_VERYFAST);

@@ -992,6 +992,26 @@
 #endif
 
 
+#ifdef GEPRC_4IN1_F421
+#define FIRMWARE_NAME "Geprc 4in1 "
+#define FILE_NAME "GEPRC_4IN1_F421"
+#define DEAD_TIME 75
+#define HARDWARE_GROUP_AT_540
+#define HARDWARE_GROUP_AT_E
+#define USE_SERIAL_TELEMETRY
+#endif
+
+
+#ifdef ORQA_F421
+#define FIRMWARE_NAME "ORQA       "
+#define FILE_NAME "ORQA_F421"
+#define DEAD_TIME 100
+#define HARDWARE_GROUP_AT_C
+#define HARDWARE_GROUP_AT_045
+#define USE_SERIAL_TELEMETRY
+#endif
+
+
 /*****************************************************AT32F415 targets ************************************************/
 
 #ifdef PB450_F051
@@ -1398,6 +1418,17 @@
 #define SIXTY_FOUR_KB_MEMORY
 #endif
 
+#ifdef JUPITER_80_G071
+#define FILE_NAME "JUPITER_80_G071"
+#define FIRMWARE_NAME "JUPITER G071"
+#define DEAD_TIME 60
+#define MILLIVOLT_PER_AMP 30
+#define CURRENT_OFFSET 0
+#define HARDWARE_GROUP_G0_L
+#define USE_SERIAL_TELEMETRY
+#define SIXTY_FOUR_KB_MEMORY
+#define TARGET_VOLTAGE_DIVIDER 280
+#endif
 
 #ifdef GEN_64K_G071
 #define FILE_NAME "GEN_64K_G071"

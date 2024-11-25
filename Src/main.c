@@ -213,6 +213,7 @@ an settings option)
 				 - todo fix signal detection
 *2.16    - add L431 
 				 - add variable auto timing
+				 - add droneCAN
 */
 #include "main.h"
 #include "ADC.h"
@@ -301,8 +302,7 @@ fastPID stallPid = { // 1khz loop time
 };
 
 EEprom_t eepromBuffer;
-uint32_t eeprom_address = EEPROM_START_ADD;
-char set_hysteris = 0;
+uint32_t eeprom_address = EEPROM_START_ADD; 
 uint16_t prop_brake_duty_cycle = 0;
 uint16_t ledcounter = 0;
 uint32_t process_time = 0;
@@ -552,27 +552,6 @@ uint16_t waitTime = 0;
 uint16_t signaltimeout = 0;
 uint8_t ubAnalogWatchdogStatus = RESET;
 
-// void checkForHighSignal(){
-// changeToInput();
-
-// setInputPullDown();
-// delayMicros(1000);
-// for(int i = 0 ; i < 1000; i ++){
-//	 if( !(getInputPinState())){  // if the pin is low for 5 checks out of
-// 100 in  100ms or more its either no signal or signal. jump to application
-//		 low_pin_count++;
-//	 }
-//      delayMicros(10);
-// }
-
-// setInputPullUp();
-//	 if(low_pin_count > 5){
-//		 return;      // its either a signal or a disconnected pin
-//	 }else{
-//		allOff();
-//		NVIC_SystemReset();
-//	 }
-// }
 
 float doPidCalculations(struct fastPID* pidnow, int actual, int target)
 {
@@ -602,7 +581,6 @@ float doPidCalculations(struct fastPID* pidnow, int actual, int target)
 
 void loadEEpromSettings()
 {
-                //*eepromBuffer = *(EEprom_t*)(eeprom_address);
     read_flash_bin(eepromBuffer.buffer, eeprom_address, sizeof(eepromBuffer.buffer));
 
     if (eepromBuffer.advance_level > 3) {
@@ -621,17 +599,21 @@ void loadEEpromSettings()
                 TIM1_AUTORELOAD / 2 * 3);
         }
         SET_AUTO_RELOAD_PWM(TIMER1_MAX_ARR);
-     //   throttle_max_at_high_rpm = TIMER1_MAX_ARR;
-     //   duty_cycle_maximum = TIMER1_MAX_ARR;
     } else {
         tim1_arr = TIM1_AUTORELOAD;
         SET_AUTO_RELOAD_PWM(tim1_arr);
     }
 
     if (eepromBuffer.startup_power < 151 && eepromBuffer.startup_power > 49) {
-        min_startup_duty = (eepromBuffer.startup_power);
-        minimum_duty_cycle = (eepromBuffer.startup_power / 3);
-        stall_protect_minimum_duty = minimum_duty_cycle + 10;
+        if(!eepromBuffer.comp_pwm){        // higher startup power for non-complementary pwm
+            min_startup_duty = (eepromBuffer.startup_power) *2 ;
+            minimum_duty_cycle = (eepromBuffer.startup_power / 2);
+            stall_protect_minimum_duty = minimum_duty_cycle + 10;
+			}else{
+            min_startup_duty = (eepromBuffer.startup_power);
+            minimum_duty_cycle = (eepromBuffer.startup_power / 3);
+            stall_protect_minimum_duty = minimum_duty_cycle + 10;
+			}
     } else {
         min_startup_duty = 150;
         minimum_duty_cycle = (min_startup_duty / 2) + 10;
@@ -748,10 +730,6 @@ void loadEEpromSettings()
         high_rpm_level = motor_kv / 12 / (32 / eepromBuffer.motor_poles);				
     }
     reverse_speed_threshold = map(motor_kv, 300, 3000, 1000, 500);
-    //   reverse_speed_threshold = 200;
-//    if (!eepromBuffer.comp_pwm) {
-//        eepromBuffer.bi_direction = 0;
-//    }
 }
 
 void saveEEpromSettings()
@@ -896,18 +874,6 @@ void interruptRoutine()
 		maskPhaseInterrupts();
 		thiszctime = INTERVAL_TIMER_COUNT;  
     SET_INTERVAL_TIMER_COUNT(0);
-//		if(thiszctime < (commutation_interval - (commutation_interval>>2))){
-//			send_LED_RGB(0, 0, 255);
-//				//	waitTime = waitTime + commutation_interval - thiszctime;
-//			    waitTime = waitTime + (commutation_interval>>2);
-//			  //  thiszctime = commutation_interval + (commutation_interval>>2);
-//		}else if(thiszctime > (commutation_interval + (commutation_interval>>2))){
-//			send_LED_RGB(255, 0, 0);
-//			 //   waitTime = waitTime - thiszctime - commutation_interval; 
-//			    waitTime = waitTime - (commutation_interval>>2);
-//			 //   thiszctime = commutation_interval - (commutation_interval>>2);
-//		}
-   // waitTime = waitTime >> fast_accel;
     SET_AND_ENABLE_COM_INT(waitTime+1); // enable COM_TIMER interrupt
     __enable_irq();
 }

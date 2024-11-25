@@ -2114,33 +2114,33 @@
 
 #endif
 
-#ifdef HARDWARE_GROUP_F0_045 // tried B
-#define PHASE_A_COMP COMP_PA0 // pa0     // works for polling mode
+#ifdef HARDWARE_GROUP_F0_045 
+#define PHASE_A_COMP COMP_PA0 // pa0     
 #define PHASE_B_COMP COMP_PA4 // pa4
 #define PHASE_C_COMP COMP_PA5 // pa5
 #endif
-#ifdef HARDWARE_GROUP_F0_504 // tried F
-#define PHASE_A_COMP COMP_PA5 // pa5            // works for polling mode
+#ifdef HARDWARE_GROUP_F0_504 
+#define PHASE_A_COMP COMP_PA5 // pa5            
 #define PHASE_B_COMP COMP_PA0 // pa0
 #define PHASE_C_COMP COMP_PA4 // pa4
 #endif
 #ifdef HARDWARE_GROUP_F0_450
-#define PHASE_A_COMP COMP_PA4 // pa4            // works for polling mode
+#define PHASE_A_COMP COMP_PA4 // pa4           
 #define PHASE_B_COMP COMP_PA5 // pa5
 #define PHASE_C_COMP COMP_PA0 // pa0
 #endif
 #ifdef HARDWARE_GROUP_F0_054
-#define PHASE_A_COMP COMP_PA0 // pa0            // works for polling mode
+#define PHASE_A_COMP COMP_PA0 // pa0            
 #define PHASE_B_COMP COMP_PA5 // pa5
 #define PHASE_C_COMP COMP_PA4 // pa4
 #endif
 #ifdef HARDWARE_GROUP_F0_405
-#define PHASE_A_COMP COMP_PA4 // pa4            // works for polling mode
+#define PHASE_A_COMP COMP_PA4 // pa4            
 #define PHASE_B_COMP COMP_PA0 // pa0
 #define PHASE_C_COMP COMP_PA5 // pa5
 #endif
-#ifdef HARDWARE_GROUP_F0_540 // tried H
-#define PHASE_A_COMP COMP_PA5 // pa5           // works for polling mode
+#ifdef HARDWARE_GROUP_F0_540 
+#define PHASE_A_COMP COMP_PA5 // pa5         
 #define PHASE_B_COMP COMP_PA4 // pa4
 #define PHASE_C_COMP COMP_PA0 // pa0
 #endif
@@ -2582,6 +2582,51 @@
 #define PHASE_A_COMP LL_COMP_INPUT_MINUS_IO3 // pa2
 #define PHASE_B_COMP LL_COMP_INPUT_MINUS_IO1 // pb3
 #define PHASE_C_COMP LL_COMP_INPUT_MINUS_IO2 // pb7
+
+#endif
+
+#ifdef HARDWARE_GROUP_G0_L
+
+#define MCU_G071
+#define N_VARIANT
+#define USE_TIMER_3_CHANNEL_1
+#define INPUT_PIN LL_GPIO_PIN_6
+#define INPUT_PIN_PORT GPIOC
+#define IC_TIMER_CHANNEL LL_TIM_CHANNEL_CH1
+#define IC_TIMER_REGISTER TIM3
+#define IC_TIMER_POINTER htim3
+
+#define INPUT_DMA_CHANNEL LL_DMA_CHANNEL_1
+#define DMA_HANDLE_TYPE_DEF hdma_tim3_ch1
+#define IC_DMA_IRQ_NAME DMA1_Channel1_IRQn
+
+#define PHASE_A_GPIO_LOW LL_GPIO_PIN_15
+#define PHASE_A_GPIO_PORT_LOW GPIOB
+#define PHASE_A_GPIO_HIGH LL_GPIO_PIN_10
+#define PHASE_A_GPIO_PORT_HIGH GPIOA
+
+#define PHASE_B_GPIO_LOW LL_GPIO_PIN_0
+#define PHASE_B_GPIO_PORT_LOW GPIOB
+#define PHASE_B_GPIO_HIGH LL_GPIO_PIN_9
+#define PHASE_B_GPIO_PORT_HIGH GPIOA
+
+#define PHASE_C_GPIO_LOW LL_GPIO_PIN_7
+#define PHASE_C_GPIO_PORT_LOW GPIOA
+#define PHASE_C_GPIO_HIGH LL_GPIO_PIN_8
+#define PHASE_C_GPIO_PORT_HIGH GPIOA
+
+#define PHASE_A_COMP LL_COMP_INPUT_MINUS_IO3 // pa0
+#define PHASE_B_COMP LL_COMP_INPUT_MINUS_IO3 // pa2
+#define PHASE_C_COMP LL_COMP_INPUT_MINUS_IO2 // pb7
+
+#define PHASE_A_EXTI_LINE LL_EXTI_LINE_17
+#define PHASE_A_COMP_NUMBER COMP1
+
+#define PHASE_B_EXTI_LINE LL_EXTI_LINE_18
+#define PHASE_B_COMP_NUMBER COMP2
+
+#define PHASE_C_EXTI_LINE LL_EXTI_LINE_18
+#define PHASE_C_COMP_NUMBER COMP2
 
 #endif
 
@@ -3103,34 +3148,34 @@
 #endif
 
 #ifdef HARDWARE_GROUP_AT_045
-#define PHASE_A_COMP 0x400000E1 // pa0     // works for polling mode
-#define PHASE_B_COMP 0x400000C1 // pa4
-#define PHASE_C_COMP 0x400000D1 // pa5
+#define PHASE_A_COMP 0x400000E5 // pa0 Medium Comp Power
+#define PHASE_B_COMP 0x400000C5 // pa4
+#define PHASE_C_COMP 0x400000D5 // pa5
 #endif
 #ifdef HARDWARE_GROUP_AT_504
-#define PHASE_A_COMP 0x400000D1 // pa5            // works for polling mode
-#define PHASE_B_COMP 0x400000E1 // pa0
-#define PHASE_C_COMP 0x400000C1 // pa4
+#define PHASE_A_COMP 0x400000D5 // pa5           
+#define PHASE_B_COMP 0x400000E5 // pa0
+#define PHASE_C_COMP 0x400000C5 // pa4
 #endif
 #ifdef HARDWARE_GROUP_AT_450
-#define PHASE_A_COMP 0x400000C1 // pa4            // works for polling mode
-#define PHASE_B_COMP 0x400000D1 // pa5
-#define PHASE_C_COMP 0x400000E1 // pa0
+#define PHASE_A_COMP 0x400000C5 // pa4            
+#define PHASE_B_COMP 0x400000D5 // pa5
+#define PHASE_C_COMP 0x400000E5 // pa0
 #endif
 #ifdef HARDWARE_GROUP_AT_054
-#define PHASE_A_COMP 0x400000E1 // pa0            // works for polling mode
-#define PHASE_B_COMP 0x400000D1 // pa5
-#define PHASE_C_COMP 0x400000C1 // pa4
+#define PHASE_A_COMP 0x400000E5 // pa0            
+#define PHASE_B_COMP 0x400000D5 // pa5
+#define PHASE_C_COMP 0x400000C5 // pa4
 #endif
 #ifdef HARDWARE_GROUP_AT_405
-#define PHASE_A_COMP 0x400000C1 // pa4            // works for polling mode
-#define PHASE_B_COMP 0x400000E1 // pa0
-#define PHASE_C_COMP 0x400000D1 // pa5
+#define PHASE_A_COMP 0x400000C5 // pa4            
+#define PHASE_B_COMP 0x400000E5 // pa0
+#define PHASE_C_COMP 0x400000D5 // pa5
 #endif
 #ifdef HARDWARE_GROUP_AT_540
-#define PHASE_A_COMP 0x400000D1 // pa5           // works for polling mode
-#define PHASE_B_COMP 0x400000C1 // pa4
-#define PHASE_C_COMP 0x400000E1 // pa0
+#define PHASE_A_COMP 0x400000D5 // pa5           
+#define PHASE_B_COMP 0x400000C5 // pa4
+#define PHASE_C_COMP 0x400000E5 // pa0
 #endif
 
 #ifdef HARDWARE_GROUP_AT_245

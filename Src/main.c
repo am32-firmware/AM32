@@ -667,9 +667,8 @@ void loadEEpromSettings()
             if (dead_time_override > 200) {
                 dead_time_override = 200;
             }
-        }
-        min_startup_duty = eepromBuffer.startup_power + dead_time_override;
-        minimum_duty_cycle = eepromBuffer.startup_power / 2 + dead_time_override;
+        min_startup_duty = min_startup_duty + dead_time_override;
+        minimum_duty_cycle = minimum_duty_cycle + dead_time_override;
         throttle_max_at_low_rpm = throttle_max_at_low_rpm + dead_time_override;
         startup_max_duty_cycle = startup_max_duty_cycle + dead_time_override;
 #ifdef STMICRO
@@ -681,7 +680,7 @@ void loadEEpromSettings()
 #ifdef GIGADEVICES
         TIMER_CCHP(TIMER0) |= dead_time_override;
 #endif
-
+        }
         if (eepromBuffer.limits.temperature < 70 || eepromBuffer.limits.temperature > 140) {
             eepromBuffer.limits.temperature = 255;
         }

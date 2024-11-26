@@ -30,7 +30,7 @@ which supports web browser based configuration and firmware update.
 
 You can also use a desktop configurator which you can download from here:
 
-[WINDOWS](https://drive.google.com/file/d/1qw2f7nM6OZftIE5GTgMPWB5zXCELxYG9/view?usp=sharing),
+[WINDOWS](https://drive.google.com/file/d/16kaPek9umz7fQFunzBeW4pp2LgT6_E5o/view?usp=drive_link)
 [LINUX](https://drive.google.com/file/d/1QtSKwp3RT6sncPADsPkmdasGqNIk68HH/view?usp=sharing)
 
 Alternately you can use the [Online-ESC Configurator](https://esc-configurator.com/) to flash or change settings with any web browser that supports web serial.

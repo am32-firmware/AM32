@@ -47,7 +47,8 @@ typedef union EEprom_u {
         uint8_t sine_mode_power; // 45
         uint8_t input_type; // 46
         uint8_t auto_advance; // 47
-        uint8_t reserved_2[4]; //48-51
+        uint16_t flags; // 48-49
+        uint8_t reserved_2[2]; //50-51
         uint8_t tune[124]; // 52-175
         struct {
             uint8_t can_node; // 176
@@ -63,6 +64,15 @@ typedef union EEprom_u {
     };
     uint8_t buffer[192];
 } EEprom_t;
+
+typedef enum am32_flags_e {
+    ROTOR_SENSE_DONE = 1 << 0,
+    // all flags must be lower than FLAGS_COUNT (uint16_t flags)
+    AM32_FLAGS_COUNT = 1 << 16
+} am32_flags_t;
+
+#define AM32_FLAG_SET 0x1
+#define AM32_FLAG_UNSET 0x0
 
 extern EEprom_t eepromBuffer;
 

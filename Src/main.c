@@ -1619,20 +1619,6 @@ int main(void)
 
     loadEEpromSettings();
 
-#ifdef USE_MAKE
-    if (
-        firmware_info.version_major != eepromBuffer.version.major ||
-        firmware_info.version_minor != eepromBuffer.version.minor ||
-        eeprom_layout_version > eepromBuffer.eeprom_version
-    ) {
-        eepromBuffer.version.major = firmware_info.version_major;
-        eepromBuffer.version.minor = firmware_info.version_minor;
-        for (int i = 0; i < 12; i++) {
-            eepromBuffer.firmware_name[i] = firmware_info.device_name[i];
-        }
-        saveEEpromSettings();
-    }
-#else
     if (VERSION_MAJOR != eepromBuffer.version.major || VERSION_MINOR != eepromBuffer.version.minor || eeprom_layout_version > eepromBuffer.eeprom_version) {
         eepromBuffer.version.major = VERSION_MAJOR;
         eepromBuffer.version.minor = VERSION_MINOR;
@@ -1641,7 +1627,7 @@ int main(void)
         }
         saveEEpromSettings();
     }
-#endif
+
     // if (eepromBuffer.use_sine_start) {
         //    min_startup_duty = sin_mode_min_s_d;
     // }

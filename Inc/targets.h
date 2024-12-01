@@ -2147,12 +2147,12 @@
 
 #endif
 
-#ifdef HARDWARE_GROUP_F0_045 
+#ifdef HARDWARE_GROUP_F0_045
 #define PHASE_A_COMP COMP_PA0 // pa0     
 #define PHASE_B_COMP COMP_PA4 // pa4
 #define PHASE_C_COMP COMP_PA5 // pa5
 #endif
-#ifdef HARDWARE_GROUP_F0_504 
+#ifdef HARDWARE_GROUP_F0_504
 #define PHASE_A_COMP COMP_PA5 // pa5            
 #define PHASE_B_COMP COMP_PA0 // pa0
 #define PHASE_C_COMP COMP_PA4 // pa4
@@ -2172,7 +2172,7 @@
 #define PHASE_B_COMP COMP_PA0 // pa0
 #define PHASE_C_COMP COMP_PA5 // pa5
 #endif
-#ifdef HARDWARE_GROUP_F0_540 
+#ifdef HARDWARE_GROUP_F0_540
 #define PHASE_A_COMP COMP_PA5 // pa5         
 #define PHASE_B_COMP COMP_PA4 // pa4
 #define PHASE_C_COMP COMP_PA0 // pa0

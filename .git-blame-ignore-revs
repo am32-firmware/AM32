@@ -1,0 +1,7 @@
+# This file allows ignoring commits in git blame view on Github.
+# For more info, see here:
+# https://docs.github.com/en/repositories/working-with-files/using-files/viewing-a-file#ignore-commits-in-the-blame-view
+
+# global reformat
+4ae63f4c9807a508e02c67d955d3fe86852e10b7
+

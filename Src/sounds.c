@@ -93,8 +93,7 @@ void playStartupTune()
 {
     __disable_irq();
 
-    uint8_t value = *(uint8_t*)(eeprom_address + 48);
-    if (value != 0xFF) {
+    if (eepromBuffer.tune[0] != 0xFF) {
         playBlueJayTune();
     } else {
         SET_AUTO_RELOAD_PWM(TIM1_AUTORELOAD);

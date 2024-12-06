@@ -130,7 +130,7 @@ void MX_COMP1_Init(void)
   NVIC_SetPriority(COMP_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),0, 0));
   NVIC_EnableIRQ(COMP_IRQn);
 
-  COMP_InitStruct.PowerMode = LL_COMP_POWERMODE_MEDIUMSPEED;
+  COMP_InitStruct.PowerMode = LL_COMP_POWERMODE_HIGHSPEED;
   COMP_InitStruct.InputPlus = LL_COMP_INPUT_PLUS_IO3;
   COMP_InitStruct.InputMinus = LL_COMP_INPUT_MINUS_IO5;
   COMP_InitStruct.InputHysteresis = LL_COMP_HYSTERESIS_NONE;
@@ -188,7 +188,7 @@ void MX_COMP2_Init(void)
   /* USER CODE BEGIN COMP2_Init 1 */
 
   /* USER CODE END COMP2_Init 1 */
-  COMP_InitStruct.PowerMode = LL_COMP_POWERMODE_MEDIUMSPEED;
+  COMP_InitStruct.PowerMode = LL_COMP_POWERMODE_HIGHSPEED;
   COMP_InitStruct.InputPlus = LL_COMP_INPUT_PLUS_IO1;
   COMP_InitStruct.InputMinus = LL_COMP_INPUT_MINUS_IO2;
   COMP_InitStruct.InputHysteresis = LL_COMP_HYSTERESIS_NONE;

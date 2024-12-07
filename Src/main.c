@@ -812,9 +812,11 @@ void commutate()
     }
     __enable_irq();
     changeCompInput();
-//	if (average_interval > 2500) {
-//      old_routine = 1;
-//   }
+#ifndef NO_POLLING_START
+	if (average_interval > 2500) {
+      old_routine = 1;
+   }
+#endif
     bemfcounter = 0;
     zcfound = 0;
    commutation_intervals[step - 1] = commutation_interval; // just used to calulate average
@@ -1499,17 +1501,24 @@ void zcfoundroutine()
     bad_count = 0;
 
     zero_crosses++;
+#ifdef NO_POLLING_START     // changes to interrupt mode after 30 zero crosses, does not re-enter
+       if (zero_crosses > 30) {
+            old_routine = 0;
+            enableCompInterrupts(); // enable interrupt
+        }
+#else
     if (eepromBuffer.stall_protection || eepromBuffer.rc_car_reverse) {
         if (zero_crosses >= 20 && commutation_interval <= 2000) {
             old_routine = 0;
             enableCompInterrupts(); // enable interrupt
         }
     } else {
-       if (zero_crosses > 30) {
+       if (commutation_interval < 2000) {
             old_routine = 0;
             enableCompInterrupts(); // enable interrupt
         }
     }
+ #endif
 }
 #ifdef BRUSHED_MODE
 void runBrushedLoop()

@@ -12,6 +12,7 @@
 #include "peripherals.h"
 #include "phaseouts.h"
 #include "targets.h"
+#include <stddef.h>
 
 uint8_t beep_volume;
 
@@ -62,7 +63,8 @@ void playBlueJayTune()
     uint16_t frequency;
     comStep(3);
     // read_flash_bin(blueJayTuneBuffer , eeprom_address + 48 , 128);
-    for (int i = 0; i < 124; i += 2) {
+    // first 4 bytes are reversed for rtttl duration, octave, beat, tempo
+    for (size_t i = 4; i < sizeof(eepromBuffer.tune); i += 2) {
         RELOAD_WATCHDOG_COUNTER();
         signaltimeout = 0;
 

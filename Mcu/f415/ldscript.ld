@@ -34,7 +34,6 @@ MEMORY
  RAM          (xrw)  : ORIGIN = 0x20000000, LENGTH = 16K
  FLASH         (rx)  : ORIGIN = 0x08001000, LENGTH = 57K
  EEPROM        (rx)  : ORIGIN = 0x0800f800, LENGTH = 2K
- FLASH_VERSION (rx)  : ORIGIN = ORIGIN(EEPROM) - 48, LENGTH = 16
  FILE_NAME     (rx)  : ORIGIN = ORIGIN(EEPROM) - 32, LENGTH = 32
 }
 
@@ -102,14 +101,6 @@ SECTIONS
     KEEP (*(.fini_array*))
     PROVIDE_HIDDEN (__fini_array_end = .);
   } >FLASH
-
-  .firmware_version :
-  {
-    . = ALIGN(4);
-	KEEP (*(.firmware_info))
-    . = ALIGN(4);
-  } >FLASH_VERSION
-
 
   /* The file name */
   .file_name :

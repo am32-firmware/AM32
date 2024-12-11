@@ -812,9 +812,11 @@ void commutate()
     }
     __enable_irq();
     changeCompInput();
-//	if (average_interval > 2500) {
-//      old_routine = 1;
-//   }
+#ifndef NO_POLLING_START
+	if (average_interval > 2500) {
+      old_routine = 1;
+   }
+#endif
     bemfcounter = 0;
     zcfound = 0;
    commutation_intervals[step - 1] = commutation_interval; // just used to calulate average
@@ -1499,17 +1501,24 @@ void zcfoundroutine()
     bad_count = 0;
 
     zero_crosses++;
+#ifdef NO_POLLING_START     // changes to interrupt mode after 30 zero crosses, does not re-enter
+       if (zero_crosses > 30) {
+            old_routine = 0;
+            enableCompInterrupts(); // enable interrupt
+        }
+#else
     if (eepromBuffer.stall_protection || eepromBuffer.rc_car_reverse) {
         if (zero_crosses >= 20 && commutation_interval <= 2000) {
             old_routine = 0;
             enableCompInterrupts(); // enable interrupt
         }
     } else {
-       if (zero_crosses > 30) {
+       if (commutation_interval < 2000) {
             old_routine = 0;
             enableCompInterrupts(); // enable interrupt
         }
     }
+ #endif
 }
 #ifdef BRUSHED_MODE
 void runBrushedLoop()
@@ -1619,20 +1628,6 @@ int main(void)
 
     loadEEpromSettings();
 
-#ifdef USE_MAKE
-    if (
-        firmware_info.version_major != eepromBuffer.version.major ||
-        firmware_info.version_minor != eepromBuffer.version.minor ||
-        eeprom_layout_version > eepromBuffer.eeprom_version
-    ) {
-        eepromBuffer.version.major = firmware_info.version_major;
-        eepromBuffer.version.minor = firmware_info.version_minor;
-        for (int i = 0; i < 12; i++) {
-            eepromBuffer.firmware_name[i] = firmware_info.device_name[i];
-        }
-        saveEEpromSettings();
-    }
-#else
     if (VERSION_MAJOR != eepromBuffer.version.major || VERSION_MINOR != eepromBuffer.version.minor || eeprom_layout_version > eepromBuffer.eeprom_version) {
         eepromBuffer.version.major = VERSION_MAJOR;
         eepromBuffer.version.minor = VERSION_MINOR;
@@ -1641,7 +1636,7 @@ int main(void)
         }
         saveEEpromSettings();
     }
-#endif
+
     // if (eepromBuffer.use_sine_start) {
         //    min_startup_duty = sin_mode_min_s_d;
     // }

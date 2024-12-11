@@ -90,7 +90,7 @@ void MX_IWDG_Init(void)
 void TIM1_Init(void)
 {
     crm_periph_clock_enable(CRM_TMR1_PERIPH_CLOCK, TRUE);
-    TMR1->pr = 3000;
+    TMR1->pr = TIM1_AUTORELOAD;
     TMR1->div = 0;
 
     TMR1->cm1 = 0x6868; // Channel 1 and 2 in PWM output mode
@@ -267,36 +267,6 @@ void LED_GPIO_init()
 void reloadWatchDogCounter()
 {
     WDT->cmd = WDT_CMD_RELOAD;
-}
-
-void disableComTimerInt() { COM_TIMER->iden &= ~TMR_OVF_INT; }
-
-void enableComTimerInt() { COM_TIMER->iden |= TMR_OVF_INT; }
-
-void setAndEnableComInt(uint16_t time)
-{
-    COM_TIMER->cval = 0;
-    COM_TIMER->pr = time;
-    COM_TIMER->ists = 0x00;
-    COM_TIMER->iden |= TMR_OVF_INT;
-}
-
-uint16_t getintervaTimerCount() { return INTERVAL_TIMER->cval; }
-
-void setintervaTimerCount(uint16_t intertime)
-{
-    INTERVAL_TIMER->cval = intertime;
-}
-
-void setPrescalerPWM(uint16_t presc) { TMR1->div = presc; }
-
-void setAutoReloadPWM(uint16_t relval) { TMR1->pr = relval; }
-
-void setDutyCycleAll(uint16_t newdc)
-{
-    TMR1->c1dt = newdc;
-    TMR1->c2dt = newdc;
-    TMR1->c3dt = newdc;
 }
 
 void setPWMCompare1(uint16_t compareone) { TMR1->c1dt = compareone; }

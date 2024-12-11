@@ -152,7 +152,7 @@ void MX_TIM1_Init(void)
 
     TIM_InitStruct.Prescaler = 0;
     TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
-    TIM_InitStruct.Autoreload = 1999;
+    TIM_InitStruct.Autoreload = TIM1_AUTORELOAD;
     TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
     TIM_InitStruct.RepetitionCounter = 0;
     LL_TIM_Init(TIM1, &TIM_InitStruct);
@@ -523,33 +523,6 @@ void initnFault()
 void reloadWatchDogCounter()
 {
     LL_IWDG_ReloadCounter(IWDG);
-}
-
-void disableComTimerInt() { COM_TIMER->DIER &= ~((0x1UL << (0U))); }
-
-void enableComTimerInt() { COM_TIMER->DIER |= (0x1UL << (0U)); }
-
-void setAndEnableComInt(uint16_t time)
-{
-    COM_TIMER->CNT = 0;
-    COM_TIMER->ARR = time;
-    COM_TIMER->SR = 0x00;
-    COM_TIMER->DIER |= (0x1UL << (0U));
-}
-
-uint16_t getintervaTimerCount() { return INTERVAL_TIMER->CNT; }
-
-void setintervaTimerCount(uint16_t intertime) { INTERVAL_TIMER->CNT = 0; }
-
-void setPrescalerPWM(uint16_t presc) { TIM1->PSC = presc; }
-
-void setAutoReloadPWM(uint16_t relval) { TIM1->ARR = relval; }
-
-void setDutyCycleAll(uint16_t newdc)
-{
-    TIM1->CCR1 = newdc;
-    TIM1->CCR2 = newdc;
-    TIM1->CCR3 = newdc;
 }
 
 inline void setPWMCompare1(uint16_t compareone) { TIM1->CCR1 = compareone; }

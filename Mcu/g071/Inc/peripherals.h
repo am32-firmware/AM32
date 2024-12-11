@@ -43,13 +43,6 @@ void MX_TIM16_Init(void);
 void MX_IWDG_Init(void);
 void MX_TIM6_Init(void);
 
-void disableComTimerInt(void);
-void enableComTimerInt(void);
-void setAndEnableComInt(uint16_t time);
-uint16_t getintervaTimerCount();
-void setintervaTimerCount(uint16_t intertime);
-void setAutoReloadPWM(uint16_t relval);
-void setDutyCycleAll(uint16_t newdc);
 void resetInputCaptureTimer();
 void setPWMCompare1(uint16_t compareone);
 void setPWMCompare2(uint16_t comparetwo);
@@ -57,4 +50,3 @@ void setPWMCompare3(uint16_t comparethree);
 void enableCorePeripherals(void);
 void reloadWatchDogCounter(void);
 void generatePwmTimerEvent(void);
-void setPrescalerPWM(uint16_t presc);

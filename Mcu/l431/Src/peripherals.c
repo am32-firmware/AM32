@@ -133,7 +133,7 @@ void MX_COMP1_Init(void)
   NVIC_SetPriority(COMP_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),0, 0));
   NVIC_EnableIRQ(COMP_IRQn);
 
-  COMP_InitStruct.PowerMode = LL_COMP_POWERMODE_MEDIUMSPEED;
+  COMP_InitStruct.PowerMode = LL_COMP_POWERMODE_HIGHSPEED;
   COMP_InitStruct.InputPlus = LL_COMP_INPUT_PLUS_IO3;
   COMP_InitStruct.InputMinus = LL_COMP_INPUT_MINUS_IO5;
   COMP_InitStruct.InputHysteresis = LL_COMP_HYSTERESIS_NONE;
@@ -191,7 +191,7 @@ void MX_COMP2_Init(void)
   /* USER CODE BEGIN COMP2_Init 1 */
 
   /* USER CODE END COMP2_Init 1 */
-  COMP_InitStruct.PowerMode = LL_COMP_POWERMODE_MEDIUMSPEED;
+  COMP_InitStruct.PowerMode = LL_COMP_POWERMODE_HIGHSPEED;
   COMP_InitStruct.InputPlus = LL_COMP_INPUT_PLUS_IO1;
   COMP_InitStruct.InputMinus = LL_COMP_INPUT_MINUS_IO2;
   COMP_InitStruct.InputHysteresis = LL_COMP_HYSTERESIS_NONE;
@@ -244,7 +244,7 @@ void MX_TIM1_Init(void)
 
     TIM_InitStruct.Prescaler = 0;
     TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
-    TIM_InitStruct.Autoreload = 3334;
+    TIM_InitStruct.Autoreload = TIM1_AUTORELOAD;
     TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
     TIM_InitStruct.RepetitionCounter = 0;
     LL_TIM_Init(TIM1, &TIM_InitStruct);
@@ -638,32 +638,7 @@ void reloadWatchDogCounter()
     LL_IWDG_ReloadCounter(IWDG);
 }
 
-void disableComTimerInt() { COM_TIMER->DIER &= ~((0x1UL << (0U))); }
-
-void enableComTimerInt() { COM_TIMER->DIER |= (0x1UL << (0U)); }
-
-void setAndEnableComInt(uint16_t time)
-{
-    COM_TIMER->CNT = 0;
-    COM_TIMER->ARR = time;
-    COM_TIMER->SR = 0x00;
-    COM_TIMER->DIER |= (0x1UL << (0U));
-}
-
-uint16_t getintervaTimerCount() { return INTERVAL_TIMER->CNT; }
-
 void setintervaTimerCount(uint16_t intertime) { INTERVAL_TIMER->CNT = 0; }
-
-void setPrescalerPWM(uint16_t presc) { TIM1->PSC = presc; }
-
-void setAutoReloadPWM(uint16_t relval) { TIM1->ARR = relval; }
-
-void setDutyCycleAll(uint16_t newdc)
-{
-    TIM1->CCR1 = newdc;
-    TIM1->CCR2 = newdc;
-    TIM1->CCR3 = newdc;
-}
 
 inline void setPWMCompare1(uint16_t compareone) { TIM1->CCR1 = compareone; }
 inline void setPWMCompare2(uint16_t comparetwo) { TIM1->CCR2 = comparetwo; }

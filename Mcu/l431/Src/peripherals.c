@@ -62,28 +62,69 @@ void SystemClock_Config(void)
   }
 
 #ifdef USE_HSE
+  /*
+    using high speed external oscillator
+   */
   LL_RCC_HSE_EnableBypass();
   LL_RCC_HSE_Enable();
 #if HSE_VALUE == 24000000
   LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_3, 20, LL_RCC_PLLR_DIV_2);
 #elif HSE_VALUE == 16000000
   LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_2, 20, LL_RCC_PLLR_DIV_2);
+#elif HSE_VALUE == 8000000
+  LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_1, 20, LL_RCC_PLLR_DIV_2);
 #else
 #error "Unsupported HSE_VALUE"
 #endif
 
-#else
+#elif defined(USE_LSE)
+  /*
+    using low speed external oscillator to trim MSI clock
+   */
   LL_RCC_MSI_Enable();
+  LL_RCC_LSI_Enable();
 
-   /* Wait till MSI is ready */
-  while(LL_RCC_MSI_IsReady() != 1)
-  {
+  /* Wait till MSI and LSI are ready */
+  while (LL_RCC_LSI_IsReady() != 1) ;
+  while (LL_RCC_MSI_IsReady() != 1) ;
+  while (LL_PWR_IsActiveFlag_VOS() != 0) ;
 
-  }
+  LL_RCC_MSI_DisablePLLMode();
+  LL_RCC_LSE_Enable();
+  LL_RCC_LSE_EnableBypass();
+  LL_RCC_LSE_SetDriveCapability(LL_RCC_LSEDRIVE_HIGH);
+
+  while (LL_RCC_LSE_IsReady() != 1) ;
+  LL_RCC_MSI_EnablePLLMode();
+
+  LL_RCC_SetRTCClockSource(LL_RCC_RTC_CLKSOURCE_LSE);
+  LL_RCC_EnableRTC();
+
   LL_RCC_MSI_EnableRangeSelection();
   LL_RCC_MSI_SetRange(LL_RCC_MSIRANGE_6);
   LL_RCC_MSI_SetCalibTrimming(0);
   LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_MSI, LL_RCC_PLLM_DIV_1, 40, LL_RCC_PLLR_DIV_2);
+
+#elif defined(USE_MSI)
+  /*
+    using medium speed internal oscillator
+   */
+  LL_RCC_MSI_Enable();
+  while(LL_RCC_MSI_IsReady() != 1) ;
+  LL_RCC_MSI_EnableRangeSelection();
+  LL_RCC_MSI_SetRange(LL_RCC_MSIRANGE_6);
+  LL_RCC_MSI_SetCalibTrimming(0);
+  LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_MSI, LL_RCC_PLLM_DIV_1, 40, LL_RCC_PLLR_DIV_2);
+#else
+  /*  default to using HSI16, which is best option for no external
+      oscillator
+   */
+  LL_RCC_HSI_Enable();
+
+  /* Wait till HSI is ready */
+  while (LL_RCC_HSI_IsReady() != 1) ;
+
+  LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSI, LL_RCC_PLLM_DIV_2, 20, LL_RCC_PLLR_DIV_2);
 #endif
 
   LL_RCC_PLL_EnableDomain_SYS();

@@ -165,6 +165,7 @@
 #define RAMP_SPEED_LOW_RPM 1
 #define RAMP_SPEED_HIGH_RPM 1
 #define LOOP_FREQUENCY_HZ 20000
+#define USE_LSE
 #endif
 
 #ifdef  REF_L431

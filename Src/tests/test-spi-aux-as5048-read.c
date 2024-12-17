@@ -8,6 +8,37 @@
 #include "mcu.h"
 
 
+// NOP
+// No operation dummy flag
+#define AS5048_REG_NOP 0x0000
+// Clear Error Flag
+// Error register. All errors are
+// cleared by access
+#define AS5048_REG_CEF 0x0001
+// Programming Control
+// Programming control register.
+// Programming must be enabled before burning
+// the fuse(s). After programming is a verification
+// mandatory. See programming procedure
+#define AS5048_REG_PC 0x0003
+// OTP Register Zero Position High
+// Zero Position value high byte
+#define AS5048_REG_ZPH 0x0016
+// OTP Register Zero Position Low 6 LSBs
+// Zero Position remaining 6 lower LSB's
+#define AS5048_REG_ZPL 0x0017
+// Diagnostics + Automatic Gain Control (AGC)
+// Diagnostic Flags
+// Automatic Gain Control value. 0 decimal
+// represents high magnetic field, 255 decimal
+// represents low magnetic field.
+#define AS5048_REG_DAGC 0x3FFD
+// Magnitude
+// Magnitude output value of the CORDIC
+#define AS5048_REG_MAGNITUDE 0x3FFE
+// Angle
+// Angle output value including zero position correction
+#define AS5048_REG_ANGLE 0x3FFF
 
 
 
@@ -42,7 +73,7 @@ spi_t* spi = &spis[AUX_AM32_SPI_PERIPH];
 
 int main()
 {
-    mcu_setup(250);
+    mcu_setup(32);
     // enable spi clock
     AUX_SPI_ENABLE_CLOCK();
 
@@ -112,13 +143,14 @@ int main()
     gpio_set_speed(&gpioSpiMOSI, 0b11);
 
     uint16_t data[] = {
-        DRV8323_READ | DRV8323_REG_FAULT_STATUS_1,
-        DRV8323_READ | DRV8323_REG_VGS_STATUS_2,
-        DRV8323_READ | DRV8323_REG_DRIVER_CONTROL,
-        DRV8323_READ | DRV8323_REG_GATE_DRIVE_HS,
-        DRV8323_READ | DRV8323_REG_GATE_DRIVE_LS,
-        DRV8323_READ | DRV8323_REG_OCP_CONTROL,
-        DRV8323_READ | DRV8323_REG_CSA_CONTROL,
+        0xFFFF,
+        0xFFFF,
+        0xFFFF,
+        0xFFFF,
+        0xFFFF,
+        0xFFFF,
+        0xFFFF,
+        0xFFFF,
     };
 
     while(1) {

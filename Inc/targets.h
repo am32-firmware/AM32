@@ -2194,6 +2194,10 @@
 #define CAN_STBY_GPIO_PORT GPIOA
 #define CAN_STBY_GPIO_PIN 15
 
+#define FDCAN_ENABLE_CLOCK() { \
+    RCC->APB1HENR |= RCC_APB1HENR_FDCANEN; \
+}
+
 
 /////////////////////////////////////////
 // CAN transceiver (MCP2542) control

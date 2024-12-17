@@ -16,7 +16,7 @@
 
 int main()
 {
-    mcu_setup(24);
+    mcu_setup(60);
     vreg5V_initialize();
     vreg5V_enable();
 

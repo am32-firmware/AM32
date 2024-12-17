@@ -12,7 +12,7 @@ static usart_t usart;
 
 int main()
 {
-    mcu_setup();
+    mcu_setup(250);
     AUX_USART_ENABLE_CLOCK();
     gpio_t gpioUsartRx = DEF_GPIO(AUX_USART_RX_PORT, AUX_USART_RX_PIN, AUX_USART_RX_AF, GPIO_AF);
     gpio_t gpioUsartTx = DEF_GPIO(AUX_USART_TX_PORT, AUX_USART_TX_PIN, AUX_USART_TX_AF, GPIO_AF);
@@ -32,7 +32,7 @@ int main()
     usart.txDmaRequest = AUX_USART_TX_DMA_REQ;
     usart.rxDmaRequest = AUX_USART_RX_DMA_REQ;
 
-    usart._baudrate = 921600;
+    usart._baudrate = 3000000;
     usart.swap = 0;
     usart_initialize(&usart);
 

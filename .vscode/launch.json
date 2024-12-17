@@ -23,6 +23,27 @@
         ],
         "svdFile": "svd/stm32h5/STM32H563.svd"
       },
+      // CMSIS-DAP configuration
+      {
+        "name": "H5-CMSIS-DAP",
+        "cwd": "${workspaceRoot}",
+        "executable": "${workspaceFolder}/obj/debug.elf",
+        "request": "launch",
+        "type": "cortex-debug",
+        "liveWatch": {
+          "enabled": true,
+          "samplesPerSecond": 10,
+        },
+        "servertype": "openocd",
+        "configFiles": [
+          "openocd-h5-cmsis-dap.cfg"
+            // "interface/stlink-dap.cfg",
+            // "board/st_nucleo_h5.cfg"
+            // "${workspaceFolder}/obj/openocd.cfg"
+
+        ],
+        "svdFile": "svd/stm32h5/STM32H563.svd"
+      },
       {
         "name": "AM32 STLink",
         "cwd": "${workspaceFolder}",
@@ -57,7 +78,7 @@
         "swoConfig": {
           "enabled": false,
         },
-        "serialNumber": "", 
+        "serialNumber": "",
         "liveWatch": {
           "enabled": true,
           "samplesPerSecond": 4

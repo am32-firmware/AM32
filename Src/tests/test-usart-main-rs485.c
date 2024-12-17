@@ -16,10 +16,8 @@ usart_t usart;
 
 int main()
 {
-    mcu_setup();
+    mcu_setup(250);
     MAIN_USART_ENABLE_CLOCK();
-
-
 
     usart.ref = MAIN_USART_REF;
 
@@ -40,9 +38,10 @@ int main()
     // gpio_initialize(&gpioUsartRx);
     gpio_initialize(&gpioUsartTx);
 
-    gpio_t gpioRS485Enable = DEF_GPIO(RS485_ENABLE_PORT, RS485_ENABLE_PIN, 0, GPIO_OUTPUT);
+    gpio_t gpioRS485Enable = DEF_GPIO(RS485_ENABLE_PORT, RS485_ENABLE_PIN, 0, GPIO_INPUT);
     gpio_initialize(&gpioRS485Enable);
-    gpio_set(&gpioRS485Enable);
+    gpio_configure_pupdr(&gpioRS485Enable, GPIO_PULL_DOWN);
+    // gpio_reset(&gpioRS485Enable);
 
     while(1) {
         usart_write_string(&usart, "hello world\n");

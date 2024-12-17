@@ -61,6 +61,17 @@ typedef struct {
     uint8_t _irqn;
 } spi_t;
 
+typedef enum {
+    SPI_1 = 0,
+    SPI_2 = 1,
+    SPI_3 = 2,
+    SPI_4 = 3,
+    SPI_5 = 4,
+    SPI_6 = 5,
+} spi_e;
+
+extern spi_t spis[];
+
 void spi_dma_transfer_complete_isr(spi_t* spi);
 void spi_configure_rcc_clock_selection(spi_t* spi, uint8_t selection);
 void spi_initialize(spi_t* spi);

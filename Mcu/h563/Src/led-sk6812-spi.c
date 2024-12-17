@@ -16,9 +16,9 @@ uint8_t data[26];
 #define LED_T0 (0b11000000)
 #define LED_T1 (0b11110000)
 
-uint16_t spi_rx_buffer[256];
-uint16_t spi_tx_buffer[256];
-spi_t spi;
+uint16_t led_spi_rx_buffer[256];
+uint16_t led_spi_tx_buffer[256];
+static spi_t* spi = &spis[LED_AM32_SPI_PERIPH];
 
 void led_initialize()
 {
@@ -42,23 +42,23 @@ void led_initialize()
         LED_SPI_MOSI_AF,
         GPIO_AF);
 
-    spi.ref = LED_SPI_PERIPH;
+    spi->ref = LED_SPI_PERIPH;
 
     // configure spi kernel clock as HSE via per_ck (25MHz)
-    spi_configure_rcc_clock_selection(&spi, 0b100);
+    spi_configure_rcc_clock_selection(spi, 0b100);
 
-    spi._rx_buffer = spi_rx_buffer;
-    spi._tx_buffer = spi_tx_buffer;
-    spi._rx_buffer_size = 256;
-    spi._tx_buffer_size = 256;
-    spi.rxDma = &dmaChannels[LED_RX_DMA_CHANNEL];
-    spi.txDma = &dmaChannels[LED_TX_DMA_CHANNEL];
+    spi->_rx_buffer = led_spi_rx_buffer;
+    spi->_tx_buffer = led_spi_tx_buffer;
+    spi->_rx_buffer_size = 256;
+    spi->_tx_buffer_size = 256;
+    spi->rxDma = &dmaChannels[LED_RX_DMA_CHANNEL];
+    spi->txDma = &dmaChannels[LED_TX_DMA_CHANNEL];
 
-    spi.txDmaRequest = LL_GPDMA1_REQUEST_SPI2_TX;
-    spi.rxDmaRequest = LL_GPDMA1_REQUEST_SPI2_RX;
+    spi->txDmaRequest = LL_GPDMA1_REQUEST_SPI2_TX;
+    spi->rxDmaRequest = LL_GPDMA1_REQUEST_SPI2_RX;
 
-    spi.CFG1_MBR = 0b001; // kernel clock / 2
-    spi_initialize(&spi);
+    spi->CFG1_MBR = 0b001; // kernel clock / 2
+    spi_initialize(spi);
 
     gpio_initialize(&gpioSpiSCK);
     gpio_initialize(&gpioSpiMOSI);
@@ -84,6 +84,6 @@ void led_write(uint32_t brg)
             data[i+2] = LED_T0;
         }
     }
-    spi_reset_buffers(&spi);
-    spi_write(&spi, (uint16_t*)data, 13);
+    spi_reset_buffers(spi);
+    spi_write(spi, (uint16_t*)data, 13);
 }

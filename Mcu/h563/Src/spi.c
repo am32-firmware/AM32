@@ -23,7 +23,14 @@ is ignored.
 the 5-bit command data.
 */
 
-extern spi_t spi;
+spi_t spis[] = {
+    {.ref = SPI1},
+    {.ref = SPI2},
+    {.ref = SPI3},
+    {.ref = SPI4},
+    {.ref = SPI5},
+    {.ref = SPI6},
+};
 
 void spi_dma_cb(dmaChannel_t* dma)
 {
@@ -153,7 +160,7 @@ void spi_initialize(spi_t* spi)
 
     // set clock polarity
     // spi->ref->CFG2 |= SPI_CFG2_CPOL;
-    
+
     // set clock phase
     // data is captured on the falling edge of SCK
     spi->ref->CFG2 |= SPI_CFG2_CPHA;
@@ -270,7 +277,7 @@ void spi_start_tx_dma_transfer(spi_t* spi)
         // spi must be disabled to set TSIZE
         spi->ref->CR2 = spi->_dma_transfer_count;
         // spi->ref->CR2 = 1;
-        
+
 
         spi->txDma->ref->CBR1 = spi->_dma_transfer_count*2;
         // spi->txDma->ref->CBR1 = spi->_dma_transfer_count*2;
@@ -354,26 +361,40 @@ void spi_start_transfer(spi_t* spi)
     spi->ref->CR1 |= SPI_CR1_CSTART; // spi must be enabled
 }
 
+void SPI_IRQHandler(spi_t* spi)
+{
+    spi->ref->IFCR |= SPI_IFCR_EOTC;
+    spi_disable(spi);
+    spi_start_tx_dma_transfer(spi);
+    // spi_dma_transfer_complete_isr(&spi);
+}
+
+void SPI1_IRQHandler(void)
+{
+    SPI_IRQHandler(&spis[SPI_1]);
+}
+
 void SPI2_IRQHandler(void)
 {
-    spi.ref->IFCR |= SPI_IFCR_EOTC;
-    spi_disable(&spi);
-    spi_start_tx_dma_transfer(&spi);
-    // spi_dma_transfer_complete_isr(&spi);
+    SPI_IRQHandler(&spis[SPI_2]);
+}
+
+void SPI3_IRQHandler(void)
+{
+    SPI_IRQHandler(&spis[SPI_3]);
 }
 
 void SPI4_IRQHandler(void)
 {
-    spi.ref->IFCR |= SPI_IFCR_EOTC;
-    spi_disable(&spi);
-    spi_start_tx_dma_transfer(&spi);
-    // spi_dma_transfer_complete_isr(&spi);
+    SPI_IRQHandler(&spis[SPI_4]);
 }
 
 void SPI5_IRQHandler(void)
 {
-    spi.ref->IFCR |= SPI_IFCR_EOTC;
-    spi_disable(&spi);
-    spi_start_tx_dma_transfer(&spi);
-    // spi_dma_transfer_complete_isr(&spi);
+    SPI_IRQHandler(&spis[SPI_5]);
+}
+
+void SPI6_IRQHandler(void)
+{
+    SPI_IRQHandler(&spis[SPI_6]);
 }

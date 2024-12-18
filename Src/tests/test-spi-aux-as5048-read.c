@@ -124,8 +124,8 @@ int main()
     // spi.CFG1_MBR = 0b010; // prescaler = 8 // this DOES NOT work on blueesc
     // spi.CFG1_MBR = 0b011; // prescaler = 16 // this DOES NOT work on blueesc
     // spi.CFG1_MBR = 0b100; // prescaler = 32 // this works on blueesc
-    spi->CFG1_MBR = 0b101; // prescaler = 64 // this works on blueesc
-    // spi.CFG1_MBR = 0b100; // prescaler = 128 // this works on blueesc
+    // spi->CFG1_MBR = 0b101; // prescaler = 64 // this works on blueesc
+    spi->CFG1_MBR = 0b100; // prescaler = 128 // this works on blueesc
     // spi.CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
 
     spi->ref = AUX_SPI_PERIPH;

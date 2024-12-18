@@ -192,8 +192,8 @@ void spi_initialize(spi_t* spi)
             NVIC_EnableIRQ(SPI5_IRQn);
             break;
     }
-    // // enable rx dma requests
-    // spi->ref->CFG1 |= SPI_CFG1_RXDMAEN;
+    // enable rx dma requests
+    spi->ref->CFG1 |= SPI_CFG1_RXDMAEN;
 
     // set DSIZE (frame width) to 16 bits
     spi->ref->CFG1 |= 0b01111 << SPI_CFG1_DSIZE_Pos;
@@ -224,7 +224,7 @@ uint8_t spi_read(spi_t* spi, uint16_t* word, uint8_t length) {
 // rxhead = 0 CNDTR=255 = 1 data waiting
 // rxhead = CNDTR-256 = rx empty
 uint8_t spi_rx_waiting(spi_t* spi) {
-    return 256 - (spi->rxDma->ref->CBR1/2 & DMA_CBR1_BNDT_Msk) - spi->_rx_head;
+    return 256 - (spi->rxDma->ref->CBR1 & DMA_CBR1_BNDT_Msk)/2 - spi->_rx_head;
 }
 
 // how many bytes are waiting to be shifted out

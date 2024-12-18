@@ -73,7 +73,7 @@ spi_t* spi = &spis[AUX_AM32_SPI_PERIPH];
 
 int main()
 {
-    mcu_setup(64);
+    mcu_setup(250);
     // enable spi clock
     AUX_SPI_ENABLE_CLOCK();
 
@@ -119,14 +119,14 @@ int main()
     // others: reserved, the kernel clock is disabled
     // spi_configure_rcc_clock_selection(spi, 0b101);
 
-    // spi.CFG1_MBR = 0b000; // prescaler = 2 // this DOES NOT work on blueesc
-    // spi.CFG1_MBR = 0b001; // prescaler = 4 // this DOES NOT work on blueesc
-    // spi.CFG1_MBR = 0b010; // prescaler = 8 // this DOES NOT work on blueesc
-    // spi.CFG1_MBR = 0b011; // prescaler = 16 // this DOES NOT work on blueesc
-    // spi.CFG1_MBR = 0b100; // prescaler = 32 // this works on blueesc
+    // spi->CFG1_MBR = 0b000; // prescaler = 2 // this DOES NOT work on blueesc
+    // spi->CFG1_MBR = 0b001; // prescaler = 4 // this DOES NOT work on blueesc
+    // spi->CFG1_MBR = 0b010; // prescaler = 8 // this DOES NOT work on blueesc
+    // spi->CFG1_MBR = 0b011; // prescaler = 16 // this DOES NOT work on blueesc
+    // spi->CFG1_MBR = 0b100; // prescaler = 32 // this works on blueesc
     // spi->CFG1_MBR = 0b101; // prescaler = 64 // this works on blueesc
-    spi->CFG1_MBR = 0b100; // prescaler = 128 // this works on blueesc
-    // spi.CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
+    // spi->CFG1_MBR = 0b100; // prescaler = 128 // this works on blueesc
+    spi->CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
 
     spi->ref = AUX_SPI_PERIPH;
 
@@ -145,6 +145,8 @@ int main()
     gpio_initialize(&gpioSpiSCK);
     gpio_initialize(&gpioSpiMISO);
     gpio_initialize(&gpioSpiMOSI);
+
+    gpio_configure_pupdr(&gpioSpiMISO, GPIO_PULL_UP);
 
     gpio_set_speed(&gpioSpiNSS, 0b11);
     gpio_set_speed(&gpioSpiSCK, 0b11);

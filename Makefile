@@ -75,7 +75,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-debug.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-delay.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-drv8323.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-drv8323-spi-read.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-drv8323-spi-read.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom-erase.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom-read.c
@@ -94,7 +94,7 @@ SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-drv8323-spi-read.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-nothing.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-rng.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-phaseouts.c
-# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-aux-as5048-read.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-aux-as5048-read.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma-single.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-ten-khz-timer.c

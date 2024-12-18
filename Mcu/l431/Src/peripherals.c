@@ -71,17 +71,15 @@ void SystemClock_Config(void)
 #endif
 
 #else
-  LL_RCC_MSI_Enable();
+  LL_RCC_HSI_Enable();
 
    /* Wait till MSI is ready */
-  while(LL_RCC_MSI_IsReady() != 1)
+  while(LL_RCC_HSI_IsReady() != 1)
   {
 
   }
-  LL_RCC_MSI_EnableRangeSelection();
-  LL_RCC_MSI_SetRange(LL_RCC_MSIRANGE_6);
-  LL_RCC_MSI_SetCalibTrimming(0);
-  LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_MSI, LL_RCC_PLLM_DIV_1, 40, LL_RCC_PLLR_DIV_2);
+  LL_RCC_HSI_SetCalibTrimming(16);
+  LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSI, LL_RCC_PLLM_DIV_1, 10, LL_RCC_PLLR_DIV_2);
 #endif
 
   LL_RCC_PLL_EnableDomain_SYS();

@@ -74,7 +74,7 @@ spi_t* spi = &spis[AUX_AM32_SPI_PERIPH];
 
 int main()
 {
-    mcu_setup(48);
+    mcu_setup(250);
     vreg5V_initialize();
     vreg5V_enable();
 
@@ -116,10 +116,10 @@ int main()
     // spi->CFG1_MBR = 0b001; // prescaler = 4 // this DOES NOT work on blueesc
     // spi->CFG1_MBR = 0b010; // prescaler = 8 // this DOES NOT work on blueesc
     // spi->CFG1_MBR = 0b011; // prescaler = 16 // this DOES NOT work on blueesc
-    // spi->CFG1_MBR = 0b100; // prescaler = 32 // this works on blueesc
+    spi->CFG1_MBR = 0b100; // prescaler = 32 // this works on blueesc
     // spi->CFG1_MBR = 0b101; // prescaler = 64 // this works on blueesc
     // spi->CFG1_MBR = 0b100; // prescaler = 128 // this works on blueesc
-    spi->CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
+    // spi->CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
 
     spi->ref = AUX_SPI_PERIPH;
 

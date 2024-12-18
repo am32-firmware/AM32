@@ -26,9 +26,10 @@
 #include "dma.h"
 #include "mcu.h"
 
-// static uint16_t spi_rx_buffer[256];
-// static uint16_t spi_tx_buffer[256];
-// spi_t spi;
+static uint16_t spi_rx_buffer[256];
+static uint16_t spi_tx_buffer[256];
+static spi_t* spi = &spis[GATE_DRIVER_AM32_SPI_PERIPH];
+
 uint16_t readData[7];
 const uint16_t defaultData[7] = {
     0,
@@ -47,11 +48,12 @@ bool compare()
             for (;;); // spin forever
         }
     }
+    return true;
 }
 
 int main()
 {
-    mcu_setup();
+    mcu_setup(250);
     // enable spi clock
     GATE_DRIVER_SPI_ENABLE_CLOCK();
 
@@ -101,7 +103,7 @@ int main()
         GPIO_AF);
 
 
-    spi.ref = SPI5;
+    spi->ref = SPI5;
 
 
     // 000: rcc_pclk3 selected as kernel clock (default after reset)
@@ -111,23 +113,23 @@ int main()
     // 100: csi_ker_ck selected as kernel clock
     // 101: hse_ck selected as kernel clock
     // others: reserved, the kernel clock is disabled
-    spi_configure_rcc_clock_selection(&spi, 0b101);
+    spi_configure_rcc_clock_selection(spi, 0b101);
 
 
-    spi._rx_buffer = spi_rx_buffer;
-    spi._tx_buffer = spi_tx_buffer;
-    spi._rx_buffer_size = 256;
-    spi._tx_buffer_size = 256;
-    spi.rxDma = &dmaChannels[7];
-    spi.txDma = &dmaChannels[0];
-    spi.txDmaRequest = LL_GPDMA1_REQUEST_SPI5_TX;
-    spi.rxDmaRequest = LL_GPDMA1_REQUEST_SPI5_RX;
-    // spi.CFG1_MBR = 0b011; // prescaler = 16 // this DOES NOT work on blueesc
-    // spi.CFG1_MBR = 0b100; // prescaler = 32 // this works on blueesc
-    spi.CFG1_MBR = 0b101; // prescaler = 64 // this works on blueesc
-    // spi.CFG1_MBR = 0b100; // prescaler = 128 // this works on blueesc
-    // spi.CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
-    spi_initialize(&spi);
+    spi->_rx_buffer = spi_rx_buffer;
+    spi->_tx_buffer = spi_tx_buffer;
+    spi->_rx_buffer_size = 256;
+    spi->_tx_buffer_size = 256;
+    spi->rxDma = &dmaChannels[7];
+    spi->txDma = &dmaChannels[0];
+    spi->txDmaRequest = LL_GPDMA1_REQUEST_SPI5_TX;
+    spi->rxDmaRequest = LL_GPDMA1_REQUEST_SPI5_RX;
+    // spi->CFG1_MBR = 0b011; // prescaler = 16 // this DOES NOT work on blueesc
+    // spi->CFG1_MBR = 0b100; // prescaler = 32 // this works on blueesc
+    spi->CFG1_MBR = 0b101; // prescaler = 64 // this works on blueesc
+    // spi->CFG1_MBR = 0b100; // prescaler = 128 // this works on blueesc
+    // spi->CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
+    spi_initialize(spi);
 
 
 
@@ -149,9 +151,9 @@ int main()
     };
 
     while(1) {
-        spi_write(&spi, data, 7);
-        while(spi_rx_waiting(&spi) < 7);
-        spi_read(&spi, readData, 7);
+        spi_write(spi, data, 7);
+        while(spi_rx_waiting(spi) < 7);
+        spi_read(spi, readData, 7);
         compare();
     }
 }

@@ -6,6 +6,7 @@
 #include "gpio.h"
 #include "dma.h"
 #include "mcu.h"
+#include "vreg.h"
 
 
 // NOP
@@ -74,19 +75,11 @@ spi_t* spi = &spis[AUX_AM32_SPI_PERIPH];
 int main()
 {
     mcu_setup(250);
+    vreg5V_initialize();
+    vreg5V_enable();
+
     // enable spi clock
     AUX_SPI_ENABLE_CLOCK();
-
-    // enable 5V regulator
-    gpio_t gpioVreg5VEnable = DEF_GPIO(
-        VREG_5V_ENABLE_PORT,
-        VREG_5V_ENABLE_PIN,
-        0,
-        GPIO_OUTPUT);
-    gpio_initialize(&gpioVreg5VEnable);
-    // gpio_set_speed(&gpioVreg5VEnable, 0b11);
-    gpio_set(&gpioVreg5VEnable);
-
 
     gpio_t gpioSpiNSS = DEF_GPIO(
         AUX_SPI_NSS_PORT,

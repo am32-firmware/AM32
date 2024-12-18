@@ -21,7 +21,7 @@ void vreg5V_enable()
     gpio_set(&gpioVreg5VEnable);
     // pgood won't pass if powered only by 5V through diode
     // on main 4-pin connector
-    // while (!vreg5V_pgood());
+    while (!vreg5V_pgood());
 }
 
 void vreg5V_disable()

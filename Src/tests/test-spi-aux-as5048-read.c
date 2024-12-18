@@ -74,7 +74,7 @@ spi_t* spi = &spis[AUX_AM32_SPI_PERIPH];
 
 int main()
 {
-    mcu_setup(250);
+    mcu_setup(48);
     vreg5V_initialize();
     vreg5V_enable();
 
@@ -161,6 +161,9 @@ int main()
         spi_write(spi, data, 7);
         while(spi_rx_waiting(spi) < 7);
         spi_read(spi, readData, 7);
-        compare();
+        for (int i = 0; i < 7; i ++) {
+            readData[i] = readData[i] & 0x3FFF;
+        }
+        // compare();
     }
 }

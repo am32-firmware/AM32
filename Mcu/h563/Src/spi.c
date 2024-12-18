@@ -335,7 +335,7 @@ uint16_t spi_write_word(spi_t* spi, uint16_t word)
     // for some reason these flags must be cleared here
     // even though they are (at least externally) cleared
     // automatically when disable and enable are called
-    spi->ref->IFCR |= SPI_IFCR_TXTFC | SPI_IFCR_EOTC;
+    spi->ref->IFCR = SPI_IFCR_TXTFC | SPI_IFCR_EOTC;
     spi->ref->CR2 = 1;
     spi_enable(spi);
     spi->ref->TXDR = word;

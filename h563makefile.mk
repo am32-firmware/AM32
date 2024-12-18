@@ -3,7 +3,7 @@ TARGETS_H563 := $(call get_targets,H563)
 
 HAL_FOLDER_H563 := $(HAL_FOLDER)/h563
 
-MCU_H563 := -mcpu=cortex-m33 -mthumb 
+MCU_H563 := -mcpu=cortex-m33 -mthumb
 LDSCRIPT_H563 := $(HAL_FOLDER_H563)/STM32H563AGI6_FLASH.ld
 
 
@@ -38,6 +38,7 @@ SRC_H563 := \
 	$(SRC_DIR_H563_SRC)/eeprom.c \
 	$(SRC_DIR_H563_SRC)/comparator.c \
 	$(SRC_DIR_H563_SRC)/ADC.c \
+	$(SRC_DIR_H563_SRC)/as5048-spi.c \
 	$(SRC_DIR_H563_SRC)/spi.c \
 	$(SRC_DIR_H563_SRC)/clock.c \
 	$(SRC_DIR_H563_SRC)/flash.c \
@@ -65,4 +66,4 @@ SRC_H563 := \
 	$(SRC_DIR_H563_HAL)/stm32h5xx_ll_rcc.c \
 	$(SRC_DIR_H563_HAL)/stm32h5xx_ll_gpio.c \
 	$(SRC_DIR_H563_HAL)/stm32h5xx_ll_tim.c
-	
+

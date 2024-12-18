@@ -116,7 +116,7 @@ int main()
     // spi->CFG1_MBR = 0b001; // prescaler = 4 // this DOES NOT work on blueesc
     // spi->CFG1_MBR = 0b010; // prescaler = 8 // this DOES NOT work on blueesc
     // spi->CFG1_MBR = 0b011; // prescaler = 16 // this DOES NOT work on blueesc
-    spi->CFG1_MBR = 0b100; // prescaler = 32 // this works on blueesc
+    spi->CFG1_MBR = SPI_MBR_DIV_32; // prescaler = 32 // this works on blueesc
     // spi->CFG1_MBR = 0b101; // prescaler = 64 // this works on blueesc
     // spi->CFG1_MBR = 0b100; // prescaler = 128 // this works on blueesc
     // spi->CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
@@ -141,10 +141,10 @@ int main()
 
     gpio_configure_pupdr(&gpioSpiMISO, GPIO_PULL_UP);
 
-    gpio_set_speed(&gpioSpiNSS, 0b11);
-    gpio_set_speed(&gpioSpiSCK, 0b11);
-    gpio_set_speed(&gpioSpiMISO, 0b11);
-    gpio_set_speed(&gpioSpiMOSI, 0b11);
+    gpio_set_speed(&gpioSpiNSS, GPIO_SPEED_VERYFAST);
+    gpio_set_speed(&gpioSpiSCK, GPIO_SPEED_VERYFAST);
+    gpio_set_speed(&gpioSpiMISO, GPIO_SPEED_VERYFAST);
+    gpio_set_speed(&gpioSpiMOSI, GPIO_SPEED_VERYFAST);
 
     uint16_t data[] = {
         0xFFFF,

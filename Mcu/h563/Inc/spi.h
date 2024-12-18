@@ -37,6 +37,15 @@
 #define DRV8323_WRITE (0 << 15)
 #define DRV8323_READ (1 << 15)
 
+#define SPI_MBR_DIV_2 0b000
+#define SPI_MBR_DIV_4 0b001
+#define SPI_MBR_DIV_8 0b010
+#define SPI_MBR_DIV_16 0b011
+#define SPI_MBR_DIV_32 0b100
+#define SPI_MBR_DIV_64 0b101
+#define SPI_MBR_DIV_128 0b110
+#define SPI_MBR_DIV_256 0b111
+
 typedef struct {
     SPI_TypeDef* ref;
 

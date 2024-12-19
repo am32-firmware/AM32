@@ -32,6 +32,56 @@ spi_t spis[] = {
     {.ref = SPI6},
 };
 
+
+
+// enable spi end of transfer (EOT) interrupts
+void spi_interrupt_enable_eotie(spi_t* spi)
+{
+    spi->ref->IER |= SPI_IER_EOTIE;
+}
+
+// disable spi end of transfer (EOT) interrupts
+void spi_interrupt_disable_eotie(spi_t* spi)
+{
+    spi->ref->IER &= ~SPI_IER_EOTIE;
+}
+
+// enable spi tx dma requests
+void spi_dma_tx_enable(spi_t* spi)
+{
+    spi->ref->CFG1 |= SPI_CFG1_TXDMAEN;
+}
+
+// disable spi tx dma requests
+void spi_dma_tx_disable(spi_t* spi)
+{
+    spi->ref->CFG1 &= ~SPI_CFG1_TXDMAEN;
+}
+
+// enable spi rx dma requests
+void spi_dma_rx_enable(spi_t* spi)
+{
+    spi->ref->CFG1 |= SPI_CFG1_RXDMAEN;
+}
+
+// disable spi rx dma requests
+void spi_dma_rx_disable(spi_t* spi)
+{
+    spi->ref->CFG1 &= ~SPI_CFG1_RXDMAEN;
+}
+void spi_dma_enable(spi_t* spi)
+{
+    spi_dma_rx_enable(spi);
+    spi_dma_tx_enable(spi);
+}
+
+void spi_dma_disable(spi_t* spi)
+{
+    spi_dma_rx_disable(spi);
+    spi_dma_tx_disable(spi);
+}
+
+
 void spi_dma_cb(dmaChannel_t* dma)
 {
     // dma->ref->CFCR |= DMA_IT_TCIF << dma->flagsShift;
@@ -193,26 +243,26 @@ void spi_initialize(spi_t* spi)
 
     // // enable TXC TxFIFO transmission complete interrupt
     // spi->ref->IER |= SPI_IER_EOTIE;
-    // switch((uint32_t)spi->ref) {
-    //     case SPI1_BASE:
-    //         NVIC_EnableIRQ(SPI1_IRQn);
-    //         break;
-    //     case SPI2_BASE:
-    //         NVIC_EnableIRQ(SPI2_IRQn);
-    //         break;
-    //     case SPI3_BASE:
-    //         NVIC_EnableIRQ(SPI3_IRQn);
-    //         break;
-    //     case SPI4_BASE:
-    //         NVIC_EnableIRQ(SPI4_IRQn);
-    //         break;
-    //     case SPI5_BASE:
-    //         NVIC_EnableIRQ(SPI5_IRQn);
-    //         break;
-    //     case SPI6_BASE:
-    //         NVIC_EnableIRQ(SPI6_IRQn);
-    //         break;
-    //     }
+    switch((uint32_t)spi->ref) {
+        case SPI1_BASE:
+            NVIC_EnableIRQ(SPI1_IRQn);
+            break;
+        case SPI2_BASE:
+            NVIC_EnableIRQ(SPI2_IRQn);
+            break;
+        case SPI3_BASE:
+            NVIC_EnableIRQ(SPI3_IRQn);
+            break;
+        case SPI4_BASE:
+            NVIC_EnableIRQ(SPI4_IRQn);
+            break;
+        case SPI5_BASE:
+            NVIC_EnableIRQ(SPI5_IRQn);
+            break;
+        case SPI6_BASE:
+            NVIC_EnableIRQ(SPI6_IRQn);
+            break;
+        }
     // // enable rx dma requests
     // spi->ref->CFG1 |= SPI_CFG1_RXDMAEN;
 
@@ -379,6 +429,7 @@ void spi_start_transfer(spi_t* spi)
 {
     spi->ref->CR1 |= SPI_CR1_CSTART; // spi must be enabled
 }
+
 
 void SPI_IRQHandler(spi_t* spi)
 {

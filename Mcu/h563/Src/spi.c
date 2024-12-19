@@ -329,7 +329,7 @@ void spi_start_tx_dma_transfer(spi_t* spi)
     //     // dma busy doing transfer
     //     return;
     // }
-    if (spi->ref->CR1 & SPI_CR1_SPE) {
+    if (spi_busy(spi)) {
         // spi busy doing transfer
         return;
     }
@@ -395,12 +395,17 @@ void spi_write(spi_t* spi, const uint16_t* data, uint8_t length)
     spi_start_tx_dma_transfer(spi);
 }
 
+bool spi_busy(spi_t* spi)
+{
+    return spi->ref->CR1 & SPI_CR1_SPE;
+}
+
 // write one word to the spi, wait for the word to be
 // shifted out on the wire, return the word recieved on
 // MISO during the transmission
 uint16_t spi_write_word(spi_t* spi, uint16_t word)
 {
-    while (spi->ref->CR1 & SPI_CR1_SPE) {
+    while (spi_busy(spi)) {
         // spi busy doing transfer
     }
     // spi_disable(spi);

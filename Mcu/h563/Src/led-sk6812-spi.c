@@ -5,13 +5,15 @@
 #include "spi.h"
 #include "vreg.h"
 
+#include <string.h>
 
 // 2 bytes for leading 0 to prevent glitch on mosi line
 // (MOSI line is pulled to the value of the first bit) for
 // a moment before data transfer commences after spi
 // is enabled
 // 24 bytes for 24bit brg data
-uint8_t data[26];
+// uint8_t data[26];
+uint8_t data[255];
 
 #define LED_T0 (0b11000000)
 #define LED_T1 (0b11110000)
@@ -70,6 +72,22 @@ void led_initialize()
 
     data[0] = 0;
     data[1] = 0;
+
+    memcpy(&data[26], &data[0], 200);
+    // data[26] = 0;
+    // data[27] = 0;
+    // data[28] = 0;
+    // data[29] = 0;
+    // data[30] = 0;
+    // data[31] = 0;
+    // data[32] = 0;
+    // data[33] = 0;
+    // data[34] = 0;
+    // data[35] = 0;
+    // data[36] = 0;
+    // data[37] = 0;
+    // data[38] = 0;
+    // data[39] = 0;
 }
 
 void led_off(void)
@@ -86,8 +104,13 @@ void led_write(uint32_t brg)
             data[i+2] = LED_T0;
         }
     }
+
+    while (spi_busy(spi));
     // do this so that buffer does not wrap and interrupt bitstream
     spi_reset_buffers(spi);
-    spi_write(spi, (uint16_t*)data, 13);
-    while (spi_tx_waiting(spi));
+    spi_write(spi, (uint16_t*)data, 150);
+    // while (spi_busy(spi));
+    // for (int i = 0; i < 0xfff; i++) {
+    //     asm("nop");
+    // }
 }

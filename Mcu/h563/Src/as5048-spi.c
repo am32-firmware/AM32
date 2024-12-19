@@ -244,11 +244,13 @@ uint16_t as5048_get_angle_degrees(as5048_t* as5048)
     return angle_degrees;
 }
 
+// read the 14-bit angle value from the device
 uint16_t as5048_read_angle(as5048_t* as5048)
 {
     return as5048_read_reg(as5048, AS5048_REG_ANGLE);
 }
 
+// read the zero position setting
 uint16_t as5048_read_zero_position(as5048_t* as5048)
 {
 
@@ -257,7 +259,6 @@ uint16_t as5048_read_zero_position(as5048_t* as5048)
 
     uint16_t zero_position = (zph << 6) & zpl;
     return zero_position;
-
 }
 
 bool as5048_set_zero_position(as5048_t* as5048)

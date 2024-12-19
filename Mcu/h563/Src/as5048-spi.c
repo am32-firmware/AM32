@@ -52,10 +52,14 @@
 // there is an even number of '1' bits in the command
 #define AS5048_CMD_PARITY_EVEN (0 << AS5048_CMD_PARITY_Pos)
 
+#define AS5048_CMD_PARITY AS5048_CMD_PARITY_ODD
+
 // 14th bit of command is read (1) / write (0) flag
 #define AS5048_CMD_RW_Pos AS5048_PKG_FLAG_Pos
 #define AS5048_CMD_READ (1 << AS5048_CMD_RW_Pos)
 #define AS5048_CMD_WRITE (0 << AS5048_CMD_RW_Pos)
+
+#define AS5048_CMD_RW_FLAG AS5048_CMD_READ
 
 #define AS5048_CMD_READ_NOP (AS5048_CMD_PARITY_ODD | AS5048_CMD_READ | AS5048_REG_NOP)
 #define AS5048_CMD_READ_CEF (AS5048_CMD_PARITY_EVEN | AS5048_CMD_READ | AS5048_REG_CEF)
@@ -137,27 +141,59 @@ void as5048_initialize_spi(as5048_t* as5048)
 
     // // a 250MHz kernel clock / 32 gives an SPI clock of 7.8125MHz
     // as5048->spi->CFG1_MBR = SPI_MBR_DIV_32; // prescaler = 32
+    // a 250MHz kernel clock / 64 gives an SPI clock of ~3.91MHz
+    as5048->spi->CFG1_MBR = SPI_MBR_DIV_64; // prescaler = 64
     // // a 250MHz kernel clock / 128 gives an SPI clock of ~1.95MHz
     // as5048->spi->CFG1_MBR = SPI_MBR_DIV_128; // prescaler = 128
-    // a 250MHz kernel clock / 256 gives an SPI clock of ~0.98MHz
-    as5048->spi->CFG1_MBR = SPI_MBR_DIV_256; // prescaler = 256
+    // // a 250MHz kernel clock / 256 gives an SPI clock of ~0.98MHz
+    // as5048->spi->CFG1_MBR = SPI_MBR_DIV_256; // prescaler = 256
 
     spi_initialize(as5048->spi);
 }
 
-// bool as5048_write_reg(as5048_t* as5048, uint16_t word)
-// {
-//     as5048_spi_write_word(as5048, word);
-//     return (as5048_read_reg(as5048, word) & as5048_FRAME_DATA_MASK) == (word & as5048_FRAME_DATA_MASK);
-// }
+uint16_t as5048_prepare_command(uint16_t word)
+{
+    uint16_t command = word;
+    if (command & AS5048_CMD_READ) {
+        // read flag is set, user error
+        while (1);
+    }
+    command &= ~AS5048_CMD_RW_FLAG;
+    command |= AS5048_CMD_READ;
 
-uint8_t as5048_parity(uint16_t word)
+    command &= ~AS5048_CMD_PARITY;
+    command |= as5048_parity(command);
+
+    return command;
+}
+
+bool as5048_write_reg(as5048_t* as5048, uint16_t reg, uint16_t data)
+{
+    uint16_t package = as5048_prepare_command(reg);
+    as5048_spi_write_word(as5048, package);
+
+    package = as5048_prepare_command(data);
+    as5048_spi_write_word(as5048, package);
+
+    uint16_t response =  as5048_read_reg(as5048, AS5048_REG_NOP);
+
+    return response == data;
+}
+
+as5048_parity_e as5048_parity(uint16_t word)
 {
     uint8_t parity = 0;
     for (int i = 0; i < AS5048_CMD_PARITY_Pos; i++) {
         parity = parity ^ ((word >> i) & 1);
     }
-    return parity;
+
+    as5048_parity_e result;
+    if (parity) {
+        result = AS5048_PARITY_EVEN;
+    } else {
+        result = AS5048_PARITY_ODD;
+    }
+    return result;
 }
 
 
@@ -197,4 +233,31 @@ void as5048_read_all(as5048_t* as5048)
     reg = as5048_read_reg(as5048, AS5048_REG_DAGC);
     reg = as5048_read_reg(as5048, AS5048_REG_MAGNITUDE);
     reg = as5048_read_reg(as5048, AS5048_REG_ANGLE);
+}
+
+uint16_t as5048_read_angle(as5048_t* as5048)
+{
+    return as5048_read_reg(as5048, AS5048_REG_ANGLE);
+}
+
+uint16_t as5048_read_zero_position(as5048_t* as5048)
+{
+
+    uint16_t zph = as5048_read_reg(as5048, AS5048_REG_ZPH);
+    uint16_t zpl = as5048_read_reg(as5048, AS5048_REG_ZPL);
+
+    uint16_t zero_position = (zph << 6) & zpl;
+    return zero_position;
+
+}
+
+bool as5048_write_zero_position(as5048_t* as5048, uint16_t zero_position)
+{
+    // lower 6 bits for zero position low (ZPL) register
+    uint16_t zpl = zero_position & 0b111111;
+
+    // upper byte (8 bits) for zero position high (ZPH) register
+    uint16_t zph = zero_position >> 6;
+
+    // as5048_write_reg(as5048, , uint16_t word)
 }

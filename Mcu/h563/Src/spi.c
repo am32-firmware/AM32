@@ -398,7 +398,7 @@ uint16_t spi_write_word(spi_t* spi, uint16_t word)
     // while (spi->ref->CR1 & SPI_CR1_SPE) {
     //     // spi busy doing transfer
     // }
-    spi_disable(spi);
+    // spi_disable(spi);
     spi_dma_disable(spi);
     spi_interrupt_disable_eotie(spi);
     // for some reason these flags must be cleared here
@@ -415,9 +415,10 @@ uint16_t spi_write_word(spi_t* spi, uint16_t word)
     while (!(spi->ref->SR & SPI_SR_RXP)); // data is available in rx fifo
     uint16_t response = spi->ref->RXDR;
 
+    spi_disable(spi);
     // asm("nop");
     spi_interrupt_enable_eotie(spi);
-    // spi_dma_enable(spi);
+    spi_dma_enable(spi);
     return response;
 }
 

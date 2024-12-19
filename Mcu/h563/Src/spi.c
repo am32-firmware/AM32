@@ -393,11 +393,14 @@ void spi_write(spi_t* spi, const uint16_t* data, uint8_t length)
     spi_start_tx_dma_transfer(spi);
 }
 
+// write one word to the spi, wait for the word to be
+// shifted out on the wire, return the word recieved on
+// MISO during the transmission
 uint16_t spi_write_word(spi_t* spi, uint16_t word)
 {
-    // while (spi->ref->CR1 & SPI_CR1_SPE) {
-    //     // spi busy doing transfer
-    // }
+    while (spi->ref->CR1 & SPI_CR1_SPE) {
+        // spi busy doing transfer
+    }
     // spi_disable(spi);
     spi_dma_disable(spi);
     spi_interrupt_disable_eotie(spi);
@@ -416,7 +419,6 @@ uint16_t spi_write_word(spi_t* spi, uint16_t word)
     uint16_t response = spi->ref->RXDR;
 
     spi_disable(spi);
-    // asm("nop");
     spi_interrupt_enable_eotie(spi);
     spi_dma_enable(spi);
     return response;

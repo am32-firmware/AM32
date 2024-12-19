@@ -13,7 +13,7 @@
 // is enabled
 // 24 bytes for 24bit brg data
 // uint8_t data[26];
-uint8_t data[255];
+uint8_t data[56];
 
 #define LED_T0 (0b11000000)
 #define LED_T1 (0b11110000)
@@ -73,7 +73,7 @@ void led_initialize()
     data[0] = 0;
     data[1] = 0;
 
-    memcpy(&data[26], &data[0], 200);
+    memcpy(&data[26], &data[0], 30);
     // data[26] = 0;
     // data[27] = 0;
     // data[28] = 0;
@@ -108,7 +108,7 @@ void led_write(uint32_t brg)
     while (spi_busy(spi));
     // do this so that buffer does not wrap and interrupt bitstream
     spi_reset_buffers(spi);
-    spi_write(spi, (uint16_t*)data, 150);
+    spi_write(spi, (uint16_t*)data, 28);
     // while (spi_busy(spi));
     // for (int i = 0; i < 0xfff; i++) {
     //     asm("nop");

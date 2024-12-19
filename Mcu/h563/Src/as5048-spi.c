@@ -162,7 +162,7 @@ uint16_t as5048_prepare_command(uint16_t word)
     command |= AS5048_CMD_READ;
 
     command &= ~AS5048_CMD_PARITY;
-    command |= as5048_parity(command);
+    command |= as5048_parity(command) << AS5048_CMD_PARITY_Pos;
 
     return command;
 }
@@ -259,5 +259,6 @@ bool as5048_write_zero_position(as5048_t* as5048, uint16_t zero_position)
     // upper byte (8 bits) for zero position high (ZPH) register
     uint16_t zph = zero_position >> 6;
 
-    // as5048_write_reg(as5048, , uint16_t word)
+    as5048_write_reg(as5048, AS5048_REG_ZPL, zpl);
+    as5048_write_reg(as5048, AS5048_REG_ZPH, zph);
 }

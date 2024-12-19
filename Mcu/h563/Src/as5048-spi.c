@@ -151,7 +151,7 @@ void as5048_initialize_spi(as5048_t* as5048)
     spi_initialize(as5048->spi);
 }
 
-uint16_t as5048_prepare_command(uint16_t word)
+uint16_t as5048_prepare_command(uint16_t word, bool read_flag)
 {
     uint16_t command = word;
     if (command & AS5048_CMD_READ) {
@@ -159,7 +159,7 @@ uint16_t as5048_prepare_command(uint16_t word)
         while (1);
     }
     command &= ~AS5048_CMD_RW_FLAG;
-    command |= AS5048_CMD_READ;
+    command |= read_flag;
 
     command &= ~AS5048_CMD_PARITY;
     command |= as5048_parity(command) << AS5048_CMD_PARITY_Pos;
@@ -169,10 +169,10 @@ uint16_t as5048_prepare_command(uint16_t word)
 
 bool as5048_write_reg(as5048_t* as5048, uint16_t reg, uint16_t data)
 {
-    uint16_t package = as5048_prepare_command(reg);
+    uint16_t package = as5048_prepare_command(reg, false);
     as5048_spi_write_word(as5048, package);
 
-    package = as5048_prepare_command(data);
+    package = as5048_prepare_command(data, false);
     as5048_spi_write_word(as5048, package);
 
     uint16_t response =  as5048_read_reg(as5048, AS5048_REG_NOP);
@@ -235,6 +235,15 @@ void as5048_read_all(as5048_t* as5048)
     reg = as5048_read_reg(as5048, AS5048_REG_ANGLE);
 }
 
+// get the angle in degrees * 100 (centidegrees)
+uint16_t as5048_get_angle_degrees(as5048_t* as5048)
+{
+    uint16_t angle = as5048_read_angle(as5048);
+    // 16 bits is the maximum shift without overflow
+    uint16_t angle_degrees = (100 * angle * (360 << 16) / (1 << 14)) >> 16;
+    return angle_degrees;
+}
+
 uint16_t as5048_read_angle(as5048_t* as5048)
 {
     return as5048_read_reg(as5048, AS5048_REG_ANGLE);
@@ -249,6 +258,12 @@ uint16_t as5048_read_zero_position(as5048_t* as5048)
     uint16_t zero_position = (zph << 6) & zpl;
     return zero_position;
 
+}
+
+bool as5048_set_zero_position(as5048_t* as5048)
+{
+    uint16_t current_angle = as5048_read_angle(as5048);
+    return as5048_write_zero_position(as5048, current_angle);
 }
 
 bool as5048_write_zero_position(as5048_t* as5048, uint16_t zero_position)

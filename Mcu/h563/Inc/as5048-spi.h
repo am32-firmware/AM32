@@ -43,7 +43,9 @@ bool as5048_write_reg(as5048_t* as5048, uint16_t reg, uint16_t data);
 
 
 uint16_t as5048_read_zero_position(as5048_t* as5048);
+bool as5048_set_zero_position(as5048_t* as5048);
 bool as5048_write_zero_position(as5048_t* as5048, uint16_t zero_position);
 
+uint16_t as5048_get_angle_degrees(as5048_t* as5048);
 uint16_t as5048_read_angle(as5048_t* as5048);
 

@@ -22,10 +22,9 @@ int main()
     mcu_setup(250);
     as5048_initialize(&as5048);
 
-    uint16_t zero_position = as5048_read_zero_position(&as5048);
-    current_angle = as5048_read_angle(&as5048);
-    as5048_write_zero_position(&as5048, current_angle);
+    as5048_set_zero_position(&as5048);
+
     while(1) {
-        current_angle = as5048_read_angle(&as5048);
+        current_angle = as5048_get_angle_degrees(&as5048);
     }
 }

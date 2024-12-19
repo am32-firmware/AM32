@@ -419,8 +419,8 @@ uint16_t spi_write_word(spi_t* spi, uint16_t word)
     uint16_t response = spi->ref->RXDR;
 
     spi_disable(spi);
-    spi_interrupt_enable_eotie(spi);
-    spi_dma_enable(spi);
+    // spi_interrupt_enable_eotie(spi);
+    // spi_dma_enable(spi);
     return response;
 }
 

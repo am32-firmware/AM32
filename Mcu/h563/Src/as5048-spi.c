@@ -135,8 +135,13 @@ void as5048_initialize_spi(as5048_t* as5048)
     as5048->spi->txDmaRequest = AUX_SPI_TX_DMA_REQ;
     as5048->spi->rxDmaRequest = AUX_SPI_RX_DMA_REQ;
 
-    // A 250MHz kernel clock / 32 gives an SPI clock of 7.8125MHz
-    as5048->spi->CFG1_MBR = SPI_MBR_DIV_32; // prescaler = 32
+    // // a 250MHz kernel clock / 32 gives an SPI clock of 7.8125MHz
+    // as5048->spi->CFG1_MBR = SPI_MBR_DIV_32; // prescaler = 32
+    // // a 250MHz kernel clock / 128 gives an SPI clock of ~1.95MHz
+    // as5048->spi->CFG1_MBR = SPI_MBR_DIV_128; // prescaler = 128
+    // a 250MHz kernel clock / 256 gives an SPI clock of ~0.98MHz
+    as5048->spi->CFG1_MBR = SPI_MBR_DIV_256; // prescaler = 256
+
     spi_initialize(as5048->spi);
 }
 
@@ -162,20 +167,18 @@ uint16_t as5048_read_reg(as5048_t* as5048, uint16_t word)
     word |= as5048_parity(word) << AS5048_CMD_PARITY_Pos;
     as5048_spi_write_word(as5048, word);
 
-    uint16_t nopCmd = AS5048_CMD_READ | AS5048_REG_NOP;
-    nopCmd |= as5048_parity(word) << AS5048_CMD_PARITY_Pos;
-
-    uint16_t response =  as5048_spi_write_word(as5048, nopCmd);
+    uint16_t response =  as5048_spi_write_word(as5048, AS5048_CMD_READ_NOP);
     if (((response >> AS5048_CMD_PARITY_Pos) & 1) ^ as5048_parity(response)) {
         // parity error
         while (1);
     }
     if (response & (1 << AS5048_PKG_FLAG_Pos)) {
         // error flag, read diagnostic register to determine the error cause
+        uint16_t dagc = as5048_spi_write_word(as5048, AS5048_CMD_READ_DAGC);
         while (1);
     }
 
-    return word & AS5048_PKG_DATA_MASK;
+    return response & AS5048_PKG_DATA_MASK;
 }
 
 uint16_t as5048_spi_write_word(as5048_t* as5048, uint16_t word)

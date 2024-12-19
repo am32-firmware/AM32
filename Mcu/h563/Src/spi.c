@@ -238,11 +238,11 @@ void spi_initialize(spi_t* spi)
     // a session and the beginning of the first data frame
     spi->ref->CFG2 |= 0b1111 << SPI_CFG2_MSSI_Pos;
 
-    // // enable DMA requests on transmission
+    // enable DMA requests on transmission
     // spi->ref->CFG1 |= SPI_CFG1_TXDMAEN;
 
-    // // enable TXC TxFIFO transmission complete interrupt
-    // spi->ref->IER |= SPI_IER_EOTIE;
+    // enable TXC TxFIFO transmission complete interrupt
+    spi->ref->IER |= SPI_IER_EOTIE;
     switch((uint32_t)spi->ref) {
         case SPI1_BASE:
             NVIC_EnableIRQ(SPI1_IRQn);
@@ -263,7 +263,7 @@ void spi_initialize(spi_t* spi)
             NVIC_EnableIRQ(SPI6_IRQn);
             break;
         }
-    // // enable rx dma requests
+    // enable rx dma requests
     // spi->ref->CFG1 |= SPI_CFG1_RXDMAEN;
 
     // set DSIZE (frame width) to 16 bits
@@ -399,6 +399,8 @@ uint16_t spi_write_word(spi_t* spi, uint16_t word)
     //     // spi busy doing transfer
     // }
     spi_disable(spi);
+    spi_dma_disable(spi);
+    spi_interrupt_disable_eotie(spi);
     // for some reason these flags must be cleared here
     // even though they are (at least externally) cleared
     // automatically when disable and enable are called
@@ -411,7 +413,11 @@ uint16_t spi_write_word(spi_t* spi, uint16_t word)
     while (!(spi->ref->SR & SPI_SR_TXC)); // all data has been submitted to the tx fifo
     while (!(spi->ref->SR & SPI_SR_EOT)); // all data has been shifted out of tx fifo
     while (!(spi->ref->SR & SPI_SR_RXP)); // data is available in rx fifo
+    // spi_disable(spi);
+
     // asm("nop");
+    spi_interrupt_enable_eotie(spi);
+    // spi_dma_enable(spi);
     return (uint16_t)spi->ref->RXDR;
 }
 

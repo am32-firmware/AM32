@@ -155,37 +155,38 @@ void spi_initialize(spi_t* spi)
     NVIC_SetPriority(spi->txDma->irqn, 0);
     NVIC_EnableIRQ(spi->txDma->irqn);
 
-    // set the channel source address
-    spi->rxDma->ref->CSAR = (uint32_t)&spi->ref->RXDR;
+    if (spi->rxDma) {
+        // set the channel source address
+        spi->rxDma->ref->CSAR = (uint32_t)&spi->ref->RXDR;
 
-    // set the channel destination address
-    spi->rxDma->ref->CDAR = (uint32_t)spi->_rx_buffer;
+        // set the channel destination address
+        spi->rxDma->ref->CDAR = (uint32_t)spi->_rx_buffer;
 
-    // set destination incrementing burst
-    spi->rxDma->ref->CTR1 |= DMA_CTR1_DINC;
-    // set the peripheral hardware request selection
-    spi->rxDma->ref->CTR2 |= spi->rxDmaRequest;
+        // set destination incrementing burst
+        spi->rxDma->ref->CTR1 |= DMA_CTR1_DINC;
+        // set the peripheral hardware request selection
+        spi->rxDma->ref->CTR2 |= spi->rxDmaRequest;
 
-    // set the transfer length in bytes (not words!)
-    spi->rxDma->ref->CBR1 = 2*256;
-    // set the block repeated destination address offset
-    spi->rxDma->ref->CBR2 |= 2*256 << DMA_CBR2_BRDAO_Pos;
-    spi->rxDma->ref->CBR1 |= DMA_CBR1_BRDDEC;
-    // configure single LLI to run repeatedly
-    spi->rxDma->ref->CLLR = 0x08000004 & DMA_CLLR_LA_Msk;
+        // set the transfer length in bytes (not words!)
+        spi->rxDma->ref->CBR1 = 2*256;
+        // set the block repeated destination address offset
+        spi->rxDma->ref->CBR2 |= 2*256 << DMA_CBR2_BRDAO_Pos;
+        spi->rxDma->ref->CBR1 |= DMA_CBR1_BRDDEC;
+        // configure single LLI to run repeatedly
+        spi->rxDma->ref->CLLR = 0x08000004 & DMA_CLLR_LA_Msk;
 
-    // set source data width to half word (16 bit)
-    spi->rxDma->ref->CTR1 |= 0b01 << DMA_CTR1_SDW_LOG2_Pos;
-    // spi->txDma->ref->CTR1 |= 0b00 << DMA_CTR1_SDW_LOG2_Pos;
-    // set destination data width to half word (16 bit)
-    spi->rxDma->ref->CTR1 |= 0b01 << DMA_CTR1_DDW_LOG2_Pos;
-    // spi->rxDma->ref->CTR1 |= 0b00 << DMA_CTR1_DDW_LOG2_Pos;
-    // spi->txDma->ref->CTR1 |= 0b00 << DMA_CTR1_DDW_LOG2_Pos;
+        // set source data width to half word (16 bit)
+        spi->rxDma->ref->CTR1 |= 0b01 << DMA_CTR1_SDW_LOG2_Pos;
+        // spi->txDma->ref->CTR1 |= 0b00 << DMA_CTR1_SDW_LOG2_Pos;
+        // set destination data width to half word (16 bit)
+        spi->rxDma->ref->CTR1 |= 0b01 << DMA_CTR1_DDW_LOG2_Pos;
+        // spi->rxDma->ref->CTR1 |= 0b00 << DMA_CTR1_DDW_LOG2_Pos;
+        // spi->txDma->ref->CTR1 |= 0b00 << DMA_CTR1_DDW_LOG2_Pos;
 
 
-    // lastly enable the dma channel
-    spi->rxDma->ref->CCR |= DMA_CCR_EN;
-
+        // lastly enable the dma channel
+        spi->rxDma->ref->CCR |= DMA_CCR_EN;
+    }
 
 
     // // set TSIZE - transfer length in words

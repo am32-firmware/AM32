@@ -148,6 +148,15 @@ void as5048_initialize_spi(as5048_t* as5048)
     // // a 250MHz kernel clock / 256 gives an SPI clock of ~0.98MHz
     // as5048->spi->CFG1_MBR = SPI_MBR_DIV_256; // prescaler = 256
 
+    as5048->spi->CFG2 =
+                ( SPI_CFG2_AFCNTR
+                | SPI_CFG2_SSOE
+                | SPI_CFG2_SSOM
+                | SPI_CFG2_CPHA
+                | SPI_CFG2_MASTER
+                | (0b1111 << SPI_CFG2_MIDI_Pos)
+                | (0b1111 << SPI_CFG2_MSSI_Pos)
+                );
     spi_initialize(as5048->spi);
 }
 

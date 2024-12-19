@@ -1880,7 +1880,10 @@
     RCC->APB1LENR |= RCC_APB1LENR_SPI2EN; \
 }
 
+// linear
 #define LED_TX_DMA_CHANNEL 3
+// circular but not needed
+// TODO remove
 #define LED_RX_DMA_CHANNEL 6
 
 

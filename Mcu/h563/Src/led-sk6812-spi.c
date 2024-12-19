@@ -49,17 +49,17 @@ void led_initialize()
     spi->_tx_buffer = led_spi_tx_buffer;
     spi->_rx_buffer_size = 256;
     spi->_tx_buffer_size = 256;
-    spi->rxDma = &dmaChannels[LED_RX_DMA_CHANNEL];
+    spi->rxDma = 0;
     spi->txDma = &dmaChannels[LED_TX_DMA_CHANNEL];
 
+    spi->rxDmaRequest = 0;
     spi->txDmaRequest = LL_GPDMA1_REQUEST_SPI2_TX;
-    spi->rxDmaRequest = LL_GPDMA1_REQUEST_SPI2_RX;
 
     spi->CFG1_MBR = 0b001; // kernel clock / 2
     spi->CFG2 = ( SPI_CFG2_SSOE
                 | SPI_CFG2_CPHA
                 | SPI_CFG2_MASTER
-    );
+                );
     spi_initialize(spi);
 
     gpio_initialize(&gpioSpiSCK);
@@ -86,6 +86,8 @@ void led_write(uint32_t brg)
             data[i+2] = LED_T0;
         }
     }
+    // do this so that buffer does not wrap and interrupt bitstream
     spi_reset_buffers(spi);
     spi_write(spi, (uint16_t*)data, 13);
+    while (spi_tx_waiting(spi));
 }

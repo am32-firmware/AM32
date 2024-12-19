@@ -53,7 +53,7 @@ void drv8323_reset(drv8323_t* drv)
     // delay at least 1ms
     delayMillis(2);
     drv8323_enable(drv);
-    // delayMicros(3000);
+    // wait for at least tREADY time, 1ms
     delayMillis(2);
     EXTI_INTERRUPT_ENABLE_MASK(1 << drv->gpioNFault->pin);
 }
@@ -88,6 +88,10 @@ void drv8323_initialize_gpio_spi(drv8323_t* drv)
     gpio_initialize(&gpioSpiMISO);
     gpio_configure_pupdr(&gpioSpiMISO, GPIO_PULL_UP);
     gpio_initialize(&gpioSpiMOSI);
+
+    gpio_set_speed(&gpioSpiNSS, GPIO_SPEED_VERYFAST);
+    gpio_set_speed(&gpioSpiSCK, GPIO_SPEED_VERYFAST);
+    gpio_set_speed(&gpioSpiMISO, GPIO_SPEED_VERYFAST);
     gpio_set_speed(&gpioSpiMOSI, GPIO_SPEED_VERYFAST);
 }
 
@@ -126,14 +130,15 @@ void drv8323_enable(drv8323_t* drv)
 
 void drv8323_initialize(drv8323_t* drv)
 {
+
+    drv8323_initialize_gpio(drv);
+
     drv8323_configure_spi(drv);
 
     // drv8323_configure_spi(drv);
     // if (drv->spi) {
         spi_initialize(drv->spi);
     // }
-
-    drv8323_initialize_gpio(drv);
 
     // drv8323_setup_fault_callback(drv, int (*)(void))
     drv8323_reset(drv);
@@ -197,10 +202,12 @@ void drv8323_configure_spi(drv8323_t* drv)
     // spiDrv8323->CFG1_MBR = SPI_MBR_DIV_8; // prescaler = 8 // this DOES NOT work on blueesc
 
     // 25MHz (HSE) / 64 = 391kHz spi clock frequency
+    // 250MHz (core) / 64 = 3.91MHz spi clock frequency
     spiDrv8323->CFG1_MBR = SPI_MBR_DIV_64; // prescaler = 64 // this works on blueesc
 
-    // spiDrv8323->CFG1_MBR = 0b100; // prescaler = 128 // this works on blueesc
-    // spiDrv8323->CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
+    // 25MHz (HSE) / 256 = ~1kHz spi clock frequency
+    // 250MHz (core) / 256 = ~1MHz spi clock frequency
+    // spiDrv8323->CFG1_MBR = SPI_MBR_DIV_256; // prescaler = 256
 
     spiDrv8323->_rx_buffer = drv8323SpiRxBuffer;
     spiDrv8323->_tx_buffer = drv8323SpiTxBuffer;

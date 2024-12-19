@@ -413,12 +413,12 @@ uint16_t spi_write_word(spi_t* spi, uint16_t word)
     while (!(spi->ref->SR & SPI_SR_TXC)); // all data has been submitted to the tx fifo
     while (!(spi->ref->SR & SPI_SR_EOT)); // all data has been shifted out of tx fifo
     while (!(spi->ref->SR & SPI_SR_RXP)); // data is available in rx fifo
-    // spi_disable(spi);
+    uint16_t response = spi->ref->RXDR;
 
     // asm("nop");
     spi_interrupt_enable_eotie(spi);
     // spi_dma_enable(spi);
-    return (uint16_t)spi->ref->RXDR;
+    return response;
 }
 
 void spi_enable(spi_t* spi)

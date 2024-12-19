@@ -25,8 +25,6 @@ void led_initialize()
     vreg5V_initialize();
     vreg5V_enable();
 
-    // enable dma clocks
-    dma_initialize();
     // enable spi clock
     LED_SPI_ENABLE_CLOCK();
 
@@ -42,7 +40,7 @@ void led_initialize()
         LED_SPI_MOSI_AF,
         GPIO_AF);
 
-    spi->ref = LED_SPI_PERIPH;
+    // spi->ref = LED_SPI_PERIPH;
 
     // configure spi kernel clock as HSE via per_ck (25MHz)
     spi_configure_rcc_clock_selection(spi, 0b100);
@@ -58,6 +56,10 @@ void led_initialize()
     spi->rxDmaRequest = LL_GPDMA1_REQUEST_SPI2_RX;
 
     spi->CFG1_MBR = 0b001; // kernel clock / 2
+    spi->CFG2 = ( SPI_CFG2_SSOE
+                | SPI_CFG2_CPHA
+                | SPI_CFG2_MASTER
+    );
     spi_initialize(spi);
 
     gpio_initialize(&gpioSpiSCK);

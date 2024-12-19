@@ -6,7 +6,7 @@
 
 int main()
 {
-    mcu_setup();
+    mcu_setup(250);
     led_initialize();
 
     while(1) {

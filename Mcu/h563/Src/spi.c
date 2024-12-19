@@ -197,49 +197,50 @@ void spi_initialize(spi_t* spi)
     // // master baud rate prescaler = 256
     // spi->ref->CFG1 |= 0b111 << SPI_CFG1_MBR_Pos;
 
-    // not for led
-    // spi always controls the state of the gpios,
-    // even when disabled (SPE = 0)
-    spi->ref->CFG2 |= SPI_CFG2_AFCNTR;
+    // // not for led
+    // // spi always controls the state of the gpios,
+    // // even when disabled (SPE = 0)
+    // spi->ref->CFG2 |= SPI_CFG2_AFCNTR;
 
-    // enable hardware SS output
-    spi->ref->CFG2 |= SPI_CFG2_SSOE;
+    // // enable hardware SS output
+    // spi->ref->CFG2 |= SPI_CFG2_SSOE;
 
-    // not for led
-    // SSOM = 1, SP = 000, MIDI > 1
-    // SS is pulsed inactive between data frames
-    spi->ref->CFG2 |= SPI_CFG2_SSOM;
+    // // not for led
+    // // SSOM = 1, SP = 000, MIDI > 1
+    // // SS is pulsed inactive between data frames
+    // spi->ref->CFG2 |= SPI_CFG2_SSOM;
 
-    // configure software management of SS signal input
-    // 0: SS input value is determined by the SS PAD
-    // 1: SS input value is determined by the SSI bit
-    // When master uses hardware SS output (SSM = 0 and SSOE = 1) the SS signal input is
-    // forced to not active state internally to prevent master mode fault error.
-    // spi->ref->CFG2 |= SPI_CFG2_SSM;
+    // // configure software management of SS signal input
+    // // 0: SS input value is determined by the SS PAD
+    // // 1: SS input value is determined by the SSI bit
+    // // When master uses hardware SS output (SSM = 0 and SSOE = 1) the SS signal input is
+    // // forced to not active state internally to prevent master mode fault error.
+    // // spi->ref->CFG2 |= SPI_CFG2_SSM;
 
-    // spi->ref->CR1 |= SPI_CR1_SSI; // software set NSS signal
+    // // spi->ref->CR1 |= SPI_CR1_SSI; // software set NSS signal
 
-    // set clock polarity
-    // spi->ref->CFG2 |= SPI_CFG2_CPOL;
+    // // set clock polarity
+    // // spi->ref->CFG2 |= SPI_CFG2_CPOL;
 
-    // set clock phase
-    // data is captured on the falling edge of SCK
-    spi->ref->CFG2 |= SPI_CFG2_CPHA;
+    // // set clock phase
+    // // data is captured on the falling edge of SCK
+    // spi->ref->CFG2 |= SPI_CFG2_CPHA;
 
-    // spi master mode
-    spi->ref->CFG2 |= SPI_CFG2_MASTER;
+    // // spi master mode
+    // spi->ref->CFG2 |= SPI_CFG2_MASTER;
 
-    // the following two need to be disabled for led
-    // 15 clock cycle periods delay inserted between two consecutive data frames
-    spi->ref->CFG2 |= 0b1111 << SPI_CFG2_MIDI_Pos;
+    // // the following two need to be disabled for led
+    // // 15 clock cycle periods delay inserted between two consecutive data frames
+    // spi->ref->CFG2 |= 0b1111 << SPI_CFG2_MIDI_Pos;
 
-    // set MSSI to 15
-    // insert 15 clock cycle periods delay between SS opening
-    // a session and the beginning of the first data frame
-    spi->ref->CFG2 |= 0b1111 << SPI_CFG2_MSSI_Pos;
+    // // set MSSI to 15
+    // // insert 15 clock cycle periods delay between SS opening
+    // // a session and the beginning of the first data frame
+    // spi->ref->CFG2 |= 0b1111 << SPI_CFG2_MSSI_Pos;
 
+    spi->ref->CFG2 = spi->CFG2;
     // enable DMA requests on transmission
-    // spi->ref->CFG1 |= SPI_CFG1_TXDMAEN;
+    spi->ref->CFG1 |= SPI_CFG1_TXDMAEN;
 
     // enable TXC TxFIFO transmission complete interrupt
     spi->ref->IER |= SPI_IER_EOTIE;

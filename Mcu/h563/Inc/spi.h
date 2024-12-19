@@ -67,6 +67,7 @@ typedef struct {
     uint8_t txDmaRequest;
     uint8_t rxDmaRequest;
     uint8_t CFG1_MBR;
+    uint32_t CFG2;
     uint8_t _irqn;
 } spi_t;
 

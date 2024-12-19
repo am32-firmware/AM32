@@ -37,7 +37,7 @@ void drv8323_fault_cb(extiChannel_t* exti)
     uint32_t mask = 1 << exti->channel;
     if (EXTI->RPR1 & mask) {
         EXTI->RPR1 |= mask;
-    } 
+    }
     if (EXTI->FPR1 & mask) {
         EXTI->FPR1 |= mask;
     }
@@ -81,7 +81,7 @@ void drv8323_initialize_gpio_spi(drv8323_t* drv)
         GATE_DRIVER_SPI_MOSI_PIN,
         GATE_DRIVER_SPI_MOSI_AF,
         GPIO_AF);
-    
+
 
     gpio_initialize(&gpioSpiNSS);
     gpio_initialize(&gpioSpiSCK);
@@ -126,8 +126,6 @@ void drv8323_enable(drv8323_t* drv)
 
 void drv8323_initialize(drv8323_t* drv)
 {
-
-
     drv8323_configure_spi(drv);
 
     // drv8323_configure_spi(drv);
@@ -143,15 +141,17 @@ void drv8323_initialize(drv8323_t* drv)
 
 bool drv8323_write_reg(drv8323_t* drv, uint16_t word)
 {
-    drv8323_spi_write_word(drv, word);
-    return (drv8323_read_reg(drv, word) & DRV8323_FRAME_DATA_MASK) == (word & DRV8323_FRAME_DATA_MASK);
+    uint16_t response = drv8323_spi_write_word(drv, word);
+    response = drv8323_read_reg(drv, word);
+    return (response & DRV8323_FRAME_DATA_MASK) == (word & DRV8323_FRAME_DATA_MASK);
 }
 
 uint16_t drv8323_read_reg(drv8323_t* drv, uint16_t word)
 {
     word |= DRV8323_READ;
     word &= ~DRV8323_FRAME_DATA_MASK;
-    return drv8323_spi_write_word(drv, word);
+    uint16_t response = drv8323_spi_write_word(drv, word);
+    return response;
 }
 
 uint16_t drv8323_spi_write_word(drv8323_t* drv, uint16_t word)
@@ -172,14 +172,14 @@ void drv8323_read_all(drv8323_t* drv)
 }
 uint16_t drv8323SpiRxBuffer[256];
 uint16_t drv8323SpiTxBuffer[256];
-spi_t spiDrv8323;
+spi_t* spiDrv8323 = &spis[GATE_DRIVER_AM32_SPI_PERIPH];
 
 void drv8323_configure_spi(drv8323_t* drv)
 {
     // enable spi clock
     GATE_DRIVER_SPI_ENABLE_CLOCK();
 
-    spiDrv8323.ref = SPI5;
+    // spiDrv8323.ref = SPI5;
 
     // 000: rcc_pclk3 selected as kernel clock (default after reset)
     // 001: pll2_q_ck selected as kernel clock
@@ -188,23 +188,27 @@ void drv8323_configure_spi(drv8323_t* drv)
     // 100: csi_ker_ck selected as kernel clock
     // 101: hse_ck selected as kernel clock
     // others: reserved, the kernel clock is disabled
-    spi_configure_rcc_clock_selection(&spiDrv8323, 0b101);
+    spi_configure_rcc_clock_selection(spiDrv8323, 0b101);
 
-    spiDrv8323._rx_buffer = drv8323SpiRxBuffer;
-    spiDrv8323._tx_buffer = drv8323SpiTxBuffer;
-    spiDrv8323._rx_buffer_size = 256;
-    spiDrv8323._tx_buffer_size = 256;
-    spiDrv8323.rxDma = &dmaChannels[7];
-    spiDrv8323.txDma = &dmaChannels[0];
-    spiDrv8323.txDmaRequest = LL_GPDMA1_REQUEST_SPI5_TX;
-    spiDrv8323.rxDmaRequest = LL_GPDMA1_REQUEST_SPI5_RX;
-    // spiDrv8323.CFG1_MBR = 0b011; // prescaler = 16 // this DOES NOT work on blueesc
-    // spiDrv8323.CFG1_MBR = 0b100; // prescaler = 32 // this works on blueesc
-    spiDrv8323.CFG1_MBR = 0b101; // prescaler = 64 // this works on blueesc
-    // spiDrv8323.CFG1_MBR = 0b100; // prescaler = 128 // this works on blueesc
-    // spiDrv8323.CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
+    // spiDrv8323->CFG1_MBR = 0b011; // prescaler = 16 // this DOES NOT work on blueesc
+    // spiDrv8323->CFG1_MBR = 0b100; // prescaler = 32 // this works on blueesc
 
-    drv->spi = &spiDrv8323;
+    // 25MHz (HSE) / 64 = 391kHz spi clock frequency
+    spiDrv8323->CFG1_MBR = SPI_MBR_DIV_64; // prescaler = 64 // this works on blueesc
+
+    // spiDrv8323->CFG1_MBR = 0b100; // prescaler = 128 // this works on blueesc
+    // spiDrv8323->CFG1_MBR = 0b111; // prescaler = 256 // this works on blueesc
+
+    spiDrv8323->_rx_buffer = drv8323SpiRxBuffer;
+    spiDrv8323->_tx_buffer = drv8323SpiTxBuffer;
+    spiDrv8323->_rx_buffer_size = 256;
+    spiDrv8323->_tx_buffer_size = 256;
+    spiDrv8323->rxDma = &dmaChannels[7];
+    spiDrv8323->txDma = &dmaChannels[0];
+    spiDrv8323->txDmaRequest = GATE_DRIVER_SPI_TX_DMA_REQ;
+    spiDrv8323->rxDmaRequest = GATE_DRIVER_SPI_RX_DMA_REQ;
+
+    drv->spi = spiDrv8323;
 }
 
 bool drv8323_get_fault_status(drv8323_t* drv)

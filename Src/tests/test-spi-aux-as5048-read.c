@@ -129,7 +129,6 @@ int main()
     spi->_tx_buffer_size = 256;
     spi->rxDma = &dmaChannels[7];
     spi->txDma = &dmaChannels[0];
-
     spi->txDmaRequest = AUX_SPI_TX_DMA_REQ;
     spi->rxDmaRequest = AUX_SPI_RX_DMA_REQ;
     spi_initialize(spi);

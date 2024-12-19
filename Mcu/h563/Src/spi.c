@@ -132,15 +132,16 @@ void spi_initialize(spi_t* spi)
     // // set TSIZE - transfer length in words
     // spi->ref->CR2 = 1;
 
-    // master baud rate prescaler = 32
+    // set the selected master baud rate prescaler (MBR)
     spi->ref->CFG1 |= spi->CFG1_MBR << SPI_CFG1_MBR_Pos;
 
     // // master baud rate prescaler = 256
     // spi->ref->CFG1 |= 0b111 << SPI_CFG1_MBR_Pos;
 
+    // not for led
     // spi always controls the state of the gpios,
     // even when disabled (SPE = 0)
-    // spi->ref->CFG2 |= SPI_CFG2_AFCNTR;
+    spi->ref->CFG2 |= SPI_CFG2_AFCNTR;
 
     // enable hardware SS output
     spi->ref->CFG2 |= SPI_CFG2_SSOE;
@@ -178,24 +179,33 @@ void spi_initialize(spi_t* spi)
     // a session and the beginning of the first data frame
     spi->ref->CFG2 |= 0b1111 << SPI_CFG2_MSSI_Pos;
 
-    // enable DMA requests on transmission
-    spi->ref->CFG1 |= SPI_CFG1_TXDMAEN;
+    // // enable DMA requests on transmission
+    // spi->ref->CFG1 |= SPI_CFG1_TXDMAEN;
 
-    // enable TXC TxFIFO transmission complete interrupt
-    spi->ref->IER |= SPI_IER_EOTIE;
-    switch((uint32_t)spi->ref) {
-        case SPI2_BASE:
-            NVIC_EnableIRQ(SPI2_IRQn);
-            break;
-        case SPI4_BASE:
-            NVIC_EnableIRQ(SPI4_IRQn);
-            break;
-        case SPI5_BASE:
-            NVIC_EnableIRQ(SPI5_IRQn);
-            break;
-    }
-    // enable rx dma requests
-    spi->ref->CFG1 |= SPI_CFG1_RXDMAEN;
+    // // enable TXC TxFIFO transmission complete interrupt
+    // spi->ref->IER |= SPI_IER_EOTIE;
+    // switch((uint32_t)spi->ref) {
+    //     case SPI1_BASE:
+    //         NVIC_EnableIRQ(SPI1_IRQn);
+    //         break;
+    //     case SPI2_BASE:
+    //         NVIC_EnableIRQ(SPI2_IRQn);
+    //         break;
+    //     case SPI3_BASE:
+    //         NVIC_EnableIRQ(SPI3_IRQn);
+    //         break;
+    //     case SPI4_BASE:
+    //         NVIC_EnableIRQ(SPI4_IRQn);
+    //         break;
+    //     case SPI5_BASE:
+    //         NVIC_EnableIRQ(SPI5_IRQn);
+    //         break;
+    //     case SPI6_BASE:
+    //         NVIC_EnableIRQ(SPI6_IRQn);
+    //         break;
+    //     }
+    // // enable rx dma requests
+    // spi->ref->CFG1 |= SPI_CFG1_RXDMAEN;
 
     // set DSIZE (frame width) to 16 bits
     spi->ref->CFG1 |= 0b01111 << SPI_CFG1_DSIZE_Pos;
@@ -263,9 +273,7 @@ void spi_start_tx_dma_transfer(spi_t* spi)
         return;
     }
 
-
     spi->_dma_transfer_count = spi_tx_dma_waiting(spi);
-
 
     // spi_disable(spi);
     if (spi->_dma_transfer_count) {
@@ -341,9 +349,9 @@ uint16_t spi_write_word(spi_t* spi, uint16_t word)
     spi->ref->TXDR = word;
     while (!(spi->ref->SR & SPI_SR_TXTF));
     spi_start_transfer(spi);
-    while (!(spi->ref->SR & SPI_SR_EOT));
-    // while (!(spi->ref->SR & SPI_SR_TXC));
-    while (!(spi->ref->SR & SPI_SR_RXP));
+    while (!(spi->ref->SR & SPI_SR_TXC)); // all data has been submitted to the tx fifo
+    // while (!(spi->ref->SR & SPI_SR_EOT)); // all data has been shifted out of tx fifo
+    while (!(spi->ref->SR & SPI_SR_RXP)); // data is available in rx fifo
     // asm("nop");
     return (uint16_t)spi->ref->RXDR;
 }

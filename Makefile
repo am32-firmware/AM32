@@ -62,7 +62,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/main.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-adc.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-read.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-led.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-led.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-set-zero.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-input-pwm.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-spi-gpio.c
@@ -104,7 +104,7 @@ SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-led.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-ten-khz-timer.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-aux.c
-# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-debug.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-debug.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-main.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-main-rs485.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-vreg-5V.c

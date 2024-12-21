@@ -15,7 +15,7 @@
 
 #define TEST_USART_BAUDRATE DEBUG_USART_BAUDRATE
 
-#define TEST_USART_DMA_REQ DEBUG_USART_DMA_REQ
+#define TEST_USART_DMA_REQ DEBUG_USART_TX_DMA_REQ
 #define TEST_USART_SWAP_IO 0
 
 #include "dma.h"
@@ -43,11 +43,11 @@ int main()
     usart._tx_buffer = usart_tx_buffer;
     usart._rx_buffer_size = 256;
     usart._tx_buffer_size = 256;
-    usart.rxDma = &dmaChannels[7];
-    usart.txDma = &dmaChannels[0];
+    usart.rxDma = &dmaChannels[DEBUG_USART_RX_DMA_CHANNEL];
+    usart.txDma = &dmaChannels[DEBUG_USART_TX_DMA_CHANNEL];
     usart.txDmaRequest = TEST_USART_DMA_REQ;
 
-    usart._baudrate = 115200;
+    usart._baudrate = TEST_USART_BAUDRATE;
     usart.swap = TEST_USART_SWAP_IO;
     usart_initialize(&usart);
 

@@ -28,9 +28,9 @@ void debug_initialize()
     usartDebug._tx_buffer_size = 256;
     usartDebug.rxDma = &dmaChannels[DEBUG_USART_RX_DMA_CHANNEL];
     usartDebug.txDma = &dmaChannels[DEBUG_USART_TX_DMA_CHANNEL];
-    usartDebug.txDmaRequest = DEBUG_USART_DMA_REQ;
+    usartDebug.txDmaRequest = DEBUG_USART_TX_DMA_REQ;
 
-    usartDebug._baudrate = 3000000;
+    usartDebug._baudrate = DEBUG_USART_BAUDRATE;
     usartDebug.swap = DEBUG_USART_SWAP_IO;
     usart_initialize(&usartDebug);
 

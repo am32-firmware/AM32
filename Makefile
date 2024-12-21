@@ -62,7 +62,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/main.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-adc.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-read.c
-# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-led.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-led.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-set-zero.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-input-pwm.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-spi-gpio.c
@@ -90,9 +90,10 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-gpio-high.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-gpio-low.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-input-pwm.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi2.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi3.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi3.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-maxfrequency.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-nothing.c

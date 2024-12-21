@@ -74,25 +74,15 @@ void led_initialize()
     data[1] = 0;
 
     memcpy(&data[26], &data[0], 30);
-    // data[26] = 0;
-    // data[27] = 0;
-    // data[28] = 0;
-    // data[29] = 0;
-    // data[30] = 0;
-    // data[31] = 0;
-    // data[32] = 0;
-    // data[33] = 0;
-    // data[34] = 0;
-    // data[35] = 0;
-    // data[36] = 0;
-    // data[37] = 0;
-    // data[38] = 0;
-    // data[39] = 0;
 }
 
 void led_off(void)
 {
     led_write(0);
+}
+
+void led_write_rgb(uint8_t r, uint8_t g, uint8_t b) {
+    led_write((b << 16) | (r << 8) | g);
 }
 
 void led_write(uint32_t brg)
@@ -109,8 +99,4 @@ void led_write(uint32_t brg)
     // do this so that buffer does not wrap and interrupt bitstream
     spi_reset_buffers(spi);
     spi_write(spi, (uint16_t*)data, 28);
-    // while (spi_busy(spi));
-    // for (int i = 0; i < 0xfff; i++) {
-    //     asm("nop");
-    // }
 }

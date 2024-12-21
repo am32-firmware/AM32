@@ -129,6 +129,9 @@ void spi_configure_rcc_clock_selection(spi_t* spi, uint8_t selection)
             break;
     }
 }
+
+// conflict with debug usart here
+
 void spi_initialize(spi_t* spi)
 {
     // set the channel destination address

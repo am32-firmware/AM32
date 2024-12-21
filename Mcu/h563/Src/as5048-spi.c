@@ -81,7 +81,7 @@ void as5048_initialize(as5048_t* as5048)
 
     as5048_initialize_gpio(as5048);
 
-    as5048_read_all(as5048);
+    // as5048_read_all(as5048);
 }
 
 void as5048_initialize_gpio(as5048_t* as5048)
@@ -134,8 +134,8 @@ void as5048_initialize_spi(as5048_t* as5048)
     as5048->spi->_tx_buffer = as5048SpiTxBuffer;
     as5048->spi->_rx_buffer_size = 256;
     as5048->spi->_tx_buffer_size = 256;
-    as5048->spi->rxDma = &dmaChannels[7];
-    as5048->spi->txDma = &dmaChannels[0];
+    as5048->spi->rxDma = &dmaChannels[AUX_SPI_RX_DMA_CHANNEL];
+    as5048->spi->txDma = &dmaChannels[AUX_SPI_TX_DMA_CHANNEL];
     as5048->spi->txDmaRequest = AUX_SPI_TX_DMA_REQ;
     as5048->spi->rxDmaRequest = AUX_SPI_RX_DMA_REQ;
 

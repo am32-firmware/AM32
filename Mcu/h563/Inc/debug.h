@@ -1,7 +1,10 @@
 #pragma once
 
+#include <inttypes.h>
+
 void debug_initialize();
 void debug_write_string(const char* string);
+void debug_write_int(uint32_t i);
 
 void debug_set_1();
 void debug_set_2();

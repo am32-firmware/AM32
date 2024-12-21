@@ -1882,10 +1882,6 @@
 
 // linear
 #define LED_TX_DMA_CHANNEL 3
-// circular but not needed
-// TODO remove
-#define LED_RX_DMA_CHANNEL 6
-
 
 #define COMPA_GPIO_PORT GPIOF
 #define COMPA_GPIO_PIN 4

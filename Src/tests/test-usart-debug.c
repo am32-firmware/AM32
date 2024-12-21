@@ -53,5 +53,6 @@ int main()
 
     while(1) {
         usart_write_string(&usart, "hello world\n");
+        usart_write_int(&usart, 80085);
     }
 }

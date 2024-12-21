@@ -44,6 +44,11 @@ void debug_write_string(const char* string)
   usart_write_string(&usartDebug, string);
 }
 
+void debug_write_int(uint32_t i)
+{
+  usart_write_int(&usartDebug, i);
+}
+
 void debug_set_1()
 {
     gpio_set(&gpioDebug1);

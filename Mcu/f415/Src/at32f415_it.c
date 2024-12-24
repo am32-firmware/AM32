@@ -20,6 +20,8 @@ int recieved_ints = 0;
 #include "ADC.h"
 #include "main.h"
 #include "targets.h"
+#include "comparator.h"
+#include "common.h"
 /** @addtogroup AT32F421_StdPeriph_Templates
  * @{
  */
@@ -164,11 +166,14 @@ void DMA1_Channel6_IRQHandler(void)
  */
 void CMP1_IRQHandler(void)
 {
-    if ((EXINT->intsts & EXTI_LINE) != (uint32_t)RESET) {
-        //	EXTI->PND = EXTI_LINE;
+  if((INTERVAL_TIMER->cval) > ((average_interval>>1))){
+       EXINT->intsts = EXTI_LINE;
+       interruptRoutine();
+    }else{ 
+      if (getCompOutputLevel() == rising){
         EXINT->intsts = EXTI_LINE;
-        interruptRoutine();
     }
+  }
 }
 
 /**

@@ -5,6 +5,10 @@
 #include "ADC.h"
 #include "main.h"
 #include "targets.h"
+#include "common.h"
+#include "comparator.h"
+
+
 extern void transfercomplete();
 extern void PeriodElapsedCallback();
 extern void interruptRoutine();
@@ -19,7 +23,6 @@ extern char send_telemetry;
 extern char telemetry_done;
 extern char servoPwm;
 extern char dshot;
-extern uint32_t commutation_interval;
 int exti_int = 0;
 
 void HardFault_Handler(void)
@@ -177,12 +180,14 @@ void DMA1_Channel5_4_IRQHandler(void)
  */
 void ADC1_CMP_IRQHandler(void)
 {
-if ((EXINT->intsts & EXTI_LINE) != (uint32_t)RESET) {
-	EXINT->intsts = EXTI_LINE;
-	if((INTERVAL_TIMER->cval) > (commutation_interval >> 1)){
+  if((INTERVAL_TIMER->cval) > ((average_interval>>1))){
+       EXINT->intsts = EXTI_LINE;
        interruptRoutine();
+    }else{ 
+      if (getCompOutputLevel() == rising){
+        EXINT->intsts = EXTI_LINE;
     }
-	}
+  }
 }
 
 /**

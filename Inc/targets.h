@@ -1653,7 +1653,7 @@
 #define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_4
 #define CURRENT_ADC_PIN LL_GPIO_PIN_4
 #define RAMP_SPEED_LOW_RPM 1
-#define RAMP_SPEED_HIGH_RPM 2
+#define RAMP_SPEED_HIGH_RPM 1
 #define USE_LED_STRIP
 #endif
 
@@ -1919,11 +1919,11 @@
 #endif
 
 #ifndef RAMP_SPEED_STARTUP
-#define RAMP_SPEED_STARTUP 1 // adjusted 2.14 to match duty cycle change between mcu targets.
+#define RAMP_SPEED_STARTUP 2 // adjusted 2.14 to match duty cycle change between mcu targets.
 #endif
 
 #ifndef RAMP_SPEED_LOW_RPM // below commutation interval of 250us
-#define RAMP_SPEED_LOW_RPM 4
+#define RAMP_SPEED_LOW_RPM 6
 #endif
 
 #ifndef RAMP_SPEED_HIGH_RPM
@@ -3275,9 +3275,9 @@
 #endif
 
 #ifdef HARDWARE_GROUP_AT_245
-#define PHASE_A_COMP 0x400000F1 // pa2     // works for polling mode
-#define PHASE_B_COMP 0x400000C1 // pa4
-#define PHASE_C_COMP 0x400000D1 // pa5
+#define PHASE_A_COMP 0x400000F5 // pa2     // works for polling mode
+#define PHASE_B_COMP 0x400000C5 // pa4
+#define PHASE_C_COMP 0x400000D5 // pa5
 #endif
 
 #ifdef     HARDWARE_GROUP_L4_A

@@ -71,7 +71,6 @@ void SystemClock_Config(void)
 #else
 #error "Unsupported HSE_VALUE"
 #endif
-#endif
 
 #else
   LL_RCC_MSI_Enable();

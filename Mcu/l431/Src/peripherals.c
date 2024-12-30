@@ -66,6 +66,8 @@ void SystemClock_Config(void)
   LL_RCC_HSE_Enable();
 #if HSE_VALUE == 24000000
   LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_3, 20, LL_RCC_PLLR_DIV_2);
+#elif HSE_VALUE == 16000000
+  LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_2, 20, LL_RCC_PLLR_DIV_2);
 #else
 #error "Unsupported HSE_VALUE"
 #endif

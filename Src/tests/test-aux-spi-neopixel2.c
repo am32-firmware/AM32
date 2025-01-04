@@ -1,12 +1,12 @@
 // Test the gpio pins used for auxilliary
 // spi port
 // (just toggle gpio pins, not the spi peripheral)
-#include "stm32h563xx.h"
 #include "targets.h"
 #include "spi.h"
+#include "mcu.h"
 #include "gpio.h"
 #include "dma.h"
-#include "clock.h"
+#include "vreg.h"
 
 
 #define LED_T0 (0b11000000)
@@ -18,23 +18,13 @@ spi_t spi;
 
 int main()
 {
-    clock_hsi_config_divider(0b00);
-    clock_hse_enable();
-    // enable dma clocks
-    dma_initialize();
+    mcu_setup(250);
+
+    vreg5V_initialize();
+    vreg5V_enable();
+
     // enable spi clock
     AUX_SPI_ENABLE_CLOCK();
-
-    // enable 5V regulator
-    gpio_t gpioVreg5VEnable = DEF_GPIO(
-        VREG_5V_ENABLE_PORT,
-        VREG_5V_ENABLE_PIN,
-        0,
-        GPIO_OUTPUT);
-    gpio_initialize(&gpioVreg5VEnable);
-    // gpio_set_speed(&gpioVreg5VEnable, 0b11);
-    gpio_set(&gpioVreg5VEnable);
-
 
     gpio_t gpioSpiNSS = DEF_GPIO(
         AUX_SPI_NSS_PORT,
@@ -56,7 +46,7 @@ int main()
         AUX_SPI_MOSI_PIN,
         AUX_SPI_MOSI_AF,
         GPIO_AF);
-    
+
 
     spi.ref = AUX_SPI_PERIPH;
 
@@ -82,10 +72,11 @@ int main()
     gpio_initialize(&gpioSpiMOSI);
 
     gpio_configure_pupdr(&gpioSpiMOSI, GPIO_PULL_DOWN);
-    gpio_set_speed(&gpioSpiNSS, 0b11);
-    gpio_set_speed(&gpioSpiSCK, 0b11);
-    gpio_set_speed(&gpioSpiMISO, 0b11);
-    gpio_set_speed(&gpioSpiMOSI, 0b11);
+    gpio_set_speed(&gpioSpiNSS, GPIO_SPEED_VERYFAST);
+    gpio_set_speed(&gpioSpiSCK, GPIO_SPEED_VERYFAST);
+    gpio_set_speed(&gpioSpiMISO, GPIO_SPEED_VERYFAST);
+    gpio_set_speed(&gpioSpiMOSI, GPIO_SPEED_VERYFAST);
+
     #define DL (50 + 20)
     uint16_t word0 = (LED_T0 << 8) | LED_T0;
     uint16_t word1 = (LED_T0 << 8) | LED_T1;
@@ -98,9 +89,10 @@ int main()
     for (int i = 50; i < 50 + 12; i++) {
         data[i] = word1;
     }
-    
+
     spi_write(&spi, data, DL);
     // arbitrary delay
+
 
     while(1) {
         // spi_write_word(&spi, word);

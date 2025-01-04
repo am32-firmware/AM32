@@ -66,7 +66,6 @@ int main()
     as5048_set_zero_position(&as5048);
 
     while(1) {
-        // current_angle = as5048_get_angle_degrees(&as5048);
         current_angle = as5048_read_angle(&as5048);
         uint32_t color = angle_to_color(current_angle);
         led_write(color);

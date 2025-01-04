@@ -91,12 +91,7 @@ void led_write(uint32_t brg)
         if (brg & (1<<i)) {
             data[i+2] = LED_T1;
         } else {
-            data[i+2] = LED_T0;        led_write(145);
-        wait(0xffffff);
-        led_write(146);
-        wait(0xffffff);
-        led_write(0);
-        wait(0xffffff);
+            data[i+2] = LED_T0;
         }
     }
 

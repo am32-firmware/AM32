@@ -60,16 +60,17 @@ SRC_COMMON := $(filter-out $(SRC_MAIN), $(SRC_COMMON))
 $(info    $(SRC_COMMON))
 
 # SRC_MAIN := $(SRC_DIRS_COMMON)/main.c
-# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-adc.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/t ests/test-adc.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-debug.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-read.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-led.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-led.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-set-zero.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-usart.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-input-pwm.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-spi-gpio.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-spi.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-spi-neopixel.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-spi-neopixel2.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-uart-tx.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-uart-sk6812.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-bridge-audio.c

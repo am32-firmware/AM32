@@ -286,4 +286,5 @@ bool as5048_write_zero_position(as5048_t* as5048, uint16_t zero_position)
 
     as5048_write_reg(as5048, AS5048_REG_ZPL, zpl);
     as5048_write_reg(as5048, AS5048_REG_ZPH, zph);
+    return true;
 }

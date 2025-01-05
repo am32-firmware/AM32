@@ -6,28 +6,23 @@
 #include "spi.h"
 #include "gpio.h"
 #include "dma.h"
+#include "mcu.h"
+#include "vreg.h"
 
 uint16_t spi_rx_buffer[256];
 uint16_t spi_tx_buffer[256];
-spi_t spi;
+static spi_t* spi = &spis[AUX_AM32_SPI_PERIPH];
 
 int main()
 {
-    // enable dma clocks
-    dma_initialize();
+    mcu_setup(250);
+
     // enable spi clock
     AUX_SPI_ENABLE_CLOCK();
 
     // enable 5V regulator
-    gpio_t gpioVreg5VEnable = DEF_GPIO(
-        VREG_5V_ENABLE_PORT,
-        VREG_5V_ENABLE_PIN,
-        0,
-        GPIO_OUTPUT);
-    gpio_initialize(&gpioVreg5VEnable);
-    // gpio_set_speed(&gpioVreg5VEnable, 0b11);
-    gpio_set(&gpioVreg5VEnable);
-
+    vreg5V_initialize();
+    vreg5V_enable();
 
     gpio_t gpioSpiNSS = DEF_GPIO(
         AUX_SPI_NSS_PORT,
@@ -49,70 +44,30 @@ int main()
         AUX_SPI_MOSI_PIN,
         AUX_SPI_MOSI_AF,
         GPIO_AF);
-    
 
-    spi.ref = AUX_SPI_PERIPH;
-
-    spi._rx_buffer = spi_rx_buffer;
-    spi._tx_buffer = spi_tx_buffer;
-    spi._rx_buffer_size = 256;
-    spi._tx_buffer_size = 256;
-    spi.rxDma = &dmaChannels[7];
-    spi.txDma = &dmaChannels[0];
-
-    spi.txDmaRequest = LL_GPDMA1_REQUEST_SPI4_TX;
-    spi.rxDmaRequest = LL_GPDMA1_REQUEST_SPI4_RX;
-    spi_initialize(&spi);
+    spi->_rx_buffer = spi_rx_buffer;
+    spi->_tx_buffer = spi_tx_buffer;
+    spi->_rx_buffer_size = 256;
+    spi->_tx_buffer_size = 256;
+    spi->rxDma = 0;
+    spi->txDma = &dmaChannels[AUX_SPI_TX_DMA_CHANNEL];
+    spi->txDmaRequest = AUX_SPI_TX_DMA_REQ;
+    spi->rxDmaRequest = AUX_SPI_RX_DMA_REQ;
+    spi_initialize(spi);
 
     gpio_initialize(&gpioSpiNSS);
     gpio_initialize(&gpioSpiSCK);
     gpio_initialize(&gpioSpiMISO);
     gpio_initialize(&gpioSpiMOSI);
 
-    gpio_set_speed(&gpioSpiNSS, 0b11);
-    gpio_set_speed(&gpioSpiSCK, 0b11);
-    gpio_set_speed(&gpioSpiMISO, 0b11);
-    gpio_set_speed(&gpioSpiMOSI, 0b11);
-    
+    gpio_set_speed(&gpioSpiNSS, GPIO_SPEED_VERYFAST);
+    gpio_set_speed(&gpioSpiSCK, GPIO_SPEED_VERYFAST);
+    gpio_set_speed(&gpioSpiMISO, GPIO_SPEED_VERYFAST);
+    gpio_set_speed(&gpioSpiMOSI, GPIO_SPEED_VERYFAST);
 
-    // for (uint16_t i = 0; i < 200; i++) {
-    //     spi_write(&spi, &i, 1);
-    // }
-    // uint16_t data = 0xf550;
-    // spi_write(&spi, &data, 1);
-    // spi_write(&spi, &data, 1);
-    // spi_write(&spi, &data, 1);
-    
-    // uint16_t data[] = {
-    //     0xff00,
-    //     0x5555,
-    //     0x0550,
-    //     0x5555,
-    //     0x00ff,
-    //     0x5555,
-    //     0x5555,
-    //     0x5555,
-    //     0x5555,
-    //     0x5555,
-    // };
-
-    // uint16_t data[] = {
-    //     DRV8323_READ | DRV8323_REG_FAULT_STATUS_1,
-    //     DRV8323_READ | DRV8323_REG_VGS_STATUS_2,
-    //     DRV8323_READ | DRV8323_REG_DRIVER_CONTROL,
-    //     DRV8323_READ | DRV8323_REG_GATE_DRIVE_HS,
-    //     DRV8323_READ | DRV8323_REG_GATE_DRIVE_LS,
-    //     DRV8323_READ | DRV8323_REG_OCP_CONTROL,
-    //     DRV8323_READ | DRV8323_REG_CSA_CONTROL,
-    // };
-
-    // spi_write(&spi, data, 7);
-    // uint16_t readData[10];
-    // while(spi_rx_waiting(&spi) < 7);
-    // spi_read(&spi, readData, 7);
     uint16_t word = 0x5555;
     while(1) {
-        spi_write_word(&spi, word);
+        spi_write_word(spi, word);
         for (int i = 0; i < 0xfffff; i++) {
             asm("nop");
         }

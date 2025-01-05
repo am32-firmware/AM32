@@ -8,7 +8,7 @@
 
 as5048_t as5048;
 
-uint16_t angle;
+uint16_t current_angle;
 
 int main()
 {
@@ -16,6 +16,6 @@ int main()
     as5048_initialize(&as5048);
 
     while(1) {
-        angle = as5048_read_angle(&as5048);
+        current_angle = as5048_read_angle(&as5048);
     }
 }

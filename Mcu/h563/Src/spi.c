@@ -421,9 +421,9 @@ uint16_t spi_write_word(spi_t* spi, uint16_t word)
     spi->ref->CR2 = 1;
     spi_enable(spi);
     spi->ref->TXDR = word;
-    while (!(spi->ref->SR & SPI_SR_TXTF));
+    while (!(spi->ref->SR & SPI_SR_TXTF)); // all data has been submitted to the tx fifo
     spi_start_transfer(spi);
-    while (!(spi->ref->SR & SPI_SR_TXC)); // all data has been submitted to the tx fifo
+    // while (!(spi->ref->SR & SPI_SR_TXC)); // the fifo has become empty
     while (!(spi->ref->SR & SPI_SR_EOT)); // all data has been shifted out of tx fifo
     while (!(spi->ref->SR & SPI_SR_RXP)); // data is available in rx fifo
     uint16_t response = spi->ref->RXDR;

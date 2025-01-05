@@ -21,43 +21,43 @@ typedef union EEprom_u {
         uint8_t advance_level; // 23
         uint8_t pwm_frequency; // 24
         uint8_t startup_power; // 25
-        uint8_t motor_kv; // 26
-        uint8_t motor_poles; // 27
-        uint8_t brake_on_stop; // 28
-        uint8_t stall_protection; // 29
-        uint8_t beep_volume; // 30
-        uint8_t telementry_on_interval; // 31
+        uint16_t motor_kv; // 26-27 (changed to uint16_t)
+        uint8_t motor_poles; // 28
+        uint8_t brake_on_stop; // 29
+        uint8_t stall_protection; // 30
+        uint8_t beep_volume; // 31
+        uint8_t telementry_on_interval; // 32
         struct {
-            uint8_t low_threshold; // 32
-            uint8_t high_threshold; // 33
-            uint8_t neutral; // 34
-            uint8_t dead_band; // 35
+            uint8_t low_threshold; // 33
+            uint8_t high_threshold; // 34
+            uint8_t neutral; // 35
+            uint8_t dead_band; // 36
         } servo;
-        uint8_t low_voltage_cut_off; // 36
-        uint8_t low_cell_volt_cutoff; // 37
-        uint8_t rc_car_reverse; // 38
-        uint8_t use_hall_sensors; // 39
-        uint8_t sine_mode_changeover_thottle_level; // 40
-        uint8_t drag_brake_strength; // 41
-        uint8_t driving_brake_strength; // 42
+        uint8_t low_voltage_cut_off; // 37
+        uint8_t low_cell_volt_cutoff; // 38
+        uint8_t rc_car_reverse; // 39
+        uint8_t use_hall_sensors; // 40
+        uint8_t sine_mode_changeover_thottle_level; // 41
+        uint8_t drag_brake_strength; // 42
+        uint8_t driving_brake_strength; // 43
         struct {
-            uint8_t temperature; // 43
-            uint8_t current; // 44
+            uint8_t temperature; // 44
+            uint8_t current; // 45
         } limits;
-        uint8_t sine_mode_power; // 45
-        uint8_t input_type; // 46
-        uint8_t auto_advance; // 47
-        uint8_t tune[128]; // 48-175
+        uint8_t sine_mode_power; // 46
+        uint8_t input_type; // 47
+        uint8_t auto_advance; // 48
+        uint8_t tune[128]; // 49-176
         struct {
-            uint8_t can_node; // 176
-            uint8_t esc_index; // 177
-            uint8_t require_arming; // 178
-            uint8_t telem_rate; // 179
-            uint8_t require_zero_throttle; // 180
-            uint8_t filter_hz; // 181
-            uint8_t debug_rate; // 182
-            uint8_t term_enable; // 183
-            uint8_t reserved[8]; // 184-191
+            uint8_t can_node; // 177
+            uint8_t esc_index; // 178
+            uint8_t require_arming; // 179
+            uint8_t telem_rate; // 180
+            uint8_t require_zero_throttle; // 181
+            uint8_t filter_hz; // 182
+            uint8_t debug_rate; // 183
+            uint8_t term_enable; // 184
+            uint8_t reserved[8]; // 185-192
         } can;
     };
     uint8_t buffer[192];

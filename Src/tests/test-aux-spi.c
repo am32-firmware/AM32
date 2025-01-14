@@ -48,6 +48,9 @@ int main()
     // configure spi kernel clock as HSE via per_ck (25MHz)
     // spi_configure_rcc_clock_selection(spi, 0b100);
 
+    // configure spi kernel clock as HSE (25MHz)
+    spi_configure_rcc_clock_selection(spi, 0b101);
+
     spi->_rx_buffer = spi_rx_buffer;
     spi->_tx_buffer = spi_tx_buffer;
     spi->_rx_buffer_size = 256;
@@ -58,23 +61,23 @@ int main()
     spi->rxDmaRequest = AUX_SPI_RX_DMA_REQ;
     spi->txDmaRequest = AUX_SPI_TX_DMA_REQ;
 
-    // spi->CFG1_MBR = SPI_MBR_DIV_4; // kernel clock / 4
-    // spi->CFG2 = ( SPI_CFG2_SSOE
-    //             | SPI_CFG2_CPHA
-    //             | SPI_CFG2_MASTER
-    //             );
-
-    // a 250MHz kernel clock / 32 gives an SPI clock of 7.8125MHz
-    spi->CFG1_MBR = SPI_MBR_DIV_32; // prescaler = 32
-    spi->CFG2 =
-                ( SPI_CFG2_AFCNTR
-                | SPI_CFG2_SSOE
-                | SPI_CFG2_SSOM
+    spi->CFG1_MBR = SPI_MBR_DIV_4; // kernel clock / 4
+    spi->CFG2 = ( SPI_CFG2_SSOE
                 | SPI_CFG2_CPHA
                 | SPI_CFG2_MASTER
-                | (0b1111 << SPI_CFG2_MIDI_Pos)
-                | (0b1111 << SPI_CFG2_MSSI_Pos)
                 );
+
+    // // a 250MHz kernel clock / 32 gives an SPI clock of 7.8125MHz
+    // spi->CFG1_MBR = SPI_MBR_DIV_32; // prescaler = 32
+    // spi->CFG2 =
+    //             ( SPI_CFG2_AFCNTR
+    //             | SPI_CFG2_SSOE
+    //             | SPI_CFG2_SSOM
+    //             | SPI_CFG2_CPHA
+    //             | SPI_CFG2_MASTER
+    //             | (0b1111 << SPI_CFG2_MIDI_Pos)
+    //             | (0b1111 << SPI_CFG2_MSSI_Pos)
+    //             );
     spi_initialize(spi);
 
     gpio_initialize(&gpioSpiNSS);

@@ -36,6 +36,8 @@ int main()
     gpio_t gpioUsartTx = DEF_GPIO(TEST_USART_TX_PORT, TEST_USART_TX_PIN, TEST_USART_TX_AF, GPIO_AF);
     gpio_initialize(&gpioUsartRx);
     gpio_initialize(&gpioUsartTx);
+    gpio_set_speed(&gpioUsartRx, GPIO_SPEED_VERYFAST);
+    gpio_set_speed(&gpioUsartTx, GPIO_SPEED_VERYFAST);
 
     usart.ref = TEST_USART_REF;
 
@@ -53,6 +55,5 @@ int main()
 
     while(1) {
         usart_write_string(&usart, "hello world\n");
-        usart_write_int(&usart, 80085);
     }
 }

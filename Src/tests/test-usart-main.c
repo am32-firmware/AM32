@@ -39,7 +39,7 @@ int main()
     usart.txDma = &dmaChannels[0];
     usart.txDmaRequest = MAIN_USART_DMA_REQ;
 
-    usart._baudrate = 9600;
+    usart._baudrate = 115200;
     usart.swap = 0;
     usart_initialize(&usart);
 

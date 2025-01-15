@@ -45,17 +45,18 @@ void led_initialize()
     // spi->ref = LED_SPI_PERIPH;
 
     // configure spi kernel clock as HSE via per_ck (25MHz)
-    spi_configure_rcc_clock_selection(spi, 0b100);
+    spi_configure_rcc_clock_selection(spi, 0b100); // for SPI2
+    // spi_configure_rcc_clock_selection(spi, 0b101); // for SPI4
 
     spi->_rx_buffer = led_spi_rx_buffer;
     spi->_tx_buffer = led_spi_tx_buffer;
     spi->_rx_buffer_size = 256;
     spi->_tx_buffer_size = 256;
     spi->rxDma = 0;
-    spi->txDma = &dmaChannels[LED_TX_DMA_CHANNEL];
+    spi->txDma = &dmaChannels[LED_SPI_TX_DMA_CHANNEL];
 
     spi->rxDmaRequest = 0;
-    spi->txDmaRequest = LL_GPDMA1_REQUEST_SPI2_TX;
+    spi->txDmaRequest = LED_SPI_TX_DMA_REQ;
 
     spi->CFG1_MBR = 0b001; // kernel clock / 2
     spi->CFG2 = ( SPI_CFG2_SSOE
@@ -68,7 +69,7 @@ void led_initialize()
     gpio_initialize(&gpioSpiMOSI);
 
     gpio_configure_pupdr(&gpioSpiMOSI, GPIO_PULL_DOWN);
-    gpio_set_speed(&gpioSpiMOSI, 0b11);
+    gpio_set_speed(&gpioSpiMOSI, GPIO_SPEED_VERYFAST);
 
     data[0] = 0;
     data[1] = 0;

@@ -99,7 +99,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi3.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi4.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi5.c
-# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi6.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi6.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-maxfrequency.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-nothing.c
@@ -111,7 +111,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-ten-khz-timer.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-aux.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-debug.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-main.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-main.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-main-rs485.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-vreg-5V.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-watchdog-fail.c

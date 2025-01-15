@@ -1862,6 +1862,12 @@
 #define AUX_SPI_RX_DMA_CHANNEL 14
 #define AUX_SPI_TX_DMA_CHANNEL 8
 
+
+
+///////////////
+// led
+///////////////
+
 #define LED_SPI_MOSI_PORT GPIOI
 #define LED_SPI_MOSI_PIN 3
 #define LED_SPI_MOSI_AF 5
@@ -1884,7 +1890,42 @@
 }
 
 // linear
-#define LED_TX_DMA_CHANNEL 3
+#define LED_SPI_TX_DMA_CHANNEL 3
+#define LED_SPI_TX_DMA_REQ LL_GPDMA1_REQUEST_SPI2_TX
+
+// ///////////////
+// // led - aux
+// ///////////////
+
+// #define LED_SPI_MOSI_PORT AUX_SPI_MOSI_PORT
+// #define LED_SPI_MOSI_PIN AUX_SPI_MOSI_PIN
+// #define LED_SPI_MOSI_AF AUX_SPI_MOSI_AF
+
+// ////////////////
+// // THIS IS A WORKAROUND
+// // GPIO D3 IS NOT CONNECTED ON BLUEESC
+// ////////////////
+// // SPI TXC is never set if the clock pin
+// // is not configured in alternate function mode!
+// // see also https://community.st.com/t5/stm32-mcus-products/stm32h7a3-spi-not-working-if-sck-disabled/td-p/201817
+// #define LED_SPI_SCK_PORT AUX_SPI_SCK_PORT
+// #define LED_SPI_SCK_PIN AUX_SPI_SCK_PIN
+// #define LED_SPI_SCK_AF AUX_SPI_SCK_AF
+
+// #define LED_SPI_PERIPH AUX_SPI_PERIPH
+// #define LED_AM32_SPI_PERIPH AUX_AM32_SPI_PERIPH
+// #define LED_SPI_ENABLE_CLOCK() { \
+//     AUX_SPI_ENABLE_CLOCK(); \
+// }
+
+// // linear
+// #define LED_SPI_TX_DMA_CHANNEL AUX_SPI_TX_DMA_CHANNEL
+// #define LED_SPI_TX_DMA_REQ AUX_SPI_TX_DMA_REQ
+
+
+///////////////
+// comparator
+///////////////
 
 #define COMPA_GPIO_PORT GPIOF
 #define COMPA_GPIO_PIN 4

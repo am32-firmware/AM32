@@ -44,9 +44,13 @@ void led_initialize()
 
     // spi->ref = LED_SPI_PERIPH;
 
-    // configure spi kernel clock as HSE via per_ck (25MHz)
-    spi_configure_rcc_clock_selection(spi, 0b100); // for SPI2
-    // spi_configure_rcc_clock_selection(spi, 0b101); // for SPI4
+    if ((uint32_t)spi->ref == SPI2_BASE) {
+        // configure spi kernel clock as HSE via per_ck (25MHz)
+        spi_configure_rcc_clock_selection(spi, 0b100); // for SPI2
+    } else if ((uint32_t)spi->ref == SPI4_BASE) {
+        // configure spi kernel clock as HSE (25MHz)
+        spi_configure_rcc_clock_selection(spi, 0b101); // for SPI4
+    }
 
     spi->_rx_buffer = led_spi_rx_buffer;
     spi->_tx_buffer = led_spi_tx_buffer;

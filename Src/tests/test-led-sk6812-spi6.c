@@ -6,12 +6,11 @@
 
 void wait(uint32_t loops)
 {
-    for (uint32_t i = 0; i < loops; i++)
-    {
+    for (uint32_t i = 0; i < loops; i++) {
+        // no-operation cpu instruction
         asm("nop");
     }
 }
-
 
 int main()
 {

@@ -92,11 +92,28 @@ void led_write_rgb(uint8_t r, uint8_t g, uint8_t b) {
 
 void led_write(uint32_t brg)
 {
+    // uint8_t ledData[24];
+
+    // for (int i = 0; i < 8; i++) {
+    //     ledData[8 - i] = (brg & (1 << i)) ? LED_T1 : LED_T0;
+    // }
+    // // for (int i = 16; i > 8; i--) {
+    // //     data[i + 2] = (brg & (1 << i)) ? LED_T1 : LED_T0;
+    // // }
+
+    // reverse the bits in each byte
+    // see also https://developer.arm.com/documentation/100235/0100/The-Cortex-M33-Instruction-Set/General-data-processing-instructions/REV--REV16--REVSH--and-RBIT
+
     for (int i = 0; i < 24; i++) {
+        data[i+2] = LED_T0;
+
+    }
+
+    for (int i = 8; i > 0; i--) {
         if (brg & (1<<i)) {
-            data[i+2] = LED_T1;
+            data[8 - i + 2] = LED_T1;
         } else {
-            data[i+2] = LED_T0;
+            data[8 - i + 2] = LED_T0;
         }
     }
 

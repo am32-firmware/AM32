@@ -5,6 +5,7 @@
 #include "clock.h"
 #include "dma.h"
 #include "flash.h"
+#include "lan8671.h"
 #include "power.h"
 
 
@@ -18,6 +19,8 @@ void mcu_setup(uint16_t coreFrequencyMHz)
     // comment if you don't need it,
     // most applications use dma
     dma_initialize();
+    // this should go under board setup, not mcu
+    lan8671_shutdown();
 }
 
 void mcu_setup_clocks(uint16_t coreFrequencyMHz)

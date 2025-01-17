@@ -3,7 +3,7 @@
 #include "gpio.h"
 #include "exti.h"
 
-gpio_t gpioButton = DEF_GPIO(GPIOC, 13, 0, GPIO_INPUT);
+gpio_t gpioButton = DEF_GPIO(BUTTON_GPIO_PORT, BUTTON_GPIO_PIN, 0, GPIO_INPUT);
 
 gpio_t gpioLed = DEF_GPIO(LED_R_GPIO_PORT, LED_R_GPIO_PIN, 0, GPIO_OUTPUT);
 
@@ -24,6 +24,7 @@ int main()
     EXTI_INTERRUPT_ENABLE_MASK(1 << gpioButton.pin);
 
     gpio_initialize(&gpioButton);
+    gpio_configure_pupdr(&gpioButton, GPIO_PULL_UP);
 
     gpio_initialize(&gpioLed);
     gpio_reset(&gpioLed);

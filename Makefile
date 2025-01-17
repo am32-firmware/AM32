@@ -92,6 +92,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-exti-comparator-3phase.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-gpio-high.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-gpio-low.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-gpio-toggle.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-input-pwm.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi.c
@@ -100,7 +101,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi4.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi5.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi6.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi7.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi7.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-maxfrequency.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-nothing.c

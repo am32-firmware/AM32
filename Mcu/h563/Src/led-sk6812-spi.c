@@ -109,11 +109,27 @@ void led_write(uint32_t brg)
 
     }
 
-    for (int i = 8; i > 0; i--) {
-        if (brg & (1<<i)) {
-            data[8 - i + 2] = LED_T1;
+    for (uint8_t i = 0; i < 8; i++) {
+        if (brg & (1 << i)) {
+            data[7 - i + 2] = LED_T1;
         } else {
-            data[8 - i + 2] = LED_T0;
+            data[7 - i + 2] = LED_T0;
+        }
+    }
+
+    for (uint8_t i = 8; i < 16; i++) {
+        if (brg & (1 << i)) {
+            data[8 + 15 - i + 2] = LED_T1;
+        } else {
+            data[8 + 15 - i + 2] = LED_T0;
+        }
+    }
+
+    for (uint8_t i = 16; i < 24; i++) {
+        if (brg & (1 << i)) {
+            data[16 + 23 - i + 2] = LED_T1;
+        } else {
+            data[16 + 23 - i + 2] = LED_T0;
         }
     }
 

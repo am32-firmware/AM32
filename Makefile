@@ -87,12 +87,12 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom-read.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom-write.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-exti-button.c
-# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-exti-button-led.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-exti-button-led.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-exti-3phase.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-exti-comparator-3phase.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-gpio-high.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-gpio-low.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-gpio-toggle.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-gpio-toggle.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-input-pwm.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi.c

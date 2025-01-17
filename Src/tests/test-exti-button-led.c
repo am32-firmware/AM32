@@ -1,3 +1,4 @@
+#include "mcu.h"
 #include "stm32h563xx.h"
 #include "targets.h"
 #include "gpio.h"
@@ -17,6 +18,8 @@ void button_exti_cb(extiChannel_t* exti)
 
 int main()
 {
+    mcu_setup(250);
+
     exti_configure_port(&extiChannels[gpioButton.pin], EXTI_CHANNEL_FROM_PORT(gpioButton.port));
     exti_configure_trigger(&extiChannels[gpioButton.pin], EXTI_TRIGGER_RISING_FALLING);
     exti_configure_cb(&extiChannels[gpioButton.pin], button_exti_cb);
@@ -30,6 +33,9 @@ int main()
     gpio_reset(&gpioLed);
 
     while(1) {
-
+        gpio_toggle(&gpioLed);
+        for (int i = 0 ; i < 0xffffff; i++) {
+            asm("nop");
+        }
     }
 }

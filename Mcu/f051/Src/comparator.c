@@ -12,7 +12,6 @@
 COMP_TypeDef* active_COMP = COMP1;
 
 uint8_t getCompOutputLevel() { return LL_COMP_ReadOutputLevel(active_COMP); }
-uint8_t medium_speed_set;
 
 void maskPhaseInterrupts()
 {
@@ -36,12 +35,9 @@ void changeCompInput()
     }
 if((average_interval < 400)){
 COMP->CSR = COMP->CSR & ~(1<<2);
-
-medium_speed_set = 0;
 }
 if((average_interval > 600)){
 COMP->CSR  = COMP->CSR | 1<<2;
-medium_speed_set = 1;
 }
     if (rising) {
         EXTI->RTSR = 0x0;

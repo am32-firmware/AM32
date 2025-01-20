@@ -6,8 +6,8 @@
  */
 
 #include "comparator.h"
-
 #include "targets.h"
+#include "common.h"
 
 uint8_t getCompOutputLevel() { return CMP->ctrlsts_bit.cmpvalue; }
 
@@ -39,6 +39,14 @@ void changeCompInput()
 //        EXINT->polcfg1 |= (uint32_t)EXTI_LINE;
 //        EXINT->polcfg2 = 0;
 //    }
-		EXINT->polcfg1 = !rising << 21;
+    if((average_interval < 150)){ 
+        //set comp to high speed mode
+        CMP->ctrlsts = CMP->ctrlsts & ~(1<<2);
+    }
+    if((average_interval > 250)){
+        //set comp to medium speed mode
+        CMP->ctrlsts  = CMP->ctrlsts | 1<<2;
+    }
+	EXINT->polcfg1 = !rising << 21;
     EXINT->polcfg2 = rising << 21;
 }

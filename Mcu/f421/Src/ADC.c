@@ -12,7 +12,7 @@ uint16_t ADCDataDMA[1];
 #ifdef USE_ADC_INPUT
 uint16_t ADCDataDMA[4];
 #else
-uint16_t ADCDataDMA[3];
+uint16_t ADCDataDMA[4];
 #endif
 #endif
 
@@ -32,7 +32,7 @@ void ADC_DMA_Callback()
     ADC_raw_current = ADCDataDMA[2];
     ADC_raw_input = ADCDataDMA[0];
 #else
-    ADC_raw_temp = ADCDataDMA[2];
+    ADC_raw_temp = ADCDataDMA[3];
 #ifdef PA6_VOLTAGE
     ADC_raw_volts = ADCDataDMA[1];
     ADC_raw_current = ADCDataDMA[0];
@@ -61,7 +61,7 @@ void ADC_Init(void)
 #ifdef PA6_NTC_ONLY
     dma_init_struct.buffer_size = 1;
 #else
-    dma_init_struct.buffer_size = 3;
+    dma_init_struct.buffer_size = 4;
 #endif
     dma_init_struct.direction = DMA_DIR_PERIPHERAL_TO_MEMORY;
     dma_init_struct.memory_base_addr = (uint32_t)&ADCDataDMA;
@@ -90,11 +90,12 @@ void ADC_Init(void)
     adc_base_config(ADC1, &adc_base_struct);
     adc_ordinary_channel_set(ADC1, ADC_CHANNEL_6, 1, ADC_SAMPLETIME_28_5);
 #else
-    adc_base_struct.ordinary_channel_length = 3;
+    adc_base_struct.ordinary_channel_length = 4;
     adc_base_config(ADC1, &adc_base_struct);
     adc_ordinary_channel_set(ADC1, ADC_CHANNEL_VOLTAGE, 1, ADC_SAMPLETIME_28_5);
     adc_ordinary_channel_set(ADC1, ADC_CHANNEL_CURRENT, 2, ADC_SAMPLETIME_28_5);
-    adc_ordinary_channel_set(ADC1, ADC_CHANNEL_TEMP, 3, ADC_SAMPLETIME_28_5);
+    adc_ordinary_channel_set(ADC1, ADC_CHANNEL_17, 3, ADC_SAMPLETIME_28_5);
+    adc_ordinary_channel_set(ADC1, ADC_CHANNEL_16, 4, ADC_SAMPLETIME_239_5);
 #endif
     adc_tempersensor_vintrv_enable(TRUE);
     adc_ordinary_conversion_trigger_set(ADC1, ADC12_ORDINARY_TRIG_SOFTWARE, TRUE);
@@ -112,7 +113,7 @@ void ADC_Init(void)
 
 int16_t getConvertedDegrees(uint16_t adcrawtemp)
 {
-    return (12600 - (int32_t)adcrawtemp * 33000 / 4096) / -42 + 15;
+    return (12800 - (int32_t)adcrawtemp * 33000 / 4096) / -42 + 25;
 }
 
 #endif // USE_ADC

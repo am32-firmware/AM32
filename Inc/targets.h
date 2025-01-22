@@ -1862,15 +1862,31 @@
 #define AUX_SPI_RX_DMA_CHANNEL 14
 #define AUX_SPI_TX_DMA_CHANNEL 8
 
+// ///////////////
+// // button-led combo on main port
+// // ... doesn't work on blueESC
+// // try aux port definition below
+// ///////////////
+
+// #define LED_R_GPIO_PORT GPIOD
+// #define LED_R_GPIO_PIN 8
+
+// // #define BUTTON_GPIO_PORT GPIOD
+// // #define BUTTON_GPIO_PIN 9
+
+// #define BUTTON_GPIO_PORT GPIOB
+// #define BUTTON_GPIO_PIN 1
+
+
 ///////////////
-// button-led combo on main port
+// button-led combo on aux port
 ///////////////
 
-#define LED_R_GPIO_PORT GPIOD
+#define LED_R_GPIO_PORT GPIOB
 #define LED_R_GPIO_PIN 8
 
-#define BUTTON_GPIO_PORT GPIOD
-#define BUTTON_GPIO_PIN 9
+#define BUTTON_GPIO_PORT GPIOB
+#define BUTTON_GPIO_PIN 7
 
 // ///////////////
 // // led

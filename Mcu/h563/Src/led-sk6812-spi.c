@@ -105,7 +105,7 @@ void led_write(uint32_t brg)
     // see also https://developer.arm.com/documentation/100235/0100/The-Cortex-M33-Instruction-Set/General-data-processing-instructions/REV--REV16--REVSH--and-RBIT
 
     for (int i = 0; i < 24; i++) {
-        data[i+2] = LED_T0;
+        data[i + 2] = LED_T0;
 
     }
 
@@ -131,6 +131,11 @@ void led_write(uint32_t brg)
         } else {
             data[16 + 23 - i + 2] = LED_T0;
         }
+    }
+
+    for (int i = 0; i < 12; i++) {
+        ((uint16_t*)data)[i + 1] = __REVSH(((uint16_t*)data)[i + 1]);
+
     }
 
     while (spi_busy(spi));

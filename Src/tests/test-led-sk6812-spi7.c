@@ -28,18 +28,24 @@ int main()
     mcu_setup(250);
     led_initialize();
 
-    uint8_t byte = 0x1;
-    byte = rotate_byte(byte);
-
-    byte = 0x2;
-    byte = rotate_byte(byte);
-
     while(1) {
         for (int i = 0; i < 0xff; i++)
         {
             led_write(0x1);
             wait(0xffffff);
             led_write(0x2);
+            wait(0xffffff);
+            led_write(0x3);
+            wait(0xffffff);
+            led_write(0x4);
+            wait(0xffffff);
+            led_write(0x5);
+            wait(0xffffff);
+            led_write(0x6);
+            wait(0xffffff);
+            led_write(0x7);
+            wait(0xffffff);
+            led_write(0x8);
             wait(0xffffff);
             led_write(0x100);
             wait(0xffffff);

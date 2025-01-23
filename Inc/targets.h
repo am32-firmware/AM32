@@ -1298,6 +1298,18 @@
 #define USE_SERIAL_TELEMETRY
 #endif
 
+#ifdef SISKIN_11A_F051 // signal pin PB4 bootloader 
+#define FILE_NAME "SISKIN_11A_F051"
+#define FIRMWARE_NAME "Siskin 11A "
+#define DEAD_TIME 30
+#define HARDWARE_GROUP_F0_B
+#define TARGET_VOLTAGE_DIVIDER 110
+#define VOLTAGE_ADC_PIN LL_GPIO_PIN_3
+#define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_3
+#define USE_SERIAL_TELEMETRY // no pad
+//#define USE_PA14_TELEMETRY // not stable
+#endif
+
 #ifdef DIATONE_F051
 #define FILE_NAME "DIATONE_F051"
 #define FIRMWARE_NAME "DIATONE GEN "

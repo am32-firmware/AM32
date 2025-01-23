@@ -819,7 +819,8 @@ void commutate()
 #endif
     bemfcounter = 0;
     zcfound = 0;
-   commutation_intervals[step - 1] = commutation_interval; // just used to calulate average
+    commutation_intervals[step - 1] = commutation_interval; // just used to calulate average
+    e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation_intervals[2] + commutation_intervals[3] + commutation_intervals[4] + commutation_intervals[5]) + 4) >> 1; // COMMUTATION INTERVAL IS 0.5US INCREMENTS
 #ifdef USE_PULSE_OUT
 		if(rising){
 			GPIOB->scr = GPIO_PINS_8;
@@ -833,7 +834,7 @@ void PeriodElapsedCallback()
 {
     DISABLE_COM_TIMER_INT(); // disable interrupt
     commutate();
-    commutation_interval = (3 * commutation_interval + thiszctime) >> 2;
+    commutation_interval = ((commutation_interval)+((lastzctime + thiszctime) >> 1))>>1;
   	if (!eepromBuffer.auto_advance) {
 	  advance = (commutation_interval >> 3) * temp_advance; // 60 divde 8 7.5 degree increments
 	} else {
@@ -872,8 +873,9 @@ void interruptRoutine()
             }
         }
     __disable_irq();
-		maskPhaseInterrupts();
-		thiszctime = INTERVAL_TIMER_COUNT;  
+    maskPhaseInterrupts();
+    lastzctime = thiszctime;
+    thiszctime = INTERVAL_TIMER_COUNT;  
     SET_INTERVAL_TIMER_COUNT(0);
     SET_AND_ENABLE_COM_INT(waitTime+1); // enable COM_TIMER interrupt
     __enable_irq();
@@ -1779,7 +1781,7 @@ if(zero_crosses < 5){
 	min_bemf_counts_down = TARGET_MIN_BEMF_COUNTS;
 }
         RELOAD_WATCHDOG_COUNTER();
-        e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation_intervals[2] + commutation_intervals[3] + commutation_intervals[4] + commutation_intervals[5]) + 4) >> 1; // COMMUTATION INTERVAL IS 0.5US INCREMENTS
+
         if (eepromBuffer.variable_pwm) {
             tim1_arr = map(commutation_interval, 96, 200, TIMER1_MAX_ARR / 2,
                 TIMER1_MAX_ARR);
@@ -1875,7 +1877,6 @@ if(zero_crosses < 5){
             }
         }
 #endif
-
         average_interval = e_com_time / 3;
         if (desync_check && zero_crosses > 10) {
             if ((getAbsDif(last_average_interval, average_interval) > average_interval >> 1) && (average_interval < 2000)) { // throttle resitricted before zc 20.
@@ -1989,28 +1990,20 @@ if(zero_crosses < 5){
 						}
 
             if (degrees_celsius > eepromBuffer.limits.temperature) {
-                duty_cycle_maximum = map(degrees_celsius, eepromBuffer.limits.temperature - 10, eepromBuffer.limits.temperature + 10,
-                    throttle_max_at_high_rpm / 2, 1);
+              duty_cycle_maximum = map(degrees_celsius, eepromBuffer.limits.temperature - 10, eepromBuffer.limits.temperature + 10,
+                throttle_max_at_high_rpm / 2, 1);
             }
             if (zero_crosses < 100 && commutation_interval > 500) {
-#ifdef MCU_G071
-                TIM1->CCR5 = 1; // comparator blanking
-                filter_level = 8;
-#else
-                filter_level = 12;
-#endif
+              filter_level = 12;
             } else {
-#ifdef MCU_G071
-                TIM1->CCR5 = 10;
-#endif
-                filter_level = map(average_interval, 100, 500, 3, 12);
+              filter_level = map(average_interval, 100, 500, 3, 12);
             }
             if (commutation_interval < 50) {
-                filter_level = 2;
+              filter_level = 2;
             }
 
             if (eepromBuffer.auto_advance) {
-			    auto_advance_level = map(duty_cycle, 100, 2000, 13, 23);
+              auto_advance_level = map(duty_cycle, 100, 2000, 13, 23);
             }
 
             /**************** old routine*********************/

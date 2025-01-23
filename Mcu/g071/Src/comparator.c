@@ -1,27 +1,3 @@
-///*
-// * comparator.c
-// *
-// *  Created on: Sep. 26, 2020
-// *      Author: Alka
-// */
-//
-// #include "comparator.h"
-// #include "targets.h"
-//
-//
-// void maskPhaseInterrupts(){
-//	EXTI->IMR1 &= ~(1 << 18);
-//	EXTI->RPR1 = EXTI_LINE;
-//	EXTI->FPR1 = EXTI_LINE;
-////	LL_EXTI_ClearRisingFlag_0_31(EXTI_LINE);
-////	LL_EXTI_ClearFallingFlag_0_31(EXTI_LINE);
-//}
-//
-// void enableCompInterrupts(){
-//    EXTI->IMR1 |= (1 << 18);
-//}
-//
-
 /*
  * comparator.c
  *
@@ -36,6 +12,7 @@
 
 COMP_TypeDef* active_COMP = COMP2;
 uint32_t current_EXTI_LINE = LL_EXTI_LINE_18;
+uint8_t medium_speed_set;
 
 uint8_t getCompOutputLevel() { return (active_COMP->CSR >> 30 & 1); }
 
@@ -55,6 +32,14 @@ void enableCompInterrupts() { EXTI->IMR1 |= current_EXTI_LINE; }
 
 void changeCompInput()
 {
+if((average_interval < 400) && medium_speed_set){
+LL_COMP_SetPowerMode(active_COMP, LL_COMP_POWERMODE_HIGHSPEED);
+medium_speed_set = 0;
+}
+if((average_interval > 600) && !medium_speed_set){
+LL_COMP_SetPowerMode(active_COMP, LL_COMP_POWERMODE_MEDIUMSPEED);
+medium_speed_set = 1;
+}
     if (step == 1 || step == 4) { // c floating
 #ifdef N_VARIANT
         current_EXTI_LINE = PHASE_C_EXTI_LINE;

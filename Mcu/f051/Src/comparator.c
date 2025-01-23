@@ -6,7 +6,7 @@
  */
 
 #include "comparator.h"
-
+#include "common.h"
 #include "targets.h"
 
 COMP_TypeDef* active_COMP = COMP1;
@@ -23,9 +23,6 @@ void enableCompInterrupts() { EXTI->IMR |= (1 << 21); }
 
 void changeCompInput()
 {
-    //	TIM3->CNT = 0;
-    //	HAL_COMP_Stop_IT(&hcomp1);            // done in comparator interrupt
-    // routine
 
     if (step == 1 || step == 4) { // c floating
         COMP->CSR = PHASE_C_COMP;
@@ -36,13 +33,15 @@ void changeCompInput()
     if (step == 3 || step == 6) { // b floating
         COMP->CSR = PHASE_B_COMP;
     }
+if((average_interval < 400)){
+COMP->CSR = COMP->CSR & ~(1<<2);
+}
+if((average_interval > 600)){
+COMP->CSR  = COMP->CSR | 1<<2;
+}
     if (rising) {
         EXTI->RTSR = 0x0;
         EXTI->FTSR = 0x200000;
-
-        //	hcomp1.Init.TriggerMode = COMP_TRIGGERMODE_IT_FALLING;   //
-        // polarity of
-        // comp output reversed
     } else {
         // falling bemf
         EXTI->FTSR = 0x0;

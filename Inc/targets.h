@@ -73,6 +73,18 @@
 #define USE_INTERNAL_AMP
 #endif
 
+#ifdef NEUTRON_SINGLE_L431
+#define FILE_NAME				"NEUTRON_SINGLE_L431"
+#define FIRMWARE_NAME           "Neutron L4 S"
+#define DEAD_TIME               70
+#define HARDWARE_GROUP_L4_N
+#define TARGET_VOLTAGE_DIVIDER  210
+#define CURRENT_OFFSET          498
+#define MILLIVOLT_PER_AMP        8
+#define USE_SERIAL_TELEMETRY
+#define USE_INTERNAL_AMP
+#endif
+
 #ifdef VIMDRONES_L431
 #define FIRMWARE_NAME "VimdroneL431"
 #define FILE_NAME "VIMDRONES_L431"
@@ -124,20 +136,64 @@
 #define FIRMWARE_NAME "SierraPulse1"
 #define FILE_NAME "SIERRA_PULSE1_L431_CAN"
 #define DRONECAN_SUPPORT 1
-#define DEAD_TIME 45
+#define USE_HSE
+#undef HSE_VALUE
+#define HSE_VALUE 16000000
+#define DEAD_TIME 120
 #define HARDWARE_GROUP_L4_C
-#define TARGET_VOLTAGE_DIVIDER 100
-#define MILLIVOLT_PER_AMP 100
+#define TARGET_VOLTAGE_DIVIDER 210
+#define MILLIVOLT_PER_AMP 10
+#define RAMP_SPEED_LOW_RPM 1
+#define RAMP_SPEED_HIGH_RPM 1
 #define USE_SERIAL_TELEMETRY
 #endif
 
 #ifdef  REF_L431
 #define FILE_NAME				"REF_L431"
-#define FIRMWARE_NAME           "L431 Neutron"
+#define FIRMWARE_NAME           "L431 TEST"
 #define DEAD_TIME               80
 #define HARDWARE_GROUP_L4_A
+#define COMP_ORDER_L4_A_045
 #define TARGET_VOLTAGE_DIVIDER  260
 #define USE_SERIAL_TELEMETRY
+#define RAMP_SPEED_LOW_RPM 1
+#define RAMP_SPEED_HIGH_RPM 1
+#endif
+
+#ifdef  TMOTOR_L431
+#define FILE_NAME				"TMOTOR_L431"
+#define FIRMWARE_NAME           "TMOTOR_L431"
+#define DEAD_TIME               80
+#define HARDWARE_GROUP_L4_A
+#define COMP_ORDER_L4_A_540
+#define TARGET_VOLTAGE_DIVIDER  260
+#define USE_SERIAL_TELEMETRY
+#endif
+
+#ifdef  TBS_12S_L431
+#define FILE_NAME				"TBS_12S_L431"
+#define FIRMWARE_NAME           "L431 TBS "
+#define DEAD_TIME               80
+#define HARDWARE_GROUP_L4_A
+#define COMP_ORDER_L4_A_045
+#define TARGET_VOLTAGE_DIVIDER  210
+#define USE_SERIAL_TELEMETRY
+#define RAMP_SPEED_LOW_RPM 1
+#define RAMP_SPEED_HIGH_RPM 1
+#define MILLIVOLT_PER_AMP 25
+#endif
+
+#ifdef  REF_L431_CAN
+#define FILE_NAME				"REF_L431_CAN"
+#define FIRMWARE_NAME           "L431 CAN"
+#define DEAD_TIME               80
+#define HARDWARE_GROUP_L4_A
+#define COMP_ORDER_L4_A_045
+#define TARGET_VOLTAGE_DIVIDER  260
+#define USE_SERIAL_TELEMETRY
+#define RAMP_SPEED_LOW_RPM 1
+#define RAMP_SPEED_HIGH_RPM 1
+#define DRONECAN_SUPPORT 1
 #endif
 
 #ifdef SEQURE_TEST_E230
@@ -242,7 +298,8 @@
 #define PA6_VOLTAGE
 #define USE_SERIAL_TELEMETRY
 #define LED_ON_PA15
-#define SLOW_RAMP_DOWN
+#define RAMP_SPEED_LOW_RPM 1
+#define RAMP_SPEED_HIGH_RPM 1
 #endif
 
 #ifdef GD32DEV_B_E230
@@ -358,6 +415,16 @@
 #define PA6_NTC_ONLY
 #endif
 
+#ifdef F4A_RUSH_F421
+#define FIRMWARE_NAME "F4A RUSH    "
+#define FILE_NAME "F4A_RUSH_F421"
+#define DEAD_TIME 40
+#define HARDWARE_GROUP_AT_540
+#define HARDWARE_GROUP_AT_E
+#define USE_SERIAL_TELEMETRY
+#endif
+
+
 #ifdef F4A_SINGLE_F421
 #define FIRMWARE_NAME "F4A Single  "
 #define FILE_NAME "F4A_SINGLE_F421"
@@ -365,7 +432,7 @@
 #define HARDWARE_GROUP_AT_540
 #define HARDWARE_GROUP_AT_E
 #define USE_SERIAL_TELEMETRY
-#define USE_PA14_TELEMETRY
+//#define USE_PA14_TELEMETRY
 #define PA6_NTC_ONLY
 #endif
 
@@ -389,6 +456,16 @@
 #define ADC_CHANNEL_VOLTAGE ADC_CHANNEL_6
 #endif
 
+#ifdef  SILENTFORCE_50_F421
+#define FIRMWARE_NAME "Silent-50   "
+#define FILE_NAME "SILENTFORCE_50_F421"
+#define DEAD_TIME 25
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_045
+#define USE_SERIAL_TELEMETRY
+#define MILLIVOLT_PER_AMP 20
+#endif
+
 #ifdef HDZ_ESC_1R0_F421
 #define FIRMWARE_NAME "HDZ_1R0 F4"
 #define FILE_NAME "HDZ_ESC_1R0_F421"
@@ -398,6 +475,18 @@
 #define USE_SERIAL_TELEMETRY
 #define ADC_CHANNEL_CURRENT ADC_CHANNEL_3
 #define ADC_CHANNEL_VOLTAGE ADC_CHANNEL_6
+#endif
+
+#ifdef JHEMCU_F421
+#define FIRMWARE_NAME "JHEMCU_F421 "
+#define FILE_NAME "JHEMCU_F421"
+#define DEAD_TIME 80
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_045
+#define USE_SERIAL_TELEMETRY
+#define ADC_CHANNEL_CURRENT ADC_CHANNEL_3
+#define ADC_CHANNEL_VOLTAGE ADC_CHANNEL_6
+#define TARGET_MIN_BEMF_COUNTS 3
 #endif
 
 #ifdef FLASHHOBBY_F421
@@ -524,7 +613,7 @@
 #define ADC_CHANNEL_VOLTAGE ADC_CHANNEL_6
 #endif
 
-#ifdef TEKKO32_4IN1_F421
+#ifdef  TEKKO32_4IN1_F421
 #define FIRMWARE_NAME "Tekko32 4in1"
 #define FILE_NAME "TEKKO32_4IN1_F421"
 #define DEAD_TIME 80
@@ -569,7 +658,6 @@
 #define HARDWARE_GROUP_AT_B
 #define HARDWARE_GROUP_AT_450
 #define USE_SERIAL_TELEMETRY
-
 #endif
 
 #ifdef HAKRC_G23_F421
@@ -584,24 +672,6 @@
 #define USE_NTC
 #define USE_LED_STRIP
 #define WS2812_PIN GPIO_PINS_7
-#define ADC_CHANNEL_CURRENT ADC_CHANNEL_3
-#define ADC_CHANNEL_VOLTAGE ADC_CHANNEL_2
-#define ADC_CHANNEL_TEMP ADC_CHANNEL_6
-#endif
-
-#ifdef FLYROTOR_F421
-#define FIRMWARE_NAME "FLYROTOR_150"
-#define FILE_NAME "FLYROTOR_F421"
-#define DEAD_TIME 100
-#define HARDWARE_GROUP_AT_B
-#define HARDWARE_GROUP_AT_450
-#define USE_SERIAL_TELEMETRY
-#define MILLIVOLT_PER_AMP 19
-#define TARGET_VOLTAGE_DIVIDER 190
-#define USE_NTC
-#define USE_LED_STRIP
-#define WS2812_PIN GPIO_PINS_3
-#define USE_PULSE_OUT
 #define ADC_CHANNEL_CURRENT ADC_CHANNEL_3
 #define ADC_CHANNEL_VOLTAGE ADC_CHANNEL_2
 #define ADC_CHANNEL_TEMP ADC_CHANNEL_6
@@ -658,7 +728,7 @@
 #endif
 
 #ifdef TEKKO32_F421
-#define FIRMWARE_NAME "Tekko32 F4"
+#define FIRMWARE_NAME "Tekko32 F421"
 #define FILE_NAME "TEKKO32_F421"
 #define DEAD_TIME 60
 #define HARDWARE_GROUP_AT_045
@@ -670,6 +740,15 @@
 #define TARGET_STALL_PROTECTION_INTERVAL 7000
 #endif
 
+#ifdef  MICOAIR_743_AIO_F421
+#define FIRMWARE_NAME "MicoAir AIO"
+#define FILE_NAME "MICOAIR_743_AIO_F421"
+#define DEAD_TIME 60
+#define HARDWARE_GROUP_AT_045
+#define HARDWARE_GROUP_AT_C
+#define USE_SERIAL_TELEMETRY
+#endif
+
 #ifdef AIKON_55A_F421
 #define FIRMWARE_NAME "AIKON F4 55A"
 #define FILE_NAME "AIKON_55A_F421"
@@ -677,6 +756,16 @@
 #define HARDWARE_GROUP_AT_C
 #define HARDWARE_GROUP_AT_045
 #define USE_SERIAL_TELEMETRY
+#endif
+
+#ifdef  TBS_MINI_F421
+#define FIRMWARE_NAME           "TBS Mini"
+#define FILE_NAME                "TBS_MINI_F421"
+#define DEAD_TIME               120
+#define HARDWARE_GROUP_AT_045
+#define HARDWARE_GROUP_AT_B
+#define USE_INVERTED_HIGH
+#define TARGET_MIN_BEMF_COUNTS 2
 #endif
 
 #ifdef TBS_12S_F421
@@ -789,7 +878,7 @@
 #endif
 
 #ifdef TEKKO32_F415
-#define FIRMWARE_NAME "Tekko32 F4  "
+#define FIRMWARE_NAME "Tekko32 F415"
 #define FILE_NAME "TEKKO32_F415"
 #define DEAD_TIME 100
 #define HARDWARE_GROUP_AT_D
@@ -804,6 +893,20 @@
 #define DRONECAN_SUPPORT 1
 #define HARDWARE_GROUP_AT_H
 #define HARDWARE_GROUP_AT_045
+#define TARGET_VOLTAGE_DIVIDER 210
+#define MILLIVOLT_PER_AMP 25
+#define RAMP_SPEED_LOW_RPM 1
+#define RAMP_SPEED_HIGH_RPM 1
+#define USE_SERIAL_TELEMETRY
+#endif
+
+#ifdef  ORCA_12S_F415
+#define FIRMWARE_NAME "ORCA 12S F4"
+#define FILE_NAME "ORCA_12S_F415"
+#define DEAD_TIME 120
+//#define DRONECAN_SUPPORT 1
+#define HARDWARE_GROUP_AT_H
+#define HARDWARE_GROUP_AT_054
 #define TARGET_VOLTAGE_DIVIDER 210
 #define MILLIVOLT_PER_AMP 25
 #define RAMP_SPEED_LOW_RPM 1
@@ -897,6 +1000,15 @@
 #define FIRMWARE_NAME "F421 Am60   "
 #define FILE_NAME "SKYSTARS_AM60_V2_F421"
 #define DEAD_TIME 70
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_045
+#define USE_SERIAL_TELEMETRY
+#endif
+
+#ifdef SKYSTARS_KO60_F421
+#define FIRMWARE_NAME "F421 KO60   "
+#define FILE_NAME "SKYSTARS_KO60_F421"
+#define DEAD_TIME 60
 #define HARDWARE_GROUP_AT_B
 #define HARDWARE_GROUP_AT_045
 #define USE_SERIAL_TELEMETRY
@@ -1015,13 +1127,10 @@
 #define FIRMWARE_NAME "F4A Zerodrag"
 #define FILE_NAME "F4A_ZERODRAG_F421"
 #define DEAD_TIME 75
-#define HARDWARE_GROUP_AT_540
+#define HARDWARE_GROUP_AT_054
 #define HARDWARE_GROUP_AT_B
 #define USE_SERIAL_TELEMETRY
-#define USE_PA14_TELEMETRY
-#define PA6_NTC_ONLY
 #endif
-
 
 #ifdef GEPRC_4IN1_F421
 #define FIRMWARE_NAME "Geprc 4in1 "
@@ -1032,7 +1141,6 @@
 #define USE_SERIAL_TELEMETRY
 #endif
 
-
 #ifdef ORQA_F421
 #define FIRMWARE_NAME "ORQA       "
 #define FILE_NAME "ORQA_F421"
@@ -1042,6 +1150,15 @@
 #define USE_SERIAL_TELEMETRY
 #endif
 
+
+#ifdef ZEX_BOREY_F421
+#define FIRMWARE_NAME "Zex Borey F4"
+#define FILE_NAME "ZEX_BOREY_F421"
+#define DEAD_TIME 80
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_450
+#define USE_SERIAL_TELEMETRY
+#endif
 
 /*****************************************************AT32F415 targets ************************************************/
 
@@ -1120,7 +1237,7 @@
 #define DEAD_TIME 45
 #define HARDWARE_GROUP_F0_B
 #define USE_SERIAL_TELEMETRY
-// #define USE_RGB_LED
+#define USE_RGB_LED
 #endif
 
 #ifdef OCDRC_F051
@@ -1510,6 +1627,28 @@
 #define SIXTY_FOUR_KB_MEMORY
 #endif
 
+#ifdef  SP_CRUSTCORE_G071
+#define FILE_NAME "SP_CRUSTCORE_G071"
+#define FIRMWARE_NAME "Crustcore 60"
+#define DEAD_TIME 40
+#define MILLIVOLT_PER_AMP 20
+#define CURRENT_OFFSET 0
+#define HARDWARE_GROUP_G0_A
+#define USE_SERIAL_TELEMETRY
+#define SIXTY_FOUR_KB_MEMORY
+#endif
+
+#ifdef  TMOTOR_F60A_G071
+#define FILE_NAME "TMOTOR_F60A_G071"
+#define FIRMWARE_NAME "F60A Mini G0"
+#define DEAD_TIME 60
+#define MILLIVOLT_PER_AMP 20
+#define CURRENT_OFFSET 0
+#define HARDWARE_GROUP_G0_A
+#define USE_SERIAL_TELEMETRY
+#define SIXTY_FOUR_KB_MEMORY
+#endif
+
 #ifdef  ST_G0_03_N_G071
 #define FILE_NAME "ST_G0_03_N_G071"
 #define FIRMWARE_NAME "ST_G0_03_N  "
@@ -1645,7 +1784,7 @@
 #define TARGET_VOLTAGE_DIVIDER 110
 #define HARDWARE_GROUP_G0_A
 #define USE_SERIAL_TELEMETRY
-#define SIXTY_FOUR_KB_MEMORY
+//#define SIXTY_FOUR_KB_MEMORY
 #define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_4
 #define CURRENT_ADC_PIN LL_GPIO_PIN_4
 #define USE_LED_STRIP
@@ -1665,7 +1804,8 @@
 #define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_4
 #define CURRENT_ADC_PIN LL_GPIO_PIN_4
 #define RAMP_SPEED_LOW_RPM 1
-#define RAMP_SPEED_HIGH_RPM 2
+#define RAMP_SPEED_HIGH_RPM 1
+#define TARGET_MIN_BEMF_COUNTS 3
 #define USE_LED_STRIP
 #endif
 
@@ -1902,6 +2042,21 @@
 #define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_7
 #endif
 
+#ifdef  CRAWLMASTER_F031
+#define FILE_NAME "CRAWLMASTER_F031"
+#define FIRMWARE_NAME "HH CM F031"
+#define DEAD_TIME 60
+#define HARDWARE_GROUP_F031_A
+#define TARGET_STALL_PROTECTION_INTERVAL 8000
+#define MILLIVOLT_PER_AMP 28
+#define USE_SERIAL_TELEMETRY
+#define CURRENT_SENSE_ADC_PIN LL_GPIO_PIN_5
+#define VOLTAGE_SENSE_ADC_PIN LL_GPIO_PIN_7
+
+#define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_5
+#define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_7
+#endif
+
 #ifndef FIRMWARE_NAME
 /* if you get this then you have forgotten to add the section for your target above */
 #error "Missing defines for target"
@@ -1931,11 +2086,11 @@
 #endif
 
 #ifndef RAMP_SPEED_STARTUP
-#define RAMP_SPEED_STARTUP 1 // adjusted 2.14 to match duty cycle change between mcu targets.
+#define RAMP_SPEED_STARTUP 2 // adjusted 2.14 to match duty cycle change between mcu targets.
 #endif
 
 #ifndef RAMP_SPEED_LOW_RPM // below commutation interval of 250us
-#define RAMP_SPEED_LOW_RPM 4
+#define RAMP_SPEED_LOW_RPM 6
 #endif
 
 #ifndef RAMP_SPEED_HIGH_RPM
@@ -3287,9 +3442,9 @@
 #endif
 
 #ifdef HARDWARE_GROUP_AT_245
-#define PHASE_A_COMP 0x400000F1 // pa2     // works for polling mode
-#define PHASE_B_COMP 0x400000C1 // pa4
-#define PHASE_C_COMP 0x400000D1 // pa5
+#define PHASE_A_COMP 0x400000F5 // pa2     // works for polling mode
+#define PHASE_B_COMP 0x400000C5 // pa4
+#define PHASE_C_COMP 0x400000D5 // pa5
 #endif
 
 #ifdef     HARDWARE_GROUP_L4_A
@@ -3322,9 +3477,18 @@
 #define PHASE_C_GPIO_PORT_HIGH         GPIOA
 
 #define USE_COMP_1
+
+#ifdef COMP_ORDER_L4_A_045
 #define PHASE_A_COMP  LL_COMP_INPUT_MINUS_IO3  // pa0
 #define PHASE_B_COMP  LL_COMP_INPUT_MINUS_IO4  // pa4
 #define PHASE_C_COMP  LL_COMP_INPUT_MINUS_IO5  // pa5
+#endif
+
+#ifdef COMP_ORDER_L4_A_540
+#define PHASE_A_COMP  LL_COMP_INPUT_MINUS_IO5  // pa5  /// THIS CONFIG FOR T-MOTOR
+#define PHASE_B_COMP  LL_COMP_INPUT_MINUS_IO4  // pa4
+#define PHASE_C_COMP  LL_COMP_INPUT_MINUS_IO3  // pa0
+#endif
 
 #define COMMON_COMP LL_COMP_INPUT_PLUS_IO3
 
@@ -3513,7 +3677,7 @@
 #define TARGET_MIN_BEMF_COUNTS 3
 // #define USE_SERIAL_TELEMETRY // moved to individual ESCs
 #define USE_ADC
-#define LOOP_FREQUENCY_HZ 10000
+#define LOOP_FREQUENCY_HZ 20000
 #endif
 
 #ifdef MCU_G071

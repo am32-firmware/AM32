@@ -629,9 +629,9 @@ static void handle_RawCommand(CanardInstance *ins, CanardRxTransfer *transfer)
     } else if (eepromBuffer.bi_direction) {
         const float scaled_value = input_can * (1000.0 / 8192);
         if (scaled_value >= 0) {
-            this_input = (uint16_t)(47 + scaled_value);
+            this_input = (uint16_t)(1047 + scaled_value);
         } else {
-            this_input = (uint16_t)(47 + (1000 - scaled_value));
+            this_input = (uint16_t)(47 + scaled_value * -1);
         }
     } else if (input_can > 0) {
         const float scaled_value = input_can * (2000.0 / 8192);

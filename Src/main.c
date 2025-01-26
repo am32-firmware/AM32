@@ -972,8 +972,46 @@ void setInput()
                 }
             }
         }
-
         if (dshot) {
+                     if (eepromBuffer.rc_car_reverse) {
+                         if (newinput > 1047) {
+                         if (forward == eepromBuffer.dir_reversed) {
+                         adjusted_input = 0;
+                         prop_brake_active = 1;
+                         if (return_to_center) {
+                             forward = 1 - eepromBuffer.dir_reversed;
+                             prop_brake_active = 0;
+                             return_to_center = 0;
+                         }
+                     }
+                     if (prop_brake_active == 0) {
+                         return_to_center = 0;
+                         adjusted_input = ((newinput - 1048) * 2 + 47) - reversing_dead_band;
+                     }
+                     }
+                     if (newinput <= 1047 && newinput > 47) {
+                     if (forward == (1 - eepromBuffer.dir_reversed)) {
+                         adjusted_input = 0;
+                         prop_brake_active = 1;
+                         if (return_to_center) {
+                             forward = eepromBuffer.dir_reversed;
+                             prop_brake_active = 0;
+                             return_to_center = 0;
+                         }
+                     }
+                     if (prop_brake_active == 0) {
+                         return_to_center = 0;
+                         adjusted_input = ((newinput - 48) * 2 + 47) - reversing_dead_band;
+                     }
+                     }
+                     if (newinput < 48) {
+                     adjusted_input = 0;
+                     if (prop_brake_active) {
+                         prop_brake_active = 0;
+                         return_to_center = 1;
+                     }
+                 }
+                         } else {
             if (newinput > 1047) {
 
                 if (forward == eepromBuffer.dir_reversed) {
@@ -983,7 +1021,7 @@ void setInput()
                         old_routine = 1;
                         maskPhaseInterrupts();
                         brushed_direction_set = 0;
-                    } else {
+                     } else {
                         newinput = 0;
                     }
                 }
@@ -997,7 +1035,7 @@ void setInput()
                         forward = eepromBuffer.dir_reversed;
                         maskPhaseInterrupts();
                         brushed_direction_set = 0;
-                    } else {
+                     } else {
                         newinput = 0;
                     }
                 }
@@ -1006,6 +1044,7 @@ void setInput()
             if (newinput < 48) {
                 adjusted_input = 0;
                 brushed_direction_set = 0;
+                }
             }
         }
     } else {
@@ -1134,7 +1173,11 @@ if (!stepper_sine && armed) {
                 }
                 if (eepromBuffer.rc_car_reverse && prop_brake_active) {
 #ifndef PWM_ENABLE_BRIDGE
-                    prop_brake_duty_cycle = (getAbsDif(1000, newinput) + 1000);
+                    if (dshot == 0) prop_brake_duty_cycle = (getAbsDif(1000, newinput) + 1000);
+                    if (dshot)  {
+                        if (newinput <= 1047 && newinput > 47) prop_brake_duty_cycle = ((newinput - 48) * 2 + 47) - reversing_dead_band;
+                        if (newinput > 1047) prop_brake_duty_cycle = ((newinput - 1048) * 2 + 47) - reversing_dead_band;
+                    }
                     if (prop_brake_duty_cycle >= (TIMER1_MAX_ARR - 1)) {
                         fullBrake();
                     } else {
@@ -1249,7 +1292,7 @@ void tenKhzRoutine()
 															playInputTune();
 #endif
                             }
-                            if (!servoPwm) {
+                            if (!servoPwm && !dshot) {
                                 eepromBuffer.rc_car_reverse = 0;
                             }
                         } else {

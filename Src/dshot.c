@@ -31,6 +31,7 @@ extern char send_telemetry;
 extern uint8_t max_duty_cycle_change;
 int dshot_full_number;
 extern char play_tone_flag;
+extern char send_esc_info_flag;
 uint8_t command_count = 0;
 uint8_t last_command = 0;
 uint8_t high_pin_count = 0;
@@ -42,6 +43,10 @@ char dshot_extended_telemetry = 0;
 uint16_t send_extended_dshot = 0;
 uint16_t processtime = 0;
 uint16_t halfpulsetime = 0;
+
+uint8_t programming_mode;
+uint16_t position;
+uint8_t  new_byte;
 
 void computeDshotDMA()
 {
@@ -80,6 +85,25 @@ void computeDshotDMA()
             dshot_goodcounts++;
             if (dpulse[11] == 1) {
                 send_telemetry = 1;
+            }
+            if(programming_mode > 0){  
+                if(programming_mode == 1){ // begin programming mode
+                    position = tocheck;    // eepromBuffer position
+                    programming_mode = 2;
+                    return;
+                }
+               if(programming_mode == 2){
+                    new_byte = tocheck;   // new value of setting
+                    programming_mode = 3;
+                    return;
+                }
+                if(programming_mode == 3){
+                    if(tocheck == 37){  // commit new values to eeprom. must use save settings to make permanent.
+                    eepromBuffer.buffer[position] = new_byte;
+                    programming_mode = 0;
+                  }
+                }
+                return; // don't process dshot signal when in programming mode
             }
             if (tocheck > 47) {
                 if (EDT_ARMED) {
@@ -137,6 +161,9 @@ void computeDshotDMA()
                     case 5:
                         play_tone_flag = 5;
                         break;
+                    case 6:
+                        send_esc_info_flag = 1;
+                        break;
                     case 7:
                         eepromBuffer.dir_reversed = 0;
                         forward = 1 - eepromBuffer.dir_reversed;
@@ -176,6 +203,10 @@ void computeDshotDMA()
                     case 21:
                         forward = eepromBuffer.dir_reversed;
                         break;
+                    case 36:
+                        programming_mode = 1;
+              //          armed = 0;           // disarm when entering programming mode
+                        break;
                     }
                     last_dshot_command = dshotcommand;
                     dshotcommand = 0;
@@ -183,6 +214,7 @@ void computeDshotDMA()
             }
         } else {
             dshot_badcounts++;
+            programming_mode = 0;
         }
     }
 }

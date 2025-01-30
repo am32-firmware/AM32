@@ -6,13 +6,14 @@
  */
 
 #include "serial_telemetry.h"
+#include "common.h"
 
-uint8_t aTxBuffer[10];
+uint8_t aTxBuffer[49];
 uint8_t nbDataToTransmit = sizeof(aTxBuffer);
 
-void send_telem_DMA()
+void send_telem_DMA(uint8_t bytes)
 { // set data length and enable channel to start transfer
-    DMA1_CHANNEL4->dtcnt = nbDataToTransmit;
+    DMA1_CHANNEL4->dtcnt = bytes;
     DMA1_CHANNEL4->ctrl_bit.chen = TRUE;
 }
 
@@ -32,6 +33,13 @@ uint8_t get_crc8(uint8_t* Buf, uint8_t BufLen)
     for (i = 0; i < BufLen; i++)
         crc = update_crc8(Buf[i], crc);
     return (crc);
+}
+
+void makeInfoPacket(){
+   for(int i = 0;i < 48; i++){
+     aTxBuffer[i] = eepromBuffer.buffer[i];
+    }
+    aTxBuffer[48] = get_crc8(aTxBuffer, 48);
 }
 
 void makeTelemPackage(uint8_t temp, uint16_t voltage, uint16_t current,

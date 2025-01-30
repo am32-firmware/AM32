@@ -8,8 +8,9 @@
 #include "serial_telemetry.h"
 
 #include "main.h"
+#include "common.h"
 
-uint8_t aTxBuffer[10];
+uint8_t aTxBuffer[49];
 uint8_t nbDataToTransmit = sizeof(aTxBuffer);
 
 void telem_UART_Init(void)
@@ -56,13 +57,13 @@ void telem_UART_Init(void)
     usart_enable(USART0);
 }
 
-void send_telem_DMA()
+void send_telem_DMA(uint8_t bytes)
 { // set data length and enable channel to start transfer
 
     usart_receive_config(USART0, USART_TRANSMIT_DISABLE);
     usart_transmit_config(USART0, USART_TRANSMIT_ENABLE);
     dma_channel_disable(DMA_CH1);
-    DMA_CHCNT(DMA_CH1) = nbDataToTransmit;
+    DMA_CHCNT(DMA_CH1) = bytes;
     usart_dma_transmit_config(USART0, USART_DENT_ENABLE);
     dma_channel_enable(DMA_CH1);
     usart_receive_config(USART0, USART_RECEIVE_ENABLE);
@@ -85,6 +86,13 @@ uint8_t get_crc8(uint8_t* Buf, uint8_t BufLen)
     for (i = 0; i < BufLen; i++)
         crc = update_crc8(Buf[i], crc);
     return (crc);
+}
+
+void makeInfoPacket(){
+   for(int i = 0;i < 48; i++){
+     aTxBuffer[i] = eepromBuffer.buffer[i];
+    }
+    aTxBuffer[48] = get_crc8(aTxBuffer, 48);
 }
 
 void makeTelemPackage(uint8_t temp, uint16_t voltage, uint16_t current,

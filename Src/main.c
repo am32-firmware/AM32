@@ -302,6 +302,7 @@ fastPID stallPid = { // 1khz loop time
 };
 
 EEprom_t eepromBuffer;
+char send_esc_info_flag;
 uint32_t eeprom_address = EEPROM_START_ADD; 
 uint16_t prop_brake_duty_cycle = 0;
 uint16_t ledcounter = 0;
@@ -1758,10 +1759,10 @@ int main(void)
 #endif
 
 #ifdef USE_INVERTED_HIGH
-  min_startup_duty = min_startup_duty + 100;
+  min_startup_duty = min_startup_duty + 200;
   minimum_duty_cycle = minimum_duty_cycle + 100;
+  startup_max_duty_cycle = startup_max_duty_cycle + 200;
 #endif
-
 
     while (1) {
 #if defined(FIXED_DUTY_MODE) || defined(FIXED_SPEED_MODE)
@@ -1909,11 +1910,15 @@ if(zero_crosses < 5){
 #endif
         if (send_telemetry) {
 #ifdef USE_SERIAL_TELEMETRY
-            makeTelemPackage(degrees_celsius, battery_voltage, actual_current,
+            makeTelemPackage((int8_t)degrees_celsius, battery_voltage, actual_current,
                 (uint16_t)consumed_current, e_rpm);
-            send_telem_DMA();
+            send_telem_DMA(10);
             send_telemetry = 0;
 #endif
+        } else if(send_esc_info_flag ) {
+           makeInfoPacket();
+           send_telem_DMA(48);
+           send_esc_info_flag = 0;
         }
         adc_counter++;
         if (adc_counter > 200) { // for adc and telemetry

@@ -6,10 +6,10 @@
  */
 
 #include "serial_telemetry.h"
-
+#include "common.h"
 #include "targets.h"
 
-uint8_t aTxBuffer[10];
+uint8_t aTxBuffer[49];
 uint8_t nbDataToTransmit = sizeof(aTxBuffer);
 
 #ifdef USE_PA14_TELEMETRY
@@ -76,11 +76,11 @@ void telem_UART_Init(void)
     LL_DMA_EnableIT_TE(DMA1, LL_DMA_CHANNEL_4);
 }
 
-void send_telem_DMA()
+void send_telem_DMA(uint8_t bytes)
 { // set data length and enable channel to start transfer
     LL_USART_SetTransferDirection(USART2, LL_USART_DIRECTION_TX);
     //  GPIOB->OTYPER &= 0 << 6;
-    LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_4, nbDataToTransmit);
+    LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_4, bytes);
     LL_USART_EnableDMAReq_TX(USART2);
 
     LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_4);
@@ -123,10 +123,6 @@ void telem_UART_Init(void)
     LL_DMA_SetPeriphSize(DMA1, LL_DMA_CHANNEL_2, LL_DMA_PDATAALIGN_BYTE);
     LL_DMA_SetMemorySize(DMA1, LL_DMA_CHANNEL_2, LL_DMA_MDATAALIGN_BYTE);
 
-    /* USART1 interrupt Init */
-    NVIC_SetPriority(USART1_IRQn, 3);
-    NVIC_EnableIRQ(USART1_IRQn);
-
     USART_InitStruct.BaudRate = 115200;
     USART_InitStruct.DataWidth = LL_USART_DATAWIDTH_8B;
     USART_InitStruct.StopBits = LL_USART_STOPBITS_1;
@@ -145,19 +141,14 @@ void telem_UART_Init(void)
         LL_USART_DMA_GetRegAddr(USART1, LL_USART_DMA_REG_DATA_TRANSMIT),
         LL_DMA_GetDataTransferDirection(DMA1, LL_DMA_CHANNEL_2));
     LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_2, nbDataToTransmit);
-
-    /* (5) Enable DMA transfer complete/error interrupts  */
-    LL_DMA_EnableIT_TC(DMA1, LL_DMA_CHANNEL_2);
-    LL_DMA_EnableIT_TE(DMA1, LL_DMA_CHANNEL_2);
+    LL_USART_EnableDMAReq_TX(USART1);
 }
 
-void send_telem_DMA()
+void send_telem_DMA(uint8_t bytes)
 { // set data length and enable channel to start transfer
     LL_USART_SetTransferDirection(USART1, LL_USART_DIRECTION_TX);
-    //  GPIOB->OTYPER &= 0 << 6;
-    LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_2, nbDataToTransmit);
-    LL_USART_EnableDMAReq_TX(USART1);
-
+    LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);
+    LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_2, bytes);
     LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_2);
     LL_USART_SetTransferDirection(USART1, LL_USART_DIRECTION_RX);
 }
@@ -180,6 +171,13 @@ uint8_t get_crc8(uint8_t* Buf, uint8_t BufLen)
     for (i = 0; i < BufLen; i++)
         crc = update_crc8(Buf[i], crc);
     return (crc);
+}
+
+void makeInfoPacket(){
+   for(int i = 0;i < 48; i++){
+     aTxBuffer[i] = eepromBuffer.buffer[i];
+    }
+    aTxBuffer[48] = get_crc8(aTxBuffer, 48);
 }
 
 void makeTelemPackage(uint8_t temp, uint16_t voltage, uint16_t current,

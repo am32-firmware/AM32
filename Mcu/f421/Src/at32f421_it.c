@@ -109,17 +109,17 @@ void DMA1_Channel1_IRQHandler(void)
     }
 }
 
-void DMA1_Channel3_2_IRQHandler(void)
-{
-    if (dma_flag_get(DMA1_FDT2_FLAG) == SET) {
-        DMA1->clr = DMA1_GL2_FLAG;
-        DMA1_CHANNEL2->ctrl_bit.chen = FALSE;
-    }
-    if (dma_flag_get(DMA1_DTERR2_FLAG) == SET) {
-        DMA1->clr = DMA1_GL2_FLAG;
-        DMA1_CHANNEL2->ctrl_bit.chen = FALSE;
-    }
-}
+//void DMA1_Channel3_2_IRQHandler(void)
+//{
+//    if (dma_flag_get(DMA1_FDT2_FLAG) == SET) {
+//        DMA1->clr = DMA1_GL2_FLAG;
+//        DMA1_CHANNEL2->ctrl_bit.chen = FALSE;
+//    }
+//    if (dma_flag_get(DMA1_DTERR2_FLAG) == SET) {
+//        DMA1->clr = DMA1_GL2_FLAG;
+//        DMA1_CHANNEL2->ctrl_bit.chen = FALSE;
+//    }
+//}
 
 void DMA1_Channel5_4_IRQHandler(void)
 {

@@ -621,7 +621,7 @@ static void handle_RawCommand(CanardInstance *ins, CanardRxTransfer *transfer)
       we need to map onto the AM32 expected range, which is a 11 bit number, where:
       0: off
       1-46: special codes
-      47-2047: throttle
+      48-2047: throttle
     */
     uint16_t this_input = 0;
     if (input_can == 0) {

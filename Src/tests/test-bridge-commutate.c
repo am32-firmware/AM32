@@ -19,11 +19,11 @@ int main()
     bridge_initialize();
     bridge_set_mode_run();
     bridge_set_run_frequency(8000);
-    bridge_set_run_duty(0x0100);
+    bridge_set_run_duty(0x0080);
     bridge_enable();
 
-    for (int n = 0; n < 12; n++) {
-        delayMillis(1000);
+    for (int n = 0; n < 1200; n++) {
+        delayMicros(8900);
         bridge_commutate();
     }
     bridge_disable();

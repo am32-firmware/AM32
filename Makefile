@@ -63,7 +63,8 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-adc.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-print.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-commutate.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-print.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-debug.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-read.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-led.c

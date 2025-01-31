@@ -11,7 +11,7 @@
 
 int main()
 {
-    mcu_setup();
+    mcu_setup(250);
     utility_timer_initialize();
     utility_timer_enable();
     drv8323_initialize(&DRV8323);

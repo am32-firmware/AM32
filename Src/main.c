@@ -204,18 +204,19 @@ an settings option)
 *2.11    - RC-Car mode fix
 *2.12    - Reduce Advance on hard braking
 *2.13    - Remove Input capture filter for dshot2400
-         - Change dshot 300 speed detection threshold 
+         - Change dshot 300 speed detection threshold
 *2.14    - Reduce G071 zero cross checks
          - Assign all mcu's duty cycle resolution 2000 steps
 *2.15    - Enforce 1/2 commutation interval as minimum for g071
          - Revert timing change on braking
 				 - Add per target over-ride option to max duty cycle change.
 				 - todo fix signal detection
-*2.16    - add L431 
+*2.16    - add L431
 				 - add variable auto timing
 */
 #include "main.h"
 #include "ADC.h"
+#include "input-timer.h"
 #include "IO.h"
 #include "common.h"
 #include "comparator.h"
@@ -251,18 +252,18 @@ void zcfoundroutine(void);
 // with sinusoidal startup !!
 
 //#define FIXED_DUTY_MODE  // bypasses signal input and arming, uses a set duty
-// cycle. For pumps, slot cars etc 
+// cycle. For pumps, slot cars etc
 //#define FIXED_DUTY_MODE_POWER 100     //
 // 0-100 percent not used in fixed speed mode
 
 // #define FIXED_SPEED_MODE  // bypasses input signal and runs at a fixed rpm
-// using the speed control loop PID 
+// using the speed control loop PID
 //#define FIXED_SPEED_MODE_RPM  1000  //
 // intended final rpm , ensure pole pair numbers are entered correctly in config
 // tool.
 
 // #define BRUSHED_MODE         // overrides all brushless config settings,
-// enables two channels for brushed control 
+// enables two channels for brushed control
 //#define GIMBAL_MODE     // also
 // sinusoidal_startup needs to be on, maps input to sinusoidal angle.
 
@@ -308,7 +309,7 @@ enum inputType {
 };
 
 
-uint32_t eeprom_address = EEPROM_START_ADD; 
+uint32_t eeprom_address = EEPROM_START_ADD;
 char set_hysteris = 0;
 uint16_t prop_brake_duty_cycle = 0;
 uint16_t ledcounter = 0;
@@ -362,7 +363,7 @@ uint16_t low_cell_volt_cutoff = 330; // 3.3volts per cell
 //=========================== END EEPROM Defaults ===========================
 
 const char filename[30] __attribute__((section(".file_name"))) = FILE_NAME;
-_Static_assert(sizeof(FIRMWARE_NAME) <=13,"Firmware name too long");   // max 12 character firmware name plus NULL 
+_Static_assert(sizeof(FIRMWARE_NAME) <=13,"Firmware name too long");   // max 12 character firmware name plus NULL
 
 uint8_t EEPROM_VERSION;
 // move these to targets folder or peripherals for each mcu
@@ -837,7 +838,7 @@ void loadEEpromSettings()
         }
         low_rpm_level = motor_kv / 100 / (32 / motor_poles);
 
-        high_rpm_level = motor_kv / 12 / (32 / motor_poles);				
+        high_rpm_level = motor_kv / 12 / (32 / motor_poles);
     }
     reverse_speed_threshold = map(motor_kv, 300, 3000, 1000, 500);
     //   reverse_speed_threshold = 200;
@@ -1018,7 +1019,7 @@ void interruptRoutine()
         }
     __disable_irq();
 		maskPhaseInterrupts();
-		thiszctime = INTERVAL_TIMER_COUNT;  
+		thiszctime = INTERVAL_TIMER_COUNT;
     SET_INTERVAL_TIMER_COUNT(0);
 //		if(thiszctime < (commutation_interval - (commutation_interval>>2))){
 //			send_LED_RGB(0, 0, 255);
@@ -1027,7 +1028,7 @@ void interruptRoutine()
 //			  //  thiszctime = commutation_interval + (commutation_interval>>2);
 //		}else if(thiszctime > (commutation_interval + (commutation_interval>>2))){
 //			send_LED_RGB(255, 0, 0);
-//			 //   waitTime = waitTime - thiszctime - commutation_interval; 
+//			 //   waitTime = waitTime - thiszctime - commutation_interval;
 //			    waitTime = waitTime - (commutation_interval>>2);
 //			 //   thiszctime = commutation_interval - (commutation_interval>>2);
 //		}
@@ -1254,7 +1255,7 @@ void setInput()
         if (input < 47 + (80 * use_sin_start)) {
             if (play_tone_flag != 0) {
                 switch (play_tone_flag) {
-									
+
                 case 1:
                     playDefaultTone();
                     break;
@@ -1498,7 +1499,7 @@ void tenKhzRoutine()
                 max_duty_cycle_change = voltage_based_max_change * 3;
             }
 #else
-            if (zero_crosses < 150 || last_duty_cycle < 150) {   
+            if (zero_crosses < 150 || last_duty_cycle < 150) {
                 max_duty_cycle_change = RAMP_SPEED_STARTUP;
             } else {
                 if (average_interval > 500) {
@@ -1635,10 +1636,10 @@ void zcfoundroutine()
 //					waitTime = waitTime + commutation_interval - thiszctime;
 //			    thiszctime = commutation_interval - (commutation_interval>>2);
 //		}else if(thiszctime > (commutation_interval + (commutation_interval>>2))){
-//			    waitTime = waitTime - thiszctime - commutation_interval; 
+//			    waitTime = waitTime - thiszctime - commutation_interval;
 //			    thiszctime = commutation_interval - (commutation_interval>>2);
 //		}
-	
+
     while ((INTERVAL_TIMER_COUNT) < (waitTime)) {
         if (zero_crosses < 5) {
             break;
@@ -1748,7 +1749,7 @@ int main(void)
 			eeprom_address = (uint32_t)0x0800F800;
 		}
 
-	
+
     if (VERSION_MAJOR != eepromBuffer[3] || VERSION_MINOR != eepromBuffer[4]) {
         eepromBuffer[3] = VERSION_MAJOR;
         eepromBuffer[4] = VERSION_MINOR;

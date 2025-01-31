@@ -203,11 +203,11 @@ void drv8323_configure_spi(drv8323_t* drv)
 
     // 25MHz (HSE) / 32 = 781kHz spi clock frequency
     // 250MHz (core) / 32 = 7.81MHz spi clock frequency
-    spiDrv8323->CFG1_MBR = SPI_MBR_DIV_32; // prescaler = 32
+    // spiDrv8323->CFG1_MBR = SPI_MBR_DIV_32; // prescaler = 32
 
     // 25MHz (HSE) / 64 = 391kHz spi clock frequency
     // 250MHz (core) / 64 = 3.91MHz spi clock frequency
-    // spiDrv8323->CFG1_MBR = SPI_MBR_DIV_64; // prescaler = 64
+    spiDrv8323->CFG1_MBR = SPI_MBR_DIV_64; // prescaler = 64
 
     // 25MHz (HSE) / 256 = ~1kHz spi clock frequency
     // 250MHz (core) / 256 = ~1MHz spi clock frequency
@@ -221,6 +221,17 @@ void drv8323_configure_spi(drv8323_t* drv)
     spiDrv8323->txDma = &dmaChannels[0];
     spiDrv8323->txDmaRequest = GATE_DRIVER_SPI_TX_DMA_REQ;
     spiDrv8323->rxDmaRequest = GATE_DRIVER_SPI_RX_DMA_REQ;
+
+
+    spiDrv8323->CFG2 =
+                ( SPI_CFG2_AFCNTR
+                | SPI_CFG2_SSOE
+                | SPI_CFG2_SSOM
+                | SPI_CFG2_CPHA
+                | SPI_CFG2_MASTER
+                | (0b1111 << SPI_CFG2_MIDI_Pos)
+                | (0b1111 << SPI_CFG2_MSSI_Pos)
+                );
 
     drv->spi = spiDrv8323;
 }

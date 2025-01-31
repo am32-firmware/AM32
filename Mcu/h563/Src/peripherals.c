@@ -6,6 +6,7 @@
 #include "commutation-timer.h"
 #include "comparator.h"
 #include "gpio.h"
+#include "input-timer.h"
 #include "ADC.h"
 #include "serial_telemetry.h"
 #include "stm32h563xx.h"

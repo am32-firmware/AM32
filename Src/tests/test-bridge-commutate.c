@@ -2,6 +2,7 @@
 #include "targets.h"
 #include "gpio.h"
 #include "bridge.h"
+#include "mcu.h"
 char comp_pwm = 1;
 uint8_t i = 0;
 
@@ -49,6 +50,7 @@ gpio_t gpioPhaseCLow = DEF_GPIO(
 
 int main()
 {
+    mcu_setup(250);
 
     gpio_t gpioDrv8323Enable = DEF_GPIO(
         GPIOF,
@@ -56,7 +58,7 @@ int main()
         0,
         GPIO_OUTPUT);
     gpio_initialize(&gpioDrv8323Enable);
-    gpio_set_speed(&gpioDrv8323Enable, 0b11);
+    gpio_set_speed(&gpioDrv8323Enable, GPIO_SPEED_VERYFAST);
     gpio_reset(&gpioDrv8323Enable);
     for (int i = 0; i < 0xfffff; i++) {
         asm("nop");
@@ -76,16 +78,18 @@ int main()
     bridge_initialize();
     bridge_set_mode_run();
     // bridge_set_run_frequency(16000);
-    bridge_set_run_duty(0x8000);
+    // bridge_set_run_duty(0x8000);
+    bridge_set_run_duty(0x1000);
     bridge_enable();
 
-
-
-    while(1) {
-        for (uint32_t i = 0; i < 32000; i++)
+    for (int n = 0; n < 24; n++) {
+        for (uint32_t i = 0; i < 320000; i++)
         {
             asm("nop");
         }
         bridge_commutate();
+    }
+    bridge_disable();
+    while (1) {
     }
 }

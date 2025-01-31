@@ -63,7 +63,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/t ests/test-adc.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-debug.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-read.c
-# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-led.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-led.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-set-zero.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-usart.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-input-pwm.c
@@ -96,7 +96,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-input-pwm.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi2.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi2.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi3.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi4.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi5.c

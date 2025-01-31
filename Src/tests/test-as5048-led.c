@@ -47,12 +47,12 @@ uint32_t angle_to_color(uint16_t angle)
     if (tmp < threshold) {
         r = map(tmp, 0, threshold, 0, 0xff);
         g = 0xff - r;
-    // } else if (tmp < 2*threshold) {
-    //     g = map(tmp - threshold, 0, threshold, 0, 0xff);
-    //     b = 0xff - g;
-    // } else {
-    //     b = map(tmp - 2*threshold, 0, threshold, 0, 0xff);
-    //     r = 0xff - b;
+    } else if (tmp < 2*threshold) {
+        g = map(tmp - threshold, 0, threshold, 0, 0xff);
+        b = 0xff - g;
+    } else {
+        b = map(tmp - 2*threshold, 0, threshold, 0, 0xff);
+        r = 0xff - b;
     }
     return (b << 16) | (r << 8) | g;
 }

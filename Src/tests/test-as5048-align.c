@@ -6,6 +6,7 @@
 #include "as5048-spi.h"
 #include "bridge.h"
 #include "drv8323-spi.h"
+#include "functions.h"
 #include "mcu.h"
 #include "utility-timer.h"
 
@@ -24,12 +25,20 @@ int main()
     drv8323_initialize(&DRV8323);
 
 
-    // bridge_initialize();
-    // bridge_set_mode_run();
-    // bridge_set_run_frequency(8000);
-    // bridge_set_run_duty(0x0080);
-    // bridge_enable();
+    bridge_initialize();
+    bridge_set_mode_run();
+    bridge_set_run_frequency(8000);
+    bridge_set_run_duty(0x0100);
+    bridge_enable();
 
+    delayMillis(1);
+    as5048_set_zero_position(&as5048);
+
+    while (as5048_read_angle(&as5048) != 0) {
+        // wait
+    }
+
+    bridge_disable();
 
     while(1) {
         current_angle = as5048_read_angle(&as5048);

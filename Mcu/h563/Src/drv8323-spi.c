@@ -217,8 +217,8 @@ void drv8323_configure_spi(drv8323_t* drv)
     spiDrv8323->_tx_buffer = drv8323SpiTxBuffer;
     spiDrv8323->_rx_buffer_size = 256;
     spiDrv8323->_tx_buffer_size = 256;
-    spiDrv8323->rxDma = &dmaChannels[7];
-    spiDrv8323->txDma = &dmaChannels[0];
+    spiDrv8323->rxDma = &dmaChannels[GATE_DRIVER_RX_DMA_CHANNEL];
+    spiDrv8323->txDma = &dmaChannels[GATE_DRIVER_TX_DMA_CHANNEL];
     spiDrv8323->txDmaRequest = GATE_DRIVER_SPI_TX_DMA_REQ;
     spiDrv8323->rxDmaRequest = GATE_DRIVER_SPI_RX_DMA_REQ;
 

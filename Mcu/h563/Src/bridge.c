@@ -11,38 +11,38 @@ timComStepChannelConfig comSteps[] =
 {
     // 1 pwm, 2 low, 3 float -fall
     {
-        .ccmr1 = (0b110<<4) | (0b100<<12),
-        .ccmr2 = (0b100<<4) | (0b110<<12),
+        .ccmr1 = (OCM_PWM1 << TIM_CCMR1_OC1M_Pos) | (OCM_INACTIVE << TIM_CCMR1_OC2M_Pos),
+        .ccmr2 = (OCM_INACTIVE << TIM_CCMR2_OC3M_Pos) | (OCM_PWM1 << TIM_CCMR2_OC4M_Pos),
         .ccer = TIM_CCER_CC1E | TIM_CCER_CC1NE | TIM_CCER_CC2E | TIM_CCER_CC2NE | TIM_CCER_CC3E
     },
     // 1 pwm, 2 float -rise, 3 low
     {
-        .ccmr1 = (0b110<<4) | (0b100<<12),
-        .ccmr2 = (0b100<<4) | (0b110<<12),
+        .ccmr1 = (OCM_PWM1 << TIM_CCMR1_OC1M_Pos) | (OCM_INACTIVE << TIM_CCMR1_OC2M_Pos),
+        .ccmr2 = (OCM_INACTIVE << TIM_CCMR2_OC3M_Pos) | (OCM_PWM1 << TIM_CCMR2_OC4M_Pos),
         .ccer = TIM_CCER_CC1E | TIM_CCER_CC1NE | TIM_CCER_CC3E | TIM_CCER_CC3NE | TIM_CCER_CC2E
     },
     // 1 float - fall, 2pwm, 3 low
     {
-        .ccmr1 = (0b100<<4) | (0b110<<12),
-        .ccmr2 = (0b100<<4) | (0b110<<12),
+        .ccmr1 = (OCM_INACTIVE << TIM_CCMR1_OC1M_Pos) | (OCM_PWM1 << TIM_CCMR1_OC2M_Pos),
+        .ccmr2 = (OCM_INACTIVE << TIM_CCMR2_OC3M_Pos) | (OCM_PWM1 << TIM_CCMR2_OC4M_Pos),
         .ccer = TIM_CCER_CC2E | TIM_CCER_CC2NE | TIM_CCER_CC3E | TIM_CCER_CC3NE | TIM_CCER_CC1E
     },
     // 1 low, 2pwm, 3 float-rise
     {
-        .ccmr1 = (0b100<<4) | (0b110<<12),
-        .ccmr2 = (0b100<<4) | (0b110<<12),
+        .ccmr1 = (OCM_INACTIVE << TIM_CCMR1_OC1M_Pos) | (OCM_PWM1 << TIM_CCMR1_OC2M_Pos),
+        .ccmr2 = (OCM_INACTIVE << TIM_CCMR2_OC3M_Pos) | (OCM_PWM1 << TIM_CCMR2_OC4M_Pos),
         .ccer = TIM_CCER_CC1E | TIM_CCER_CC1NE | TIM_CCER_CC2E | TIM_CCER_CC2NE | TIM_CCER_CC3E
     },
     // 1 low, 2 float -fall, 3 pwm
     {
-        .ccmr1 = (0b100<<4) | (0b100<<12),
-        .ccmr2 = (0b110<<4) | (0b110<<12),
+        .ccmr1 = (OCM_INACTIVE << TIM_CCMR1_OC1M_Pos) | (OCM_INACTIVE << TIM_CCMR1_OC2M_Pos),
+        .ccmr2 = (OCM_PWM1 << TIM_CCMR2_OC3M_Pos) | (OCM_PWM1 << TIM_CCMR2_OC4M_Pos),
         .ccer = TIM_CCER_CC1E | TIM_CCER_CC1NE | TIM_CCER_CC3E | TIM_CCER_CC3NE | TIM_CCER_CC2E
     },
     // 1 float-rise, 2 low, 3 pwm
     {
-        .ccmr1 = (0b100<<4) | (0b100<<12),
-        .ccmr2 = (0b110<<4) | (0b110<<12),
+        .ccmr1 = (OCM_INACTIVE << TIM_CCMR1_OC1M_Pos) | (OCM_INACTIVE << TIM_CCMR1_OC2M_Pos),
+        .ccmr2 = (OCM_PWM1 << TIM_CCMR2_OC3M_Pos) | (OCM_PWM1 << TIM_CCMR2_OC4M_Pos),
         .ccer = TIM_CCER_CC2E | TIM_CCER_CC2NE | TIM_CCER_CC3E | TIM_CCER_CC3NE | TIM_CCER_CC1E
     },
 };

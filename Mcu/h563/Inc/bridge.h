@@ -3,9 +3,9 @@
 #include "gpio.h"
 #include "commutation.h"
 
-#define OCM_PWM1 0b110
-#define OCM_INACTIVE 0b100
-#define OCM_ACTIVE 0b101
+#define OCM_PWM1 0b0110
+#define OCM_INACTIVE 0b0100
+#define OCM_ACTIVE 0b0101
 
 void bridge_initialize();
 void bridge_gpio_initialize();

@@ -104,6 +104,13 @@ void bridge_gpio_initialize()
     gpio_initialize(&gpioVl);
     gpio_initialize(&gpioWh);
     gpio_initialize(&gpioWl);
+
+    gpio_set_speed(&gpioUh, GPIO_SPEED_VERYFAST);
+    gpio_set_speed(&gpioUl, GPIO_SPEED_VERYFAST);
+    gpio_set_speed(&gpioVh, GPIO_SPEED_VERYFAST);
+    gpio_set_speed(&gpioVl, GPIO_SPEED_VERYFAST);
+    gpio_set_speed(&gpioWh, GPIO_SPEED_VERYFAST);
+    gpio_set_speed(&gpioWl, GPIO_SPEED_VERYFAST);
 }
 
 void bridge_set_mode_audio(void)
@@ -140,10 +147,9 @@ void bridge_set_run_frequency(uint32_t f)
 // duty may never exceed 12.5%
 void bridge_set_audio_duty(uint8_t duty)
 {
-    // duty = duty & 0xf;
-    // if (duty > 0xf) {
-    //     duty = 0xf;
-    // }
+    // limit duty to 0xff
+    duty = duty & 0xff;
+
     BRIDGE_TIMER->CCR1 = duty;
     BRIDGE_TIMER->CCR2 = duty;
     BRIDGE_TIMER->CCR3 = duty;

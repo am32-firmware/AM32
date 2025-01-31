@@ -2,10 +2,10 @@
 
 typedef enum
 {
-    COM_STEP1,
-    COM_STEP2,
-    COM_STEP3,
-    COM_STEP4,
-    COM_STEP5,
-    COM_STEP6
+    COM_STEP1 = 0,
+    COM_STEP2 = 1,
+    COM_STEP3 = 2,
+    COM_STEP4 = 3,
+    COM_STEP5 = 4,
+    COM_STEP6 = 5,
 } commutationStep_e;

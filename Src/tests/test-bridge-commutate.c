@@ -19,7 +19,7 @@ int main()
     bridge_initialize();
     bridge_set_mode_run();
     bridge_set_run_frequency(8000);
-    bridge_set_run_duty(0x0400);
+    bridge_set_run_duty(0x0100);
     bridge_enable();
 
     for (int n = 0; n < 12; n++) {

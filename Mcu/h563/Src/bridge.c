@@ -91,13 +91,13 @@ void bridge_initialize()
 void bridge_gpio_initialize()
 {
 
-    gpio_t gpioUh = DEF_GPIO(BRIDGE_UH_PORT, BRIDGE_UH_PIN, BRIDGE_UH_AF, GPIO_AF); 
+    gpio_t gpioUh = DEF_GPIO(BRIDGE_UH_PORT, BRIDGE_UH_PIN, BRIDGE_UH_AF, GPIO_AF);
     gpio_t gpioUl = DEF_GPIO(BRIDGE_UL_PORT, BRIDGE_UL_PIN, BRIDGE_UL_AF, GPIO_AF);
     gpio_t gpioVh = DEF_GPIO(BRIDGE_VH_PORT, BRIDGE_VH_PIN, BRIDGE_VH_AF, GPIO_AF);
     gpio_t gpioVl = DEF_GPIO(BRIDGE_VL_PORT, BRIDGE_VL_PIN, BRIDGE_VL_AF, GPIO_AF);
     gpio_t gpioWh = DEF_GPIO(BRIDGE_WH_PORT, BRIDGE_WH_PIN, BRIDGE_WH_AF, GPIO_AF);
     gpio_t gpioWl = DEF_GPIO(BRIDGE_WL_PORT, BRIDGE_WL_PIN, BRIDGE_WL_AF, GPIO_AF);
-    
+
     gpio_initialize(&gpioUh);
     gpio_initialize(&gpioUl);
     gpio_initialize(&gpioVh);
@@ -151,8 +151,8 @@ void bridge_set_audio_duty(uint8_t duty)
 
 void bridge_set_run_duty(uint16_t duty)
 {
-    if (duty > 800) {
-        duty = 800;
+    if (duty > 0x1000) {
+        duty = 0x1000;
     }
     BRIDGE_TIMER->CCR1 = duty;
     BRIDGE_TIMER->CCR2 = duty;
@@ -219,7 +219,7 @@ void bridge_set_deadtime_ns(uint32_t deadtime)
         deadtime_ticks -= 32;
         dtg = 0xe0 | deadtime_ticks;
     }
-    
+
     BRIDGE_TIMER->BDTR = (BRIDGE_TIMER->BDTR & ~0xf) | dtg;
     // BRIDGE_TIMER->BDTR = (BRIDGE_TIMER->BDTR & ~0xf);
 }

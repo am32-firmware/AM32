@@ -1831,8 +1831,36 @@
 // blueESC
 ///////////////
 
+
+
+
+
 #define VREG_5V_ENABLE_PORT GPIOI
 #define VREG_5V_ENABLE_PIN 2
+
+
+
+///////////////
+// aux gpio pins
+///////////////
+
+
+#define AUX_P2_PORT GPIOE
+#define AUX_P2_PIN 2
+
+#define AUX_P3_PORT GPIOE
+#define AUX_P3_PIN 4
+
+#define AUX_P4_PORT GPIOE
+#define AUX_P4_PIN 5
+
+#define AUX_P5_PORT GPIOE
+#define AUX_P5_PIN 6
+
+
+///////////////
+// aux spi definitions
+///////////////
 
 #define AUX_SPI_SCK_PORT GPIOE
 #define AUX_SPI_SCK_PIN 2

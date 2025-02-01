@@ -1,11 +1,13 @@
 // this is a test of the comparator.h interface
 // it will have the 3 leds reflect the state of the 3 phases
 
-#include "targets.h"
 #include "comparator.h"
 #include "exti.h"
+#include "functions.h"
 #include "led.h"
 #include "mcu.h"
+#include "targets.h"
+#include "utility-timer.h"
 
 // IMR1 reset value is 0xfffe0000
 gpio_t gpioCompPhaseATest = DEF_GPIO(COMPA_GPIO_PORT, COMPA_GPIO_PIN, 0, GPIO_INPUT);
@@ -80,9 +82,24 @@ comparator_t comp = {
 int main()
 {
     mcu_setup(250);
+    utility_timer_initialize();
+    utility_timer_enable();
+
     led_initialize();
+    delayMillis(10);
+    led_write(0x00000010);
+    delayMillis(10);
+    led_write(0x00001000);
+    delayMillis(10);
+    led_write(0x00100000);
+    delayMillis(10);
 
     comparator_initialize(&comp);
+
+    // set a low priority on comparator interrupt
+    // this is necessary for this example
+    // to use the sk6812 led spi interrupt
+    comparator_nvic_set_priority(&comp, 4);
 
     comparator_enable_interrupts(&comp);
 

@@ -32,8 +32,10 @@ void phaseATestcb(extiChannel_t* exti)
         EXTI->FPR1 |= mask;
     }
     if(gpio_read(&gpioCompPhaseATest)) {
+        debug_set_3();
         brg |= BLUE_VALUE;
     } else {
+        debug_reset_3();
         brg &= ~BLUE_VALUE;
     }
     led_write(brg);
@@ -49,8 +51,10 @@ void phaseBTestcb(extiChannel_t* exti)
         EXTI->FPR1 |= mask;
     }
     if(gpio_read(&gpioCompPhaseBTest)) {
+        debug_set_2();
         brg |= RED_VALUE;
     } else {
+        debug_reset_2();
         brg &= ~RED_VALUE;
     }
     led_write(brg);
@@ -66,8 +70,10 @@ void phaseCTestcb(extiChannel_t* exti)
         EXTI->FPR1 |= mask;
     }
     if(gpio_read(&gpioCompPhaseCTest)) {
+        debug_set_1();
         brg |= GREEN_VALUE;
     } else {
+        debug_reset_1();
         brg &= ~GREEN_VALUE;
     }
     led_write(brg);

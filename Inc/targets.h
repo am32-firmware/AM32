@@ -1871,6 +1871,26 @@
 
 
 ///////////////
+// main gpio pins
+///////////////
+
+// it is connected to:
+// GPIO A8
+// GPIO A12
+// GPIO D8 (via series resistor)
+// GPIO F11
+#define MAIN_P2_PORT GPIOD
+#define MAIN_P2_PIN 8
+
+// it is connected to:
+// GPIO A11
+// GPIO B1
+// GPIO D9 (via series resistor)
+// GPIO E14
+#define MAIN_P3_PORT GPIOD
+#define MAIN_P3_PIN 9
+
+///////////////
 // aux spi definitions
 ///////////////
 

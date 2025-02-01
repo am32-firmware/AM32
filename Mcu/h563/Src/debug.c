@@ -8,9 +8,9 @@ usart_t usartDebug;
 uint8_t usartDebugTxBuffer[256];
 uint8_t usartDebugRxBuffer[256];
 
-// gpio_t gpioDebug1 = DEF_GPIO(DEBUG_GPIO1_PORT, DEBUG_GPIO1_PIN, 0, GPIO_OUTPUT);
-// gpio_t gpioDebug2 = DEF_GPIO(DEBUG_GPIO2_PORT, DEBUG_GPIO2_PIN, 0, GPIO_OUTPUT);
-// gpio_t gpioDebug3 = DEF_GPIO(DEBUG_GPIO3_PORT, DEBUG_GPIO3_PIN, 0, GPIO_OUTPUT);
+gpio_t gpioDebug1 = DEF_GPIO(DEBUG_GPIO1_PORT, DEBUG_GPIO1_PIN, 0, GPIO_OUTPUT);
+gpio_t gpioDebug2 = DEF_GPIO(DEBUG_GPIO2_PORT, DEBUG_GPIO2_PIN, 0, GPIO_OUTPUT);
+gpio_t gpioDebug3 = DEF_GPIO(DEBUG_GPIO3_PORT, DEBUG_GPIO3_PIN, 0, GPIO_OUTPUT);
 
 void debug_initialize()
 {
@@ -34,9 +34,18 @@ void debug_initialize()
     usartDebug.swap = DEBUG_USART_SWAP_IO;
     usart_initialize(&usartDebug);
 
-    // gpio_initialize(&gpioDebug1);
-    // gpio_initialize(&gpioDebug2);
-    // gpio_initialize(&gpioDebug3);
+    gpio_initialize(&gpioDebug1);
+    gpio_initialize(&gpioDebug2);
+    gpio_initialize(&gpioDebug3);
+
+    gpio_set_speed(&gpioDebug1, GPIO_SPEED_VERYFAST);
+    gpio_set_speed(&gpioDebug2, GPIO_SPEED_VERYFAST);
+    gpio_set_speed(&gpioDebug3, GPIO_SPEED_VERYFAST);
+
+    gpio_reset(&gpioDebug1);
+    gpio_reset(&gpioDebug2);
+    gpio_reset(&gpioDebug3);
+
 }
 
 void debug_write_string(const char* string)

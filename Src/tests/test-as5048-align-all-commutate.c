@@ -81,7 +81,7 @@ int main()
     magnet_angles[num_poles] = 1<<14;
 
     for (int i = 0; i < num_poles; i++) {
-        zc_angles[i] = magnet_angles[i] + ((magnet_angles[i + 1] - magnet_angles[i]) / 2);
+        zc_angles[i] = magnet_angles[i] + ((magnet_angles[i + 1] - magnet_angles[i]) / 2) - 30;
         debug_write_string("\n\rindex: ");
         debug_write_int(i);
         debug_write_string("\tmagnet_angle: ");
@@ -90,7 +90,7 @@ int main()
         debug_write_int(zc_angles[i]);
         delayMillis(10);
     }
-    // bridge_set_run_duty(0x0200);
+    bridge_set_run_duty(0x0400);
 
     // bridge_enable();
     bridge_commutate();

@@ -22,7 +22,7 @@ void phaseATestcb(extiChannel_t* exti)
     uint32_t mask = 1 << exti->channel;
     if (EXTI->RPR1 & mask) {
         EXTI->RPR1 |= mask;
-    } 
+    }
     if (EXTI->FPR1 & mask) {
         EXTI->FPR1 |= mask;
     }
@@ -79,7 +79,7 @@ comparator_t comp = {
 
 int main()
 {
-    mcu_setup();
+    mcu_setup(250);
     led_initialize();
 
     comparator_initialize(&comp);

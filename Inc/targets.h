@@ -1844,18 +1844,30 @@
 // aux gpio pins
 ///////////////
 
+// it is connected to:
+// GPIO C3
+// GPIO E0
+// GPIO E4
+#define AUX_P2_PORT GPIOC
+#define AUX_P2_PIN 3
 
-#define AUX_P2_PORT GPIOE
-#define AUX_P2_PIN 2
+// it is connected to:
+// GPIO B6
+// GPIO E6
+#define AUX_P3_PORT GPIOB
+#define AUX_P3_PIN 6
 
-#define AUX_P3_PORT GPIOE
-#define AUX_P3_PIN 4
+// it is connected to:
+// GPIO B7
+// GPIO E5
+#define AUX_P4_PORT GPIOB
+#define AUX_P4_PIN 7
 
-#define AUX_P4_PORT GPIOE
-#define AUX_P4_PIN 5
-
-#define AUX_P5_PORT GPIOE
-#define AUX_P5_PIN 6
+// it is connected to:
+// GPIO B8
+// GPIO E2
+#define AUX_P5_PORT GPIOB
+#define AUX_P5_PIN 8
 
 
 ///////////////
@@ -2041,6 +2053,8 @@
 // GPIO E4
 #define DEBUG_GPIO1_PORT AUX_P2_PORT
 #define DEBUG_GPIO1_PIN AUX_P2_PIN
+// #define DEBUG_GPIO1_PORT GPIOC
+// #define DEBUG_GPIO1_PIN 3
 // #define DEBUG_GPIO1_PORT GPIOE
 // #define DEBUG_GPIO1_PIN 0
 // #define DEBUG_GPIO1_PORT GPIOE
@@ -2053,6 +2067,8 @@
 // GPIO E6
 #define DEBUG_GPIO2_PORT AUX_P3_PORT
 #define DEBUG_GPIO2_PIN AUX_P3_PIN
+// #define DEBUG_GPIO2_PORT GPIOB
+// #define DEBUG_GPIO2_PIN 6
 // #define DEBUG_GPIO2_PORT GPIOE
 // #define DEBUG_GPIO2_PIN 6
 
@@ -2063,6 +2079,8 @@
 // GPIO E5
 #define DEBUG_GPIO3_PORT AUX_P4_PORT
 #define DEBUG_GPIO3_PIN AUX_P4_PIN
+// #define DEBUG_GPIO3_PORT GPIOB
+// #define DEBUG_GPIO3_PIN 7
 // #define DEBUG_GPIO3_PORT GPIOE
 // #define DEBUG_GPIO3_PIN 5
 

@@ -94,16 +94,21 @@ int main()
 
     // bridge_enable();
     bridge_commutate();
-    do {
-        current_angle = as5048_read_angle(&as5048);
-    } while (current_angle > magnet_angles[num_poles - 1]);
 
-    for (int i = 0; i < num_poles; i++) {
+    for (int n = 0; n < 30; n++) {
+
         do {
             current_angle = as5048_read_angle(&as5048);
-        } while (current_angle < zc_angles[i]);
-        bridge_commutate();
+        } while (current_angle > magnet_angles[num_poles - 1]);
+        delayMicros(100);
+        for (int i = 0; i < num_poles; i++) {
+            do {
+                current_angle = as5048_read_angle(&as5048);
+            } while (current_angle < zc_angles[i]);
+            bridge_commutate();
+        }
     }
+
 
     bridge_disable();
     while(1) {

@@ -81,7 +81,7 @@ int main()
     magnet_angles[num_poles] = 1<<14;
 
     for (int i = 0; i < num_poles; i++) {
-        zc_angles[i] = magnet_angles[i] + ((magnet_angles[i + 1] - magnet_angles[i]) / 2) - 50;
+        zc_angles[i] = magnet_angles[i] + ((magnet_angles[i + 1] - magnet_angles[i]) / 2) - 20;
         debug_write_string("\n\rindex: ");
         debug_write_int(i);
         debug_write_string("\tmagnet_angle: ");
@@ -99,8 +99,8 @@ int main()
 
         do {
             current_angle = as5048_read_angle(&as5048);
-        } while (current_angle > magnet_angles[num_poles - 1]);
-        delayMicros(20);
+        } while (current_angle > magnet_angles[num_poles - 1] || current_angle < 20);
+        // delayMicros(10);
         for (int i = 0; i < num_poles; i++) {
             do {
                 current_angle = as5048_read_angle(&as5048);

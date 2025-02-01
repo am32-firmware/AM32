@@ -36,7 +36,7 @@ int main()
 
     bridge_initialize();
     bridge_set_mode_run();
-    bridge_set_run_frequency(12000);
+    bridge_set_run_frequency(24000);
     bridge_set_run_duty(0x0300);
     bridge_enable();
 
@@ -70,7 +70,7 @@ int main()
         debug_write_int(current_angle - last_angle);
 
 
-    } while (current_angle < 16373  && current_angle > 10);
+    } while (current_angle < 16363  && current_angle > 20);
 
     // bridge_disable();
 
@@ -90,13 +90,13 @@ int main()
         debug_write_int(zc_angles[i]);
         delayMillis(10);
     }
-    bridge_set_run_duty(0x0200);
+    // bridge_set_run_duty(0x0200);
 
     // bridge_enable();
     bridge_commutate();
     do {
         current_angle = as5048_read_angle(&as5048);
-    } while (current_angle < 0);
+    } while (current_angle > magnet_angles[num_poles - 1]);
 
     for (int i = 0; i < num_poles; i++) {
         do {

@@ -4,6 +4,7 @@
 // the aux port connector
 
 #include "comparator.h"
+#include "debug.h"
 #include "exti.h"
 #include "functions.h"
 #include "led.h"
@@ -87,14 +88,29 @@ int main()
     utility_timer_initialize();
     utility_timer_enable();
 
+    debug_initialize();
+
     led_initialize();
-    delayMillis(10);
+
+    delayMillis(65);
+    delayMillis(65);
+    delayMillis(65);
+    delayMillis(65);
     led_write(0x00000010);
-    delayMillis(10);
+    delayMillis(65);
+    delayMillis(65);
+    delayMillis(65);
+    delayMillis(65);
     led_write(0x00001000);
-    delayMillis(10);
+    delayMillis(65);
+    delayMillis(65);
+    delayMillis(65);
+    delayMillis(65);
     led_write(0x00100000);
-    delayMillis(10);
+    delayMillis(65);
+    delayMillis(65);
+    delayMillis(65);
+    delayMillis(65);
 
     comparator_initialize(&comp);
 

@@ -58,47 +58,47 @@ void debug_write_int(uint32_t i)
   usart_write_int(&usartDebug, i);
 }
 
-// void debug_set_1()
-// {
-//     gpio_set(&gpioDebug1);
-// }
+void debug_set_1()
+{
+    gpio_set(&gpioDebug1);
+}
 
-// void debug_reset_1()
-// {
-//     gpio_reset(&gpioDebug1);
-// }
+void debug_reset_1()
+{
+    gpio_reset(&gpioDebug1);
+}
 
-// void debug_toggle_1()
-// {
-//     gpio_toggle(&gpioDebug1);
-// }
+void debug_toggle_1()
+{
+    gpio_toggle(&gpioDebug1);
+}
 
-// void debug_set_2()
-// {
-//     gpio_set(&gpioDebug2);
-// }
+void debug_set_2()
+{
+    gpio_set(&gpioDebug2);
+}
 
-// void debug_reset_2()
-// {
-//     gpio_reset(&gpioDebug2);
-// }
+void debug_reset_2()
+{
+    gpio_reset(&gpioDebug2);
+}
 
-// void debug_toggle_2()
-// {
-//     gpio_toggle(&gpioDebug2);
-// }
+void debug_toggle_2()
+{
+    gpio_toggle(&gpioDebug2);
+}
 
-// void debug_set_3()
-// {
-//     gpio_set(&gpioDebug3);
-// }
+void debug_set_3()
+{
+    gpio_set(&gpioDebug3);
+}
 
-// void debug_reset_3()
-// {
-//     gpio_reset(&gpioDebug3);
-// }
+void debug_reset_3()
+{
+    gpio_reset(&gpioDebug3);
+}
 
-// void debug_toggle_3()
-// {
-//     gpio_toggle(&gpioDebug3);
-// }
+void debug_toggle_3()
+{
+    gpio_toggle(&gpioDebug3);
+}

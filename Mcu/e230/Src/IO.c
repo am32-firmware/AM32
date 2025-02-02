@@ -82,5 +82,5 @@ void setInputPullUp()
 void enableHalfTransferInt() { DMA_CHCTL(INPUT_DMA_CHANNEL) |= DMA_INT_HTF; }
 void setInputPullNone()
 {
-    gpio_mode_set(INPUT_PIN_PORT, GPIO_MODE_AF, GPIO_PUPD_NONE, INPUT_PIN)
+    gpio_mode_set(INPUT_PIN_PORT, GPIO_MODE_AF, GPIO_PUPD_NONE, INPUT_PIN);
 }

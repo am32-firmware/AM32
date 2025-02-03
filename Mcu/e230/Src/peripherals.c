@@ -245,11 +245,12 @@ void MX_GPIO_Init(void) { }
 
 void UN_TIM_Init(void)
 {
+    rcu_periph_clock_enable(RCU_GPIOA);
     rcu_periph_clock_enable(RCU_GPIOB);
     rcu_periph_clock_enable(RCU_DMA);
 
-    gpio_output_options_set(GPIOB, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ, GPIO_PIN_4);
-    gpio_af_set(GPIOB, GPIO_AF_1, GPIO_PIN_4);
+    gpio_output_options_set(INPUT_PIN_PORT, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ, INPUT_PIN);
+    gpio_af_set(INPUT_PIN_PORT, INPUT_PIN_AF, INPUT_PIN);
 
     dma_periph_address_config(INPUT_DMA_CHANNEL,
         (uint32_t)&TIMER_CH0CV(IC_TIMER_REGISTER));
@@ -269,12 +270,13 @@ void UN_TIM_Init(void)
     NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
     NVIC_EnableIRQ(IC_DMA_IRQ_NAME);
     rcu_periph_clock_enable(RCU_TIMER2);
+    rcu_periph_clock_enable(RCU_TIMER14);
     TIMER_CAR(TIMER2) = 0xFFFF;
     TIMER_PSC(TIMER2) = 10;
     /* enable a TIMER */
 
     //	LL_TIM_DisableARRPreload(IC_TIMER_REGISTER);
-    timer_auto_reload_shadow_disable(TIMER2);
+    timer_auto_reload_shadow_disable(IC_TIMER_REGISTER);
 
     timer_ic_parameter_struct timer_icinitpara;
     timer_channel_input_struct_para_init(&timer_icinitpara);
@@ -283,13 +285,13 @@ void UN_TIM_Init(void)
     timer_icinitpara.icselection = TIMER_IC_SELECTION_DIRECTTI;
     timer_icinitpara.icprescaler = TIMER_IC_PSC_DIV1;
     timer_icinitpara.icfilter = 0x0;
-    timer_input_pwm_capture_config(TIMER2, TIMER_CH_0, &timer_icinitpara);
+    timer_input_pwm_capture_config(IC_TIMER_REGISTER, IC_TIMER_CHANNEL, &timer_icinitpara);
 
     // NVIC_SetPriority(TIMER2_IRQn, 0);
     //  NVIC_EnableIRQ(TIMER2_IRQn);
-    timer_enable(TIMER2);
+    timer_enable(IC_TIMER_REGISTER);
 
-    gpio_mode_set(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO_PIN_4);
+    gpio_mode_set(INPUT_PIN_PORT, GPIO_MODE_AF, GPIO_PUPD_NONE, INPUT_PIN);
 }
 
 #ifdef USE_RGB_LED // has 3 color led

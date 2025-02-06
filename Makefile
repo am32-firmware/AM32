@@ -82,7 +82,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-can-io.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator-3phase.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator-output.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator-output.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-debug.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-delay.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/1111test-drv8323.c
@@ -124,7 +124,7 @@ SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator-output.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-vreg-5V.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-watchdog-fail.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-watchdog-pass.c
-# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-watchdog-period.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-watchdog-period.c
 
 TARGET_FNAME = $(IDENTIFIER)_$(TARGET)_$(FIRMWARE_VERSION)
 TARGET_BASENAME = $(BIN_DIR)/$(TARGET_FNAME)

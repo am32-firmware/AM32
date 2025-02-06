@@ -6,8 +6,8 @@
 
 typedef enum
 {
-    IWDG_PRESCALER_4,
-    IWDG_PRESCALER_8,
+    IWDG_PRESCALER_4 = 0,
+    IWDG_PRESCALER_8 = 1,
     IWDG_PRESCALER_16,
     IWDG_PRESCALER_32,
     IWDG_PRESCALER_64,
@@ -23,7 +23,7 @@ void watchdog_initialize(
 
 void watchdog_initialize_period(uint16_t period_ms);
 void watchdog_enable();
-void watchdog_goodboy_pat();
+void watchdog_reload();
 void watchdog_set_prescaler(iwdgPrescaler_e prescaler);
 void watchdog_set_reload(uint32_t reload);
 

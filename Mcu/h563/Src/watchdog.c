@@ -97,15 +97,17 @@ void watchdog_initialize(
     // enable 32kHz lsi clock
     // (the only clock source for IWDG)
     clock_lsi_enable();
-    // enable IWDG clock
-    // LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_WWDG);
+
+    // // enable the IWDG
+    // watchdog_enable();
 
     // unlock watchdog via key register
     watchdog_unlock();
 
     // set prescaler
     // IWDG->PR = prescaler;
-    watchdog_set_prescaler(prescaler);
+    // watchdog_set_prescaler(prescaler);
+    watchdog_set_prescaler(IWDG_PRESCALER_8);
     // IWDG->PR = LL_IWDG_PRESCALER_16;
     // set reload register
     watchdog_set_reload(reload);
@@ -113,7 +115,7 @@ void watchdog_initialize(
     // while (IWDG->SR); // wait for the registers to be updated
     watchdog_reload();
 
-    watchdog_unlock();
+    // watchdog_unlock();
 
 }
 
@@ -126,7 +128,14 @@ void watchdog_set_reload(uint32_t reload)
         // reload value can only be updated
         // when RVU bit is reset
     }
+
     IWDG->RLR = reload;
+
+    while (IWDG->SR & IWDG_SR_RVU)
+    {
+        // wait for reload value to update
+    }
+
     watchdog_write_key(WATCHDOG_KEY_RELOAD);
 
 }
@@ -137,9 +146,13 @@ void watchdog_set_prescaler(iwdgPrescaler_e prescaler)
     {
         // The prescaler value can be updated only when PVU bit is reset.
     }
+
     IWDG->PR = prescaler;
 
-    // watchdog_write_key();
+    while (IWDG->SR & IWDG_SR_PVU)
+    {
+        // wait for the prescaler value to update
+    }
 }
 
 void watchdog_write_key(uint16_t key)

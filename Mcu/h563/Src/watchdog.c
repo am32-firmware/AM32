@@ -106,8 +106,8 @@ void watchdog_initialize(
 
     // set prescaler
     // IWDG->PR = prescaler;
-    // watchdog_set_prescaler(prescaler);
-    watchdog_set_prescaler(IWDG_PRESCALER_8);
+    watchdog_set_prescaler(prescaler);
+    // watchdog_set_prescaler(IWDG_PRESCALER_8);
     // IWDG->PR = LL_IWDG_PRESCALER_16;
     // set reload register
     watchdog_set_reload(reload);

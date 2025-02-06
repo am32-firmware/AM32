@@ -90,12 +90,12 @@ int main()
         debug_write_int(zc_angles[i]);
         delayMillis(10);
     }
-    bridge_set_run_duty(0x0800);
+    bridge_set_run_duty(0x0400);
 
     // bridge_enable();
     bridge_commutate();
 
-    for (int n = 0; n < 300; n++) {
+    for (int n = 0; n < 30; n++) {
 
         do {
             current_angle = as5048_read_angle(&as5048);

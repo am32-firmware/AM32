@@ -32,16 +32,18 @@ void phaseATestcb(extiChannel_t* exti)
 {
     uint32_t mask = 1 << exti->channel;
     if (EXTI->RPR1 & mask) {
+        debug_set_1();
         EXTI->RPR1 |= mask;
     }
     if (EXTI->FPR1 & mask) {
+        debug_reset_1();
         EXTI->FPR1 |= mask;
     }
-    if(gpio_read(&gpioCompPhaseATest)) {
-        debug_set_1();
-    } else {
-        debug_reset_1();
-    }
+    // if(gpio_read(&gpioCompPhaseATest)) {
+    //     debug_set_1();
+    // } else {
+    //     debug_reset_1();
+    // }
 }
 
 void phaseBTestcb(extiChannel_t* exti)
@@ -53,11 +55,11 @@ void phaseBTestcb(extiChannel_t* exti)
     if (EXTI->FPR1 & mask) {
         EXTI->FPR1 |= mask;
     }
-    if(gpio_read(&gpioCompPhaseBTest)) {
-        debug_set_2();
-    } else {
-        debug_reset_2();
-    }
+    // if(gpio_read(&gpioCompPhaseBTest)) {
+    //     debug_set_2();
+    // } else {
+    //     debug_reset_2();
+    // }
 }
 
 void phaseCTestcb(extiChannel_t* exti)
@@ -77,8 +79,8 @@ comparator_t comp = {
     .phaseB = &gpioCompPhaseBTest,
     .phaseC = &gpioCompPhaseCTest,
     .phaseAcb = phaseATestcb,
-    .phaseBcb = phaseBTestcb,
-    .phaseCcb = phaseCTestcb
+    .phaseBcb = 0,
+    .phaseCcb = 0,
 };
 
 int main()
@@ -121,6 +123,9 @@ int main()
         delayMillis(WAIT_MS);
         delayMillis(WAIT_MS);
         delayMillis(WAIT_MS);
+        delayMillis(WAIT_MS);
+        delayMillis(WAIT_MS);
+        delayMillis(WAIT_MS);
         uint16_t last_angle = current_angle;
         current_angle = as5048_read_angle(&as5048);
         magnet_angles[pole_index++] = current_angle;
@@ -147,12 +152,12 @@ int main()
     // set a low priority on comparator interrupt
     // this is necessary for this example
     // to use the sk6812 led spi interrupt
-    comparator_nvic_set_priority(&comp, 4);
+    // comparator_nvic_set_priority(&comp, 4);
 
     comparator_enable_interrupts(&comp);
 
     for (int i = 0; i < num_poles; i++) {
-        zc_angles[i] = magnet_angles[i] + ((magnet_angles[i + 1] - magnet_angles[i]) / 2) - 65;
+        zc_angles[i] = magnet_angles[i] + ((magnet_angles[i + 1] - magnet_angles[i]) / 2) - 10;
         debug_write_string("\n\rindex: ");
         debug_write_int(i);
         debug_write_string("\tmagnet_angle: ");
@@ -177,6 +182,7 @@ int main()
                 current_angle = as5048_read_angle(&as5048);
             } while (current_angle < zc_angles[i]);
             bridge_commutate();
+            debug_toggle_2();
         }
     }
 
@@ -193,6 +199,7 @@ int main()
                 current_angle = as5048_read_angle(&as5048);
             } while (current_angle < zc_angles[i]);
             bridge_commutate();
+            debug_toggle_2();
         }
     }
 
@@ -209,6 +216,7 @@ int main()
                 current_angle = as5048_read_angle(&as5048);
             } while (current_angle < zc_angles[i]);
             bridge_commutate();
+            debug_toggle_2();
         }
     }
 

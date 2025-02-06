@@ -26,8 +26,8 @@ int main()
     }
 
 
-    // set watchdog to trigger after 50ms
-    watchdog_initialize_period(100);
+    // set watchdog to trigger after 25ms
+    watchdog_initialize_period(25);
     watchdog_enable();
     // debug_reset_1();
     while(1) {

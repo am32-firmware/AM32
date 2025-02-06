@@ -15,6 +15,8 @@ as5048_t as5048;
 
 uint16_t current_angle;
 
+#define DEAD_ZONE 10
+
 #define WAIT_MS 65 // 65 ms is max
 int main()
 {
@@ -31,8 +33,8 @@ int main()
 
     bridge_initialize();
     bridge_set_mode_run();
-    bridge_set_run_frequency(12000);
-    bridge_set_run_duty(0x0300);
+    bridge_set_run_frequency(24000);
+    bridge_set_run_duty(0x0200);
     bridge_enable();
 
     delayMillis(WAIT_MS);
@@ -59,7 +61,7 @@ int main()
         debug_write_int(current_angle - last_angle);
 
 
-    } while (current_angle < 16373  && current_angle > 10);
+    } while (current_angle < (1<<14) - DEAD_ZONE  && current_angle > DEAD_ZONE);
 
     bridge_disable();
 

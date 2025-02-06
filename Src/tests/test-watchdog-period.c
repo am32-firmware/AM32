@@ -25,12 +25,13 @@ int main()
         debug_toggle_1();
     }
 
-
     // set watchdog to trigger after 25ms
     watchdog_initialize_period(25);
     watchdog_enable();
     // debug_reset_1();
     while(1) {
         // watchdog_reload();
+        delayMillis(1);
+        debug_toggle_1();
     }
 }

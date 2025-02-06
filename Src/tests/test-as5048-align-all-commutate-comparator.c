@@ -5,6 +5,7 @@
 
 #include "as5048-spi.h"
 #include "bridge.h"
+#include "comparator.h"
 #include "debug.h"
 #include "drv8323-spi.h"
 #include "functions.h"
@@ -21,6 +22,65 @@ uint16_t zc_angles[MAGNET_ANGLES_MAX];
 uint16_t pole_index;
 
 #define WAIT_MS 65 // 65 ms is max
+
+
+gpio_t gpioCompPhaseATest = DEF_GPIO(COMPA_GPIO_PORT, COMPA_GPIO_PIN, 0, GPIO_INPUT);
+gpio_t gpioCompPhaseBTest = DEF_GPIO(COMPB_GPIO_PORT, COMPB_GPIO_PIN, 0, GPIO_INPUT);
+gpio_t gpioCompPhaseCTest = DEF_GPIO(COMPC_GPIO_PORT, COMPC_GPIO_PIN, 0, GPIO_INPUT);
+
+void phaseATestcb(extiChannel_t* exti)
+{
+    uint32_t mask = 1 << exti->channel;
+    if (EXTI->RPR1 & mask) {
+        EXTI->RPR1 |= mask;
+    }
+    if (EXTI->FPR1 & mask) {
+        EXTI->FPR1 |= mask;
+    }
+    if(gpio_read(&gpioCompPhaseATest)) {
+        debug_set_1();
+    } else {
+        debug_reset_1();
+    }
+}
+
+void phaseBTestcb(extiChannel_t* exti)
+{
+    uint32_t mask = 1 << exti->channel;
+    if (EXTI->RPR1 & mask) {
+        EXTI->RPR1 |= mask;
+    }
+    if (EXTI->FPR1 & mask) {
+        EXTI->FPR1 |= mask;
+    }
+    if(gpio_read(&gpioCompPhaseBTest)) {
+        debug_set_2();
+    } else {
+        debug_reset_2();
+    }
+}
+
+void phaseCTestcb(extiChannel_t* exti)
+{
+    uint32_t mask = 1 << exti->channel;
+    if (EXTI->RPR1 & mask) {
+        EXTI->RPR1 |= mask;
+    }
+    if (EXTI->FPR1 & mask) {
+        EXTI->FPR1 |= mask;
+    }
+}
+
+
+comparator_t comp = {
+    .phaseA = &gpioCompPhaseATest,
+    .phaseB = &gpioCompPhaseBTest,
+    .phaseC = &gpioCompPhaseCTest,
+    .phaseAcb = phaseATestcb,
+    .phaseBcb = phaseBTestcb,
+    .phaseCcb = phaseCTestcb
+};
+
 int main()
 {
     mcu_setup(250);
@@ -39,7 +99,9 @@ int main()
     bridge_set_run_frequency(24000);
     bridge_set_run_duty(0x0300);
     bridge_enable();
-
+    bridge_commutate();
+    delayMillis(WAIT_MS);
+    delayMillis(WAIT_MS);
     delayMillis(WAIT_MS);
     as5048_set_zero_position(&as5048);
 
@@ -80,8 +142,17 @@ int main()
     uint16_t num_poles = pole_index - 1;
     magnet_angles[num_poles] = 1<<14;
 
+    comparator_initialize(&comp);
+
+    // set a low priority on comparator interrupt
+    // this is necessary for this example
+    // to use the sk6812 led spi interrupt
+    comparator_nvic_set_priority(&comp, 4);
+
+    comparator_enable_interrupts(&comp);
+
     for (int i = 0; i < num_poles; i++) {
-        zc_angles[i] = magnet_angles[i] + ((magnet_angles[i + 1] - magnet_angles[i]) / 2) - 20;
+        zc_angles[i] = magnet_angles[i] + ((magnet_angles[i + 1] - magnet_angles[i]) / 2) - 65;
         debug_write_string("\n\rindex: ");
         debug_write_int(i);
         debug_write_string("\tmagnet_angle: ");
@@ -90,10 +161,26 @@ int main()
         debug_write_int(zc_angles[i]);
         delayMillis(10);
     }
-    bridge_set_run_duty(0x0400);
+    bridge_set_run_duty(0x0100);
 
     // bridge_enable();
     bridge_commutate();
+
+    for (int n = 0; n < 15; n++) {
+
+        do {
+            current_angle = as5048_read_angle(&as5048);
+        } while (current_angle > magnet_angles[num_poles - 1] || current_angle < 20);
+        // delayMicros(10);
+        for (int i = 0; i < num_poles; i++) {
+            do {
+                current_angle = as5048_read_angle(&as5048);
+            } while (current_angle < zc_angles[i]);
+            bridge_commutate();
+        }
+    }
+
+    bridge_set_run_duty(0x0200);
 
     for (int n = 0; n < 30; n++) {
 
@@ -109,6 +196,21 @@ int main()
         }
     }
 
+    bridge_set_run_duty(0x0800);
+
+    for (int n = 0; n < 500; n++) {
+
+        do {
+            current_angle = as5048_read_angle(&as5048);
+        } while (current_angle > magnet_angles[num_poles - 1] || current_angle < 20);
+        // delayMicros(10);
+        for (int i = 0; i < num_poles; i++) {
+            do {
+                current_angle = as5048_read_angle(&as5048);
+            } while (current_angle < zc_angles[i]);
+            bridge_commutate();
+        }
+    }
 
     bridge_disable();
     while(1) {

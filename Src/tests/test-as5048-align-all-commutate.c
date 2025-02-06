@@ -39,7 +39,9 @@ int main()
     bridge_set_run_frequency(24000);
     bridge_set_run_duty(0x0300);
     bridge_enable();
-
+    bridge_commutate();
+    delayMillis(WAIT_MS);
+    delayMillis(WAIT_MS);
     delayMillis(WAIT_MS);
     as5048_set_zero_position(&as5048);
 
@@ -81,7 +83,7 @@ int main()
     magnet_angles[num_poles] = 1<<14;
 
     for (int i = 0; i < num_poles; i++) {
-        zc_angles[i] = magnet_angles[i] + ((magnet_angles[i + 1] - magnet_angles[i]) / 2) - 20;
+        zc_angles[i] = magnet_angles[i] + ((magnet_angles[i + 1] - magnet_angles[i]) / 2) - 65;
         debug_write_string("\n\rindex: ");
         debug_write_int(i);
         debug_write_string("\tmagnet_angle: ");
@@ -90,12 +92,12 @@ int main()
         debug_write_int(zc_angles[i]);
         delayMillis(10);
     }
-    bridge_set_run_duty(0x0800);
+    bridge_set_run_duty(0x0100);
 
     // bridge_enable();
     bridge_commutate();
 
-    for (int n = 0; n < 300; n++) {
+    for (int n = 0; n < 15; n++) {
 
         do {
             current_angle = as5048_read_angle(&as5048);
@@ -109,6 +111,37 @@ int main()
         }
     }
 
+    bridge_set_run_duty(0x0200);
+
+    for (int n = 0; n < 30; n++) {
+
+        do {
+            current_angle = as5048_read_angle(&as5048);
+        } while (current_angle > magnet_angles[num_poles - 1] || current_angle < 20);
+        // delayMicros(10);
+        for (int i = 0; i < num_poles; i++) {
+            do {
+                current_angle = as5048_read_angle(&as5048);
+            } while (current_angle < zc_angles[i]);
+            bridge_commutate();
+        }
+    }
+
+    bridge_set_run_duty(0x0800);
+
+    for (int n = 0; n < 500; n++) {
+
+        do {
+            current_angle = as5048_read_angle(&as5048);
+        } while (current_angle > magnet_angles[num_poles - 1] || current_angle < 20);
+        // delayMicros(10);
+        for (int i = 0; i < num_poles; i++) {
+            do {
+                current_angle = as5048_read_angle(&as5048);
+            } while (current_angle < zc_angles[i]);
+            bridge_commutate();
+        }
+    }
 
     bridge_disable();
     while(1) {

@@ -17,7 +17,7 @@ int main()
 
 
     bridge_initialize();
-    bridge_set_deadtime_ns(150);
+    bridge_set_deadtime_ns(500);
     bridge_set_mode_run();
     bridge_set_run_frequency(24000);
     bridge_set_run_duty(0x0400);

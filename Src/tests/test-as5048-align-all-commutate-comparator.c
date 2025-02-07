@@ -50,9 +50,11 @@ void phaseBTestcb(extiChannel_t* exti)
 {
     uint32_t mask = 1 << exti->channel;
     if (EXTI->RPR1 & mask) {
+        debug_set_2();
         EXTI->RPR1 |= mask;
     }
     if (EXTI->FPR1 & mask) {
+        debug_reset_2();
         EXTI->FPR1 |= mask;
     }
     // if(gpio_read(&gpioCompPhaseBTest)) {
@@ -66,9 +68,11 @@ void phaseCTestcb(extiChannel_t* exti)
 {
     uint32_t mask = 1 << exti->channel;
     if (EXTI->RPR1 & mask) {
+        debug_set_2();
         EXTI->RPR1 |= mask;
     }
     if (EXTI->FPR1 & mask) {
+        debug_reset_2();
         EXTI->FPR1 |= mask;
     }
 }
@@ -80,7 +84,7 @@ comparator_t comp = {
     .phaseC = &gpioCompPhaseCTest,
     .phaseAcb = phaseATestcb,
     .phaseBcb = 0,
-    .phaseCcb = 0,
+    .phaseCcb = phaseCTestcb,
 };
 
 int main()
@@ -157,7 +161,8 @@ int main()
     comparator_enable_interrupts(&comp);
 
     for (int i = 0; i < num_poles; i++) {
-        zc_angles[i] = magnet_angles[i] + ((magnet_angles[i + 1] - magnet_angles[i]) / 2) - 65;
+        // zc_angles[i] = magnet_angles[i] + ((magnet_angles[i + 1] - magnet_angles[i]) / 2) - 65;
+        zc_angles[i] = magnet_angles[i] + ((magnet_angles[i + 1] - magnet_angles[i]) / 2) - 20;
         debug_write_string("\n\rindex: ");
         debug_write_int(i);
         debug_write_string("\tmagnet_angle: ");
@@ -166,12 +171,12 @@ int main()
         debug_write_int(zc_angles[i]);
         delayMillis(10);
     }
-    bridge_set_run_duty(0x0100);
+    bridge_set_run_duty(0x0200);
 
     // bridge_enable();
     bridge_commutate();
 
-    for (int n = 0; n < 30; n++) {
+    for (int n = 0; n < 5; n++) {
 
         do {
             current_angle = as5048_read_angle(&as5048);
@@ -182,30 +187,13 @@ int main()
                 current_angle = as5048_read_angle(&as5048);
             } while (current_angle < zc_angles[i]);
             bridge_commutate();
-            debug_toggle_2();
-        }
-    }
-
-    bridge_set_run_duty(0x0200);
-
-    for (int n = 0; n < 30; n++) {
-
-        do {
-            current_angle = as5048_read_angle(&as5048);
-        } while (current_angle > magnet_angles[num_poles - 1] || current_angle < 20);
-        // delayMicros(10);
-        for (int i = 0; i < num_poles; i++) {
-            do {
-                current_angle = as5048_read_angle(&as5048);
-            } while (current_angle < zc_angles[i]);
-            bridge_commutate();
-            debug_toggle_2();
+            // debug_toggle_2();
         }
     }
 
     bridge_set_run_duty(0x0400);
 
-    for (int n = 0; n < 500; n++) {
+    for (int n = 0; n < 10; n++) {
 
         do {
             current_angle = as5048_read_angle(&as5048);
@@ -216,7 +204,24 @@ int main()
                 current_angle = as5048_read_angle(&as5048);
             } while (current_angle < zc_angles[i]);
             bridge_commutate();
-            debug_toggle_2();
+            // debug_toggle_2();
+        }
+    }
+
+    bridge_set_run_duty(0x0800);
+
+    for (int n = 0; n < 100; n++) {
+
+        do {
+            current_angle = as5048_read_angle(&as5048);
+        } while (current_angle > magnet_angles[num_poles - 1] || current_angle < 20);
+        // delayMicros(10);
+        for (int i = 0; i < num_poles; i++) {
+            do {
+                current_angle = as5048_read_angle(&as5048);
+            } while (current_angle < zc_angles[i]);
+            bridge_commutate();
+            // debug_toggle_2();
         }
     }
 

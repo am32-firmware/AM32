@@ -64,7 +64,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-commutate.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-commutate-comparator.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-commutate-comparator.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-print.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-debug.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-read.c
@@ -84,6 +84,7 @@ SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-commutate-comparator.
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator-3phase.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator-output.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator-output-main.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-debug.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-delay.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/1111test-drv8323.c

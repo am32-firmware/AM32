@@ -55,8 +55,7 @@ void bridge_initialize()
     BRIDGE_TIMER_ENABLE_CLOCK();
 
     bridge_set_run_frequency(24000);
-    // BRIDGE_TIMER->BDTR |= 0x40; // configure dead-time
-    BRIDGE_TIMER->BDTR |= 0x40; // configure dead-time
+    bridge_set_deadtime_ns(200); // configure dead-time
     BRIDGE_TIMER->CCR1 = 0;
     BRIDGE_TIMER->CCR2 = 0;
     BRIDGE_TIMER->CCR3 = 0;

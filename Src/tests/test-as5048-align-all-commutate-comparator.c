@@ -84,7 +84,8 @@ comparator_t comp = {
     .phaseC = &gpioCompPhaseCTest,
     .phaseAcb = phaseATestcb,
     .phaseBcb = 0,
-    .phaseCcb = phaseCTestcb,
+    // .phaseCcb = phaseCTestcb,
+    .phaseCcb = 0,
 };
 
 int main()
@@ -163,7 +164,8 @@ int main()
 
     for (int i = 0; i < num_poles; i++) {
         // zc_angles[i] = magnet_angles[i] + ((magnet_angles[i + 1] - magnet_angles[i]) / 2) - 65;
-        zc_angles[i] = magnet_angles[i] + ((magnet_angles[i + 1] - magnet_angles[i]) / 2) - 20;
+        // zc_angles[i] = magnet_angles[i] + ((magnet_angles[i + 1] - magnet_angles[i]) / 2) - 20;
+        zc_angles[i] = magnet_angles[i] + ((magnet_angles[i + 1] - magnet_angles[i]) / 2);
         debug_write_string("\n\rindex: ");
         debug_write_int(i);
         debug_write_string("\tmagnet_angle: ");

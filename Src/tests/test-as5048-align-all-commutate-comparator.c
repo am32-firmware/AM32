@@ -157,7 +157,7 @@ int main()
     comparator_enable_interrupts(&comp);
 
     for (int i = 0; i < num_poles; i++) {
-        zc_angles[i] = magnet_angles[i] + ((magnet_angles[i + 1] - magnet_angles[i]) / 2) - 10;
+        zc_angles[i] = magnet_angles[i] + ((magnet_angles[i + 1] - magnet_angles[i]) / 2) - 65;
         debug_write_string("\n\rindex: ");
         debug_write_int(i);
         debug_write_string("\tmagnet_angle: ");
@@ -171,7 +171,7 @@ int main()
     // bridge_enable();
     bridge_commutate();
 
-    for (int n = 0; n < 15; n++) {
+    for (int n = 0; n < 30; n++) {
 
         do {
             current_angle = as5048_read_angle(&as5048);
@@ -203,7 +203,7 @@ int main()
         }
     }
 
-    bridge_set_run_duty(0x0800);
+    bridge_set_run_duty(0x0400);
 
     for (int n = 0; n < 500; n++) {
 

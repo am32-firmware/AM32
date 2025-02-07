@@ -101,6 +101,7 @@ int main()
 
 
     bridge_initialize();
+    bridge_set_deadtime_ns(1000);
     bridge_set_mode_run();
     bridge_set_run_frequency(24000);
     bridge_set_run_duty(0x0300);
@@ -208,7 +209,7 @@ int main()
         }
     }
 
-    bridge_set_run_duty(0x0800);
+    bridge_set_run_duty(0x0780);
 
     for (int n = 0; n < 100; n++) {
 

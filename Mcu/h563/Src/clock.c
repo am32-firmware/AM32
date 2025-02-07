@@ -85,20 +85,7 @@ uint8_t clock_pll1_get_source()
     return (RCC->PLL1CFGR & RCC_PLL1CFGR_PLL1SRC_Msk) >> RCC_PLL1CFGR_PLL1SRC_Pos;
 }
 
-void clock_pll1_set_prescaler(uint8_t prescaler)
-{
-    // The frequency of the reference clock provided to the PLLs (refx_ck) must range from 1 to
-    // 16 MHz. The DIVMx dividers of the RCC PLL clock source selection register
-    // (RCC_PLL1CFGR) must be properly programmed in order to match this condition.
-    // divide by 12, 2MHz for a 24MHz HSE
 
-    // uint8_t prescaler = 25;
-    // set the prescaler for pll1 (PLL1M)
-    uint32_t pll1cfgr = RCC->PLL1CFGR;
-    pll1cfgr &= ~RCC_PLL1CFGR_PLL1M_Msk;
-    RCC->PLL1CFGR |= pll1cfgr | (prescaler << RCC_PLL1CFGR_PLL1M_Pos);
-
-}
 
 void clock_update_hclk_frequency()
 {
@@ -142,7 +129,7 @@ void clock_update_hclk_frequency()
         }
         case (CLOCK_SYS_SRC_HSE):
         {
-            HCLK_FREQUENCY = 25000000;
+            HCLK_FREQUENCY = AM32_HSE_VALUE;
             break;
         }
         case (CLOCK_SYS_SRC_PLL1):
@@ -174,7 +161,10 @@ void clock_pll1_enable_pclk()
 
 // to set multiplier higher than 420MHz,
 // PLL1VCOSEL must be configured to wide range
-// 192 to 836 MHz (default after reset)
+// 128 to 560 MHz (default after reset)
+// Note there is a discrepancy between the datasheet and
+// reference manual. The reference manual says 192 to 836 MHz.
+// the datasheet says 128 to 560 MHz.
 void clock_pll1_set_multiplier(uint8_t multiplier)
 {
     // set pll multiplier
@@ -194,6 +184,21 @@ uint8_t clock_pll1_get_multiplier()
     uint32_t pll1divr = RCC->PLL1DIVR;
     uint32_t ret = (pll1divr & RCC_PLL1DIVR_PLL1N_Msk) >> RCC_PLL1DIVR_PLL1N_Pos;
     return (ret + 1)/2;
+}
+
+void clock_pll1_set_prescaler(uint8_t prescaler)
+{
+    // The frequency of the reference clock provided to the PLLs (refx_ck) must range from 1 to
+    // 16 MHz. The DIVMx dividers of the RCC PLL clock source selection register
+    // (RCC_PLL1CFGR) must be properly programmed in order to match this condition.
+    // divide by 12, 2MHz for a 24MHz HSE
+
+    // uint8_t prescaler = 25;
+    // set the prescaler for pll1 (PLL1M)
+    uint32_t pll1cfgr = RCC->PLL1CFGR;
+    pll1cfgr &= ~RCC_PLL1CFGR_PLL1M_Msk;
+    RCC->PLL1CFGR |= pll1cfgr | (prescaler << RCC_PLL1CFGR_PLL1M_Pos);
+
 }
 
 uint8_t clock_pll1_get_prescaler()

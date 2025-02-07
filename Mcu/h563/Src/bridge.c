@@ -56,6 +56,7 @@ void bridge_initialize()
 
     bridge_set_run_frequency(24000);
     // BRIDGE_TIMER->BDTR |= 0x40; // configure dead-time
+    BRIDGE_TIMER->BDTR |= 0x40; // configure dead-time
     BRIDGE_TIMER->CCR1 = 0;
     BRIDGE_TIMER->CCR2 = 0;
     BRIDGE_TIMER->CCR3 = 0;
@@ -226,6 +227,6 @@ void bridge_set_deadtime_ns(uint32_t deadtime)
         dtg = 0xe0 | deadtime_ticks;
     }
 
-    BRIDGE_TIMER->BDTR = (BRIDGE_TIMER->BDTR & ~0xf) | dtg;
+    BRIDGE_TIMER->BDTR = (BRIDGE_TIMER->BDTR & ~TIM_BDTR_DTG_Msk) | dtg;
     // BRIDGE_TIMER->BDTR = (BRIDGE_TIMER->BDTR & ~0xf);
 }

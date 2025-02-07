@@ -17,13 +17,14 @@ int main()
 
 
     bridge_initialize();
+    bridge_set_deadtime_ns(150);
     bridge_set_mode_run();
-    bridge_set_run_frequency(8000);
-    bridge_set_run_duty(0x0080);
+    bridge_set_run_frequency(24000);
+    bridge_set_run_duty(0x0400);
     bridge_enable();
 
     for (int n = 0; n < 1200; n++) {
-        delayMicros(8900);
+        delayMillis(10);
         bridge_commutate();
     }
     bridge_disable();

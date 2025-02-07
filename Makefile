@@ -79,12 +79,12 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-uart-tx.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-uart-sk6812.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-bridge-audio.c
-# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-bridge-commutate.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-bridge-commutate.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-can-io.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator-3phase.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator-output.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator-output-main.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator-output-main.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-debug.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-delay.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/1111test-drv8323.c

@@ -1,13 +1,14 @@
 #include "stm32h563xx.h"
 
-#include "mcu.h"
-#include "stm32h5xx_ll_cortex.h"
+
 #include "clock.h"
 #include "dma.h"
 #include "flash.h"
 #include "lan8671.h"
+#include "mcu.h"
 #include "power.h"
-
+#include "stm32h5xx_ll_cortex.h"
+#include "targets.h"
 
 void mcu_setup(uint16_t coreFrequencyMHz)
 {
@@ -30,7 +31,7 @@ void mcu_setup_clocks(uint16_t coreFrequencyMHz)
     clock_pll1_set_source(CLOCK_PLL1_SRC_HSE);
     // HSE frequency is 25MHz
     // set prescaler to 25 for 1MHz input clock
-    clock_pll1_set_prescaler(25);
+    clock_pll1_set_prescaler(AM32_HSE_VALUE/1000000);
     clock_pll1_enable_pclk();
     clock_pll1_set_multiplier(coreFrequencyMHz);
     clock_pll1_enable();

@@ -111,6 +111,11 @@ int main()
     delayMillis(WAIT_MS);
     delayMillis(WAIT_MS);
     delayMillis(WAIT_MS);
+    delayMillis(WAIT_MS);
+    delayMillis(WAIT_MS);
+    delayMillis(WAIT_MS);
+    delayMillis(WAIT_MS);
+    delayMillis(WAIT_MS);
     as5048_set_zero_position(&as5048);
 
 
@@ -126,6 +131,9 @@ int main()
     uint16_t i = 0;
     do {
         bridge_commutate();
+        delayMillis(WAIT_MS);
+        delayMillis(WAIT_MS);
+        delayMillis(WAIT_MS);
         delayMillis(WAIT_MS);
         delayMillis(WAIT_MS);
         delayMillis(WAIT_MS);
@@ -165,7 +173,11 @@ int main()
     for (int i = 0; i < num_poles; i++) {
         // zc_angles[i] = magnet_angles[i] + ((magnet_angles[i + 1] - magnet_angles[i]) / 2) - 65;
         // zc_angles[i] = magnet_angles[i] + ((magnet_angles[i + 1] - magnet_angles[i]) / 2) - 20;
-        zc_angles[i] = magnet_angles[i] + ((magnet_angles[i + 1] - magnet_angles[i]) / 2);
+        uint32_t diff = magnet_angles[i + 1] - magnet_angles[i];
+        // zc_angles[i] = magnet_angles[i] + (diff / 2.0f) - (diff / 10.0f);
+        // zc_angles[i] = magnet_angles[i] + (diff / 6.0f);
+        zc_angles[i] = magnet_angles[i]; // this works
+        // zc_angles[i] = magnet_angles[i + 1];
         debug_write_string("\n\rindex: ");
         debug_write_int(i);
         debug_write_string("\tmagnet_angle: ");

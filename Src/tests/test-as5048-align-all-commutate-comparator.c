@@ -168,11 +168,13 @@ int main()
         // zc_angles[i] = magnet_angles[i] + (diff / 2.0f) - (diff / 10.0f);
         // zc_angles[i] = magnet_angles[i] + (diff / 6.0f);
         // zc_angles[i] = magnet_angles[i] - 20; // this works
-        if (i == 0) {
-            zc_angles[i] = (1 << 14) - 35;
-        } else {
-            zc_angles[i] = magnet_angles[i] - 35;
-        }
+        // if (i == 0) {
+        //     zc_angles[i] = (1 << 14) - 35;
+        // } else {
+        //     zc_angles[i] = magnet_angles[i] - 35;
+        // }
+        zc_angles[i] = magnet_angles[i];
+
         if (i < 3 || i > num_poles - 3) {
             debug_write_string("\n\rindex: ");
             debug_write_int(i);

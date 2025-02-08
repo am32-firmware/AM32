@@ -178,16 +178,16 @@ int main()
         delayMillis(10);
     }
     // zc_angles[0] = (1 << 14) - 20;
-    bridge_set_run_duty(0x0400);
+    bridge_set_run_duty(0x0100);
 
     // bridge_enable();
     bridge_commutate();
 
-    for (int n = 0; n < 50; n++) {
+    for (int n = 0; n < 500; n++) {
 
         do {
             current_angle = as5048_read_angle(&as5048);
-        } while (current_angle > zc_angles[num_poles - 1] || current_angle < 50);
+        } while (current_angle > zc_angles[num_poles - 2] || current_angle < 50);
         // delayMicros(10);
         for (int i = 0; i < num_poles; i++) {
             do {
@@ -198,39 +198,39 @@ int main()
         }
     }
 
-    bridge_set_run_duty(0x0400);
+    // bridge_set_run_duty(0x0400);
 
-    for (int n = 0; n < 10; n++) {
+    // for (int n = 0; n < 10; n++) {
 
-        do {
-            current_angle = as5048_read_angle(&as5048);
-        } while (current_angle > magnet_angles[num_poles - 1] || current_angle < 20);
-        // delayMicros(10);
-        for (int i = 0; i < num_poles; i++) {
-            do {
-                current_angle = as5048_read_angle(&as5048);
-            } while (current_angle < zc_angles[i]);
-            bridge_commutate();
-            // debug_toggle_2();
-        }
-    }
+    //     do {
+    //         current_angle = as5048_read_angle(&as5048);
+    //     } while (current_angle > magnet_angles[num_poles - 1] || current_angle < 20);
+    //     // delayMicros(10);
+    //     for (int i = 0; i < num_poles; i++) {
+    //         do {
+    //             current_angle = as5048_read_angle(&as5048);
+    //         } while (current_angle < zc_angles[i]);
+    //         bridge_commutate();
+    //         // debug_toggle_2();
+    //     }
+    // }
 
-    bridge_set_run_duty(0x0780);
+    // bridge_set_run_duty(0x0780);
 
-    for (int n = 0; n < 100; n++) {
+    // for (int n = 0; n < 100; n++) {
 
-        do {
-            current_angle = as5048_read_angle(&as5048);
-        } while (current_angle > magnet_angles[num_poles - 1] || current_angle < 20);
-        // delayMicros(10);
-        for (int i = 0; i < num_poles; i++) {
-            do {
-                current_angle = as5048_read_angle(&as5048);
-            } while (current_angle < zc_angles[i]);
-            bridge_commutate();
-            // debug_toggle_2();
-        }
-    }
+    //     do {
+    //         current_angle = as5048_read_angle(&as5048);
+    //     } while (current_angle > magnet_angles[num_poles - 1] || current_angle < 20);
+    //     // delayMicros(10);
+    //     for (int i = 0; i < num_poles; i++) {
+    //         do {
+    //             current_angle = as5048_read_angle(&as5048);
+    //         } while (current_angle < zc_angles[i]);
+    //         bridge_commutate();
+    //         // debug_toggle_2();
+    //     }
+    // }
 
     bridge_disable();
     while(1) {

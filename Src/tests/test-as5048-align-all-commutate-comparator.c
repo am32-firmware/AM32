@@ -146,8 +146,8 @@ int main()
 
     // bridge_disable();
 
-    debug_write_string("\n\rpole_index: ");
-    debug_write_int(pole_index);
+    debug_write_string("\n\rcurrent_angle: ");
+    debug_write_int(current_angle);
 
     uint16_t num_poles = pole_index - 1;
     magnet_angles[num_poles] = 1<<14;
@@ -168,34 +168,43 @@ int main()
         // zc_angles[i] = magnet_angles[i] + (diff / 2.0f) - (diff / 10.0f);
         // zc_angles[i] = magnet_angles[i] + (diff / 6.0f);
         // zc_angles[i] = magnet_angles[i] - 20; // this works
-        zc_angles[i] = magnet_angles[i];
-        debug_write_string("\n\rindex: ");
-        debug_write_int(i);
-        debug_write_string("\tmagnet_angle: ");
-        debug_write_int(magnet_angles[i]);
-        debug_write_string("\tzc_angle: ");
-        debug_write_int(zc_angles[i]);
-        delayMillis(10);
-    }
-    // zc_angles[0] = (1 << 14) - 20;
-    bridge_set_run_duty(0x0100);
+        if (i == 0) {
+            zc_angles[i] = (1 << 14) - 35;
+        } else {
+            zc_angles[i] = magnet_angles[i] - 35;
+        }
+        if (i < 3 || i > num_poles - 3) {
+            debug_write_string("\n\rindex: ");
+            debug_write_int(i);
+            debug_write_string("\tmagnet_angle: ");
+            debug_write_int(magnet_angles[i]);
+            debug_write_string("\tzc_angle: ");
+            debug_write_int(zc_angles[i]);
+            delayMillis(10);
+        }
 
-    // bridge_enable();
-    bridge_commutate();
+    }
+    bridge_set_run_duty(0x0400);
+
+    // here we are at angle = 0
 
     for (int n = 0; n < 500; n++) {
+        bridge_commutate();
 
         do {
             current_angle = as5048_read_angle(&as5048);
-        } while (current_angle > zc_angles[num_poles - 2] || current_angle < 50);
+        } while ((current_angle > zc_angles[num_poles - 2]) || (current_angle < 50));
         // delayMicros(10);
-        for (int i = 0; i < num_poles; i++) {
+        for (int i = 1; i < num_poles; i++) {
             do {
                 current_angle = as5048_read_angle(&as5048);
             } while (current_angle < zc_angles[i]);
             bridge_commutate();
             // debug_toggle_2();
         }
+        do {
+            current_angle = as5048_read_angle(&as5048);
+        } while (current_angle < zc_angles[0]);
     }
 
     // bridge_set_run_duty(0x0400);

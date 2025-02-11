@@ -84,7 +84,7 @@ comparator_t comp = {
     .phaseB = &gpioCompPhaseBTest,
     .phaseC = &gpioCompPhaseCTest,
     .phaseAcb = phaseATestcb,
-    .phaseBcb = 0,
+    .phaseBcb = phaseBTestcb,
     // .phaseCcb = phaseCTestcb,
     .phaseCcb = 0,
 };
@@ -101,7 +101,7 @@ int main()
     as5048_initialize(&as5048);
     drv8323_initialize(&DRV8323);
 
-    watchdog_initialize_period(1000);
+    watchdog_initialize_period(400);
     watchdog_enable();
 
     bridge_initialize();
@@ -211,7 +211,7 @@ int main()
         }
     }
 
-    bridge_set_run_duty(0x0780);
+    bridge_set_run_duty(0x0400);
 
     // here we are at angle = 0
 

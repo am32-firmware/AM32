@@ -140,7 +140,9 @@ void as5048_initialize_spi(as5048_t* as5048)
     as5048->spi->rxDmaRequest = AUX_SPI_RX_DMA_REQ;
 
     // a 250MHz kernel clock / 32 gives an SPI clock of 7.8125MHz
-    as5048->spi->CFG1_MBR = SPI_MBR_DIV_32; // prescaler = 32
+    as5048->spi->CFG1_MBR = SPI_MBR_DIV_16; // prescaler = 32
+    // // a 250MHz kernel clock / 32 gives an SPI clock of 7.8125MHz
+    // as5048->spi->CFG1_MBR = SPI_MBR_DIV_32; // prescaler = 32
     // // a 250MHz kernel clock / 64 gives an SPI clock of ~3.91MHz
     // as5048->spi->CFG1_MBR = SPI_MBR_DIV_64; // prescaler = 64
     // // a 250MHz kernel clock / 128 gives an SPI clock of ~1.95MHz

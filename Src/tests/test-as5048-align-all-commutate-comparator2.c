@@ -91,6 +91,34 @@ comparator_t comp = {
     .phaseCcb = 0,
 };
 
+void bridge_timer_irq_handler()
+{
+    if (BRIDGE_TIMER->SR & TIM_SR_CC4IF) {
+        BRIDGE_TIMER->SR &= ~TIM_SR_CC4IF;
+
+        switch (bridgeComStep) {
+            case 1:
+            case 2:
+            case 4:
+            case 5:
+                break;
+            case 3:
+                if (!gpio_read(&gpioCompPhaseATest)) {
+                    debug_reset_2();
+                }
+                break;
+            case 0:
+                if (gpio_read(&gpioCompPhaseATest)) {
+                    debug_set_2();
+                }
+                break;
+
+            default:
+                while(1);
+        }
+    }
+}
+
 int main()
 {
     mcu_setup(250);
@@ -227,7 +255,7 @@ int main()
         } else {
             diff = zc_angles[i] - zc_angles[i - 1];
         }
-        zc_angles[i] -= round(diff / 4.0f);
+        zc_angles[i] -= round(diff / 5.0f);
         // zc_angles[i] -= diff;
 
         if (i < 3 || i > num_poles - 3) {
@@ -244,7 +272,7 @@ int main()
     }
 
 
-    bridge_set_run_duty(0x0700);
+    bridge_set_run_duty(0x0600);
 
     // here we are at angle = 0
 

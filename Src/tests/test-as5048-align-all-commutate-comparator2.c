@@ -199,6 +199,7 @@ int main()
             zc_angles[i] = zc_angles[i+1] - 50;
         }
 
+
         if (i < 3 || i > num_poles - 3) {
             debug_write_string("\n\rindex: ");
             debug_write_int(i);
@@ -210,12 +211,13 @@ int main()
         }
     }
 
-    bridge_set_run_duty(0x0200);
+    bridge_set_run_duty(0x0780);
 
     // here we are at angle = 0
 
     bridge_commutate();
-    for (int n = 0; n < 50; n++) {
+    // for (int n = 0; n < 50; n++) {
+    while (1) {
 
         do {
             current_angle = as5048_read_angle(&as5048);

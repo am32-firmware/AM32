@@ -65,7 +65,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-commutate.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-commutate-comparator.c
-# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-commutate-comparator2.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-commutate-comparator2.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-print.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-debug.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-read.c
@@ -80,7 +80,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-uart-tx.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-aux-uart-sk6812.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-bridge-audio.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-bridge-commutate.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-bridge-commutate.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-can-io.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator-3phase.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator.c

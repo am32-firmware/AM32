@@ -85,7 +85,8 @@ comparator_t comp = {
     .phaseB = &gpioCompPhaseBTest,
     .phaseC = &gpioCompPhaseCTest,
     .phaseAcb = phaseATestcb,
-    .phaseBcb = phaseBTestcb,
+    // .phaseBcb = phaseBTestcb,
+    .phaseBcb = 0,
     // .phaseCcb = phaseCTestcb,
     .phaseCcb = 0,
 };
@@ -110,6 +111,7 @@ int main()
     bridge_set_mode_run();
     bridge_set_run_frequency(24000);
     bridge_set_run_duty(0x0300);
+    bridge_sample_interrupt_enable();
     bridge_enable();
     bridge_commutate();
     delayMillis(WAIT_MS);

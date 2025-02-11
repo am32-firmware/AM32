@@ -1870,55 +1870,55 @@
 #define AUX_P5_PIN 8
 
 
-///////////////
-// main gpio pins (nucleo)
-///////////////
-
-#define MAIN_P1_PORT GPIOE
-#define MAIN_P1_PIN 6
-
-#define MAIN_P2_PORT GPIOE
-#define MAIN_P2_PIN 15
-
-#define MAIN_P3_PORT GPIOB
-#define MAIN_P3_PIN 10
-
 // ///////////////
-// // main gpio pins (blueESC)
+// // main gpio pins (nucleo)
 // ///////////////
 
-// // it is connected to:
-// // GPIO C13 WKUP4
-// #define MAIN_P1_PORT GPIOC
-// #define MAIN_P1_PIN 13
+// #define MAIN_P1_PORT GPIOE
+// #define MAIN_P1_PIN 6
 
-// // it is connected to:
-// // GPIO A8 TIM1_CH1
-// // GPIO A12 USB_DP
-// // GPIO D8 (via series resistor) USART3_TX
-// // GPIO F11 ADC1_INP2
-// // #define MAIN_P2_PORT GPIOA
-// // #define MAIN_P2_PIN 8
+// #define MAIN_P2_PORT GPIOE
+// #define MAIN_P2_PIN 15
+
+// #define MAIN_P3_PORT GPIOB
+// #define MAIN_P3_PIN 10
+
+///////////////
+// main gpio pins (blueESC)
+///////////////
+
+// it is connected to:
+// GPIO C13 WKUP4
+#define MAIN_P1_PORT GPIOC
+#define MAIN_P1_PIN 13
+
+// it is connected to:
+// GPIO A8 TIM1_CH1
+// GPIO A12 USB_DP
+// GPIO D8 (via series resistor) USART3_TX
+// GPIO F11 ADC1_INP2
 // #define MAIN_P2_PORT GPIOA
-// #define MAIN_P2_PIN 12
-// // #define MAIN_P2_PORT GPIOD
-// // #define MAIN_P2_PIN 8
-// // #define MAIN_P2_PORT GPIOF
-// // #define MAIN_P2_PIN 11
+// #define MAIN_P2_PIN 8
+#define MAIN_P2_PORT GPIOA
+#define MAIN_P2_PIN 12
+// #define MAIN_P2_PORT GPIOD
+// #define MAIN_P2_PIN 8
+// #define MAIN_P2_PORT GPIOF
+// #define MAIN_P2_PIN 11
 
-// // it is connected to:
-// // GPIO A11 USB_DM
-// // GPIO B1 ADC1_INP5
-// // GPIO D9 (via series resistor)
-// // GPIO E14 TIM1_CH4
-// #define MAIN_P3_PORT GPIOA
-// #define MAIN_P3_PIN 11
-// // #define MAIN_P3_PORT GPIOB
-// // #define MAIN_P3_PIN 1
-// // #define MAIN_P3_PORT GPIOD
-// // #define MAIN_P3_PIN 9
-// // #define MAIN_P3_PORT GPIOE
-// // #define MAIN_P3_PIN 14
+// it is connected to:
+// GPIO A11 USB_DM
+// GPIO B1 ADC1_INP5
+// GPIO D9 (via series resistor)
+// GPIO E14 TIM1_CH4
+#define MAIN_P3_PORT GPIOA
+#define MAIN_P3_PIN 11
+// #define MAIN_P3_PORT GPIOB
+// #define MAIN_P3_PIN 1
+// #define MAIN_P3_PORT GPIOD
+// #define MAIN_P3_PIN 9
+// #define MAIN_P3_PORT GPIOE
+// #define MAIN_P3_PIN 14
 
 ///////////////
 // aux spi definitions
@@ -2280,115 +2280,115 @@
 #define GATE_DRIVER_SPI_TX_DMA_REQ LL_GPDMA1_REQUEST_SPI5_TX
 
 
-// /////////////////////////////////////////
-// // Bridge on TIM8 (blueESC)
-// /////////////////////////////////////////
-
-// #define BRIDGE_TIMER TIM8
-
-// #define BRIDGE_TIMER_CC4_IRQn TIM8_CC_IRQn
-
-// #define BRIDGE_TIMER_ENABLE_CLOCK() { \
-//     RCC->APB2ENR |= RCC_APB2ENR_TIM8EN; \
-// }
-
-// // INLA PH13 TIM8_CH1N AF03
-// // INHA PC6 TIM8_CH1 AF03
-// // INLB PH14 TIM8_CH2N AF03
-// // INHB PI6 TIM8_CH2 AF03
-// // INLC PH15 TIM8_CH3N AF03
-// // INHC PI7 TIM8_CH3 AF03
-
-// // INLA H13
-// #define PHASE_A_GPIO_LOW LL_GPIO_PIN_13
-// #define PHASE_A_GPIO_LOW_PIN 13
-// #define PHASE_A_GPIO_PORT_LOW GPIOH
-// #define PHASE_A_LOW_AF 3
-
-// // INHA C6
-// #define PHASE_A_GPIO_HIGH LL_GPIO_PIN_6
-// #define PHASE_A_GPIO_HIGH_PIN 6
-// #define PHASE_A_GPIO_PORT_HIGH GPIOC
-// #define PHASE_A_HIGH_AF 3
-
-// // INLB H14
-// #define PHASE_B_GPIO_LOW LL_GPIO_PIN_14
-// #define PHASE_B_GPIO_LOW_PIN 14
-// #define PHASE_B_GPIO_PORT_LOW GPIOH
-// #define PHASE_B_LOW_AF 3
-
-// // INHB I6
-// #define PHASE_B_GPIO_HIGH LL_GPIO_PIN_6
-// #define PHASE_B_GPIO_HIGH_PIN 6
-// #define PHASE_B_GPIO_PORT_HIGH GPIOI
-// #define PHASE_B_HIGH_AF 3
-
-// // INLC H15
-// #define PHASE_C_GPIO_LOW LL_GPIO_PIN_15
-// #define PHASE_C_GPIO_LOW_PIN 15
-// #define PHASE_C_GPIO_PORT_LOW GPIOH
-// #define PHASE_C_LOW_AF 3
-
-// // INHC I7
-// #define PHASE_C_GPIO_HIGH LL_GPIO_PIN_7
-// #define PHASE_C_GPIO_HIGH_PIN 7
-// #define PHASE_C_GPIO_PORT_HIGH GPIOI
-// #define PHASE_C_HIGH_AF 3
-
-
 /////////////////////////////////////////
-// Bridge on TIM1 (h563 nucleo-144)
+// Bridge on TIM8 (blueESC)
 /////////////////////////////////////////
 
-#define BRIDGE_TIMER TIM1
+#define BRIDGE_TIMER TIM8
 
-#define BRIDGE_TIMER_CC4_IRQn TIM1_CC_IRQn
+#define BRIDGE_TIMER_CC4_IRQn TIM8_CC_IRQn
 
 #define BRIDGE_TIMER_ENABLE_CLOCK() { \
-    RCC->APB2ENR |= RCC_APB2ENR_TIM1EN; \
+    RCC->APB2ENR |= RCC_APB2ENR_TIM8EN; \
 }
-// INLA PE8 TIM1_CH1N AF03
-// INHA PE9 TIM1_CH1 AF03
-// INLB PE10 TIM1_CH2N AF03
-// INHB PE11 TIM1_CH2 AF03
-// INLC PE12 TIM1_CH3N AF03
-// INHC PE13 TIM1_CH3 AF03
 
-// INLA PE8
-#define PHASE_A_GPIO_LOW LL_GPIO_PIN_8
-#define PHASE_A_GPIO_LOW_PIN 8
-#define PHASE_A_GPIO_PORT_LOW GPIOE
-#define PHASE_A_LOW_AF 1
+// INLA PH13 TIM8_CH1N AF03
+// INHA PC6 TIM8_CH1 AF03
+// INLB PH14 TIM8_CH2N AF03
+// INHB PI6 TIM8_CH2 AF03
+// INLC PH15 TIM8_CH3N AF03
+// INHC PI7 TIM8_CH3 AF03
 
-// INHA PE9
-#define PHASE_A_GPIO_HIGH LL_GPIO_PIN_9
-#define PHASE_A_GPIO_HIGH_PIN 9
-#define PHASE_A_GPIO_PORT_HIGH GPIOE
-#define PHASE_A_HIGH_AF 1
+// INLA H13
+#define PHASE_A_GPIO_LOW LL_GPIO_PIN_13
+#define PHASE_A_GPIO_LOW_PIN 13
+#define PHASE_A_GPIO_PORT_LOW GPIOH
+#define PHASE_A_LOW_AF 3
 
-// INLB PE10
-#define PHASE_B_GPIO_LOW LL_GPIO_PIN_10
-#define PHASE_B_GPIO_LOW_PIN 10
-#define PHASE_B_GPIO_PORT_LOW GPIOE
-#define PHASE_B_LOW_AF 1
+// INHA C6
+#define PHASE_A_GPIO_HIGH LL_GPIO_PIN_6
+#define PHASE_A_GPIO_HIGH_PIN 6
+#define PHASE_A_GPIO_PORT_HIGH GPIOC
+#define PHASE_A_HIGH_AF 3
 
-// INHB PE11
-#define PHASE_B_GPIO_HIGH LL_GPIO_PIN_11
-#define PHASE_B_GPIO_HIGH_PIN 11
-#define PHASE_B_GPIO_PORT_HIGH GPIOE
-#define PHASE_B_HIGH_AF 1
+// INLB H14
+#define PHASE_B_GPIO_LOW LL_GPIO_PIN_14
+#define PHASE_B_GPIO_LOW_PIN 14
+#define PHASE_B_GPIO_PORT_LOW GPIOH
+#define PHASE_B_LOW_AF 3
 
-// INLC PE12
-#define PHASE_C_GPIO_LOW LL_GPIO_PIN_12
-#define PHASE_C_GPIO_LOW_PIN 12
-#define PHASE_C_GPIO_PORT_LOW GPIOE
-#define PHASE_C_LOW_AF 1
+// INHB I6
+#define PHASE_B_GPIO_HIGH LL_GPIO_PIN_6
+#define PHASE_B_GPIO_HIGH_PIN 6
+#define PHASE_B_GPIO_PORT_HIGH GPIOI
+#define PHASE_B_HIGH_AF 3
 
-// INHC PE13
-#define PHASE_C_GPIO_HIGH LL_GPIO_PIN_13
-#define PHASE_C_GPIO_HIGH_PIN 13
-#define PHASE_C_GPIO_PORT_HIGH GPIOE
-#define PHASE_C_HIGH_AF 1
+// INLC H15
+#define PHASE_C_GPIO_LOW LL_GPIO_PIN_15
+#define PHASE_C_GPIO_LOW_PIN 15
+#define PHASE_C_GPIO_PORT_LOW GPIOH
+#define PHASE_C_LOW_AF 3
+
+// INHC I7
+#define PHASE_C_GPIO_HIGH LL_GPIO_PIN_7
+#define PHASE_C_GPIO_HIGH_PIN 7
+#define PHASE_C_GPIO_PORT_HIGH GPIOI
+#define PHASE_C_HIGH_AF 3
+
+
+// /////////////////////////////////////////
+// // Bridge on TIM1 (h563 nucleo-144)
+// /////////////////////////////////////////
+
+// #define BRIDGE_TIMER TIM1
+
+// #define BRIDGE_TIMER_CC4_IRQn TIM1_CC_IRQn
+
+// #define BRIDGE_TIMER_ENABLE_CLOCK() { \
+//     RCC->APB2ENR |= RCC_APB2ENR_TIM1EN; \
+// }
+// // INLA PE8 TIM1_CH1N AF03
+// // INHA PE9 TIM1_CH1 AF03
+// // INLB PE10 TIM1_CH2N AF03
+// // INHB PE11 TIM1_CH2 AF03
+// // INLC PE12 TIM1_CH3N AF03
+// // INHC PE13 TIM1_CH3 AF03
+
+// // INLA PE8
+// #define PHASE_A_GPIO_LOW LL_GPIO_PIN_8
+// #define PHASE_A_GPIO_LOW_PIN 8
+// #define PHASE_A_GPIO_PORT_LOW GPIOE
+// #define PHASE_A_LOW_AF 1
+
+// // INHA PE9
+// #define PHASE_A_GPIO_HIGH LL_GPIO_PIN_9
+// #define PHASE_A_GPIO_HIGH_PIN 9
+// #define PHASE_A_GPIO_PORT_HIGH GPIOE
+// #define PHASE_A_HIGH_AF 1
+
+// // INLB PE10
+// #define PHASE_B_GPIO_LOW LL_GPIO_PIN_10
+// #define PHASE_B_GPIO_LOW_PIN 10
+// #define PHASE_B_GPIO_PORT_LOW GPIOE
+// #define PHASE_B_LOW_AF 1
+
+// // INHB PE11
+// #define PHASE_B_GPIO_HIGH LL_GPIO_PIN_11
+// #define PHASE_B_GPIO_HIGH_PIN 11
+// #define PHASE_B_GPIO_PORT_HIGH GPIOE
+// #define PHASE_B_HIGH_AF 1
+
+// // INLC PE12
+// #define PHASE_C_GPIO_LOW LL_GPIO_PIN_12
+// #define PHASE_C_GPIO_LOW_PIN 12
+// #define PHASE_C_GPIO_PORT_LOW GPIOE
+// #define PHASE_C_LOW_AF 1
+
+// // INHC PE13
+// #define PHASE_C_GPIO_HIGH LL_GPIO_PIN_13
+// #define PHASE_C_GPIO_HIGH_PIN 13
+// #define PHASE_C_GPIO_PORT_HIGH GPIOE
+// #define PHASE_C_HIGH_AF 1
 
 #define BRIDGE_UL_PORT PHASE_A_GPIO_PORT_LOW
 #define BRIDGE_UL_PIN PHASE_A_GPIO_LOW_PIN

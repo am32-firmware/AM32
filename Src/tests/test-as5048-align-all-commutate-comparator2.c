@@ -244,7 +244,7 @@ int main()
     }
 
 
-    bridge_set_run_duty(0x0200);
+    bridge_set_run_duty(0x0400);
 
     // here we are at angle = 0
 

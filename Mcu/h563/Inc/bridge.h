@@ -21,7 +21,9 @@ extern commutationStep_e bridgeComStep;
 extern timComStepChannelConfig comSteps[];
 
 void bridge_set_deadtime_ns(uint32_t deadtime);
-void bridge_commutate(void);
+void bridge_commutate();
+void bridge_sample_interrupt_enable();
+void bridge_sample_intterupt_disable();
 void bridge_set_com_step(uint8_t step);
 void bridge_set_audio_duty(uint8_t duty);
 void bridge_set_run_duty(uint16_t duty);
@@ -33,3 +35,4 @@ void bridge_set_run_frequency(uint32_t f);
 void bridge_enable();
 void bridge_disable();
 void bridge_play_note(uint32_t f, uint8_t v);
+void bridge_timer_irq_handler();

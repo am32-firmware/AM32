@@ -33,6 +33,7 @@ extern void transfercomplete();
 extern void PeriodElapsedCallback();
 extern void interruptRoutine();
 extern void doPWMChanges();
+extern void bridge_timer_irq_handler();
 extern void tenKhzRoutine();
 extern void sendDshotDma();
 extern void receiveDshotDma();
@@ -58,7 +59,7 @@ int interrupt_time = 0;
 /**
  * @brief This function handles Non maskable interrupt.
  */
-void NMI_Handler(void) { 
+void NMI_Handler(void) {
     if (READ_REG(FLASH->ECCDR) == 0xFFFF)
     {
         FLASH->ECCDETR |= FLASH_ECCR_ECCD;
@@ -176,6 +177,18 @@ void ADC1_COMP_IRQHandler(void)
         interruptRoutine();
     }
     //
+}
+
+// TIM1 is the bridge pwm timer (nucleo)
+void TIM1_CC_IRQHandler(void)
+{
+    bridge_timer_irq_handler();
+}
+
+// TIM8 is the bridge pwm timer (blueESC)
+void TIM8_CC_IRQHandler(void)
+{
+    bridge_timer_irq_handler();
 }
 
 // TIM6 is used to trigger the tenKhzRoutine

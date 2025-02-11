@@ -1871,41 +1871,54 @@
 
 
 ///////////////
-// main gpio pins
+// main gpio pins (nucleo)
 ///////////////
 
-// it is connected to:
-// GPIO C13 WKUP4
-#define MAIN_P1_PORT GPIOC
-#define MAIN_P1_PIN 13
+#define MAIN_P1_PORT GPIOE
+#define MAIN_P1_PIN 6
 
-// it is connected to:
-// GPIO A8 TIM1_CH1
-// GPIO A12 USB_DP
-// GPIO D8 (via series resistor) USART3_TX
-// GPIO F11 ADC1_INP2
+#define MAIN_P2_PORT GPIOE
+#define MAIN_P2_PIN 15
+
+#define MAIN_P3_PORT GPIOB
+#define MAIN_P3_PIN 10
+
+// ///////////////
+// // main gpio pins (blueESC)
+// ///////////////
+
+// // it is connected to:
+// // GPIO C13 WKUP4
+// #define MAIN_P1_PORT GPIOC
+// #define MAIN_P1_PIN 13
+
+// // it is connected to:
+// // GPIO A8 TIM1_CH1
+// // GPIO A12 USB_DP
+// // GPIO D8 (via series resistor) USART3_TX
+// // GPIO F11 ADC1_INP2
+// // #define MAIN_P2_PORT GPIOA
+// // #define MAIN_P2_PIN 8
 // #define MAIN_P2_PORT GPIOA
-// #define MAIN_P2_PIN 8
-#define MAIN_P2_PORT GPIOA
-#define MAIN_P2_PIN 12
-// #define MAIN_P2_PORT GPIOD
-// #define MAIN_P2_PIN 8
-// #define MAIN_P2_PORT GPIOF
-// #define MAIN_P2_PIN 11
+// #define MAIN_P2_PIN 12
+// // #define MAIN_P2_PORT GPIOD
+// // #define MAIN_P2_PIN 8
+// // #define MAIN_P2_PORT GPIOF
+// // #define MAIN_P2_PIN 11
 
-// it is connected to:
-// GPIO A11 USB_DM
-// GPIO B1 ADC1_INP5
-// GPIO D9 (via series resistor)
-// GPIO E14 TIM1_CH4
-#define MAIN_P3_PORT GPIOA
-#define MAIN_P3_PIN 11
-// #define MAIN_P3_PORT GPIOB
-// #define MAIN_P3_PIN 1
-// #define MAIN_P3_PORT GPIOD
-// #define MAIN_P3_PIN 9
-// #define MAIN_P3_PORT GPIOE
-// #define MAIN_P3_PIN 14
+// // it is connected to:
+// // GPIO A11 USB_DM
+// // GPIO B1 ADC1_INP5
+// // GPIO D9 (via series resistor)
+// // GPIO E14 TIM1_CH4
+// #define MAIN_P3_PORT GPIOA
+// #define MAIN_P3_PIN 11
+// // #define MAIN_P3_PORT GPIOB
+// // #define MAIN_P3_PIN 1
+// // #define MAIN_P3_PORT GPIOD
+// // #define MAIN_P3_PIN 9
+// // #define MAIN_P3_PORT GPIOE
+// // #define MAIN_P3_PIN 14
 
 ///////////////
 // aux spi definitions

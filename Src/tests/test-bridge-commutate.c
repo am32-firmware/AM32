@@ -2,6 +2,7 @@
 #include "targets.h"
 #include "gpio.h"
 #include "bridge.h"
+#include "debug.h"
 #include "drv8323-spi.h"
 #include "functions.h"
 #include "mcu.h"
@@ -10,6 +11,8 @@
 int main()
 {
     mcu_setup(250);
+
+    debug_initialize();
 
     utility_timer_initialize();
     utility_timer_enable();
@@ -21,6 +24,7 @@ int main()
     bridge_set_mode_run();
     bridge_set_run_frequency(24000);
     bridge_set_run_duty(0x0400);
+    bridge_sample_interrupt_enable();
     bridge_enable();
 
     for (int n = 0; n < 1200; n++) {

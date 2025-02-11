@@ -208,11 +208,13 @@ void bridge_set_run_duty(uint16_t duty)
     BRIDGE_TIMER->CCR1 = duty;
     BRIDGE_TIMER->CCR2 = duty;
     BRIDGE_TIMER->CCR3 = duty;
-    if (duty > 0x0800) { // sample during middle of on time
-        uint16_t sample_point = 0x0800 + ((duty - 0x0800)/2);
+    if (duty > 0x0400) { // sample during middle of on time
+        // uint16_t sample_point = 0x0800 + ((duty - 0x0800)/2);
+        uint16_t sample_point = duty/2;
         BRIDGE_TIMER->CCR4 = sample_point;
     } else { // sample during middle of off time
-        uint16_t sample_point = duty/2;
+        // uint16_t sample_point = duty/2;
+        uint16_t sample_point = duty + ((0x0800 - duty) / 2);
         BRIDGE_TIMER->CCR4 = sample_point;
     }
 }

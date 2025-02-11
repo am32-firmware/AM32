@@ -190,6 +190,26 @@ int main()
         }
 
     }
+
+    for (int i = 0; i < num_poles; i++) {
+        if (i == num_poles - 1) {
+            zc_angles[i] = (1<<14);
+        } else {
+            // zc_angles[i] = magnet_angles[i] - 20;
+            zc_angles[i] = zc_angles[i+1];
+        }
+
+        if (i < 3 || i > num_poles - 3) {
+            debug_write_string("\n\rindex: ");
+            debug_write_int(i);
+            debug_write_string("\tmagnet_angle: ");
+            debug_write_int(magnet_angles[i]);
+            debug_write_string("\tzc_angle: ");
+            debug_write_int(zc_angles[i]);
+            delayMillis(10);
+        }
+    }
+
     bridge_set_run_duty(0x0200);
 
     // here we are at angle = 0
@@ -202,11 +222,12 @@ int main()
         } while (current_angle > magnet_angles[num_poles - 2] || current_angle < 50);
         // delayMicros(10);
         for (int i = 0; i < num_poles; i++) {
+            watchdog_reload();
+            bridge_commutate();
             do {
                 current_angle = as5048_read_angle(&as5048);
             } while (current_angle < zc_angles[i]);
-            watchdog_reload();
-            bridge_commutate();
+
             // debug_toggle_2();
         }
     }

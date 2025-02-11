@@ -128,6 +128,9 @@ void bridge_initialize()
 
     bridge_gpio_initialize();
 
+    NVIC_SetPriority(BRIDGE_TIMER_CC4_IRQn, 3);
+    NVIC_EnableIRQ(BRIDGE_TIMER_CC4_IRQn);
+
 }
 void bridge_gpio_initialize()
 {
@@ -275,4 +278,14 @@ void bridge_set_deadtime_ns(uint32_t deadtime)
 
     BRIDGE_TIMER->BDTR = (BRIDGE_TIMER->BDTR & ~TIM_BDTR_DTG_Msk) | dtg;
     // BRIDGE_TIMER->BDTR = (BRIDGE_TIMER->BDTR & ~0xf);
+}
+
+void bridge_sample_interrupt_enable()
+{
+    BRIDGE_TIMER->DIER |= TIM_DIER_CC4IE; // enable interrupt
+}
+
+void bridge_sample_interrupt_disable()
+{
+    BRIDGE_TIMER->DIER &= TIM_DIER_CC4IE; // disable interrupt
 }

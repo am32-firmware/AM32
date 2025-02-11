@@ -116,8 +116,6 @@ int main()
     delayMillis(WAIT_MS);
     delayMillis(WAIT_MS);
     delayMillis(WAIT_MS);
-    delayMillis(WAIT_MS);
-    delayMillis(WAIT_MS);
     as5048_set_zero_position(&as5048);
 
 
@@ -138,8 +136,7 @@ int main()
         delayMillis(WAIT_MS);
         delayMillis(WAIT_MS);
         delayMillis(WAIT_MS);
-        delayMillis(WAIT_MS);
-        delayMillis(WAIT_MS);
+
 
         uint16_t last_angle = current_angle;
         current_angle = as5048_read_angle(&as5048);
@@ -245,7 +242,7 @@ int main()
     }
 
 
-    bridge_set_run_duty(0x0800);
+    bridge_set_run_duty(0x0600);
 
     // here we are at angle = 0
 

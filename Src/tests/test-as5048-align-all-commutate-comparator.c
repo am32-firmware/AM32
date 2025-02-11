@@ -11,6 +11,7 @@
 #include "functions.h"
 #include "mcu.h"
 #include "utility-timer.h"
+#include "watchdog.h"
 
 as5048_t as5048;
 
@@ -100,6 +101,8 @@ int main()
     as5048_initialize(&as5048);
     drv8323_initialize(&DRV8323);
 
+    watchdog_initialize_period(1000);
+    watchdog_enable();
 
     bridge_initialize();
     bridge_set_deadtime_ns(1000);
@@ -126,6 +129,7 @@ int main()
 
     uint16_t i = 0;
     do {
+        watchdog_reload();
         bridge_commutate();
         delayMillis(WAIT_MS);
         delayMillis(WAIT_MS);
@@ -186,11 +190,12 @@ int main()
         }
 
     }
-    bridge_set_run_duty(0x0400);
+    bridge_set_run_duty(0x0080);
 
     // here we are at angle = 0
 
-    for (int n = 0; n < 500; n++) {
+    for (int n = 0; n < 50; n++) {
+        watchdog_reload();
         bridge_commutate();
 
         do {
@@ -201,6 +206,7 @@ int main()
             do {
                 current_angle = as5048_read_angle(&as5048);
             } while (current_angle < zc_angles[i]);
+            watchdog_reload();
             bridge_commutate();
             // debug_toggle_2();
         }
@@ -245,6 +251,7 @@ int main()
 
     bridge_disable();
     while(1) {
+        watchdog_reload();
         current_angle = as5048_read_angle(&as5048);
     }
 }

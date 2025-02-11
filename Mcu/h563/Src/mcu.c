@@ -12,6 +12,7 @@
 
 void mcu_setup(uint16_t coreFrequencyMHz)
 {
+    mcu_check_reset_flags();
     mcu_setup_flash();
     mcu_setup_core_voltage();
     mcu_setup_clocks(coreFrequencyMHz);
@@ -22,6 +23,21 @@ void mcu_setup(uint16_t coreFrequencyMHz)
     dma_initialize();
     // this should go under board setup, not mcu
     lan8671_shutdown();
+}
+
+// check the reset status register (RSR)
+void mcu_check_reset_flags()
+{
+    uint32_t rsr = RCC->RSR;
+    // reset the flag values
+    RCC->RSR |= RCC_RSR_RMVF;
+
+    if (rsr & RCC_RSR_IWDGRSTF) {
+        // spin
+        while (1) {
+        }
+    }
+
 }
 
 void mcu_setup_clocks(uint16_t coreFrequencyMHz)

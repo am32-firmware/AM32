@@ -193,10 +193,10 @@ int main()
 
     for (int i = 0; i < num_poles; i++) {
         if (i == num_poles - 1) {
-            zc_angles[i] = (1<<14);
+            zc_angles[i] = (1<<14) - 20;
         } else {
             // zc_angles[i] = magnet_angles[i] - 20;
-            zc_angles[i] = zc_angles[i+1];
+            zc_angles[i] = zc_angles[i+1] - 20;
         }
 
         if (i < 3 || i > num_poles - 3) {

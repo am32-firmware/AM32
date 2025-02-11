@@ -227,7 +227,7 @@ int main()
         } else {
             diff = zc_angles[i] - zc_angles[i - 1];
         }
-        zc_angles[i] -= round(diff / 8.0f);
+        zc_angles[i] -= round(diff / 6.0f);
         // zc_angles[i] -= diff;
 
         if (i < 3 || i > num_poles - 3) {
@@ -244,7 +244,7 @@ int main()
     }
 
 
-    bridge_set_run_duty(0x0400);
+    bridge_set_run_duty(0x0500);
 
     // here we are at angle = 0
 
@@ -254,7 +254,7 @@ int main()
 
         do {
             current_angle = as5048_read_angle(&as5048);
-        } while (current_angle > magnet_angles[num_poles - 2] || current_angle < 50);
+        } while (current_angle > magnet_angles[num_poles - 2]);
         // delayMicros(10);
         for (int i = 0; i < num_poles; i++) {
             watchdog_reload();

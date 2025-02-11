@@ -9,6 +9,7 @@
 #include "debug.h"
 #include "drv8323-spi.h"
 #include "functions.h"
+#include "math.h"
 #include "mcu.h"
 #include "utility-timer.h"
 #include "watchdog.h"
@@ -115,6 +116,8 @@ int main()
     delayMillis(WAIT_MS);
     delayMillis(WAIT_MS);
     delayMillis(WAIT_MS);
+    delayMillis(WAIT_MS);
+    delayMillis(WAIT_MS);
     as5048_set_zero_position(&as5048);
 
 
@@ -134,6 +137,9 @@ int main()
         delayMillis(WAIT_MS);
         delayMillis(WAIT_MS);
         delayMillis(WAIT_MS);
+        delayMillis(WAIT_MS);
+        delayMillis(WAIT_MS);
+        delayMillis(WAIT_MS);
 
         uint16_t last_angle = current_angle;
         current_angle = as5048_read_angle(&as5048);
@@ -147,6 +153,7 @@ int main()
 
 
     } while (current_angle < 16353  && current_angle > 30);
+    watchdog_reload();
 
     // bridge_disable();
 
@@ -186,17 +193,17 @@ int main()
             debug_write_int(magnet_angles[i]);
             debug_write_string("\tzc_angle: ");
             debug_write_int(zc_angles[i]);
-            delayMillis(10);
+            delayMillis(5);
         }
 
     }
 
     for (int i = 0; i < num_poles; i++) {
         if (i == num_poles - 1) {
-            zc_angles[i] = (1<<14) - 50;
+            zc_angles[i] = (1<<14);
         } else {
             // zc_angles[i] = magnet_angles[i] - 20;
-            zc_angles[i] = zc_angles[i+1] - 50;
+            zc_angles[i] = zc_angles[i+1];
         }
 
 
@@ -207,11 +214,38 @@ int main()
             debug_write_int(magnet_angles[i]);
             debug_write_string("\tzc_angle: ");
             debug_write_int(zc_angles[i]);
-            delayMillis(10);
+            delayMillis(5);
         }
     }
 
-    bridge_set_run_duty(0x0400);
+
+
+    // apply advance
+    for (int i = 0; i < num_poles; i++) {
+        uint16_t diff;
+        if (i == 0) {
+            diff = zc_angles[0];
+        } else {
+            diff = zc_angles[i] - zc_angles[i - 1];
+        }
+        zc_angles[i] -= round(diff / 6.0f);
+        // zc_angles[i] -= diff;
+
+        if (i < 3 || i > num_poles - 3) {
+            debug_write_string("\n\rindex: ");
+            debug_write_int(i);
+            debug_write_string("\tmagnet_angle: ");
+            debug_write_int(magnet_angles[i]);
+            debug_write_string("\tzc_angle: ");
+            debug_write_int(zc_angles[i]);
+            debug_write_string("\tdiff: ");
+            debug_write_int(diff);
+            delayMillis(5);
+        }
+    }
+
+
+    bridge_set_run_duty(0x0300);
 
     // here we are at angle = 0
 

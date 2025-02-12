@@ -33,10 +33,22 @@ gpio_t gpioCompPhaseBTest = DEF_GPIO(COMPB_GPIO_PORT, COMPB_GPIO_PIN, 0, GPIO_IN
 gpio_t gpioCompPhaseCTest = DEF_GPIO(COMPC_GPIO_PORT, COMPC_GPIO_PIN, 0, GPIO_INPUT);
 
 
+comparator_t comp = {
+    .phaseA = &gpioCompPhaseATest,
+    .phaseB = &gpioCompPhaseBTest,
+    .phaseC = &gpioCompPhaseCTest,
+    .phaseAcb = 0,
+    // .phaseBcb = phaseBTestcb,
+    .phaseBcb = 0,
+    // .phaseCcb = phaseCTestcb,
+    .phaseCcb = 0,
+};
+
 // aka the period
 uint32_t compA_rising_time;
 uint32_t compA_falling_time;
 uint32_t compA_duty;
+
 
 // uint32_t comp_period, comp_duty;
 void phaseATestcb(extiChannel_t* exti)
@@ -54,6 +66,7 @@ void phaseATestcb(extiChannel_t* exti)
         if (compA_duty > 550 && cnt > 2000) {
         // if (compA_duty > 650 && cnt > 7500) {
                 debug_toggle_2();
+                comparator_disable_interrupts(&comp);
         }
     }
     if (EXTI->FPR1 & mask) {
@@ -83,6 +96,7 @@ void phaseAFallingCb(extiChannel_t* exti)
         if (compA_duty < 450 && cnt > 2000) {
         // if (compA_duty > 650 && cnt > 7500) {
                 debug_toggle_2();
+                comparator_disable_interrupts(&comp);
         }
     }
     if (EXTI->FPR1 & mask) {
@@ -128,17 +142,6 @@ void phaseCTestcb(extiChannel_t* exti)
     }
 }
 
-
-comparator_t comp = {
-    .phaseA = &gpioCompPhaseATest,
-    .phaseB = &gpioCompPhaseBTest,
-    .phaseC = &gpioCompPhaseCTest,
-    .phaseAcb = phaseATestcb,
-    // .phaseBcb = phaseBTestcb,
-    .phaseBcb = 0,
-    // .phaseCcb = phaseCTestcb,
-    .phaseCcb = 0,
-};
 
 void bridge_timer_irq_handler()
 {

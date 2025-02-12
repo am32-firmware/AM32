@@ -292,7 +292,7 @@ void bridge_sample_interrupt_enable()
 
 void bridge_sample_interrupt_disable()
 {
-    BRIDGE_TIMER->DIER &= TIM_DIER_CC4IE; // disable interrupt
+    BRIDGE_TIMER->DIER &= ~TIM_DIER_CC4IE; // disable interrupt
 }
 
 __WEAK void bridge_timer_irq_handler()

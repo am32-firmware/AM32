@@ -34,11 +34,9 @@ gpio_t gpioCompPhaseCTest = DEF_GPIO(COMPC_GPIO_PORT, COMPC_GPIO_PIN, 0, GPIO_IN
 
 
 // aka the period
-uint32_t comp_rising_time;
-
-uint32_t comp_falling_time;
-
-uint32_t comp_duty;
+uint32_t compA_rising_time;
+uint32_t compA_falling_time;
+uint32_t compA_duty;
 
 // uint32_t comp_period, comp_duty;
 void phaseATestcb(extiChannel_t* exti)
@@ -49,17 +47,19 @@ void phaseATestcb(extiChannel_t* exti)
         comp_timer_enable();
         debug_set_1();
         EXTI->RPR1 |= mask;
-        comp_rising_time = cnt;
+        compA_rising_time = cnt;
         // this gives ~17ms of period available (keep period < 17ms)
-        comp_duty = comp_falling_time * 1000 / comp_rising_time;
-        if (comp_duty > 650) {
-            debug_toggle_2();
+        compA_duty = compA_falling_time * 1000 / compA_rising_time;
+        // if (compA_duty > 650) {
+        if (compA_duty > 650 && cnt > 3300) {
+        // if (compA_duty > 650 && cnt > 7500) {
+                debug_toggle_2();
         }
     }
     if (EXTI->FPR1 & mask) {
         debug_reset_1();
         EXTI->FPR1 |= mask;
-        comp_falling_time = cnt;
+        compA_falling_time = cnt;
     }
     // if(gpio_read(&gpioCompPhaseATest)) {
     //     debug_set_1();
@@ -160,6 +160,7 @@ void blanking_interrupt_handler()
         BLANKING_TIMER->SR &= ~TIM_SR_CC1IF;
         blanking_disable();
         debug_toggle_3();
+        comparator_enable_interrupts(&comp);
         // bridge_sample_interrupt_enable();
     }
 }
@@ -254,17 +255,6 @@ int main()
     comparator_enable_interrupts(&comp);
 
     for (int i = 0; i < num_poles; i++) {
-        // zc_angles[i] = magnet_angles[i] + ((magnet_angles[i + 1] - magnet_angles[i]) / 2) - 65;
-        // zc_angles[i] = magnet_angles[i] + ((magnet_angles[i + 1] - magnet_angles[i]) / 2) - 20;
-        uint32_t diff = magnet_angles[i + 1] - magnet_angles[i];
-        // zc_angles[i] = magnet_angles[i] + (diff / 2.0f) - (diff / 10.0f);
-        // zc_angles[i] = magnet_angles[i] + (diff / 6.0f);
-        // zc_angles[i] = magnet_angles[i] - 20; // this works
-        // if (i == 0) {
-        //     zc_angles[i] = (1 << 14) - 35;
-        // } else {
-        //     zc_angles[i] = magnet_angles[i] - 35;
-        // }
         zc_angles[i] = magnet_angles[i];
 
         if (i < 3 || i > num_poles - 3) {
@@ -344,6 +334,7 @@ int main()
         // delayMicros(10);
         for (int i = 0; i < num_poles; i++) {
             // bridge_sample_interrupt_disable();
+            comparator_disable_interrupts(&comp);
             blanking_enable();
             bridge_commutate();
             // debug_toggle_3();

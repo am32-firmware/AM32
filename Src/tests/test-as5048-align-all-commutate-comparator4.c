@@ -180,7 +180,7 @@ int main()
     as5048_initialize(&as5048);
     drv8323_initialize(&DRV8323);
 
-    watchdog_initialize_period(400);
+    watchdog_initialize_period(500);
     watchdog_enable();
 
     bridge_initialize();
@@ -191,6 +191,9 @@ int main()
     // bridge_sample_interrupt_enable();
     bridge_enable();
     bridge_commutate();
+    // wait extra for first step because it may be up to 3 steps out of alignment
+    delayMillis(WAIT_MS);
+    delayMillis(WAIT_MS);
     delayMillis(WAIT_MS);
     delayMillis(WAIT_MS);
     delayMillis(WAIT_MS);

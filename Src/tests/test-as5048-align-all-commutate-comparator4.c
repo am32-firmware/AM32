@@ -229,7 +229,7 @@ int main()
     watchdog_enable();
 
     bridge_initialize();
-    bridge_set_deadtime_ns(1000);
+    bridge_set_deadtime_ns(0);
     bridge_set_mode_run();
     bridge_set_run_frequency(24000);
     bridge_set_run_duty(0x0300);

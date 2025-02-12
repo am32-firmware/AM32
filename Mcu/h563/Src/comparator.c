@@ -62,6 +62,28 @@ void comparator_initialize(comparator_t* comp)
     comparator_initialize_gpio(comp->phaseC);
 }
 
+void comparator_configure_callbacks(comparator_t* comp) {
+    if (comp->phaseAcb) {
+        exti_configure_cb(&extiChannels[comp->phaseA->pin], comp->phaseAcb);
+        comparator_gpio_exti_nvic_enable(comp->phaseA);
+    } else {
+        comparator_gpio_exti_nvic_disable(comp->phaseA);
+    }
+
+    if (comp->phaseBcb) {
+        exti_configure_cb(&extiChannels[comp->phaseB->pin], comp->phaseBcb);
+        comparator_gpio_exti_nvic_enable(comp->phaseB);
+    } else {
+        comparator_gpio_exti_nvic_disable(comp->phaseB);
+    }
+
+    if (comp->phaseCcb) {
+        exti_configure_cb(&extiChannels[comp->phaseC->pin], comp->phaseCcb);
+        comparator_gpio_exti_nvic_enable(comp->phaseC);
+    } else {
+        comparator_gpio_exti_nvic_disable(comp->phaseC);
+    }
+}
 void comparator_initialize_gpio(gpio_t* gpio)
 {
     gpio_initialize(gpio);
@@ -71,6 +93,11 @@ void comparator_gpio_exti_nvic_enable(gpio_t* gpio)
 {
     exti_configure_trigger(&extiChannels[gpio->pin], EXTI_TRIGGER_RISING_FALLING);
     EXTI_NVIC_ENABLE(gpio->pin);
+}
+
+void comparator_gpio_exti_nvic_disable(gpio_t* gpio)
+{
+    EXTI_NVIC_DISABLE(gpio->pin);
 }
 
 void comparator_nvic_set_priority(comparator_t* comp, uint32_t priority)

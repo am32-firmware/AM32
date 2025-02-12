@@ -68,6 +68,35 @@ void phaseATestcb(extiChannel_t* exti)
     // }
 }
 
+void phaseAFallingCb(extiChannel_t* exti)
+{
+    uint32_t cnt = COMP_TIMER->CNT;
+    uint32_t mask = 1 << exti->channel;
+    if (EXTI->RPR1 & mask) {
+        comp_timer_enable();
+        debug_set_1();
+        EXTI->RPR1 |= mask;
+        compA_rising_time = cnt;
+        // this gives ~17ms of period available (keep period < 17ms)
+        compA_duty = compA_falling_time * 1000 / compA_rising_time;
+        // if (compA_duty > 650) {
+        if (compA_duty < 350 && cnt > 3300) {
+        // if (compA_duty > 650 && cnt > 7500) {
+                debug_toggle_2();
+        }
+    }
+    if (EXTI->FPR1 & mask) {
+        debug_reset_1();
+        EXTI->FPR1 |= mask;
+        compA_falling_time = cnt;
+    }
+    // if(gpio_read(&gpioCompPhaseATest)) {
+    //     debug_set_1();
+    // } else {
+    //     debug_reset_1();
+    // }
+}
+
 void phaseBTestcb(extiChannel_t* exti)
 {
     uint32_t mask = 1 << exti->channel;
@@ -160,6 +189,20 @@ void blanking_interrupt_handler()
         BLANKING_TIMER->SR &= ~TIM_SR_CC1IF;
         blanking_disable();
         debug_toggle_3();
+
+        switch (bridgeComStep) {
+            case 0:
+                comp.phaseAcb = phaseATestcb;
+                break;
+            case 3:
+                comp.phaseAcb = phaseAFallingCb;
+                break;
+            default:
+                comp.phaseAcb = 0;
+                break;
+
+        }
+        comparator_configure_callbacks(&comp);
         comparator_enable_interrupts(&comp);
         // bridge_sample_interrupt_enable();
     }
@@ -302,7 +345,7 @@ int main()
         } else {
             diff = zc_angles[i] - zc_angles[i - 1];
         }
-        zc_angles[i] -= round(diff / 8.0f);
+        zc_angles[i] -= round(diff / 6.0f);
         // zc_angles[i] -= diff;
 
         if (i < 3 || i > num_poles - 3) {

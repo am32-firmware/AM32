@@ -85,6 +85,9 @@ typedef struct extiChannel_s
 #define EXTI_NVIC_ENABLE(channel) { \
     NVIC_EnableIRQ(EXTI0_IRQn + channel); \
 }
+#define EXTI_NVIC_DISABLE(channel) { \
+    NVIC_DisableIRQ(EXTI0_IRQn + channel); \
+}
 #define EXTI_NVIC_SET_PRIORITY(channel, priority) { \
     NVIC_SetPriority(EXTI0_IRQn + channel, priority); \
 }

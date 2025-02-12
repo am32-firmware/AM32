@@ -7,6 +7,7 @@
 #include "blanking.h"
 #include "bridge.h"
 #include "comparator.h"
+#include "comp-timer.h"
 #include "debug.h"
 #include "drv8323-spi.h"
 #include "functions.h"
@@ -31,10 +32,16 @@ gpio_t gpioCompPhaseATest = DEF_GPIO(COMPA_GPIO_PORT, COMPA_GPIO_PIN, 0, GPIO_IN
 gpio_t gpioCompPhaseBTest = DEF_GPIO(COMPB_GPIO_PORT, COMPB_GPIO_PIN, 0, GPIO_INPUT);
 gpio_t gpioCompPhaseCTest = DEF_GPIO(COMPC_GPIO_PORT, COMPC_GPIO_PIN, 0, GPIO_INPUT);
 
+
+uint32_t comp_rising_time, ct_falling_time;
+
 void phaseATestcb(extiChannel_t* exti)
 {
+    uint32_t cnt = COMP_TIMER->CNT;
     uint32_t mask = 1 << exti->channel;
     if (EXTI->RPR1 & mask) {
+        comp_rising_time = cnt;
+        comp_timer_enable();
         debug_set_1();
         EXTI->RPR1 |= mask;
     }
@@ -148,6 +155,8 @@ int main()
     mcu_setup(250);
 
     debug_initialize();
+
+    comp_timer_initialize();
 
     blanking_initialize();
 
@@ -300,7 +309,7 @@ int main()
     }
 
 
-    bridge_set_run_duty(0x0780);
+    bridge_set_run_duty(0x0200);
 
     // here we are at angle = 0
 

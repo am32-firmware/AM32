@@ -279,6 +279,8 @@ int main()
 
     }
 
+    watchdog_reload();
+
     for (int i = 0; i < num_poles; i++) {
         if (i == num_poles - 1) {
             zc_angles[i] = (1<<14);
@@ -299,6 +301,7 @@ int main()
         }
     }
 
+    watchdog_reload();
 
 
     // apply advance
@@ -325,8 +328,9 @@ int main()
         }
     }
 
+    watchdog_reload();
 
-    bridge_set_run_duty(0x0480);
+    bridge_set_run_duty(0x0780);
 
     // here we are at angle = 0
 

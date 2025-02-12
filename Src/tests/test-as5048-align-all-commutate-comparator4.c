@@ -52,15 +52,14 @@ void phaseATestcb(extiChannel_t* exti)
         comp_rising_time = cnt;
         // this gives ~17ms of period available (keep period < 17ms)
         comp_duty = comp_falling_time * 1000 / comp_rising_time;
+        if (comp_duty > 650) {
+            debug_toggle_2();
+        }
     }
     if (EXTI->FPR1 & mask) {
         debug_reset_1();
         EXTI->FPR1 |= mask;
         comp_falling_time = cnt;
-    }
-
-    if (comp_duty > 250) {
-        debug_toggle_2();
     }
     // if(gpio_read(&gpioCompPhaseATest)) {
     //     debug_set_1();

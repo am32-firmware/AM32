@@ -283,7 +283,7 @@ int main()
         } else {
             diff = zc_angles[i] - zc_angles[i - 1];
         }
-        zc_angles[i] -= round(diff / 6.0f);
+        zc_angles[i] -= round(diff / 4.0f);
         // zc_angles[i] -= diff;
 
         if (i < 3 || i > num_poles - 3) {
@@ -300,7 +300,7 @@ int main()
     }
 
 
-    bridge_set_run_duty(0x0280);
+    bridge_set_run_duty(0x0780);
 
     // here we are at angle = 0
 

@@ -51,7 +51,7 @@ void phaseATestcb(extiChannel_t* exti)
         // this gives ~17ms of period available (keep period < 17ms)
         compA_duty = compA_falling_time * 1000 / compA_rising_time;
         // if (compA_duty > 650) {
-        if (compA_duty > 600 && cnt > 3300) {
+        if (compA_duty > 550 && cnt > 2000) {
         // if (compA_duty > 650 && cnt > 7500) {
                 debug_toggle_2();
         }
@@ -80,7 +80,7 @@ void phaseAFallingCb(extiChannel_t* exti)
         // this gives ~17ms of period available (keep period < 17ms)
         compA_duty = compA_falling_time * 1000 / compA_rising_time;
         // if (compA_duty > 650) {
-        if (compA_duty < 400 && cnt > 3300) {
+        if (compA_duty < 450 && cnt > 2000) {
         // if (compA_duty > 650 && cnt > 7500) {
                 debug_toggle_2();
         }
@@ -364,7 +364,7 @@ int main()
 
     watchdog_reload();
 
-    bridge_set_run_duty(0x0500);
+    bridge_set_run_duty(0x0280);
 
     // here we are at angle = 0
 

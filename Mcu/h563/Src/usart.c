@@ -34,7 +34,7 @@ void usart_initialize(usart_t* usart)
     usart->txDma->callback = usart_dma_cb;
     usart->txDma->userParam = (uint32_t)usart;
 
-    NVIC_SetPriority(usart->txDma->irqn, 0);
+    NVIC_SetPriority(usart->txDma->irqn, 3);
     NVIC_EnableIRQ(usart->txDma->irqn);
 
     // set the source address

@@ -194,7 +194,7 @@ int main()
     // set a low priority on comparator interrupt
     // this is necessary for this example
     // to use the sk6812 led spi interrupt
-    // comparator_nvic_set_priority(&comp, 4);
+    comparator_nvic_set_priority(&comp, 1);
 
     comparator_enable_interrupts(&comp);
 

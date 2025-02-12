@@ -33,21 +33,34 @@ gpio_t gpioCompPhaseBTest = DEF_GPIO(COMPB_GPIO_PORT, COMPB_GPIO_PIN, 0, GPIO_IN
 gpio_t gpioCompPhaseCTest = DEF_GPIO(COMPC_GPIO_PORT, COMPC_GPIO_PIN, 0, GPIO_INPUT);
 
 
-uint32_t comp_rising_time, ct_falling_time;
+// aka the period
+uint32_t comp_rising_time;
 
+uint32_t comp_falling_time;
+
+uint32_t comp_duty;
+
+// uint32_t comp_period, comp_duty;
 void phaseATestcb(extiChannel_t* exti)
 {
     uint32_t cnt = COMP_TIMER->CNT;
     uint32_t mask = 1 << exti->channel;
     if (EXTI->RPR1 & mask) {
-        comp_rising_time = cnt;
         comp_timer_enable();
         debug_set_1();
         EXTI->RPR1 |= mask;
+        comp_rising_time = cnt;
+        // this gives ~17ms of period available (keep period < 17ms)
+        comp_duty = comp_falling_time * 1000 / comp_rising_time;
     }
     if (EXTI->FPR1 & mask) {
         debug_reset_1();
         EXTI->FPR1 |= mask;
+        comp_falling_time = cnt;
+    }
+
+    if (comp_duty > 250) {
+        debug_toggle_2();
     }
     // if(gpio_read(&gpioCompPhaseATest)) {
     //     debug_set_1();
@@ -103,40 +116,42 @@ void bridge_timer_irq_handler()
 {
     if (BRIDGE_TIMER->SR & TIM_SR_CC4IF) {
         BRIDGE_TIMER->SR &= ~TIM_SR_CC4IF;
-        switch (bridgeComStep) {
-            case 1:
-            case 2:
-            case 4:
-            case 5:
-                break;
-            case 3:
-                for (int i = 0; i < 10; i ++) {
-                    if (gpio_read(&gpioCompPhaseATest)) {
-                        goto leave3;
-                    }
-                }
-                debug_reset_2();
-                // if (!gpio_read(&gpioCompPhaseATest)) {
-                //     debug_reset_2();
-                // }
-                leave3:
-                break;
-            case 0:
-                for (int i = 0; i < 10; i ++) {
-                    if (!gpio_read(&gpioCompPhaseATest)) {
-                        goto leave0;
-                    }
-                }
-                debug_set_2();
-                // if (gpio_read(&gpioCompPhaseATest)) {
-                //     debug_set_2();
-                // }
-                leave0:
-                break;
 
-            default:
-                while(1);
-        }
+        debug_toggle_3();
+        // switch (bridgeComStep) {
+        //     case 1:
+        //     case 2:
+        //     case 4:
+        //     case 5:
+        //         break;
+        //     case 3:
+        //         for (int i = 0; i < 10; i ++) {
+        //             if (gpio_read(&gpioCompPhaseATest)) {
+        //                 goto leave3;
+        //             }
+        //         }
+        //         debug_reset_2();
+        //         // if (!gpio_read(&gpioCompPhaseATest)) {
+        //         //     debug_reset_2();
+        //         // }
+        //         leave3:
+        //         break;
+        //     case 0:
+        //         for (int i = 0; i < 10; i ++) {
+        //             if (!gpio_read(&gpioCompPhaseATest)) {
+        //                 goto leave0;
+        //             }
+        //         }
+        //         debug_set_2();
+        //         // if (gpio_read(&gpioCompPhaseATest)) {
+        //         //     debug_set_2();
+        //         // }
+        //         leave0:
+        //         break;
+
+        //     default:
+        //         while(1);
+        // }
     }
 }
 
@@ -146,7 +161,7 @@ void blanking_interrupt_handler()
         BLANKING_TIMER->SR &= ~TIM_SR_CC1IF;
         blanking_disable();
         debug_toggle_3();
-        bridge_sample_interrupt_enable();
+        // bridge_sample_interrupt_enable();
     }
 }
 
@@ -174,7 +189,7 @@ int main()
     bridge_set_mode_run();
     bridge_set_run_frequency(24000);
     bridge_set_run_duty(0x0300);
-    bridge_sample_interrupt_enable();
+    // bridge_sample_interrupt_enable();
     bridge_enable();
     bridge_commutate();
     delayMillis(WAIT_MS);
@@ -322,7 +337,7 @@ int main()
         } while (current_angle > magnet_angles[num_poles - 2]);
         // delayMicros(10);
         for (int i = 0; i < num_poles; i++) {
-            bridge_sample_interrupt_disable();
+            // bridge_sample_interrupt_disable();
             blanking_enable();
             bridge_commutate();
             // debug_toggle_3();

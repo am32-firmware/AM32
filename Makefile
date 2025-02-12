@@ -66,7 +66,8 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-commutate.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-commutate-comparator.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-commutate-comparator2.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-commutate-comparator3.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-commutate-comparator3.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-commutate-comparator4.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-print.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-blanking.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-debug.c

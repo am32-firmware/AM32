@@ -33,6 +33,7 @@ extern void transfercomplete();
 extern void PeriodElapsedCallback();
 extern void interruptRoutine();
 extern void doPWMChanges();
+extern void blanking_interrupt_handler();
 extern void bridge_timer_irq_handler();
 extern void tenKhzRoutine();
 extern void sendDshotDma();
@@ -248,14 +249,15 @@ void TIM15_IRQHandler(void)
 
 void TIM3_IRQHandler(void)
 {
-    if (LL_TIM_IsActiveFlag_CC1(TIM3) == 1) {
-        LL_TIM_ClearFlag_CC1(TIM3);
-    }
+    blanking_interrupt_handler();
+    // if (LL_TIM_IsActiveFlag_CC1(TIM3) == 1) {
+    //     LL_TIM_ClearFlag_CC1(TIM3);
+    // }
 
-    if (LL_TIM_IsActiveFlag_UPDATE(TIM3) == 1) {
-        LL_TIM_ClearFlag_UPDATE(TIM3);
-        // update_interupt++;
-    }
+    // if (LL_TIM_IsActiveFlag_UPDATE(TIM3) == 1) {
+    //     LL_TIM_ClearFlag_UPDATE(TIM3);
+    //     // update_interupt++;
+    // }
 }
 
 // DMA1 Channel 1 is used for triggering ADC_DMA_Callback

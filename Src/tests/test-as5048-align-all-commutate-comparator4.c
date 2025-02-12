@@ -145,7 +145,7 @@ void bridge_timer_irq_handler()
     if (BRIDGE_TIMER->SR & TIM_SR_CC4IF) {
         BRIDGE_TIMER->SR &= ~TIM_SR_CC4IF;
 
-        debug_toggle_3();
+        // debug_toggle_3();
         // switch (bridgeComStep) {
         //     case 1:
         //     case 2:
@@ -188,7 +188,7 @@ void blanking_interrupt_handler()
     if (BLANKING_TIMER->SR & TIM_SR_CC1IF) {
         BLANKING_TIMER->SR &= ~TIM_SR_CC1IF;
         blanking_disable();
-        debug_toggle_3();
+        // debug_toggle_3();
 
         switch (bridgeComStep) {
             case 0:
@@ -368,6 +368,7 @@ int main()
 
     // here we are at angle = 0
 
+    // debug_set_3();
     bridge_commutate();
     // for (int n = 0; n < 50; n++) {
     while (1) {
@@ -381,7 +382,7 @@ int main()
             comparator_disable_interrupts(&comp);
             blanking_enable();
             bridge_commutate();
-            // debug_toggle_3();
+            debug_toggle_3();
             watchdog_reload();
             do {
                 current_angle = as5048_read_angle(&as5048);

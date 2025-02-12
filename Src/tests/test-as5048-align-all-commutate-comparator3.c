@@ -103,14 +103,28 @@ void bridge_timer_irq_handler()
             case 5:
                 break;
             case 3:
-                if (!gpio_read(&gpioCompPhaseATest)) {
-                    debug_reset_2();
+                for (int i = 0; i < 10; i ++) {
+                    if (gpio_read(&gpioCompPhaseATest)) {
+                        goto leave3;
+                    }
                 }
+                debug_reset_2();
+                // if (!gpio_read(&gpioCompPhaseATest)) {
+                //     debug_reset_2();
+                // }
+                leave3:
                 break;
             case 0:
-                if (gpio_read(&gpioCompPhaseATest)) {
-                    debug_set_2();
+                for (int i = 0; i < 10; i ++) {
+                    if (!gpio_read(&gpioCompPhaseATest)) {
+                        goto leave0;
+                    }
                 }
+                debug_set_2();
+                // if (gpio_read(&gpioCompPhaseATest)) {
+                //     debug_set_2();
+                // }
+                leave0:
                 break;
 
             default:
@@ -124,7 +138,7 @@ void blanking_interrupt_handler()
     if (BLANKING_TIMER->SR & TIM_SR_CC1IF) {
         BLANKING_TIMER->SR &= ~TIM_SR_CC1IF;
         blanking_disable();
-        // debug_toggle_3();
+        debug_toggle_3();
         bridge_sample_interrupt_enable();
     }
 }
@@ -302,7 +316,7 @@ int main()
             bridge_sample_interrupt_disable();
             blanking_enable();
             bridge_commutate();
-            debug_toggle_3();
+            // debug_toggle_3();
             watchdog_reload();
             do {
                 current_angle = as5048_read_angle(&as5048);

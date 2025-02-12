@@ -104,12 +104,12 @@ void bridge_timer_irq_handler()
                 break;
             case 3:
                 if (!gpio_read(&gpioCompPhaseATest)) {
-                    debug_reset_2();
+                    debug_toggle_2();
                 }
                 break;
             case 0:
                 if (gpio_read(&gpioCompPhaseATest)) {
-                    debug_set_2();
+                    debug_toggle_2();
                 }
                 break;
 

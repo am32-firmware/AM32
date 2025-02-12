@@ -60,14 +60,23 @@ void phaseATestcb(extiChannel_t* exti)
         debug_set_1();
         EXTI->RPR1 |= mask;
         compA_rising_time = cnt;
-        // this gives ~17ms of period available (keep period < 17ms)
-        compA_duty = compA_falling_time * 1000 / compA_rising_time;
-        // if (compA_duty > 650) {
-        if (compA_duty > 550 && cnt > 2000) {
-        // if (compA_duty > 650 && cnt > 7500) {
+        if (compA_rising_time > compA_falling_time) { // somehow this is not always the case TODO figure out why and take this out
+            // this gives ~17ms of period available (keep period < 17ms)
+            compA_duty = compA_falling_time * 1000 / compA_rising_time;
+            // if (compA_duty > 650) {
+            if (compA_duty > 550 && cnt > 2000) {
+            // if (compA_duty > 650 && cnt > 7500) {
                 debug_toggle_2();
+                debug_write_string("\n\r");
+                debug_write_int(compA_falling_time);
+                debug_write_string("\t");
+                debug_write_int(compA_rising_time);
+                // debug_write_string("\t");
+                // debug_write_int(compA_duty);
                 comparator_disable_interrupts(&comp);
+            }
         }
+
     }
     if (EXTI->FPR1 & mask) {
         debug_reset_1();
@@ -196,9 +205,13 @@ void blanking_interrupt_handler()
         switch (bridgeComStep) {
             case 0:
                 comp.phaseAcb = phaseATestcb;
+                // compA_rising_time = 0;
+                // compA_falling_time = 0;
                 break;
             case 3:
                 comp.phaseAcb = phaseAFallingCb;
+                // compA_rising_time = 0;
+                // compA_falling_time = 0;
                 break;
             default:
                 comp.phaseAcb = 0;

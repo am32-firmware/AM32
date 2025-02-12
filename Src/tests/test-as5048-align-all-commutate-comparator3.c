@@ -104,12 +104,12 @@ void bridge_timer_irq_handler()
                 break;
             case 3:
                 if (!gpio_read(&gpioCompPhaseATest)) {
-                    debug_toggle_2();
+                    debug_reset_2();
                 }
                 break;
             case 0:
                 if (gpio_read(&gpioCompPhaseATest)) {
-                    debug_toggle_2();
+                    debug_set_2();
                 }
                 break;
 
@@ -124,7 +124,7 @@ void blanking_interrupt_handler()
     if (BLANKING_TIMER->SR & TIM_SR_CC1IF) {
         BLANKING_TIMER->SR &= ~TIM_SR_CC1IF;
         blanking_disable();
-        debug_toggle_3();
+        // debug_toggle_3();
         bridge_sample_interrupt_enable();
     }
 }
@@ -158,6 +158,7 @@ int main()
     delayMillis(WAIT_MS);
     delayMillis(WAIT_MS);
     delayMillis(WAIT_MS);
+    delayMillis(WAIT_MS);
     as5048_set_zero_position(&as5048);
 
 
@@ -174,6 +175,7 @@ int main()
     do {
         watchdog_reload();
         bridge_commutate();
+        delayMillis(WAIT_MS);
         delayMillis(WAIT_MS);
         delayMillis(WAIT_MS);
         delayMillis(WAIT_MS);
@@ -267,7 +269,7 @@ int main()
         } else {
             diff = zc_angles[i] - zc_angles[i - 1];
         }
-        zc_angles[i] -= round(diff / 5.0f);
+        zc_angles[i] -= round(diff / 6.0f);
         // zc_angles[i] -= diff;
 
         if (i < 3 || i > num_poles - 3) {
@@ -284,7 +286,7 @@ int main()
     }
 
 
-    bridge_set_run_duty(0x0380);
+    bridge_set_run_duty(0x0280);
 
     // here we are at angle = 0
 
@@ -300,6 +302,7 @@ int main()
             bridge_sample_interrupt_disable();
             blanking_enable();
             bridge_commutate();
+            debug_toggle_3();
             watchdog_reload();
             do {
                 current_angle = as5048_read_angle(&as5048);

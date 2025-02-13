@@ -45,20 +45,23 @@ comparator_t comp = {
 };
 
 // aka the period
+uint32_t compA_prev_rising_time;
 uint32_t compA_rising_time;
 uint32_t compA_falling_time;
 uint32_t compA_duty;
 
+uint32_t compB_prev_rising_time;
 uint32_t compB_rising_time;
 uint32_t compB_falling_time;
 uint32_t compB_duty;
 
+uint32_t compC_prev_rising_time;
 uint32_t compC_rising_time;
 uint32_t compC_falling_time;
 uint32_t compC_duty;
 
-#define COMP_TIM_CNT_VALID 3500
-#define COMP_DUTY_THRESHOLD 100
+#define COMP_TIM_CNT_VALID 2000
+#define COMP_DUTY_THRESHOLD 50
 #define COMP_DUTY_THRESHOLD_RISING (500 + COMP_DUTY_THRESHOLD)
 #define COMP_DUTY_THRESHOLD_FALLING (500 - COMP_DUTY_THRESHOLD)
 // uint32_t comp_period, comp_duty;
@@ -70,12 +73,12 @@ void phaseARisingCb(extiChannel_t* exti)
         comp_timer_enable();
         debug_set_1();
         EXTI->RPR1 |= mask;
+        compA_prev_rising_time = compA_rising_time;
         compA_rising_time = cnt;
-        if (compA_rising_time > compA_falling_time) { // somehow this is not always the case TODO figure out why and take this out
+        if (compA_prev_rising_time > 0 && compA_rising_time > compA_falling_time) { // somehow this is not always the case TODO figure out why and take this out
             // this gives ~17ms of period available (keep period < 17ms)
             compA_duty = compA_falling_time * 1000 / compA_rising_time;
             if (compA_duty > COMP_DUTY_THRESHOLD_RISING && cnt > COMP_TIM_CNT_VALID) {
-                debug_toggle_2();
                 debug_toggle_2();
                 comparator_disable_interrupts(&comp);
             }
@@ -97,13 +100,12 @@ void phaseAFallingCb(extiChannel_t* exti)
         comp_timer_enable();
         debug_set_1();
         EXTI->RPR1 |= mask;
+        compA_prev_rising_time = compA_rising_time;
         compA_rising_time = cnt;
-        if (compA_rising_time > compA_falling_time) { // somehow this is not always the case TODO figure out why and take this out
+        if (compA_prev_rising_time > 0 && compA_rising_time > compA_falling_time) { // somehow this is not always the case TODO figure out why and take this out
             // this gives ~17ms of period available (keep period < 17ms)
             compA_duty = compA_falling_time * 1000 / compA_rising_time;
             if (compA_duty < COMP_DUTY_THRESHOLD_FALLING && cnt > COMP_TIM_CNT_VALID) {
-                debug_toggle_2();
-                debug_toggle_2();
                 debug_toggle_2();
                 comparator_disable_interrupts(&comp);
             }
@@ -127,8 +129,9 @@ void phaseBRisingCb(extiChannel_t* exti)
         comp_timer_enable();
         debug_set_1();
         EXTI->RPR1 |= mask;
+        compB_prev_rising_time = compB_rising_time;
         compB_rising_time = cnt;
-        if (compB_rising_time > compB_falling_time) { // somehow this is not always the case TODO figure out why and take this out
+        if (compB_prev_rising_time > 0 && compB_rising_time > compB_falling_time) { // somehow this is not always the case TODO figure out why and take this out
             // this gives ~17ms of period available (keep period < 17ms)
             compB_duty = compB_falling_time * 1000 / compB_rising_time;
             if (compB_duty > COMP_DUTY_THRESHOLD_RISING && cnt > COMP_TIM_CNT_VALID) {
@@ -153,8 +156,9 @@ void phaseBFallingCb(extiChannel_t* exti)
         comp_timer_enable();
         debug_set_1();
         EXTI->RPR1 |= mask;
+        compB_prev_rising_time = compB_rising_time;
         compB_rising_time = cnt;
-        if (compB_rising_time > compB_falling_time) { // somehow this is not always the case TODO figure out why and take this out
+        if (compB_prev_rising_time > 0 && compB_rising_time > compB_falling_time) { // somehow this is not always the case TODO figure out why and take this out
             // this gives ~17ms of period available (keep period < 17ms)
             compB_duty = compB_falling_time * 1000 / compB_rising_time;
             if (compB_duty < COMP_DUTY_THRESHOLD_FALLING && cnt > COMP_TIM_CNT_VALID) {
@@ -182,8 +186,9 @@ void phaseCRisingCb(extiChannel_t* exti)
         comp_timer_enable();
         debug_set_1();
         EXTI->RPR1 |= mask;
+        compC_prev_rising_time = compC_rising_time;
         compC_rising_time = cnt;
-        if (compC_rising_time > compC_falling_time) { // somehow this is not always the case TODO figure out why and take this out
+        if (compC_prev_rising_time > 0 && compC_rising_time > compC_falling_time) { // somehow this is not always the case TODO figure out why and take this out
             // this gives ~17ms of period available (keep period < 17ms)
             compC_duty = compC_falling_time * 1000 / compC_rising_time;
             if (compC_duty > COMP_DUTY_THRESHOLD_RISING && cnt > COMP_TIM_CNT_VALID) {
@@ -208,8 +213,9 @@ void phaseCFallingCb(extiChannel_t* exti)
         comp_timer_enable();
         debug_set_1();
         EXTI->RPR1 |= mask;
+        compC_prev_rising_time = compC_rising_time;
         compC_rising_time = cnt;
-        if (compC_rising_time > compC_falling_time) { // somehow this is not always the case TODO figure out why and take this out
+        if (compC_prev_rising_time > 0 && compC_rising_time > compC_falling_time) { // somehow this is not always the case TODO figure out why and take this out
             // this gives ~17ms of period available (keep period < 17ms)
             compC_duty = compC_falling_time * 1000 / compC_rising_time;
             if (compC_duty < COMP_DUTY_THRESHOLD_FALLING && cnt > COMP_TIM_CNT_VALID) {

@@ -280,26 +280,26 @@ void blanking_interrupt_handler()
                 comp.phaseAcb = phaseARisingCb;
                 compA_rising_time = 0;
                 break;
-            case 1:
-                comp.phaseCcb = phaseCFallingCb;
-                compC_rising_time = 0;
-                break;
-            case 2:
-                comp.phaseBcb = phaseBRisingCb;
-                compB_rising_time = 0;
-                break;
+            // case 1:
+            //     comp.phaseCcb = phaseCFallingCb;
+            //     compC_rising_time = 0;
+            //     break;
+            // case 2:
+            //     comp.phaseBcb = phaseBRisingCb;
+            //     compB_rising_time = 0;
+            //     break;
             case 3:
                 comp.phaseAcb = phaseAFallingCb;
                 compA_rising_time = 0;
                 break;
-            case 4:
-                comp.phaseCcb = phaseCRisingCb;
-                compC_rising_time = 0;
-                break;
-            case 5:
-                comp.phaseBcb = phaseBFallingCb;
-                compB_rising_time = 0;
-                break;
+            // case 4:
+            //     comp.phaseCcb = phaseCRisingCb;
+            //     compC_rising_time = 0;
+            //     break;
+            // case 5:
+            //     comp.phaseBcb = phaseBFallingCb;
+            //     compB_rising_time = 0;
+            //     break;
             default:
                 comp.phaseAcb = 0;
                 comp.phaseBcb = 0;

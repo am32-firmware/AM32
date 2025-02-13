@@ -60,8 +60,8 @@ uint32_t compC_rising_time;
 uint32_t compC_falling_time;
 uint32_t compC_duty;
 
-#define COMP_TIM_CNT_VALID 2000
-#define COMP_DUTY_THRESHOLD 50
+#define COMP_TIM_CNT_VALID 1500
+#define COMP_DUTY_THRESHOLD 100
 #define COMP_DUTY_THRESHOLD_RISING (500 + COMP_DUTY_THRESHOLD)
 #define COMP_DUTY_THRESHOLD_FALLING (500 - COMP_DUTY_THRESHOLD)
 // uint32_t comp_period, comp_duty;
@@ -469,7 +469,7 @@ int main()
         } else {
             diff = zc_angles[i] - zc_angles[i - 1];
         }
-        zc_angles[i] -= round(diff / 8.0f);
+        zc_angles[i] -= round(diff / 6.0f);
         // zc_angles[i] -= diff;
 
         if (i < 3 || i > num_poles - 3) {
@@ -487,7 +487,7 @@ int main()
 
     watchdog_reload();
 
-    bridge_set_run_duty(0x0180);
+    bridge_set_run_duty(0x0480);
 
     // here we are at angle = 0
 

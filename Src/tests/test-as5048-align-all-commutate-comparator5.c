@@ -14,6 +14,7 @@
 #include "functions.h"
 #include "math.h"
 #include "mcu.h"
+#include "stm32h563xx.h"
 #include "utility-timer.h"
 #include "watchdog.h"
 
@@ -49,8 +50,13 @@ comparator_t comp = {
 void commutation_timer_interrupt_handler()
 {
     if (COM_TIMER->SR & TIM_SR_CC1IF) {
-        COM_TIMER->SR &= ~TIM_SR_CC1IF;
+        comparator_disable_interrupts(&comp);
+        blanking_enable();
+        comp_timer_enable();
+        bridge_commutate();
         debug_toggle_2();
+        COM_TIMER->SR &= ~TIM_SR_CC1IF;
+        watchdog_reload();
     }
 }
 
@@ -365,7 +371,7 @@ int main()
     debug_initialize();
 
     commutation_timer_initialize();
-    commutation_timer_interrupt_enable();
+    // commutation_timer_interrupt_enable();
     comp_timer_initialize();
 
     blanking_initialize();
@@ -523,8 +529,8 @@ int main()
 
     // debug_set_3();
     bridge_commutate();
-    // for (int n = 0; n < 50; n++) {
-    while (1) {
+    for (int n = 0; n < 3; n++) {
+    // while (1) {
 
         do {
             current_angle = as5048_read_angle(&as5048);
@@ -545,7 +551,12 @@ int main()
             // debug_toggle_2();
         }
     }
+    // COM_TIMER->SR &= ~TIM_SR_CC1IF;
+    commutation_timer_interrupt_enable();
 
+    while(1) {
+
+    }
     bridge_disable();
     while(1) {
         watchdog_reload();

@@ -57,8 +57,8 @@ uint32_t compC_rising_time;
 uint32_t compC_falling_time;
 uint32_t compC_duty;
 
-#define COMP_TIM_CNT_VALID 3300
-#define COMP_DUTY_THRESHOLD 200
+#define COMP_TIM_CNT_VALID 2000
+#define COMP_DUTY_THRESHOLD 100
 #define COMP_DUTY_THRESHOLD_RISING (500 + COMP_DUTY_THRESHOLD)
 #define COMP_DUTY_THRESHOLD_FALLING (500 - COMP_DUTY_THRESHOLD)
 // uint32_t comp_period, comp_duty;

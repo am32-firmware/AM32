@@ -172,11 +172,15 @@ void maskPhaseInterrupts()
 
 void comparator_disable_interrupts(comparator_t* comp)
 {
-    EXTI_INTERRUPT_DISABLE_MASK(
-        (1 << comp->phaseA->pin) |
-        (1 << comp->phaseB->pin) |
-        (1 << comp->phaseC->pin)
-    )
+    uint32_t mask = 0;
+    mask |= 1 << comp->phaseA->pin;
+    mask |= 1 << comp->phaseB->pin;
+    mask |= 1 << comp->phaseC->pin;
+
+    EXTI_INTERRUPT_DISABLE_MASK(mask);
+
+    EXTI->RPR1 |= mask;
+    EXTI->FPR1 |= mask;
 }
 
 void enableCompInterrupts()

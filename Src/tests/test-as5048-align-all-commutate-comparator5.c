@@ -57,7 +57,7 @@ uint32_t compC_rising_time;
 uint32_t compC_falling_time;
 uint32_t compC_duty;
 
-#define COMP_TIM_CNT_VALID 2000
+#define COMP_TIM_CNT_VALID 3500
 #define COMP_DUTY_THRESHOLD 100
 #define COMP_DUTY_THRESHOLD_RISING (500 + COMP_DUTY_THRESHOLD)
 #define COMP_DUTY_THRESHOLD_FALLING (500 - COMP_DUTY_THRESHOLD)
@@ -283,26 +283,32 @@ void blanking_interrupt_handler()
             case 0:
                 comp.phaseAcb = phaseARisingCb;
                 compA_rising_time = 0;
+                compA_falling_time = 1<<31;
                 break;
             case 1:
                 comp.phaseCcb = phaseCFallingCb;
                 compC_rising_time = 0;
+                compC_falling_time = 1<<31;
                 break;
             case 2:
                 comp.phaseBcb = phaseBRisingCb;
                 compB_rising_time = 0;
+                compB_falling_time = 1<<31;
                 break;
             case 3:
                 comp.phaseAcb = phaseAFallingCb;
                 compA_rising_time = 0;
+                compA_falling_time = 1<<31;
                 break;
             case 4:
                 comp.phaseCcb = phaseCRisingCb;
                 compC_rising_time = 0;
+                compC_falling_time = 1<<31;
                 break;
             case 5:
                 comp.phaseBcb = phaseBFallingCb;
                 compB_rising_time = 0;
+                compB_falling_time = 1<<31;
                 break;
             default:
                 comp.phaseAcb = 0;
@@ -492,6 +498,7 @@ int main()
             // bridge_sample_interrupt_disable();
             comparator_disable_interrupts(&comp);
             blanking_enable();
+            comp_timer_enable();
             bridge_commutate();
             debug_toggle_3();
             watchdog_reload();

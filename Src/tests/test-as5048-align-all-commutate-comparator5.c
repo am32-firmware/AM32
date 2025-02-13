@@ -433,7 +433,7 @@ int main()
         } else {
             diff = zc_angles[i] - zc_angles[i - 1];
         }
-        zc_angles[i] -= round(diff / 6.0f);
+        zc_angles[i] -= round(diff / 8.0f);
         // zc_angles[i] -= diff;
 
         if (i < 3 || i > num_poles - 3) {

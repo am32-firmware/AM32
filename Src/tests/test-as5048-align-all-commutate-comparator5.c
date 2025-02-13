@@ -94,11 +94,13 @@ void phaseAFallingCb(extiChannel_t* exti)
         debug_set_1();
         EXTI->RPR1 |= mask;
         compA_rising_time = cnt;
-        // this gives ~17ms of period available (keep period < 17ms)
-        compA_duty = compA_falling_time * 1000 / compA_rising_time;
-        if (compA_duty < 450 && cnt > COMP_TIM_CNT_VALID) {
-                debug_toggle_2();
-                comparator_disable_interrupts(&comp);
+        if (compA_rising_time > compA_falling_time) { // somehow this is not always the case TODO figure out why and take this out
+            // this gives ~17ms of period available (keep period < 17ms)
+            compA_duty = compA_falling_time * 1000 / compA_rising_time;
+            if (compA_duty < 450 && cnt > COMP_TIM_CNT_VALID) {
+                    debug_toggle_2();
+                    comparator_disable_interrupts(&comp);
+            }
         }
     }
     if (EXTI->FPR1 & mask) {
@@ -146,11 +148,13 @@ void phaseBFallingCb(extiChannel_t* exti)
         debug_set_1();
         EXTI->RPR1 |= mask;
         compB_rising_time = cnt;
-        // this gives ~17ms of period available (keep period < 17ms)
-        compB_duty = compB_falling_time * 1000 / compB_rising_time;
-        if (compB_duty < 450 && cnt > COMP_TIM_CNT_VALID) {
-                debug_toggle_2();
-                comparator_disable_interrupts(&comp);
+        if (compB_rising_time > compB_falling_time) { // somehow this is not always the case TODO figure out why and take this out
+            // this gives ~17ms of period available (keep period < 17ms)
+            compB_duty = compB_falling_time * 1000 / compB_rising_time;
+            if (compB_duty < 450 && cnt > COMP_TIM_CNT_VALID) {
+                    debug_toggle_2();
+                    comparator_disable_interrupts(&comp);
+            }
         }
     }
     if (EXTI->FPR1 & mask) {
@@ -199,11 +203,13 @@ void phaseCFallingCb(extiChannel_t* exti)
         debug_set_1();
         EXTI->RPR1 |= mask;
         compC_rising_time = cnt;
-        // this gives ~17ms of period available (keep period < 17ms)
-        compC_duty = compC_falling_time * 1000 / compC_rising_time;
-        if (compC_duty < 450 && cnt > COMP_TIM_CNT_VALID) {
-                debug_toggle_2();
-                comparator_disable_interrupts(&comp);
+        if (compC_rising_time > compC_falling_time) { // somehow this is not always the case TODO figure out why and take this out
+            // this gives ~17ms of period available (keep period < 17ms)
+            compC_duty = compC_falling_time * 1000 / compC_rising_time;
+            if (compC_duty < 450 && cnt > COMP_TIM_CNT_VALID) {
+                    debug_toggle_2();
+                    comparator_disable_interrupts(&comp);
+            }
         }
     }
     if (EXTI->FPR1 & mask) {

@@ -48,7 +48,7 @@ void telem_UART_Init(void)
     LL_DMA_SetPeriphSize(DMA1, LL_DMA_CHANNEL_4, LL_DMA_PDATAALIGN_BYTE);
     LL_DMA_SetMemorySize(DMA1, LL_DMA_CHANNEL_4, LL_DMA_MDATAALIGN_BYTE);
 
-    /* USART1 interrupt Init */
+    /* USART2 interrupt Init */
     NVIC_SetPriority(USART2_IRQn, 3);
     NVIC_EnableIRQ(USART2_IRQn);
 
@@ -78,13 +78,17 @@ void telem_UART_Init(void)
 
 void send_telem_DMA()
 { // set data length and enable channel to start transfer
+    LL_USART_ClearFlag_TC(USART2);
     LL_USART_SetTransferDirection(USART2, LL_USART_DIRECTION_TX);
     //  GPIOB->OTYPER &= 0 << 6;
     LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_4, nbDataToTransmit);
+
+    // enable interrupt - USART Tx transfer complete
+    LL_USART_EnableIT_TC(USART2);
+
     LL_USART_EnableDMAReq_TX(USART2);
 
     LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_4);
-    LL_USART_SetTransferDirection(USART2, LL_USART_DIRECTION_RX);
 }
 
 #else
@@ -153,13 +157,17 @@ void telem_UART_Init(void)
 
 void send_telem_DMA()
 { // set data length and enable channel to start transfer
+    LL_USART_ClearFlag_TC(USART1);
     LL_USART_SetTransferDirection(USART1, LL_USART_DIRECTION_TX);
     //  GPIOB->OTYPER &= 0 << 6;
+
+    // enable interrupt - USART Tx transfer complete
+    LL_USART_EnableIT_TC(USART1);
+
     LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_2, nbDataToTransmit);
     LL_USART_EnableDMAReq_TX(USART1);
 
     LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_2);
-    LL_USART_SetTransferDirection(USART1, LL_USART_DIRECTION_RX);
 }
 
 #endif

@@ -51,7 +51,7 @@ uint32_t compA_duty;
 
 
 // uint32_t comp_period, comp_duty;
-void phaseATestcb(extiChannel_t* exti)
+void phaseARisingCb(extiChannel_t* exti)
 {
     uint32_t cnt = COMP_TIMER->CNT;
     uint32_t mask = 1 << exti->channel;
@@ -204,7 +204,7 @@ void blanking_interrupt_handler()
 
         switch (bridgeComStep) {
             case 0:
-                comp.phaseAcb = phaseATestcb;
+                comp.phaseAcb = phaseARisingCb;
                 // compA_rising_time = 0;
                 // compA_falling_time = 0;
                 break;

@@ -31,7 +31,7 @@ gpio_t gpioCompPhaseATest = DEF_GPIO(COMPA_GPIO_PORT, COMPA_GPIO_PIN, 0, GPIO_IN
 gpio_t gpioCompPhaseBTest = DEF_GPIO(COMPB_GPIO_PORT, COMPB_GPIO_PIN, 0, GPIO_INPUT);
 gpio_t gpioCompPhaseCTest = DEF_GPIO(COMPC_GPIO_PORT, COMPC_GPIO_PIN, 0, GPIO_INPUT);
 
-void phaseATestcb(extiChannel_t* exti)
+void phaseARisingCb(extiChannel_t* exti)
 {
     uint32_t mask = 1 << exti->channel;
     if (EXTI->RPR1 & mask) {
@@ -85,7 +85,7 @@ comparator_t comp = {
     .phaseA = &gpioCompPhaseATest,
     .phaseB = &gpioCompPhaseBTest,
     .phaseC = &gpioCompPhaseCTest,
-    .phaseAcb = phaseATestcb,
+    .phaseAcb = phaseARisingCb,
     // .phaseBcb = phaseBTestcb,
     .phaseBcb = 0,
     // .phaseCcb = phaseCTestcb,

@@ -76,6 +76,7 @@ void phaseARisingCb(extiChannel_t* exti)
             compA_duty = compA_falling_time * 1000 / compA_rising_time;
             if (compA_duty > COMP_DUTY_THRESHOLD_RISING && cnt > COMP_TIM_CNT_VALID) {
                 debug_toggle_2();
+                debug_toggle_2();
                 comparator_disable_interrupts(&comp);
             }
         }
@@ -101,8 +102,10 @@ void phaseAFallingCb(extiChannel_t* exti)
             // this gives ~17ms of period available (keep period < 17ms)
             compA_duty = compA_falling_time * 1000 / compA_rising_time;
             if (compA_duty < COMP_DUTY_THRESHOLD_FALLING && cnt > COMP_TIM_CNT_VALID) {
-                    debug_toggle_2();
-                    comparator_disable_interrupts(&comp);
+                debug_toggle_2();
+                debug_toggle_2();
+                debug_toggle_2();
+                comparator_disable_interrupts(&comp);
             }
         }
     }

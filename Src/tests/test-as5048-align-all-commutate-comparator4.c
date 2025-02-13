@@ -49,7 +49,15 @@ uint32_t compA_rising_time;
 uint32_t compA_falling_time;
 uint32_t compA_duty;
 
+uint32_t compB_rising_time;
+uint32_t compB_falling_time;
+uint32_t compB_duty;
 
+uint32_t compC_rising_time;
+uint32_t compC_falling_time;
+uint32_t compC_duty;
+
+#define COMP_TIM_CNT_VALID 3300
 // uint32_t comp_period, comp_duty;
 void phaseARisingCb(extiChannel_t* exti)
 {
@@ -63,16 +71,8 @@ void phaseARisingCb(extiChannel_t* exti)
         if (compA_rising_time > compA_falling_time) { // somehow this is not always the case TODO figure out why and take this out
             // this gives ~17ms of period available (keep period < 17ms)
             compA_duty = compA_falling_time * 1000 / compA_rising_time;
-            // if (compA_duty > 650) {
-            if (compA_duty > 550 && cnt > 2000) {
-            // if (compA_duty > 650 && cnt > 7500) {
+            if (compA_duty > 550 && cnt > COMP_TIM_CNT_VALID) {
                 debug_toggle_2();
-                debug_write_string("\n\r");
-                debug_write_int(compA_falling_time);
-                debug_write_string("\t");
-                debug_write_int(compA_rising_time);
-                // debug_write_string("\t");
-                // debug_write_int(compA_duty);
                 comparator_disable_interrupts(&comp);
             }
         }
@@ -83,11 +83,6 @@ void phaseARisingCb(extiChannel_t* exti)
         EXTI->FPR1 |= mask;
         compA_falling_time = cnt;
     }
-    // if(gpio_read(&gpioCompPhaseATest)) {
-    //     debug_set_1();
-    // } else {
-    //     debug_reset_1();
-    // }
 }
 
 void phaseAFallingCb(extiChannel_t* exti)
@@ -101,9 +96,7 @@ void phaseAFallingCb(extiChannel_t* exti)
         compA_rising_time = cnt;
         // this gives ~17ms of period available (keep period < 17ms)
         compA_duty = compA_falling_time * 1000 / compA_rising_time;
-        // if (compA_duty > 650) {
-        if (compA_duty < 450 && cnt > 2000) {
-        // if (compA_duty > 650 && cnt > 7500) {
+        if (compA_duty < 450 && cnt > COMP_TIM_CNT_VALID) {
                 debug_toggle_2();
                 comparator_disable_interrupts(&comp);
         }
@@ -113,44 +106,112 @@ void phaseAFallingCb(extiChannel_t* exti)
         EXTI->FPR1 |= mask;
         compA_falling_time = cnt;
     }
-    // if(gpio_read(&gpioCompPhaseATest)) {
-    //     debug_set_1();
-    // } else {
-    //     debug_reset_1();
-    // }
 }
 
-void phaseBTestcb(extiChannel_t* exti)
+
+
+// uint32_t comp_period, comp_duty;
+void phaseBRisingCb(extiChannel_t* exti)
 {
+    uint32_t cnt = COMP_TIMER->CNT;
     uint32_t mask = 1 << exti->channel;
     if (EXTI->RPR1 & mask) {
-        debug_set_2();
+        comp_timer_enable();
+        debug_set_1();
         EXTI->RPR1 |= mask;
+        compB_rising_time = cnt;
+        if (compB_rising_time > compB_falling_time) { // somehow this is not always the case TODO figure out why and take this out
+            // this gives ~17ms of period available (keep period < 17ms)
+            compB_duty = compB_falling_time * 1000 / compB_rising_time;
+            if (compB_duty > 550 && cnt > COMP_TIM_CNT_VALID) {
+                debug_toggle_2();
+                comparator_disable_interrupts(&comp);
+            }
+        }
+
     }
     if (EXTI->FPR1 & mask) {
-        debug_reset_2();
+        debug_reset_1();
         EXTI->FPR1 |= mask;
+        compB_falling_time = cnt;
     }
-    // if(gpio_read(&gpioCompPhaseBTest)) {
-    //     debug_set_2();
-    // } else {
-    //     debug_reset_2();
-    // }
 }
 
-void phaseCTestcb(extiChannel_t* exti)
+void phaseBFallingCb(extiChannel_t* exti)
 {
+    uint32_t cnt = COMP_TIMER->CNT;
     uint32_t mask = 1 << exti->channel;
     if (EXTI->RPR1 & mask) {
-        debug_set_2();
+        comp_timer_enable();
+        debug_set_1();
         EXTI->RPR1 |= mask;
+        compB_rising_time = cnt;
+        // this gives ~17ms of period available (keep period < 17ms)
+        compB_duty = compB_falling_time * 1000 / compB_rising_time;
+        if (compB_duty < 450 && cnt > COMP_TIM_CNT_VALID) {
+                debug_toggle_2();
+                comparator_disable_interrupts(&comp);
+        }
     }
     if (EXTI->FPR1 & mask) {
-        debug_reset_2();
+        debug_reset_1();
         EXTI->FPR1 |= mask;
+        compB_falling_time = cnt;
     }
 }
 
+
+
+
+// uint32_t comp_period, comp_duty;
+void phaseCRisingCb(extiChannel_t* exti)
+{
+    uint32_t cnt = COMP_TIMER->CNT;
+    uint32_t mask = 1 << exti->channel;
+    if (EXTI->RPR1 & mask) {
+        comp_timer_enable();
+        debug_set_1();
+        EXTI->RPR1 |= mask;
+        compC_rising_time = cnt;
+        if (compC_rising_time > compC_falling_time) { // somehow this is not always the case TODO figure out why and take this out
+            // this gives ~17ms of period available (keep period < 17ms)
+            compC_duty = compC_falling_time * 1000 / compC_rising_time;
+            if (compC_duty > 550 && cnt > COMP_TIM_CNT_VALID) {
+                debug_toggle_2();
+                comparator_disable_interrupts(&comp);
+            }
+        }
+
+    }
+    if (EXTI->FPR1 & mask) {
+        debug_reset_1();
+        EXTI->FPR1 |= mask;
+        compC_falling_time = cnt;
+    }
+}
+
+void phaseCFallingCb(extiChannel_t* exti)
+{
+    uint32_t cnt = COMP_TIMER->CNT;
+    uint32_t mask = 1 << exti->channel;
+    if (EXTI->RPR1 & mask) {
+        comp_timer_enable();
+        debug_set_1();
+        EXTI->RPR1 |= mask;
+        compC_rising_time = cnt;
+        // this gives ~17ms of period available (keep period < 17ms)
+        compC_duty = compC_falling_time * 1000 / compC_rising_time;
+        if (compC_duty < 450 && cnt > COMP_TIM_CNT_VALID) {
+                debug_toggle_2();
+                comparator_disable_interrupts(&comp);
+        }
+    }
+    if (EXTI->FPR1 & mask) {
+        debug_reset_1();
+        EXTI->FPR1 |= mask;
+        compC_falling_time = cnt;
+    }
+}
 
 void bridge_timer_irq_handler()
 {
@@ -205,16 +266,26 @@ void blanking_interrupt_handler()
         switch (bridgeComStep) {
             case 0:
                 comp.phaseAcb = phaseARisingCb;
-                // compA_rising_time = 0;
-                // compA_falling_time = 0;
+                break;
+            case 1:
+                comp.phaseBcb = phaseBFallingCb;
+                break;
+            case 2:
+                comp.phaseCcb = phaseCRisingCb;
                 break;
             case 3:
                 comp.phaseAcb = phaseAFallingCb;
-                // compA_rising_time = 0;
-                // compA_falling_time = 0;
+                break;
+            case 4:
+                comp.phaseBcb = phaseBRisingCb;
+                break;
+            case 5:
+                comp.phaseCcb = phaseCFallingCb;
                 break;
             default:
                 comp.phaseAcb = 0;
+                comp.phaseBcb = 0;
+                comp.phaseCcb = 0;
                 break;
 
         }

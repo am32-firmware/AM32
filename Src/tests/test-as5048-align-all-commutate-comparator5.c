@@ -331,6 +331,8 @@ int main()
     delayMillis(WAIT_MS);
     delayMillis(WAIT_MS);
     delayMillis(WAIT_MS);
+    delayMillis(WAIT_MS);
+    delayMillis(WAIT_MS);
     as5048_set_zero_position(&as5048);
 
 
@@ -451,7 +453,7 @@ int main()
 
     watchdog_reload();
 
-    bridge_set_run_duty(0x0280);
+    bridge_set_run_duty(0x0180);
 
     // here we are at angle = 0
 

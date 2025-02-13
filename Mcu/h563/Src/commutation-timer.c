@@ -4,15 +4,26 @@
 
 #include "clock.h"
 
-void commutation_timer_initialize(void)
+void commutation_timer_disable()
+{
+    COM_TIMER->CR1 &= ~TIM_CR1_CEN;
+}
+
+void commutation_timer_enable()
+{
+    COM_TIMER->CNT = 0;
+    COM_TIMER->CR1 |= TIM_CR1_CEN;
+}
+
+void commutation_timer_initialize()
 {
     COM_TIMER_ENABLE_CLOCK();
 
     clock_update_hclk_frequency();
-    // 2MHz clock frequency
-    COM_TIMER->PSC = ((HCLK_FREQUENCY/1000000)/2) - 1;
-    COM_TIMER->ARR = 4000;
-    NVIC_SetPriority(COM_TIMER_IRQ, 0);
-    NVIC_EnableIRQ(COM_TIMER_IRQ);
-    LL_TIM_EnableARRPreload(COM_TIMER);
+
+    // max reload period
+    COM_TIMER->ARR = 0xffffffff;
+
+    // update preloaded registers
+    COM_TIMER->EGR |= TIM_EGR_UG;
 }

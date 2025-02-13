@@ -275,31 +275,35 @@ void blanking_interrupt_handler()
         blanking_disable();
         // debug_toggle_3();
 
+        comp.phaseAcb = 0;
+        comp.phaseBcb = 0;
+        comp.phaseCcb = 0;
+
         switch (bridgeComStep) {
             case 0:
                 comp.phaseAcb = phaseARisingCb;
                 compA_rising_time = 0;
                 break;
-            // case 1:
-            //     comp.phaseCcb = phaseCFallingCb;
-            //     compC_rising_time = 0;
-            //     break;
-            // case 2:
-            //     comp.phaseBcb = phaseBRisingCb;
-            //     compB_rising_time = 0;
-            //     break;
+            case 1:
+                comp.phaseCcb = phaseCFallingCb;
+                compC_rising_time = 0;
+                break;
+            case 2:
+                comp.phaseBcb = phaseBRisingCb;
+                compB_rising_time = 0;
+                break;
             case 3:
                 comp.phaseAcb = phaseAFallingCb;
                 compA_rising_time = 0;
                 break;
-            // case 4:
-            //     comp.phaseCcb = phaseCRisingCb;
-            //     compC_rising_time = 0;
-            //     break;
-            // case 5:
-            //     comp.phaseBcb = phaseBFallingCb;
-            //     compB_rising_time = 0;
-            //     break;
+            case 4:
+                comp.phaseCcb = phaseCRisingCb;
+                compC_rising_time = 0;
+                break;
+            case 5:
+                comp.phaseBcb = phaseBFallingCb;
+                compB_rising_time = 0;
+                break;
             default:
                 comp.phaseAcb = 0;
                 comp.phaseBcb = 0;

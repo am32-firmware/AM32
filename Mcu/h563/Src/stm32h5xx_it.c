@@ -33,6 +33,7 @@ extern void transfercomplete();
 extern void PeriodElapsedCallback();
 extern void interruptRoutine();
 extern void doPWMChanges();
+extern void commutation_timer_interrupt_handler();
 extern void blanking_interrupt_handler();
 extern void bridge_timer_irq_handler();
 extern void tenKhzRoutine();
@@ -178,6 +179,11 @@ void ADC1_COMP_IRQHandler(void)
         interruptRoutine();
     }
     //
+}
+
+void TIM2_IRQHandler(void)
+{
+    commutation_timer_interrupt_handler();
 }
 
 // TIM1 is the bridge pwm timer (nucleo)

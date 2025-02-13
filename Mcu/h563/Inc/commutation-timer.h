@@ -7,4 +7,8 @@
     (COM_TIMER->CNT = 0, COM_TIMER->ARR = time, COM_TIMER->SR = 0x00, \
     COM_TIMER->DIER |= (0x1UL << (0U)))
 
-void commutation_timer_initialize(void);
+void commutation_timer_disable();
+void commutation_timer_enable();
+void commutation_timer_initialize();
+void commutation_timer_interrupt_enable();
+void commutation_timer_interrupt_handler();

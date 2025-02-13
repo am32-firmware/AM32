@@ -6,6 +6,7 @@
 #include "as5048-spi.h"
 #include "blanking.h"
 #include "bridge.h"
+#include "commutation-timer.h"
 #include "comparator.h"
 #include "comp-timer.h"
 #include "debug.h"
@@ -44,6 +45,15 @@ comparator_t comp = {
     .phaseCcb = 0,
 };
 
+
+void commutation_timer_interrupt_handler()
+{
+    if (COM_TIMER->SR & TIM_SR_CC1IF) {
+        COM_TIMER->SR &= ~TIM_SR_CC1IF;
+        debug_toggle_2();
+    }
+}
+
 // aka the period
 uint32_t compA_prev_rising_time;
 uint32_t compA_rising_time;
@@ -68,6 +78,7 @@ uint32_t compC_duty;
 void phaseARisingCb(extiChannel_t* exti)
 {
     uint32_t cnt = COMP_TIMER->CNT;
+    uint32_t comCnt = COM_TIMER->CNT;
     uint32_t mask = 1 << exti->channel;
     if (EXTI->RPR1 & mask) {
         comp_timer_enable();
@@ -80,6 +91,8 @@ void phaseARisingCb(extiChannel_t* exti)
             compA_duty = compA_falling_time * 1000 / compA_rising_time;
             if (compA_duty > COMP_DUTY_THRESHOLD_RISING && cnt > COMP_TIM_CNT_VALID) {
                 debug_toggle_2();
+                COM_TIMER->CCR1 = comCnt/2;
+                commutation_timer_enable();
                 comparator_disable_interrupts(&comp);
             }
         }
@@ -107,6 +120,7 @@ void phaseAFallingCb(extiChannel_t* exti)
             compA_duty = compA_falling_time * 1000 / compA_rising_time;
             if (compA_duty < COMP_DUTY_THRESHOLD_FALLING && cnt > COMP_TIM_CNT_VALID) {
                 debug_toggle_2();
+                commutation_timer_enable();
                 comparator_disable_interrupts(&comp);
             }
         }
@@ -136,6 +150,7 @@ void phaseBRisingCb(extiChannel_t* exti)
             compB_duty = compB_falling_time * 1000 / compB_rising_time;
             if (compB_duty > COMP_DUTY_THRESHOLD_RISING && cnt > COMP_TIM_CNT_VALID) {
                 debug_toggle_2();
+                commutation_timer_enable();
                 comparator_disable_interrupts(&comp);
             }
         }
@@ -163,6 +178,7 @@ void phaseBFallingCb(extiChannel_t* exti)
             compB_duty = compB_falling_time * 1000 / compB_rising_time;
             if (compB_duty < COMP_DUTY_THRESHOLD_FALLING && cnt > COMP_TIM_CNT_VALID) {
                     debug_toggle_2();
+                    commutation_timer_enable();
                     comparator_disable_interrupts(&comp);
             }
         }
@@ -193,6 +209,7 @@ void phaseCRisingCb(extiChannel_t* exti)
             compC_duty = compC_falling_time * 1000 / compC_rising_time;
             if (compC_duty > COMP_DUTY_THRESHOLD_RISING && cnt > COMP_TIM_CNT_VALID) {
                 debug_toggle_2();
+                commutation_timer_enable();
                 comparator_disable_interrupts(&comp);
             }
         }
@@ -220,6 +237,7 @@ void phaseCFallingCb(extiChannel_t* exti)
             compC_duty = compC_falling_time * 1000 / compC_rising_time;
             if (compC_duty < COMP_DUTY_THRESHOLD_FALLING && cnt > COMP_TIM_CNT_VALID) {
                     debug_toggle_2();
+                    commutation_timer_enable();
                     comparator_disable_interrupts(&comp);
             }
         }
@@ -336,6 +354,8 @@ int main()
 
     debug_initialize();
 
+    commutation_timer_initialize();
+    commutation_timer_interrupt_enable();
     comp_timer_initialize();
 
     blanking_initialize();

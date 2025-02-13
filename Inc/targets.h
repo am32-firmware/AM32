@@ -2494,6 +2494,13 @@
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM2); \
 }
 
+
+#define COM_TIMER TIM2
+#define COM_TIMER_IRQn TIM2_IRQn
+#define COM_TIMER_ENABLE_CLOCK() { \
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM2); \
+}
+
 // TIM5 is a 32 bit timer
 #define COMP_TIMER TIM5
 #define COMP_TIMER_IRQn TIM5_IRQn
@@ -2519,11 +2526,6 @@
 }
 // utility timer frequency is 1MHz
 #define UTILITY_TIMER_PSC (CPU_FREQUENCY_MHZ/1 - 1)
-#define COM_TIMER_ENABLE_CLOCK() { \
-    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM14); \
-}
-#define COM_TIMER TIM14
-#define COM_TIMER_IRQ TIM14_IRQn
 
 ////////////////////////////////
 // PWM/DSHOT INPUT PIN AND TIMER

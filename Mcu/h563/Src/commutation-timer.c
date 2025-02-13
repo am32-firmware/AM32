@@ -26,4 +26,19 @@ void commutation_timer_initialize()
 
     // update preloaded registers
     COM_TIMER->EGR |= TIM_EGR_UG;
+
+    NVIC_SetPriority(COM_TIMER_IRQn, 1);
+    NVIC_EnableIRQ(COM_TIMER_IRQn);
+}
+
+void commutation_timer_interrupt_enable()
+{
+    COM_TIMER->DIER |= TIM_DIER_CC1IE;
+}
+
+__WEAK void commutation_timer_interrupt_handler()
+{
+    if (COM_TIMER->SR & TIM_SR_CC1IF) {
+        COM_TIMER->SR &= ~TIM_SR_CC1IF;
+    }
 }

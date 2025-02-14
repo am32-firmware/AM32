@@ -395,7 +395,7 @@ int main()
     bridge_commutate();
 
     // COM_TIMER->SR &= ~TIM_SR_CC1IF;
-    COM_TIMER->CCR1 = 1000;
+    COM_TIMER->CCR1 = 100000;
     commutation_timer_interrupt_enable();
 
     while(1) {

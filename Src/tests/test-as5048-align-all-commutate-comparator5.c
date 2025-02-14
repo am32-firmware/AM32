@@ -523,7 +523,7 @@ int main()
 
     watchdog_reload();
 
-    bridge_set_run_duty(0x0480);
+    bridge_set_run_duty(0x0780);
 
     // here we are at angle = 0
 

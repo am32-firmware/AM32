@@ -388,7 +388,7 @@ int main()
     // to use the sk6812 led spi interrupt
     comparator_nvic_set_priority(&comp, 1);
 
-    bridge_set_run_duty(0x0100);
+    bridge_set_run_duty(0x0080);
 
     comp_timer_enable();
     blanking_enable();

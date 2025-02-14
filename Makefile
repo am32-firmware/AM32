@@ -68,7 +68,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-commutate-comparator2.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-commutate-comparator3.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-commutate-comparator4.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-commutate-comparator5.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-commutate-comparator5.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-print.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-blanking.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-debug.c
@@ -120,6 +120,7 @@ SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-commutate-comparator5
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-nothing.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-rng.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-phaseouts.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-sensorless-bldc.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-aux-as5048-read.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma-single.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma.c

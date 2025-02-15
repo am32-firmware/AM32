@@ -92,6 +92,7 @@ void commutation_timer_interrupt_handler()
         debug_toggle_2();
         COM_TIMER->SR &= ~TIM_SR_CC1IF;
         watchdog_reload();
+        commutation_timer_enable();
     }
 }
 
@@ -132,7 +133,9 @@ void phaseARisingCb(extiChannel_t* exti)
             compA_duty = compA_falling_time * 1000 / compA_rising_time;
             if (compA_duty > COMP_DUTY_THRESHOLD_RISING && cnt > COMP_TIM_CNT_VALID) {
                 debug_toggle_2();
-                COM_TIMER->CCR1 = comCnt/2 - comCnt/8;
+                if (comCnt > 250) {
+                    COM_TIMER->CCR1 = comCnt/2 - comCnt/8;
+                }
                 commutation_timer_enable();
                 comparator_disable_interrupts(&comp);
             }
@@ -162,7 +165,9 @@ void phaseAFallingCb(extiChannel_t* exti)
             compA_duty = compA_falling_time * 1000 / compA_rising_time;
             if (compA_duty < COMP_DUTY_THRESHOLD_FALLING && cnt > COMP_TIM_CNT_VALID) {
                 debug_toggle_2();
-                COM_TIMER->CCR1 = comCnt/2 - comCnt/8;
+                if (comCnt > 250) {
+                    COM_TIMER->CCR1 = comCnt/2 - comCnt/8;
+                }
                 commutation_timer_enable();
                 comparator_disable_interrupts(&comp);
             }
@@ -194,7 +199,9 @@ void phaseBRisingCb(extiChannel_t* exti)
             compB_duty = compB_falling_time * 1000 / compB_rising_time;
             if (compB_duty > COMP_DUTY_THRESHOLD_RISING && cnt > COMP_TIM_CNT_VALID) {
                 debug_toggle_2();
-                COM_TIMER->CCR1 = comCnt/2 - comCnt/8;
+                if (comCnt > 250) {
+                    COM_TIMER->CCR1 = comCnt/2 - comCnt/8;
+                }
                 commutation_timer_enable();
                 comparator_disable_interrupts(&comp);
             }
@@ -223,10 +230,12 @@ void phaseBFallingCb(extiChannel_t* exti)
             // this gives ~17ms of period available (keep period < 17ms)
             compB_duty = compB_falling_time * 1000 / compB_rising_time;
             if (compB_duty < COMP_DUTY_THRESHOLD_FALLING && cnt > COMP_TIM_CNT_VALID) {
-                    debug_toggle_2();
+                debug_toggle_2();
+                if (comCnt > 250) {
                     COM_TIMER->CCR1 = comCnt/2 - comCnt/8;
-                    commutation_timer_enable();
-                    comparator_disable_interrupts(&comp);
+                }
+                commutation_timer_enable();
+                comparator_disable_interrupts(&comp);
             }
         }
     }
@@ -257,7 +266,9 @@ void phaseCRisingCb(extiChannel_t* exti)
             compC_duty = compC_falling_time * 1000 / compC_rising_time;
             if (compC_duty > COMP_DUTY_THRESHOLD_RISING && cnt > COMP_TIM_CNT_VALID) {
                 debug_toggle_2();
-                COM_TIMER->CCR1 = comCnt/2 - comCnt/8;
+                if (comCnt > 250) {
+                    COM_TIMER->CCR1 = comCnt/2 - comCnt/8;
+                }
                 commutation_timer_enable();
                 comparator_disable_interrupts(&comp);
             }
@@ -286,10 +297,12 @@ void phaseCFallingCb(extiChannel_t* exti)
             // this gives ~17ms of period available (keep period < 17ms)
             compC_duty = compC_falling_time * 1000 / compC_rising_time;
             if (compC_duty < COMP_DUTY_THRESHOLD_FALLING && cnt > COMP_TIM_CNT_VALID) {
-                    debug_toggle_2();
+                debug_toggle_2();
+                if (comCnt > 250) {
                     COM_TIMER->CCR1 = comCnt/2 - comCnt/8;
-                    commutation_timer_enable();
-                    comparator_disable_interrupts(&comp);
+                }
+                commutation_timer_enable();
+                comparator_disable_interrupts(&comp);
             }
         }
     }
@@ -448,7 +461,7 @@ int main()
     bridge_commutate();
 
     // COM_TIMER->SR &= ~TIM_SR_CC1IF;
-    COM_TIMER->CCR1 = 100000;
+    COM_TIMER->CCR1 = 1000000;
     commutation_timer_interrupt_enable();
 
     for (int i = 0x0080; i < 0x0780; i++) {

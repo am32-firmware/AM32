@@ -26,7 +26,7 @@ void blanking_initialize()
     // max reload period
     BLANKING_TIMER->ARR = 0xffff;
     // 100
-    BLANKING_TIMER->CCR1 = 200;
+    BLANKING_TIMER->CCR1 = 100;
 
     // update preloaded registers
     BLANKING_TIMER->EGR |= TIM_EGR_UG;

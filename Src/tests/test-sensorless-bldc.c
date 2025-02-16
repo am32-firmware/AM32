@@ -92,7 +92,7 @@ void commutation_timer_interrupt_handler()
         debug_toggle_2();
         COM_TIMER->SR &= ~TIM_SR_CC1IF;
         watchdog_reload();
-        commutation_timer_enable();
+        // commutation_timer_enable();
     }
 }
 
@@ -465,7 +465,7 @@ int main()
     commutation_timer_interrupt_enable();
 
     for (int i = 0x0080; i < 0x0780; i++) {
-        delayMillis(10);
+        delayMillis(3);
         bridge_set_run_duty(i);
         debug_write_string("\n\r");
         debug_write_int(i);

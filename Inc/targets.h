@@ -1972,11 +1972,11 @@
 // button-led combo on aux port
 ///////////////
 
-#define LED_R_GPIO_PORT GPIOB
-#define LED_R_GPIO_PIN 8
+#define LED_R_GPIO_PORT AUX_P4_PORT
+#define LED_R_GPIO_PIN AUX_P4_PIN
 
-#define BUTTON_GPIO_PORT GPIOB
-#define BUTTON_GPIO_PIN 7
+#define BUTTON_GPIO_PORT AUX_P5_PORT
+#define BUTTON_GPIO_PIN AUX_P5_PIN
 
 ///////////////
 // led

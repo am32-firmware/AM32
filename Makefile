@@ -99,7 +99,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom-read.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-eeprom-write.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-exti-button.c
-# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-exti-button-led.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-exti-button-led.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-exti-3phase.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-exti-comparator-3phase.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-gpio-high.c
@@ -120,7 +120,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-nothing.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-rng.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-phaseouts.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-sensorless-bldc.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-sensorless-bldc.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-aux-as5048-read.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma-single.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma.c

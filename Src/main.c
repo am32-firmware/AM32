@@ -226,6 +226,7 @@ an settings option)
 #include "peripherals.h"
 #include "phaseouts.h"
 #include "serial_telemetry.h"
+#include "kiss_telemetry.h"
 #include "signal.h"
 #include "sounds.h"
 #include "targets.h"
@@ -1265,9 +1266,12 @@ void tenKhzRoutine()
         }
     }
 
-    if (eepromBuffer.telementry_on_interval) {
+    if (eepromBuffer.telemetry_on_interval) {
         telem_ms_count++;
-        if (telem_ms_count > telemetry_interval_ms * 20) {
+        if (telem_ms_count > ((telemetry_interval_ms - 1 + eepromBuffer.telemetry_on_interval) * 20)) {
+            // telemetry_on_interval = 1 is a boolean, but it can also be 2 or more to indicate an identifier
+            // by making the interval just slightly different with an unique identifier, we can guarantee that many ESCs can communicate on just one signal
+            // there will be some collisions but not as many as if two ESCs always tried to talk at once.
             send_telemetry = 1;
             telem_ms_count = 0;
         }

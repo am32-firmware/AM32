@@ -26,7 +26,7 @@ typedef union EEprom_u {
         uint8_t brake_on_stop; // 28
         uint8_t stall_protection; // 29
         uint8_t beep_volume; // 30
-        uint8_t telementry_on_interval; // 31
+        uint8_t telemetry_on_interval; // 31
         struct {
             uint8_t low_threshold; // 32
             uint8_t high_threshold; // 33

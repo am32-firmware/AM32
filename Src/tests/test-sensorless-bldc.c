@@ -386,7 +386,7 @@ int main()
     // set a low priority on comparator interrupt
     // this is necessary for this example
     // to use the sk6812 led spi interrupt
-    comparator_nvic_set_priority(&comp, 1);
+    comparator_nvic_set_priority(&comp, 0);
 
     bridge_set_run_duty(0x0080);
 
@@ -398,6 +398,10 @@ int main()
     COM_TIMER->CCR1 = 100000;
     commutation_timer_interrupt_enable();
 
+    for (int i = 0; i < 300; i++) {
+        delayMillis(10);
+        bridge_set_run_duty(0x0080 + i);
+    }
     while(1) {
     }
 }

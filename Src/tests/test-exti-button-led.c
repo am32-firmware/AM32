@@ -11,9 +11,14 @@ gpio_t gpioLed = DEF_GPIO(LED_R_GPIO_PORT, LED_R_GPIO_PIN, 0, GPIO_OUTPUT);
 
 void button_exti_cb(extiChannel_t* exti)
 {
-    EXTI->RPR1 |= 1 << exti->channel;
-    EXTI->FPR1 |= 1 << exti->channel;
-    gpio_toggle(&gpioLed);
+    uint32_t mask = 1 << exti->channel;
+    if (EXTI->RPR1 & mask) {
+        EXTI->RPR1 |= mask;
+        gpio_reset(&gpioLed);
+    } else {
+        EXTI->FPR1 |= mask;
+        gpio_set(&gpioLed);
+    }
 }
 
 int main()
@@ -26,7 +31,7 @@ int main()
 
     gpio_toggle(&gpioLed);
     exti_configure_port(&extiChannels[gpioButton.pin], EXTI_CHANNEL_FROM_PORT(gpioButton.port));
-    exti_configure_trigger(&extiChannels[gpioButton.pin], EXTI_TRIGGER_FALLING);
+    exti_configure_trigger(&extiChannels[gpioButton.pin], EXTI_TRIGGER_RISING_FALLING);
     exti_configure_cb(&extiChannels[gpioButton.pin], button_exti_cb);
 
     gpio_initialize(&gpioButton);

@@ -18,6 +18,53 @@
 #include "watchdog.h"
 
 
+
+
+gpio_t gpioButton = DEF_GPIO(BUTTON_GPIO_PORT, BUTTON_GPIO_PIN, 0, GPIO_INPUT);
+
+gpio_t gpioLed = DEF_GPIO(LED_R_GPIO_PORT, LED_R_GPIO_PIN, 0, GPIO_OUTPUT);
+
+bool button_flag = 0;
+
+// this is set up for a normally open button
+// that pulls the pin low when pushed
+void button_exti_cb(extiChannel_t* exti)
+{
+    uint32_t mask = 1 << exti->channel;
+    if (EXTI->RPR1 & mask) {
+        EXTI->RPR1 |= mask;
+        NVIC_SystemReset();
+    } else {
+        EXTI->FPR1 |= mask;
+        button_flag = true;
+        gpio_set(&gpioLed);
+        // debounce
+        for (uint32_t i = 0; i < 50000; i++) {
+            asm("nop");
+        }
+        while (EXTI->RPR1 & mask) {
+            EXTI->RPR1 |= mask;
+        }
+    }
+}
+
+int button_setup()
+{
+    gpio_initialize(&gpioLed);
+    gpio_set_speed(&gpioLed, GPIO_SPEED_LOW);
+    gpio_reset(&gpioLed);
+
+    exti_configure_port(&extiChannels[gpioButton.pin], EXTI_CHANNEL_FROM_PORT(gpioButton.port));
+    exti_configure_trigger(&extiChannels[gpioButton.pin], EXTI_TRIGGER_RISING_FALLING);
+    exti_configure_cb(&extiChannels[gpioButton.pin], button_exti_cb);
+
+    gpio_initialize(&gpioButton);
+    gpio_configure_pupdr(&gpioButton, GPIO_PULL_UP);
+
+    EXTI_NVIC_ENABLE(gpioButton.pin);
+    EXTI_INTERRUPT_ENABLE_MASK(1 << gpioButton.pin);
+}
+
 gpio_t gpioCompPhaseATest = DEF_GPIO(COMPA_GPIO_PORT, COMPA_GPIO_PIN, 0, GPIO_INPUT);
 gpio_t gpioCompPhaseBTest = DEF_GPIO(COMPB_GPIO_PORT, COMPB_GPIO_PIN, 0, GPIO_INPUT);
 gpio_t gpioCompPhaseCTest = DEF_GPIO(COMPC_GPIO_PORT, COMPC_GPIO_PIN, 0, GPIO_INPUT);
@@ -358,6 +405,11 @@ int main()
 
     debug_initialize();
 
+    button_setup();
+
+    while(!button_flag) {
+
+    }
     commutation_timer_initialize();
     // commutation_timer_interrupt_enable();
     comp_timer_initialize();

@@ -401,11 +401,12 @@ void blanking_interrupt_handler()
 
 int main()
 {
+    button_setup();
+
     mcu_setup(250);
 
     debug_initialize();
 
-    button_setup();
 
     while(!button_flag) {
 
@@ -450,9 +451,11 @@ int main()
     COM_TIMER->CCR1 = 100000;
     commutation_timer_interrupt_enable();
 
-    for (int i = 0; i < 300; i++) {
+    for (int i = 0x0080; i < 0x0780; i++) {
         delayMillis(10);
-        bridge_set_run_duty(0x0080 + i);
+        bridge_set_run_duty(i);
+        debug_write_string("\n\r");
+        debug_write_int(i);
     }
     while(1) {
     }

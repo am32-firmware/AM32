@@ -472,7 +472,7 @@ int main()
     COM_TIMER->CCR1 = 1000000;
     commutation_timer_interrupt_enable();
 
-    for (int i = 0x0080; i < 0x0780; i++) {
+    for (int i = 0x0080; i < 0x0700; i++) {
         delayMillis(3);
         bridge_set_run_duty(i);
         debug_write_string("\n\r");

@@ -473,7 +473,8 @@ int main()
     commutation_timer_interrupt_enable();
 
     for (int i = 0x0080; i < 0x0700; i++) {
-        delayMillis(3);
+        delayMicros(400);
+        // delayMillis(1);
         bridge_set_run_duty(i);
         debug_write_string("\n\r");
         debug_write_int(i);

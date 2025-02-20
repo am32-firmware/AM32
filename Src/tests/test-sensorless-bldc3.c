@@ -283,7 +283,7 @@ int main()
     COM_TIMER->CCR1 = 1000000;
     commutation_timer_interrupt_enable();
 
-    for (int i = 0x0080; i < 0x07e0; i++) {
+    for (int i = 0x0080; i < 0x0750; i++) {
         delayMicros(400);
         // delayMillis(1);
         bridge_set_run_duty(i);

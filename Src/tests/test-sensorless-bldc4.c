@@ -1,0 +1,286 @@
+// This example reads the as5048 using
+// the as5048-spi.h driver
+// add the global variable `angle` to live watch
+// to see the sensor angle reading
+
+#include "blanking.h"
+#include "bridge.h"
+#include "commutation-timer.h"
+#include "comparator.h"
+#include "comp-timer.h"
+#include "debug.h"
+#include "drv8323-spi.h"
+#include "functions.h"
+#include "math.h"
+#include "mcu.h"
+#include "stm32h563xx.h"
+#include "utility-timer.h"
+#include "watchdog.h"
+
+
+
+
+gpio_t gpioButton = DEF_GPIO(BUTTON_GPIO_PORT, BUTTON_GPIO_PIN, 0, GPIO_INPUT);
+
+gpio_t gpioLed = DEF_GPIO(LED_R_GPIO_PORT, LED_R_GPIO_PIN, 0, GPIO_OUTPUT);
+
+bool button_flag = 0;
+
+// this is set up for a normally open button
+// that pulls the pin low when pushed
+void button_exti_cb(extiChannel_t* exti)
+{
+    uint32_t mask = 1 << exti->channel;
+    if (EXTI->RPR1 & mask) {
+        EXTI->RPR1 |= mask;
+        NVIC_SystemReset();
+    } else {
+        EXTI->FPR1 |= mask;
+        button_flag = true;
+        gpio_set(&gpioLed);
+        // debounce
+        for (uint32_t i = 0; i < 50000; i++) {
+            asm("nop");
+        }
+        while (EXTI->RPR1 & mask) {
+            EXTI->RPR1 |= mask;
+        }
+    }
+}
+
+int button_setup()
+{
+    gpio_initialize(&gpioLed);
+    gpio_set_speed(&gpioLed, GPIO_SPEED_LOW);
+    gpio_reset(&gpioLed);
+
+    exti_configure_port(&extiChannels[gpioButton.pin], EXTI_CHANNEL_FROM_PORT(gpioButton.port));
+    exti_configure_trigger(&extiChannels[gpioButton.pin], EXTI_TRIGGER_RISING_FALLING);
+    exti_configure_cb(&extiChannels[gpioButton.pin], button_exti_cb);
+
+    gpio_initialize(&gpioButton);
+    gpio_configure_pupdr(&gpioButton, GPIO_PULL_UP);
+
+    EXTI_NVIC_ENABLE(gpioButton.pin);
+    EXTI_INTERRUPT_ENABLE_MASK(1 << gpioButton.pin);
+}
+
+gpio_t gpioCompPhaseATest = DEF_GPIO(COMPA_GPIO_PORT, COMPA_GPIO_PIN, 0, GPIO_INPUT);
+gpio_t gpioCompPhaseBTest = DEF_GPIO(COMPB_GPIO_PORT, COMPB_GPIO_PIN, 0, GPIO_INPUT);
+gpio_t gpioCompPhaseCTest = DEF_GPIO(COMPC_GPIO_PORT, COMPC_GPIO_PIN, 0, GPIO_INPUT);
+
+
+comparator_t comp = {
+    .phaseA = &gpioCompPhaseATest,
+    .phaseB = &gpioCompPhaseBTest,
+    .phaseC = &gpioCompPhaseCTest,
+    .phaseAcb = 0,
+    // .phaseBcb = phaseBTestcb,
+    .phaseBcb = 0,
+    // .phaseCcb = phaseCTestcb,
+    .phaseCcb = 0,
+};
+
+
+void commutation_timer_interrupt_handler()
+{
+    if (COM_TIMER->SR & TIM_SR_CC1IF) {
+        comparator_disable_interrupts(&comp);
+        blanking_enable();
+        comp_timer_enable();
+        bridge_commutate();
+        debug_toggle_2();
+        COM_TIMER->SR &= ~TIM_SR_CC1IF;
+        watchdog_reload();
+        // commutation_timer_enable();
+    }
+}
+
+// aka the period
+uint32_t compA_prev_rising_time;
+uint32_t compA_rising_time;
+uint32_t compA_falling_time;
+uint32_t compA_duty;
+
+#define COMP_TIM_CNT_VALID 1500
+#define COMP_DUTY_THRESHOLD 50
+#define COMP_DUTY_THRESHOLD_RISING (500 + COMP_DUTY_THRESHOLD)
+#define COMP_DUTY_THRESHOLD_FALLING (500 - COMP_DUTY_THRESHOLD)
+
+// uint32_t comp_period, comp_duty;
+void phaseARisingCb(extiChannel_t* exti)
+{
+    uint32_t cnt = COMP_TIMER->CNT;
+    uint32_t comCnt = COM_TIMER->CNT;
+    uint32_t mask = 1 << exti->channel;
+    if (EXTI->RPR1 & mask) {
+        comp_timer_enable();
+        debug_set_1();
+        EXTI->RPR1 |= mask;
+        compA_prev_rising_time = compA_rising_time;
+        compA_rising_time = cnt;
+        if (compA_prev_rising_time > 0 && compA_rising_time > compA_falling_time) { // somehow this is not always the case TODO figure out why and take this out
+            // this gives ~17ms of period available (keep period < 17ms)
+            compA_duty = compA_falling_time * 1000 / compA_rising_time;
+            if (compA_duty > COMP_DUTY_THRESHOLD_RISING && cnt > COMP_TIM_CNT_VALID) {
+                debug_toggle_2();
+                if (comCnt > 250) {
+                    comCnt += compA_rising_time;
+                    COM_TIMER->CCR1 = comCnt/2 - comCnt/8;
+                }
+                commutation_timer_enable();
+                comparator_disable_interrupts(&comp);
+            }
+        }
+
+    }
+    if (EXTI->FPR1 & mask) {
+        debug_reset_1();
+        EXTI->FPR1 |= mask;
+        compA_falling_time = cnt;
+    }
+}
+
+void phaseAFallingCb(extiChannel_t* exti)
+{
+    uint32_t cnt = COMP_TIMER->CNT;
+    uint32_t comCnt = COM_TIMER->CNT;
+    uint32_t mask = 1 << exti->channel;
+    if (EXTI->RPR1 & mask) {
+        comp_timer_enable();
+        debug_set_1();
+        EXTI->RPR1 |= mask;
+        compA_prev_rising_time = compA_rising_time;
+        compA_rising_time = cnt;
+        if (compA_prev_rising_time > 0 && compA_rising_time > compA_falling_time) { // somehow this is not always the case TODO figure out why and take this out
+            // this gives ~17ms of period available (keep period < 17ms)
+            compA_duty = compA_falling_time * 1000 / compA_rising_time;
+            if (compA_duty < COMP_DUTY_THRESHOLD_FALLING && cnt > COMP_TIM_CNT_VALID) {
+                debug_toggle_2();
+                if (comCnt > 250) {
+                    comCnt += compA_rising_time;
+                    COM_TIMER->CCR1 = comCnt/2 - comCnt/8;
+                }
+                commutation_timer_enable();
+                comparator_disable_interrupts(&comp);
+            }
+        }
+    }
+    if (EXTI->FPR1 & mask) {
+        debug_reset_1();
+        EXTI->FPR1 |= mask;
+        compA_falling_time = cnt;
+    }
+}
+
+
+
+void blanking_interrupt_handler()
+{
+    if (BLANKING_TIMER->SR & TIM_SR_CC1IF) {
+        BLANKING_TIMER->SR &= ~TIM_SR_CC1IF;
+        blanking_disable();
+        // debug_toggle_3();
+
+        comp.phaseAcb = 0;
+        comp.phaseBcb = 0;
+        comp.phaseCcb = 0;
+
+        // compA_rising_time = 0;
+        // compA_falling_time = 0;
+        // compA_prev_rising_time = 0;
+        switch (bridgeComStep) {
+            case 0:
+                comp.phaseAcb = phaseARisingCb;
+                break;
+            case 1:
+                comp.phaseCcb = phaseAFallingCb;
+                break;
+            case 2:
+                comp.phaseBcb = phaseARisingCb;
+                break;
+            case 3:
+                comp.phaseAcb = phaseAFallingCb;
+                break;
+            case 4:
+                comp.phaseCcb = phaseARisingCb;
+                break;
+            case 5:
+                comp.phaseBcb = phaseAFallingCb;
+                break;
+            default:
+                comp.phaseAcb = 0;
+                comp.phaseBcb = 0;
+                comp.phaseCcb = 0;
+                break;
+
+        }
+        comparator_configure_callbacks(&comp);
+        comp_timer_enable();
+        comparator_enable_interrupts(&comp);
+        // bridge_sample_interrupt_enable();
+    }
+}
+
+int main()
+{
+    button_setup();
+
+    mcu_setup(250);
+
+    debug_initialize();
+
+
+    while(!button_flag) {
+
+    }
+    commutation_timer_initialize();
+    // commutation_timer_interrupt_enable();
+    comp_timer_initialize();
+
+    blanking_initialize();
+
+    utility_timer_initialize();
+    utility_timer_enable();
+
+    drv8323_initialize(&DRV8323);
+
+    watchdog_initialize_period(500);
+    watchdog_enable();
+
+    bridge_initialize();
+    bridge_set_deadtime_ns(0);
+    bridge_set_mode_run();
+    bridge_set_run_frequency(24000);
+    bridge_set_run_duty(0x0300);
+    // bridge_sample_interrupt_enable();
+    bridge_enable();
+    bridge_commutate();
+
+    comparator_initialize(&comp);
+
+    // set a low priority on comparator interrupt
+    // this is necessary for this example
+    // to use the sk6812 led spi interrupt
+    comparator_nvic_set_priority(&comp, 0);
+
+    bridge_set_run_duty(0x0080);
+
+    comp_timer_enable();
+    blanking_enable();
+    bridge_commutate();
+
+    // COM_TIMER->SR &= ~TIM_SR_CC1IF;
+    COM_TIMER->CCR1 = 1000000;
+    commutation_timer_interrupt_enable();
+
+    for (int i = 0x0080; i < 0x0750; i++) {
+        delayMicros(400);
+        // delayMillis(1);
+        bridge_set_run_duty(i);
+        debug_write_string("\n\r");
+        debug_write_int(i);
+    }
+    while(1) {
+    }
+}

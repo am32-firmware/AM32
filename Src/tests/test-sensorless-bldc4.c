@@ -107,13 +107,31 @@ uint32_t compA_duty;
 #define COMP_DUTY_THRESHOLD_RISING (500 + COMP_DUTY_THRESHOLD)
 #define COMP_DUTY_THRESHOLD_FALLING (500 - COMP_DUTY_THRESHOLD)
 
+
+bool jacob_rising = false;
+bool comparator_state = false;
+
+void comp_timer_interrupt_handler()
+{
+    if (COMP_TIMER->SR & TIM_SR_CC1IF) {
+        COMP_TIMER->SR &= ~TIM_SR_CC1IF;
+        if (jacob_rising && comparator_state == true) {
+            debug_toggle_3();
+        } else if (!jacob_rising && comparator_state == false) {
+            debug_toggle_3();
+        }
+    }
+}
+
 // uint32_t comp_period, comp_duty;
 void phaseARisingCb(extiChannel_t* exti)
 {
     uint32_t cnt = COMP_TIMER->CNT;
     uint32_t comCnt = COM_TIMER->CNT;
     uint32_t mask = 1 << exti->channel;
+    jacob_rising = true;
     if (EXTI->RPR1 & mask) {
+        comparator_state = true;
         comp_timer_enable();
         comp_timer_interrupt_enable();
         debug_set_1();
@@ -137,6 +155,7 @@ void phaseARisingCb(extiChannel_t* exti)
 
     }
     if (EXTI->FPR1 & mask) {
+        comparator_state = false;
         debug_reset_1();
         EXTI->FPR1 |= mask;
         compA_falling_time = cnt;
@@ -148,7 +167,9 @@ void phaseAFallingCb(extiChannel_t* exti)
     uint32_t cnt = COMP_TIMER->CNT;
     uint32_t comCnt = COM_TIMER->CNT;
     uint32_t mask = 1 << exti->channel;
+    jacob_rising = false;
     if (EXTI->RPR1 & mask) {
+        comparator_state = true;
         comp_timer_enable();
         comp_timer_interrupt_enable();
         debug_set_1();
@@ -171,6 +192,7 @@ void phaseAFallingCb(extiChannel_t* exti)
         }
     }
     if (EXTI->FPR1 & mask) {
+        comparator_state = false;
         debug_reset_1();
         EXTI->FPR1 |= mask;
         compA_falling_time = cnt;

@@ -46,6 +46,7 @@ void comp_timer_interrupt_disable()
 
 void comp_timer_interrupt_enable()
 {
+    COMP_TIMER->SR &= ~TIM_SR_CC1IF; // clear flag
     COMP_TIMER->DIER |= TIM_DIER_CC1IE; // enable interrupt
 }
 

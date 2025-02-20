@@ -115,6 +115,7 @@ void phaseARisingCb(extiChannel_t* exti)
     uint32_t mask = 1 << exti->channel;
     if (EXTI->RPR1 & mask) {
         comp_timer_enable();
+        comp_timer_interrupt_enable();
         debug_set_1();
         EXTI->RPR1 |= mask;
         compA_prev_rising_time = compA_rising_time;
@@ -130,6 +131,7 @@ void phaseARisingCb(extiChannel_t* exti)
                 }
                 commutation_timer_enable();
                 comparator_disable_interrupts(&comp);
+                comp_timer_disable();
             }
         }
 
@@ -148,6 +150,7 @@ void phaseAFallingCb(extiChannel_t* exti)
     uint32_t mask = 1 << exti->channel;
     if (EXTI->RPR1 & mask) {
         comp_timer_enable();
+        comp_timer_interrupt_enable();
         debug_set_1();
         EXTI->RPR1 |= mask;
         compA_prev_rising_time = compA_rising_time;
@@ -163,6 +166,7 @@ void phaseAFallingCb(extiChannel_t* exti)
                 }
                 commutation_timer_enable();
                 comparator_disable_interrupts(&comp);
+                comp_timer_disable();
             }
         }
     }
@@ -216,8 +220,8 @@ void blanking_interrupt_handler()
 
         }
         comparator_configure_callbacks(&comp);
+        comp_timer_interrupt_disable();
         comp_timer_enable();
-        comp_timer_interrupt_enable();
         comparator_enable_interrupts(&comp);
         // bridge_sample_interrupt_enable();
     }

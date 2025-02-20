@@ -25,8 +25,8 @@ void blanking_initialize()
     BLANKING_TIMER->PSC = (HCLK_FREQUENCY/1000000) - 1;
     // max reload period
     BLANKING_TIMER->ARR = 0xffff;
-    // 100
-    BLANKING_TIMER->CCR1 = 100;
+    // 25us
+    BLANKING_TIMER->CCR1 = 25;
 
     // update preloaded registers
     BLANKING_TIMER->EGR |= TIM_EGR_UG;

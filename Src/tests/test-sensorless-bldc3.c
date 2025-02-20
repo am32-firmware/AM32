@@ -186,36 +186,27 @@ void blanking_interrupt_handler()
         comp.phaseBcb = 0;
         comp.phaseCcb = 0;
 
+        // compA_rising_time = 0;
+        // compA_falling_time = 0;
+        // compA_prev_rising_time = 0;
         switch (bridgeComStep) {
             case 0:
                 comp.phaseAcb = phaseARisingCb;
-                // compA_rising_time = 0;
-                // compA_falling_time = 1<<31;
                 break;
             case 1:
                 comp.phaseCcb = phaseAFallingCb;
-                // compC_rising_time = 0;
-                // compC_falling_time = 1<<31;
                 break;
             case 2:
                 comp.phaseBcb = phaseARisingCb;
-                // compB_rising_time = 0;
-                // compB_falling_time = 1<<31;
                 break;
             case 3:
                 comp.phaseAcb = phaseAFallingCb;
-                // compA_rising_time = 0;
-                // compA_falling_time = 1<<31;
                 break;
             case 4:
                 comp.phaseCcb = phaseARisingCb;
-                // compC_rising_time = 0;
-                // compC_falling_time = 1<<31;
                 break;
             case 5:
                 comp.phaseBcb = phaseAFallingCb;
-                // compB_rising_time = 0;
-                // compB_falling_time = 1<<31;
                 break;
             default:
                 comp.phaseAcb = 0;

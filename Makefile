@@ -90,6 +90,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator-output.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comparator-output-main.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-comp-timer.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-debug.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-delay.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/1111test-drv8323.c
@@ -122,7 +123,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-phaseouts.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-sensorless-bldc.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-sensorless-bldc2.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-sensorless-bldc3.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-sensorless-bldc3.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-aux-as5048-read.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma-single.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma.c

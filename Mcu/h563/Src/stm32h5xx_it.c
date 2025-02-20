@@ -33,6 +33,7 @@ extern void transfercomplete();
 extern void PeriodElapsedCallback();
 extern void interruptRoutine();
 extern void doPWMChanges();
+extern void comp_timer_interrupt_handler();
 extern void commutation_timer_interrupt_handler();
 extern void blanking_interrupt_handler();
 extern void bridge_timer_irq_handler();
@@ -256,6 +257,19 @@ void TIM15_IRQHandler(void)
 void TIM3_IRQHandler(void)
 {
     blanking_interrupt_handler();
+    // if (LL_TIM_IsActiveFlag_CC1(TIM3) == 1) {
+    //     LL_TIM_ClearFlag_CC1(TIM3);
+    // }
+
+    // if (LL_TIM_IsActiveFlag_UPDATE(TIM3) == 1) {
+    //     LL_TIM_ClearFlag_UPDATE(TIM3);
+    //     // update_interupt++;
+    // }
+}
+
+void TIM5_IRQHandler(void)
+{
+    comp_timer_interrupt_handler();
     // if (LL_TIM_IsActiveFlag_CC1(TIM3) == 1) {
     //     LL_TIM_ClearFlag_CC1(TIM3);
     // }

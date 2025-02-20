@@ -294,6 +294,7 @@ void bridge_sample_interrupt_enable()
 void bridge_sample_interrupt_disable()
 {
     BRIDGE_TIMER->DIER &= ~TIM_DIER_CC4IE; // disable interrupt
+    BRIDGE_TIMER->SR &= ~TIM_SR_CC4IF; // clear flag
 }
 
 __WEAK void bridge_timer_irq_handler()

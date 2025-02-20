@@ -119,6 +119,11 @@ void comp_timer_interrupt_handler()
         if ((jacob_rising && comparator_state == true)
         || (!jacob_rising && comparator_state == false)) {
             debug_toggle_3();
+            comCnt -= 14000;
+            COM_TIMER->CCR1 = comCnt/2 - comCnt/8;
+            commutation_timer_enable();
+            comparator_disable_interrupts(&comp);
+            comp_timer_disable();
         }
 
     }

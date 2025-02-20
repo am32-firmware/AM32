@@ -113,13 +113,14 @@ bool comparator_state = false;
 
 void comp_timer_interrupt_handler()
 {
+    uint32_t comCnt = COM_TIMER->CNT;
     if (COMP_TIMER->SR & TIM_SR_CC1IF) {
         COMP_TIMER->SR &= ~TIM_SR_CC1IF;
-        if (jacob_rising && comparator_state == true) {
-            debug_toggle_3();
-        } else if (!jacob_rising && comparator_state == false) {
+        if ((jacob_rising && comparator_state == true)
+        || (!jacob_rising && comparator_state == false)) {
             debug_toggle_3();
         }
+
     }
 }
 

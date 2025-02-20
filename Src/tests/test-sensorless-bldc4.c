@@ -217,6 +217,7 @@ void blanking_interrupt_handler()
         }
         comparator_configure_callbacks(&comp);
         comp_timer_enable();
+        comp_timer_interrupt_enable();
         comparator_enable_interrupts(&comp);
         // bridge_sample_interrupt_enable();
     }

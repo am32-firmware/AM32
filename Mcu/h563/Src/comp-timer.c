@@ -53,5 +53,6 @@ __WEAK void comp_timer_interrupt_handler()
 {
     if (COMP_TIMER->SR & TIM_SR_CC1IF) {
         COMP_TIMER->SR &= ~TIM_SR_CC1IF;
+        debug_toggle_3();
     }
 }

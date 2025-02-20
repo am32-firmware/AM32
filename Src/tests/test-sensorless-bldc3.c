@@ -103,7 +103,7 @@ uint32_t compA_falling_time;
 uint32_t compA_duty;
 
 #define COMP_TIM_CNT_VALID 1500
-#define COMP_DUTY_THRESHOLD 100
+#define COMP_DUTY_THRESHOLD 50
 #define COMP_DUTY_THRESHOLD_RISING (500 + COMP_DUTY_THRESHOLD)
 #define COMP_DUTY_THRESHOLD_FALLING (500 - COMP_DUTY_THRESHOLD)
 
@@ -189,33 +189,33 @@ void blanking_interrupt_handler()
         switch (bridgeComStep) {
             case 0:
                 comp.phaseAcb = phaseARisingCb;
-                compA_rising_time = 0;
-                compA_falling_time = 1<<31;
+                // compA_rising_time = 0;
+                // compA_falling_time = 1<<31;
                 break;
             case 1:
                 comp.phaseCcb = phaseAFallingCb;
-                compC_rising_time = 0;
-                compC_falling_time = 1<<31;
+                // compC_rising_time = 0;
+                // compC_falling_time = 1<<31;
                 break;
             case 2:
                 comp.phaseBcb = phaseARisingCb;
-                compB_rising_time = 0;
-                compB_falling_time = 1<<31;
+                // compB_rising_time = 0;
+                // compB_falling_time = 1<<31;
                 break;
             case 3:
                 comp.phaseAcb = phaseAFallingCb;
-                compA_rising_time = 0;
-                compA_falling_time = 1<<31;
+                // compA_rising_time = 0;
+                // compA_falling_time = 1<<31;
                 break;
             case 4:
                 comp.phaseCcb = phaseARisingCb;
-                compC_rising_time = 0;
-                compC_falling_time = 1<<31;
+                // compC_rising_time = 0;
+                // compC_falling_time = 1<<31;
                 break;
             case 5:
                 comp.phaseBcb = phaseAFallingCb;
-                compB_rising_time = 0;
-                compB_falling_time = 1<<31;
+                // compB_rising_time = 0;
+                // compB_falling_time = 1<<31;
                 break;
             default:
                 comp.phaseAcb = 0;

@@ -134,6 +134,7 @@ void phaseARisingCb(extiChannel_t* exti)
             if (compA_duty > COMP_DUTY_THRESHOLD_RISING && cnt > COMP_TIM_CNT_VALID) {
                 debug_toggle_2();
                 if (comCnt > 250) {
+                    comCnt += compA_rising_time;
                     COM_TIMER->CCR1 = comCnt/2 - comCnt/8;
                 }
                 commutation_timer_enable();
@@ -166,6 +167,7 @@ void phaseAFallingCb(extiChannel_t* exti)
             if (compA_duty < COMP_DUTY_THRESHOLD_FALLING && cnt > COMP_TIM_CNT_VALID) {
                 debug_toggle_2();
                 if (comCnt > 250) {
+                    comCnt += compA_rising_time;
                     COM_TIMER->CCR1 = comCnt/2 - comCnt/8;
                 }
                 commutation_timer_enable();
@@ -200,6 +202,7 @@ void phaseBRisingCb(extiChannel_t* exti)
             if (compB_duty > COMP_DUTY_THRESHOLD_RISING && cnt > COMP_TIM_CNT_VALID) {
                 debug_toggle_2();
                 if (comCnt > 250) {
+                    comCnt += compB_rising_time;
                     COM_TIMER->CCR1 = comCnt/2 - comCnt/8;
                 }
                 commutation_timer_enable();
@@ -232,6 +235,7 @@ void phaseBFallingCb(extiChannel_t* exti)
             if (compB_duty < COMP_DUTY_THRESHOLD_FALLING && cnt > COMP_TIM_CNT_VALID) {
                 debug_toggle_2();
                 if (comCnt > 250) {
+                    comCnt += compA_rising_time;
                     COM_TIMER->CCR1 = comCnt/2 - comCnt/8;
                 }
                 commutation_timer_enable();
@@ -275,6 +279,7 @@ void phaseCRisingCb(extiChannel_t* exti)
             if (compC_duty > COMP_DUTY_THRESHOLD_RISING && cnt > COMP_TIM_CNT_VALID) {
                 debug_toggle_2();
                 if (comCnt > 250) {
+                    comCnt += compC_rising_time;
                     COM_TIMER->CCR1 = comCnt/2 - comCnt/8;
                 }
                 commutation_timer_enable();
@@ -307,6 +312,7 @@ void phaseCFallingCb(extiChannel_t* exti)
             if (compC_duty < COMP_DUTY_THRESHOLD_FALLING && cnt > COMP_TIM_CNT_VALID) {
                 debug_toggle_2();
                 if (comCnt > 250) {
+                    comCnt += compC_rising_time;
                     COM_TIMER->CCR1 = comCnt/2 - comCnt/8;
                 }
                 commutation_timer_enable();
@@ -472,7 +478,7 @@ int main()
     COM_TIMER->CCR1 = 1000000;
     commutation_timer_interrupt_enable();
 
-    for (int i = 0x0080; i < 0x0700; i++) {
+    for (int i = 0x0080; i < 0x07e0; i++) {
         delayMicros(400);
         // delayMillis(1);
         bridge_set_run_duty(i);

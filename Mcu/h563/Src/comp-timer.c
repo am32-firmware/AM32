@@ -28,7 +28,7 @@ void comp_timer_initialize()
     // corresponds to ~period of bridge timer
     // this interrupt will trigger if the comparator has not changed state
     // for the period that the bridge pwm takes
-    COMP_TIMER->CCR1 = 10000;
+    COMP_TIMER->CCR1 = 14000;
     // update preloaded registers
     COMP_TIMER->EGR |= TIM_EGR_UG;
 

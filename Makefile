@@ -121,7 +121,8 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-rng.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-phaseouts.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-sensorless-bldc.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-sensorless-bldc2.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-sensorless-bldc2.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-sensorless-bldc3.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-aux-as5048-read.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma-single.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma.c

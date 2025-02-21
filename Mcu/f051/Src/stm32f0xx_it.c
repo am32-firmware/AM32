@@ -89,16 +89,16 @@ void SysTick_Handler(void) { }
 /**
  * @brief This function handles DMA1 channel 2 and 3 interrupts.
  */
-void DMA1_Channel2_3_IRQHandler(void)
-{
-    if (LL_DMA_IsActiveFlag_TC2(DMA1)) {
-        LL_DMA_ClearFlag_GI2(DMA1);
-        LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);
-    } else if (LL_DMA_IsActiveFlag_TE2(DMA1)) {
-        LL_DMA_ClearFlag_GI2(DMA1);
-        LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);
-    }
-}
+//void DMA1_Channel2_3_IRQHandler(void)
+//{
+//    if (LL_DMA_IsActiveFlag_TC2(DMA1)) {
+//        LL_DMA_ClearFlag_GI2(DMA1);
+//        LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);
+//    } else if (LL_DMA_IsActiveFlag_TE2(DMA1)) {
+//        LL_DMA_ClearFlag_GI2(DMA1);
+//        LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);
+//    }
+//}
 
 /**
  * @brief This function handles DMA1 channel 4 and 5 interrupts.

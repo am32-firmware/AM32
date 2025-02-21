@@ -2067,6 +2067,17 @@
 #define SIXTY_FOUR_KB_MEMORY
 #endif
 
+#ifdef LUMENIER_SIEGE_G071
+#define FILE_NAME "LUMENIER_SIEGE_G071"
+#define FIRMWARE_NAME "SIEGE NDAA"
+#define DEAD_TIME 60
+#define MILLIVOLT_PER_AMP 10
+#define CURRENT_OFFSET 0
+#define HARDWARE_GROUP_G0_K
+#define USE_SERIAL_TELEMETRY
+#define SIXTY_FOUR_KB_MEMORY
+#endif
+
 /********************************** F031 Targets
  * ***********************************/
 

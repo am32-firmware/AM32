@@ -1265,6 +1265,7 @@ void tenKhzRoutine()
         }
     }
 
+#ifndef NO_PERIODIC_TELEMETRY
     if (eepromBuffer.telementry_on_interval) {
         telem_ms_count++;
         if (telem_ms_count > telemetry_interval_ms * 20) {
@@ -1272,6 +1273,7 @@ void tenKhzRoutine()
             telem_ms_count = 0;
         }
     }
+#endif
 
 #ifndef BRUSHED_MODE
 

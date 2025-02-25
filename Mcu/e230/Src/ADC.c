@@ -49,7 +49,7 @@ void ADC_Init(void)
 
     /* config the GPIO as analog mode */
     gpio_mode_set(GPIOA, GPIO_MODE_ANALOG, GPIO_PUPD_NONE,
-        GPIO_PIN_3 | GPIO_PIN_6);
+        VOLTAGE_ADC_PIN | CURRENT_ADC_PIN);
 
     dma_parameter_struct dma_data_parameter;
 
@@ -84,8 +84,8 @@ void ADC_Init(void)
     adc_tempsensor_vrefint_enable(); // enable the temp sensor
 
     /* ADC regular channel config */
-    adc_regular_channel_config(0, ADC_CHANNEL_3, ADC_SAMPLETIME_55POINT5);
-    adc_regular_channel_config(1, ADC_CHANNEL_6, ADC_SAMPLETIME_55POINT5);
+    adc_regular_channel_config(0, VOLTAGE_ADC_CHANNEL, ADC_SAMPLETIME_55POINT5);
+    adc_regular_channel_config(1, CURRENT_ADC_CHANNEL, ADC_SAMPLETIME_55POINT5);
     adc_regular_channel_config(2, ADC_CHANNEL_16, ADC_SAMPLETIME_55POINT5);
 
     /* ADC trigger config */

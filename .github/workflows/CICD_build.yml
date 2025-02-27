@@ -7,6 +7,16 @@ on:
       - 'v[0-9]+.[0-9]+'
   pull_request:
     branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      file_type:
+        description: 'File type to upload (hex or elf)'
+        required: true
+        default: 'hex'
+        type: choice
+        options:
+          - hex
+          - elf
 
 jobs:
   build:
@@ -31,10 +41,18 @@ jobs:
             tools/windows/make/bin/make
           fi
 
+      - name: Archive build
+        uses: actions/upload-artifact@v4
+        with:
+          name: AM32-binaries
+          path: |
+            obj/*.hex
+          retention-days: 7
+
       - name: Find and store hex files
         if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'ubuntu-latest'
         run: |
-          hex_files=$(find obj -type f -name "*.hex" | tr '\n' ',' | sed 's/,$//')
+          hex_files=$(find obj -type f -name "*.${{ inputs.include_hex }}" | tr '\n' ',' | sed 's/,$//')
           echo "Found hex files: $hex_files"
           echo "HEX_FILES=$hex_files" >> $GITHUB_ENV
 

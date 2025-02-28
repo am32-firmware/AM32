@@ -6,6 +6,7 @@
 #include "mcu.h"
 #include "targets.h"
 #include "utility-timer.h"
+#include "vreg.h"
 
 void testgpio(gpio_t* gpio)
 {
@@ -19,6 +20,8 @@ void testgpio(gpio_t* gpio)
 int main()
 {
     mcu_setup(250);
+
+    vreg5V_initialize();
 
     utility_timer_initialize();
     utility_timer_enable();
@@ -51,6 +54,8 @@ int main()
 
     gpio_reset(&gpioRS485Enable);
 
+    delayMillis(10);
+    vreg5V_enable();
     while(1) {
         testgpio(&gpioMainP2);
         testgpio(&gpioMainP3);

@@ -1778,8 +1778,8 @@
 
 // #define HCLK_FREQUENCY 25000000
 
-#define AM32_HSE_VALUE (8000000)
-// #define AM32_HSE_VALUE (25000000)
+// #define AM32_HSE_VALUE (8000000)
+#define AM32_HSE_VALUE (25000000)
 
 
 #define PHASEA_CURRENT_PORT GPIOF
@@ -1898,49 +1898,49 @@
 #define MAIN_P1_PORT GPIOC
 #define MAIN_P1_PIN 13
 
-// // it is connected to:
-// // GPIO A8 TIM1_CH1
-// // GPIO A12 USB_DP
-// // GPIO D8 (via series resistor) USART3_TX
-// // GPIO F11 ADC1_INP2
-// // #define MAIN_P2_PORT GPIOA
-// // #define MAIN_P2_PIN 8
+// it is connected to:
+// GPIO A8 TIM1_CH1
+// GPIO A12 USB_DP
+// GPIO D8 (via series resistor) USART3_TX
+// GPIO F11 ADC1_INP2
 // #define MAIN_P2_PORT GPIOA
-// #define MAIN_P2_PIN 12
-// // #define MAIN_P2_PORT GPIOD
-// // #define MAIN_P2_PIN 8
-// // #define MAIN_P2_PORT GPIOF
-// // #define MAIN_P2_PIN 11
+// #define MAIN_P2_PIN 8
+#define MAIN_P2_PORT GPIOA
+#define MAIN_P2_PIN 12
+// #define MAIN_P2_PORT GPIOD
+// #define MAIN_P2_PIN 8
+// #define MAIN_P2_PORT GPIOF
+// #define MAIN_P2_PIN 11
+
+// it is connected to:
+// GPIO A11 USB_DM
+// GPIO B1 ADC1_INP5
+// GPIO D9 (via series resistor)
+// GPIO E14 TIM1_CH4
+#define MAIN_P3_PORT GPIOA
+#define MAIN_P3_PIN 11
+// #define MAIN_P3_PORT GPIOB
+// #define MAIN_P3_PIN 1
+// #define MAIN_P3_PORT GPIOD
+// #define MAIN_P3_PIN 9
+// #define MAIN_P3_PORT GPIOE
+// #define MAIN_P3_PIN 14
+
+
+// ///////////////
+// // main gpio pins (blueServo)
+// ///////////////
 
 // // it is connected to:
-// // GPIO A11 USB_DM
-// // GPIO B1 ADC1_INP5
-// // GPIO D9 (via series resistor)
-// // GPIO E14 TIM1_CH4
-// #define MAIN_P3_PORT GPIOA
-// #define MAIN_P3_PIN 11
-// // #define MAIN_P3_PORT GPIOB
-// // #define MAIN_P3_PIN 1
-// // #define MAIN_P3_PORT GPIOD
-// // #define MAIN_P3_PIN 9
-// // #define MAIN_P3_PORT GPIOE
-// // #define MAIN_P3_PIN 14
+// // GPIO D12 (via series resistor) UART4_TX
+// #define MAIN_P2_PORT GPIOD
+// #define MAIN_P2_PIN 12
 
-
-///////////////
-// main gpio pins (blueServo)
-///////////////
-
-// it is connected to:
-// GPIO D12 (via series resistor) UART4_TX
-#define MAIN_P2_PORT GPIOD
-#define MAIN_P2_PIN 12
-
-// it is connected to:
-// GPIO D14 (via series resistor) UART9_RX
-#define MAIN_P3_PORT GPIOD
-#define MAIN_P3_PIN 11 // nucleo
-// #define MAIN_P3_PIN 14 // blueServo
+// // it is connected to:
+// // GPIO D14 (via series resistor) UART9_RX
+// #define MAIN_P3_PORT GPIOD
+// #define MAIN_P3_PIN 11 // nucleo
+// // #define MAIN_P3_PIN 14 // blueServo
 
 ///////////////
 // aux spi definitions

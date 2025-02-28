@@ -34,11 +34,22 @@ int main()
         0,
         GPIO_OUTPUT);
 
+
+    gpio_t gpioRS485Enable = DEF_GPIO(
+        RS485_ENABLE_PORT,
+        RS485_ENABLE_PIN,
+        0,
+        GPIO_OUTPUT);
+
     gpio_initialize(&gpioMainP2);
     gpio_initialize(&gpioMainP3);
+    gpio_initialize(&gpioRS485Enable);
 
     gpio_set_speed(&gpioMainP2, GPIO_SPEED_VERYFAST);
     gpio_set_speed(&gpioMainP3, GPIO_SPEED_VERYFAST);
+    gpio_set_speed(&gpioRS485Enable, GPIO_SPEED_VERYFAST);
+
+    gpio_reset(&gpioRS485Enable);
 
     while(1) {
         testgpio(&gpioMainP2);

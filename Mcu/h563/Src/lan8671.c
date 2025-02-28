@@ -4,8 +4,8 @@
 
 void lan8671_shutdown()
 {
-    // gpio_t gpioLANnRST = DEF_GPIO(GPIOG, 0, 0, GPIO_OUTPUT);
-    gpio_t gpioLANnRST = DEF_GPIO(GPIOH, 6, 0, GPIO_OUTPUT);
+    gpio_t gpioLANnRST = DEF_GPIO(GPIOG, 0, 0, GPIO_OUTPUT); // blueESC
+    // gpio_t gpioLANnRST = DEF_GPIO(GPIOH, 6, 0, GPIO_OUTPUT); // blueServo
     gpio_initialize(&gpioLANnRST);
     gpio_reset(&gpioLANnRST);
 }

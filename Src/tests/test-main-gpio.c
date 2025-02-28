@@ -10,9 +10,9 @@
 void testgpio(gpio_t* gpio)
 {
     gpio_reset(gpio);
-    delayMillis(2);
+    // delayMicros(1);
     gpio_set(gpio);
-    delayMillis(2);
+    // delayMicros(1);
     gpio_reset(gpio);
 }
 

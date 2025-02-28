@@ -105,6 +105,7 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-exti-comparator-3phase.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-gpio-high.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-gpio-low.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-gpio-pullup-parallel.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-gpio-toggle.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-input-pwm.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812.c
@@ -117,14 +118,14 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-sk6812-spi7.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-led-maxfrequency.c
-# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-main-gpio.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-main-gpio.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-nothing.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-rng.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-phaseouts.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-sensorless-bldc.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-sensorless-bldc2.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-sensorless-bldc3.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-sensorless-bldc4.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-sensorless-bldc4.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-aux-as5048-read.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma-single.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma.c

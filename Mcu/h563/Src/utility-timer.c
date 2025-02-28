@@ -13,11 +13,14 @@ void utility_timer_initialize()
     // 1MHz clock frequency
     UTILITY_TIMER->PSC = (HCLK_FREQUENCY / 1000000) - 1;
     UTILITY_TIMER->ARR = 0XFFFF;
-    LL_TIM_DisableARRPreload(UTILITY_TIMER);
+    // LL_TIM_DisableARRPreload(UTILITY_TIMER);
+    UTILITY_TIMER->EGR |= TIM_EGR_UG; // update the timer to update preloaded values
 }
 
 void utility_timer_enable()
 {
     LL_TIM_EnableCounter(UTILITY_TIMER);
-    LL_TIM_GenerateEvent_UPDATE(UTILITY_TIMER);
+    // LL_TIM_GenerateEvent_UPDATE(UTILITY_TIMER);
+    UTILITY_TIMER->EGR |= TIM_EGR_UG; // update the timer to update preloaded values
+
 }

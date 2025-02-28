@@ -1899,8 +1899,10 @@
 #define MAIN_P1_PIN 13
 
 // it is connected to:
-// GPIO A8 TIM1_CH1
-// GPIO A12 USB_DP
+// GPIO A8 TIM1_CH1 AF2
+// GPIO A8 UART7_RX AF11
+// GPIO A12 USB_DP AF10
+// GPIO A12 UART4_TX AF6
 // GPIO D8 (via series resistor) USART3_TX
 // GPIO F11 ADC1_INP2
 // #define MAIN_P2_PORT GPIOA
@@ -1913,18 +1915,19 @@
 // #define MAIN_P2_PIN 11
 
 // it is connected to:
-// GPIO A11 USB_DM
+// GPIO A11 USB_DM AF10
+// GPIO A11 UART4_RX AF6
 // GPIO B1 ADC1_INP5
 // GPIO D9 (via series resistor)
 // GPIO E14 TIM1_CH4
-#define MAIN_P3_PORT GPIOA
-#define MAIN_P3_PIN 11
+// #define MAIN_P3_PORT GPIOA
+// #define MAIN_P3_PIN 11
 // #define MAIN_P3_PORT GPIOB
 // #define MAIN_P3_PIN 1
 // #define MAIN_P3_PORT GPIOD
 // #define MAIN_P3_PIN 9
-// #define MAIN_P3_PORT GPIOE
-// #define MAIN_P3_PIN 14
+#define MAIN_P3_PORT GPIOE
+#define MAIN_P3_PIN 14
 
 
 // ///////////////
@@ -2233,18 +2236,34 @@
 // Main USART control
 /////////////////////////////////////////
 
-#define MAIN_USART_RX_PORT GPIOD
-#define MAIN_USART_RX_PIN 9
-#define MAIN_USART_RX_AF 7
-#define MAIN_USART_TX_PORT GPIOD
-#define MAIN_USART_TX_PIN 8
-#define MAIN_USART_TX_AF 7
-#define MAIN_USART_REF USART3
+// USART3 (via series resistors)
+// #define MAIN_USART_RX_PORT GPIOD
+// #define MAIN_USART_RX_PIN 9
+// #define MAIN_USART_RX_AF 7
+// #define MAIN_USART_TX_PORT GPIOD
+// #define MAIN_USART_TX_PIN 8
+// #define MAIN_USART_TX_AF 7
+// #define MAIN_USART_REF USART3
+// #define MAIN_USART_BAUDRATE 1000000
+// #define MAIN_USART_DMA_REQ LL_GPDMA1_REQUEST_USART3_TX
+// #define MAIN_USART_ENABLE_CLOCK() { \
+//     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_USART3); \
+// }
+
+#define MAIN_USART_RX_PORT GPIOA
+#define MAIN_USART_RX_PIN 11
+#define MAIN_USART_RX_AF 6
+#define MAIN_USART_TX_PORT GPIOA
+#define MAIN_USART_TX_PIN 12
+#define MAIN_USART_TX_AF 6
+#define MAIN_USART_REF UART4
 #define MAIN_USART_BAUDRATE 1000000
-#define MAIN_USART_DMA_REQ LL_GPDMA1_REQUEST_USART3_TX
+#define MAIN_USART_DMA_REQ LL_GPDMA1_REQUEST_UART4_TX
 #define MAIN_USART_ENABLE_CLOCK() { \
-    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_USART3); \
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_UART4); \
 }
+
+
 /////////////////////////////////////////
 // Main USART control
 /////////////////////////////////////////

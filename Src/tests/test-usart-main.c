@@ -10,17 +10,9 @@ static uint8_t usart_rx_buffer[256];
 static uint8_t usart_tx_buffer[256];
 static usart_t usart;
 
-void shutdownLAN()
-{
-    gpio_t gpioLANnRST = DEF_GPIO(GPIOG, 0, 0, GPIO_OUTPUT);
-    gpio_initialize(&gpioLANnRST);
-    gpio_reset(&gpioLANnRST);
-}
-
 int main()
 {
     mcu_setup(250);
-    shutdownLAN();
     MAIN_USART_ENABLE_CLOCK();
     gpio_t gpioUsartRx = DEF_GPIO(MAIN_USART_RX_PORT, MAIN_USART_RX_PIN, MAIN_USART_RX_AF, GPIO_AF);
     gpio_t gpioUsartTx = DEF_GPIO(MAIN_USART_TX_PORT, MAIN_USART_TX_PIN, MAIN_USART_TX_AF, GPIO_AF);

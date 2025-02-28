@@ -22,6 +22,7 @@ int main()
     mcu_setup(250);
 
     vreg5V_initialize();
+    vreg5V_enable();
 
     utility_timer_initialize();
     utility_timer_enable();
@@ -53,9 +54,9 @@ int main()
     gpio_set_speed(&gpioRS485Enable, GPIO_SPEED_VERYFAST);
 
     gpio_reset(&gpioRS485Enable);
+    // gpio_set(&gpioRS485Enable);
 
-    delayMillis(10);
-    vreg5V_enable();
+    // delayMillis(10);
     while(1) {
         testgpio(&gpioMainP2);
         testgpio(&gpioMainP3);

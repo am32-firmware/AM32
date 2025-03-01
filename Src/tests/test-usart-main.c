@@ -35,7 +35,7 @@ int main()
     gpio_set_speed(&gpioUsartRx, GPIO_SPEED_VERYFAST);
     gpio_set_speed(&gpioUsartTx, GPIO_SPEED_VERYFAST);
 
-    gpio_configure_pupdr(&gpioUsartRx, GPIO_PULL_UP);
+    // gpio_configure_pupdr(&gpioUsartRx, GPIO_PULL_UP);
     gpio_configure_pupdr(&gpioUsartTx, GPIO_PULL_UP);
 
     usart.ref = MAIN_USART_REF;
@@ -49,7 +49,7 @@ int main()
     usart.rxDmaRequest = MAIN_USART_RX_DMA_REQ;
     usart.txDmaRequest = MAIN_USART_TX_DMA_REQ;
 
-    usart._baudrate = 12000000;
+    usart._baudrate = 6000000;
     usart.swap = 0;
     usart_initialize(&usart);
 

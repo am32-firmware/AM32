@@ -2272,8 +2272,23 @@
 /////////////////////////////////////////
 // Main RS485 control
 /////////////////////////////////////////
-#define RS485_ENABLE_PORT GPIOD
-#define RS485_ENABLE_PIN 12
+
+#define RS485_USART_RX_PORT GPIOD
+#define RS485_USART_RX_PIN 9
+#define RS485_USART_RX_AF 7
+#define RS485_USART_TX_PORT GPIOD
+#define RS485_USART_TX_PIN 8
+#define RS485_USART_TX_AF 7
+#define RS485_USART_REF USART3
+#define RS485_USART_BAUDRATE 1000000
+#define RS485_USART_RX_DMA_REQ LL_GPDMA1_REQUEST_USART3_RX
+#define RS485_USART_TX_DMA_REQ LL_GPDMA1_REQUEST_USART3_TX
+#define RS485_USART_ENABLE_CLOCK() { \
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_USART3); \
+}
+
+#define RS485_USART_ENABLE_PORT GPIOD
+#define RS485_USART_ENABLE_PIN 12
 /////////////////////////////////////////
 // Main RS485 control
 /////////////////////////////////////////

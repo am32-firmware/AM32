@@ -50,7 +50,7 @@ void adc_dma_cb(dmaChannel_t* dma)
 void adc_dma_initialize(ADC_TypeDef* adc)
 {
     dmaChannel_t* dma = &dmaChannels[ADC_DMA_CHANNEL];
-    
+
     NVIC_SetPriority(dma->irqn, 0);
     NVIC_EnableIRQ(dma->irqn);
 
@@ -132,7 +132,7 @@ void adc_initialize(ADC_TypeDef* adc)
   adc_dma_initialize(adc);
   // set adc input clock prescaler to divide by 2 (for a final clock of HCLK/4 = 42.5MHz)
   // ADC12_COMMON->CCR |= 0b0001 << ADC_CCR_PRESC_Pos;
-  
+
   RCC->AHB2ENR |= RCC_AHB2ENR_ADCEN;
   delayMicros(100);
 

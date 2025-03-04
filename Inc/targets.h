@@ -1658,6 +1658,37 @@
 #define MILLIVOLT_PER_AMP 16
 #endif
 
+#ifdef  YYRC_F60MINI_F051  
+#define FILE_NAME "YYRC_F60MINI_F051"
+#define FIRMWARE_NAME "YYRC_F60MINI"
+#define DEAD_TIME 20
+#define HARDWARE_GROUP_F0_F
+#define USE_SERIAL_TELEMETRY
+#endif
+
+#ifdef  YYRC_F65MINI_F051
+#define FILE_NAME "YYRC_F65MINI_F051"
+#define FIRMWARE_NAME "YYRC_F65MINI"
+#define DEAD_TIME 20
+#define HARDWARE_GROUP_F0_F
+#define USE_SERIAL_TELEMETRY
+#endif
+
+#ifdef  YYRC_F60PRO_F051
+#define FILE_NAME "YYRC_F60PRO_F051"
+#define FIRMWARE_NAME "YYRC_F60PRO"
+#define DEAD_TIME 20
+#define HARDWARE_GROUP_F0_F
+#define USE_SERIAL_TELEMETRY
+#endif
+
+#ifdef  YYRC_F65PRO_F051
+#define FILE_NAME "YYRC_F65PRO_F051"
+#define FIRMWARE_NAME "YYRC_F65PRO"
+#define DEAD_TIME 20
+#define HARDWARE_GROUP_F0_F
+#define USE_SERIAL_TELEMETRY
+#endif
 
 /*******************************   G071 Targets
  * *********************************/

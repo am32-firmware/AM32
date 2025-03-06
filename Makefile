@@ -61,6 +61,7 @@ $(info    $(SRC_COMMON))
 
 # SRC_MAIN := $(SRC_DIRS_COMMON)/main.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-adc.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-adc-main-p2.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-as5048-align-all-commutate.c
@@ -131,9 +132,9 @@ $(info    $(SRC_COMMON))
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-spi-dma.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-ten-khz-timer.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-aux.c
-# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-debug.c
+SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-debug.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-main.c
-SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-main-rs485.c
+# SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-usart-main-rs485.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-vreg-5V.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-watchdog-fail.c
 # SRC_MAIN := $(SRC_DIRS_COMMON)/tests/test-watchdog-pass.c

@@ -54,8 +54,10 @@ SRC_H563 := \
 	$(SRC_DIR_H563_SRC)/bridge.c \
 	$(SRC_DIR_H563_SRC)/drv8323-spi.c \
 	$(SRC_DIR_H563_SRC)/usart.c \
+	$(SRC_DIR_H563_SRC)/can.c \
 	$(SRC_DIR_H563_SRC)/gpio.c \
 	$(SRC_DIR_H563_SRC)/power.c \
+	$(SRC_DIR_H563_SRC)/rs485.c \
 	$(SRC_DIR_H563_SRC)/serial_telemetry.c \
 	$(SRC_DIR_H563_SRC)/mcu.c \
 	$(SRC_DIR_H563_SRC)/input-timer.c \

@@ -1,14 +1,17 @@
 #include "stm32h563xx.h"
 
 
+#include "can.h"
 #include "clock.h"
 #include "dma.h"
 #include "flash.h"
 #include "lan8671.h"
 #include "mcu.h"
 #include "power.h"
+#include "rs485.h"
 #include "stm32h5xx_ll_cortex.h"
 #include "targets.h"
+#include "vreg.h"
 
 void mcu_setup(uint16_t coreFrequencyMHz)
 {
@@ -22,7 +25,11 @@ void mcu_setup(uint16_t coreFrequencyMHz)
     // most applications use dma
     dma_initialize();
     // this should go under board setup, not mcu
+    // vreg5V_initialize();
+    // vreg5V_enable();
     lan8671_shutdown();
+    rs485_initialize();
+    can_initialize();
 }
 
 // check the reset status register (RSR)

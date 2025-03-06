@@ -1,3 +1,5 @@
+// this example tests adc reading on pin 2
+// of the main 4-pin jst-gh connector
 #include "stm32h563xx.h"
 #include "stm32h5xx_ll_adc.h"
 #include "targets.h"
@@ -8,15 +10,23 @@
 #include "utility-timer.h"
 #include "vref.h"
 
+// these are declared just for compatibility
+// (compilation) with AM32
+uint16_t ADC_raw_temp;
+uint16_t ADC_raw_volts;
+uint16_t ADC_raw_current;
+int32_t converted_degrees;
+
+
 int main()
 {
-    mcu_setup();
+    mcu_setup(250);
     utility_timer_initialize();
     utility_timer_enable();
 
-    // vref_enable();
+    vref_enable();
 
-    gpio_t gpioMainP1 = DEF_GPIO(MAIN_P1_GPIO_PORT, MAIN_P1_GPIO_PIN, 0, GPIO_OUTPUT);
+    gpio_t gpioMainP1 = DEF_GPIO(MAIN_P1_PORT, MAIN_P1_PIN, 0, GPIO_OUTPUT);
     gpio_initialize(&gpioMainP1);
     gpio_set(&gpioMainP1);
 

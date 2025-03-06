@@ -15,18 +15,6 @@ int main()
 {
     mcu_setup(250);
 
-    vreg5V_initialize();
-    vreg5V_enable();
-
-    gpio_t gpioRS485Enable = DEF_GPIO(
-        RS485_ENABLE_PORT,
-        RS485_ENABLE_PIN,
-        0,
-        GPIO_OUTPUT);
-    gpio_initialize(&gpioRS485Enable);
-    gpio_set_speed(&gpioRS485Enable, GPIO_SPEED_VERYFAST);
-    gpio_reset(&gpioRS485Enable);
-
     MAIN_USART_ENABLE_CLOCK();
     gpio_t gpioUsartRx = DEF_GPIO(MAIN_USART_RX_PORT, MAIN_USART_RX_PIN, MAIN_USART_RX_AF, GPIO_AF);
     gpio_t gpioUsartTx = DEF_GPIO(MAIN_USART_TX_PORT, MAIN_USART_TX_PIN, MAIN_USART_TX_AF, GPIO_AF);
@@ -49,7 +37,7 @@ int main()
     usart.rxDmaRequest = MAIN_USART_RX_DMA_REQ;
     usart.txDmaRequest = MAIN_USART_TX_DMA_REQ;
 
-    usart._baudrate = 6000000;
+    usart._baudrate = 3000000;
     usart.swap = 0;
     usart_initialize(&usart);
 

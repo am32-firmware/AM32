@@ -49,7 +49,8 @@ int main()
     usart.txDma = &dmaChannels[DEBUG_USART_TX_DMA_CHANNEL];
     usart.txDmaRequest = TEST_USART_DMA_REQ;
 
-    usart._baudrate = TEST_USART_BAUDRATE;
+    // usart._baudrate = TEST_USART_BAUDRATE;
+    usart._baudrate = 3000000;
     usart.swap = TEST_USART_SWAP_IO;
     usart_initialize(&usart);
 

@@ -25,8 +25,8 @@ void mcu_setup(uint16_t coreFrequencyMHz)
     // most applications use dma
     dma_initialize();
     // this should go under board setup, not mcu
-    // vreg5V_initialize();
-    // vreg5V_enable();
+    vreg5V_initialize();
+    vreg5V_enable();
     lan8671_shutdown();
     rs485_initialize();
     can_initialize();

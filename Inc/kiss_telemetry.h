@@ -20,6 +20,6 @@ kiss_telem_pkt_t; // sizeof(kiss_telem_pkt_t) = 10
 
 extern kiss_telem_pkt_t telem_pkt __attribute__((aligned(4)));
 
-void makeTelemPackage(uint8_t temp, uint16_t voltage, uint16_t current, uint16_t consumption, uint16_t e_rpm, uint8_t id);
+void makeTelemPackage(uint8_t temp, uint16_t voltage, uint16_t current, uint16_t consumption, uint16_t e_rpm);
 
 #endif

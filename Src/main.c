@@ -1914,7 +1914,7 @@ if(zero_crosses < 5){
         if (send_telemetry) {
 #ifdef USE_SERIAL_TELEMETRY
             makeTelemPackage(degrees_celsius, battery_voltage, actual_current,
-                (uint16_t)consumed_current, e_rpm, eepromBuffer.telemetry_on_interval);
+                (uint16_t)consumed_current, e_rpm);
             send_telem_DMA();
             send_telemetry = 0;
 #endif

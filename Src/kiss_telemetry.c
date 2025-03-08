@@ -4,7 +4,7 @@ extern uint8_t get_crc8(uint8_t* Buf, uint8_t BufLen);
 
 kiss_telem_pkt_t telem_pkt __attribute__((aligned(4)));
 
-void makeTelemPackage(uint8_t temp, uint16_t voltage, uint16_t current, uint16_t consumption, uint16_t e_rpm, uint8_t id)
+void makeTelemPackage(uint8_t temp, uint16_t voltage, uint16_t current, uint16_t consumption, uint16_t e_rpm)
 {
     telem_pkt.temperature = temp; // temperature in Celcius
 
@@ -12,21 +12,9 @@ void makeTelemPackage(uint8_t temp, uint16_t voltage, uint16_t current, uint16_t
     telem_pkt.voltage_h = (voltage >> 8) & 0xFF;
     telem_pkt.voltage_l = voltage & 0xFF;
 
-    if (id >= 2) {
-        // if this is called with an unique ID, then the ID will occupy the highest 4 bits of the current value, so limit the maximum current being reported
-        current = current > 4095 ? 4095 : current;
-        // so if the identifier is being used, the highest current that can be reported is 409.5A
-    }
-
     // current in centiamps
     telem_pkt.current_h = (current >> 8) & 0xFF;
     telem_pkt.current_l = current & 0xFF;
-
-    if (id >= 2) {
-        // if this is called with an unique ID, then embed this in the highest 4 bits of the current value
-        telem_pkt.current_h &= 0x0F;
-        telem_pkt.current_h |= id << 4;
-    }
 
     // accumulated current consumption in mAH
     telem_pkt.consumption_h = (consumption >> 8) & 0xFF;

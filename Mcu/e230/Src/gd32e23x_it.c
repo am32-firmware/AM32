@@ -73,8 +73,8 @@ void SysTick_Handler(void) { delay_decrement(); }
 void DMA_Channel3_4_IRQHandler(void)
 {
     if (dshot_telemetry && armed) {
-        DMA_INTC |= DMA_FLAG_ADD(DMA_INT_FLAG_G, DMA_CH3);
-        DMA_CHCTL(DMA_CH3) &= ~DMA_CHXCTL_CHEN;
+        DMA_INTC |= DMA_FLAG_ADD(DMA_INT_FLAG_G, INPUT_DMA_CHANNEL);
+        DMA_CHCTL(INPUT_DMA_CHANNEL) &= ~DMA_CHXCTL_CHEN;
         if (out_put) {
             receiveDshotDma();
             compute_dshot_flag = 2;
@@ -86,19 +86,19 @@ void DMA_Channel3_4_IRQHandler(void)
         return;
     }
 
-    if (dma_interrupt_flag_get(DMA_CH3, DMA_INT_FLAG_HTF)) {
+    if (dma_interrupt_flag_get(INPUT_DMA_CHANNEL, DMA_INT_FLAG_HTF)) {
         if (servoPwm) {
             TIMER_CHCTL2(TIMER2) |= (uint32_t)(TIMER_IC_POLARITY_FALLING);
-            dma_interrupt_flag_clear(DMA_CH3, DMA_INT_FLAG_HTF);
+            dma_interrupt_flag_clear(INPUT_DMA_CHANNEL, DMA_INT_FLAG_HTF);
         }
     }
-    if (dma_interrupt_flag_get(DMA_CH3, DMA_INT_FLAG_FTF) == 1) {
-        dma_interrupt_flag_clear(DMA_CH3, DMA_INT_FLAG_G);
-        dma_channel_disable(DMA_CH3);
+    if (dma_interrupt_flag_get(INPUT_DMA_CHANNEL, DMA_INT_FLAG_FTF) == 1) {
+        dma_interrupt_flag_clear(INPUT_DMA_CHANNEL, DMA_INT_FLAG_G);
+        dma_channel_disable(INPUT_DMA_CHANNEL);
         transfercomplete();
         EXTI_SWIEV |= (uint32_t)EXTI_15;
-    } else if (dma_interrupt_flag_get(DMA_CH3, DMA_INT_FLAG_ERR) == 1) {
-        dma_interrupt_flag_clear(DMA_CH3, DMA_INT_FLAG_G);
+    } else if (dma_interrupt_flag_get(INPUT_DMA_CHANNEL, DMA_INT_FLAG_ERR) == 1) {
+        dma_interrupt_flag_clear(INPUT_DMA_CHANNEL, DMA_INT_FLAG_G);
     }
 }
 

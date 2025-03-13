@@ -100,6 +100,7 @@
 #define FIRMWARE_NAME "VimdroneL431"
 #define FILE_NAME "VIMDRONES_L431_CAN"
 #define DRONECAN_SUPPORT 1
+#define DRONECAN_NODE_NAME "com.vimdrones.esc_dev"
 #define DEAD_TIME 45
 #define HARDWARE_GROUP_L4_B
 #define TARGET_VOLTAGE_DIVIDER 94
@@ -122,6 +123,7 @@
 #define FIRMWARE_NAME "VM_NANO_CAN"
 #define FILE_NAME "VIMDRONES_NANO_L431_CAN"
 #define DRONECAN_SUPPORT 1
+#define DRONECAN_NODE_NAME "com.vimdrones.esc_nano"
 #define USE_HSE
 #undef HSE_VALUE
 #define HSE_VALUE 24000000

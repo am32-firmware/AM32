@@ -1444,21 +1444,71 @@
 
 //
 
-#ifdef NUCLEO
+#ifdef NUCLEO_H563
 #include "stm32h5xx_ll_bus.h"
-#define FILE_NAME "NUCLEO"
-#define FIRMWARE_NAME "NUCLEO"
+#define FILE_NAME "NUCLEO_H563"
+#define FIRMWARE_NAME "NUCLEO H563"
 
 #define DEAD_TIME 60
 #define HARDWARE_GROUP_H563
 #define TARGET_STALL_PROTECTION_INTERVAL 8000
 #define MILLIVOLT_PER_AMP 28
 #define USE_SERIAL_TELEMETRY
-#define CURRENT_SENSE_ADC_PIN LL_GPIO_PIN_5
-#define VOLTAGE_SENSE_ADC_PIN LL_GPIO_PIN_7
 
-#define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_5
-#define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_7
+#define AM32_HSE_VALUE (24000000)
+
+
+#define CURRENT_SENSE_ADC_PORT PHASEB_CURRENT_PORT
+#define CURRENT_SENSE_ADC_PIN PHASEB_CURRENT_PIN
+// there is only support for one current measurment,
+// so use phase B for now
+#define CURRENT_ADC_CHANNEL 0
+
+#define VOLTAGE_SENSE_ADC_PORT GPIOB
+#define VOLTAGE_SENSE_ADC_PIN LL_GPIO_PIN_0
+// ADC12_INP9
+#define VOLTAGE_ADC ADC1
+// #define VOLTAGE_ADC ADC2
+// #define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_9
+#define VOLTAGE_ADC_CHANNEL 9
+
+// ADC1 INP16
+#define DIE_TEMPERATURE_ADC_CHANNEL 16
+
+#define ADC_DMA_CHANNEL 15
+
+
+///////////////
+// aux spi definitions
+///////////////
+
+#define AUX_SPI_SCK_PORT GPIOE
+#define AUX_SPI_SCK_PIN 2
+#define AUX_SPI_SCK_AF 5
+
+#define AUX_SPI_NSS_PORT GPIOE
+#define AUX_SPI_NSS_PIN 4
+#define AUX_SPI_NSS_AF 5
+
+#define AUX_SPI_MISO_PORT GPIOE
+#define AUX_SPI_MISO_PIN 5
+#define AUX_SPI_MISO_AF 5
+
+#define AUX_SPI_MOSI_PORT GPIOE
+#define AUX_SPI_MOSI_PIN 6
+#define AUX_SPI_MOSI_AF 5
+
+#define AUX_SPI_PERIPH SPI4
+#define AUX_AM32_SPI_PERIPH SPI_4
+#define AUX_SPI_ENABLE_CLOCK() { \
+    RCC->APB2ENR |= RCC_APB2ENR_SPI4EN; \
+}
+
+#define AUX_SPI_RX_DMA_REQ LL_GPDMA1_REQUEST_SPI4_RX
+#define AUX_SPI_TX_DMA_REQ LL_GPDMA1_REQUEST_SPI4_TX
+
+#define AUX_SPI_RX_DMA_CHANNEL 14
+#define AUX_SPI_TX_DMA_CHANNEL 8
 
 // MB1404 nucleo red user LED3
 #define LED_R_GPIO_PORT GPIOG
@@ -1503,14 +1553,51 @@
 // 5V voltage regulator control
 /////////////////////////////////////////
 
-#define DSHOT_PRIORITY_THRESHOLD 70
+/////////////////////////////////////////
+// Debug USART control
+/////////////////////////////////////////
+#define DEBUG_USART_RX_PORT GPIOC
+#define DEBUG_USART_RX_PIN 11
+#define DEBUG_USART_RX_AF 8
 
-// #define HCLK_FREQUENCY 25000000
+#define DEBUG_USART_TX_PORT GPIOC
+#define DEBUG_USART_TX_PIN 10
+#define DEBUG_USART_TX_AF 8
 
-#define AM32_HSE_VALUE (25000000)
+#define DEBUG_USART_REF UART4
 
-#define INPUT_DMA_CHANNEL LL_DMA_CHANNEL_4
-#define IC_DMA_IRQ_NAME GPDMA1_Channel4_IRQn
+#define DEBUG_USART_BAUDRATE 115200
+#define DEBUG_USART_RX_DMA_REQ LL_GPDMA1_REQUEST_UART4_RX
+#define DEBUG_USART_TX_DMA_REQ LL_GPDMA1_REQUEST_UART4_TX
+
+#define DEBUG_USART_RX_DMA_CHANNEL 6
+#define DEBUG_USART_TX_DMA_CHANNEL 1
+
+#define DEBUG_USART_SWAP_IO 0
+
+#define DEBUG_USART_ENABLE_CLOCK() { \
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_UART4); \
+}
+/////////////////////////////////////////
+// Debug USART control
+/////////////////////////////////////////
+
+
+/////////////////////////////////////////
+// Debug GPIO (flag) control
+/////////////////////////////////////////
+#define DEBUG_GPIO1_PORT GPIOA
+#define DEBUG_GPIO1_PIN 1
+
+#define DEBUG_GPIO2_PORT GPIOA
+#define DEBUG_GPIO2_PIN 1
+
+#define DEBUG_GPIO3_PORT GPIOA
+#define DEBUG_GPIO3_PIN 1
+
+/////////////////////////////////////////
+// Debug GPIO (flag) control
+/////////////////////////////////////////
 
 /////////////////////////////////////////
 // Gate driver control
@@ -1653,10 +1740,6 @@
 
 #define DSHOT_PRIORITY_THRESHOLD 70
 
-// #define HCLK_FREQUENCY 25000000
-
-#define AM32_HSE_VALUE (25000000)
-
 #define INPUT_DMA_CHANNEL LL_DMA_CHANNEL_4
 #define IC_DMA_IRQ_NAME GPDMA1_Channel4_IRQn
 
@@ -1691,7 +1774,43 @@
 #define EEPROM_START_ADD (uint32_t)(EEPROM_BASE + EEPROM_PAGE*EEPROM_PAGE_SIZE)
 
 
+#define INTERVAL_TIMER TIM2
+#define INTERVAL_TIMER_ENABLE_CLOCK() { \
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM2); \
+}
 
+
+#define COM_TIMER TIM2
+#define COM_TIMER_IRQn TIM2_IRQn
+#define COM_TIMER_ENABLE_CLOCK() { \
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM2); \
+}
+
+// TIM5 is a 32 bit timer
+#define COMP_TIMER TIM5
+#define COMP_TIMER_IRQn TIM5_IRQn
+#define COMP_TIMER_ENABLE_CLOCK() { \
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM5); \
+}
+
+#define BLANKING_TIMER TIM3
+#define BLANKING_TIMER_IRQn TIM3_IRQn
+#define BLANKING_TIMER_ENABLE_CLOCK() { \
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM3); \
+}
+
+#define TEN_KHZ_TIMER TIM6
+#define TEN_KHZ_TIMER_IRQn TIM6_IRQn
+#define TEN_KHZ_TIMER_ENABLE_CLOCK() { \
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM6); \
+}
+
+#define UTILITY_TIMER TIM17
+#define UTILITY_TIMER_ENABLE_CLOCK() { \
+    LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM17); \
+}
+// utility timer frequency is 1MHz
+#define UTILITY_TIMER_PSC (CPU_FREQUENCY_MHZ/1 - 1)
 
 ////////////////////////////////
 // PWM/DSHOT INPUT PIN AND TIMER
@@ -1729,31 +1848,6 @@
 ////////////////////////////////
 // PWM/DSHOT INPUT PIN AND TIMER
 ////////////////////////////////
-
-
-#define INTERVAL_TIMER TIM2
-#define INTERVAL_TIMER_ENABLE_CLOCK() { \
-    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM2); \
-}
-#define TEN_KHZ_TIMER TIM6
-#define TEN_KHZ_TIMER_IRQn TIM6_IRQn
-#define TEN_KHZ_TIMER_ENABLE_CLOCK() { \
-    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM6); \
-}
-
-#define UTILITY_TIMER TIM17
-#define UTILITY_TIMER_ENABLE_CLOCK() { \
-    LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM17); \
-}
-// utility timer frequency is 1MHz
-#define UTILITY_TIMER_PSC (CPU_FREQUENCY_MHZ/1 - 1)
-#define COM_TIMER_ENABLE_CLOCK() { \
-    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM14); \
-}
-#define COM_TIMER TIM14
-#define COM_TIMER_IRQ TIM14_IRQn
-
-
 
 #define TIM1_AUTORELOAD 1999
 #define APPLICATION_ADDRESS 0x08001000

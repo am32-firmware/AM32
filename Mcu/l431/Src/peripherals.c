@@ -68,18 +68,35 @@ void SystemClock_Config(void)
   LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_3, 20, LL_RCC_PLLR_DIV_2);
 #elif HSE_VALUE == 16000000
   LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_2, 20, LL_RCC_PLLR_DIV_2);
+#elif HSE_VALUE == 8000000
+  LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_1, 20, LL_RCC_PLLR_DIV_2);
 #else
 #error "Unsupported HSE_VALUE"
 #endif
 
-#else
+#elif defined(USE_LSE)
+  LL_RCC_LSE_Enable();
+  LL_RCC_LSCO_SetSource(LL_RCC_LSCO_CLKSOURCE_LSE);
+  LL_RCC_LSCO_Enable();
+  while(LL_RCC_LSE_IsReady() != 1) ;
+
   LL_RCC_MSI_Enable();
 
-   /* Wait till MSI is ready */
-  while(LL_RCC_MSI_IsReady() != 1)
-  {
+  while(LL_RCC_MSI_IsReady() != 1) ;
+  LL_RCC_MSI_EnableRangeSelection();
+  LL_RCC_MSI_SetRange(LL_RCC_MSIRANGE_6);
+  LL_RCC_MSI_SetCalibTrimming(0);
+  LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_MSI, LL_RCC_PLLM_DIV_1, 40, LL_RCC_PLLR_DIV_2);
+#elif defined(USE_HSI)
+  LL_RCC_HSI_Enable();
 
-  }
+  /* Wait till HSI is ready */
+  while (LL_RCC_HSI_IsReady() != 1) ;
+
+  LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSI, LL_RCC_PLLM_DIV_2, 20, LL_RCC_PLLR_DIV_2);
+#else // MSI
+  LL_RCC_MSI_Enable();
+  while(LL_RCC_MSI_IsReady() != 1) ;
   LL_RCC_MSI_EnableRangeSelection();
   LL_RCC_MSI_SetRange(LL_RCC_MSIRANGE_6);
   LL_RCC_MSI_SetCalibTrimming(0);

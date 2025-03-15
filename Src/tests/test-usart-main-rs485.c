@@ -6,6 +6,7 @@
 #include "dma.h"
 #include "gpio.h"
 #include "mcu.h"
+#include "rs485.h"
 #include "usart.h"
 #include "targets.h"
 
@@ -29,7 +30,7 @@ int main()
     usart.txDma = &dmaChannels[0];
     usart.txDmaRequest = RS485_USART_TX_DMA_REQ;
 
-    usart._baudrate = 6000000;
+    usart._baudrate = 3000000;
     usart.swap = 0;
     usart_initialize(&usart);
 
@@ -38,11 +39,8 @@ int main()
     // gpio_initialize(&gpioUsartRx);
     gpio_initialize(&gpioUsartTx);
 
-    gpio_t gpioRS485Enable = DEF_GPIO(RS485_ENABLE_PORT, RS485_ENABLE_PIN, 0, GPIO_INPUT);
-    gpio_initialize(&gpioRS485Enable);
-    // gpio_configure_pupdr(&gpioRS485Enable, GPIO_PULL_DOWN);
-    // gpio_reset(&gpioRS485Enable);
-    gpio_set(&gpioRS485Enable);
+    rs485_initialize();
+    rs485_enable();
 
     while(1) {
         usart_write_string(&usart, "hello world\n");

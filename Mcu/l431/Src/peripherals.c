@@ -62,15 +62,26 @@ void SystemClock_Config(void)
   }
 
 #ifdef USE_HSE
-  LL_RCC_HSE_EnableBypass();
-  LL_RCC_HSE_Enable();
-#if HSE_VALUE == 24000000
-  LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_3, 20, LL_RCC_PLLR_DIV_2);
-#elif HSE_VALUE == 16000000
-  LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_2, 20, LL_RCC_PLLR_DIV_2);
-#else
-#error "Unsupported HSE_VALUE"
-#endif
+  // Configure HSE mode based on USE_HSE_CRYSTAL
+  #ifdef USE_HSE_CRYSTAL
+      LL_RCC_HSE_DisableBypass();  // Use crystal mode
+  #else
+      LL_RCC_HSE_EnableBypass();   // Use external oscillator
+  #endif
+
+  LL_RCC_HSE_Enable();  // Enable HSE
+
+  // Wait for HSE to be ready
+  while (LL_RCC_HSE_IsReady() != 1U) {}
+
+  // Configure PLL based on HSE frequency
+  #if HSE_VALUE == 24000000
+    LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_3, 20, LL_RCC_PLLR_DIV_2);
+  #elif HSE_VALUE == 16000000
+    LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_2, 20, LL_RCC_PLLR_DIV_2);
+  #else
+    #error "Unsupported HSE_VALUE"
+  #endif
 
 #else
   LL_RCC_MSI_Enable();

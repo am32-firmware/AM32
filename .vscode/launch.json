@@ -8,7 +8,25 @@
       {
         "name": "H5",
         "cwd": "${workspaceRoot}",
-        "executable": "${workspaceFolder}/obj/debug.elf",
+        "executable": "${workspaceFolder}/obj/AM32_BLUEESC_H563_2.16.elf",
+        "request": "launch",
+        "type": "cortex-debug",
+        "liveWatch": {
+          "enabled": true,
+          "samplesPerSecond": 10,
+        },
+        "servertype": "openocd",
+        "configFiles": [
+            "board/st_nucleo_h5.cfg"
+            // "${workspaceFolder}/obj/openocd.cfg"
+
+        ],
+        "svdFile": "svd/stm32h5/STM32H563.svd"
+      },
+      {
+        "name": "H5-nucleo",
+        "cwd": "${workspaceRoot}",
+        "executable": "${workspaceFolder}/obj/AM32_NUCLEO_H563_2.16.elf",
         "request": "launch",
         "type": "cortex-debug",
         "liveWatch": {

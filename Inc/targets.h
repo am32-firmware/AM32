@@ -1553,6 +1553,39 @@
 // 5V voltage regulator control
 /////////////////////////////////////////
 
+///////////////
+// led
+///////////////
+
+#define LED_SPI_MOSI_PORT GPIOC
+#define LED_SPI_MOSI_PIN 12
+#define LED_SPI_MOSI_AF 6
+
+////////////////
+// THIS IS A WORKAROUND
+// GPIO D3 IS NOT CONNECTED ON BLUEESC
+////////////////
+// SPI TXC is never set if the clock pin
+// is not configured in alternate function mode!
+// see also https://community.st.com/t5/stm32-mcus-products/stm32h7a3-spi-not-working-if-sck-disabled/td-p/201817
+#define LED_SPI_SCK_PORT GPIOC
+#define LED_SPI_SCK_PIN 10
+#define LED_SPI_SCK_AF 6
+
+#define LED_SPI_PERIPH SPI3
+#define LED_AM32_SPI_PERIPH SPI_3
+#define LED_SPI_ENABLE_CLOCK() { \
+    RCC->APB1LENR |= RCC_APB1LENR_SPI3EN; \
+}
+
+// linear
+#define LED_SPI_TX_DMA_CHANNEL 3
+#define LED_SPI_TX_DMA_REQ LL_GPDMA1_REQUEST_SPI2_TX
+
+///////////////
+// led
+///////////////
+
 /////////////////////////////////////////
 // Debug USART control
 /////////////////////////////////////////
@@ -1599,6 +1632,32 @@
 // Debug GPIO (flag) control
 /////////////////////////////////////////
 
+
+/////////////////////////////////////////
+// Main RS485 control
+/////////////////////////////////////////
+
+#define RS485_USART_RX_PORT GPIOA
+#define RS485_USART_RX_PIN 0
+#define RS485_USART_RX_AF 7
+#define RS485_USART_TX_PORT GPIOA
+#define RS485_USART_TX_PIN 0
+#define RS485_USART_TX_AF 7
+#define RS485_USART_REF USART3
+#define RS485_USART_BAUDRATE 1000000
+#define RS485_USART_RX_DMA_REQ LL_GPDMA1_REQUEST_USART3_RX
+#define RS485_USART_TX_DMA_REQ LL_GPDMA1_REQUEST_USART3_TX
+#define RS485_USART_ENABLE_CLOCK() { \
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_USART3); \
+}
+
+#define RS485_USART_ENABLE_PORT GPIOA
+#define RS485_USART_ENABLE_PIN 0
+
+/////////////////////////////////////////
+// Main RS485 control
+/////////////////////////////////////////
+
 /////////////////////////////////////////
 // Gate driver control
 /////////////////////////////////////////
@@ -1636,6 +1695,8 @@
 }
 
 #define BRIDGE_TIMER TIM1
+
+#define BRIDGE_TIMER_CC4_IRQn TIM1_CC_IRQn
 
 #define BRIDGE_TIMER_ENABLE_CLOCK() { \
     RCC->APB2ENR |= RCC_APB2ENR_TIM1EN; \
@@ -1724,9 +1785,44 @@
 #define GATE_DRIVER_SPI_MOSI_AF 5
 
 #define GATE_DRIVER_SPI_PERIPH SPI5
+#define GATE_DRIVER_AM32_SPI_PERIPH SPI_5
+#define GATE_DRIVER_SPI_ENABLE_CLOCK() { \
+    RCC->APB3ENR |= RCC_APB3ENR_SPI5EN; \
+}
+
+#define GATE_DRIVER_RX_DMA_CHANNEL 7
+#define GATE_DRIVER_TX_DMA_CHANNEL 0
+
+
+#define GATE_DRIVER_SPI_RX_DMA_REQ LL_GPDMA1_REQUEST_SPI5_RX
+#define GATE_DRIVER_SPI_TX_DMA_REQ LL_GPDMA1_REQUEST_SPI5_TX
 
 /////////////////////////////////////////
 // Gate driver control
+/////////////////////////////////////////
+
+/////////////////////////////////////////
+// CAN transceiver (MCP2542) control
+/////////////////////////////////////////
+
+#define CAN_RX_GPIO_PORT GPIOA
+#define CAN_RX_GPIO_PIN 0
+#define CAN_RX_GPIO_AF 9
+
+#define CAN_TX_GPIO_PORT GPIOA
+#define CAN_TX_GPIO_PIN 0
+#define CAN_TX_GPIO_AF 9
+
+// MCP2542 CAN transceiver standby mode pin (STBY)
+#define CAN_STBY_GPIO_PORT GPIOA
+#define CAN_STBY_GPIO_PIN 0
+
+#define FDCAN_ENABLE_CLOCK() { \
+    RCC->APB1HENR |= RCC_APB1HENR_FDCANEN; \
+}
+
+/////////////////////////////////////////
+// CAN transceiver (MCP2542) control
 /////////////////////////////////////////
 
 // nucleo
@@ -2430,6 +2526,9 @@
 #define GATE_DRIVER_SPI_RX_DMA_REQ LL_GPDMA1_REQUEST_SPI5_RX
 #define GATE_DRIVER_SPI_TX_DMA_REQ LL_GPDMA1_REQUEST_SPI5_TX
 
+/////////////////////////////////////////
+// Gate driver control
+/////////////////////////////////////////
 
 /////////////////////////////////////////
 // Bridge on TIM8 (blueESC)

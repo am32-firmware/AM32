@@ -195,6 +195,9 @@ void drv8323_configure_spi(drv8323_t* drv)
     // others: reserved, the kernel clock is disabled
     spi_configure_rcc_clock_selection(spiDrv8323, 0b101);
 
+    // 25MHz (HSE) / 2 = 12.5MHz spi clock frequency
+    spiDrv8323->CFG1_MBR = SPI_MBR_DIV_2; // prescaler = 2
+
     // 25MHz (HSE) / 4 = 6.25MHz spi clock frequency
     // spiDrv8323->CFG1_MBR = SPI_MBR_DIV_4; // prescaler = 4
 
@@ -207,7 +210,7 @@ void drv8323_configure_spi(drv8323_t* drv)
 
     // 25MHz (HSE) / 64 = 391kHz spi clock frequency
     // 250MHz (core) / 64 = 3.91MHz spi clock frequency
-    spiDrv8323->CFG1_MBR = SPI_MBR_DIV_64; // prescaler = 64
+    // spiDrv8323->CFG1_MBR = SPI_MBR_DIV_64; // prescaler = 64
 
     // 25MHz (HSE) / 256 = ~1kHz spi clock frequency
     // 250MHz (core) / 256 = ~1MHz spi clock frequency

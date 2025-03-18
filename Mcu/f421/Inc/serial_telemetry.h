@@ -11,7 +11,6 @@
 #define SERIAL_TELEMETRY_H_
 
 void telem_UART_Init(void);
-void makeInfoPacket(void);
 void send_telem_DMA(uint8_t bytes);
 
 #endif /* SERIAL_TELEMETRY_H_ */

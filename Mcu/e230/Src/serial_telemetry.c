@@ -28,7 +28,7 @@ void telem_UART_Init(void)
     dma_struct_para_init(&dma_init_struct);
 
     dma_init_struct.direction = DMA_MEMORY_TO_PERIPHERAL;
-    dma_init_struct.memory_addr = (uint32_t)aTxBuffer;
+    dma_init_struct.memory_addr = (uint32_t)&telem_pkt;
     dma_init_struct.memory_inc = DMA_MEMORY_INCREASE_ENABLE;
     dma_init_struct.memory_width = DMA_MEMORY_WIDTH_8BIT;
     dma_init_struct.number = sizeof(aTxBuffer);

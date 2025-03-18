@@ -64,7 +64,7 @@ void telem_UART_Init(void)
 
     // set dma address
     LL_DMA_ConfigAddresses(
-        DMA1, LL_DMA_CHANNEL_4, (uint32_t)aTxBuffer,
+        DMA1, LL_DMA_CHANNEL_4, (uint32_t)&telem_pkt,
         LL_USART_DMA_GetRegAddr(USART2, LL_USART_DMA_REG_DATA_TRANSMIT),
         LL_DMA_GetDataTransferDirection(DMA1, LL_DMA_CHANNEL_4));
     LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_4, sizeof(aTxBuffer));
@@ -135,7 +135,7 @@ void telem_UART_Init(void)
 
     // set dma address
     LL_DMA_ConfigAddresses(
-        DMA1, LL_DMA_CHANNEL_2, (uint32_t)aTxBuffer,
+        DMA1, LL_DMA_CHANNEL_2, (uint32_t)&telem_pkt,
         LL_USART_DMA_GetRegAddr(USART1, LL_USART_DMA_REG_DATA_TRANSMIT),
         LL_DMA_GetDataTransferDirection(DMA1, LL_DMA_CHANNEL_2));
     LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_2, sizeof(aTxBuffer));

@@ -7,7 +7,7 @@ uint8_t aTxBuffer[49] __attribute__((aligned(4)));
 
 void makeTelemPackage(uint8_t temp, uint16_t voltage, uint16_t current, uint16_t consumption, uint16_t e_rpm)
 {
-    kiss_telem_pkt_t* telem_pkt;
+    kiss_telem_pkt_t* telem_pkt = (kiss_telem_pkt_t*)aTxBuffer;
 
     telem_pkt->temperature = temp; // temperature in Celcius
 

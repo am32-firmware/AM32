@@ -10,11 +10,11 @@
 * microcontroller manufactured by Nanjing Qinheng Microelectronics.
 *******************************************************************************/
 #include "ch32v20x_it.h"
-
 #include "ADC.h"
 #include "main.h"
 #include "targets.h"
 #include "common.h"
+#include "comparator.h"
 extern void transfercomplete();
 extern void PeriodElapsedCallback();
 extern void interruptRoutine();
@@ -104,11 +104,11 @@ void DMA1_Channel1_IRQHandler(void)
 //for ic timer
 void DMA1_Channel5_IRQHandler(void)
 {
-    if(DMA1->INTFR & DMA1_IT_HT5) //´«Êä¹ý°ë,ÇÐ»»±ßÑØ
+    if(DMA1->INTFR & DMA1_IT_HT5) 
     {
         if(servoPwm)
         {
-            IC_TIMER_REGISTER->CCER = 0x03;  //ÇÐ»»ÎªÏÂ½µÑØ
+            IC_TIMER_REGISTER->CCER = 0x03;  
         }
         DMA1->INTFCR = DMA1_IT_HT5;
     }
@@ -166,14 +166,26 @@ void EXTI2_IRQHandler(void)
 #else
 void EXTI3_IRQHandler(void)
 {
-    EXTI->INTFR = EXTI_Line3;
-    interruptRoutine( );
+    if((INTERVAL_TIMER->CNT) > ((average_interval>>1))){
+        EXTI->INTFR = EXTI_Line3;
+        interruptRoutine();
+     }else{ 
+       if (getCompOutputLevel() == rising){
+        EXTI->INTFR = EXTI_Line3;
+     }
+   }
 }
 
 void EXTI4_IRQHandler(void)
 {
-    EXTI->INTFR = EXTI_Line4;
-    interruptRoutine( );
+    if((INTERVAL_TIMER->CNT) > ((average_interval>>1))){
+        EXTI->INTFR = EXTI_Line4;
+        interruptRoutine();
+     }else{ 
+       if (getCompOutputLevel() == rising){
+           EXTI->INTFR = EXTI_Line4;
+     }
+   }
 }
 #endif
 

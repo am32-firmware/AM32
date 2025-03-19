@@ -4319,18 +4319,17 @@
 #define WCH
 #define NEED_INPUT_READY
 #define ERASED_FLASH_BYTE    0x39
-#define CPU_FREQUENCY_MHZ    48                      //PWM freq is 48MHz, CPU freq is 96MHz
+#define CPU_FREQUENCY_MHZ    48                     //PWM freq is 48MHz, CPU freq is 96MHz
 #define EEPROM_START_ADD     (uint32_t)0x0800f800
 #define INTERVAL_TIMER       TIM4
 #define TEN_KHZ_TIMER        SysTick
 #define UTILITY_TIMER        TIM4
-#define COM_TIMER            TIM3                      //for
-#define TIM1_AUTORELOAD      2000
+#define COM_TIMER            TIM3                    
+#define TIM1_AUTORELOAD      1999
 #define APPLICATION_ADDRESS  0x08001000
 
-#define TARGET_MIN_BEMF_COUNTS  6
+#define TARGET_MIN_BEMF_COUNTS  3
 #define USE_ADC
-// #define DSHOT_PRE            95
 #define DSHOT_PRIORITY_THRESHOLD 50
 #define COM_TIMER_IRQ      TIM3_IRQn
 

@@ -100,6 +100,7 @@
 #define FIRMWARE_NAME "VimdroneL431"
 #define FILE_NAME "VIMDRONES_L431_CAN"
 #define DRONECAN_SUPPORT 1
+#define DRONECAN_NODE_NAME "com.vimdrones.esc_dev"
 #define DEAD_TIME 45
 #define HARDWARE_GROUP_L4_B
 #define TARGET_VOLTAGE_DIVIDER 94
@@ -122,6 +123,7 @@
 #define FIRMWARE_NAME "VM_NANO_CAN"
 #define FILE_NAME "VIMDRONES_NANO_L431_CAN"
 #define DRONECAN_SUPPORT 1
+#define DRONECAN_NODE_NAME "com.vimdrones.esc_nano"
 #define USE_HSE
 #undef HSE_VALUE
 #define HSE_VALUE 24000000
@@ -141,11 +143,29 @@
 #define HSE_VALUE 16000000
 #define DEAD_TIME 120
 #define HARDWARE_GROUP_L4_C
+#define HARDWARE_GROUP_L4_045
 #define TARGET_VOLTAGE_DIVIDER 210
 #define MILLIVOLT_PER_AMP 10
 #define RAMP_SPEED_LOW_RPM 1
 #define RAMP_SPEED_HIGH_RPM 1
 #define USE_SERIAL_TELEMETRY
+#endif
+
+#ifdef TBS_12S_L431_CAN
+#define FIRMWARE_NAME "TBS 12S CAN"
+#define FILE_NAME "TBS_12S_L431_CAN"
+#define DEAD_TIME 120
+#define HARDWARE_GROUP_L4_C
+#define HARDWARE_GROUP_L4_045
+#define DRONECAN_SUPPORT 1
+#define CAN_TERM_PIN GPIO_PORT_PIN(1, 3) // PB3
+#define CAN_TERM_POLARITY 1 // active high
+#define TARGET_VOLTAGE_DIVIDER 210
+#define MILLIVOLT_PER_AMP 25
+#define RAMP_SPEED_LOW_RPM 1
+#define RAMP_SPEED_HIGH_RPM 1
+#define LOOP_FREQUENCY_HZ 20000
+#define USE_LSE
 #endif
 
 #ifdef  REF_L431
@@ -2292,6 +2312,15 @@
 #define NO_POLLING_START
 #endif
 
+/*****************************************************CH32V203 targets
+ * ************************************************/
+#ifdef AIRBOT_V203
+//#define USE_PA2_AS_COMP
+#define FIRMWARE_NAME "AIRBOT_V203"
+#define FILE_NAME "AIRBOT_V203"
+#define DEAD_TIME 75
+#define HARDWARE_GROUP_CH_A
+#endif
 
 #ifndef FIRMWARE_NAME
 /* if you get this then you have forgotten to add the section for your target above */
@@ -3845,9 +3874,6 @@
 #define PHASE_C_GPIO_PORT_HIGH         GPIOA
 
 #define USE_COMP_1
-#define PHASE_A_COMP  LL_COMP_INPUT_MINUS_IO3  // pa0
-#define PHASE_B_COMP  LL_COMP_INPUT_MINUS_IO5  // pa5
-#define PHASE_C_COMP  LL_COMP_INPUT_MINUS_IO4  // pa4
 
 #define COMMON_COMP LL_COMP_INPUT_PLUS_IO3  //pa1
 
@@ -3857,6 +3883,18 @@
 #define CURRENT_ADC_CHANNEL         LL_ADC_CHANNEL_8
 #define VOLTAGE_ADC_CHANNEL         LL_ADC_CHANNEL_11
 
+#endif
+
+#ifdef HARDWARE_GROUP_L4_045
+#define PHASE_A_COMP  LL_COMP_INPUT_MINUS_IO3  // pa0
+#define PHASE_B_COMP  LL_COMP_INPUT_MINUS_IO4  // pa4
+#define PHASE_C_COMP  LL_COMP_INPUT_MINUS_IO5  // pa5
+#endif
+
+#ifdef HARDWARE_GROUP_L4_054
+#define PHASE_A_COMP  LL_COMP_INPUT_MINUS_IO3  // pa0
+#define PHASE_B_COMP  LL_COMP_INPUT_MINUS_IO5  // pa5
+#define PHASE_C_COMP  LL_COMP_INPUT_MINUS_IO4  // pa4
 #endif
 
 #ifdef     HARDWARE_GROUP_L4_N
@@ -3991,6 +4029,35 @@
 #endif
 
 
+#ifdef HARDWARE_GROUP_CH_A
+
+#define MCU_CH32V203
+#define USE_TIMER_15_CHANNEL_1
+
+#define INPUT_PIN GPIO_Pin_0
+#define INPUT_PIN_PORT GPIOA
+#define IC_TIMER_CHANNEL        (1-1)
+#define IC_TIMER_REGISTER       TIM2
+#define INPUT_DMA_CHANNEL       DMA1_Channel5
+#define IC_DMA_IRQ_NAME         DMA1_Channel5_IRQn
+
+#define PHASE_A_GPIO_LOW        GPIO_Pin_1
+#define PHASE_A_GPIO_PORT_LOW   GPIOB
+#define PHASE_A_GPIO_HIGH       GPIO_Pin_10
+#define PHASE_A_GPIO_PORT_HIGH  GPIOA
+
+#define PHASE_B_GPIO_LOW        GPIO_Pin_0
+#define PHASE_B_GPIO_PORT_LOW   GPIOB
+#define PHASE_B_GPIO_HIGH       GPIO_Pin_9
+#define PHASE_B_GPIO_PORT_HIGH  GPIOA
+
+#define PHASE_C_GPIO_LOW        GPIO_Pin_7
+#define PHASE_C_GPIO_PORT_LOW   GPIOA
+#define PHASE_C_GPIO_HIGH       GPIO_Pin_8
+#define PHASE_C_GPIO_PORT_HIGH  GPIOA
+
+
+#endif
 
 /************************************ MCU COMMON PERIPHERALS
  * **********************************************/
@@ -4024,6 +4091,7 @@
 #endif
 
 #ifdef MCU_F031
+#define NEED_INPUT_READY
 #define STMICRO
 #define CPU_FREQUENCY_MHZ 48
 #define EEPROM_START_ADD (uint32_t)0x08007C00
@@ -4246,6 +4314,34 @@
 #define USE_ADC
 #endif
 
+
+#ifdef MCU_CH32V203
+#define WCH
+#define NEED_INPUT_READY
+#define ERASED_FLASH_BYTE    0x39
+#define CPU_FREQUENCY_MHZ    48                      //PWM freq is 48MHz, CPU freq is 96MHz
+#define EEPROM_START_ADD     (uint32_t)0x0800f800
+#define INTERVAL_TIMER       TIM4
+#define TEN_KHZ_TIMER        SysTick
+#define UTILITY_TIMER        TIM4
+#define COM_TIMER            TIM3                      //for
+#define TIM1_AUTORELOAD      2000
+#define APPLICATION_ADDRESS  0x08001000
+
+#define TARGET_MIN_BEMF_COUNTS  6
+#define USE_ADC
+// #define DSHOT_PRE            95
+#define DSHOT_PRIORITY_THRESHOLD 50
+#define COM_TIMER_IRQ      TIM3_IRQn
+
+#ifndef USE_PA2_AS_COMP
+  #define COMPARATOR_IRQ    EXTI3_IRQn
+  #define COMPARATOR_IRQ_2  EXTI4_IRQn
+#else
+  #define COMPARATOR_IRQ   EXTI2_IRQn
+#endif
+
+#endif
 
 #ifndef LOOP_FREQUENCY_HZ
 #define LOOP_FREQUENCY_HZ 20000

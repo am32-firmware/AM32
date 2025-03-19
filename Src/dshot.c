@@ -266,7 +266,7 @@ void make_dshot_package(uint16_t com_time)
             << 5 // 3rd set of four digits
         | gcr_encode_table[(((1 << 4) - 1) & (dshot_full_number >> 0))]; // last four digits
 // GCR RLL encode 20 to 21bit output
-#if defined(MCU_F051) || defined(MCU_F031)
+#if defined(MCU_F051) || defined(MCU_F031) || defined(MCU_CH32V203)
     gcr[1 + buffer_padding] = 64;
     for (int i = 19; i >= 0; i--) { // each digit in gcrnumber
         gcr[buffer_padding + 20 - i + 1] = ((((gcrnumber & 1 << i)) >> i) ^ (gcr[buffer_padding + 20 - i] >> 6))

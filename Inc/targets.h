@@ -2299,6 +2299,29 @@
 #define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_7
 #endif
 
+/******************** G031 TARGETS ******************************************/
+
+#ifdef GEN_G031
+#define FILE_NAME "GEN_G031"
+#define FIRMWARE_NAME "AM32DEV G031"
+#define DEAD_TIME 60
+#define MILLIVOLT_PER_AMP 20
+#define CURRENT_OFFSET 0
+#define HARDWARE_GROUP_G031_A
+#define USE_SERIAL_TELEMETRY
+#define NO_POLLING_START
+#endif
+
+/*****************************************************CH32V203 targets
+ * ************************************************/
+#ifdef AIRBOT_V203
+//#define USE_PA2_AS_COMP
+#define FIRMWARE_NAME "AIRBOT_V203"
+#define FILE_NAME "AIRBOT_V203"
+#define DEAD_TIME 75
+#define HARDWARE_GROUP_CH_A
+#endif
+
 #ifndef FIRMWARE_NAME
 /* if you get this then you have forgotten to add the section for your target above */
 #error "Missing defines for target"
@@ -3918,6 +3941,124 @@
 
 #endif
 
+/************************************ G031 Hardware Groups
+ * ************************************************/
+
+#ifdef HARDWARE_GROUP_G031_A
+
+#define MCU_G031
+//#define EXTI_TYPE_BAC            // ??
+
+#define USE_TIMER_3_CHANNEL_1
+#define INPUT_PIN LL_GPIO_PIN_6
+#define INPUT_PIN_PORT GPIOA
+#define IC_TIMER_CHANNEL LL_TIM_CHANNEL_CH1
+#define IC_TIMER_REGISTER TIM3
+#define IC_TIMER_POINTER htim3
+
+#define INPUT_DMA_CHANNEL LL_DMA_CHANNEL_1
+#define DMA_HANDLE_TYPE_DEF hdma_tim3_ch1
+#define IC_DMA_IRQ_NAME DMA1_Channel1_IRQn
+
+#define PHASE_A_EXTI_PORT GPIOC
+#define PHASE_B_EXTI_PORT GPIOB
+#define PHASE_C_EXTI_PORT GPIOB
+
+#define PHASE_A_EXTI_PIN LL_GPIO_PIN_14
+#define PHASE_B_EXTI_PIN LL_GPIO_PIN_7
+#define PHASE_C_EXTI_PIN LL_GPIO_PIN_1
+
+#define PHASE_A_EXTI_LINE 14
+#define PHASE_B_EXTI_LINE 7
+#define PHASE_C_EXTI_LINE 1
+
+#define SYSCFG_EXTI_PORTA LL_EXTI_CONFIG_PORTC
+#define SYSCFG_EXTI_PORTB LL_EXTI_CONFIG_PORTB
+#define SYSCFG_EXTI_PORTC LL_EXTI_CONFIG_PORTB
+
+#define SYSCFG_EXTI_LINEA LL_EXTI_CONFIG_LINE14
+#define SYSCFG_EXTI_LINEB LL_EXTI_CONFIG_LINE7
+#define SYSCFG_EXTI_LINEC LL_EXTI_CONFIG_LINE1
+
+#define PHASE_A_LL_EXTI_LINE LL_EXTI_LINE_14
+#define PHASE_B_LL_EXTI_LINE LL_EXTI_LINE_7
+#define PHASE_C_LL_EXTI_LINE LL_EXTI_LINE_1
+
+#define EXTI_IRQ1_NAME EXTI0_1_IRQn
+#define EXTI_IRQ2_NAME EXTI4_15_IRQn
+
+
+//#define PHASE_A_GPIO_LOW LL_GPIO_PIN_15
+//#define PHASE_A_GPIO_PORT_LOW GPIOB
+//#define PHASE_A_GPIO_HIGH LL_GPIO_PIN_10
+//#define PHASE_A_GPIO_PORT_HIGH GPIOA
+
+//#define PHASE_B_GPIO_LOW LL_GPIO_PIN_14
+//#define PHASE_B_GPIO_PORT_LOW GPIOB
+//#define PHASE_B_GPIO_HIGH LL_GPIO_PIN_9
+//#define PHASE_B_GPIO_PORT_HIGH GPIOA
+
+//#define PHASE_C_GPIO_LOW LL_GPIO_PIN_13
+//#define PHASE_C_GPIO_PORT_LOW GPIOB
+//#define PHASE_C_GPIO_HIGH LL_GPIO_PIN_8
+//#define PHASE_C_GPIO_PORT_HIGH GPIOA
+
+#define PHASE_A_GPIO_LOW LL_GPIO_PIN_14
+#define PHASE_A_GPIO_PORT_LOW GPIOB
+#define PHASE_A_GPIO_HIGH LL_GPIO_PIN_9
+#define PHASE_A_GPIO_PORT_HIGH GPIOA
+
+#define PHASE_B_GPIO_LOW LL_GPIO_PIN_13
+#define PHASE_B_GPIO_PORT_LOW GPIOB
+#define PHASE_B_GPIO_HIGH LL_GPIO_PIN_8
+#define PHASE_B_GPIO_PORT_HIGH GPIOA
+
+#define PHASE_C_GPIO_LOW LL_GPIO_PIN_15
+#define PHASE_C_GPIO_PORT_LOW GPIOB
+#define PHASE_C_GPIO_HIGH LL_GPIO_PIN_10
+#define PHASE_C_GPIO_PORT_HIGH GPIOA
+
+
+
+#define VOLTAGE_ADC_PIN LL_GPIO_PIN_5
+#define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_5
+
+#define CURRENT_ADC_PIN LL_GPIO_PIN_4
+#define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_4
+
+#endif
+
+
+#ifdef HARDWARE_GROUP_CH_A
+
+#define MCU_CH32V203
+#define USE_TIMER_15_CHANNEL_1
+
+#define INPUT_PIN GPIO_Pin_0
+#define INPUT_PIN_PORT GPIOA
+#define IC_TIMER_CHANNEL        (1-1)
+#define IC_TIMER_REGISTER       TIM2
+#define INPUT_DMA_CHANNEL       DMA1_Channel5
+#define IC_DMA_IRQ_NAME         DMA1_Channel5_IRQn
+
+#define PHASE_A_GPIO_LOW        GPIO_Pin_1
+#define PHASE_A_GPIO_PORT_LOW   GPIOB
+#define PHASE_A_GPIO_HIGH       GPIO_Pin_10
+#define PHASE_A_GPIO_PORT_HIGH  GPIOA
+
+#define PHASE_B_GPIO_LOW        GPIO_Pin_0
+#define PHASE_B_GPIO_PORT_LOW   GPIOB
+#define PHASE_B_GPIO_HIGH       GPIO_Pin_9
+#define PHASE_B_GPIO_PORT_HIGH  GPIOA
+
+#define PHASE_C_GPIO_LOW        GPIO_Pin_7
+#define PHASE_C_GPIO_PORT_LOW   GPIOA
+#define PHASE_C_GPIO_HIGH       GPIO_Pin_8
+#define PHASE_C_GPIO_PORT_HIGH  GPIOA
+
+
+#endif
+
 /************************************ MCU COMMON PERIPHERALS
  * **********************************************/
 
@@ -3950,6 +4091,7 @@
 #endif
 
 #ifdef MCU_F031
+#define NEED_INPUT_READY
 #define STMICRO
 #define CPU_FREQUENCY_MHZ 48
 #define EEPROM_START_ADD (uint32_t)0x08007C00
@@ -4000,6 +4142,38 @@
 #define DSHOT_PRIORITY_THRESHOLD 60
 #define COM_TIMER_IRQ TIM14_IRQn
 #endif
+
+#ifdef MCU_G031
+#define STMICRO
+#define CPU_FREQUENCY_MHZ 64
+#define EEPROM_START_ADD (uint32_t)0x0800F800
+#define INTERVAL_TIMER TIM2
+#define TEN_KHZ_TIMER TIM16
+#define UTILITY_TIMER TIM17
+#define COM_TIMER TIM14
+#define APPLICATION_ADDRESS 0x08001000
+
+#ifndef TARGET_MIN_BEMF_COUNTS
+#define TARGET_MIN_BEMF_COUNTS 2
+#endif
+//#define COMPARATOR_IRQ ADC1_COMP_IRQn
+#define USE_ADC
+#ifndef CURRENT_ADC_CHANNEL
+#define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_4
+#endif
+#ifndef VOLTAGE_ADC_CHANNEL
+#define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_5
+#endif
+#ifndef CURRENT_ADC_PIN
+#define CURRENT_ADC_PIN LL_GPIO_PIN_4
+#endif
+#ifndef VOLTAGE_ADC_PIN
+#define VOLTAGE_ADC_PIN LL_GPIO_PIN_5
+#endif
+#define DSHOT_PRIORITY_THRESHOLD 60
+#define COM_TIMER_IRQ TIM14_IRQn
+#endif
+
 
 #ifdef MCU_G431
 #define STMICRO
@@ -4140,6 +4314,33 @@
 #define USE_ADC
 #endif
 
+
+#ifdef MCU_CH32V203
+#define WCH
+#define NEED_INPUT_READY
+#define ERASED_FLASH_BYTE    0x39
+#define CPU_FREQUENCY_MHZ    48                     //PWM freq is 48MHz, CPU freq is 96MHz
+#define EEPROM_START_ADD     (uint32_t)0x0800f800
+#define INTERVAL_TIMER       TIM4
+#define TEN_KHZ_TIMER        SysTick
+#define UTILITY_TIMER        TIM4
+#define COM_TIMER            TIM3                    
+#define TIM1_AUTORELOAD      1999
+#define APPLICATION_ADDRESS  0x08001000
+
+#define TARGET_MIN_BEMF_COUNTS  3
+#define USE_ADC
+#define DSHOT_PRIORITY_THRESHOLD 50
+#define COM_TIMER_IRQ      TIM3_IRQn
+
+#ifndef USE_PA2_AS_COMP
+  #define COMPARATOR_IRQ    EXTI3_IRQn
+  #define COMPARATOR_IRQ_2  EXTI4_IRQn
+#else
+  #define COMPARATOR_IRQ   EXTI2_IRQn
+#endif
+
+#endif
 
 #ifndef LOOP_FREQUENCY_HZ
 #define LOOP_FREQUENCY_HZ 20000

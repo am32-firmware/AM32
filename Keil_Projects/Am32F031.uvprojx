@@ -424,6 +424,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

@@ -8,65 +8,18 @@
 
 #include "serial_telemetry.h"
 #include "common.h"
-
-uint8_t aTxBuffer[49];
-uint8_t nbDataToTransmit = sizeof(aTxBuffer);
+#include "kiss_telemetry.h"
 
 //USART2_TX
-void send_telem_DMA()
+void send_telem_DMA(uint8_t bytes)
 {
     // set data length and enable channel to start transfer
     // set data length and enable channel to start transfer
-    MODIFY_REG(USART2->CTLR1, 0x3<<2, 0x1<<3);  //Ê¹ÄÜ·¢ËÍ
-    DMA1_Channel7->CNTR  = nbDataToTransmit;
-    DMA1_Channel7->MADDR = (uint32_t)&aTxBuffer[0];  //DMAµØÖ·×ÔÔöµÄ£¬ÐèÒªÖØÐÂÉèÖÃ
+    MODIFY_REG(USART2->CTLR1, USART_CTLR1_RE | USART_CTLR1_TE, USART_CTLR1_TE);  //Ê¹ï¿½Ü·ï¿½ï¿½ï¿½
+    DMA1_Channel7->CNTR  = bytes;
+    DMA1_Channel7->MADDR = (uint32_t)&aTxBuffer[0];  //DMAï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     USART_DMACmd(USART2,USART_DMAReq_Tx,ENABLE);
     DMA_Cmd(DMA1_Channel7, ENABLE);
-}
-
-uint8_t update_crc8(uint8_t crc, uint8_t crc_seed)
-{
-    uint8_t crc_u, i;
-    crc_u = crc;
-    crc_u ^= crc_seed;
-    for (i = 0; i < 8; i++)
-        crc_u = (crc_u & 0x80) ? 0x7 ^ (crc_u << 1) : (crc_u << 1);
-    return (crc_u);
-}
-
-uint8_t get_crc8(uint8_t* Buf, uint8_t BufLen)
-{
-    uint8_t crc = 0, i;
-    for (i = 0; i < BufLen; i++)
-        crc = update_crc8(Buf[i], crc);
-    return (crc);
-}
-
-void makeInfoPacket(){
-   for(int i = 0;i < 48; i++){
-     aTxBuffer[i] = eepromBuffer.buffer[i];
-    }
-    aTxBuffer[48] = get_crc8(aTxBuffer, 48);
-}
-
-void makeTelemPackage(uint8_t temp, uint16_t voltage, uint16_t current,
-    uint16_t consumption, uint16_t e_rpm)
-{
-    aTxBuffer[0] = temp; // temperature
-
-    aTxBuffer[1] = (voltage >> 8) & 0xFF; // voltage hB
-    aTxBuffer[2] = voltage & 0xFF; // voltage   lowB
-
-    aTxBuffer[3] = (current >> 8) & 0xFF; // current
-    aTxBuffer[4] = current & 0xFF; // divide by 10 for Amps
-
-    aTxBuffer[5] = (consumption >> 8) & 0xFF; // consumption
-    aTxBuffer[6] = consumption & 0xFF; //  in mah
-
-    aTxBuffer[7] = (e_rpm >> 8) & 0xFF; //
-    aTxBuffer[8] = e_rpm & 0xFF; // eRpM *100
-
-    aTxBuffer[9] = get_crc8(aTxBuffer, 9);
 }
 
 void telem_UART_Init(void)
@@ -100,7 +53,7 @@ void telem_UART_Init(void)
     DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t) &(USART2->DATAR);
     DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)&aTxBuffer[0];
     DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralDST;
-    DMA_InitStructure.DMA_BufferSize = nbDataToTransmit;
+    DMA_InitStructure.DMA_BufferSize = sizeof(aTxBuffer);
     DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
     DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
     DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
@@ -115,6 +68,6 @@ void telem_UART_Init(void)
     DMA_ClearFlag(DMA1_FLAG_TC7|DMA1_FLAG_TE7|DMA1_FLAG_HT7);
     DMA_ITConfig(DMA1_Channel7, DMA_IT_TC|DMA_IT_TE, ENABLE);
 
-    NVIC_SetPriority(DMA1_Channel7_IRQn, 0xE0);  //´«ÊäÍê³ÉÖÐ¶Ï
+    NVIC_SetPriority(DMA1_Channel7_IRQn, 0xE0);  //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½
     NVIC_EnableIRQ(DMA1_Channel7_IRQn);
 }

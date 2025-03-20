@@ -16,8 +16,8 @@
         <TargetCommonOption>
           <Device>GD32E230K6</Device>
           <Vendor>GigaDevice</Vendor>
-          <PackID>GigaDevice.GD32E23x_DFP.1.0.1</PackID>
-          <PackURL>http://gd32mcu.com/data/documents/pack/</PackURL>
+          <PackID>GigaDevice.GD32E23x_DFP.1.0.2</PackID>
+          <PackURL>https://gd32mcu.com/data/documents/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x0001800) IROM(0x08000000,0x0008000) CPUTYPE("Cortex-M23") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -414,6 +414,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -660,8 +665,8 @@
         <TargetCommonOption>
           <Device>GD32E230K6</Device>
           <Vendor>GigaDevice</Vendor>
-          <PackID>GigaDevice.GD32E23x_DFP.1.0.1</PackID>
-          <PackURL>http://gd32mcu.com/data/documents/pack/</PackURL>
+          <PackID>GigaDevice.GD32E23x_DFP.1.0.2</PackID>
+          <PackURL>https://gd32mcu.com/data/documents/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x0001800) IROM(0x08000000,0x0008000) CPUTYPE("Cortex-M23") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -1058,6 +1063,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1304,8 +1314,8 @@
         <TargetCommonOption>
           <Device>GD32E230K6</Device>
           <Vendor>GigaDevice</Vendor>
-          <PackID>GigaDevice.GD32E23x_DFP.1.0.1</PackID>
-          <PackURL>http://gd32mcu.com/data/documents/pack/</PackURL>
+          <PackID>GigaDevice.GD32E23x_DFP.1.0.2</PackID>
+          <PackURL>https://gd32mcu.com/data/documents/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x0001800) IROM(0x08000000,0x0008000) CPUTYPE("Cortex-M23") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -1702,6 +1712,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1942,14 +1957,14 @@
       <TargetName>SKYSTARS_KM55_E230</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
+      <pCCUsed>6210000::V6.21::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>GD32E230K6</Device>
           <Vendor>GigaDevice</Vendor>
-          <PackID>GigaDevice.GD32E23x_DFP.1.0.1</PackID>
-          <PackURL>http://gd32mcu.com/data/documents/pack/</PackURL>
+          <PackID>GigaDevice.GD32E23x_DFP.1.0.2</PackID>
+          <PackURL>https://gd32mcu.com/data/documents/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x0001800) IROM(0x08000000,0x0008000) CPUTYPE("Cortex-M23") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -2346,6 +2361,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2523,8 +2543,8 @@
         <TargetCommonOption>
           <Device>GD32E230K6</Device>
           <Vendor>GigaDevice</Vendor>
-          <PackID>GigaDevice.GD32E23x_DFP.1.0.1</PackID>
-          <PackURL>http://gd32mcu.com/data/documents/pack/</PackURL>
+          <PackID>GigaDevice.GD32E23x_DFP.1.0.2</PackID>
+          <PackURL>https://gd32mcu.com/data/documents/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x0001800) IROM(0x08000000,0x0008000) CPUTYPE("Cortex-M23") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -2921,6 +2941,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3167,8 +3192,8 @@
         <TargetCommonOption>
           <Device>GD32E230K6</Device>
           <Vendor>GigaDevice</Vendor>
-          <PackID>GigaDevice.GD32E23x_DFP.1.0.1</PackID>
-          <PackURL>http://gd32mcu.com/data/documents/pack/</PackURL>
+          <PackID>GigaDevice.GD32E23x_DFP.1.0.2</PackID>
+          <PackURL>https://gd32mcu.com/data/documents/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x0001800) IROM(0x08000000,0x0008000) CPUTYPE("Cortex-M23") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -3565,6 +3590,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3742,8 +3772,8 @@
         <TargetCommonOption>
           <Device>GD32E230K6</Device>
           <Vendor>GigaDevice</Vendor>
-          <PackID>GigaDevice.GD32E23x_DFP.1.0.1</PackID>
-          <PackURL>http://gd32mcu.com/data/documents/pack/</PackURL>
+          <PackID>GigaDevice.GD32E23x_DFP.1.0.2</PackID>
+          <PackURL>https://gd32mcu.com/data/documents/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x0001800) IROM(0x08000000,0x0008000) CPUTYPE("Cortex-M23") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -4140,6 +4170,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4317,8 +4352,8 @@
         <TargetCommonOption>
           <Device>GD32E230K6</Device>
           <Vendor>GigaDevice</Vendor>
-          <PackID>GigaDevice.GD32E23x_DFP.1.0.1</PackID>
-          <PackURL>http://gd32mcu.com/data/documents/pack/</PackURL>
+          <PackID>GigaDevice.GD32E23x_DFP.1.0.2</PackID>
+          <PackURL>https://gd32mcu.com/data/documents/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x0001800) IROM(0x08000000,0x0008000) CPUTYPE("Cortex-M23") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -4714,6 +4749,11 @@
               <FileName>firmwareversion.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
             </File>
           </Files>
         </Group>

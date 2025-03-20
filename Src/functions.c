@@ -85,6 +85,26 @@ void delayMillis(uint32_t millis)
     }
 }
 
+uint8_t update_crc8(uint8_t crc, uint8_t crc_seed)
+{
+    uint8_t crc_u, i;
+    crc_u = crc;
+    crc_u ^= crc_seed;
+    for (i = 0; i < 8; i++) {
+        crc_u = (crc_u & 0x80) ? 0x7 ^ (crc_u << 1) : (crc_u << 1);
+    }
+    return (crc_u);
+}
+
+uint8_t get_crc8(uint8_t* Buf, uint8_t BufLen)
+{
+    uint8_t crc = 0, i;
+    for (i = 0; i < BufLen; i++) {
+        crc = update_crc8(Buf[i], crc);
+    }
+    return (crc);
+}
+
 #ifdef MCU_AT421
 void gpio_mode_QUICK(gpio_type* gpio_periph, uint32_t mode,
     uint32_t pull_up_down, uint32_t pin)

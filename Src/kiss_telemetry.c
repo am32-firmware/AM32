@@ -27,7 +27,7 @@ void makeTelemPackage(uint8_t temp, uint16_t voltage, uint16_t current, uint16_t
     telem_pkt->erpm_h = (e_rpm >> 8) & 0xFF;
     telem_pkt->erpm_l = e_rpm & 0xFF;
 
-    telem_pkt->crc = get_crc8((uint8_t*)telem_pkt, sizeof(telem_pkt) - 1);
+    telem_pkt->crc = get_crc8((uint8_t*)telem_pkt, sizeof(kiss_telem_pkt_t) - 1);
 }
 
 void makeInfoPacket()

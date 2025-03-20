@@ -29,8 +29,6 @@
 
   <project>
     <PathAndName>.\Am32G071.uvprojx</PathAndName>
-    <NodeIsActive>1</NodeIsActive>
-    <NodeIsExpanded>1</NodeIsExpanded>
   </project>
 
   <project>
@@ -39,6 +37,12 @@
 
   <project>
     <PathAndName>.\Am32l431.uvprojx</PathAndName>
+  </project>
+
+  <project>
+    <PathAndName>.\Am32G031.uvprojx</PathAndName>
+    <NodeIsActive>1</NodeIsActive>
+    <NodeIsExpanded>1</NodeIsExpanded>
   </project>
 
 </ProjectWorkspace>

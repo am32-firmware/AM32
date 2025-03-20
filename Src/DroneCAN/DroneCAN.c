@@ -552,7 +552,11 @@ static void handle_GetNodeInfo(CanardInstance *ins, CanardRxTransfer *transfer)
 
     sys_can_getUniqueID(pkt.hardware_version.unique_id);
 
+#ifdef DRONECAN_NODE_NAME
+    strncpy((char*)pkt.name.data, DRONECAN_NODE_NAME, sizeof(pkt.name.data));
+#else
     strncpy((char*)pkt.name.data, FIRMWARE_NAME, sizeof(pkt.name.data));
+#endif
     pkt.name.len = strnlen((char*)pkt.name.data, sizeof(pkt.name.data));
 
     uint16_t total_size = uavcan_protocol_GetNodeInfoResponse_encode(&pkt, buffer);

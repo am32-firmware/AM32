@@ -13,6 +13,10 @@
 #include "phaseouts.h"
 #include "targets.h"
 
+#ifndef ERASED_FLASH_BYTE
+#define ERASED_FLASH_BYTE  0xFF
+#endif
+
 uint8_t beep_volume;
 
 void pause(uint16_t ms)
@@ -94,7 +98,7 @@ void playStartupTune()
 {
     __disable_irq();
 
-    if (eepromBuffer.tune[0] != 0xFF) {
+    if (eepromBuffer.tune[0] != ERASED_FLASH_BYTE) {
         playBlueJayTune();
     } else {
         SET_AUTO_RELOAD_PWM(TIM1_AUTORELOAD);

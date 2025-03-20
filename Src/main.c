@@ -553,6 +553,9 @@ uint16_t waitTime = 0;
 uint16_t signaltimeout = 0;
 uint8_t ubAnalogWatchdogStatus = RESET;
 
+#ifdef NEED_INPUT_READY
+volatile char input_ready = 0;
+#endif
 
 int32_t doPidCalculations(struct fastPID* pidnow, int actual, int target)
 {
@@ -681,6 +684,9 @@ void loadEEpromSettings()
 #ifdef GIGADEVICES
         TIMER_CCHP(TIMER0) |= dead_time_override;
 #endif
+#ifdef WCH
+            TIM1->BDTR |= dead_time_override;
+#endif
         }
         if (eepromBuffer.limits.temperature < 70 || eepromBuffer.limits.temperature > 140) {
             eepromBuffer.limits.temperature = 255;
@@ -756,7 +762,7 @@ uint16_t getSmoothedCurrent()
 void getBemfState()
 {
     uint8_t current_state = 0;
-#ifdef MCU_F031
+#if defined(MCU_F031) || defined(MCU_G031)
     if (step == 1 || step == 4) {
         current_state = PHASE_C_EXTI_PORT->IDR & PHASE_C_EXTI_PIN;
     }
@@ -865,7 +871,7 @@ void interruptRoutine()
         }
     }
         for (int i = 0; i < filter_level; i++) {
-#ifdef MCU_F031
+#if defined(MCU_F031) || defined(MCU_G031)
             if (((current_GPIO_PORT->IDR & current_GPIO_PIN) == !(rising))) {
 #else
             if (getCompOutputLevel() == rising) {
@@ -1305,8 +1311,8 @@ void tenKhzRoutine()
                 if (use_current_limit_adjust < minimum_duty_cycle) {
                     use_current_limit_adjust = minimum_duty_cycle;
                 }
-                if (use_current_limit_adjust > tim1_arr) {
-                    use_current_limit_adjust = tim1_arr;
+                if (use_current_limit_adjust > 2000) {
+                    use_current_limit_adjust = 2000;
                 }
             }
             if (eepromBuffer.stall_protection && running) { // this boosts throttle as the rpm gets lower, for crawlers
@@ -1504,8 +1510,8 @@ void zcfoundroutine()
     bad_count = 0;
 
     zero_crosses++;
-#ifdef NO_POLLING_START     // changes to interrupt mode after 30 zero crosses, does not re-enter
-       if (zero_crosses > 30) {
+#ifdef NO_POLLING_START     // changes to interrupt mode after 2 zero crosses, does not re-enter
+       if (zero_crosses > 2) {
             old_routine = 0;
             enableCompInterrupts(); // enable interrupt
         }
@@ -1677,7 +1683,10 @@ int main(void)
     GPIOF->BRR = LL_GPIO_PIN_7; // out of standby mode
     GPIOA->BRR = LL_GPIO_PIN_11;
 #endif
-
+#ifdef MCU_G031
+    GPIOA->BRR = LL_GPIO_PIN_11;
+    GPIOA->BSRR = LL_GPIO_PIN_12;    // Pa12 attached to enable on dev board
+#endif
 #ifdef USE_LED_STRIP
     send_LED_RGB(125, 0, 0);
 #endif
@@ -1768,7 +1777,8 @@ int main(void)
 #if defined(FIXED_DUTY_MODE) || defined(FIXED_SPEED_MODE)
         setInput();
 #endif
-#ifdef MCU_F031
+
+#ifdef NEED_INPUT_READY
         if (input_ready) {
             processDshot();
             input_ready = 0;
@@ -1897,16 +1907,16 @@ if(zero_crosses < 5){
             last_average_interval = average_interval;
         }
 
-#ifndef MCU_F031
+#if !defined(MCU_G031) && !defined(NEED_INPUT_READY)
         if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD)) {
-            NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
-            NVIC_SetPriority(COM_TIMER_IRQ, 1);
-            NVIC_SetPriority(COMPARATOR_IRQ, 1);
-        } else {
-            NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
-            NVIC_SetPriority(COM_TIMER_IRQ, 0);
-            NVIC_SetPriority(COMPARATOR_IRQ, 0);
-        }
+             NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
+             NVIC_SetPriority(COM_TIMER_IRQ, 1);
+             NVIC_SetPriority(COMPARATOR_IRQ, 1);
+         } else {
+             NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
+             NVIC_SetPriority(COM_TIMER_IRQ, 0);
+             NVIC_SetPriority(COMPARATOR_IRQ, 0);
+         }
 #endif
         if (send_telemetry) {
 #ifdef USE_SERIAL_TELEMETRY
@@ -1936,6 +1946,10 @@ if(zero_crosses < 5){
 #ifdef ARTERY
             ADC_DMA_Callback();
             adc_ordinary_software_trigger_enable(ADC1, TRUE);
+            converted_degrees = getConvertedDegrees(ADC_raw_temp);
+#endif
+#ifdef WCH
+            startADCConversion( );
             converted_degrees = getConvertedDegrees(ADC_raw_temp);
 #endif
             degrees_celsius = converted_degrees;

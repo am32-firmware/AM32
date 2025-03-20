@@ -1,0 +1,66 @@
+name: CI Build Linux
+
+on: 
+  push:
+    branches: ["main"]
+    tags:
+      - 'v[0-9]+.[0-9]+'
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      file_type:
+        description: 'File type to upload (hex or elf)'
+        required: true
+        default: 'hex'
+        type: choice
+        options:
+          - hex
+          - elf
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: Build CI
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            make arm_sdk_install
+            make -j8
+          elif [ "$RUNNER_OS" == "Windows" ]; then
+            make arm_sdk_install
+            tools/windows/make/bin/make
+          fi
+
+      - name: Archive build
+        uses: actions/upload-artifact@v4
+        with:
+          name: AM32-binaries-${{ matrix.os }}
+          path: |
+            obj/*.hex
+          retention-days: 7
+
+      - name: Find and store hex files
+        if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'ubuntu-latest'
+        run: |
+          hex_files=$(find obj -type f -name "*.${{ inputs.include_hex }}" | tr '\n' ',' | sed 's/,$//')
+          echo "Found hex files: $hex_files"
+          echo "HEX_FILES=$hex_files" >> $GITHUB_ENV
+
+      - name: Upload release assets
+        if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'ubuntu-latest'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.HEX_FILES }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              

@@ -16,8 +16,8 @@
         <TargetCommonOption>
           <Device>STM32G071K8Ux</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G0xx_DFP.1.4.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G0xx_DFP.1.5.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00009000) IROM(0x08000000,0x00010000) CPUTYPE("Cortex-M0+") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -444,6 +444,11 @@
               <FileType>1</FileType>
               <FilePath>..\Mcu\g071\Src\WS2812.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -548,8 +553,8 @@
         <TargetCommonOption>
           <Device>STM32G071K8Ux</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G0xx_DFP.1.4.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G0xx_DFP.1.5.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00009000) IROM(0x08000000,0x00010000) CPUTYPE("Cortex-M0+") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -976,6 +981,11 @@
               <FileType>1</FileType>
               <FilePath>..\Mcu\g071\Src\WS2812.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1080,8 +1090,8 @@
         <TargetCommonOption>
           <Device>STM32G071K8Ux</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G0xx_DFP.1.4.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G0xx_DFP.1.5.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00009000) IROM(0x08000000,0x00010000) CPUTYPE("Cortex-M0+") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -1508,6 +1518,11 @@
               <FileType>1</FileType>
               <FilePath>..\Mcu\g071\Src\WS2812.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1612,8 +1627,8 @@
         <TargetCommonOption>
           <Device>STM32G071K8Ux</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G0xx_DFP.1.4.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G0xx_DFP.1.5.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00009000) IROM(0x08000000,0x00010000) CPUTYPE("Cortex-M0+") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -2040,6 +2055,11 @@
               <FileType>1</FileType>
               <FilePath>..\Mcu\g071\Src\WS2812.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2144,8 +2164,8 @@
         <TargetCommonOption>
           <Device>STM32G071K8Ux</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G0xx_DFP.1.4.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G0xx_DFP.1.5.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00009000) IROM(0x08000000,0x00010000) CPUTYPE("Cortex-M0+") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -2572,6 +2592,11 @@
               <FileType>1</FileType>
               <FilePath>..\Mcu\g071\Src\WS2812.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2676,8 +2701,8 @@
         <TargetCommonOption>
           <Device>STM32G071K8Ux</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G0xx_DFP.1.4.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G0xx_DFP.1.5.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00009000) IROM(0x08000000,0x00010000) CPUTYPE("Cortex-M0+") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -3104,6 +3129,11 @@
               <FileType>1</FileType>
               <FilePath>..\Mcu\g071\Src\WS2812.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3208,8 +3238,8 @@
         <TargetCommonOption>
           <Device>STM32G071K8Ux</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G0xx_DFP.1.4.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G0xx_DFP.1.5.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00009000) IROM(0x08000000,0x00010000) CPUTYPE("Cortex-M0+") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -3636,6 +3666,11 @@
               <FileType>1</FileType>
               <FilePath>..\Mcu\g071\Src\WS2812.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3740,8 +3775,8 @@
         <TargetCommonOption>
           <Device>STM32G071K8Ux</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G0xx_DFP.1.4.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G0xx_DFP.1.5.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00009000) IROM(0x08000000,0x00010000) CPUTYPE("Cortex-M0+") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -4168,6 +4203,11 @@
               <FileType>1</FileType>
               <FilePath>..\Mcu\g071\Src\WS2812.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4272,8 +4312,8 @@
         <TargetCommonOption>
           <Device>STM32G071K8Ux</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G0xx_DFP.1.4.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G0xx_DFP.1.5.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00009000) IROM(0x08000000,0x00010000) CPUTYPE("Cortex-M0+") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -4700,6 +4740,11 @@
               <FileType>1</FileType>
               <FilePath>..\Mcu\g071\Src\WS2812.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4804,8 +4849,8 @@
         <TargetCommonOption>
           <Device>STM32G071K8Ux</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G0xx_DFP.1.4.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G0xx_DFP.1.5.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00009000) IROM(0x08000000,0x00010000) CPUTYPE("Cortex-M0+") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -5232,6 +5277,11 @@
               <FileType>1</FileType>
               <FilePath>..\Mcu\g071\Src\WS2812.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5336,8 +5386,8 @@
         <TargetCommonOption>
           <Device>STM32G071K8Ux</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G0xx_DFP.1.4.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G0xx_DFP.1.5.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00009000) IROM(0x08000000,0x00010000) CPUTYPE("Cortex-M0+") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -5764,6 +5814,11 @@
               <FileType>1</FileType>
               <FilePath>..\Mcu\g071\Src\WS2812.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5868,8 +5923,8 @@
         <TargetCommonOption>
           <Device>STM32G071K8Ux</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G0xx_DFP.1.4.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G0xx_DFP.1.5.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00009000) IROM(0x08000000,0x00010000) CPUTYPE("Cortex-M0+") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -6296,6 +6351,11 @@
               <FileType>1</FileType>
               <FilePath>..\Mcu\g071\Src\WS2812.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -6400,8 +6460,8 @@
         <TargetCommonOption>
           <Device>STM32G071K8Ux</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G0xx_DFP.1.4.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G0xx_DFP.1.5.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00009000) IROM(0x08000000,0x00010000) CPUTYPE("Cortex-M0+") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -6828,6 +6888,11 @@
               <FileType>1</FileType>
               <FilePath>..\Mcu\g071\Src\WS2812.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -6932,8 +6997,8 @@
         <TargetCommonOption>
           <Device>STM32G071K8Ux</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G0xx_DFP.1.4.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G0xx_DFP.1.5.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00009000) IROM(0x08000000,0x00010000) CPUTYPE("Cortex-M0+") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -7360,6 +7425,11 @@
               <FileType>1</FileType>
               <FilePath>..\Mcu\g071\Src\WS2812.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -7464,8 +7534,8 @@
         <TargetCommonOption>
           <Device>STM32G071K8Ux</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G0xx_DFP.1.4.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G0xx_DFP.1.5.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00009000) IROM(0x08000000,0x00010000) CPUTYPE("Cortex-M0+") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -7892,6 +7962,11 @@
               <FileType>1</FileType>
               <FilePath>..\Mcu\g071\Src\WS2812.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -7996,8 +8071,8 @@
         <TargetCommonOption>
           <Device>STM32G071K8Ux</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G0xx_DFP.1.4.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G0xx_DFP.1.5.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00009000) IROM(0x08000000,0x00010000) CPUTYPE("Cortex-M0+") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -8424,6 +8499,11 @@
               <FileType>1</FileType>
               <FilePath>..\Mcu\g071\Src\WS2812.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -8528,8 +8608,8 @@
         <TargetCommonOption>
           <Device>STM32G071K8Ux</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G0xx_DFP.1.4.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G0xx_DFP.1.5.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00009000) IROM(0x08000000,0x00010000) CPUTYPE("Cortex-M0+") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -8956,6 +9036,11 @@
               <FileType>1</FileType>
               <FilePath>..\Mcu\g071\Src\WS2812.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -9060,8 +9145,8 @@
         <TargetCommonOption>
           <Device>STM32G071K8Ux</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G0xx_DFP.1.4.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G0xx_DFP.1.5.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00009000) IROM(0x08000000,0x00010000) CPUTYPE("Cortex-M0+") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -9488,6 +9573,11 @@
               <FileType>1</FileType>
               <FilePath>..\Mcu\g071\Src\WS2812.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -9592,8 +9682,8 @@
         <TargetCommonOption>
           <Device>STM32G071K8Ux</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G0xx_DFP.1.4.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G0xx_DFP.1.5.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00009000) IROM(0x08000000,0x00010000) CPUTYPE("Cortex-M0+") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -10020,6 +10110,11 @@
               <FileType>1</FileType>
               <FilePath>..\Mcu\g071\Src\WS2812.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -10124,8 +10219,8 @@
         <TargetCommonOption>
           <Device>STM32G071K8Ux</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G0xx_DFP.1.4.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G0xx_DFP.1.5.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00009000) IROM(0x08000000,0x00010000) CPUTYPE("Cortex-M0+") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -10552,6 +10647,11 @@
               <FileType>1</FileType>
               <FilePath>..\Mcu\g071\Src\WS2812.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -10656,8 +10756,8 @@
         <TargetCommonOption>
           <Device>STM32G071K8Ux</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G0xx_DFP.1.4.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G0xx_DFP.1.5.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00009000) IROM(0x08000000,0x00010000) CPUTYPE("Cortex-M0+") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -11084,6 +11184,11 @@
               <FileType>1</FileType>
               <FilePath>..\Mcu\g071\Src\WS2812.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -11182,14 +11287,14 @@
       <TargetName>RRIOT_G071</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
+      <pCCUsed>6210000::V6.21::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32G071K8Ux</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G0xx_DFP.1.4.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G0xx_DFP.1.5.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00009000) IROM(0x08000000,0x00010000) CPUTYPE("Cortex-M0+") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -11615,6 +11720,11 @@
               <FileName>WS2812.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\g071\Src\WS2812.c</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -552,7 +552,11 @@ static void handle_GetNodeInfo(CanardInstance *ins, CanardRxTransfer *transfer)
 
     sys_can_getUniqueID(pkt.hardware_version.unique_id);
 
+#ifdef DRONECAN_NODE_NAME
+    strncpy((char*)pkt.name.data, DRONECAN_NODE_NAME, sizeof(pkt.name.data));
+#else
     strncpy((char*)pkt.name.data, FIRMWARE_NAME, sizeof(pkt.name.data));
+#endif
     pkt.name.len = strnlen((char*)pkt.name.data, sizeof(pkt.name.data));
 
     uint16_t total_size = uavcan_protocol_GetNodeInfoResponse_encode(&pkt, buffer);
@@ -621,7 +625,7 @@ static void handle_RawCommand(CanardInstance *ins, CanardRxTransfer *transfer)
       we need to map onto the AM32 expected range, which is a 11 bit number, where:
       0: off
       1-46: special codes
-      47-2047: throttle
+      48-2047: throttle
     */
     uint16_t this_input = 0;
     if (input_can == 0) {
@@ -629,9 +633,9 @@ static void handle_RawCommand(CanardInstance *ins, CanardRxTransfer *transfer)
     } else if (eepromBuffer.bi_direction) {
         const float scaled_value = input_can * (1000.0 / 8192);
         if (scaled_value >= 0) {
-            this_input = (uint16_t)(47 + scaled_value);
+            this_input = (uint16_t)(1047 + scaled_value);
         } else {
-            this_input = (uint16_t)(47 + (1000 - scaled_value));
+            this_input = (uint16_t)(47 + scaled_value * -1);
         }
     } else if (input_can > 0) {
         const float scaled_value = input_can * (2000.0 / 8192);

@@ -226,6 +226,7 @@ an settings option)
 #include "peripherals.h"
 #include "phaseouts.h"
 #include "serial_telemetry.h"
+#include "kiss_telemetry.h"
 #include "signal.h"
 #include "sounds.h"
 #include "targets.h"
@@ -302,6 +303,7 @@ fastPID stallPid = { // 1khz loop time
 };
 
 EEprom_t eepromBuffer;
+char send_esc_info_flag;
 uint32_t eeprom_address = EEPROM_START_ADD; 
 uint16_t prop_brake_duty_cycle = 0;
 uint16_t ledcounter = 0;
@@ -346,10 +348,10 @@ char return_to_center = 0;
 uint16_t target_e_com_time = 0;
 int16_t Speed_pid_output;
 char use_speed_control_loop = 0;
-float input_override = 0;
+int32_t input_override = 0;
 int16_t use_current_limit_adjust = 2000;
 char use_current_limit = 0;
-float stall_protection_adjust = 0;
+int32_t stall_protection_adjust = 0;
 
 uint32_t MCU_Id = 0;
 uint32_t REV_Id = 0;
@@ -375,7 +377,7 @@ char cell_count = 0;
 char brushed_direction_set = 0;
 
 uint16_t tenkhzcounter = 0;
-float consumed_current = 0;
+int32_t consumed_current = 0;
 int32_t smoothed_raw_current = 0;
 int16_t actual_current = 0;
 
@@ -552,8 +554,11 @@ uint16_t waitTime = 0;
 uint16_t signaltimeout = 0;
 uint8_t ubAnalogWatchdogStatus = RESET;
 
+#ifdef NEED_INPUT_READY
+volatile char input_ready = 0;
+#endif
 
-float doPidCalculations(struct fastPID* pidnow, int actual, int target)
+int32_t doPidCalculations(struct fastPID* pidnow, int actual, int target)
 {
 
     pidnow->error = actual - target;
@@ -680,6 +685,9 @@ void loadEEpromSettings()
 #ifdef GIGADEVICES
         TIMER_CCHP(TIMER0) |= dead_time_override;
 #endif
+#ifdef WCH
+            TIM1->BDTR |= dead_time_override;
+#endif
         }
         if (eepromBuffer.limits.temperature < 70 || eepromBuffer.limits.temperature > 140) {
             eepromBuffer.limits.temperature = 255;
@@ -755,7 +763,7 @@ uint16_t getSmoothedCurrent()
 void getBemfState()
 {
     uint8_t current_state = 0;
-#ifdef MCU_F031
+#if defined(MCU_F031) || defined(MCU_G031)
     if (step == 1 || step == 4) {
         current_state = PHASE_C_EXTI_PORT->IDR & PHASE_C_EXTI_PIN;
     }
@@ -864,7 +872,7 @@ void interruptRoutine()
         }
     }
         for (int i = 0; i < filter_level; i++) {
-#ifdef MCU_F031
+#if defined(MCU_F031) || defined(MCU_G031)
             if (((current_GPIO_PORT->IDR & current_GPIO_PIN) == !(rising))) {
 #else
             if (getCompOutputLevel() == rising) {
@@ -1047,21 +1055,21 @@ void setInput()
                         speedPid.error = 0;
                         input_override = 0;
                     } else {
-                        input = (uint16_t)input_override; // speed control pid override
-                        if (input_override > 2047) {
+                        input = (uint16_t)(input_override / 10000); // speed control pid override
+                        if (input > 2047) {
                             input = 2047;
                         }
-                        if (input_override < 48) {
+                        if (input < 48) {
                             input = 48;
                         }
                     }
                 } else {
 
-                    input = (uint16_t)input_override; // speed control pid override
-                    if (input_override > 2047) {
+                    input = (uint16_t)(input_override / 10000); // speed control pid override
+                    if (input > 2047) {
                         input = 2047;
                     }
-                    if (input_override < 48) {
+                    if (input < 48) {
                         input = 48;
                     }
                 }
@@ -1204,7 +1212,7 @@ if (!stepper_sine && armed) {
 
             if (stall_protection_adjust > 0 && input > 47) {
 
-                duty_cycle_setpoint = duty_cycle_setpoint + (uint16_t)stall_protection_adjust;
+                duty_cycle_setpoint = duty_cycle_setpoint + (uint16_t)(stall_protection_adjust/10000);
             }
         }
     }
@@ -1264,9 +1272,12 @@ void tenKhzRoutine()
         }
     }
 
-    if (eepromBuffer.telementry_on_interval) {
+    if (eepromBuffer.telemetry_on_interval) {
         telem_ms_count++;
-        if (telem_ms_count > telemetry_interval_ms * 20) {
+        if (telem_ms_count > ((telemetry_interval_ms - 1 + eepromBuffer.telemetry_on_interval) * 20)) {
+            // telemetry_on_interval = 1 is a boolean, but it can also be 2 or more to indicate an identifier
+            // by making the interval just slightly different with an unique identifier, we can guarantee that many ESCs can communicate on just one signal
+            // there will be some collisions but not as many as if two ESCs always tried to talk at once.
             send_telemetry = 1;
             telem_ms_count = 0;
         }
@@ -1304,25 +1315,25 @@ void tenKhzRoutine()
                 if (use_current_limit_adjust < minimum_duty_cycle) {
                     use_current_limit_adjust = minimum_duty_cycle;
                 }
-                if (use_current_limit_adjust > tim1_arr) {
-                    use_current_limit_adjust = tim1_arr;
+                if (use_current_limit_adjust > 2000) {
+                    use_current_limit_adjust = 2000;
                 }
             }
             if (eepromBuffer.stall_protection && running) { // this boosts throttle as the rpm gets lower, for crawlers
                                                // and rc cars only, do not use for multirotors.
                 stall_protection_adjust += (doPidCalculations(&stallPid, commutation_interval,
-                                               stall_protect_target_interval))/ 10000;
-                if (stall_protection_adjust > 150) {
-                    stall_protection_adjust = 150;
+                                               stall_protect_target_interval));
+                if (stall_protection_adjust > 150 * 10000) {
+                    stall_protection_adjust = 150 * 10000;
                 }
                 if (stall_protection_adjust <= 0) {
                     stall_protection_adjust = 0;
                 }
             }
             if (use_speed_control_loop && running) {
-                input_override += doPidCalculations(&speedPid, e_com_time, target_e_com_time) / 10000;
-                if (input_override > 2047) {
-                    input_override = 2047;
+                input_override += doPidCalculations(&speedPid, e_com_time, target_e_com_time);
+                if (input_override > 2047 * 10000) {
+                    input_override = 2047 * 10000;
                 }
                 if (input_override < 0) {
                     input_override = 0;
@@ -1503,8 +1514,8 @@ void zcfoundroutine()
     bad_count = 0;
 
     zero_crosses++;
-#ifdef NO_POLLING_START     // changes to interrupt mode after 30 zero crosses, does not re-enter
-       if (zero_crosses > 30) {
+#ifdef NO_POLLING_START     // changes to interrupt mode after 2 zero crosses, does not re-enter
+       if (zero_crosses > 2) {
             old_routine = 0;
             enableCompInterrupts(); // enable interrupt
         }
@@ -1676,7 +1687,10 @@ int main(void)
     GPIOF->BRR = LL_GPIO_PIN_7; // out of standby mode
     GPIOA->BRR = LL_GPIO_PIN_11;
 #endif
-
+#ifdef MCU_G031
+    GPIOA->BRR = LL_GPIO_PIN_11;
+    GPIOA->BSRR = LL_GPIO_PIN_12;    // Pa12 attached to enable on dev board
+#endif
 #ifdef USE_LED_STRIP
     send_LED_RGB(125, 0, 0);
 #endif
@@ -1758,16 +1772,17 @@ int main(void)
 #endif
 
 #ifdef USE_INVERTED_HIGH
-  min_startup_duty = min_startup_duty + 100;
+  min_startup_duty = min_startup_duty + 200;
   minimum_duty_cycle = minimum_duty_cycle + 100;
+  startup_max_duty_cycle = startup_max_duty_cycle + 200;
 #endif
-
 
     while (1) {
 #if defined(FIXED_DUTY_MODE) || defined(FIXED_SPEED_MODE)
         setInput();
 #endif
-#ifdef MCU_F031
+
+#ifdef NEED_INPUT_READY
         if (input_ready) {
             processDshot();
             input_ready = 0;
@@ -1834,7 +1849,7 @@ if(zero_crosses < 5){
 #endif
 
         if (tenkhzcounter > LOOP_FREQUENCY_HZ) { // 1s sample interval 10000
-            consumed_current = (float)actual_current / 360 + consumed_current;
+            consumed_current += (actual_current << 16) / 360;
             switch (dshot_extended_telemetry) {
 
             case 1:
@@ -1896,24 +1911,28 @@ if(zero_crosses < 5){
             last_average_interval = average_interval;
         }
 
-#ifndef MCU_F031
+#if !defined(MCU_G031) && !defined(NEED_INPUT_READY)
         if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD)) {
-            NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
-            NVIC_SetPriority(COM_TIMER_IRQ, 1);
-            NVIC_SetPriority(COMPARATOR_IRQ, 1);
-        } else {
-            NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
-            NVIC_SetPriority(COM_TIMER_IRQ, 0);
-            NVIC_SetPriority(COMPARATOR_IRQ, 0);
-        }
+             NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
+             NVIC_SetPriority(COM_TIMER_IRQ, 1);
+             NVIC_SetPriority(COMPARATOR_IRQ, 1);
+         } else {
+             NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
+             NVIC_SetPriority(COM_TIMER_IRQ, 0);
+             NVIC_SetPriority(COMPARATOR_IRQ, 0);
+         }
 #endif
         if (send_telemetry) {
 #ifdef USE_SERIAL_TELEMETRY
-            makeTelemPackage(degrees_celsius, battery_voltage, actual_current,
-                (uint16_t)consumed_current, e_rpm);
-            send_telem_DMA();
+            makeTelemPackage((int8_t)degrees_celsius, battery_voltage, actual_current,
+                (uint16_t)(consumed_current >> 16), e_rpm);
+            send_telem_DMA(10);
             send_telemetry = 0;
 #endif
+        } else if(send_esc_info_flag ) {
+           makeInfoPacket();
+           send_telem_DMA(49);
+           send_esc_info_flag = 0;
         }
         adc_counter++;
         if (adc_counter > 200) { // for adc and telemetry
@@ -1924,12 +1943,17 @@ if(zero_crosses < 5){
 #endif
 #ifdef MCU_GDE23
             ADC_DMA_Callback();
-            converted_degrees = (1.43 - ADC_raw_temp * 3.3 / 4096) * 1000 / 4.3 + 25;
+            // converted_degrees = (1.43 - ADC_raw_temp * 3.3 / 4096) * 1000 / 4.3 + 25;
+            converted_degrees = ((int32_t)(357.5581395348837f * (1 << 16)) - ADC_raw_temp * (int32_t)(0.18736373546511628f * (1 << 16))) >> 16;
             adc_software_trigger_enable(ADC_REGULAR_CHANNEL);
 #endif
 #ifdef ARTERY
             ADC_DMA_Callback();
             adc_ordinary_software_trigger_enable(ADC1, TRUE);
+            converted_degrees = getConvertedDegrees(ADC_raw_temp);
+#endif
+#ifdef WCH
+            startADCConversion( );
             converted_degrees = getConvertedDegrees(ADC_raw_temp);
 #endif
             degrees_celsius = converted_degrees;

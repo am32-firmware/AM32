@@ -1931,7 +1931,7 @@ if(zero_crosses < 5){
 #endif
         } else if(send_esc_info_flag ) {
            makeInfoPacket();
-           send_telem_DMA(48);
+           send_telem_DMA(49);
            send_esc_info_flag = 0;
         }
         adc_counter++;

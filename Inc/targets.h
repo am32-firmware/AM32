@@ -4152,6 +4152,9 @@
 #endif
 #define COM_TIMER_IRQ TIM14_IRQn
 #define DSHOT_PRIORITY_THRESHOLD 120
+#define COMP_PA0 0b1100001
+#define COMP_PA4 0b1000001
+#define COMP_PA5 0b1010001
 #endif
 
 #ifdef MCU_F031

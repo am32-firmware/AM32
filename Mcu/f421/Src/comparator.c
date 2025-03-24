@@ -39,11 +39,11 @@ void changeCompInput()
 //        EXINT->polcfg1 |= (uint32_t)EXTI_LINE;
 //        EXINT->polcfg2 = 0;
 //    }
-    if((average_interval < 150)){ 
+    if((average_interval < 400)){ 
         //set comp to high speed mode
         CMP->ctrlsts = CMP->ctrlsts & ~(1<<2);
     }
-    if((average_interval > 250)){
+    if((average_interval > 600)){
         //set comp to medium speed mode
         CMP->ctrlsts  = CMP->ctrlsts | 1<<2;
     }

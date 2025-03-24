@@ -828,7 +828,7 @@ void commutate()
     bemfcounter = 0;
     zcfound = 0;
     commutation_intervals[step - 1] = commutation_interval; // just used to calulate average
-    e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation_intervals[2] + commutation_intervals[3] + commutation_intervals[4] + commutation_intervals[5]) + 4) >> 1; // COMMUTATION INTERVAL IS 0.5US INCREMENTS
+    
 #ifdef USE_PULSE_OUT
 		if(rising){
 			GPIOB->scr = GPIO_PINS_8;
@@ -1778,6 +1778,8 @@ int main(void)
 #endif
 
     while (1) {
+
+e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation_intervals[2] + commutation_intervals[3] + commutation_intervals[4] + commutation_intervals[5]) + 4) >> 1; // COMMUTATION INTERVAL IS 0.5US INCREMENTS
 #if defined(FIXED_DUTY_MODE) || defined(FIXED_SPEED_MODE)
         setInput();
 #endif

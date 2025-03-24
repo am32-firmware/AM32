@@ -1771,10 +1771,10 @@ int main(void)
     setInputPullUp();
 #endif
 
-#ifdef USE_INVERTED_HIGH
-  min_startup_duty = min_startup_duty + 200;
-  minimum_duty_cycle = minimum_duty_cycle + 100;
-  startup_max_duty_cycle = startup_max_duty_cycle + 200;
+#ifdef USE_STARTUP_BOOST
+  min_startup_duty = min_startup_duty + 200 + ((eepromBuffer.pwm_frequency * 100)/24);
+  minimum_duty_cycle = minimum_duty_cycle + 50 + ((eepromBuffer.pwm_frequency * 50 )/24);
+  startup_max_duty_cycle = startup_max_duty_cycle + 400;
 #endif
 
     while (1) {

@@ -20,6 +20,7 @@ MEMORY
         RESET_FLASH(rx)   : ORIGIN = 0x00001000, LENGTH = 192
         FLASH_VERSION(rx) : ORIGIN = 0x000010C0, LENGTH = 16
         FLASH (rx)     : ORIGIN = 0x000010D0, LENGTH = 56K - 0xD0
+        EEPROM        (rx)  : ORIGIN = 0x0000f800, LENGTH = 1K
         FILE_NAME (rx) : ORIGIN = 0x0000f800 - 32, LENGTH = 32
 	RAM (xrw)     : ORIGIN = 0x20000000, LENGTH = 20K
 }

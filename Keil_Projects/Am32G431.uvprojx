@@ -550,6 +550,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\sounds.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1155,6 +1160,11 @@
               <FileName>sounds.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\sounds.c</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -23,11 +23,10 @@
 #include "stm32f0xx_it.h"
 
 #include "main.h"
-/* Private includes
- * ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
+#include "comparator.h"
 #include "ADC.h"
 #include "targets.h"
+#include "common.h"
 
 extern void transfercomplete();
 extern void PeriodElapsedCallback();
@@ -43,7 +42,6 @@ extern char servoPwm;
 extern char dshot_telemetry;
 extern char armed;
 extern char out_put;
-extern char compute_dshot_flag;
 /* USER CODE END EV */
 
 uint16_t interrupt_time = 0;
@@ -193,11 +191,16 @@ void DMA1_Channel4_5_IRQHandler(void)
  */
 void ADC1_COMP_IRQHandler(void)
 {
-    if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_21) != RESET) {
-        LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_21);
-        interruptRoutine();
-    }
-    //
+  if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_21) != RESET) {
+      if((INTERVAL_TIMER->CNT) > ((average_interval>>1))){
+       EXTI->PR = EXTI_LINE;
+      interruptRoutine();
+  }else{ 
+      if (getCompOutputLevel() == rising){
+      EXTI->PR = EXTI_LINE;
+  }
+}
+}
 }
 
 /**

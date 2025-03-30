@@ -424,6 +424,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -531,6 +536,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -957,6 +1017,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1064,6 +1129,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1559,6 +1679,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1666,6 +1791,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2161,6 +2341,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2268,6 +2453,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2763,6 +3003,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2870,6 +3115,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3365,6 +3665,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3472,6 +3777,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3967,6 +4327,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4074,6 +4439,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -4569,6 +4989,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4676,6 +5101,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -5171,6 +5651,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5278,6 +5763,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -5773,6 +6313,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5880,6 +6425,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -6375,6 +6975,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -6482,6 +7087,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -6977,6 +7637,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -7084,6 +7749,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -7579,6 +8299,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -7686,6 +8411,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -8181,6 +8961,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -8288,6 +9073,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -8783,6 +9623,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -8890,6 +9735,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -9385,6 +10285,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -9492,6 +10397,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -9987,6 +10947,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -10094,6 +11059,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -10589,6 +11609,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -10696,6 +11721,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -11191,6 +12271,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -11298,6 +12383,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -11793,6 +12933,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -11900,6 +13045,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -12395,6 +13595,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -12502,6 +13707,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -12997,6 +14257,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -13104,6 +14369,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -13599,6 +14919,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -13706,6 +15031,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -14201,6 +15581,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -14308,6 +15693,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -14803,6 +16243,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -14910,6 +16355,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -15405,6 +16905,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -15512,6 +17017,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -15938,6 +17498,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -16045,6 +17610,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -16540,6 +18160,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -16647,6 +18272,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -17073,6 +18753,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -17180,6 +18865,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -17606,6 +19346,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -17713,6 +19458,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -18139,6 +19939,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -18246,6 +20051,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -18741,6 +20601,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -18848,6 +20713,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -19343,6 +21263,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -19450,6 +21375,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -19945,6 +21925,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -20052,6 +22037,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -20547,6 +22587,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -20654,6 +22699,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -21149,6 +23249,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\firmwareversion.c</FilePath>
             </File>
+            <File>
+              <FileName>kiss_telemetry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kiss_telemetry.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -21256,6 +23361,61 @@
               <FileName>stm32f0xx_ll_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Mcu\f051\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>version.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\version.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>kiss_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\kiss_telemetry.h</FilePath>
             </File>
           </Files>
         </Group>

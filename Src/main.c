@@ -303,6 +303,9 @@ fastPID stallPid = { // 1khz loop time
 };
 
 EEprom_t eepromBuffer;
+volatile uint8_t max_ramp_startup = RAMP_SPEED_STARTUP;
+volatile uint8_t max_ramp_low_rpm = RAMP_SPEED_LOW_RPM;
+volatile uint8_t max_ramp_high_rpm = RAMP_SPEED_HIGH_RPM;
 char send_esc_info_flag;
 uint32_t eeprom_address = EEPROM_START_ADD; 
 uint16_t prop_brake_duty_cycle = 0;
@@ -588,13 +591,13 @@ void loadEEpromSettings()
 {
     read_flash_bin(eepromBuffer.buffer, eeprom_address, sizeof(eepromBuffer.buffer));
 
-    if (eepromBuffer.advance_level > 3) {
-        eepromBuffer.advance_level = 2;
+    if (eepromBuffer.advance_level > 32) {
+        eepromBuffer.advance_level = 16;
     }
 
-    if (eepromBuffer.pwm_frequency < 49 && eepromBuffer.pwm_frequency > 7) {
-        if (eepromBuffer.pwm_frequency < 49 && eepromBuffer.pwm_frequency > 23) {
-            TIMER1_MAX_ARR = map(eepromBuffer.pwm_frequency, 24, 48, TIM1_AUTORELOAD, TIM1_AUTORELOAD / 2);
+    if (eepromBuffer.pwm_frequency < 145 && eepromBuffer.pwm_frequency > 7) {
+        if (eepromBuffer.pwm_frequency < 144 && eepromBuffer.pwm_frequency > 23) {
+            TIMER1_MAX_ARR = map(eepromBuffer.pwm_frequency, 24, 48, TIM1_AUTORELOAD, TIM1_AUTORELOAD / 6);
         }
         if (eepromBuffer.pwm_frequency < 24 && eepromBuffer.pwm_frequency > 11) {
             TIMER1_MAX_ARR = map(eepromBuffer.pwm_frequency, 12, 24, TIM1_AUTORELOAD * 2, TIM1_AUTORELOAD);
@@ -844,7 +847,7 @@ void PeriodElapsedCallback()
     commutate();
     commutation_interval = ((commutation_interval)+((lastzctime + thiszctime) >> 1))>>1;
   	if (!eepromBuffer.auto_advance) {
-	  advance = (commutation_interval >> 3) * temp_advance; // 60 divde 8 7.5 degree increments
+	  advance = (eepromBuffer.advance_level * commutation_interval) >> 6; // 60 divde 64 0.9375 degree increments
 	} else {
 	  advance = (commutation_interval * auto_advance_level) >> 6; // 60 divde 64 0.9375 degree increments
     }
@@ -1344,8 +1347,6 @@ void tenKhzRoutine()
             }
         }
         if (maximum_throttle_change_ramp) {
-            //	max_duty_cycle_change = map(k_erpm, low_rpm_level,
-            // high_rpm_level, 1, 40);
 #ifdef VOLTAGE_BASED_RAMP
             uint16_t voltage_based_max_change = map(battery_voltage, 800, 2200, 10, 1);
             if (average_interval > 200) {
@@ -1355,41 +1356,26 @@ void tenKhzRoutine()
             }
 #else
             if (zero_crosses < 150 || last_duty_cycle < 150) {   
-                max_duty_cycle_change = RAMP_SPEED_STARTUP;
+                max_duty_cycle_change = max_ramp_startup;
             } else {
                 if (average_interval > 500) {
-                    max_duty_cycle_change = RAMP_SPEED_LOW_RPM;
+                    max_duty_cycle_change = max_ramp_low_rpm;
                 } else {
-                    max_duty_cycle_change = RAMP_SPEED_HIGH_RPM;
+                    max_duty_cycle_change = max_ramp_high_rpm;
                 }
             }
+          }
 #endif
 #ifdef CUSTOM_RAMP
    //         max_duty_cycle_change = eepromBuffer[30];
 #endif
             if ((duty_cycle - last_duty_cycle) > max_duty_cycle_change) {
                 duty_cycle = last_duty_cycle + max_duty_cycle_change;
-                if (commutation_interval > 500) {
-                    fast_accel = 1;
-									  temp_advance = eepromBuffer.advance_level;
-                } else {
-                    fast_accel = 0;
-                }
 
-            } else if ((last_duty_cycle - duty_cycle) > max_duty_cycle_change) {
-                duty_cycle = last_duty_cycle - max_duty_cycle_change;
-                fast_accel = 0;
-							  temp_advance = eepromBuffer.advance_level;
-            } else {
-							if(duty_cycle < 300 && commutation_interval < 300){
-								temp_advance = eepromBuffer.advance_level;
-							}else{
-								temp_advance =  eepromBuffer.advance_level;
-							}
-
-                fast_accel = 0;
             }
-        }
+            if ((last_duty_cycle - duty_cycle) > max_duty_cycle_change) {
+                duty_cycle = last_duty_cycle - max_duty_cycle_change;
+            }
         if ((armed && running) && input > 47) {
             if (eepromBuffer.variable_pwm) {
             }

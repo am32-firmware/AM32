@@ -18,9 +18,8 @@ typedef union EEprom_u {
         uint8_t current_P; // 0-255
         uint8_t current_I; // 0-255
         uint8_t current_D; // 0-255
-        uint8_t drive_mode; // 0 normal, 1 drive by rpm
         uint8_t active_brake_power; // 1-5 percent duty cycle
-        char reserved_eeprom_3[3]; //5-16
+        char reserved_eeprom_3[4]; //14-16  for crsf input
         uint8_t dir_reversed; // 17
         uint8_t bi_direction; // 18
         uint8_t use_sine_start; // 19
@@ -32,7 +31,7 @@ typedef union EEprom_u {
         uint8_t startup_power; // 25
         uint8_t motor_kv; // 26
         uint8_t motor_poles; // 27
-        uint8_t brake_on_stop_mode; // 28 
+        uint8_t brake_on_stop; // 28 
         uint8_t stall_protection; // 29
         uint8_t beep_volume; // 30
         uint8_t telemetry_on_interval; // 31

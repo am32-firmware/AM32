@@ -600,8 +600,8 @@ void loadEEpromSettings()
     }
 
     if (eepromBuffer.pwm_frequency < 145 && eepromBuffer.pwm_frequency > 7) {
-        if (eepromBuffer.pwm_frequency < 144 && eepromBuffer.pwm_frequency > 23) {
-            TIMER1_MAX_ARR = map(eepromBuffer.pwm_frequency, 24, 48, TIM1_AUTORELOAD, TIM1_AUTORELOAD / 6);
+        if (eepromBuffer.pwm_frequency < 145 && eepromBuffer.pwm_frequency > 23) {
+            TIMER1_MAX_ARR = map(eepromBuffer.pwm_frequency, 24, 144, TIM1_AUTORELOAD, TIM1_AUTORELOAD / 6);
         }
         if (eepromBuffer.pwm_frequency < 24 && eepromBuffer.pwm_frequency > 11) {
             TIMER1_MAX_ARR = map(eepromBuffer.pwm_frequency, 12, 24, TIM1_AUTORELOAD * 2, TIM1_AUTORELOAD);

@@ -615,20 +615,12 @@ void loadEEpromSettings()
         tim1_arr = TIM1_AUTORELOAD;
         SET_AUTO_RELOAD_PWM(tim1_arr);
     }
+    minimum_duty_cycle = eepromBuffer.minimum_duty_cycle * 10;
 
     if (eepromBuffer.startup_power < 151 && eepromBuffer.startup_power > 49) {
-        if(!eepromBuffer.comp_pwm){        // higher startup power for non-complementary pwm
-            min_startup_duty = (eepromBuffer.startup_power) *2 ;
-            minimum_duty_cycle = (eepromBuffer.startup_power / 2);
-            stall_protect_minimum_duty = minimum_duty_cycle + 10;
-			}else{
-            min_startup_duty = (eepromBuffer.startup_power);
-            minimum_duty_cycle = (eepromBuffer.startup_power / 3);
-            stall_protect_minimum_duty = minimum_duty_cycle + 10;
-			}
+            min_startup_duty = minimum_duty_cycle + eepromBuffer.startup_power;
     } else {
-        min_startup_duty = 150;
-        minimum_duty_cycle = (min_startup_duty / 2) + 10;
+        min_startup_duty = minimum_duty_cycle;
     }
     motor_kv = (eepromBuffer.motor_kv * 40) + 20;
 #ifdef THREE_CELL_MAX

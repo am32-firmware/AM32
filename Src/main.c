@@ -303,6 +303,7 @@ fastPID stallPid = { // 1khz loop time
 };
 
 EEprom_t eepromBuffer;
+volatile uint8_t ramp_divider;
 volatile uint8_t max_ramp_startup = RAMP_SPEED_STARTUP;
 volatile uint8_t max_ramp_low_rpm = RAMP_SPEED_LOW_RPM;
 volatile uint8_t max_ramp_high_rpm = RAMP_SPEED_HIGH_RPM;
@@ -590,7 +591,10 @@ int32_t doPidCalculations(struct fastPID* pidnow, int actual, int target)
 void loadEEpromSettings()
 {
     read_flash_bin(eepromBuffer.buffer, eeprom_address, sizeof(eepromBuffer.buffer));
-
+    if(eepromBuffer.eeprom_version < 3){
+      NVIC_SystemReset(); // do not load any settings if eeprom less than 3
+    }
+  
     if (eepromBuffer.advance_level > 32) {
         eepromBuffer.advance_level = 16;
     }
@@ -647,14 +651,9 @@ void loadEEpromSettings()
         servo_neutral = (eepromBuffer.servo.neutral) + 1374;
         servo_dead_band = eepromBuffer.servo.dead_band;
 
-        if (eepromBuffer.low_voltage_cut_off == 0x01) {
-            LOW_VOLTAGE_CUTOFF = 1;
-        } else {
-            LOW_VOLTAGE_CUTOFF = 0;
-        }
-
         low_cell_volt_cutoff = eepromBuffer.low_cell_volt_cutoff + 250; // 2.5 to 3.5 volts per cell range
-
+        
+        
 #ifndef HAS_HALL_SENSORS
         eepromBuffer.use_hall_sensors = 0;
 #endif
@@ -700,6 +699,10 @@ void loadEEpromSettings()
             use_current_limit = 1;
         }
         
+        currentPid.Kp = eepromBuffer.current_P;
+        currentPid.Ki = eepromBuffer.current_I;
+        currentPid.Kd = eepromBuffer.current_D;
+        
         if (eepromBuffer.sine_mode_power == 0 || eepromBuffer.sine_mode_power > 10) {
             eepromBuffer.sine_mode_power = 5;
         }
@@ -732,6 +735,25 @@ void loadEEpromSettings()
             servoPwm = 0;
             EDT_ARMED = 1;
         }
+        
+        if(eepromBuffer.max_ramp < 10){
+          ramp_divider = 10;
+          max_ramp_startup = eepromBuffer.max_ramp;
+          max_ramp_low_rpm = eepromBuffer.max_ramp;
+          max_ramp_high_rpm = eepromBuffer.max_ramp;
+        }else{
+          ramp_divider = 1;
+          if((eepromBuffer.max_ramp / 10) < max_ramp_startup){
+            max_ramp_startup = eepromBuffer.max_ramp / 10;
+          }
+          if((eepromBuffer.max_ramp / 10) < max_ramp_low_rpm){
+            max_ramp_low_rpm = eepromBuffer.max_ramp / 10;
+          }
+          if((eepromBuffer.max_ramp / 10) < max_ramp_high_rpm){
+            max_ramp_high_rpm = eepromBuffer.max_ramp / 10;
+          }
+        }
+        
         if (motor_kv < 300) {
             low_rpm_throttle_limit = 0;
         }
@@ -1159,12 +1181,16 @@ if (!stepper_sine && armed) {
                     old_routine = 1;
                     zero_crosses = 0;
                     bad_count = 0;
-                    if (eepromBuffer.brake_on_stop) {
+                    if (eepromBuffer.brake_on_stop == 1) {
                         if (!eepromBuffer.use_sine_start) {
 #ifndef PWM_ENABLE_BRIDGE
+                          if((eepromBuffer.brake_on_stop == 2) && degrees_celsius < 75){ // guard active brake with temperature limit
+                             SET_DUTY_CYCLE_ALL(eepromBuffer.active_brake_power);
+                            }else{
                             prop_brake_duty_cycle = (1980) + eepromBuffer.drag_brake_strength * 2;
                             proportionalBrake();
                             prop_brake_active = 1;
+                            }
 #else
                             // todo add proportional braking for pwm/enable style bridge.
 #endif
@@ -1246,7 +1272,7 @@ void tenKhzRoutine()
                             GPIOB->BSRR = LL_GPIO_PIN_8; // turn on green
                             GPIOB->BSRR = LL_GPIO_PIN_5;
 #endif
-                            if ((cell_count == 0) && LOW_VOLTAGE_CUTOFF) {
+                            if ((cell_count == 0) && eepromBuffer.low_voltage_cut_off == 1) {
                                 cell_count = battery_voltage / 370;
                                 for (int i = 0; i < cell_count; i++) {
                                     playInputTune();
@@ -1346,7 +1372,7 @@ void tenKhzRoutine()
                 }
             }
         }
-        if (maximum_throttle_change_ramp) {
+        if (tenkhzcounter % ramp_divider == 0) {
 #ifdef VOLTAGE_BASED_RAMP
             uint16_t voltage_based_max_change = map(battery_voltage, 800, 2200, 10, 1);
             if (average_interval > 200) {
@@ -1391,6 +1417,9 @@ void tenKhzRoutine()
         }
         last_duty_cycle = duty_cycle;
         SET_AUTO_RELOAD_PWM(tim1_arr);
+         if((eepromBuffer.brake_on_stop == 2) && !running && (degrees_celsius < 75)){
+            SET_DUTY_CYCLE_ALL(eepromBuffer.active_brake_power);
+         }
         SET_DUTY_CYCLE_ALL(adjusted_duty_cycle);
     }
 #endif // ndef brushed_mode
@@ -1630,9 +1659,6 @@ int main(void)
     if (VERSION_MAJOR != eepromBuffer.version.major || VERSION_MINOR != eepromBuffer.version.minor || eeprom_layout_version > eepromBuffer.eeprom_version) {
         eepromBuffer.version.major = VERSION_MAJOR;
         eepromBuffer.version.minor = VERSION_MINOR;
-        for (size_t i = 0; i < 12; i++) {
-            strlen(FIRMWARE_NAME) > i ? eepromBuffer.firmware_name[i] = (uint8_t)FIRMWARE_NAME[i] : 0;
-        }
         saveEEpromSettings();
     }
 
@@ -1961,22 +1987,35 @@ if(zero_crosses < 5){
             actual_current = ((smoothed_raw_current * 3300 / 41) - (CURRENT_OFFSET * 100)) / (MILLIVOLT_PER_AMP);
             if (actual_current < 0) {
                 actual_current = 0;
-            }
-            if (LOW_VOLTAGE_CUTOFF) {
+            }             
+            if (eepromBuffer.low_voltage_cut_off == 1) {  
                 if (battery_voltage < (cell_count * low_cell_volt_cutoff)) {
-                    low_voltage_count++;
-                    if (low_voltage_count > (20000 - (stepper_sine * 900))) {
-                        input = 0;
-                        allOff();
-                        maskPhaseInterrupts();
-                        running = 0;
-                        zero_input_count = 0;
-                        armed = 0;
-                    }
+                  low_voltage_count++;
                 } else {
+                  if(!LOW_VOLTAGE_CUTOFF){  // if set low cutoff has happened, require power cycle to reset
                     low_voltage_count = 0;
+                  }
                 }
             }
+            if (eepromBuffer.low_voltage_cut_off == 2 ){   // absolute cut off
+              if (battery_voltage <  eepromBuffer.absolute_voltage_cutoff) {
+                low_voltage_count++;    
+                } else {
+                  if(!LOW_VOLTAGE_CUTOFF){
+                    low_voltage_count = 0;
+                  }
+                }
+            }
+            if (low_voltage_count > (20000 - (stepper_sine * 18000))) {
+              LOW_VOLTAGE_CUTOFF = 1;
+              input = 0;
+              allOff();
+              maskPhaseInterrupts();
+              running = 0;
+              zero_input_count = 0;
+              armed = 0;
+             }
+           
             adc_counter = 0;
 #ifdef USE_ADC_INPUT
             if (ADC_raw_input < 10) {

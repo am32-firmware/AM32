@@ -591,7 +591,7 @@ int32_t doPidCalculations(struct fastPID* pidnow, int actual, int target)
 void loadEEpromSettings()
 {
     read_flash_bin(eepromBuffer.buffer, eeprom_address, sizeof(eepromBuffer.buffer));
-    if(eepromBuffer.eeprom_version < 3){
+    if(eepromBuffer.eeprom_version < EEPROM_VERSION){
       NVIC_SystemReset(); // do not load any settings if eeprom less than 3
     }
   
@@ -766,9 +766,6 @@ void loadEEpromSettings()
 
 void saveEEpromSettings()
 {
-
-    eepromBuffer.eeprom_version = eeprom_layout_version;
-
     save_flash_nolib(eepromBuffer.buffer, sizeof(eepromBuffer.buffer), eeprom_address);
 }
 

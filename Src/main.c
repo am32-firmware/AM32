@@ -615,13 +615,18 @@ void loadEEpromSettings()
         tim1_arr = TIM1_AUTORELOAD;
         SET_AUTO_RELOAD_PWM(tim1_arr);
     }
+    if(eepromBuffer.minimum_duty_cycle < 51 && eepromBuffer.minimum_duty_cycle > 0){
     minimum_duty_cycle = eepromBuffer.minimum_duty_cycle * 10;
-
+    }else{
+    minimum_duty_cycle = 0;
+    }
     if (eepromBuffer.startup_power < 151 && eepromBuffer.startup_power > 49) {
             min_startup_duty = minimum_duty_cycle + eepromBuffer.startup_power;
     } else {
         min_startup_duty = minimum_duty_cycle;
     }
+    startup_max_duty_cycle = minimum_duty_cycle + 400;  
+
     motor_kv = (eepromBuffer.motor_kv * 40) + 20;
 #ifdef THREE_CELL_MAX
 		motor_kv =  motor_kv / 2;
@@ -638,8 +643,7 @@ void loadEEpromSettings()
         }
 #endif
         servo_low_threshold = (eepromBuffer.servo.low_threshold * 2) + 750; // anything below this point considered 0
-        servo_high_threshold = (eepromBuffer.servo.high_threshold * 2) + 1750;
-        ; // anything above this point considered 2000 (max)
+        servo_high_threshold = (eepromBuffer.servo.high_threshold * 2) + 1750; // anything above this point considered 2000 (max)
         servo_neutral = (eepromBuffer.servo.neutral) + 1374;
         servo_dead_band = eepromBuffer.servo.dead_band;
 
@@ -750,7 +754,6 @@ void loadEEpromSettings()
             low_rpm_throttle_limit = 0;
         }
         low_rpm_level = motor_kv / 100 / (32 / eepromBuffer.motor_poles);
-
         high_rpm_level = motor_kv / 12 / (32 / eepromBuffer.motor_poles);				
     }
     reverse_speed_threshold = map(motor_kv, 300, 3000, 1000, 500);
@@ -916,7 +919,6 @@ void startMotor()
 
 void setInput()
 {
-
     if (eepromBuffer.bi_direction) {
         if (dshot == 0) {
             if (eepromBuffer.rc_car_reverse) {
@@ -1157,7 +1159,7 @@ if (!stepper_sine && armed) {
                 if (eepromBuffer.rc_car_reverse && prop_brake_active) {
 #ifndef PWM_ENABLE_BRIDGE
                     prop_brake_duty_cycle = (getAbsDif(1000, newinput) + 1000);
-                    if (prop_brake_duty_cycle >= (TIMER1_MAX_ARR - 1)) {
+                    if (prop_brake_duty_cycle >= (1999)) {
                         fullBrake();
                     } else {
                         proportionalBrake();
@@ -1170,16 +1172,18 @@ if (!stepper_sine && armed) {
                     old_routine = 1;
                     zero_crosses = 0;
                     bad_count = 0;
-                    if (eepromBuffer.brake_on_stop == 1) {
+                    if (eepromBuffer.brake_on_stop > 0) {
                         if (!eepromBuffer.use_sine_start) {
 #ifndef PWM_ENABLE_BRIDGE
-                          if((eepromBuffer.brake_on_stop == 2) && degrees_celsius < 75){ // guard active brake with temperature limit
-                             SET_DUTY_CYCLE_ALL(eepromBuffer.active_brake_power);
-                            }else{
-                            prop_brake_duty_cycle = (1980) + eepromBuffer.drag_brake_strength * 2;
-                            proportionalBrake();
-                            prop_brake_active = 1;
-                            }
+                          if(eepromBuffer.brake_on_stop == 1){
+                             prop_brake_duty_cycle =  eepromBuffer.drag_brake_strength * 200;
+                              if (prop_brake_duty_cycle >= (1999)) {
+                                fullBrake();
+                              } else {
+                                proportionalBrake();
+                                prop_brake_active = 1;
+                              }
+                           }
 #else
                             // todo add proportional braking for pwm/enable style bridge.
 #endif
@@ -1379,7 +1383,7 @@ void tenKhzRoutine()
                     max_duty_cycle_change = max_ramp_high_rpm;
                 }
             }
-          }
+          
 #endif
 #ifdef CUSTOM_RAMP
    //         max_duty_cycle_change = eepromBuffer[30];
@@ -1391,6 +1395,10 @@ void tenKhzRoutine()
             if ((last_duty_cycle - duty_cycle) > max_duty_cycle_change) {
                 duty_cycle = last_duty_cycle - max_duty_cycle_change;
             }
+            }else{
+             duty_cycle = last_duty_cycle;
+            }
+
         if ((armed && running) && input > 47) {
             if (eepromBuffer.variable_pwm) {
             }
@@ -1399,17 +1407,19 @@ void tenKhzRoutine()
         } else {
 
             if (prop_brake_active) {
-                adjusted_duty_cycle = TIMER1_MAX_ARR - ((prop_brake_duty_cycle * tim1_arr) / 2000) + 1;
+                adjusted_duty_cycle =  tim1_arr - ((prop_brake_duty_cycle * tim1_arr) / 2000);
             } else {
                 adjusted_duty_cycle = ((duty_cycle * tim1_arr) / 2000);
             }
         }
         last_duty_cycle = duty_cycle;
         SET_AUTO_RELOAD_PWM(tim1_arr);
-         if((eepromBuffer.brake_on_stop == 2) && !running && (degrees_celsius < 75)){
-            SET_DUTY_CYCLE_ALL(eepromBuffer.active_brake_power);
-         }
+        if((eepromBuffer.brake_on_stop == 2) && !running){
+        comStep(2);
+        SET_DUTY_CYCLE_ALL(DEAD_TIME + ((eepromBuffer.active_brake_power * tim1_arr) / 2000)* 10);
+         }else{
         SET_DUTY_CYCLE_ALL(adjusted_duty_cycle);
+          }
     }
 #endif // ndef brushed_mode
 #if defined(FIXED_DUTY_MODE) || defined(FIXED_SPEED_MODE)
@@ -1650,10 +1660,6 @@ int main(void)
         eepromBuffer.version.minor = VERSION_MINOR;
         saveEEpromSettings();
     }
-
-    // if (eepromBuffer.use_sine_start) {
-        //    min_startup_duty = sin_mode_min_s_d;
-    // }
     
     if (eepromBuffer.dir_reversed == 1) {
         forward = 0;
@@ -1661,9 +1667,6 @@ int main(void)
         forward = 1;
     }
     tim1_arr = TIMER1_MAX_ARR;
- //   startup_max_duty_cycle = startup_max_duty_cycle * TIMER1_MAX_ARR / 2000 + dead_time_override; // adjust for pwm frequency
- //   throttle_max_at_low_rpm = throttle_max_at_low_rpm * TIMER1_MAX_ARR / 2000; // adjust to new pwm frequency
- //   throttle_max_at_high_rpm = TIMER1_MAX_ARR; // adjust to new pwm frequency
     if (!eepromBuffer.comp_pwm) {
         eepromBuffer.use_sine_start = 0; // sine start requires complementary pwm.
     }
@@ -2162,19 +2165,26 @@ if(zero_crosses < 5){
 
             } else {
                 do_once_sinemode = 1;
-                if (eepromBuffer.brake_on_stop) {
+                if (eepromBuffer.brake_on_stop == 1) {
 #ifndef PWM_ENABLE_BRIDGE
-                    duty_cycle = (TIMER1_MAX_ARR - 19) + eepromBuffer.drag_brake_strength * 2;
-                    adjusted_duty_cycle = TIMER1_MAX_ARR - ((duty_cycle * tim1_arr) / TIMER1_MAX_ARR) + 1;
-                    proportionalBrake();
-                    SET_DUTY_CYCLE_ALL(adjusted_duty_cycle);
-                    prop_brake_active = 1;
+                    prop_brake_duty_cycle =  eepromBuffer.drag_brake_strength * 200;
+                    adjusted_duty_cycle =  tim1_arr - ((prop_brake_duty_cycle * tim1_arr) / 2000);
+                    if(adjusted_duty_cycle < 100){
+                      fullBrake();
+                    }else{
+                      proportionalBrake();
+                      SET_DUTY_CYCLE_ALL(adjusted_duty_cycle);
+                      prop_brake_active = 1;
+                    } 
 #else
                     // todo add braking for PWM /enable style bridges.
 #endif
-                } else {
-                    SET_DUTY_CYCLE_ALL(0);
-                    allOff();
+                } else if (eepromBuffer.brake_on_stop == 2){
+                  comStep(2);
+                  SET_DUTY_CYCLE_ALL(DEAD_TIME + ((eepromBuffer.active_brake_power * tim1_arr) / 2000)* 10);
+                }else{
+                   SET_DUTY_CYCLE_ALL(0);
+                   allOff();
                 }
                 e_rpm = 0;
             }

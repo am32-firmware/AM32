@@ -320,7 +320,7 @@ uint8_t compute_dshot_flag = 0;
 uint8_t crsf_input_channel = 1;
 uint8_t crsf_output_PWM_channel = 2;
 uint8_t telemetry_interval_ms = 30;
-char temp_advance = 1;
+uint8_t temp_advance;
 uint16_t motor_kv = 2000;
 uint8_t dead_time_override = DEAD_TIME;
 uint16_t stall_protect_target_interval = TARGET_STALL_PROTECTION_INTERVAL;
@@ -591,7 +591,6 @@ void loadEEpromSettings()
 {
     read_flash_bin(eepromBuffer.buffer, eeprom_address, sizeof(eepromBuffer.buffer));
     if(eepromBuffer.eeprom_version < EEPROM_VERSION){
-      eepromBuffer.advance_level = eepromBuffer.advance_level << 3;  // correct for shift in advance
       eepromBuffer.max_ramp = 160;    // 0.1% per ms to 25% per ms 
       eepromBuffer.minimum_duty_cycle = 1; // 0.2% to 51 percent
       eepromBuffer.disable_stick_calibration = 0; // 
@@ -606,8 +605,14 @@ void loadEEpromSettings()
       eepromBuffer.reserved_eeprom_3[3] = 0;
     }
   
-    if (eepromBuffer.advance_level > 32) {
-        eepromBuffer.advance_level = 16;
+    if (eepromBuffer.advance_level > 42) {
+        temp_advance = 16;
+    }
+    if (eepromBuffer.advance_level < 10) {         // old format needs to be converted to 0-32 range
+        temp_advance = (eepromBuffer.advance_level<<3);
+    }
+    if (eepromBuffer.advance_level < 43 && eepromBuffer.advance_level > 9 ) { // new format subtract 10 from advance
+        temp_advance = eepromBuffer.advance_level - 10;
     }
 
     if (eepromBuffer.pwm_frequency < 145 && eepromBuffer.pwm_frequency > 7) {
@@ -872,7 +877,7 @@ void PeriodElapsedCallback()
     commutate();
     commutation_interval = ((commutation_interval)+((lastzctime + thiszctime) >> 1))>>1;
   	if (!eepromBuffer.auto_advance) {
-	  advance = (eepromBuffer.advance_level * commutation_interval) >> 6; // 60 divde 64 0.9375 degree increments
+	  advance = (commutation_interval * temp_advance) >> 6; // 60 divde 64 0.9375 degree increments
 	} else {
 	  advance = (commutation_interval * auto_advance_level) >> 6; // 60 divde 64 0.9375 degree increments
     }

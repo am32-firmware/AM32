@@ -62,20 +62,30 @@ void SystemClock_Config(void)
   }
 
 #ifdef USE_HSE
-  /*
-    using high speed external oscillator
-   */
-  LL_RCC_HSE_EnableBypass();
-  LL_RCC_HSE_Enable();
-#if HSE_VALUE == 24000000
-  LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_3, 20, LL_RCC_PLLR_DIV_2);
-#elif HSE_VALUE == 16000000
-  LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_2, 20, LL_RCC_PLLR_DIV_2);
-#elif HSE_VALUE == 8000000
-  LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_1, 20, LL_RCC_PLLR_DIV_2);
-#else
-#error "Unsupported HSE_VALUE"
-#endif
+    /*
+        Using high-speed external source (HSE)
+        - Default: Bypass mode (external oscillator)
+        - Define USE_HSE_BYPASS to disable bypass (use crystal)
+    */
+    #if defined(USE_HSE_BYPASS) && (USE_HSE_BYPASS == 0)
+        LL_RCC_HSE_DisableBypass(); // Use crystal mode
+    #else
+        LL_RCC_HSE_EnableBypass(); // Default: Use external oscillator
+    #endif
+    LL_RCC_HSE_Enable();
+
+    // Wait for HSE to be ready
+    while (LL_RCC_HSE_IsReady() != 1U) {}
+
+    #if HSE_VALUE == 24000000
+        LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_3, 20, LL_RCC_PLLR_DIV_2);
+    #elif HSE_VALUE == 16000000
+        LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_2, 20, LL_RCC_PLLR_DIV_2);
+    #elif HSE_VALUE == 8000000
+        LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_1, 20, LL_RCC_PLLR_DIV_2);
+    #else
+        #error "Unsupported HSE_VALUE"
+    #endif
 
 #elif defined(USE_LSE)
   /*

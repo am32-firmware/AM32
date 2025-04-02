@@ -319,7 +319,6 @@ uint16_t target_e_com_time_low;
 uint8_t compute_dshot_flag = 0;
 uint8_t crsf_input_channel = 1;
 uint8_t crsf_output_PWM_channel = 2;
-char eeprom_layout_version = EEPROM_VERSION;
 uint8_t telemetry_interval_ms = 30;
 char temp_advance = 1;
 uint16_t motor_kv = 2000;
@@ -591,8 +590,20 @@ int32_t doPidCalculations(struct fastPID* pidnow, int actual, int target)
 void loadEEpromSettings()
 {
     read_flash_bin(eepromBuffer.buffer, eeprom_address, sizeof(eepromBuffer.buffer));
-    if(eepromBuffer.eeprom_version != EEPROM_VERSION){
-      NVIC_SystemReset(); // do not load any settings if eeprom not 3
+    if(eepromBuffer.eeprom_version < EEPROM_VERSION){
+      eepromBuffer.advance_level = eepromBuffer.advance_level << 3;  // correct for shift in advance
+      eepromBuffer.max_ramp = 160;    // 0.1% per ms to 25% per ms 
+      eepromBuffer.minimum_duty_cycle = 1; // 0.2% to 51 percent
+      eepromBuffer.disable_stick_calibration = 0; // 
+      eepromBuffer.absolute_voltage_cutoff = 10;  // voltage level 1 to 100 in 0.5v increments
+      eepromBuffer.current_P = 100; // 0-255
+      eepromBuffer.current_I = 0; // 0-255
+      eepromBuffer.current_D = 100; // 0-255
+      eepromBuffer.active_brake_power = 0; // 1-5 percent duty cycle
+      eepromBuffer.reserved_eeprom_3[0] = 0; //14-16  for crsf input
+      eepromBuffer.reserved_eeprom_3[1] = 0;
+      eepromBuffer.reserved_eeprom_3[2] = 0;
+      eepromBuffer.reserved_eeprom_3[3] = 0;
     }
   
     if (eepromBuffer.advance_level > 32) {
@@ -1655,9 +1666,10 @@ int main(void)
 
     loadEEpromSettings();
 
-    if (VERSION_MAJOR != eepromBuffer.version.major || VERSION_MINOR != eepromBuffer.version.minor || eeprom_layout_version > eepromBuffer.eeprom_version) {
+    if (VERSION_MAJOR != eepromBuffer.version.major || VERSION_MINOR != eepromBuffer.version.minor || EEPROM_VERSION > eepromBuffer.eeprom_version) {
         eepromBuffer.version.major = VERSION_MAJOR;
         eepromBuffer.version.minor = VERSION_MINOR;
+        eepromBuffer.eeprom_version = EEPROM_VERSION;
         saveEEpromSettings();
     }
     

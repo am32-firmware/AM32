@@ -1426,19 +1426,19 @@ void tenKhzRoutine()
         } else {
 
             if (prop_brake_active) {
-                adjusted_duty_cycle =  tim1_arr - ((prop_brake_duty_cycle * tim1_arr) / 2000);
+              adjusted_duty_cycle =  tim1_arr - ((prop_brake_duty_cycle * tim1_arr) / 2000);
             } else {
+              if((eepromBuffer.brake_on_stop == 2) && armed){  // require arming for active brake
+                comStep(2);
+                adjusted_duty_cycle = DEAD_TIME + ((eepromBuffer.active_brake_power * tim1_arr) / 2000)* 10;
+            }else{
                 adjusted_duty_cycle = ((duty_cycle * tim1_arr) / 2000);
+            }
             }
         }
         last_duty_cycle = duty_cycle;
         SET_AUTO_RELOAD_PWM(tim1_arr);
-        if((eepromBuffer.brake_on_stop == 2) && !running){
-        comStep(2);
-        SET_DUTY_CYCLE_ALL(DEAD_TIME + ((eepromBuffer.active_brake_power * tim1_arr) / 2000)* 10);
-         }else{
         SET_DUTY_CYCLE_ALL(adjusted_duty_cycle);
-          }
     }
 #endif // ndef brushed_mode
 #if defined(FIXED_DUTY_MODE) || defined(FIXED_SPEED_MODE)

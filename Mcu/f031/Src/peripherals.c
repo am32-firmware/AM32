@@ -565,10 +565,6 @@ void enableCorePeripherals()
     LL_TIM_CC_EnableChannel(
         TIM1, LL_TIM_CHANNEL_CH5); // timer used for comparator blanking
 #endif
-    LL_TIM_CC_EnableChannel(TIM1,
-        LL_TIM_CHANNEL_CH4); // timer used for timing adc read
-    TIM1->CCR4 = 100; // set in 10khz loop to match pwm cycle timed to end of pwm on
-
     /* Enable counter */
     LL_TIM_EnableCounter(TIM1);
     LL_TIM_EnableAllOutputs(TIM1);
@@ -579,7 +575,7 @@ void enableCorePeripherals()
 
 #else
     LL_TIM_CC_EnableChannel(IC_TIMER_REGISTER,
-        IC_TIMER_CHANNEL); // input capture and output compare
+    IC_TIMER_CHANNEL); // input capture and output compare
     LL_TIM_EnableCounter(IC_TIMER_REGISTER);
 #endif
 
@@ -602,14 +598,14 @@ void enableCorePeripherals()
 #endif
     LL_TIM_EnableCounter(UTILITY_TIMER);
     LL_TIM_GenerateEvent_UPDATE(UTILITY_TIMER);
-    //
+    
     LL_TIM_EnableCounter(INTERVAL_TIMER);
     LL_TIM_GenerateEvent_UPDATE(INTERVAL_TIMER);
 
     LL_TIM_EnableCounter(TEN_KHZ_TIMER); // 10khz timer
     LL_TIM_GenerateEvent_UPDATE(TEN_KHZ_TIMER);
     TEN_KHZ_TIMER->DIER |= (0x1UL << (0U)); // enable interrupt
-    // RCC->APB2ENR  &= ~(1 << 22);  // turn debug off
+   
 #ifdef USE_ADC
     ADC_Init();
     enableADC_DMA();

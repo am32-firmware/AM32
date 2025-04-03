@@ -604,11 +604,11 @@ void loadEEpromSettings()
       eepromBuffer.reserved_eeprom_3[2] = 0;
       eepromBuffer.reserved_eeprom_3[3] = 0;
     }
-  
-    if (eepromBuffer.advance_level > 42) {
+    // eepromBuffer.advance_level can either be set to 0-3 with config tools less than 1.90 or 10-42 with 1.90 or above 
+    if (eepromBuffer.advance_level > 42 || (eepromBuffer.advance_level < 10 && eepromBuffer.advance_level > 3)){
         temp_advance = 16;
     }
-    if (eepromBuffer.advance_level < 10) {         // old format needs to be converted to 0-32 range
+    if (eepromBuffer.advance_level < 4) {         // old format needs to be converted to 0-32 range
         temp_advance = (eepromBuffer.advance_level<<3);
     }
     if (eepromBuffer.advance_level < 43 && eepromBuffer.advance_level > 9 ) { // new format subtract 10 from advance
@@ -847,6 +847,9 @@ void commutate()
         }
         rising = !(step % 2);
     }
+#ifdef INVERTED_EXTI
+    rising = !rising;
+#endif
     __disable_irq(); // don't let dshot interrupt
     if (!prop_brake_active) {
         comStep(step);
@@ -1662,13 +1665,9 @@ int main(void)
 {
 
     initAfterJump();
-
     checkDeviceInfo();
-
     initCorePeripherals();
-
     enableCorePeripherals();
-
     loadEEpromSettings();
 
     if (VERSION_MAJOR != eepromBuffer.version.major || VERSION_MINOR != eepromBuffer.version.minor || EEPROM_VERSION > eepromBuffer.eeprom_version) {
@@ -1765,7 +1764,6 @@ int main(void)
 
 #else
     // checkForHighSignal();     // will reboot if signal line is high for 10ms
-
     receiveDshotDma();
     if (drive_by_rpm) {
         use_speed_control_loop = 1;

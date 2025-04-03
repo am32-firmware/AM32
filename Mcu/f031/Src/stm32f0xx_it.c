@@ -271,18 +271,26 @@ void DMA1_Channel4_5_IRQHandler(void)
  */
 void TIM2_IRQHandler(void)
 {
-    if (LL_TIM_IsActiveFlag_CC4(TIM2) == 1) {
-        LL_TIM_ClearFlag_CC4(TIM2);
-    }
+update_interupt++;
+//    if (LL_TIM_IsActiveFlag_CC4(TIM2) == 1) {
+//        LL_TIM_ClearFlag_CC4(TIM2);
+//    }
 
     if (LL_TIM_IsActiveFlag_UPDATE(TIM2) == 1) {
         LL_TIM_ClearFlag_UPDATE(TIM2);
+        tenKhzRoutine();
         update_interupt++;
     }
 
-    if (LL_TIM_IsActiveFlag_CC1(TIM2) == 1) {
-        LL_TIM_ClearFlag_CC1(TIM2);
-    }
+//    if (LL_TIM_IsActiveFlag_CC1(TIM2) == 1) {
+//        LL_TIM_ClearFlag_CC1(TIM2);
+//    }
+//    if (LL_TIM_IsActiveFlag_CC2(TIM2) == 1) {
+//        LL_TIM_ClearFlag_CC2(TIM2);
+//    }
+//    if (LL_TIM_IsActiveFlag_CC3(TIM2) == 1) {
+//        LL_TIM_ClearFlag_CC3(TIM2);
+//    }
 }
 
 /**
@@ -308,7 +316,7 @@ void TIM14_IRQHandler(void)
  */
 void TIM16_IRQHandler(void)
 {
-#ifdef USE_TIM_16
+#ifdef USE_TIMER_16
     if (LL_TIM_IsActiveFlag_CC1(TIM16) == 1) {
         LL_TIM_ClearFlag_CC1(TIM16);
     }

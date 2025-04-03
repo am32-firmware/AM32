@@ -117,6 +117,7 @@ void computeServoInput()
 
 void transfercomplete()
 {
+#ifndef MCU_F031   // f031 does not use software EXTI event to process dshot
     if (armed && dshot_telemetry) {
         if (out_put) {
             receiveDshotDma();
@@ -128,6 +129,7 @@ void transfercomplete()
             return;
         }
     }
+#endif
     if (inputSet == 0) {
         detectInput();
         receiveDshotDma();

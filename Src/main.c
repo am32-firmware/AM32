@@ -895,18 +895,18 @@ void PeriodElapsedCallback()
 
 void interruptRoutine()
 {
-   if (average_interval > 125) {
-        if ((INTERVAL_TIMER_COUNT < 125) && (duty_cycle < 600) && (zero_crosses < 500)) { // should be impossible, desync?exit anyway
-           return;
-        }
-        stuckcounter++; // stuck at 100 interrupts before the main loop happens
-                        // again.
-        if (stuckcounter > 100) {
-            maskPhaseInterrupts();
-            zero_crosses = 0;
-            return;
-        }
-    }
+//   if (average_interval > 125) {
+//        if ((INTERVAL_TIMER_COUNT < 125) && (duty_cycle < 600) && (zero_crosses < 500)) { // should be impossible, desync?exit anyway
+//           return;
+//        }
+//        stuckcounter++; // stuck at 100 interrupts before the main loop happens
+//                        // again.
+//        if (stuckcounter > 100) {
+//            maskPhaseInterrupts();
+//            zero_crosses = 0;
+//            return;
+//        }
+//    }
         for (int i = 0; i < filter_level; i++) {
 #if defined(MCU_F031) || defined(MCU_G031)
             if (((current_GPIO_PORT->IDR & current_GPIO_PIN) == !(rising))) {
@@ -1518,16 +1518,8 @@ void zcfoundroutine()
     thiszctime = INTERVAL_TIMER_COUNT;
     SET_INTERVAL_TIMER_COUNT(0);
     commutation_interval = (thiszctime + (3 * commutation_interval)) / 4;
-    advance = (commutation_interval >> 3) * 2; //   7.5 degree increments
+    advance = (temp_advance * commutation_interval) >> 6; //   7.5 degree increments
     waitTime = commutation_interval / 2 - advance;
-//			if(thiszctime < (commutation_interval - (commutation_interval>>2))){
-//					waitTime = waitTime + commutation_interval - thiszctime;
-//			    thiszctime = commutation_interval - (commutation_interval>>2);
-//		}else if(thiszctime > (commutation_interval + (commutation_interval>>2))){
-//			    waitTime = waitTime - thiszctime - commutation_interval; 
-//			    thiszctime = commutation_interval - (commutation_interval>>2);
-//		}
-	
     while ((INTERVAL_TIMER_COUNT) < (waitTime)) {
         if (zero_crosses < 5) {
             break;
@@ -1559,7 +1551,7 @@ void zcfoundroutine()
             enableCompInterrupts(); // enable interrupt
         }
     } else {
-       if (commutation_interval < 2000) {
+       if (commutation_interval < POLLING_MODE_THRESHOLD) {
             old_routine = 0;
             enableCompInterrupts(); // enable interrupt
         }
@@ -1804,11 +1796,19 @@ e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation
 #endif
 
 #ifdef NEED_INPUT_READY
-        if (input_ready) {
-            processDshot();
-            input_ready = 0;
-        }
+ #ifdef MCU_F031
+    if (input_ready) {
+    setInput(); 
+    input_ready = 0;
+    }
+#else
+    if (input_ready) {
+     processDshot();
+     input_ready = 0;
+     }
 #endif
+#endif
+
 if(zero_crosses < 5){
 	  min_bemf_counts_up = TARGET_MIN_BEMF_COUNTS * 2;
 		min_bemf_counts_down = TARGET_MIN_BEMF_COUNTS * 2;

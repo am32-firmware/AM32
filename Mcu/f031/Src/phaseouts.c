@@ -9,6 +9,10 @@
 #include "targets.h"
 
 extern char prop_brake_active;
+uint32_t current_GPIO_PIN;
+GPIO_TypeDef* current_GPIO_PORT;
+uint32_t current_EXTI_LINE = 0;
+
 
 #ifndef PWM_ENABLE_BRIDGE
 
@@ -300,36 +304,54 @@ void comStep(int newStep)
         phaseCFLOAT();
         phaseBLOW();
         phaseAPWM();
+        current_GPIO_PIN = PHASE_C_EXTI_PIN;
+        current_GPIO_PORT = PHASE_C_EXTI_PORT;
+        current_EXTI_LINE = PHASE_C_EXTI_LINE;
         break;
 
     case 2: // C-B
         phaseAFLOAT();
         phaseBLOW();
         phaseCPWM();
+        current_GPIO_PIN = PHASE_A_EXTI_PIN;
+        current_GPIO_PORT = PHASE_A_EXTI_PORT;
+        current_EXTI_LINE = PHASE_A_EXTI_LINE;
         break;
 
     case 3: // C-A
         phaseBFLOAT();
         phaseALOW();
         phaseCPWM();
+        current_GPIO_PIN = PHASE_B_EXTI_PIN;
+        current_GPIO_PORT = PHASE_B_EXTI_PORT;
+        current_EXTI_LINE = PHASE_B_EXTI_LINE;
         break;
 
     case 4: // B-A
         phaseCFLOAT();
         phaseALOW();
         phaseBPWM();
+        current_GPIO_PIN = PHASE_C_EXTI_PIN;
+        current_GPIO_PORT = PHASE_C_EXTI_PORT;
+        current_EXTI_LINE = PHASE_C_EXTI_LINE;
         break;
 
     case 5: // B-C
         phaseAFLOAT();
         phaseCLOW();
         phaseBPWM();
+        current_GPIO_PIN = PHASE_A_EXTI_PIN;
+        current_GPIO_PORT = PHASE_A_EXTI_PORT;
+        current_EXTI_LINE = PHASE_A_EXTI_LINE;
         break;
 
     case 6: // A-C
         phaseBFLOAT();
         phaseCLOW();
         phaseAPWM();
+        current_GPIO_PIN = PHASE_B_EXTI_PIN;
+        current_GPIO_PORT = PHASE_B_EXTI_PORT;
+        current_EXTI_LINE = PHASE_B_EXTI_LINE;
         break;
     }
 }

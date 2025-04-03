@@ -2421,6 +2421,7 @@
 #define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_0
 #define INVERTED_EXTI
 #define TARGET_VOLTAGE_DIVIDER 152
+//#define NO_POLLING_START
 #endif
 
 /******************** G031 TARGETS ******************************************/
@@ -4291,10 +4292,11 @@
 #define UTILITY_TIMER TIM17
 #define COM_TIMER TIM14
 #define APPLICATION_ADDRESS 0x08001000
-#define TARGET_MIN_BEMF_COUNTS 3
+#define TARGET_MIN_BEMF_COUNTS 2
 // #define USE_SERIAL_TELEMETRY // moved to individual ESCs
 #define USE_ADC
 #define LOOP_FREQUENCY_HZ 20000
+#define POLLING_MODE_THRESHOLD 500
 #endif
 
 #ifdef MCU_G071
@@ -4558,4 +4560,6 @@
 #define TIM1_AUTORELOAD    ((uint16_t)(CPU_FREQUENCY_MHZ * 1000U * 1000U / NOMINAL_PWM)-1)
 #endif
 
-
+#ifndef POLLING_MODE_THRESHOLD
+#define POLLING_MODE_THRESHOLD 2000
+#endif

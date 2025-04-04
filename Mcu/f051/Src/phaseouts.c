@@ -299,36 +299,42 @@ void comStep(char newStep)
         phaseCFLOAT();
         phaseBLOW();
         phaseAPWM();
+        COMP->CSR = PHASE_C_COMP;
         break;
 
     case 2: // C-B
         phaseAFLOAT();
         phaseBLOW();
         phaseCPWM();
+        COMP->CSR = PHASE_A_COMP;
         break;
 
     case 3: // C-A
         phaseBFLOAT();
         phaseALOW();
         phaseCPWM();
+        COMP->CSR = PHASE_B_COMP;
         break;
 
     case 4: // B-A
         phaseCFLOAT();
         phaseALOW();
         phaseBPWM();
+        COMP->CSR = PHASE_C_COMP;
         break;
 
     case 5: // B-C
         phaseAFLOAT();
         phaseCLOW();
         phaseBPWM();
+        COMP->CSR = PHASE_A_COMP;
         break;
 
     case 6: // A-C
         phaseBFLOAT();
         phaseCLOW();
         phaseAPWM();
+        COMP->CSR = PHASE_B_COMP;
         break;
     }
 }

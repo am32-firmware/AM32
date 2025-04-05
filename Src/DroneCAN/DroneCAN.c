@@ -1024,7 +1024,11 @@ static void send_ESCStatus(void)
     current.count = 0;
 
     pkt.temperature = C_TO_KELVIN(degrees_celsius);
-    pkt.rpm = (e_rpm * 200) / eepromBuffer.motor_poles;
+    if (forward) {
+      pkt.rpm = (e_rpm * 200) / eepromBuffer.motor_poles;
+    } else {
+      pkt.rpm = (e_rpm * 200) / eepromBuffer.motor_poles * -1;
+    }
     pkt.power_rating_pct = 0; // how do we get this?
     pkt.esc_index = eepromBuffer.can.esc_index;
 

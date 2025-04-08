@@ -355,12 +355,12 @@ ARM Macro Assembler    Page 6
   244 00000014                 END
               00000000 
               00000000 
-Command Line: --debug --xref --diag_suppress=9931,A1950W --cpu=Cortex-M0+ --dep
-end=.\objects\startup_stm32g031xx.d -o.\objects\startup_stm32g031xx.o -IC:\Keil
-Packs\Keil\STM32G0xx_DFP\1.4.0\Drivers\CMSIS\Device\ST\STM32G0xx\Include --pred
-efine="__EVAL SETA 1" --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VE
-RSION SETA 538" --predefine="STM32G031xx SETA 1" --list=startup_stm32g031xx.lst
- ..\Mcu\g031\Startup\mdk\startup_stm32g031xx.s
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M0+ --depend=.\o
+bjects\startup_stm32g031xx.d -o.\objects\startup_stm32g031xx.o -IC:\Users\alkaz
+\AppData\Local\Arm\Packs\Keil\STM32G0xx_DFP\1.4.0\Drivers\CMSIS\Device\ST\STM32
+G0xx\Include --predefine="__EVAL SETA 1" --predefine="__MICROLIB SETA 1" --pred
+efine="__UVISION_VERSION SETA 536" --predefine="STM32G031xx SETA 1" --list=star
+tup_stm32g031xx.lst ..\Mcu\g031\Startup\mdk\startup_stm32g031xx.s
 
 
 

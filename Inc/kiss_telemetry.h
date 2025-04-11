@@ -5,16 +5,16 @@
 
 typedef struct __attribute__((packed))
 {
-    uint8_t temperature; // temperature in Celcius
-    uint8_t voltage_h; // voltage in centivolts
-    uint8_t voltage_l;
-    uint8_t current_h; // current in centiamps
-    uint8_t current_l;
-    uint8_t consumption_h; // accumulated current consumption in mAH
-    uint8_t consumption_l;
-    uint8_t erpm_h; // eRPM * 100, so 1 in the packet means 100 eRPM
-    uint8_t erpm_l;
-    uint8_t crc;
+  uint8_t temperature; // temperature in Celcius
+  uint8_t voltage_h; // voltage in centivolts
+  uint8_t voltage_l;
+  uint8_t current_h; // current in centiamps
+  uint8_t current_l;
+  uint8_t consumption_h; // accumulated current consumption in mAH
+  uint8_t consumption_l;
+  uint8_t erpm_h; // eRPM * 100, so 1 in the packet means 100 eRPM
+  uint8_t erpm_l;
+  uint8_t crc;
 }
 kiss_telem_pkt_t; // sizeof(kiss_telem_pkt_t) = 10
 

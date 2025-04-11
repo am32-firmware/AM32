@@ -4,112 +4,109 @@
  *  Created on: May 20, 2020
  *      Author: Alka
  */
- #include "ADC.h"
+#include "ADC.h"
 
- #ifdef USE_ADC_INPUT
- uint16_t ADCDataDMA[4];
- #else
- uint16_t ADCDataDMA[3];
- #endif
+#ifdef USE_ADC_INPUT
+uint16_t ADCDataDMA[4];
+#else
+uint16_t ADCDataDMA[3];
+#endif
 
- extern uint16_t ADC_raw_temp;
- extern uint16_t ADC_raw_volts;
- extern uint16_t ADC_raw_current;
- extern uint16_t ADC_raw_input;
+extern uint16_t ADC_raw_temp;
+extern uint16_t ADC_raw_volts;
+extern uint16_t ADC_raw_current;
+extern uint16_t ADC_raw_input;
 
 #define ADC_DELAY_CALIB_ENABLE_CPU_CYCLES \
     (LL_ADC_DELAY_CALIB_ENABLE_ADC_CYCLES * 64)
 
- void ADC_DMA_Callback()
-{ // read dma buffer and set extern variables
+void ADC_DMA_Callback()
+{
+  // read dma buffer and set extern variables
 
- #ifdef USE_ADC_INPUT
-     ADC_raw_temp = ADCDataDMA[3];
-     ADC_raw_volts = ADCDataDMA[1] / 2;
-     ADC_raw_current = ADCDataDMA[2];
-     ADC_raw_input = ADCDataDMA[0];
+#ifdef USE_ADC_INPUT
+  ADC_raw_temp = ADCDataDMA[3];
+  ADC_raw_volts = ADCDataDMA[1] / 2;
+  ADC_raw_current = ADCDataDMA[2];
+  ADC_raw_input = ADCDataDMA[0];
 
- #else
-     ADC_raw_temp = ADCDataDMA[0];
-     ADC_raw_volts = ADCDataDMA[1];
+#else
+  ADC_raw_temp = ADCDataDMA[0];
+  ADC_raw_volts = ADCDataDMA[1];
   //   ADC_raw_current = ADCDataDMA[0];
- #endif
- }
+#endif
+}
 
- void enableADC_DMA()
-{ // enables channel
+void enableADC_DMA()
+{
+  // enables channel
 
-    NVIC_SetPriority(DMA1_Channel1_IRQn, 3);
-    NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+  NVIC_SetPriority(DMA1_Channel1_IRQn, 3);
+  NVIC_EnableIRQ(DMA1_Channel1_IRQn);
 
-    LL_DMA_ConfigAddresses(
-        DMA1, LL_DMA_CHANNEL_2,
-        LL_ADC_DMA_GetRegAddr(ADC1, LL_ADC_DMA_REG_REGULAR_DATA),
-        (uint32_t)&ADCDataDMA, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
+  LL_DMA_ConfigAddresses(
+    DMA1, LL_DMA_CHANNEL_2,
+    LL_ADC_DMA_GetRegAddr(ADC1, LL_ADC_DMA_REG_REGULAR_DATA),
+    (uint32_t)&ADCDataDMA, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
 
-    /* Set DMA transfer size */
- #ifdef USE_ADC_INPUT
-    LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_2, 4);
- #else
-    LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_2, 2);
+  /* Set DMA transfer size */
+#ifdef USE_ADC_INPUT
+  LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_2, 4);
+#else
+  LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_2, 2);
 
- #endif
-     /* Enable DMA transfer interruption: transfer complete */
- //    LL_DMA_EnableIT_TC(DMA1, LL_DMA_CHANNEL_2);
+#endif
+  /* Enable DMA transfer interruption: transfer complete */
+  //    LL_DMA_EnableIT_TC(DMA1, LL_DMA_CHANNEL_2);
 
-    /* Enable DMA transfer interruption: transfer error */
-//    LL_DMA_EnableIT_TE(DMA1, LL_DMA_CHANNEL_2);
+  /* Enable DMA transfer interruption: transfer error */
+  //    LL_DMA_EnableIT_TE(DMA1, LL_DMA_CHANNEL_2);
 
-    /*## Activation of DMA
-     * #####################################################*/
-    /* Enable the DMA transfer */
-    LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_2);
+  /*## Activation of DMA
+   * #####################################################*/
+  /* Enable the DMA transfer */
+  LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_2);
 }
 
 void activateADC(void)
 {
   __IO uint32_t wait_loop_index = 0U;
-  #if (USE_TIMEOUT == 1)
+#if (USE_TIMEOUT == 1)
   uint32_t Timeout = 0U; /* Variable used for timeout management */
-  #endif /* USE_TIMEOUT */
-  if (LL_ADC_IsEnabled(ADC1) == 0)
-  {
+#endif /* USE_TIMEOUT */
+  if (LL_ADC_IsEnabled(ADC1) == 0) {
     /* Disable ADC deep power down (enabled by default after reset state) */
     LL_ADC_DisableDeepPowerDown(ADC1);
-    
+
     /* Enable ADC internal voltage regulator */
     LL_ADC_EnableInternalRegulator(ADC1);
     wait_loop_index = ((LL_ADC_DELAY_INTERNAL_REGUL_STAB_US * (SystemCoreClock / (100000 * 2))) / 10);
-    while(wait_loop_index != 0)
-    {
+    while (wait_loop_index != 0) {
       wait_loop_index--;
     }
-    
+
     /* Run ADC self calibration */
     LL_ADC_StartCalibration(ADC1, LL_ADC_SINGLE_ENDED);
-    
+
     /* Poll for ADC effectively calibrated */
-    #if (USE_TIMEOUT == 1)
+#if (USE_TIMEOUT == 1)
     Timeout = ADC_CALIBRATION_TIMEOUT_MS;
-    #endif /* USE_TIMEOUT */
-    
-    while (LL_ADC_IsCalibrationOnGoing(ADC1) != 0)
-    {
+#endif /* USE_TIMEOUT */
+
+    while (LL_ADC_IsCalibrationOnGoing(ADC1) != 0) {
     }
     wait_loop_index = (ADC_DELAY_CALIB_ENABLE_CPU_CYCLES >> 1);
-    while(wait_loop_index != 0)
-    {
+    while (wait_loop_index != 0) {
       wait_loop_index--;
     }
-    
+
     /* Enable ADC */
     LL_ADC_Enable(ADC1);
-    
-    while (LL_ADC_IsActiveFlag_ADRDY(ADC1) == 0)
-    {
+
+    while (LL_ADC_IsActiveFlag_ADRDY(ADC1) == 0) {
     }
-  }                                
-  
+  }
+
 }
 
 void ADC_Init(void)
@@ -193,8 +190,7 @@ void ADC_Init(void)
   /* is only a few CPU processing cycles. */
   uint32_t wait_loop_index;
   wait_loop_index = ((LL_ADC_DELAY_INTERNAL_REGUL_STAB_US * (SystemCoreClock / (100000 * 2))) / 10);
-  while(wait_loop_index != 0)
-  {
+  while (wait_loop_index != 0) {
     wait_loop_index--;
   }
 

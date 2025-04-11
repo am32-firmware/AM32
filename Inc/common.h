@@ -67,26 +67,26 @@ extern volatile char input_ready;
 // }PID;
 
 typedef struct fastPID {
-    int32_t error;
-    uint32_t Kp;
-    uint32_t Ki;
-    uint32_t Kd;
-    int32_t integral;
-    int32_t derivative;
-    int32_t last_error;
-    int32_t pid_output;
-    int32_t integral_limit;
-    int32_t output_limit;
+  int32_t error;
+  uint32_t Kp;
+  uint32_t Ki;
+  uint32_t Kd;
+  int32_t integral;
+  int32_t derivative;
+  int32_t last_error;
+  int32_t pid_output;
+  int32_t integral_limit;
+  int32_t output_limit;
 } fastPID;
 
 /*
   input signal types
  */
 enum inputType {
-    AUTO_IN = 0,
-    DSHOT_IN = 1,
-    SERVO_IN = 2,
-    SERIAL_IN = 3,
-    EDTARM_IN = 4,
-    DRONECAN_IN = 5,
+  AUTO_IN = 0,
+  DSHOT_IN = 1,
+  SERVO_IN = 2,
+  SERIAL_IN = 3,
+  EDTARM_IN = 4,
+  DRONECAN_IN = 5,
 };

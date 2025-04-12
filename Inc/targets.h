@@ -1645,7 +1645,7 @@
 #ifdef ARK_4IN1_F051
 #define FILE_NAME "ARK_4IN1_F051"
 #define FIRMWARE_NAME "ARK 4IN1"
-#define DEAD_TIME 45
+#define DEAD_TIME 30
 #define HARDWARE_GROUP_F0_B
 #define MILLIVOLT_PER_AMP 10
 #define CURRENT_OFFSET 25 // millivolts

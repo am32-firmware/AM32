@@ -554,6 +554,48 @@ static void handle_GetNodeInfo(CanardInstance *ins, CanardRxTransfer *transfer)
 
 #ifdef DRONECAN_NODE_NAME
     strncpy((char*)pkt.name.data, DRONECAN_NODE_NAME, sizeof(pkt.name.data));
+#elif defined FIRMWARE_NAME_USE_PARAM
+#define DroneCAN_NODE_NAME_ADD_PARAM FIRMWARE_NAME "." FIRMWARE_NAME_USE_PARAM "."
+    char dronecan_node_name[50] = FIRMWARE_NAME;
+    char *param_name = FIRMWARE_NAME_USE_PARAM;
+
+    uint8_t i;
+    char str_param_num[6] = {0};
+
+    for (i = 0; i < sizeof(parameters) / sizeof(parameters[0]); i++)
+    {
+        if (strcmp(parameters[i].name, param_name) == 0)
+        {
+            strcpy(dronecan_node_name, DroneCAN_NODE_NAME_ADD_PARAM);
+            switch (parameters[i].vtype)
+            {
+            case T_BOOL:
+                sprintf(str_param_num, "%u", *(bool *)parameters[i].ptr);
+                break;
+            case T_UINT8:
+                sprintf(str_param_num, "%u", *(uint8_t *)parameters[i].ptr);
+                break;
+            case T_UINT16:
+                sprintf(str_param_num, "%u", *(uint16_t *)parameters[i].ptr);
+                break;
+            default:
+                break;
+            }
+            // val = *(bool *)parameters[i].ptr;
+            break;
+        }
+    }
+
+    if (parameters[i].vtype != T_STRING)
+    {
+        strcat(dronecan_node_name, str_param_num);
+    }
+    else
+    {
+        strcat(dronecan_node_name, "MELODY");
+    }
+
+    strncpy((char *)pkt.name.data, dronecan_node_name, sizeof(pkt.name.data));
 #else
     strncpy((char*)pkt.name.data, FIRMWARE_NAME, sizeof(pkt.name.data));
 #endif

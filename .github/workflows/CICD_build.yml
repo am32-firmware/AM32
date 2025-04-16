@@ -47,7 +47,7 @@ jobs:
           name: AM32-binaries-${{ matrix.os }}
           path: |
             obj/*.hex
-          retention-days: 7
+          retention-days: 60
 
       - name: Find and store hex files
         if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'ubuntu-latest'

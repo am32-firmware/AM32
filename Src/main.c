@@ -432,7 +432,7 @@ uint16_t ADC_raw_temp;
 uint16_t ADC_raw_volts;
 uint16_t ADC_raw_current;
 uint16_t ADC_raw_input;
-uint8_t adc_counter = 0;
+uint8_t PROCESS_ADC_FLAG = 0;
 char send_telemetry = 0;
 char telemetry_done = 0;
 char prop_brake_active = 0;
@@ -447,10 +447,10 @@ uint16_t adjusted_input = 0;
 #define TEMP110_CAL_VALUE ((uint16_t*)((uint32_t)0x1FFFF7C2))
 
 uint16_t smoothedcurrent = 0;
-const uint8_t numReadings = 100; // the readings from the analog input
+const uint8_t numReadings = 50; // the readings from the analog input
 uint8_t readIndex = 0; // the index of the current reading
 uint32_t total = 0;
-uint16_t readings[100];
+uint16_t readings[50];
 
 uint8_t bemf_timeout_happened = 0;
 uint8_t changeover_step = 5;
@@ -711,9 +711,9 @@ void loadEEpromSettings()
             use_current_limit = 1;
         }
         
-        currentPid.Kp = eepromBuffer.current_P;
+        currentPid.Kp = eepromBuffer.current_P*2;
         currentPid.Ki = eepromBuffer.current_I;
-        currentPid.Kd = eepromBuffer.current_D;
+        currentPid.Kd = eepromBuffer.current_D*2;
         
         if (eepromBuffer.sine_mode_power == 0 || eepromBuffer.sine_mode_power > 10) {
             eepromBuffer.sine_mode_power = 5;
@@ -1348,6 +1348,7 @@ void tenKhzRoutine()
         }
 #endif
         if (one_khz_loop_counter > PID_LOOP_DIVIDER) { // 1khz PID loop
+            PROCESS_ADC_FLAG = 1; // set flag to do new adc read at lower priority
             one_khz_loop_counter = 0;
             if (use_current_limit && running) {
                 use_current_limit_adjust -= (int16_t)(doPidCalculations(&currentPid, actual_current,
@@ -1789,7 +1790,6 @@ int main(void)
 #endif
 
     while (1) {
-
 e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation_intervals[2] + commutation_intervals[3] + commutation_intervals[4] + commutation_intervals[5]) + 4) >> 1; // COMMUTATION INTERVAL IS 0.5US INCREMENTS
 #if defined(FIXED_DUTY_MODE) || defined(FIXED_SPEED_MODE)
         setInput();
@@ -1966,8 +1966,7 @@ if(zero_crosses < 5){
            send_telem_DMA(49);
            send_esc_info_flag = 0;
         }
-        adc_counter++;
-        if (adc_counter > 200) { // for adc and telemetry
+        if (PROCESS_ADC_FLAG == 1) { // for adc and telemetry set adc counter at 1khz loop rate
 #if defined(STMICRO)
             ADC_DMA_Callback();
             LL_ADC_REG_StartConversion(ADC1);
@@ -2013,7 +2012,7 @@ if(zero_crosses < 5){
                   }
                 }
             }
-            if (low_voltage_count > (20000 - (stepper_sine * 18000))) {
+            if (low_voltage_count > (10000 - (stepper_sine * 9900))) {      // 10 second wait before cut-off for low voltage
               LOW_VOLTAGE_CUTOFF = 1;
               input = 0;
               allOff();
@@ -2023,7 +2022,7 @@ if(zero_crosses < 5){
               armed = 0;
              }
            
-            adc_counter = 0;
+            PROCESS_ADC_FLAG = 0;
 #ifdef USE_ADC_INPUT
             if (ADC_raw_input < 10) {
                 zero_input_count++;

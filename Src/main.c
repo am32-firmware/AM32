@@ -741,6 +741,7 @@ void loadEEpromSettings()
 
 void saveEEpromSettings()
 {
+    allOff(); // turn off all outputs
 
     eepromBuffer.eeprom_version = eeprom_layout_version;
 

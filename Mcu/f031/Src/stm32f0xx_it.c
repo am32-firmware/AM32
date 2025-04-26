@@ -21,37 +21,13 @@
 /* Includes
  * ------------------------------------------------------------------*/
 #include "stm32f0xx_it.h"
-
 #include "main.h"
-/* Private includes
- * ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
+#include "comparator.h"
 #include "ADC.h"
-#include "common.h"
 #include "targets.h"
-/* USER CODE END Includes */
+#include "common.h"
 
-/* Private typedef
- * -----------------------------------------------------------*/
-/* USER CODE BEGIN TD */
 
-/* USER CODE END TD */
-
-/* Private define
- * ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
-
-/* USER CODE END PD */
-
-/* Private macro
- * -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
-
-/* USER CODE END PM */
-
-/* Private variables
- * ---------------------------------------------------------*/
-/* USER CODE BEGIN PV */
 extern void sendDshotDma(void);
 extern void receiveDshotDma(void);
 extern void transfercomplete(void);
@@ -60,31 +36,9 @@ extern void PeriodElapsedCallback();
 extern void tenKhzRoutine();
 extern char servoPwm;
 
-// extern uint32_t gcr[];
-// extern uint8_t gcr_size;
 int update_interupt = 0;
 uint8_t update_count = 0;
 uint16_t interrupt_time = 0;
-/* USER CODE END PV */
-
-/* Private function prototypes
- * -----------------------------------------------*/
-/* USER CODE BEGIN PFP */
-
-/* USER CODE END PFP */
-
-/* Private user code
- * ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
-
-/* External variables
- * --------------------------------------------------------*/
-
-/* USER CODE BEGIN EV */
-
-/* USER CODE END EV */
 
 /******************************************************************************/
 /*           Cortex-M0 Processor Interruption and Exception Handlers */
@@ -168,44 +122,14 @@ void SysTick_Handler(void)
  */
 void DMA1_Channel2_3_IRQHandler(void)
 {
-    /* USER CODE BEGIN DMA1_Channel2_3_IRQn 0 */
-    /* USER CODE BEGIN DMA1_Channel5_IRQn 0 */
-    if (LL_DMA_IsActiveFlag_HT3(DMA1)) {
-        if (servoPwm) {
-            LL_TIM_IC_SetPolarity(IC_TIMER_REGISTER, IC_TIMER_CHANNEL,
-                LL_TIM_IC_POLARITY_FALLING);
-            LL_DMA_ClearFlag_HT3(DMA1);
-        }
-    }
     if (LL_DMA_IsActiveFlag_TC3(DMA1) == 1) {
         LL_DMA_ClearFlag_GI3(DMA1);
-
         LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_3);
         transfercomplete();
         input_ready = 1;
     } else if (LL_DMA_IsActiveFlag_TE3(DMA1) == 1) {
         LL_DMA_ClearFlag_GI3(DMA1);
     }
-    /* USER CODE END DMA1_Channel2_3_IRQn 0 */
-    if (LL_DMA_IsActiveFlag_TC2(DMA1) == 1) {
-        /* Clear flag DMA global interrupt */
-        /* (global interrupt flag: half transfer and transfer complete flags) */
-        LL_DMA_ClearFlag_GI2(DMA1);
-        ADC_DMA_Callback();
-        /* Call interruption treatment function */
-        //   AdcDmaTransferComplete_Callback();
-    }
-
-    /* Check whether DMA transfer error caused the DMA interruption */
-    if (LL_DMA_IsActiveFlag_TE2(DMA1) == 1) {
-        /* Clear flag DMA transfer error */
-        LL_DMA_ClearFlag_TE2(DMA1);
-
-        /* Call interruption treatment function */
-    }
-    /* USER CODE BEGIN DMA1_Channel2_3_IRQn 1 */
-
-    /* USER CODE END DMA1_Channel2_3_IRQn 1 */
 }
 
 /**
@@ -271,18 +195,26 @@ void DMA1_Channel4_5_IRQHandler(void)
  */
 void TIM2_IRQHandler(void)
 {
-    if (LL_TIM_IsActiveFlag_CC4(TIM2) == 1) {
-        LL_TIM_ClearFlag_CC4(TIM2);
-    }
+update_interupt++;
+//    if (LL_TIM_IsActiveFlag_CC4(TIM2) == 1) {
+//        LL_TIM_ClearFlag_CC4(TIM2);
+//    }
 
     if (LL_TIM_IsActiveFlag_UPDATE(TIM2) == 1) {
         LL_TIM_ClearFlag_UPDATE(TIM2);
+        tenKhzRoutine();
         update_interupt++;
     }
 
-    if (LL_TIM_IsActiveFlag_CC1(TIM2) == 1) {
-        LL_TIM_ClearFlag_CC1(TIM2);
-    }
+//    if (LL_TIM_IsActiveFlag_CC1(TIM2) == 1) {
+//        LL_TIM_ClearFlag_CC1(TIM2);
+//    }
+//    if (LL_TIM_IsActiveFlag_CC2(TIM2) == 1) {
+//        LL_TIM_ClearFlag_CC2(TIM2);
+//    }
+//    if (LL_TIM_IsActiveFlag_CC3(TIM2) == 1) {
+//        LL_TIM_ClearFlag_CC3(TIM2);
+//    }
 }
 
 /**
@@ -308,7 +240,7 @@ void TIM14_IRQHandler(void)
  */
 void TIM16_IRQHandler(void)
 {
-#ifdef USE_TIM_16
+#ifdef USE_TIMER_16
     if (LL_TIM_IsActiveFlag_CC1(TIM16) == 1) {
         LL_TIM_ClearFlag_CC1(TIM16);
     }
@@ -325,43 +257,18 @@ void TIM16_IRQHandler(void)
 #endif
 }
 
-// void EXTI0_1_IRQHandler(void){
-//  if (LL_EXTI_IsActiveFlag_0_31(PHASE_B_LL_EXTI_LINE) != RESET){
-//     LL_EXTI_ClearFlag_0_31(PHASE_B_LL_EXTI_LINE);
-//
-//     interruptRoutine();
-//
-//   }
-//   if (LL_EXTI_IsActiveFlag_0_31(PHASE_A_LL_EXTI_LINE) != RESET)
-//   {
-//     LL_EXTI_ClearFlag_0_31(PHASE_A_LL_EXTI_LINE);
-//
-//     interruptRoutine();
-//
-//   }
-// }
 
 void EXTI4_15_IRQHandler(void)
 {
-    if (LL_EXTI_IsActiveFlag_0_31(PHASE_C_LL_EXTI_LINE) != RESET) {
-        LL_EXTI_ClearFlag_0_31(PHASE_C_LL_EXTI_LINE);
-
+        EXTI->PR = current_EXTI_LINE;
         interruptRoutine();
-    }
 }
 
 // #ifdef BLUE_BOARD
 void EXTI0_1_IRQHandler(void)
-{ // interrupt_time = UTILITY_TIMER->CNT;
-    if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_0) != RESET) {
-        LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_0);
+{ 
+        EXTI->PR = current_EXTI_LINE;
         interruptRoutine();
-    }
-    if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_1) != RESET) {
-        LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_1);
-        interruptRoutine();
-    }
-    //
 }
 
 void EXTI2_3_IRQHandler(void)
@@ -375,20 +282,11 @@ void EXTI2_3_IRQHandler(void)
 // #endif
 void DMA1_Channel1_IRQHandler(void)
 {
-    if (LL_DMA_IsActiveFlag_HT1(DMA1)) {
-        if (servoPwm) {
-            LL_TIM_IC_SetPolarity(IC_TIMER_REGISTER, IC_TIMER_CHANNEL,
-                LL_TIM_IC_POLARITY_FALLING);
-            LL_DMA_ClearFlag_HT1(DMA1);
-        }
-    }
     if (LL_DMA_IsActiveFlag_TC1(DMA1) == 1) {
-        LL_DMA_ClearFlag_GI1(DMA1);
-
-        LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_1);
-
-        transfercomplete();
-        input_ready = 1;
+       LL_DMA_ClearFlag_GI1(DMA1);
+       LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_1);
+       transfercomplete();
+       // input_ready = 1;
     } else if (LL_DMA_IsActiveFlag_TE1(DMA1) == 1) {
         LL_DMA_ClearFlag_GI1(DMA1);
     }

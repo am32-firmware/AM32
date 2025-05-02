@@ -1382,7 +1382,14 @@
 #define VOLTAGE_ADC_PIN GPIO_PINS_3
 #endif
 
-
+#ifdef BOTDRIVE_F421
+#define FIRMWARE_NAME "BOTDRIVE F4 "
+#define FILE_NAME "BOTDRIVE_F421"
+#define DEAD_TIME 100
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_540
+#define USE_SERIAL_TELEMETRY
+#endif
 
 
 /*****************************************************AT32F415 targets ************************************************/

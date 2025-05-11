@@ -1846,6 +1846,21 @@
 /*******************************   G071 Targets
  * *********************************/
 
+#ifdef  FlashBird_G071
+#define FILE_NAME "FlashBird_G071"
+#define FIRMWARE_NAME "FlashBird G071 "
+#define DEAD_TIME 60
+#define MILLIVOLT_PER_AMP 33
+#define CURRENT_OFFSET 0
+#define TARGET_STALL_PROTECTION_INTERVAL 7000
+#define TARGET_VOLTAGE_DIVIDER 110
+#define HARDWARE_GROUP_G0_A
+#define USE_SERIAL_TELEMETRY
+#define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_4
+#define CURRENT_ADC_PIN LL_GPIO_PIN_4
+#define USE_LED_STRIP
+#endif
+
 #ifdef AIRBOT_PHOENIX_12S_G071
 #define FILE_NAME "AIRBOT_PHOENIX_12S_G071"
 #define FIRMWARE_NAME "PHEONIX 12S "

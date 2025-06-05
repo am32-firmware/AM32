@@ -36,7 +36,9 @@ void initCorePeripherals(void)
     MX_TIM17_Init();
     MX_TIM6_Init();
     MX_TIM15_Init();
-//    telem_UART_Init();
+#ifdef USE_SERIAL_TELEMETRY
+    telem_UART_Init();
+#endif
 #ifdef USE_LED_STRIP
     WS2812_Init();
 #endif

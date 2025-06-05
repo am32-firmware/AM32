@@ -138,15 +138,4 @@ void EXTI15_10_IRQHandler(void)
 
 void DMA1_Channel3_IRQHandler(void)
 {
-    if (LL_DMA_IsActiveFlag_TC3(DMA1)) {
-        send_telemetry = 0;
-        LL_DMA_ClearFlag_GI3(DMA1);
-        LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_3);
-        /* Call function Transmission complete Callback */
-    } else if (LL_DMA_IsActiveFlag_TE3(DMA1)) {
-        LL_DMA_ClearFlag_GI3(DMA1);
-        LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_3);
-        /* Call Error function */
-        // USART_TransferError_Callback();
-    }
 }

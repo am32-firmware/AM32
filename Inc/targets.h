@@ -734,6 +734,16 @@
 #define VOLTAGE_ADC_CHANNEL ADC_CHANNEL_6
 #define VOLTAGE_ADC_PIN GPIO_PINS_6
 #endif
+
+#ifdef CATALYST_F421
+#define FIRMWARE_NAME "CATALYST ESC"
+#define FILE_NAME "CATALYST_F421"
+#define DEAD_TIME 80
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_045
+#define USE_SERIAL_TELEMETRY
+#endif
+
 /****************************************Generic********************************************/
 
 #ifdef AT32PB4_054_F421

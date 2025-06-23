@@ -792,7 +792,7 @@ void enableCorePeripherals()
     NVIC_SetPriority(EXTI4_15_IRQn, 2);
     NVIC_EnableIRQ(EXTI4_15_IRQn);
     EXTI->IMR1 |= (1 << 15);
-		#ifdef USE_PULSE_OUT
-		 LL_GPIO_SetPinMode(RPM_PULSE_PORT, RPM_PULSE_PIN, LL_GPIO_MODE_OUTPUT);
-		#endif
+#ifdef USE_PULSE_OUT
+    LL_GPIO_SetPinMode(RPM_PULSE_PORT, RPM_PULSE_PIN, LL_GPIO_MODE_OUTPUT);
+#endif
 }

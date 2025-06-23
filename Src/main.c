@@ -866,11 +866,9 @@ void commutate()
     commutation_intervals[step - 1] = commutation_interval; // just used to calulate average
     
 #ifdef USE_PULSE_OUT
-		if(rising){
-			GPIOB->scr = GPIO_PINS_8;
-		}else{
-			GPIOB->clr = GPIO_PINS_8;
-		}
+		if(step == 1 || step == 4  ){
+WRITE_REG(RPM_PULSE_PORT->ODR, READ_REG(RPM_PULSE_PORT->ODR) ^ RPM_PULSE_PIN);
+	}
 #endif
 }
 

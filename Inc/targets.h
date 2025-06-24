@@ -416,6 +416,13 @@
 #define DEAD_TIME 40
 #define HARDWARE_GROUP_GD_A
 #define USE_SERIAL_TELEMETRY
+#define USE_RGB_LED
+#define GREEN_LED_GPIO_PORT    GPIOB
+#define GREEN_LED_GPIO_PIN     GPIO_PIN_3
+#define BLUE_LED_GPIO_PORT  GPIOA
+#define BLUE_LED_GPIO_PIN   GPIO_PIN_15
+#define RED_LED_GPIO_PORT   GPIOB
+#define RED_LED_GPIO_PIN    GPIO_PIN_5
 #endif
 
 /*********************************************************************AT32F421

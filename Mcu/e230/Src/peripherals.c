@@ -31,8 +31,9 @@ void initCorePeripherals(void)
     COMP_Init();
     TIMER15_Init();
     TIMER13_Init();
-
-    //  UN_TIM_Init();
+#ifdef USE_RGB_LED
+    LED_GPIO_init();
+#endif 
 #ifdef USE_SERIAL_TELEMETRY
     telem_UART_Init();
 #endif
@@ -297,35 +298,42 @@ void UN_TIM_Init(void)
 #ifdef USE_RGB_LED // has 3 color led
 void LED_GPIO_init()
 {
-    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+    rcu_periph_clock_enable(RCU_GPIOA);
+    rcu_periph_clock_enable(RCU_GPIOB);
 
-    /* GPIO Ports Clock Enable */
-    LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOB);
+    gpio_mode_set(RED_LED_GPIO_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE,
+        RED_LED_GPIO_PIN);
+    gpio_output_options_set(RED_LED_GPIO_PORT, GPIO_OTYPE_PP,
+        GPIO_OSPEED_50MHZ, RED_LED_GPIO_PIN);
 
-    LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_8);
-    LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_5);
-    LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_3);
+    gpio_mode_set(GREEN_LED_GPIO_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE,
+        GREEN_LED_GPIO_PIN);
+    gpio_output_options_set(GREEN_LED_GPIO_PORT, GPIO_OTYPE_PP,
+        GPIO_OSPEED_50MHZ, GREEN_LED_GPIO_PIN);
 
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_8;
-    GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
-    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    gpio_mode_set(BLUE_LED_GPIO_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE,
+        BLUE_LED_GPIO_PIN);
+    gpio_output_options_set(BLUE_LED_GPIO_PORT, GPIO_OTYPE_PP,
+        GPIO_OSPEED_50MHZ, BLUE_LED_GPIO_PIN);    
+}
 
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_5;
-    GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
-    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+void setIndividualRGBLed(uint8_t red, uint8_t green, uint8_t blue){
 
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_3;
-    GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
-    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  if(red > 0){   
+    GPIO_BOP(RED_LED_GPIO_PORT) = RED_LED_GPIO_PIN;
+  }else{
+    GPIO_BC(RED_LED_GPIO_PORT) = RED_LED_GPIO_PIN;
+  }
+  if(green > 0){
+    GPIO_BOP(GREEN_LED_GPIO_PORT) = GREEN_LED_GPIO_PIN;
+  }else{
+    GPIO_BC(GREEN_LED_GPIO_PORT) = GREEN_LED_GPIO_PIN;
+  }
+  if(blue > 0){
+    GPIO_BOP(BLUE_LED_GPIO_PORT) = BLUE_LED_GPIO_PIN;
+  }else{
+    GPIO_BC(BLUE_LED_GPIO_PORT) = BLUE_LED_GPIO_PIN;
+  }
 }
 
 #endif

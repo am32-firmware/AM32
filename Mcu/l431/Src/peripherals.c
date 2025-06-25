@@ -91,6 +91,12 @@ void SystemClock_Config(void)
   /*
     using low speed external oscillator to trim MSI clock
    */
+
+  // ensure RCC is reset
+  LL_PWR_EnableBkUpAccess();
+  LL_RCC_ForceBackupDomainReset();
+  LL_RCC_ReleaseBackupDomainReset();
+
   LL_RCC_MSI_Enable();
   LL_RCC_LSI_Enable();
 
@@ -99,10 +105,15 @@ void SystemClock_Config(void)
   while (LL_RCC_MSI_IsReady() != 1) ;
   while (LL_PWR_IsActiveFlag_VOS() != 0) ;
 
+  // setup MSI and LSE
   LL_RCC_MSI_DisablePLLMode();
-  LL_RCC_LSE_Enable();
-  LL_RCC_LSE_EnableBypass();
   LL_RCC_LSE_SetDriveCapability(LL_RCC_LSEDRIVE_HIGH);
+#if USE_LSE_BYPASS
+  LL_RCC_LSE_EnableBypass();
+#else
+  LL_RCC_LSE_DisableBypass();
+#endif
+  LL_RCC_LSE_Enable();
 
   while (LL_RCC_LSE_IsReady() != 1) ;
   LL_RCC_MSI_EnablePLLMode();

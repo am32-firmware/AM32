@@ -211,6 +211,24 @@
 #define USE_LSE
 #endif
 
+#ifdef TBS_16S_L431_CAN
+#define FIRMWARE_NAME "TBS 16S CAN"
+#define FILE_NAME "TBS_16S_L431_CAN"
+#define DEAD_TIME 120
+#define HARDWARE_GROUP_L4_C
+#define HARDWARE_GROUP_L4_045
+#define DRONECAN_SUPPORT 1
+#define CAN_TERM_PIN GPIO_PORT_PIN(1, 3) // PB3
+#define CAN_TERM_POLARITY 1 // active high
+#define TARGET_VOLTAGE_DIVIDER 210
+#define MILLIVOLT_PER_AMP 25
+#define RAMP_SPEED_LOW_RPM 1
+#define RAMP_SPEED_HIGH_RPM 1
+#define LOOP_FREQUENCY_HZ 20000
+// LSE oscillator not working yet
+// #define USE_LSE
+#endif
+
 #ifdef  REF_L431
 #define FILE_NAME				"REF_L431"
 #define FIRMWARE_NAME           "L431 TEST"

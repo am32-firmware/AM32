@@ -209,6 +209,7 @@
 #define RAMP_SPEED_HIGH_RPM 1
 #define LOOP_FREQUENCY_HZ 20000
 #define USE_LSE
+#define USE_LSE_BYPASS 0
 #endif
 
 #ifdef TBS_16S_L431_CAN
@@ -225,8 +226,8 @@
 #define RAMP_SPEED_LOW_RPM 1
 #define RAMP_SPEED_HIGH_RPM 1
 #define LOOP_FREQUENCY_HZ 20000
-// LSE oscillator not working yet
-// #define USE_LSE
+#define USE_LSE
+#define USE_LSE_BYPASS 1
 #endif
 
 #ifdef  REF_L431

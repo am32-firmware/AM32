@@ -265,6 +265,17 @@
 #define MILLIVOLT_PER_AMP 25
 #endif
 
+#ifdef POGO_L431_CAN
+#define FIRMWARE_NAME "pogo.canesc"
+#define FILE_NAME "POGO_L431_CAN"
+#define DRONECAN_SUPPORT 1
+#define DEAD_TIME 110
+#define HARDWARE_GROUP_L4_B
+#define TARGET_VOLTAGE_DIVIDER 210
+#define MILLIVOLT_PER_AMP 50
+#define USE_SERIAL_TELEMETRY
+#endif
+
 #ifdef  REF_L431_CAN
 #define FILE_NAME				"REF_L431_CAN"
 #define FIRMWARE_NAME           "L431 CAN"

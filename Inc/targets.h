@@ -1901,6 +1901,33 @@
 #define USE_CUSTOM_LED
 #endif
 
+#ifdef NYXTRONICS_50A_F051
+#define FILE_NAME "NYXTRONICS_50A_F051"
+#define FIRMWARE_NAME "NYXT 50A    "
+#define DEAD_TIME 20
+#define HARDWARE_GROUP_F0_A
+#define TARGET_VOLTAGE_DIVIDER 110
+#define USE_SERIAL_TELEMETRY
+#endif
+
+#ifdef NYXTRONICS_DOUBLE_75A_F051
+#define FILE_NAME "NYXTRONICS_DOUBLE_75A_F051"
+#define FIRMWARE_NAME "NYXT 75A    "
+#define DEAD_TIME 20
+#define HARDWARE_GROUP_F0_A
+#define TARGET_VOLTAGE_DIVIDER 110
+#define USE_SERIAL_TELEMETRY
+#endif
+
+#ifdef NYXTRONICS_DOUBLE_80A_F051
+#define FILE_NAME "NYXTRONICS_DOUBLE_80A_F051"
+#define FIRMWARE_NAME "NYXT 80A    "
+#define DEAD_TIME 40
+#define HARDWARE_GROUP_F0_A
+#define TARGET_VOLTAGE_DIVIDER 110
+#define USE_SERIAL_TELEMETRY
+#endif
+
 /*******************************   G071 Targets
  * *********************************/
 

@@ -234,6 +234,12 @@ an settings option)
 #include <string.h>
 #include <assert.h>
 
+// New modular headers
+#include "constants.h"
+#include "motor_control.h"
+#include "input_processing.h"
+#include "control_loops.h"
+
 #ifdef USE_LED_STRIP
 #include "WS2812.h"
 #endif
@@ -446,11 +452,7 @@ uint16_t adjusted_input = 0;
 #define TEMP30_CAL_VALUE ((uint16_t*)((uint32_t)0x1FFFF7B8))
 #define TEMP110_CAL_VALUE ((uint16_t*)((uint32_t)0x1FFFF7C2))
 
-uint16_t smoothedcurrent = 0;
-const uint8_t numReadings = 50; // the readings from the analog input
-uint8_t readIndex = 0; // the index of the current reading
-uint32_t total = 0;
-uint16_t readings[50];
+// smoothedcurrent variables moved to motor_control_inline.h getSmoothedCurrent function
 
 uint8_t bemf_timeout_happened = 0;
 uint8_t changeover_step = 5;
@@ -561,31 +563,7 @@ uint8_t ubAnalogWatchdogStatus = RESET;
 volatile char input_ready = 0;
 #endif
 
-int32_t doPidCalculations(struct fastPID* pidnow, int actual, int target)
-{
-
-    pidnow->error = actual - target;
-    pidnow->integral = pidnow->integral + pidnow->error * pidnow->Ki;
-    if (pidnow->integral > pidnow->integral_limit) {
-        pidnow->integral = pidnow->integral_limit;
-    }
-    if (pidnow->integral < -pidnow->integral_limit) {
-        pidnow->integral = -pidnow->integral_limit;
-    }
-
-    pidnow->derivative = pidnow->Kd * (pidnow->error - pidnow->last_error);
-    pidnow->last_error = pidnow->error;
-
-    pidnow->pid_output = pidnow->error * pidnow->Kp + pidnow->integral + pidnow->derivative;
-
-    if (pidnow->pid_output > pidnow->output_limit) {
-        pidnow->pid_output = pidnow->output_limit;
-    }
-    if (pidnow->pid_output < -pidnow->output_limit) {
-        pidnow->pid_output = -pidnow->output_limit;
-    }
-    return pidnow->pid_output;
-}
+// doPidCalculations function moved to control_loops_inline.h
 
 void loadEEpromSettings()
 {
@@ -780,55 +758,9 @@ void saveEEpromSettings()
     save_flash_nolib(eepromBuffer.buffer, sizeof(eepromBuffer.buffer), eeprom_address);
 }
 
-uint16_t getSmoothedCurrent()
-{
-    total = total - readings[readIndex];
-    readings[readIndex] = ADC_raw_current;
-    total = total + readings[readIndex];
-    readIndex = readIndex + 1;
-    if (readIndex >= numReadings) {
-        readIndex = 0;
-    }
-    smoothedcurrent = total / numReadings;
-    return smoothedcurrent;
-}
+// getSmoothedCurrent function moved to motor_control_inline.h
 
-void getBemfState()
-{
-    uint8_t current_state = 0;
-#if defined(MCU_F031) || defined(MCU_G031)
-    if (step == 1 || step == 4) {
-        current_state = PHASE_C_EXTI_PORT->IDR & PHASE_C_EXTI_PIN;
-    }
-    if (step == 2 || step == 5) { //        in phase two or 5 read from phase A Pf1
-        current_state = PHASE_A_EXTI_PORT->IDR & PHASE_A_EXTI_PIN;
-    }
-    if (step == 3 || step == 6) { // phase B pf0
-        current_state = PHASE_B_EXTI_PORT->IDR & PHASE_B_EXTI_PIN;
-    }
-#else
-    current_state = !getCompOutputLevel(); // polarity reversed
-#endif
-    if (rising) {
-        if (current_state) {
-            bemfcounter++;
-        } else {
-            bad_count++;
-            if (bad_count > bad_count_threshold) {
-                bemfcounter = 0;
-            }
-        }
-    } else {
-        if (!current_state) {
-            bemfcounter++;
-        } else {
-            bad_count++;
-            if (bad_count > bad_count_threshold) {
-                bemfcounter = 0;
-            }
-        }
-    }
-}
+// getBemfState function moved to motor_control_inline.h
 
 void commutate()
 {
@@ -936,7 +868,9 @@ void startMotor()
     enableCompInterrupts();
 }
 
-void setInput()
+// setInput function moved to input_processing_inline.h
+
+void setInput_placeholder()
 {
     if (eepromBuffer.bi_direction) {
         if (dshot == 0) {

@@ -16,6 +16,8 @@ extern uint8_t zcfound;
 extern uint8_t rising;
 extern uint8_t running;
 extern uint8_t step;
+extern uint8_t bad_count;
+extern uint8_t bad_count_threshold;
 extern uint8_t stepper_sine;
 extern uint8_t old_routine;
 extern uint16_t duty_cycle;
@@ -65,7 +67,21 @@ extern uint8_t do_once_sinemode;
  */
 static inline uint16_t getSmoothedCurrent(void)
 {
-    return (7 * smoothed_raw_current + ADC_raw_current) >> 3;
+    static uint16_t total = 0;
+    static uint16_t readings[8] = {0};
+    static uint8_t readIndex = 0;
+    static uint16_t smoothedcurrent = 0;
+    static const uint8_t numReadings = 8;
+    
+    total = total - readings[readIndex];
+    readings[readIndex] = ADC_raw_current;
+    total = total + readings[readIndex];
+    readIndex = readIndex + 1;
+    if (readIndex >= numReadings) {
+        readIndex = 0;
+    }
+    smoothedcurrent = total / numReadings;
+    return smoothedcurrent;
 }
 
 /**
@@ -75,26 +91,38 @@ static inline void getBemfState(void)
 {
     uint8_t current_state = 0;
     
-    #ifdef STMICRO
-        #if defined(MCU_F031) || defined(MCU_G031)
-            current_state = (GPIOA->IDR & current_GPIO_PIN) == current_GPIO_PIN;
-        #else
-            current_state = LL_COMP_ReadOutputLevel(active_COMP);
-        #endif
-    #endif
+#if defined(MCU_F031) || defined(MCU_G031)
+    if (step == 1 || step == 4) {
+        current_state = PHASE_C_EXTI_PORT->IDR & PHASE_C_EXTI_PIN;
+    }
+    if (step == 2 || step == 5) { //        in phase two or 5 read from phase A Pf1
+        current_state = PHASE_A_EXTI_PORT->IDR & PHASE_A_EXTI_PIN;
+    }
+    if (step == 3 || step == 6) { // phase B pf0
+        current_state = PHASE_B_EXTI_PORT->IDR & PHASE_B_EXTI_PIN;
+    }
+#else
+    current_state = !getCompOutputLevel(); // polarity reversed
+#endif
     
-    #ifdef GIGADEVICES
-        current_state = gpio_input_bit_get(current_GPIO_PORT, current_GPIO_PIN);
-    #endif
-    
-    #ifdef ARTERY
-        current_state = gpio_input_data_bit_read(current_GPIO_PORT, current_GPIO_PIN);
-    #endif
-    
-    if (current_state == rising) {
-        bemfcounter++;
+    if (rising) {
+        if (current_state) {
+            bemfcounter++;
+        } else {
+            bad_count++;
+            if (bad_count > bad_count_threshold) {
+                bemfcounter = 0;
+            }
+        }
     } else {
-        bemfcounter = 0;
+        if (!current_state) {
+            bemfcounter++;
+        } else {
+            bad_count++;
+            if (bad_count > bad_count_threshold) {
+                bemfcounter = 0;
+            }
+        }
     }
 }
 

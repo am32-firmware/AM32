@@ -1436,6 +1436,14 @@
 #define USE_SERIAL_TELEMETRY
 #endif
 
+#ifdef HUMMINGBIRD_G_F421
+#define FIRMWARE_NAME "HUMMINGBIRD F4 G  "
+#define FILE_NAME "HUMMINGBIRD_G_F421"
+#define DEAD_TIME 80
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_450
+#define USE_SERIAL_TELEMETRY
+#endif
 
 /*****************************************************AT32F415 targets ************************************************/
 

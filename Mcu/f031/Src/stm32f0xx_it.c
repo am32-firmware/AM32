@@ -286,7 +286,7 @@ void DMA1_Channel1_IRQHandler(void)
        LL_DMA_ClearFlag_GI1(DMA1);
        LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_1);
        transfercomplete();
-       // input_ready = 1;
+        input_ready = 1;
     } else if (LL_DMA_IsActiveFlag_TE1(DMA1) == 1) {
         LL_DMA_ClearFlag_GI1(DMA1);
     }

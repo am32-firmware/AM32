@@ -2100,9 +2100,10 @@ if(zero_crosses < 5){
 							duty_cycle_maximum = 2000;
 						}
 
-            if (degrees_celsius > eepromBuffer.limits.temperature) {
+            // Temperature derating needs to be a continuous function for UAV control to remain possible.
+            if (degrees_celsius > eepromBuffer.limits.temperature - 10) {
               duty_cycle_maximum = map(degrees_celsius, eepromBuffer.limits.temperature - 10, eepromBuffer.limits.temperature + 10,
-                throttle_max_at_high_rpm / 2, 1);
+                throttle_max_at_high_rpm, 1);
             }
             if (zero_crosses < 100 && commutation_interval > 500) {
               filter_level = 12;

@@ -476,6 +476,15 @@
 /*********************************************************************AT32F421
  * targets*********************************************/
 
+#ifdef ORQA_F421
+#define FIRMWARE_NAME "ORQA       "
+#define FILE_NAME "ORQA_F421"
+#define DEAD_TIME 100
+#define HARDWARE_GROUP_AT_C
+#define HARDWARE_GROUP_AT_045
+#define USE_SERIAL_TELEMETRY
+#endif
+
 #ifdef TBS_6S_4IN1_F421
 #define FIRMWARE_NAME "TBSlu6s4in1"
 #define FILE_NAME "TBS_6S_4IN1_F421"

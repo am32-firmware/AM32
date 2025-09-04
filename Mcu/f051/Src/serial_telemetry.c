@@ -140,6 +140,8 @@ void telem_UART_Init(void)
         LL_DMA_GetDataTransferDirection(DMA1, LL_DMA_CHANNEL_2));
     LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_2, sizeof(aTxBuffer));
     LL_USART_EnableDMAReq_TX(USART1);
+
+    LL_USART_SetTransferDirection(USART1, LL_USART_DIRECTION_RX);
 }
 
 void send_telem_DMA(uint8_t bytes)

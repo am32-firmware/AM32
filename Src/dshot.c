@@ -138,7 +138,7 @@ void computeDshotDMA()
                     last_command = dshotcommand;
                     command_count = 0;
                 }
-                if (dshotcommand < 5) { // beacons
+                if (dshotcommand <= 5) { // beacons
                     command_count = 6; // go on right away
                 }
                 command_count++;

@@ -234,9 +234,17 @@ void MX_TIM1_Init(void)
     /* USER CODE BEGIN TIM1_Init 2 */
 
     /* USER CODE END TIM1_Init 2 */
+
+    /*
+    If Pins PE8-13 should be used (available on STSPIN32G4, STM32G431Mxx, STM32G431Vxx) do this:
+    1) Uncomment "LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOE);"
+    2) Replace all "GPIO_InitStruct.Alternate = LL_GPIO_AF_6;" with "GPIO_InitStruct.Alternate = LL_GPIO_AF_2;"
+    */  
+
     LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOF);
     LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
     LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOB);
+    // LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOE);
     /**TIM1 GPIO Configuration
     PF0-OSC_IN   ------> TIM1_CH3N
     PA7   ------> TIM1_CH1N
@@ -253,45 +261,45 @@ void MX_TIM1_Init(void)
     GPIO_InitStruct.Alternate = LL_GPIO_AF_6;
     LL_GPIO_Init(PHASE_A_GPIO_PORT_LOW, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_7;
+    GPIO_InitStruct.Pin = PHASE_B_GPIO_LOW;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
     GPIO_InitStruct.Alternate = LL_GPIO_AF_6;
-    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    LL_GPIO_Init(PHASE_B_GPIO_PORT_LOW, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_0;
+    GPIO_InitStruct.Pin = PHASE_C_GPIO_LOW;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
     GPIO_InitStruct.Alternate = LL_GPIO_AF_6;
-    LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    LL_GPIO_Init(PHASE_C_GPIO_PORT_LOW, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_8;
+    GPIO_InitStruct.Pin = PHASE_A_GPIO_HIGH;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
     GPIO_InitStruct.Alternate = LL_GPIO_AF_6;
-    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    LL_GPIO_Init(PHASE_A_GPIO_PORT_HIGH, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_9;
+    GPIO_InitStruct.Pin = PHASE_B_GPIO_HIGH;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
     GPIO_InitStruct.Alternate = LL_GPIO_AF_6;
-    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    LL_GPIO_Init(PHASE_B_GPIO_PORT_HIGH, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_10;
+    GPIO_InitStruct.Pin = PHASE_C_GPIO_HIGH;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
     GPIO_InitStruct.Alternate = LL_GPIO_AF_6;
-    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    LL_GPIO_Init(PHASE_C_GPIO_PORT_HIGH, &GPIO_InitStruct);
 }
 
 void MX_TIM2_Init(void)

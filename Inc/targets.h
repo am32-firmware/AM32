@@ -2019,6 +2019,14 @@
 #define USE_SERIAL_TELEMETRY
 #endif
 
+#ifdef ORQA_F051
+#define FIRMWARE_NAME "ORQA F0    "
+#define FILE_NAME "ORQA_F051"
+#define DEAD_TIME 100
+#define HARDWARE_GROUP_F0_C
+#define USE_SERIAL_TELEMETRY
+#endif
+
 /*******************************   G071 Targets
  * *********************************/
 

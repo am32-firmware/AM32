@@ -22,6 +22,25 @@ const char gcr_encode_table[16] = {
     0b11010, 0b01001, 0b01010, 0b01011, 0b11110, 0b01101, 0b01110, 0b01111
 };
 
+typedef struct {
+    uint16_t temp_count;
+    uint16_t voltage_count;
+    uint16_t current_count;
+    uint8_t last_sent_extended;
+} dshot_telem_scheduler_t;
+
+static dshot_telem_scheduler_t telem_scheduler = {0};
+
+// These divisors create ratios regardless of input rate:
+// - Temperature: every 200 calls (4Hz at 800Hz input)
+// - Voltage: every 200 calls (4Hz at 800Hz input)
+// - Current: every 40 calls (20Hz at 800Hz input)
+// - eRPM: fills all other slots
+
+#define TEMP_EDT_RATE_DIVISOR    200
+#define VOLTAGE_EDT_RATE_DIVISOR 200
+#define CURRENT_EDT_RATE_DIVISOR 40
+
 char EDT_ARM_ENABLE = 0;
 char EDT_ARMED = 0;
 int shift_amount = 0;
@@ -39,8 +58,7 @@ uint32_t gcr[37] = { 0 };
 uint16_t dshot_frametime;
 uint16_t dshot_goodcounts;
 uint16_t dshot_badcounts;
-char dshot_extended_telemetry = 0;
-uint16_t send_extended_dshot = 0;
+uint8_t dshot_extended_telemetry = 0;
 uint16_t processtime = 0;
 uint16_t halfpulsetime = 0;
 
@@ -187,15 +205,12 @@ void computeDshotDMA()
                         break;
                     case 13:
                         dshot_extended_telemetry = 1;
-                        send_extended_dshot = 0b111000000000;
                         if (EDT_ARM_ENABLE == 1) {
                             EDT_ARMED = 1;
                         }
                         break;
                     case 14:
                         dshot_extended_telemetry = 0;
-                        send_extended_dshot = 0b111011111111;
-                        //	make_dshot_package();
                         break;
                     case 20:
                         forward = 1 - eepromBuffer.dir_reversed;
@@ -221,9 +236,37 @@ void computeDshotDMA()
 
 void make_dshot_package(uint16_t com_time)
 {
-    if (send_extended_dshot > 0) {
-        dshot_full_number = send_extended_dshot;
-        send_extended_dshot = 0;
+    uint16_t extended_frame_to_send = 0;
+
+    if (dshot_extended_telemetry) {
+        // Only send extended telemetry if last frame wasn't extended. This ensures eRPM interleaving.
+        if (telem_scheduler.last_sent_extended) {
+            telem_scheduler.last_sent_extended = 0;
+
+        } else {
+            telem_scheduler.current_count++;
+            telem_scheduler.voltage_count++;
+            telem_scheduler.temp_count++;
+
+            if (telem_scheduler.current_count >= CURRENT_EDT_RATE_DIVISOR) {
+                extended_frame_to_send = 0b0110 << 8 | (uint8_t)(actual_current / 50);
+                telem_scheduler.current_count = 0;
+            }
+            else if (telem_scheduler.voltage_count >= VOLTAGE_EDT_RATE_DIVISOR) {
+                extended_frame_to_send = 0b0100 << 8 | (uint8_t)(battery_voltage / 25);
+                telem_scheduler.voltage_count = 0;
+            }
+            else if (telem_scheduler.temp_count >= TEMP_EDT_RATE_DIVISOR) {
+                extended_frame_to_send = 0b0010 << 8 | degrees_celsius;
+                telem_scheduler.temp_count = 0;
+            }
+        }
+    }
+
+    if (extended_frame_to_send > 0) {
+        dshot_full_number = extended_frame_to_send;
+        telem_scheduler.last_sent_extended = 1;
+
     } else {
         if (!running) {
             com_time = 65535;

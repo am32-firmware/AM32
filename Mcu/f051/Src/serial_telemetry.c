@@ -54,7 +54,7 @@ void telem_UART_Init(void)
     USART_InitStruct.DataWidth = LL_USART_DATAWIDTH_8B;
     USART_InitStruct.StopBits = LL_USART_STOPBITS_1;
     USART_InitStruct.Parity = LL_USART_PARITY_NONE;
-    USART_InitStruct.TransferDirection = LL_USART_DIRECTION_TX;
+    USART_InitStruct.TransferDirection = LL_USART_DIRECTION_RX;
     USART_InitStruct.HardwareFlowControl = LL_USART_HWCONTROL_NONE;
     USART_InitStruct.OverSampling = LL_USART_OVERSAMPLING_16;
     LL_USART_Init(USART2, &USART_InitStruct);
@@ -125,7 +125,7 @@ void telem_UART_Init(void)
     USART_InitStruct.DataWidth = LL_USART_DATAWIDTH_8B;
     USART_InitStruct.StopBits = LL_USART_STOPBITS_1;
     USART_InitStruct.Parity = LL_USART_PARITY_NONE;
-    USART_InitStruct.TransferDirection = LL_USART_DIRECTION_TX;
+    USART_InitStruct.TransferDirection = LL_USART_DIRECTION_RX;
     USART_InitStruct.HardwareFlowControl = LL_USART_HWCONTROL_NONE;
     USART_InitStruct.OverSampling = LL_USART_OVERSAMPLING_16;
     LL_USART_Init(USART1, &USART_InitStruct);
@@ -140,8 +140,6 @@ void telem_UART_Init(void)
         LL_DMA_GetDataTransferDirection(DMA1, LL_DMA_CHANNEL_2));
     LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_2, sizeof(aTxBuffer));
     LL_USART_EnableDMAReq_TX(USART1);
-
-    LL_USART_SetTransferDirection(USART1, LL_USART_DIRECTION_RX);
 }
 
 void send_telem_DMA(uint8_t bytes)

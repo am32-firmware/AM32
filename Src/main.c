@@ -1915,21 +1915,6 @@ if(zero_crosses < 5){
 
         if (tenkhzcounter > LOOP_FREQUENCY_HZ) { // 1s sample interval 10000
             consumed_current += (actual_current << 16) / 360;
-            switch (dshot_extended_telemetry) {
-
-            case 1:
-                send_extended_dshot = 0b0010 << 8 | degrees_celsius;
-                dshot_extended_telemetry = 2;
-                break;
-            case 2:
-                send_extended_dshot = 0b0110 << 8 | (uint8_t)actual_current / 50;
-                dshot_extended_telemetry = 3;
-                break;
-            case 3:
-                send_extended_dshot = 0b0100 << 8 | (uint8_t)(battery_voltage / 25);
-                dshot_extended_telemetry = 1;
-                break;
-            }
             tenkhzcounter = 0;
         }
 

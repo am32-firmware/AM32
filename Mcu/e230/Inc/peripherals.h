@@ -45,7 +45,7 @@ void TIMER15_Init(void);
 void TIMER16_Init(void);
 void TIMER13_Init(void);
 // static void MX_USART1_UART_Init(void);
-
+void setIndividualRGBLed(uint8_t red, uint8_t green, uint8_t blue);
 void resetInputCaptureTimer();
 void setPWMCompare1(uint16_t compareone);
 void setPWMCompare2(uint16_t comparetwo);

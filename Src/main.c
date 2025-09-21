@@ -1866,8 +1866,8 @@ if(zero_crosses < 5){
               tim1_arr = 250 * (CPU_FREQUENCY_MHZ/9);
           } 
         }
-        if (signaltimeout > (LOOP_FREQUENCY_HZ >> 1)) { // half second timeout when armed;
-            if (armed) {
+        if (signaltimeout > (LOOP_FREQUENCY_HZ >> 1)) { // half second timeout when armed // 2 second when not armed
+            if ((armed) || (signaltimeout > LOOP_FREQUENCY_HZ << 1)) { 
                 allOff();
                 armed = 0;
                 input = 0;
@@ -1879,20 +1879,7 @@ if(zero_crosses < 5){
                     dma_buffer[i] = 0;
                 }
                 NVIC_SystemReset();
-            }
-            if (signaltimeout > LOOP_FREQUENCY_HZ << 1) { // 2 second when not armed
-                allOff();
-                armed = 0;
-                input = 0;
-                inputSet = 0;
-                zero_input_count = 0;
-                SET_DUTY_CYCLE_ALL(0);
-                resetInputCaptureTimer();
-                for (int i = 0; i < 64; i++) {
-                    dma_buffer[i] = 0;
-                }
-                NVIC_SystemReset();
-            }
+            }            
         }
 #ifdef USE_CUSTOM_LED
         if ((input >= 47) && (input < 1947)) {

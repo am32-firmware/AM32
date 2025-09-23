@@ -431,6 +431,7 @@ uint16_t ADC_raw_temp;
 uint16_t ADC_raw_volts;
 uint16_t ADC_raw_current;
 uint16_t ADC_raw_input;
+uint16_t ADC_raw_ntc_temp;
 uint8_t PROCESS_ADC_FLAG = 0;
 char send_telemetry = 0;
 char telemetry_done = 0;
@@ -857,8 +858,8 @@ void commutate()
     commutation_intervals[step - 1] = commutation_interval; // just used to calulate average
     
 #ifdef USE_PULSE_OUT
-		if(step == 1 || step == 4  ){
-WRITE_REG(RPM_PULSE_PORT->ODR, READ_REG(RPM_PULSE_PORT->ODR) ^ RPM_PULSE_PIN);
+	if(step == 1 || step == 4  ){
+    WRITE_REG(RPM_PULSE_PORT->ODR, READ_REG(RPM_PULSE_PORT->ODR) ^ RPM_PULSE_PIN);
 	}
 #endif
 }
@@ -2003,6 +2004,9 @@ if(zero_crosses < 5){
 #if defined(STMICRO)
             ADC_DMA_Callback();
             LL_ADC_REG_StartConversion(ADC1);
+#ifdef USE_ADC_1_2
+          LL_ADC_REG_StartConversion(ADC2);
+#endif          
             converted_degrees = __LL_ADC_CALC_TEMPERATURE(3300, ADC_raw_temp, LL_ADC_RESOLUTION_12B);
 #endif
 #ifdef MCU_GDE23

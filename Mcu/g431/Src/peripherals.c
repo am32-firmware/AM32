@@ -52,47 +52,87 @@ void initAfterJump()
 
 void SystemClock_Config(void)
 {
-    LL_FLASH_SetLatency(LL_FLASH_LATENCY_4);
-    while (LL_FLASH_GetLatency() != LL_FLASH_LATENCY_4) {
-    }
-    LL_PWR_SetRegulVoltageScaling(LL_PWR_REGU_VOLTAGE_SCALE1);
-    LL_RCC_HSI_Enable();
-    /* Wait till HSI is ready */
-    while (LL_RCC_HSI_IsReady() != 1) {
-    }
+//    LL_FLASH_SetLatency(LL_FLASH_LATENCY_4);
+//    while (LL_FLASH_GetLatency() != LL_FLASH_LATENCY_4) {
+//    }
+//    LL_PWR_SetRegulVoltageScaling(LL_PWR_REGU_VOLTAGE_SCALE1);
+//    LL_RCC_HSI_Enable();
+//    /* Wait till HSI is ready */
+//    while (LL_RCC_HSI_IsReady() != 1) {
+//    }
 
-    LL_RCC_HSI_SetCalibTrimming(64);
-    LL_RCC_LSI_Enable();
-    /* Wait till LSI is ready */
-    while (LL_RCC_LSI_IsReady() != 1) {
-    }
+//    LL_RCC_HSI_SetCalibTrimming(64);
+//    LL_RCC_LSI_Enable();
+//    /* Wait till LSI is ready */
+//    while (LL_RCC_LSI_IsReady() != 1) {
+//    }
 
-    LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSI, LL_RCC_PLLM_DIV_4, 75,
-        LL_RCC_PLLR_DIV_2);
-    LL_RCC_PLL_EnableDomain_SYS();
-    LL_RCC_PLL_Enable();
-    /* Wait till PLL is ready */
-    while (LL_RCC_PLL_IsReady() != 1) {
-    }
+//    LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSI, LL_RCC_PLLM_DIV_4, 75,
+//        LL_RCC_PLLR_DIV_2);
+//    LL_RCC_PLL_EnableDomain_SYS();
+//    LL_RCC_PLL_Enable();
+//    /* Wait till PLL is ready */
+//    while (LL_RCC_PLL_IsReady() != 1) {
+//    }
 
-    LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_PLL);
-    LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_2);
-    /* Wait till System clock is ready */
-    while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_PLL) {
-    }
+//    LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_PLL);
+//    LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_2);
+//    /* Wait till System clock is ready */
+//    while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_PLL) {
+//    }
 
-    /* Insure 1us transition state at intermediate medium speed clock*/
-    for (__IO uint32_t i = (170 >> 1); i != 0; i--)
-        ;
+//    /* Insure 1us transition state at intermediate medium speed clock*/
+//    for (__IO uint32_t i = (170 >> 1); i != 0; i--)
+//        ;
 
-    /* Set AHB prescaler*/
-    LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_1);
-    LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_1);
-    LL_RCC_SetAPB2Prescaler(LL_RCC_APB2_DIV_1);
+//    /* Set AHB prescaler*/
+//    LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_1);
+//    LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_1);
+//    LL_RCC_SetAPB2Prescaler(LL_RCC_APB2_DIV_1);
 
-    LL_Init1msTick(150000000);
+//    LL_Init1msTick(150000000);
 
-    LL_SetSystemCoreClock(150000000);
+//    LL_SetSystemCoreClock(150000000);
+
+  LL_FLASH_SetLatency(LL_FLASH_LATENCY_4);
+  while(LL_FLASH_GetLatency() != LL_FLASH_LATENCY_4)
+  {
+  }
+  LL_PWR_EnableRange1BoostMode();
+  LL_RCC_HSI_Enable();
+   /* Wait till HSI is ready */
+  while(LL_RCC_HSI_IsReady() != 1)
+  {
+  }
+
+  LL_RCC_HSI_SetCalibTrimming(64);
+  LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSI, LL_RCC_PLLM_DIV_4, 85, LL_RCC_PLLR_DIV_2);
+  LL_RCC_PLL_EnableDomain_SYS();
+  LL_RCC_PLL_Enable();
+   /* Wait till PLL is ready */
+  while(LL_RCC_PLL_IsReady() != 1)
+  {
+  }
+
+  LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_PLL);
+  LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_2);
+   /* Wait till System clock is ready */
+  while(LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_PLL)
+  {
+  }
+
+  /* Insure 1us transition state at intermediate medium speed clock*/
+  for (__IO uint32_t i = (170 >> 1); i !=0; i--);
+
+  /* Set AHB prescaler*/
+  LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_1);
+  LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_1);
+  LL_RCC_SetAPB2Prescaler(LL_RCC_APB2_DIV_1);
+
+  LL_Init1msTick(170000000);
+
+  LL_SetSystemCoreClock(170000000);
+
 }
 
 void MX_COMP1_Init(void)
@@ -237,61 +277,55 @@ void MX_TIM1_Init(void)
     LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOF);
     LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
     LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOB);
-    /**TIM1 GPIO Configuration
-    PF0-OSC_IN   ------> TIM1_CH3N
-    PA7   ------> TIM1_CH1N
-    PB0   ------> TIM1_CH2N
-    PA8   ------> TIM1_CH1
-    PA9   ------> TIM1_CH2
-    PA10   ------> TIM1_CH3
-    */
+
+    /**TIM1 GPIO Configuration   */
     GPIO_InitStruct.Pin = PHASE_A_GPIO_LOW;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    GPIO_InitStruct.Alternate = LL_GPIO_AF_6;
+    GPIO_InitStruct.Alternate = AF_A_LOW;
     LL_GPIO_Init(PHASE_A_GPIO_PORT_LOW, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_7;
+    GPIO_InitStruct.Pin = PHASE_B_GPIO_LOW;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    GPIO_InitStruct.Alternate = LL_GPIO_AF_6;
-    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    GPIO_InitStruct.Alternate = AF_B_LOW;
+    LL_GPIO_Init(PHASE_B_GPIO_PORT_LOW, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_0;
+    GPIO_InitStruct.Pin = PHASE_C_GPIO_LOW;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    GPIO_InitStruct.Alternate = LL_GPIO_AF_6;
-    LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    GPIO_InitStruct.Alternate = AF_C_LOW;
+    LL_GPIO_Init(PHASE_C_GPIO_PORT_LOW, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_8;
+    GPIO_InitStruct.Pin = PHASE_A_GPIO_HIGH;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
     GPIO_InitStruct.Alternate = LL_GPIO_AF_6;
-    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    LL_GPIO_Init(PHASE_A_GPIO_PORT_HIGH, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_9;
+    GPIO_InitStruct.Pin = PHASE_B_GPIO_HIGH;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
     GPIO_InitStruct.Alternate = LL_GPIO_AF_6;
-    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    LL_GPIO_Init(PHASE_B_GPIO_PORT_HIGH, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_10;
+    GPIO_InitStruct.Pin = PHASE_C_GPIO_HIGH;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
     GPIO_InitStruct.Alternate = LL_GPIO_AF_6;
-    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    LL_GPIO_Init(PHASE_C_GPIO_PORT_HIGH, &GPIO_InitStruct);
 }
 
 void MX_TIM2_Init(void)
@@ -497,4 +531,8 @@ void enableCorePeripherals()
     NVIC_SetPriority(EXTI15_10_IRQn, 2);
     NVIC_EnableIRQ(EXTI15_10_IRQn);
     EXTI->IMR1 |= (1 << 15);
+    
+#ifdef USE_PULSE_OUT
+		 LL_GPIO_SetPinMode(RPM_PULSE_PORT, RPM_PULSE_PIN, LL_GPIO_MODE_OUTPUT);
+#endif
 }

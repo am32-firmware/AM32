@@ -15,6 +15,7 @@ extern char servoPwm;
 extern char dshot_telemetry;
 extern char out_put;
 extern char armed;
+extern char dma_busy;
 
 uint16_t interrupt_time = 0;
 
@@ -24,6 +25,7 @@ uint16_t interrupt_time = 0;
 #include "main.h"
 #include "systick.h"
 #include "targets.h"
+#include "WS2812.h"
 
 /*!
     \brief      this function handles NMI exception
@@ -100,6 +102,45 @@ void DMA_Channel3_4_IRQHandler(void)
     } else if (dma_interrupt_flag_get(INPUT_DMA_CHANNEL, DMA_INT_FLAG_ERR) == 1) {
         dma_interrupt_flag_clear(INPUT_DMA_CHANNEL, DMA_INT_FLAG_G);
     }
+}
+
+// DMA1_Channel1_2_IRQHandler
+// use CH2 for WS2812
+void DMA_Channel1_2_IRQHandler(void)
+{
+    // Check DMA_CH2 transfer complete for WS2812
+    if (dma_interrupt_flag_get(DMA_CH2, DMA_INT_FLAG_FTF)) {
+        dma_interrupt_flag_clear(DMA_CH2, DMA_INT_FLAG_G);
+        dma_channel_disable(DMA_CH2);
+        
+        // Disable timer and outputs
+        #ifdef USE_TIMER_14_CHANNEL_0
+        timer_primary_output_config(TIMER2, DISABLE);
+        timer_disable(TIMER2);
+        #endif
+        #ifdef USE_TIMER_2_CHANNEL_0
+        timer_primary_output_config(TIMER14, DISABLE);
+        timer_disable(TIMER14);
+        #endif
+        
+        dma_busy = 0;  // Ready for next LED update
+    }else if (dma_interrupt_flag_get(DMA_CH2, DMA_INT_FLAG_ERR)) {
+        dma_interrupt_flag_clear(DMA_CH2, DMA_INT_FLAG_G);
+        dma_channel_disable(DMA_CH2);
+        
+        // Disable timer and outputs
+        #ifdef USE_TIMER_14_CHANNEL_0
+        timer_primary_output_config(TIMER2, DISABLE);
+        timer_disable(TIMER2);
+        #endif
+        #ifdef USE_TIMER_2_CHANNEL_0
+        timer_primary_output_config(TIMER14, DISABLE);
+        timer_disable(TIMER14);
+        #endif
+        
+        dma_busy = 0;  // Ready for next LED update
+    }
+    
 }
 
 /**

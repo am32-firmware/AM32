@@ -131,16 +131,16 @@ void WS2812_Init(void)
     timer_initpara.alignedmode = TIMER_COUNTER_EDGE;
     timer_initpara.counterdirection = TIMER_COUNTER_DOWN;
     timer_initpara.period = 89; // 800KHz
-    timer_initpara.clockdivision = TIMER_CLOCKDIVISION_DIV1;
+    timer_initpara.clockdivision = TIMER_CKDIV_DIV1;
     timer_initpara.repetitioncounter = 0;
 
     // Configure Timer Channel
     timer_ocinitpara.outputstate = TIMER_CCX_DISABLE;
-    timer_ocinitpara.outputnsate = TIMER_CCXN_DISABLE;
-    timer_ocinitpara.ocpolarity = TIMER_OCPOLARITY_HIGH;
-    timer_ocinitpara.ocnpolarity = TIMER_OCNPOLARITY_HIGH;
-    timer_ocinitpara.ocidle = TIMER_OCIDLESTATE_LOW;
-    timer_ocinitpara.ocnidle = TIMER_OCNIDLESTATE_LOW;
+    timer_ocinitpara.outputnstate = TIMER_CCXN_DISABLE;
+    timer_ocinitpara.ocpolarity = TIMER_OC_POLARITY_HIGH;
+    timer_ocinitpara.ocnpolarity = TIMER_OCN_POLARITY_HIGH;
+    timer_ocinitpara.ocidlestate = TIMER_OC_IDLE_STATE_LOW;
+    timer_ocinitpara.ocnidlestate = TIMER_OC_IDLE_STATE_LOW;
 
     timer_init(TIMER2, &timer_initpara);
     timer_auto_reload_shadow_enable(TIMER2);
@@ -153,7 +153,7 @@ void WS2812_Init(void)
 
     // Configure DMA
     dma_deinit(DMA_CH2);
-    dma_initpara.periph_addr = (uint32_t)(&((TIMER_TypeDef *)TIMER2)->CH0CV);
+    dma_initpara.periph_addr = (uint32_t)&TIMER_CH0CV(TIMER2);
     dma_initpara.periph_inc = DMA_PERIPH_INCREASE_DISABLE;
     dma_initpara.memory_addr = (uint32_t)&led_Buffer;
     dma_initpara.memory_inc = DMA_MEMORY_INCREASE_ENABLE;
@@ -167,19 +167,19 @@ void WS2812_Init(void)
     #ifdef USE_TIMER_2_CHANNEL_0
     timer_deinit(TIMER14);
     timer_initpara.prescaler = 0;
-    timer_initpara.alignedmode = TIMER_COUNTER_DOWN;
+    timer_initpara.alignedmode = TIMER_COUNTER_EDGE;
     timer_initpara.counterdirection = TIMER_COUNTER_DOWN;
     timer_initpara.period = 89; // 800KHz
-    timer_initpara.clockdivision = TIMER_CLOCKDIVISION_DIV1;
+    timer_initpara.clockdivision = TIMER_CKDIV_DIV1;
     timer_initpara.repetitioncounter = 0;
 
     // Configure Timer Channel
     timer_ocinitpara.outputstate = TIMER_CCX_DISABLE;
-    timer_ocinitpara.outputnsate = TIMER_CCXN_DISABLE;
-    timer_ocinitpara.ocpolarity = TIMER_OCPOLARITY_HIGH;
-    timer_ocinitpara.ocnpolarity = TIMER_OCNPOLARITY_HIGH;
-    timer_ocinitpara.ocidle = TIMER_OCIDLESTATE_LOW;
-    timer_ocinitpara.ocnidle = TIMER_OCNIDLESTATE_LOW;
+    timer_ocinitpara.outputnstate = TIMER_CCXN_DISABLE;
+    timer_ocinitpara.ocpolarity = TIMER_OC_POLARITY_HIGH;
+    timer_ocinitpara.ocnpolarity = TIMER_OCN_POLARITY_HIGH;
+    timer_ocinitpara.ocidlestate = TIMER_OC_IDLE_STATE_LOW;
+    timer_ocinitpara.ocnidlestate = TIMER_OC_IDLE_STATE_LOW;
 
     timer_init(TIMER14, &timer_initpara);
     timer_auto_reload_shadow_enable(TIMER14);
@@ -192,7 +192,7 @@ void WS2812_Init(void)
 
     // Configure DMA
     dma_deinit(DMA_CH2);
-    dma_initpara.periph_addr = (uint32_t)(&((TIMER_TypeDef *)TIMER14)->CH0CV);
+    dma_initpara.periph_addr = (uint32_t)&TIMER_CH0CV(TIMER14);
     dma_initpara.periph_inc = DMA_PERIPH_INCREASE_DISABLE;
     dma_initpara.memory_addr = (uint32_t)&led_Buffer;
     dma_initpara.memory_inc = DMA_MEMORY_INCREASE_ENABLE;

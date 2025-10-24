@@ -15,7 +15,6 @@ extern char servoPwm;
 extern char dshot_telemetry;
 extern char out_put;
 extern char armed;
-extern char dma_busy;
 
 uint16_t interrupt_time = 0;
 

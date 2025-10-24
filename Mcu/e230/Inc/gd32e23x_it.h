@@ -59,6 +59,7 @@ void PendSV_Handler(void);
 void SysTick_Handler(void);
 
 void DMA_Channel3_4_IRQHandler(void);
+void DMA_Channel1_2_IRQHandler(void);
 void ADC_CMP_IRQHandler(void);
 void TIMER13_IRQHandler(void);
 void TIMER15_IRQHandler(void);

@@ -39,7 +39,7 @@ void MX_TIM16_Init(void);
 void MX_TIM14_Init(void);
 void MX_TIM6_Init(void);
 void MX_TIM17_Init(void);
-// static void MX_USART1_UART_Init(void);
+void setIndividualRGBLed(uint8_t red, uint8_t green, uint8_t blue);
 void resetInputCaptureTimer();
 void setPWMCompare1(uint16_t compareone);
 void setPWMCompare2(uint16_t comparetwo);

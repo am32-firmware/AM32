@@ -355,7 +355,6 @@ int32_t input_override = 0;
 int16_t use_current_limit_adjust = 2000;
 char use_current_limit = 0;
 int32_t stall_protection_adjust = 0;
-
 uint32_t MCU_Id = 0;
 uint32_t REV_Id = 0;
 
@@ -432,6 +431,7 @@ uint16_t ADC_raw_temp;
 uint16_t ADC_raw_volts;
 uint16_t ADC_raw_current;
 uint16_t ADC_raw_input;
+uint16_t ADC_raw_ntc_temp;
 uint8_t PROCESS_ADC_FLAG = 0;
 char send_telemetry = 0;
 char telemetry_done = 0;
@@ -616,20 +616,12 @@ void loadEEpromSettings()
     }
 
     if (eepromBuffer.pwm_frequency < 145 && eepromBuffer.pwm_frequency > 7) {
-        if (eepromBuffer.pwm_frequency < 145 && eepromBuffer.pwm_frequency > 23) {
-            TIMER1_MAX_ARR = map(eepromBuffer.pwm_frequency, 24, 144, TIM1_AUTORELOAD, TIM1_AUTORELOAD / 6);
-        }
-        if (eepromBuffer.pwm_frequency < 24 && eepromBuffer.pwm_frequency > 11) {
-            TIMER1_MAX_ARR = map(eepromBuffer.pwm_frequency, 12, 24, TIM1_AUTORELOAD * 2, TIM1_AUTORELOAD);
-        }
-        if (eepromBuffer.pwm_frequency < 12 && eepromBuffer.pwm_frequency > 7) {
-            TIMER1_MAX_ARR = map(eepromBuffer.pwm_frequency, 7, 16, TIM1_AUTORELOAD * 3,
-                TIM1_AUTORELOAD / 2 * 3);
-        }
-        SET_AUTO_RELOAD_PWM(TIMER1_MAX_ARR);
+      int divider = eepromBuffer.pwm_frequency * 100 / 6;
+      TIMER1_MAX_ARR =   TIM1_AUTORELOAD * 400 / divider;
+      SET_AUTO_RELOAD_PWM(TIMER1_MAX_ARR);
     } else {
-        tim1_arr = TIM1_AUTORELOAD;
-        SET_AUTO_RELOAD_PWM(tim1_arr);
+      tim1_arr = TIM1_AUTORELOAD;
+      SET_AUTO_RELOAD_PWM(tim1_arr);
     }
     if(eepromBuffer.minimum_duty_cycle < 51 && eepromBuffer.minimum_duty_cycle > 0){
     minimum_duty_cycle = eepromBuffer.minimum_duty_cycle * 10;
@@ -866,8 +858,8 @@ void commutate()
     commutation_intervals[step - 1] = commutation_interval; // just used to calulate average
     
 #ifdef USE_PULSE_OUT
-		if(step == 1 || step == 4  ){
-WRITE_REG(RPM_PULSE_PORT->ODR, READ_REG(RPM_PULSE_PORT->ODR) ^ RPM_PULSE_PIN);
+	if(step == 1 || step == 4  ){
+    WRITE_REG(RPM_PULSE_PORT->ODR, READ_REG(RPM_PULSE_PORT->ODR) ^ RPM_PULSE_PIN);
 	}
 #endif
 }
@@ -1098,9 +1090,7 @@ void setInput()
         input = 0;
         bemf_timeout_happened = 102;
 #ifdef USE_RGB_LED
-        GPIOB->BRR = LL_GPIO_PIN_8; // on red
-        GPIOB->BSRR = LL_GPIO_PIN_5; //
-        GPIOB->BSRR = LL_GPIO_PIN_3;
+        setIndividualRGBLed(1, 0, 0);
 #endif
     } else {
 #ifdef FIXED_DUTY_MODE
@@ -1323,9 +1313,7 @@ void tenKhzRoutine()
                             send_LED_RGB(0, 255, 0);
 #endif
 #ifdef USE_RGB_LED
-                            GPIOB->BRR = LL_GPIO_PIN_3; // turn on green
-                            GPIOB->BSRR = LL_GPIO_PIN_8; // turn on green
-                            GPIOB->BSRR = LL_GPIO_PIN_5;
+                            setIndividualRGBLed(0,1,0);
 #endif
                             if ((cell_count == 0) && eepromBuffer.low_voltage_cut_off == 1) {
                                 cell_count = battery_voltage / 370;
@@ -1750,6 +1738,9 @@ int main(void)
 #ifdef USE_LED_STRIP
     send_LED_RGB(125, 0, 0);
 #endif
+#ifdef USE_RGB_LED
+     setIndividualRGBLed(1,0,0);
+#endif
 
 #ifdef USE_CRSF_INPUT
     inputSet = 1;
@@ -1925,21 +1916,6 @@ if(zero_crosses < 5){
 
         if (tenkhzcounter > LOOP_FREQUENCY_HZ) { // 1s sample interval 10000
             consumed_current += (actual_current << 16) / 360;
-            switch (dshot_extended_telemetry) {
-
-            case 1:
-                send_extended_dshot = 0b0010 << 8 | degrees_celsius;
-                dshot_extended_telemetry = 2;
-                break;
-            case 2:
-                send_extended_dshot = 0b0110 << 8 | (uint8_t)actual_current / 50;
-                dshot_extended_telemetry = 3;
-                break;
-            case 3:
-                send_extended_dshot = 0b0100 << 8 | (uint8_t)(battery_voltage / 25);
-                dshot_extended_telemetry = 1;
-                break;
-            }
             tenkhzcounter = 0;
         }
 
@@ -2013,6 +1989,9 @@ if(zero_crosses < 5){
 #if defined(STMICRO)
             ADC_DMA_Callback();
             LL_ADC_REG_StartConversion(ADC1);
+#ifdef USE_ADC_1_2
+          LL_ADC_REG_StartConversion(ADC2);
+#endif          
             converted_degrees = __LL_ADC_CALC_TEMPERATURE(3300, ADC_raw_temp, LL_ADC_RESOLUTION_12B);
 #endif
 #ifdef MCU_GDE23

@@ -150,7 +150,7 @@ static const struct parameter {
         { "DIR_REVERSED",           T_BOOL,  0, 1,   0, &eepromBuffer.dir_reversed},
         { "BI_DIRECTIONAL",         T_BOOL,  0, 1,   0, &eepromBuffer.bi_direction},
         { "BEEP_VOLUME",            T_UINT8, 0, 11,  5, &eepromBuffer.beep_volume},
-        { "VARIABLE_PWM",           T_BOOL,  0, 1,   1, &eepromBuffer.variable_pwm},
+        { "VARIABLE_PWM",           T_UINT8, 0, 2,   1, &eepromBuffer.variable_pwm},
         { "PWM_FREQUENCY",          T_UINT8, 8, 48,  24, &eepromBuffer.pwm_frequency},
         { "USE_SIN_START",          T_BOOL,  0, 1,   0, &eepromBuffer.use_sine_start},
         { "COMP_PWM",               T_BOOL,  0, 1,   1, &eepromBuffer.comp_pwm},

@@ -55,6 +55,12 @@ extern void DroneCAN_processTxQueue();
 extern void DroneCAN_receiveFrame();
 
 /*
+  alternative for interrupt driven receive, called from CAN interrupt
+  handler
+ */
+extern void DroneCAN_handleFrame(const CanardCANFrame *rx_frame);
+
+/*
   try to transmit a frame.
   return 1 for success, 0 for no space, -ve for error
  */

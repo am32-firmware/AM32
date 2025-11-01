@@ -1127,6 +1127,16 @@ void DroneCAN_receiveFrame(void)
     }
 }
 
+void DroneCAN_handleFrame(const CanardCANFrame *rx_frame)
+{
+  canstats.num_receive++;
+  int ecode = canardHandleRxFrame(&canard, rx_frame, micros64());
+  if (ecode != CANARD_OK && ecode != -CANARD_ERROR_RX_NOT_WANTED) {
+    canstats.rx_ecode = ecode;
+    canstats.rxframe_error++;
+  }
+}
+
 /*
   Transmits all frames from the TX queue
 */
@@ -1167,6 +1177,9 @@ static void DroneCAN_Startup(void)
          */
 #ifdef MCU_L431
         NVIC_DisableIRQ(DMA1_Channel5_IRQn);
+        NVIC_DisableIRQ(EXTI15_10_IRQn);
+        EXTI->IMR1 &= ~(1U << 15);
+#elif defined(MCU_G431)
         NVIC_DisableIRQ(EXTI15_10_IRQn);
         EXTI->IMR1 &= ~(1U << 15);
 #elif defined(MCU_AT415)

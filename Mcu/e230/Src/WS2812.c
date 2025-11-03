@@ -52,22 +52,26 @@ void send_LED_DMA()
     dma_busy = 1;
 
     #ifdef USE_TIMER_14_CHANNEL_0
+    dma_channel_disable(DMA_CH2);
+    dma_transfer_number_config(DMA_CH2, RGB_BUFFER_SIZE);  // Reload DMA counter
     timer_counter_value_config(TIMER2, 0);  // Reset timer count to 0
     dma_interrupt_enable(DMA_CH2, DMA_INT_FTF);
     dma_interrupt_enable(DMA_CH2, DMA_INT_ERR);
     dma_channel_enable(DMA_CH2);
     timer_dma_enable(TIMER2, TIMER_DMA_CH0D);
-    timer_channel_output_enable(TIMER2, TIMER_CH_0);
+    timer_channel_output_state_config(TIMER2, TIMER_CH_0, TIMER_CCX_ENABLE);
     timer_primary_output_config(TIMER2, ENABLE);
     timer_enable(TIMER2);
     #endif
     #ifdef USE_TIMER_2_CHANNEL_0
+    dma_channel_disable(DMA_CH2);
+    dma_transfer_number_config(DMA_CH2, RGB_BUFFER_SIZE);  // Reload DMA counter
     timer_counter_value_config(TIMER14, 0);  // Reset timer count to 0
     dma_interrupt_enable(DMA_CH2, DMA_INT_FTF);
     dma_interrupt_enable(DMA_CH2, DMA_INT_ERR);
     dma_channel_enable(DMA_CH2);
     timer_dma_enable(TIMER14, TIMER_DMA_CH0D);
-    timer_channel_output_enable(TIMER14, TIMER_CH_0);
+    timer_channel_output_state_config(TIMER14, TIMER_CH_0, TIMER_CCX_ENABLE);
     timer_primary_output_config(TIMER14, ENABLE);
     timer_enable(TIMER14);
     #endif
@@ -102,10 +106,12 @@ void WS2812_Init(void)
     rcu_periph_clock_enable(RCU_DMA);
 
     #ifdef USE_TIMER_14_CHANNEL_0
+    // DShot uses TIMER14, so WS2812 uses TIMER2/PB4
     rcu_periph_clock_enable(RCU_TIMER2);
     rcu_periph_clock_enable(RCU_GPIOB);
     #endif
     #ifdef USE_TIMER_2_CHANNEL_0
+    // DShot uses TIMER2, so WS2812 uses TIMER14/PA2
     rcu_periph_clock_enable(RCU_TIMER14);
     rcu_periph_clock_enable(RCU_GPIOA);
     #endif

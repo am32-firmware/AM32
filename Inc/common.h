@@ -46,7 +46,6 @@ extern uint32_t current_GPIO_PORT;
 #endif
 extern uint32_t current_EXTI_LINE;
 extern int e_com_time;
-extern char dshot_extended_telemetry;
 extern char EDT_ARM_ENABLE;
 extern char EDT_ARMED;
 extern uint16_t send_extended_dshot;

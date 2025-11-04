@@ -16,6 +16,9 @@
 #include "WS2812.h"
 #endif
 
+// we setup with HSI clock for a PCLK of 160MHz
+#define PCLK_MHZ 160
+
 // extern uint16_t DEAD_TIME;
 
 void initCorePeripherals(void)
@@ -46,53 +49,77 @@ void initCorePeripherals(void)
 
 void initAfterJump()
 {
+#if DRONECAN_SUPPORT
+    SCB->VTOR = 0x08004000;
+#else
     SCB->VTOR = 0x08001000;
+#endif
     __enable_irq();
 }
 
 void SystemClock_Config(void)
 {
-    LL_FLASH_SetLatency(LL_FLASH_LATENCY_4);
-    while (LL_FLASH_GetLatency() != LL_FLASH_LATENCY_4) {
-    }
-    LL_PWR_SetRegulVoltageScaling(LL_PWR_REGU_VOLTAGE_SCALE1);
-    LL_RCC_HSI_Enable();
-    /* Wait till HSI is ready */
-    while (LL_RCC_HSI_IsReady() != 1) {
-    }
+  LL_FLASH_SetLatency(LL_FLASH_LATENCY_4);
+  while (LL_FLASH_GetLatency()!= LL_FLASH_LATENCY_4) ;
+  LL_PWR_SetRegulVoltageScaling(LL_PWR_REGU_VOLTAGE_SCALE1);
+  while (LL_PWR_IsActiveFlag_VOS() != 0) ;
 
-    LL_RCC_HSI_SetCalibTrimming(64);
-    LL_RCC_LSI_Enable();
-    /* Wait till LSI is ready */
-    while (LL_RCC_LSI_IsReady() != 1) {
-    }
+#ifdef USE_HSE
+  // setup to use HSE
+#if defined(USE_HSE_BYPASS) && (USE_HSE_BYPASS == 0)
+  LL_RCC_HSE_DisableBypass(); // Use crystal mode
+#else
+  LL_RCC_HSE_EnableBypass(); // Default: Use external oscillator
+#endif
+  LL_RCC_HSE_Enable();
+  while (LL_RCC_HSE_IsReady() != 1) ;
+  #define PLL_SRC LL_RCC_PLLSOURCE_HSE
+#if HSE_VALUE == 8000000
+  #define PLLM_DIV LL_RCC_PLLM_DIV_1
+#elif HSE_VALUE == 16000000
+  #define PLLM_DIV LL_RCC_PLLM_DIV_2
+#elif HSE_VALUE == 24000000
+  #define PLLM_DIV LL_RCC_PLLM_DIV_3
+#else
+  #error "Unsupported HSE_VALUE"
+#endif
+#else // default to HSI (16MHz)
+  LL_RCC_HSI_Enable();
+  while (LL_RCC_HSI_IsReady() != 1) ;
+  #define PLLM_DIV LL_RCC_PLLM_DIV_2
+  #define PLL_SRC LL_RCC_PLLSOURCE_HSI
+#endif
 
-    LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSI, LL_RCC_PLLM_DIV_4, 75,
-        LL_RCC_PLLR_DIV_2);
-    LL_RCC_PLL_EnableDomain_SYS();
-    LL_RCC_PLL_Enable();
-    /* Wait till PLL is ready */
-    while (LL_RCC_PLL_IsReady() != 1) {
-    }
+  LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_1);
+  LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_1);
+  LL_RCC_SetAPB2Prescaler(LL_RCC_APB2_DIV_1);
 
-    LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_PLL);
-    LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_2);
-    /* Wait till System clock is ready */
-    while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_PLL) {
-    }
+  LL_RCC_PLL_ConfigDomain_SYS(PLL_SRC, PLLM_DIV, 40, LL_RCC_PLLR_DIV_2);
+  LL_RCC_PLL_EnableDomain_SYS();
 
-    /* Insure 1us transition state at intermediate medium speed clock*/
-    for (__IO uint32_t i = (170 >> 1); i != 0; i--)
-        ;
+#if DRONECAN_SUPPORT
+  // FDCAN clock must be 80MHz
+  LL_RCC_SetFDCANClockSource(LL_RCC_FDCAN_CLKSOURCE_PLL);
+  LL_RCC_PLL_EnableDomain_48M();
+  MODIFY_REG(RCC->PLLCFGR, RCC_PLLCFGR_PLLQ, LL_RCC_PLLQ_DIV_4);
 
-    /* Set AHB prescaler*/
-    LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_1);
-    LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_1);
-    LL_RCC_SetAPB2Prescaler(LL_RCC_APB2_DIV_1);
+  // also enable the backup domain registers in TAMP for communication
+  // between bootloader and main firmware
+  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_PWR);
+  PWR->CR1 |= PWR_CR1_DBP;
+  LL_RCC_SetRTCClockSource(LL_RCC_RTC_CLKSOURCE_NONE);
+  RCC->BDCR |= RCC_BDCR_RTCEN;
+#endif
 
-    LL_Init1msTick(150000000);
+  LL_RCC_PLL_Enable();
+  while (LL_RCC_PLL_IsReady() != 1) ;
 
-    LL_SetSystemCoreClock(150000000);
+  LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_PLL);
+  while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_PLL) ;
+
+  LL_Init1msTick(PCLK_MHZ*1000000);
+
+  LL_SetSystemCoreClock(PCLK_MHZ*1000000);
 }
 
 void MX_COMP1_Init(void)
@@ -237,68 +264,62 @@ void MX_TIM1_Init(void)
     LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOF);
     LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
     LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOB);
-    /**TIM1 GPIO Configuration
-    PF0-OSC_IN   ------> TIM1_CH3N
-    PA7   ------> TIM1_CH1N
-    PB0   ------> TIM1_CH2N
-    PA8   ------> TIM1_CH1
-    PA9   ------> TIM1_CH2
-    PA10   ------> TIM1_CH3
-    */
+
+    /**TIM1 GPIO Configuration   */
     GPIO_InitStruct.Pin = PHASE_A_GPIO_LOW;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    GPIO_InitStruct.Alternate = LL_GPIO_AF_6;
+    GPIO_InitStruct.Alternate = AF_A_LOW;
     LL_GPIO_Init(PHASE_A_GPIO_PORT_LOW, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_7;
+    GPIO_InitStruct.Pin = PHASE_B_GPIO_LOW;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    GPIO_InitStruct.Alternate = LL_GPIO_AF_6;
-    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    GPIO_InitStruct.Alternate = AF_B_LOW;
+    LL_GPIO_Init(PHASE_B_GPIO_PORT_LOW, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_0;
+    GPIO_InitStruct.Pin = PHASE_C_GPIO_LOW;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    GPIO_InitStruct.Alternate = LL_GPIO_AF_6;
-    LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    GPIO_InitStruct.Alternate = AF_C_LOW;
+    LL_GPIO_Init(PHASE_C_GPIO_PORT_LOW, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_8;
+    GPIO_InitStruct.Pin = PHASE_A_GPIO_HIGH;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
     GPIO_InitStruct.Alternate = LL_GPIO_AF_6;
-    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    LL_GPIO_Init(PHASE_A_GPIO_PORT_HIGH, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_9;
+    GPIO_InitStruct.Pin = PHASE_B_GPIO_HIGH;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
     GPIO_InitStruct.Alternate = LL_GPIO_AF_6;
-    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    LL_GPIO_Init(PHASE_B_GPIO_PORT_HIGH, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_10;
+    GPIO_InitStruct.Pin = PHASE_C_GPIO_HIGH;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
     GPIO_InitStruct.Alternate = LL_GPIO_AF_6;
-    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    LL_GPIO_Init(PHASE_C_GPIO_PORT_HIGH, &GPIO_InitStruct);
 }
 
 void MX_TIM2_Init(void)
 {
     LL_TIM_InitTypeDef TIM_InitStruct = { 0 };
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM2);
-    TIM_InitStruct.Prescaler = 74;
+    TIM_InitStruct.Prescaler = PCLK_MHZ/2 - 1;
     TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
     TIM_InitStruct.Autoreload = 65535;
     TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
@@ -368,7 +389,7 @@ void MX_TIM16_Init(void)
     NVIC_SetPriority(TIM1_UP_TIM16_IRQn,
         NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
     NVIC_EnableIRQ(TIM1_UP_TIM16_IRQn);
-    TIM_InitStruct.Prescaler = 74;
+    TIM_InitStruct.Prescaler = (PCLK_MHZ/2) - 1;
     TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
     TIM_InitStruct.Autoreload = 65535;
     TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
@@ -386,7 +407,7 @@ void MX_TIM17_Init(void)
 {
     LL_TIM_InitTypeDef TIM_InitStruct = { 0 };
     LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM17);
-    TIM_InitStruct.Prescaler = 159;
+    TIM_InitStruct.Prescaler = PCLK_MHZ-1;
     TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
     TIM_InitStruct.Autoreload = 65535;
     TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
@@ -400,21 +421,21 @@ void MX_TIM17_Init(void)
  */
 void MX_DMA_Init(void)
 {
-
     LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMAMUX1);
     LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1);
 
     NVIC_SetPriority(DMA1_Channel1_IRQn, 1);
     NVIC_EnableIRQ(DMA1_Channel1_IRQn);
 }
+
 void MX_TIM6_Init(void)
 {
     LL_TIM_InitTypeDef TIM_InitStruct = { 0 };
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM6);
     NVIC_SetPriority(TIM6_DAC_IRQn,
-        NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
+                     NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
     NVIC_EnableIRQ(TIM6_DAC_IRQn);
-    TIM_InitStruct.Prescaler = 149;
+    TIM_InitStruct.Prescaler = PCLK_MHZ-1;
     TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
     TIM_InitStruct.Autoreload = 1000000 / LOOP_FREQUENCY_HZ;
     LL_TIM_Init(TIM6, &TIM_InitStruct);
@@ -422,6 +443,7 @@ void MX_TIM6_Init(void)
     LL_TIM_SetTriggerOutput(TIM6, LL_TIM_TRGO_RESET);
     LL_TIM_DisableMasterSlaveMode(TIM6);
 }
+
 void MX_GPIO_Init(void)
 {
     /* GPIO Ports Clock Enable */
@@ -497,4 +519,8 @@ void enableCorePeripherals()
     NVIC_SetPriority(EXTI15_10_IRQn, 2);
     NVIC_EnableIRQ(EXTI15_10_IRQn);
     EXTI->IMR1 |= (1 << 15);
+    
+#ifdef USE_PULSE_OUT
+		 LL_GPIO_SetPinMode(RPM_PULSE_PORT, RPM_PULSE_PIN, LL_GPIO_MODE_OUTPUT);
+#endif
 }

@@ -150,12 +150,14 @@ static const struct parameter {
         { "DIR_REVERSED",           T_BOOL,  0, 1,   0, &eepromBuffer.dir_reversed},
         { "BI_DIRECTIONAL",         T_BOOL,  0, 1,   0, &eepromBuffer.bi_direction},
         { "BEEP_VOLUME",            T_UINT8, 0, 11,  5, &eepromBuffer.beep_volume},
-        { "VARIABLE_PWM",           T_BOOL,  0, 1,   1, &eepromBuffer.variable_pwm},
-        { "PWM_FREQUENCY",          T_UINT8, 8, 48,  24, &eepromBuffer.pwm_frequency},
+        { "VARIABLE_PWM",           T_UINT8, 0, 2,   1, &eepromBuffer.variable_pwm},
+        { "PWM_FREQUENCY",          T_UINT8, 8, 144, 24, &eepromBuffer.pwm_frequency},
+        { "MAX_RAMP",               T_UINT8, 1, 200, 160, &eepromBuffer.max_ramp},
+        { "MIN_DUTY_CYCLE",         T_UINT8, 0, 50,  4, &eepromBuffer.minimum_duty_cycle},
         { "USE_SIN_START",          T_BOOL,  0, 1,   0, &eepromBuffer.use_sine_start},
         { "COMP_PWM",               T_BOOL,  0, 1,   1, &eepromBuffer.comp_pwm},
         { "STUCK_ROTOR_PROTECTION", T_BOOL,  0, 1,   1, &eepromBuffer.stuck_rotor_protection},
-        { "ADVANCE_LEVEL",          T_UINT8, 0, 4,   2, &eepromBuffer.advance_level},
+        { "ADVANCE_LEVEL",          T_UINT8, 0, 30,  26, &eepromBuffer.advance_level},
         { "AUTO_ADVANCE",           T_BOOL,  0, 1,   0, &eepromBuffer.auto_advance},
         { "STARTUP_POWER",          T_UINT8, 50,150, 10, &eepromBuffer.startup_power},
         { "CURRENT_LIMIT",          T_UINT8, 0, 200, 0, &eepromBuffer.limits.current},
@@ -196,6 +198,9 @@ static void load_settings(void)
                 uint8_t max_value = p->max_value;
                 if (pvalue == &eepromBuffer.limits.current) {
                     max_value = max_value / 2;
+                }
+                if (pvalue == &eepromBuffer.advance_level) {
+                    max_value = max_value + 10;
                 }
                 if (*pvalue < p->min_value || *pvalue > max_value) {
                     *pvalue = p->default_value;
@@ -272,12 +277,17 @@ static uint32_t millis32(void)
 
 /*
   default settings, based on public/assets/eeprom_default.bin in AM32 configurator
+  update to 2.19 default 
  */
 static const uint8_t default_settings[] = {
-    0x01, 0x02, 0x01, 0x01, 0x23, 0x4e, 0x45, 0x4f, 0x45, 0x53, 0x43, 0x20, 0x66, 0x30, 0x35, 0x31,
-    0x20, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x02, 0x18, 0x64, 0x37, 0x0e, 0x00, 0x00, 0x05, 0x00,
-    0x80, 0x80, 0x80, 0x32, 0x00, 0x32, 0x00, 0x00, 0x0f, 0x0a, 0x0a, 0x8d, 0x66, 0x06, 0x00, 0x00
+    0x01, 0x03, 0x01, 0x01, 0x23, 0xa0, 0x04, 0x00, 0x0a, 0x64, 0x00, 0x32, 0x02, 0x30, 0x35, 0x31,
+    0x20, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x1a, 0x18, 0x64, 0x37, 0x0e, 0x00, 0x00, 0x05, 0x00,
+    0x80, 0x80, 0x80, 0x32, 0x00, 0x32, 0x00, 0x00, 0x0f, 0x0a, 0x0a, 0x8d, 0x66, 0x06, 0x01, 0x00
 };
+
+static const uint8_t advance_level_v3_remap[] = {
+  0x00, 0x08, 0x10, 0x16 // old values 0-3 map to new values 0,8,16,22 
+};  
 
 // printf to CAN LogMessage for debugging
 static void can_printf(const char *fmt, ...)
@@ -339,6 +349,9 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
                     *ptr8 = req.value.integer_value / 2;
                 } else {
                     *ptr8 = req.value.integer_value;
+                }
+                if (ptr8 == &eepromBuffer.advance_level) {
+                    *ptr8 = req.value.integer_value + 10; // adjust for advance level offset for eeprom v3
                 }
                 break;
             }
@@ -410,6 +423,16 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
             if ((uint8_t *)p->ptr == &eepromBuffer.limits.current) {
                 pkt.default_value.integer_value *= 2;
                 pkt.value.integer_value *= 2;
+            }
+            if ((uint8_t *)p->ptr == &eepromBuffer.advance_level) {
+              // automatically remap old values
+              if (pkt.value.integer_value < sizeof(advance_level_v3_remap)) {
+                pkt.value.integer_value = advance_level_v3_remap[pkt.value.integer_value];
+              }
+              // adjust for advance level offset for eeprom v3
+              if (pkt.value.integer_value >= 10) {
+                pkt.value.integer_value -= 10; 
+              }
             }
             break;
         case T_UINT16:
@@ -553,7 +576,7 @@ static void handle_GetNodeInfo(CanardInstance *ins, CanardRxTransfer *transfer)
     sys_can_getUniqueID(pkt.hardware_version.unique_id);
 
 #ifdef DRONECAN_NODE_NAME
-    strncpy((char*)pkt.name.data, DRONECAN_NODE_NAME, sizeof(pkt.name.data));
+    snprintf((char*)pkt.name.data, sizeof(pkt.name.data), "%s#M%u", DRONECAN_NODE_NAME, eepromBuffer.can.esc_index + 1);
 #else
     strncpy((char*)pkt.name.data, FIRMWARE_NAME, sizeof(pkt.name.data));
 #endif
@@ -1104,6 +1127,16 @@ void DroneCAN_receiveFrame(void)
     }
 }
 
+void DroneCAN_handleFrame(const CanardCANFrame *rx_frame)
+{
+  canstats.num_receive++;
+  int ecode = canardHandleRxFrame(&canard, rx_frame, micros64());
+  if (ecode != CANARD_OK && ecode != -CANARD_ERROR_RX_NOT_WANTED) {
+    canstats.rx_ecode = ecode;
+    canstats.rxframe_error++;
+  }
+}
+
 /*
   Transmits all frames from the TX queue
 */
@@ -1144,6 +1177,9 @@ static void DroneCAN_Startup(void)
          */
 #ifdef MCU_L431
         NVIC_DisableIRQ(DMA1_Channel5_IRQn);
+        NVIC_DisableIRQ(EXTI15_10_IRQn);
+        EXTI->IMR1 &= ~(1U << 15);
+#elif defined(MCU_G431)
         NVIC_DisableIRQ(EXTI15_10_IRQn);
         EXTI->IMR1 &= ~(1U << 15);
 #elif defined(MCU_AT415)

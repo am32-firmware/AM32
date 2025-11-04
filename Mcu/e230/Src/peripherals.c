@@ -275,12 +275,12 @@ void UN_TIM_Init(void)
 
     NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
     NVIC_EnableIRQ(IC_DMA_IRQ_NAME);
-    #ifdef USE_TIMER_2_CHANNEL_0
+    #ifdef LED_USES_PA2
     rcu_periph_clock_enable(RCU_TIMER2);
     TIMER_CAR(TIMER2) = 0xFFFF;
     TIMER_PSC(TIMER2) = 10;
     #endif
-    #ifdef USE_TIMER_14_CHANNEL_0
+    #ifdef LED_USES_PB4
     rcu_periph_clock_enable(RCU_TIMER14);
     TIMER_CAR(TIMER14) = 0xFFFF;
     TIMER_PSC(TIMER14) = 10;

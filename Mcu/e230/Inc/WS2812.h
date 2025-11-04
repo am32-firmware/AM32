@@ -9,6 +9,7 @@
 #define INC_WS2812_H_
 
 #include "main.h"
+#define RGB_BUFFER_SIZE 28
 
 void send_LED_DMA();
 void WS2812_Init(void);

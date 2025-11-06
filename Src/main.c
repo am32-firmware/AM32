@@ -431,7 +431,7 @@ uint16_t ADC_raw_temp;
 uint16_t ADC_raw_volts;
 uint16_t ADC_raw_current;
 uint16_t ADC_raw_input;
-uint16_t ADC_raw_ntc_temp;
+uint16_t ADC_raw_ntc;
 uint8_t PROCESS_ADC_FLAG = 0;
 char send_telemetry = 0;
 char telemetry_done = 0;

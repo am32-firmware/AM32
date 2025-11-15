@@ -5,6 +5,8 @@
  *      Author: Alka
  */
 
+// Specification: https://github.com/bird-sanctuary/extended-dshot-telemetry
+
 #include "dshot.h"
 #include "IO.h"
 #include "common.h"

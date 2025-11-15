@@ -40,6 +40,8 @@ static dshot_telem_scheduler_t telem_scheduler = {0};
 #define TEMP_EDT_RATE_DIVISOR    200
 #define VOLTAGE_EDT_RATE_DIVISOR 200
 #define CURRENT_EDT_RATE_DIVISOR 40
+#define EDT_ENABLE_ACK 0b111000000000
+#define EDT_DISABLE_ACK 0b111011111111
 
 char EDT_ARM_ENABLE = 0;
 char EDT_ARMED = 0;
@@ -205,12 +207,14 @@ void computeDshotDMA()
                         break;
                     case 13:
                         dshot_extended_telemetry = 1;
+                        send_extended_dshot = EDT_ENABLE_ACK;
                         if (EDT_ARM_ENABLE == 1) {
                             EDT_ARMED = 1;
                         }
                         break;
                     case 14:
                         dshot_extended_telemetry = 0;
+                        send_extended_dshot = EDT_DISABLE_ACK;
                         break;
                     case 20:
                         forward = 1 - eepromBuffer.dir_reversed;

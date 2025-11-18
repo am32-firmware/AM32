@@ -610,6 +610,7 @@ void loadEEpromSettings()
     }
     if (eepromBuffer.advance_level < 4) {         // old format needs to be converted to 0-32 range
         temp_advance = (eepromBuffer.advance_level<<3);
+        eepromBuffer.advance_level = temp_advance + 10;
     }
     if (eepromBuffer.advance_level < 43 && eepromBuffer.advance_level > 9 ) { // new format subtract 10 from advance
         temp_advance = eepromBuffer.advance_level - 10;
@@ -638,6 +639,9 @@ void loadEEpromSettings()
     motor_kv = (eepromBuffer.motor_kv * 40) + 20;
 #ifdef THREE_CELL_MAX
 		motor_kv =  motor_kv / 2;
+#endif
+#ifdef ONE_TWO_CELL_MAX
+		motor_kv =  motor_kv / 16;
 #endif
     setVolume(2);
     if (eepromBuffer.eeprom_version > 0) { // these commands weren't introduced until eeprom version 1.

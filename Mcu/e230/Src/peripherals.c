@@ -14,6 +14,10 @@
 #include "functions.h"
 #include "serial_telemetry.h"
 #include "targets.h"
+#ifdef USE_LED_STRIP
+#include "WS2812.h"
+#endif
+
 
 void initCorePeripherals(void)
 {
@@ -34,6 +38,9 @@ void initCorePeripherals(void)
 #ifdef USE_RGB_LED
     LED_GPIO_init();
 #endif 
+#ifdef USE_LED_STRIP
+    WS2812_Init();
+#endif
 #ifdef USE_SERIAL_TELEMETRY
     telem_UART_Init();
 #endif
@@ -238,8 +245,6 @@ void MX_DMA_Init(void)
     NVIC_SetPriority(DMA_Channel1_2_IRQn, 3);
     NVIC_EnableIRQ(DMA_Channel1_2_IRQn);
 
-    //  NVIC_SetPriority(DMA_Channel3_4_IRQn, 1);
-    //  NVIC_EnableIRQ(DMA_Channel3_4_IRQn);
 }
 
 void MX_GPIO_Init(void) { }
@@ -270,10 +275,16 @@ void UN_TIM_Init(void)
 
     NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
     NVIC_EnableIRQ(IC_DMA_IRQ_NAME);
+    #ifdef LED_USES_PA2
     rcu_periph_clock_enable(RCU_TIMER2);
-    rcu_periph_clock_enable(RCU_TIMER14);
     TIMER_CAR(TIMER2) = 0xFFFF;
     TIMER_PSC(TIMER2) = 10;
+    #endif
+    #ifdef LED_USES_PB4
+    rcu_periph_clock_enable(RCU_TIMER14);
+    TIMER_CAR(TIMER14) = 0xFFFF;
+    TIMER_PSC(TIMER14) = 10;
+    #endif
     /* enable a TIMER */
 
     //	LL_TIM_DisableARRPreload(IC_TIMER_REGISTER);

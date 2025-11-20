@@ -24,6 +24,7 @@ uint16_t interrupt_time = 0;
 #include "main.h"
 #include "systick.h"
 #include "targets.h"
+#include "WS2812.h"
 
 /*!
     \brief      this function handles NMI exception
@@ -72,6 +73,22 @@ void SysTick_Handler(void) { delay_decrement(); }
 
 void DMA_Channel3_4_IRQHandler(void)
 {
+    #ifdef USE_LED_STRIP
+        // Check transfer complete for WS2812
+        if (dma_interrupt_flag_get(LED_DMA_CHANNEL, DMA_INT_FLAG_FTF)) {
+            dma_interrupt_flag_clear(LED_DMA_CHANNEL, DMA_INT_FLAG_G);
+            dma_channel_disable(LED_DMA_CHANNEL);
+            dma_busy = 0;  // Ready for next LED update
+            return;
+        }
+        if (dma_interrupt_flag_get(LED_DMA_CHANNEL, DMA_INT_FLAG_ERR)) {
+            dma_interrupt_flag_clear(LED_DMA_CHANNEL, DMA_INT_FLAG_G);
+            dma_channel_disable(LED_DMA_CHANNEL);
+            dma_busy = 0;  // Ready for next LED update
+            return;
+        }
+    #endif
+
     if (dshot_telemetry && armed) {
         DMA_INTC |= DMA_FLAG_ADD(DMA_INT_FLAG_G, INPUT_DMA_CHANNEL);
         DMA_CHCTL(INPUT_DMA_CHANNEL) &= ~DMA_CHXCTL_CHEN;

@@ -41,6 +41,9 @@ static dshot_telem_scheduler_t telem_scheduler = {0};
 #define VOLTAGE_EDT_RATE_DIVISOR 200
 #define CURRENT_EDT_RATE_DIVISOR 40
 
+
+char send_EDT_init;
+char send_EDT_deinit;
 char EDT_ARM_ENABLE = 0;
 char EDT_ARMED = 0;
 int shift_amount = 0;
@@ -205,12 +208,14 @@ void computeDshotDMA()
                         break;
                     case 13:
                         dshot_extended_telemetry = 1;
+                        send_EDT_init = 1;
                         if (EDT_ARM_ENABLE == 1) {
                             EDT_ARMED = 1;
                         }
                         break;
                     case 14:
                         dshot_extended_telemetry = 0;
+                        send_EDT_deinit = 1;
                         break;
                     case 20:
                         forward = 1 - eepromBuffer.dir_reversed;
@@ -262,7 +267,15 @@ void make_dshot_package(uint16_t com_time)
             }
         }
     }
-
+      if(send_EDT_init){
+        extended_frame_to_send = 0b111000000000;
+        send_EDT_init = 0;
+      }
+      if(send_EDT_deinit){
+        extended_frame_to_send = 0b111011111111;
+        send_EDT_deinit = 0;
+      }
+    
     if (extended_frame_to_send > 0) {
         dshot_full_number = extended_frame_to_send;
         telem_scheduler.last_sent_extended = 1;

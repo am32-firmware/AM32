@@ -23,7 +23,7 @@
  extern uint16_t ADC_raw_volts;
  extern uint16_t ADC_raw_current;
  extern uint16_t ADC_raw_input;
- extern uint16_t ADC_raw_ntc_temp;
+ extern uint16_t ADC_raw_ntc;
 
 #define ADC_DELAY_CALIB_ENABLE_CPU_CYCLES \
     (LL_ADC_DELAY_CALIB_ENABLE_ADC_CYCLES * 64)
@@ -32,7 +32,7 @@
 { // read dma buffer and set extern variables
  #ifdef USE_ADC_1_2
      ADC_raw_temp = ADC1DataDMA[0];
-     ADC_raw_ntc_temp = ADC1DataDMA[1];
+     ADC_raw_ntc = ADC1DataDMA[1];
      ADC_raw_volts = ADC2DataDMA[0];
      ADC_raw_current = ADC2DataDMA[1];
   

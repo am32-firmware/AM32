@@ -2007,7 +2007,11 @@ if(zero_crosses < 5){
 #ifdef ARTERY
             ADC_DMA_Callback();
             adc_ordinary_software_trigger_enable(ADC1, TRUE);
+    #ifdef USE_NTC
+            converted_degrees = getNTCDegrees(ADC_raw_ntc);
+    #else     
             converted_degrees = getConvertedDegrees(ADC_raw_temp);
+    #endif
 #endif
 #ifdef WCH
             startADCConversion( );

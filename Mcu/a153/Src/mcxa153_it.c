@@ -226,3 +226,15 @@ void DMA_CH2_IRQHandler(void)
 	modifyReg32(&DMA0->CH[DMA_CH_UART].CH_CSR, DMA_CH_CSR_DONE_MASK, DMA_CH_CSR_DONE(1));
 }
 
+void LPSPI0_IRQHandler(void)
+{
+	//Clear Transfer complete flag
+	LPSPI0->SR = LPSPI_SR_TCF_MASK | LPSPI_SR_FCF_MASK | LPSPI_SR_WCF_MASK;
+
+	//Set PWM/Dshot input pin to timer capture/compare input
+	//Enable input buffer and disable pull-up/down resistor
+	modifyReg32(&INPUT_PIN_PORT->PCR[INPUT_PIN],
+			PORT_PCR_MUX_MASK | PORT_PCR_IBE_MASK | PORT_PCR_PE_MASK | PORT_PCR_PS_MASK,
+			PORT_PCR_MUX(INPUT_PIN_ALT_FUNC) | PORT_PCR_IBE(1) | PORT_PCR_PE(0) | PORT_PCR_PS(1));
+}
+

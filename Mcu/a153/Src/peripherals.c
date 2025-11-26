@@ -18,6 +18,7 @@ void initCorePeripherals(void)
 #ifndef USE_ADC_INPUT
 	initDshotPWMTimer();
 	initDMA_DshotPWM();
+	initSPI();
 #endif
 #ifndef BRUSHED_MODE
 	initComTimer();
@@ -214,32 +215,77 @@ void initGPIO(void)
 	GPIO3->PCOR = (1 << 28);
 }
 
+/*
+ * @brief 	Initializes LPSPI0 module for sending Dshot telemetry.
+ * 			Set LPSPI functional clock to 12MHz.
+ * 			SPI bitrate should be 5/4 x Dshot bit rate.
+ * 			So on DSHOT600 the 21 GCR bits are sent with a bitrate of 750kbit/s.
+ */
+void initSPI(void)
+{
+	//Unlock clock configuration registers access
+	modifyReg32(&SYSCON->CLKUNLOCK, SYSCON_CLKUNLOCK_UNLOCK(1), 0);
+
+	//Select FRO_HF as clock for LPSPI0, which is 192MHz, see SystemClock_Config()
+//	modifyReg32(&MRCC0->MRCC_LPSPI0_CLKSEL, MRCC_MRCC_LPSPI0_CLKSEL_MUX_MASK, MRCC_MRCC_LPSPI0_CLKSEL_MUX(1));
+	modifyReg32(&MRCC0->MRCC_LPSPI0_CLKSEL, MRCC_MRCC_LPSPI0_CLKSEL_MUX_MASK, MRCC_MRCC_LPSPI0_CLKSEL_MUX(0));
+
+	//Enable LPSPI0 and set divider to 4, so clock frequency is 48MHz
+//	modifyReg32(&MRCC0->MRCC_LPSPI0_CLKDIV,
+//			MRCC_MRCC_LPSPI0_CLKDIV_HALT_MASK | MRCC_MRCC_LPSPI0_CLKDIV_DIV_MASK,
+//			MRCC_MRCC_LPSPI0_CLKDIV_DIV(3));
+	modifyReg32(&MRCC0->MRCC_LPSPI0_CLKDIV,
+			MRCC_MRCC_LPSPI0_CLKDIV_HALT_MASK | MRCC_MRCC_LPSPI0_CLKDIV_DIV_MASK,
+			MRCC_MRCC_LPSPI0_CLKDIV_DIV(0));
+
+	//Enable peripheral clocks
+	MRCC0->MRCC_GLB_CC0_SET = MRCC_MRCC_GLB_CC0_LPSPI0(1);
+
+	//Release peripherals from reset
+	MRCC0->MRCC_GLB_RST0_SET = MRCC_MRCC_GLB_RST0_LPSPI0(1);
+
+	//Freeze clock configuration registers access
+	modifyReg32(&SYSCON->CLKUNLOCK, 0, SYSCON_CLKUNLOCK_UNLOCK(1));
+
+	//Set that transfer complete flag generates interrupt
+	modifyReg32(&LPSPI0->IER, 0, LPSPI_IER_TCIE(1));
+
+	//Set that SIN is used for input and output data
+	//Set LPSPI master operating mode
+	//Set output data is 3-stated
+	modifyReg32(&LPSPI0->CFGR1,
+			LPSPI_CFGR1_PINCFG_MASK | LPSPI_CFGR1_MASTER_MASK | LPSPI_CFGR1_OUTCFG_MASK,
+			LPSPI_CFGR1_PINCFG(3) | LPSPI_CFGR1_MASTER(1) | LPSPI_CFGR1_OUTCFG(1));
+
+	//Set CCR
+//	modifyReg32(&LPSPI0->CCR, 0, LPSPI_CCR_SCKDIV(1));
+//	LPSPI0->CCR = LPSPI_CCR_SCKDIV(1) | LPSPI_CCR_DBT(1) | LPSPI_CCR_PCSSCK(1) | LPSPI_CCR_SCKPCS(1);
+	LPSPI0->CCR = 0;
+
+	//Set TX watermark to 1 word
+//	modifyReg32(&LPSPI0->FCR, LPSPI_FCR_TXWATER_MASK, LPSPI_FCR_TXWATER(1));
+	LPSPI0->FCR = LPSPI_FCR_TXWATER(0);
+
+	//Set prescaler to 8, in the end it will be 16 due to an additional value doubling.
+	//Baud rate will be 750kbit/s at 12MHz functional clock
+	//Set frame size to 32.
+	//Mask RX so we do not receive any data.
+	modifyReg32(&LPSPI0->TCR,
+			LPSPI_TCR_PRESCALE_MASK | LPSPI_TCR_FRAMESZ_MASK,
+			LPSPI_TCR_PRESCALE(3) | LPSPI_TCR_FRAMESZ(20) | LPSPI_TCR_RXMSK(1));
+
+	//Enable SPI module
+	modifyReg32(&LPSPI0->CR, LPSPI_CR_MEN_MASK, LPSPI_CR_MEN(1));
+
+	//Enable interrupt
+	__NVIC_SetPriority(LPSPI0_IRQn, 1);	//set interrupt priority to 1
+	__NVIC_EnableIRQ(LPSPI0_IRQn);
+}
+
 void enableCorePeripherals()
 {
 	//Enable PWM
 	enableFlexPWM();
-
-//	//Unlock clock configuration registers access
-//	modifyReg32(&SYSCON->CLKUNLOCK, SYSCON_CLKUNLOCK_UNLOCK(1), 0);
-//
-//	modifyReg32(&MRCC0->MRCC_CLKOUT_CLKSEL, MRCC_MRCC_CLKOUT_CLKSEL_MUX_MASK, MRCC_MRCC_CLKOUT_CLKSEL_MUX(0));
-//
-//	modifyReg32(&MRCC0->MRCC_CLKOUT_CLKDIV,
-//			MRCC_MRCC_CLKOUT_CLKDIV_HALT_MASK | MRCC_MRCC_CLKOUT_CLKDIV_DIV_MASK,
-//			MRCC_MRCC_CLKOUT_CLKDIV_DIV(9));
-//
-//	//Freeze clock configuration registers access
-//	modifyReg32(&SYSCON->CLKUNLOCK, 0, SYSCON_CLKUNLOCK_UNLOCK(1));
-//
-//	//Enable CLKOUT on P3_6
-//	modifyReg32(&PORT3->PCR[6],
-//			PORT_PCR_MUX_MASK | PORT_PCR_PE_MASK | PORT_PCR_PS_MASK,
-//			PORT_PCR_MUX(1));
-//
-//	//Enable CLKOUT on P3_8
-//	modifyReg32(&PORT3->PCR[8],
-//			PORT_PCR_MUX_MASK | PORT_PCR_PE_MASK | PORT_PCR_PS_MASK,
-//			PORT_PCR_MUX(12));
 
 	//Enable the timers
 #ifndef USE_ADC_INPUT

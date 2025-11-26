@@ -12,6 +12,8 @@ uint32_t dma_buffer[64] = { 0 };
 char out_put = 0;
 uint8_t buffer_padding = 0;
 
+extern volatile uint32_t gcrnumber;
+
 void receiveDshotDma()
 {
 	out_put = 0;
@@ -61,39 +63,54 @@ void receiveDshotDma()
 
 void sendDshotDma()
 {
-	//TODO put in our own SPI dshot timer + DMA config
-	//Change Dshot pin to SPI output
-//	modifyReg32(&INPUT_PIN_PORT->PCR[INPUT_PIN],
-//			PORT_PCR_MUX_MASK | PORT_PCR_IBE_MASK | PORT_PCR_PE_MASK | PORT_PCR_PS_MASK,
-//			PORT_PCR_MUX(2) | PORT_PCR_IBE(0) | PORT_PCR_PE(0) | PORT_PCR_PS(1));
+//	gcrnumber = 0x1a55aa;
 
-	//Set SPI bus prescaler according to output_timer_prescaler. 0 for Dshot600, 1 for Dshot300
+//	while (1){
+//		RELOAD_WATCHDOG_COUNTER();
 
-	//Get calculated GCR data to send
+		GPIO3->PTOR = (1 << 27);	//ENC_A
 
-	//Send GCR data to the SPI FIFO by enabling DMA transfer
+		//Change Dshot pin to SPI0_SDI
+		modifyReg32(&INPUT_PIN_PORT->PCR[INPUT_PIN],
+				PORT_PCR_MUX_MASK | PORT_PCR_IBE_MASK | PORT_PCR_PE_MASK | PORT_PCR_PS_MASK,
+				PORT_PCR_MUX(2) | PORT_PCR_IBE(0) | PORT_PCR_PE(1) | PORT_PCR_PS(1));
 
-    out_put = 1;
+		//Functional LPSPI0 clock is 48MHz. To get 5/4 x Dshot bit rate, SPI prescaler should be:
+		//Dshot600 => prescaler = 64
+		//Dshot300 => prescaler = 128
 
-//    RCC->APB2RSTR |= LL_APB2_GRP1_PERIPH_TIM15;
-//    RCC->APB2RSTR &= ~LL_APB2_GRP1_PERIPH_TIM15;
+		//Check if Dshot600
+		if (ic_timer_prescaler) {
+			//Set transmit prescaler to 64 for Dshot600
+			//Set framesize to 21 bits
+			modifyReg32(&LPSPI0->TCR,
+					LPSPI_TCR_PRESCALE_MASK | LPSPI_TCR_FRAMESZ_MASK,
+					LPSPI_TCR_PRESCALE(3) | LPSPI_TCR_FRAMESZ(20) | LPSPI_TCR_RXMSK(1));
+		//Is Dshot300
+		} else {
+			//Set transmit prescaler to 128 for Dshot300
+			//Set framesize to 21 bits
+			modifyReg32(&LPSPI0->TCR,
+					LPSPI_TCR_PRESCALE_MASK | LPSPI_TCR_FRAMESZ_MASK,
+					LPSPI_TCR_PRESCALE(4) | LPSPI_TCR_FRAMESZ(20) | LPSPI_TCR_RXMSK(1));
+		}
 
-//    IC_TIMER_REGISTER->CCMR1 = 0x60;
-//    IC_TIMER_REGISTER->CCER = 0x3;
-//    IC_TIMER_REGISTER->PSC = output_timer_prescaler;
-//    IC_TIMER_REGISTER->ARR = 115;
+//		while (!(LPSPI0->SR & LPSPI_SR_TDF_MASK)) {
+//		    // Wait until transmit FIFO is ready
+//		}
+
+		//Send GCR data to LPSPI FIFO
+		LPSPI0->TDR = gcrnumber;
+
+//		while (!(LPSPI0->SR & LPSPI_SR_TCF_MASK)) {
+//		    // Wait until transfer complete
+//		}
 //
-//    IC_TIMER_REGISTER->EGR |= TIM_EGR_UG;
+//		LPSPI0->SR = LPSPI_SR_TCF_MASK | LPSPI_SR_FCF_MASK | LPSPI_SR_WCF_MASK;
 
-//    DMA1_Channel5->CMAR = (uint32_t)&gcr;
-//    DMA1_Channel5->CPAR = (uint32_t)&IC_TIMER_REGISTER->CCR1;
-//    DMA1_Channel5->CNDTR = 23 + buffer_padding;
-//    DMA1_Channel5->CCR = 0x99b;
-
-//    IC_TIMER_REGISTER->DIER |= TIM_DIER_CC1DE;
-//    IC_TIMER_REGISTER->CCER |= IC_TIMER_CHANNEL;
-//    IC_TIMER_REGISTER->BDTR |= TIM_BDTR_MOE;
-//    IC_TIMER_REGISTER->CR1 |= TIM_CR1_CEN;
+		//Set output variable for state machine
+		out_put = 1;
+//	}
 }
 
 uint8_t getInputPinState()

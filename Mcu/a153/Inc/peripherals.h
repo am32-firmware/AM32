@@ -14,6 +14,7 @@ void initAfterJump(void);
 void initCorePeripherals(void);
 void SystemClock_Config(void);
 void initGPIO(void);
+void initSPI(void);
 void enableCorePeripherals(void);
 
 #endif /* PERIPHERALS_H_ */

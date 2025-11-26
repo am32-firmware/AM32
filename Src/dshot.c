@@ -25,7 +25,7 @@ const char gcr_encode_table[16] = {
 char EDT_ARM_ENABLE = 0;
 char EDT_ARMED = 0;
 int shift_amount = 0;
-uint32_t gcrnumber;
+volatile uint32_t gcrnumber;
 extern int zero_crosses;
 extern char send_telemetry;
 extern uint8_t max_duty_cycle_change;
@@ -259,13 +259,10 @@ void make_dshot_package(uint16_t com_time)
 
     // GCR RLL encode 16 to 20 bit
 
-    gcrnumber = gcr_encode_table[(dshot_full_number >> 12)]
-            << 15 // first set of four digits
-        | gcr_encode_table[(((1 << 4) - 1) & (dshot_full_number >> 8))]
-            << 10 // 2nd set of 4 digits
-        | gcr_encode_table[(((1 << 4) - 1) & (dshot_full_number >> 4))]
-            << 5 // 3rd set of four digits
-        | gcr_encode_table[(((1 << 4) - 1) & (dshot_full_number >> 0))]; // last four digits
+    gcrnumber = gcr_encode_table[(dshot_full_number >> 12)] << 15 // first set of four digits
+        | gcr_encode_table[(0xf & (dshot_full_number >> 8))] << 10 // 2nd set of 4 digits
+        | gcr_encode_table[(0xf & (dshot_full_number >> 4))] << 5 // 3rd set of four digits
+        | gcr_encode_table[(0xf & (dshot_full_number >> 0))]; // last four digits
 // GCR RLL encode 20 to 21bit output
 #if defined(MCU_F051) || defined(MCU_F031) || defined(MCU_CH32V203)
     gcr[1 + buffer_padding] = 64;
@@ -275,6 +272,12 @@ void make_dshot_package(uint16_t com_time)
                   // output timer.
     }
     gcr[buffer_padding] = 0;
+#elif defined(NXP)
+    uint32_t binary = gcrnumber;
+    while (gcrnumber >>= 1) {
+        binary ^= gcrnumber;
+    }
+    gcrnumber = binary;
 #else
     gcr[1 + buffer_padding] = 128;
     for (int i = 19; i >= 0; i--) { // each digit in gcrnumber

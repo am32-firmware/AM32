@@ -19,6 +19,7 @@
 // #define BLPWR
 // #define HVFLYCOLOR
 // #define AM32REF_F051
+#define ODDITYRC_F80_F421
 
 // #define G072ESC
 // #define G071ENABLE
@@ -1543,6 +1544,8 @@
 #define CURRENT_ADC_CHANNEL ADC_CHANNEL_6
 #define CURRENT_ADC_PIN GPIO_PINS_6
 #define MILLIVOLT_PER_AMP 25
+#define USE_LED_STRIP
+#define WS2812_PIN LL_GPIO_PIN_8 
 #endif
 
 #ifdef  JMITEST_1_2S_F421

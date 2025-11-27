@@ -48,6 +48,12 @@ uint8_t programming_mode;
 uint16_t position;
 uint8_t  new_byte;
 
+//TODO remove this
+uint32_t avg_data_arr[100];
+uint32_t avg_window = 100;
+uint32_t avg_data = 0;
+uint8_t avg_idx = 0;
+
 void computeDshotDMA()
 {
     dshot_frametime = dma_buffer[31] - dma_buffer[0];
@@ -80,11 +86,33 @@ void computeDshotDMA()
 
         int tocheck = (dpulse[0] << 10 | dpulse[1] << 9 | dpulse[2] << 8 | dpulse[3] << 7 | dpulse[4] << 6 | dpulse[5] << 5 | dpulse[6] << 4 | dpulse[7] << 3 | dpulse[8] << 2 | dpulse[9] << 1 | dpulse[10]);
 
+        //TODO remove this
+        //average tocheck data and send telemetry if different
+//        avg_data_arr[avg_idx++] = tocheck;
+//
+//        //Correct index roll-over
+//        if (avg_idx >= avg_window) {
+//			avg_idx = 0;
+//		}
+//
+//        //Average data
+//        avg_data = 0;
+//        for (uint32_t i = 0; i < avg_window; ++i) {
+//			avg_data += avg_data_arr[i];
+//		}
+//        avg_data = avg_data / avg_window;
+//
+//        //Check if new value is out of bound
+//        if (avg_data != (uint32_t)tocheck) {
+//        	send_telemetry = 1;
+//        	battery_voltage = (uint16_t)tocheck;
+//		}
+        //TODO remove untill here
+
         if (calcCRC == checkCRC) {
             signaltimeout = 0;
             dshot_goodcounts++;
             if (dpulse[11] == 1) {
-//            if (dpulse[10] == 1) {	//TODO remove this
                 send_telemetry = 1;
             }
             if(programming_mode > 0){  
@@ -273,6 +301,8 @@ void make_dshot_package(uint16_t com_time)
     }
     gcr[buffer_padding] = 0;
 #elif defined(NXP)
+    //Do grey encoding
+    //Apparently GCR RLL is not done here but Grey encoding.
     uint32_t binary = gcrnumber;
     while (gcrnumber >>= 1) {
         binary ^= gcrnumber;

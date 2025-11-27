@@ -16,6 +16,7 @@ extern volatile uint32_t gcrnumber;
 
 void receiveDshotDma()
 {
+	//Set output variable for state machine
 	out_put = 0;
 
 	//Set prescaler
@@ -24,16 +25,18 @@ void receiveDshotDma()
 	if (buffersize > 3) {
 		//Resets PWM/Dshot timer to 0. Needed for Dshot to work properly.
 		resetInputCaptureTimer();
+//		CTIMER0->TC = 0;
 
 		//Set match1 value to higher then the minimum Dshot300 frame time which is around 53us, so take at least 53us.
 		CTIMER0->MR[1] = 10000 / (CTIMER0->PR + 1);
 
 		//Reset timer and enable interrupt on Match1 event
-		modifyReg32(&CTIMER0->MCR, 0, CTIMER_MCR_MR1I(1) | CTIMER_MCR_MR1R(1));
+//		modifyReg32(&CTIMER0->MCR, 0, CTIMER_MCR_MR1I(1) | CTIMER_MCR_MR1R(1));
+		modifyReg32(&CTIMER0->MCR, CTIMER_MCR_MR1I_MASK | CTIMER_MCR_MR1R_MASK, CTIMER_MCR_MR1I(1));
 
 	} else {
 		//Disable interrupt and reset on Match1 event
-		modifyReg32(&CTIMER0->MCR, CTIMER_MCR_MR1I(1) | CTIMER_MCR_MR1R(1), 0);
+		modifyReg32(&CTIMER0->MCR, CTIMER_MCR_MR1I_MASK | CTIMER_MCR_MR1R_MASK, 0);
 	}
 
 	//Set the major loop count and addresses again to prevent unintended DMA request from CTIMER match register
@@ -63,54 +66,42 @@ void receiveDshotDma()
 
 void sendDshotDma()
 {
-//	gcrnumber = 0x1a55aa;
+	//Set output variable for state machine
+	out_put = 1;
 
-//	while (1){
-//		RELOAD_WATCHDOG_COUNTER();
+	//Reset Dshot timer to prevent a timeout from happening during Dshot sending
+//	resetInputCaptureTimer();
 
-		GPIO3->PTOR = (1 << 27);	//ENC_A
+	//Disable interrupt and reset on Match1 event
+//	modifyReg32(&CTIMER0->MCR, CTIMER_MCR_MR1I_MASK | CTIMER_MCR_MR1R_MASK, 0);
 
-		//Change Dshot pin to SPI0_SDI
-		modifyReg32(&INPUT_PIN_PORT->PCR[INPUT_PIN],
-				PORT_PCR_MUX_MASK | PORT_PCR_IBE_MASK | PORT_PCR_PE_MASK | PORT_PCR_PS_MASK,
-				PORT_PCR_MUX(2) | PORT_PCR_IBE(0) | PORT_PCR_PE(1) | PORT_PCR_PS(1));
+	//Change Dshot pin to SPI0_SDI
+	modifyReg32(&INPUT_PIN_PORT->PCR[INPUT_PIN],
+			PORT_PCR_MUX_MASK | PORT_PCR_IBE_MASK | PORT_PCR_PE_MASK | PORT_PCR_PS_MASK,
+			PORT_PCR_MUX(2) | PORT_PCR_IBE(0) | PORT_PCR_PE(1) | PORT_PCR_PS(1));
 
-		//Functional LPSPI0 clock is 48MHz. To get 5/4 x Dshot bit rate, SPI prescaler should be:
-		//Dshot600 => prescaler = 64
-		//Dshot300 => prescaler = 128
+	//Functional LPSPI0 clock is 12MHz. To get 5/4 x Dshot bit rate, SPI prescaler should be:
+	//Dshot600 => prescaler = 8
+	//Dshot300 => prescaler = 16
 
-		//Check if Dshot600
-		if (ic_timer_prescaler) {
-			//Set transmit prescaler to 64 for Dshot600
-			//Set framesize to 21 bits
-			modifyReg32(&LPSPI0->TCR,
-					LPSPI_TCR_PRESCALE_MASK | LPSPI_TCR_FRAMESZ_MASK,
-					LPSPI_TCR_PRESCALE(3) | LPSPI_TCR_FRAMESZ(20) | LPSPI_TCR_RXMSK(1));
-		//Is Dshot300
-		} else {
-			//Set transmit prescaler to 128 for Dshot300
-			//Set framesize to 21 bits
-			modifyReg32(&LPSPI0->TCR,
-					LPSPI_TCR_PRESCALE_MASK | LPSPI_TCR_FRAMESZ_MASK,
-					LPSPI_TCR_PRESCALE(4) | LPSPI_TCR_FRAMESZ(20) | LPSPI_TCR_RXMSK(1));
-		}
+	//Check if Dshot600
+	if (ic_timer_prescaler) {
+		//Set transmit prescaler to 8 for Dshot600
+		//Set framesize to 21 bits
+		modifyReg32(&LPSPI0->TCR,
+				LPSPI_TCR_PRESCALE_MASK | LPSPI_TCR_FRAMESZ_MASK,
+				LPSPI_TCR_PRESCALE(3) | LPSPI_TCR_FRAMESZ(20) | LPSPI_TCR_RXMSK(1));
+	//Is Dshot300
+	} else {
+		//Set transmit prescaler to 16 for Dshot300
+		//Set framesize to 21 bits
+		modifyReg32(&LPSPI0->TCR,
+				LPSPI_TCR_PRESCALE_MASK | LPSPI_TCR_FRAMESZ_MASK,
+				LPSPI_TCR_PRESCALE(4) | LPSPI_TCR_FRAMESZ(20) | LPSPI_TCR_RXMSK(1));
+	}
 
-//		while (!(LPSPI0->SR & LPSPI_SR_TDF_MASK)) {
-//		    // Wait until transmit FIFO is ready
-//		}
-
-		//Send GCR data to LPSPI FIFO
-		LPSPI0->TDR = gcrnumber;
-
-//		while (!(LPSPI0->SR & LPSPI_SR_TCF_MASK)) {
-//		    // Wait until transfer complete
-//		}
-//
-//		LPSPI0->SR = LPSPI_SR_TCF_MASK | LPSPI_SR_FCF_MASK | LPSPI_SR_WCF_MASK;
-
-		//Set output variable for state machine
-		out_put = 1;
-//	}
+	//Send GCR data to LPSPI FIFO
+	LPSPI0->TDR = gcrnumber;
 }
 
 uint8_t getInputPinState()

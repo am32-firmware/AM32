@@ -49,6 +49,7 @@ void MX_IWDG_Init(void)
  * 			On the falling edge the timer is cleared, which causes a match0 event that triggers a DMA0 request.
  * 			The DMA then transfers the capture 1 and capture 2 counter values to the DMA buffer.
  * 			To reconstruct the Dshot/PWM data a correction is done after the DMA buffer is fully filled.
+ * 			CTIMER0 is configured to run at functional clock of 96MHz
  */
 void initDshotPWMTimer(void)
 {
@@ -89,11 +90,16 @@ void initDshotPWMTimer(void)
 	CTIMER0->MR[0] = 0;
 
 	//Set match1 value to higher then the minimum Dshot300 frame time which is around 53us, so take at least 53us.
-	//Set to 6000 => approximately 60us.
+	//Functional clock is 96MHz. So Dshot300 frame is around 5000 clock ticks.
+	//Set match event to trigger at twice the frame time.
+	//And correct for prescaler.
 	CTIMER0->MR[1] = 10000 / (CTIMER0->PR + 1);
 
 	//Reset timer and enable interrupt on Match1 event
-	modifyReg32(&CTIMER0->MCR, 0, CTIMER_MCR_MR1I(1) | CTIMER_MCR_MR1R(1));
+//	modifyReg32(&CTIMER0->MCR, 0, CTIMER_MCR_MR1I(1) | CTIMER_MCR_MR1R(1));
+
+	//Enable interrupt on Match1 event
+	modifyReg32(&CTIMER0->MCR, 0, CTIMER_MCR_MR1I(1));
 
 	//Configure capture control register so capture value register is loaded on CR1 rising edge and CR2 falling edge
 	modifyReg32(&CTIMER0->CCR,

@@ -406,7 +406,7 @@ void loadEEpromSettings()
     eepromBuffer.limits.temperature = 141;
     eepromBuffer.limits.current = 102;
     eepromBuffer.sine_mode_power = 6;
-    eepromBuffer.telemetry_on_interval = 1;
+    eepromBuffer.telemetry_on_interval = 0;
     eepromBuffer.input_type = 0;	//Sets Dshot input
 
     eepromBuffer.tune[0] = 0xff;	//Turn off BJ tune
@@ -1871,8 +1871,9 @@ if(zero_crosses < 5){
 #endif
         if (send_telemetry) {
 #ifdef USE_SERIAL_TELEMETRY
-            makeTelemPackage((int8_t)degrees_celsius, battery_voltage, actual_current,
-                (uint16_t)(consumed_current >> 16), e_rpm);
+//            makeTelemPackage((int8_t)degrees_celsius, battery_voltage, actual_current,
+//                (uint16_t)(consumed_current >> 16), e_rpm);
+        	makeTelemPackage(0x0d, battery_voltage, 0, 0, 0);
             send_telem_DMA(10);
             send_telemetry = 0;
 #endif

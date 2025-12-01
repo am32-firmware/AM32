@@ -281,6 +281,7 @@
 #endif
 
 #ifdef POGO_L431_CAN
+#define DRONECAN_NODE_NAME "pogo.canesc"
 #define FIRMWARE_NAME "pogo.canesc"
 #define FILE_NAME "POGO_L431_CAN"
 #define DRONECAN_SUPPORT 1

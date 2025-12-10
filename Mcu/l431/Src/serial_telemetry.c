@@ -32,8 +32,8 @@ void telem_UART_Init()
   GPIO_InitStruct.Alternate = LL_GPIO_AF_7;
   LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-//  NVIC_SetPriority(USART1_IRQn, 3);
-//  NVIC_EnableIRQ(USART1_IRQn);
+  //  NVIC_SetPriority(USART1_IRQn, 3);
+  //  NVIC_EnableIRQ(USART1_IRQn);
 
 
   LL_DMA_SetPeriphRequest(DMA1, LL_DMA_CHANNEL_4, LL_DMA_REQUEST_2);
@@ -64,8 +64,7 @@ void telem_UART_Init()
 
 
   LL_USART_Enable(USART1);
-  while((!(LL_USART_IsActiveFlag_TEACK(USART1))) || (!(LL_USART_IsActiveFlag_REACK(USART1))))
-  {
+  while ((!(LL_USART_IsActiveFlag_TEACK(USART1))) || (!(LL_USART_IsActiveFlag_REACK(USART1)))) {
   }
 
   LL_DMA_ConfigAddresses(DMA1, LL_DMA_CHANNEL_4,
@@ -79,12 +78,13 @@ void telem_UART_Init()
   LL_DMA_EnableIT_TE(DMA1, LL_DMA_CHANNEL_4);
 }
 
-void send_telem_DMA(uint8_t bytes){   // set data length and enable channel to start transfer
-	  LL_USART_SetTransferDirection(USART1, LL_USART_DIRECTION_TX);
-	//  GPIOB->OTYPER &= 0 << 6;
-	  LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_4, bytes);
-	  LL_USART_EnableDMAReq_TX(USART1);
+void send_telem_DMA(uint8_t bytes)    // set data length and enable channel to start transfer
+{
+  LL_USART_SetTransferDirection(USART1, LL_USART_DIRECTION_TX);
+  //  GPIOB->OTYPER &= 0 << 6;
+  LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_4, bytes);
+  LL_USART_EnableDMAReq_TX(USART1);
 
-	  LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_4);
-	  LL_USART_SetTransferDirection(USART1, LL_USART_DIRECTION_RX);
+  LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_4);
+  LL_USART_SetTransferDirection(USART1, LL_USART_DIRECTION_RX);
 }

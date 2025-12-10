@@ -6,7 +6,7 @@
  * Description        : Main Interrupt Service Routines.
 *********************************************************************************
 * Copyright (c) 2021 Nanjing Qinheng Microelectronics Co., Ltd.
-* Attention: This software (modified or not) and binary are used for 
+* Attention: This software (modified or not) and binary are used for
 * microcontroller manufactured by Nanjing Qinheng Microelectronics.
 *******************************************************************************/
 #include "ch32v20x_it.h"
@@ -62,8 +62,7 @@ void SW_Handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
  */
 void NMI_Handler(void)
 {
-  while (1)
-  {
+  while (1) {
   }
 }
 
@@ -79,8 +78,7 @@ void HardFault_Handler(void)
   PRINT("mcause:%08x\r\n",__get_MCAUSE());
   PRINT("mtval:%08x\r\n",__get_MTVAL());
   PRINT("mepc:%08x\r\n",__get_MEPC());
-  while (1)
-  {
+  while (1) {
 
   }
 }
@@ -88,120 +86,111 @@ void HardFault_Handler(void)
 // for adc
 void DMA1_Channel1_IRQHandler(void)
 {
-    if(DMA_GetITStatus(DMA1_IT_TC1))
-    {
-        DMA_ClearFlag(DMA1_IT_TC1|DMA1_IT_HT1);
-        ADC_DMA_Callback( );
-    }
-    /* Check whether DMA transfer error caused the DMA interruption */
-    if(DMA_GetITStatus(DMA1_IT_TE1))
-    {
-        DMA_ClearFlag(DMA1_IT_TE1);
-    }
+  if (DMA_GetITStatus(DMA1_IT_TC1)) {
+    DMA_ClearFlag(DMA1_IT_TC1|DMA1_IT_HT1);
+    ADC_DMA_Callback( );
+  }
+  /* Check whether DMA transfer error caused the DMA interruption */
+  if (DMA_GetITStatus(DMA1_IT_TE1)) {
+    DMA_ClearFlag(DMA1_IT_TE1);
+  }
 
 }
 
 //for ic timer
 void DMA1_Channel5_IRQHandler(void)
 {
-    if(DMA1->INTFR & DMA1_IT_HT5) 
-    {
-        if(servoPwm)
-        {
-            IC_TIMER_REGISTER->CCER = 0x03;  
-        }
-        DMA1->INTFCR = DMA1_IT_HT5;
+  if (DMA1->INTFR & DMA1_IT_HT5) {
+    if (servoPwm) {
+      IC_TIMER_REGISTER->CCER = 0x03;
     }
-    if( DMA1->INTFR & DMA1_IT_TC5)
-    {
-        CLEAR_BIT(INPUT_DMA_CHANNEL->CFGR,0x1);  //disable DMA1_CH5
-        transfercomplete();
-        DMA1->INTFCR = DMA1_IT_TC5;
-        input_ready = 1;
-    }
-    /* Check whether DMA transfer error caused the DMA interruption */
-    if( DMA1->INTFR & DMA1_IT_TE5)
-    {
-        CLEAR_BIT(INPUT_DMA_CHANNEL->CFGR,0x1);  //disable DMA1_CH5
-        DMA_ClearFlag(DMA1_IT_TE5);
-        transfercomplete( );
-        input_ready = 1;
-    }
+    DMA1->INTFCR = DMA1_IT_HT5;
+  }
+  if ( DMA1->INTFR & DMA1_IT_TC5) {
+    CLEAR_BIT(INPUT_DMA_CHANNEL->CFGR,0x1);  //disable DMA1_CH5
+    transfercomplete();
+    DMA1->INTFCR = DMA1_IT_TC5;
+    input_ready = 1;
+  }
+  /* Check whether DMA transfer error caused the DMA interruption */
+  if ( DMA1->INTFR & DMA1_IT_TE5) {
+    CLEAR_BIT(INPUT_DMA_CHANNEL->CFGR,0x1);  //disable DMA1_CH5
+    DMA_ClearFlag(DMA1_IT_TE5);
+    transfercomplete( );
+    input_ready = 1;
+  }
 }
 
 //for tele
 void DMA1_Channel7_IRQHandler(void)
 {
-    if(DMA_GetITStatus(DMA1_IT_TC7))
-    {
-        USART_DMACmd(USART2,USART_DMAReq_Tx,DISABLE);
-        DMA_Cmd(DMA1_Channel7, DISABLE);
-        MODIFY_REG(USART2->CTLR1, 0x3<<2, 0x0<<3);  //disable send
-        DMA_ClearFlag(DMA1_IT_TC7);
-    }
-    /* Check whether DMA transfer error caused the DMA interruption */
-    if(DMA_GetITStatus(DMA1_IT_TE7))
-    {
-        USART_DMACmd(USART2,USART_DMAReq_Tx,DISABLE);
-        MODIFY_REG(USART2->CTLR1, 0x3<<2, 0x0<<3);  //disable send
-        DMA_Cmd(DMA1_Channel7, DISABLE);
-        DMA_ClearFlag(DMA1_IT_TE7);
-    }
+  if (DMA_GetITStatus(DMA1_IT_TC7)) {
+    USART_DMACmd(USART2,USART_DMAReq_Tx,DISABLE);
+    DMA_Cmd(DMA1_Channel7, DISABLE);
+    MODIFY_REG(USART2->CTLR1, 0x3<<2, 0x0<<3);  //disable send
+    DMA_ClearFlag(DMA1_IT_TC7);
+  }
+  /* Check whether DMA transfer error caused the DMA interruption */
+  if (DMA_GetITStatus(DMA1_IT_TE7)) {
+    USART_DMACmd(USART2,USART_DMAReq_Tx,DISABLE);
+    MODIFY_REG(USART2->CTLR1, 0x3<<2, 0x0<<3);  //disable send
+    DMA_Cmd(DMA1_Channel7, DISABLE);
+    DMA_ClearFlag(DMA1_IT_TE7);
+  }
 }
 
 //for tenkhz
 void SysTick_Handler(void)
 {
-    SysTick->SR = 0;
-    tenKhzRoutine( );
+  SysTick->SR = 0;
+  tenKhzRoutine( );
 }
 
 //for cmp
 #ifdef USE_PA2_AS_COMP
 void EXTI2_IRQHandler(void)
 {
-    EXTI->INTFR = EXTI_Line2;
-    interruptRoutine( );
+  EXTI->INTFR = EXTI_Line2;
+  interruptRoutine( );
 }
 #else
 void EXTI3_IRQHandler(void)
 {
-    if((INTERVAL_TIMER->CNT) > ((average_interval>>1))){
-        EXTI->INTFR = EXTI_Line3;
-        interruptRoutine();
-     }else{ 
-       if (getCompOutputLevel() == rising){
-        EXTI->INTFR = EXTI_Line3;
-     }
-   }
+  if ((INTERVAL_TIMER->CNT) > ((average_interval>>1))) {
+    EXTI->INTFR = EXTI_Line3;
+    interruptRoutine();
+  } else {
+    if (getCompOutputLevel() == rising) {
+      EXTI->INTFR = EXTI_Line3;
+    }
+  }
 }
 
 void EXTI4_IRQHandler(void)
 {
-    if((INTERVAL_TIMER->CNT) > ((average_interval>>1))){
-        EXTI->INTFR = EXTI_Line4;
-        interruptRoutine();
-     }else{ 
-       if (getCompOutputLevel() == rising){
-           EXTI->INTFR = EXTI_Line4;
-     }
-   }
+  if ((INTERVAL_TIMER->CNT) > ((average_interval>>1))) {
+    EXTI->INTFR = EXTI_Line4;
+    interruptRoutine();
+  } else {
+    if (getCompOutputLevel() == rising) {
+      EXTI->INTFR = EXTI_Line4;
+    }
+  }
 }
 #endif
 
 //for com
 void TIM3_IRQHandler(void)
 {
-    if(TIM_GetITStatus(TIM3,TIM_IT_Update))
-    {
-        PeriodElapsedCallback( );
-        TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
-    }
+  if (TIM_GetITStatus(TIM3,TIM_IT_Update)) {
+    PeriodElapsedCallback( );
+    TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+  }
 }
 
 
 //for processDshot
 void SW_Handler(void)
 {
-//   processDshot();
+  //   processDshot();
 }

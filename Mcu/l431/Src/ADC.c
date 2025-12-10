@@ -25,42 +25,42 @@ extern uint16_t ADC_raw_input;
 //char marker = 0;
 //
 //
-void ADC_DMA_Callback(){  // read dma buffer and set extern variables
+void ADC_DMA_Callback()   // read dma buffer and set extern variables
+{
 
 #ifdef USE_ADC_INPUT
-	ADC_raw_temp =    ADCDataDMA[3];
-	ADC_raw_volts  = ADCDataDMA[1]/2;
-	ADC_raw_current =ADCDataDMA[2];
-	ADC_raw_input = ADCDataDMA[0];
+  ADC_raw_temp =    ADCDataDMA[3];
+  ADC_raw_volts  = ADCDataDMA[1]/2;
+  ADC_raw_current =ADCDataDMA[2];
+  ADC_raw_input = ADCDataDMA[0];
 
 
 #else
-ADC_raw_temp =    ADCDataDMA[2];
-ADC_raw_volts  =  ADCDataDMA[1];
-ADC_raw_current = ADCDataDMA[0];
+  ADC_raw_temp =    ADCDataDMA[2];
+  ADC_raw_volts  =  ADCDataDMA[1];
+  ADC_raw_current = ADCDataDMA[0];
 #endif
 }
 
 void ADC_Init(void)
-{       // gpio A3 mapped to channel 8, A6 to 11, temp on channel 17.
+{
+  // gpio A3 mapped to channel 8, A6 to 11, temp on channel 17.
   LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
-	LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_3, LL_GPIO_MODE_ANALOG);
+  LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_3, LL_GPIO_MODE_ANALOG);
   LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_6, LL_GPIO_MODE_ANALOG);
 
-//  NVIC_SetPriority(ADC1_2_IRQn, 0); /* ADC IRQ greater priority than DMA IRQ */
-//  NVIC_EnableIRQ(ADC1_2_IRQn);
+  //  NVIC_SetPriority(ADC1_2_IRQn, 0); /* ADC IRQ greater priority than DMA IRQ */
+  //  NVIC_EnableIRQ(ADC1_2_IRQn);
 
   LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_ADC);
 
-  if(__LL_ADC_IS_ENABLED_ALL_COMMON_INSTANCE() == 0)
-  {
+  if (__LL_ADC_IS_ENABLED_ALL_COMMON_INSTANCE() == 0) {
     LL_ADC_SetCommonClock(__LL_ADC_COMMON_INSTANCE(ADC1), LL_ADC_CLOCK_SYNC_PCLK_DIV1);
     LL_ADC_SetCommonPathInternalCh(__LL_ADC_COMMON_INSTANCE(ADC1), LL_ADC_PATH_INTERNAL_TEMPSENSOR);
   }
 
   if ((LL_ADC_IsEnabled(ADC1) == 0)               ||
-      (LL_ADC_REG_IsConversionOngoing(ADC1) == 0)   )
-  {
+      (LL_ADC_REG_IsConversionOngoing(ADC1) == 0)   ) {
     LL_ADC_REG_SetTriggerSource(ADC1, LL_ADC_REG_TRIG_SOFTWARE);
 
     // LL_ADC_REG_SetTriggerEdge(ADC1, LL_ADC_REG_TRIG_EXT_RISING);
@@ -76,14 +76,13 @@ void ADC_Init(void)
 
     LL_ADC_REG_SetSequencerRanks(ADC1, LL_ADC_REG_RANK_1, LL_ADC_CHANNEL_8);
     LL_ADC_REG_SetSequencerRanks(ADC1, LL_ADC_REG_RANK_2, LL_ADC_CHANNEL_11);
-     LL_ADC_REG_SetSequencerRanks(ADC1, LL_ADC_REG_RANK_3, LL_ADC_CHANNEL_17);
+    LL_ADC_REG_SetSequencerRanks(ADC1, LL_ADC_REG_RANK_3, LL_ADC_CHANNEL_17);
   }
 
   if ((LL_ADC_IsEnabled(ADC1) == 0)                    ||
       ((LL_ADC_REG_IsConversionOngoing(ADC1) == 0) &&
-       (LL_ADC_INJ_IsConversionOngoing(ADC1) == 0)   )   )
-  {
-	LL_ADC_SetChannelSamplingTime(ADC1, LL_ADC_CHANNEL_8, LL_ADC_SAMPLINGTIME_47CYCLES_5);
+       (LL_ADC_INJ_IsConversionOngoing(ADC1) == 0)   )   ) {
+    LL_ADC_SetChannelSamplingTime(ADC1, LL_ADC_CHANNEL_8, LL_ADC_SAMPLINGTIME_47CYCLES_5);
     LL_ADC_SetChannelSamplingTime(ADC1, LL_ADC_CHANNEL_11, LL_ADC_SAMPLINGTIME_47CYCLES_5);
     LL_ADC_SetChannelSamplingTime(ADC1, LL_ADC_CHANNEL_17, LL_ADC_SAMPLINGTIME_47CYCLES_5);
 
@@ -99,29 +98,24 @@ void activateADC(void)
 {
   __IO uint32_t wait_loop_index = 0U;
 
-  if (LL_ADC_IsEnabled(ADC1) == 0)
-  {
+  if (LL_ADC_IsEnabled(ADC1) == 0) {
     LL_ADC_DisableDeepPowerDown(ADC1);
     LL_ADC_EnableInternalRegulator(ADC1);
 
     wait_loop_index = ((LL_ADC_DELAY_INTERNAL_REGUL_STAB_US * (SystemCoreClock / (100000 * 2))) / 10);
-    while(wait_loop_index != 0)
-    {
+    while (wait_loop_index != 0) {
       wait_loop_index--;
     }
-      LL_ADC_StartCalibration(ADC1, LL_ADC_SINGLE_ENDED);
-      while (LL_ADC_IsCalibrationOnGoing(ADC1) != 0)
-      {
+    LL_ADC_StartCalibration(ADC1, LL_ADC_SINGLE_ENDED);
+    while (LL_ADC_IsCalibrationOnGoing(ADC1) != 0) {
 
-      }
-      wait_loop_index = (ADC_DELAY_CALIB_ENABLE_CPU_CYCLES >> 1);
-      while(wait_loop_index != 0)
-      {
-        wait_loop_index--;
-      }
+    }
+    wait_loop_index = (ADC_DELAY_CALIB_ENABLE_CPU_CYCLES >> 1);
+    while (wait_loop_index != 0) {
+      wait_loop_index--;
+    }
     LL_ADC_Enable(ADC1);
-    while (LL_ADC_IsActiveFlag_ADRDY(ADC1) == 0)
-    {
+    while (LL_ADC_IsActiveFlag_ADRDY(ADC1) == 0) {
 
     }
 

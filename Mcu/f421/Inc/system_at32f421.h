@@ -56,7 +56,7 @@ extern "C" {
  */
 
 extern unsigned int
-    system_core_clock; /*!< system clock frequency (core clock) */
+system_core_clock; /*!< system clock frequency (core clock) */
 
 /**
  * @}

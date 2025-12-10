@@ -763,7 +763,7 @@
 #define CURRENT_ADC_PIN GPIO_PINS_2
 #define VOLTAGE_ADC_CHANNEL ADC_CHANNEL_3
 #define VOLTAGE_ADC_PIN GPIO_PINS_3
-#define USE_NTC 
+#define USE_NTC
 #define NTC_ADC_CHANNEL ADC_CHANNEL_6
 #define NTC_ADC_PIN GPIO_PINS_6
 #endif
@@ -1438,7 +1438,7 @@
 #define CURRENT_ADC_PIN GPIO_PINS_6
 #define VOLTAGE_ADC_CHANNEL ADC_CHANNEL_3
 #define VOLTAGE_ADC_PIN GPIO_PINS_3
-#define USE_NTC 
+#define USE_NTC
 #define NTC_ADC_CHANNEL ADC_CHANNEL_2
 #define NTC_ADC_PIN GPIO_PINS_2
 #endif
@@ -1454,7 +1454,7 @@
 #define CURRENT_ADC_PIN GPIO_PINS_6
 #define VOLTAGE_ADC_CHANNEL ADC_CHANNEL_3
 #define VOLTAGE_ADC_PIN GPIO_PINS_3
-#define USE_NTC 
+#define USE_NTC
 #define NTC_ADC_CHANNEL ADC_CHANNEL_2
 #define NTC_ADC_PIN GPIO_PINS_2
 #endif
@@ -2186,7 +2186,7 @@
 #define MILLIVOLT_PER_AMP 16
 #endif
 
-#ifdef  YYRC_F60MINI_F051  
+#ifdef  YYRC_F60MINI_F051
 #define FILE_NAME "YYRC_F60MINI_F051"
 #define FIRMWARE_NAME "YYRC_F60MINI"
 #define DEAD_TIME 40
@@ -3238,12 +3238,12 @@
 
 #endif
 
-#ifdef HARDWARE_GROUP_F0_045 
+#ifdef HARDWARE_GROUP_F0_045
 #define PHASE_A_COMP COMP_PA0 // pa0     
 #define PHASE_B_COMP COMP_PA4 // pa4
 #define PHASE_C_COMP COMP_PA5 // pa5
 #endif
-#ifdef HARDWARE_GROUP_F0_504 
+#ifdef HARDWARE_GROUP_F0_504
 #define PHASE_A_COMP COMP_PA5 // pa5            
 #define PHASE_B_COMP COMP_PA0 // pa0
 #define PHASE_C_COMP COMP_PA4 // pa4
@@ -3263,7 +3263,7 @@
 #define PHASE_B_COMP COMP_PA0 // pa0
 #define PHASE_C_COMP COMP_PA5 // pa5
 #endif
-#ifdef HARDWARE_GROUP_F0_540 
+#ifdef HARDWARE_GROUP_F0_540
 #define PHASE_A_COMP COMP_PA5 // pa5         
 #define PHASE_B_COMP COMP_PA4 // pa4
 #define PHASE_C_COMP COMP_PA0 // pa0
@@ -3809,7 +3809,7 @@
 #define PHASE_C_EXTI_LINE LL_EXTI_LINE_21
 #define PHASE_C_COMP_NUMBER COMP1
 
-#else 
+#else
 
 
 #define PHASE_A_COMP LL_COMP_INPUT_MINUS_IO1 //
@@ -4994,22 +4994,22 @@
 #define TARGET_MIN_BEMF_COUNTS 3
 #define COMPARATOR_IRQ COMP1_2_3_IRQn
 #define USE_ADC
- #ifndef VOLTAGE_ADC_CHANNEL
- #define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_6
- #endif
- #ifndef VOLTAGE_ADC_PIN
- #define VOLTAGE_ADC_PIN LL_GPIO_PIN_6
- #endif
+#ifndef VOLTAGE_ADC_CHANNEL
+#define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_6
+#endif
+#ifndef VOLTAGE_ADC_PIN
+#define VOLTAGE_ADC_PIN LL_GPIO_PIN_6
+#endif
 #ifndef AF_A_LOW
-  #define AF_A_LOW LL_GPIO_AF_6
+#define AF_A_LOW LL_GPIO_AF_6
 #endif
 #ifndef AF_B_LOW
-  #define AF_B_LOW LL_GPIO_AF_6
+#define AF_B_LOW LL_GPIO_AF_6
 #endif
 #ifndef AF_C_LOW
-  #define AF_C_LOW LL_GPIO_AF_6
+#define AF_C_LOW LL_GPIO_AF_6
 #endif
- 
+
 #define DSHOT_PRIORITY_THRESHOLD 60
 #define COM_TIMER_IRQ TIM1_UP_TIM16_IRQn
 #endif
@@ -5133,7 +5133,7 @@
 #define INTERVAL_TIMER       TIM4
 #define TEN_KHZ_TIMER        SysTick
 #define UTILITY_TIMER        TIM4
-#define COM_TIMER            TIM3                    
+#define COM_TIMER            TIM3
 #define TIM1_AUTORELOAD      1999
 #define APPLICATION_ADDRESS  0x08001000
 
@@ -5143,10 +5143,10 @@
 #define COM_TIMER_IRQ      TIM3_IRQn
 
 #ifndef USE_PA2_AS_COMP
-  #define COMPARATOR_IRQ    EXTI3_IRQn
-  #define COMPARATOR_IRQ_2  EXTI4_IRQn
+#define COMPARATOR_IRQ    EXTI3_IRQn
+#define COMPARATOR_IRQ_2  EXTI4_IRQn
 #else
-  #define COMPARATOR_IRQ   EXTI2_IRQn
+#define COMPARATOR_IRQ   EXTI2_IRQn
 #endif
 
 #endif

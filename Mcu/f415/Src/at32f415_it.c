@@ -44,9 +44,9 @@ void NMI_Handler(void) { }
  */
 void HardFault_Handler(void)
 {
-    /* Go to infinite loop when Hard Fault exception occurs */
-    while (1) {
-    }
+  /* Go to infinite loop when Hard Fault exception occurs */
+  while (1) {
+  }
 }
 
 /**
@@ -56,9 +56,9 @@ void HardFault_Handler(void)
  */
 void MemManage_Handler(void)
 {
-    /* Go to infinite loop when Memory Manage exception occurs */
-    while (1) {
-    }
+  /* Go to infinite loop when Memory Manage exception occurs */
+  while (1) {
+  }
 }
 
 /**
@@ -68,9 +68,9 @@ void MemManage_Handler(void)
  */
 void BusFault_Handler(void)
 {
-    /* Go to infinite loop when Bus Fault exception occurs */
-    while (1) {
-    }
+  /* Go to infinite loop when Bus Fault exception occurs */
+  while (1) {
+  }
 }
 
 /**
@@ -80,9 +80,9 @@ void BusFault_Handler(void)
  */
 void UsageFault_Handler(void)
 {
-    /* Go to infinite loop when Usage Fault exception occurs */
-    while (1) {
-    }
+  /* Go to infinite loop when Usage Fault exception occurs */
+  while (1) {
+  }
 }
 
 /**
@@ -115,49 +115,49 @@ void SysTick_Handler(void) { }
 
 void DMA1_Channel1_IRQHandler(void)
 {
-    if (dma_flag_get(DMA1_FDT1_FLAG) == SET) {
-        DMA1->clr = DMA1_GL1_FLAG;
+  if (dma_flag_get(DMA1_FDT1_FLAG) == SET) {
+    DMA1->clr = DMA1_GL1_FLAG;
 #ifdef USE_ADC
-        ADC_DMA_Callback();
+    ADC_DMA_Callback();
 #endif
-        if (dma_flag_get(DMA1_DTERR1_FLAG) == SET) {
-            DMA1->clr = DMA1_GL1_FLAG;
-        }
+    if (dma_flag_get(DMA1_DTERR1_FLAG) == SET) {
+      DMA1->clr = DMA1_GL1_FLAG;
     }
+  }
 }
 
 void DMA1_Channel4_IRQHandler(void)
 {
-    if (dma_flag_get(DMA1_FDT4_FLAG) == SET) {
-        DMA1->clr = DMA1_GL4_FLAG;
-        DMA1_CHANNEL4->ctrl_bit.chen = FALSE;
-    }
-    if (dma_flag_get(DMA1_DTERR2_FLAG) == SET) {
-        DMA1->clr = DMA1_GL4_FLAG;
-        DMA1_CHANNEL4->ctrl_bit.chen = FALSE;
-    }
+  if (dma_flag_get(DMA1_FDT4_FLAG) == SET) {
+    DMA1->clr = DMA1_GL4_FLAG;
+    DMA1_CHANNEL4->ctrl_bit.chen = FALSE;
+  }
+  if (dma_flag_get(DMA1_DTERR2_FLAG) == SET) {
+    DMA1->clr = DMA1_GL4_FLAG;
+    DMA1_CHANNEL4->ctrl_bit.chen = FALSE;
+  }
 }
 
 void DMA1_Channel6_IRQHandler(void)
 {
-    if (dma_flag_get(DMA1_HDT6_FLAG) == SET) {
-        if (servoPwm) {
-            IC_TIMER_REGISTER->cctrl_bit.c1p = TMR_INPUT_FALLING_EDGE;
-            DMA1->clr = DMA1_HDT6_FLAG;
-        }
+  if (dma_flag_get(DMA1_HDT6_FLAG) == SET) {
+    if (servoPwm) {
+      IC_TIMER_REGISTER->cctrl_bit.c1p = TMR_INPUT_FALLING_EDGE;
+      DMA1->clr = DMA1_HDT6_FLAG;
     }
+  }
 
-    if (dma_flag_get(DMA1_FDT6_FLAG) == SET) {
-        DMA1->clr = DMA1_GL6_FLAG;
-        INPUT_DMA_CHANNEL->ctrl_bit.chen = FALSE;
-        transfercomplete();
-        EXINT->swtrg = EXINT_LINE_15;
-    }
-    if (dma_flag_get(DMA1_DTERR6_FLAG) == SET) {
-        DMA1->clr = DMA1_GL6_FLAG;
-        INPUT_DMA_CHANNEL->ctrl_bit.chen = FALSE;
-        transfercomplete();
-    }
+  if (dma_flag_get(DMA1_FDT6_FLAG) == SET) {
+    DMA1->clr = DMA1_GL6_FLAG;
+    INPUT_DMA_CHANNEL->ctrl_bit.chen = FALSE;
+    transfercomplete();
+    EXINT->swtrg = EXINT_LINE_15;
+  }
+  if (dma_flag_get(DMA1_DTERR6_FLAG) == SET) {
+    DMA1->clr = DMA1_GL6_FLAG;
+    INPUT_DMA_CHANNEL->ctrl_bit.chen = FALSE;
+    transfercomplete();
+  }
 }
 
 /**
@@ -166,12 +166,12 @@ void DMA1_Channel6_IRQHandler(void)
  */
 void CMP1_IRQHandler(void)
 {
-  if((INTERVAL_TIMER->cval) > ((average_interval>>1))){
-       EXINT->intsts = EXTI_LINE;
-       interruptRoutine();
-    }else{ 
-      if (getCompOutputLevel() == rising){
-        EXINT->intsts = EXTI_LINE;
+  if ((INTERVAL_TIMER->cval) > ((average_interval>>1))) {
+    EXINT->intsts = EXTI_LINE;
+    interruptRoutine();
+  } else {
+    if (getCompOutputLevel() == rising) {
+      EXINT->intsts = EXTI_LINE;
     }
   }
 }
@@ -181,18 +181,18 @@ void CMP1_IRQHandler(void)
  */
 void TMR1_BRK_TMR9_IRQHandler(void)
 {
-    /* USER CODE BEGIN TIM6_DAC_IRQn 0 */
-    // TIM6->DIER &= ~(0x1UL << (0U));
-    TMR9->ists = (uint16_t)~TMR_OVF_FLAG;
-    TMR1->ists = 0x00;
-    //		timer_interrupt_flag_clear(TIMER13, TIMER_INT_FLAG_UP);
-    tenKhzRoutine();
+  /* USER CODE BEGIN TIM6_DAC_IRQn 0 */
+  // TIM6->DIER &= ~(0x1UL << (0U));
+  TMR9->ists = (uint16_t)~TMR_OVF_FLAG;
+  TMR1->ists = 0x00;
+  //		timer_interrupt_flag_clear(TIMER13, TIMER_INT_FLAG_UP);
+  tenKhzRoutine();
 
-    /* USER CODE END TIM6_DAC_IRQn 0 */
+  /* USER CODE END TIM6_DAC_IRQn 0 */
 
-    /* USER CODE BEGIN TIM6_DAC_IRQn 1 */
+  /* USER CODE BEGIN TIM6_DAC_IRQn 1 */
 
-    /* USER CODE END TIM6_DAC_IRQn 1 */
+  /* USER CODE END TIM6_DAC_IRQn 1 */
 }
 
 /**
@@ -200,27 +200,27 @@ void TMR1_BRK_TMR9_IRQHandler(void)
  */
 void TMR1_TRG_HALL_TMR11_IRQHandler(void)
 {
-    /* USER CODE BEGIN TIM14_IRQn 0 */
-    //	  if(LL_TIM_IsActiveFlag_UPDATE(TIM14) == 1)
-    //	  {
-    //  timer_interrupt_flag_clear(TIMER15, TIMER_INT_FLAG_UP);
+  /* USER CODE BEGIN TIM14_IRQn 0 */
+  //	  if(LL_TIM_IsActiveFlag_UPDATE(TIM14) == 1)
+  //	  {
+  //  timer_interrupt_flag_clear(TIMER15, TIMER_INT_FLAG_UP);
 
-    TMR11->ists = 0x00;
-    TMR1->ists = 0x00;
-    PeriodElapsedCallback();
+  TMR11->ists = 0x00;
+  TMR1->ists = 0x00;
+  PeriodElapsedCallback();
 
-    //	  }
+  //	  }
 
-    /* USER CODE END TIM14_IRQn 0 */
-    /* USER CODE BEGIN TIM14_IRQn 1 */
+  /* USER CODE END TIM14_IRQn 0 */
+  /* USER CODE BEGIN TIM14_IRQn 1 */
 
-    /* USER CODE END TIM14_IRQn 1 */
+  /* USER CODE END TIM14_IRQn 1 */
 }
 
 void TMR1_OVF_TMR10_IRQHandler(void)
 {
-    TMR10->ists = (uint16_t)~TMR_OVF_FLAG;
-    TMR10->ists = (uint16_t)~TMR_C1_FLAG;
+  TMR10->ists = (uint16_t)~TMR_OVF_FLAG;
+  TMR10->ists = (uint16_t)~TMR_C1_FLAG;
 }
 
 /**
@@ -229,22 +229,22 @@ void TMR1_OVF_TMR10_IRQHandler(void)
  */
 void USART1_IRQHandler(void)
 {
-    /* USER CODE BEGIN USART1_IRQn 0 */
+  /* USER CODE BEGIN USART1_IRQn 0 */
 
-    /* USER CODE END USART1_IRQn 0 */
-    /* USER CODE BEGIN USART1_IRQn 1 */
+  /* USER CODE END USART1_IRQn 0 */
+  /* USER CODE BEGIN USART1_IRQn 1 */
 
-    /* USER CODE END USART1_IRQn 1 */
+  /* USER CODE END USART1_IRQn 1 */
 }
 
 void TMR3_GLOBAL_IRQHandler(void)
 {
-    if ((TMR3->ists & TMR_C1_FLAG) != (uint16_t)RESET) {
-        TMR3->ists = (uint16_t)~TMR_C1_FLAG;
-    }
-    if ((TMR3->ists & TMR_OVF_FLAG) != (uint16_t)RESET) {
-        TMR3->ists = (uint16_t)~TMR_OVF_FLAG;
-    }
+  if ((TMR3->ists & TMR_C1_FLAG) != (uint16_t)RESET) {
+    TMR3->ists = (uint16_t)~TMR_C1_FLAG;
+  }
+  if ((TMR3->ists & TMR_OVF_FLAG) != (uint16_t)RESET) {
+    TMR3->ists = (uint16_t)~TMR_OVF_FLAG;
+  }
 }
 
 // void DMA_Channel0_IRQHandler(void)         // ADC
@@ -270,10 +270,10 @@ void TMR3_GLOBAL_IRQHandler(void)
 
 void EXINT15_10_IRQHandler(void)
 {
-    if ((EXINT->intsts & EXINT_LINE_15) != (uint32_t)RESET) {
-        EXINT->intsts = EXINT_LINE_15;
-        processDshot();
-    }
+  if ((EXINT->intsts & EXINT_LINE_15) != (uint32_t)RESET) {
+    EXINT->intsts = EXINT_LINE_15;
+    processDshot();
+  }
 }
 
 /******************************************************************************/

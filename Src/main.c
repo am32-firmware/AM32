@@ -303,6 +303,7 @@ fastPID stallPid = { // 1khz loop time
 };
 
 EEprom_t eepromBuffer;
+volatile uint32_t polling_mode_changeover;
 volatile uint8_t ramp_divider;
 volatile uint8_t max_ramp_startup = RAMP_SPEED_STARTUP;
 volatile uint8_t max_ramp_low_rpm = RAMP_SPEED_LOW_RPM;
@@ -770,6 +771,11 @@ void loadEEpromSettings()
         high_rpm_level = motor_kv / 12 / (32 / eepromBuffer.motor_poles);				
     }
     reverse_speed_threshold = map(motor_kv, 300, 3000, 1000, 500);
+    if (eepromBuffer.bi_direction){
+      polling_mode_changeover = POLLING_MODE_THRESHOLD / 2;
+    }else{
+      polling_mode_changeover = POLLING_MODE_THRESHOLD;
+    }
 }
 
 void saveEEpromSettings()
@@ -854,7 +860,7 @@ void commutate()
     __enable_irq();
     changeCompInput();
 #ifndef NO_POLLING_START
-	if (average_interval > POLLING_MODE_THRESHOLD+500) {
+	if (average_interval > polling_mode_changeover + 500) {
       old_routine = 1;
    }
 #endif
@@ -1590,7 +1596,7 @@ void zcfoundroutine()
             enableCompInterrupts(); // enable interrupt
         }
     } else {
-       if (commutation_interval < POLLING_MODE_THRESHOLD) {
+       if (commutation_interval < polling_mode_changeover) {
             old_routine = 0;
             enableCompInterrupts(); // enable interrupt
         }
@@ -1849,15 +1855,20 @@ e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation
      }
 #endif
 #endif
-
 if(zero_crosses < 5){
-	  min_bemf_counts_up = TARGET_MIN_BEMF_COUNTS * 2;
-		min_bemf_counts_down = TARGET_MIN_BEMF_COUNTS * 2;
+    if(eepromBuffer.bi_direction){
+     min_bemf_counts_up = TARGET_MIN_BEMF_COUNTS + 1;
+     min_bemf_counts_down = TARGET_MIN_BEMF_COUNTS + 1;
+   }else{
+     min_bemf_counts_up = TARGET_MIN_BEMF_COUNTS * 2;
+     min_bemf_counts_down = TARGET_MIN_BEMF_COUNTS * 2;
+   }
 }else{
-	 min_bemf_counts_up = TARGET_MIN_BEMF_COUNTS;
-	min_bemf_counts_down = TARGET_MIN_BEMF_COUNTS;
+	  min_bemf_counts_up = TARGET_MIN_BEMF_COUNTS;
+	  min_bemf_counts_down = TARGET_MIN_BEMF_COUNTS;
 }
-        RELOAD_WATCHDOG_COUNTER();
+
+       RELOAD_WATCHDOG_COUNTER();
 
         if (eepromBuffer.variable_pwm == 1) {      // uses range defined by pwm frequency setting
             tim1_arr = map(commutation_interval, 96, 200, TIMER1_MAX_ARR / 2,

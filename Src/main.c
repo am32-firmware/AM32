@@ -312,6 +312,7 @@ char send_esc_info_flag;
 uint32_t eeprom_address = EEPROM_START_ADD; 
 uint16_t prop_brake_duty_cycle = 0;
 uint16_t ledcounter = 0;
+uint16_t ramp_count;
 uint32_t process_time = 0;
 uint32_t start_process = 0;
 uint16_t one_khz_loop_counter = 0;
@@ -746,7 +747,7 @@ void loadEEpromSettings()
         }
         
         if(eepromBuffer.max_ramp < 10){
-          ramp_divider = 10;
+          ramp_divider = 10 - eepromBuffer.max_ramp;
           max_ramp_startup = eepromBuffer.max_ramp;
           max_ramp_low_rpm = eepromBuffer.max_ramp;
           max_ramp_high_rpm = eepromBuffer.max_ramp;
@@ -1308,6 +1309,7 @@ void tenKhzRoutine()
     duty_cycle = duty_cycle_setpoint;
     tenkhzcounter++;
     ledcounter++;
+    ramp_count++;
     one_khz_loop_counter++;
     if (!armed) {
         if (cell_count == 0) {
@@ -1426,7 +1428,8 @@ void tenKhzRoutine()
                 }
             }
         }
-        if (tenkhzcounter % ramp_divider == 0) {
+        if (ramp_count >= ramp_divider) {
+          ramp_count = 0;
 #ifdef VOLTAGE_BASED_RAMP
             uint16_t voltage_based_max_change = map(battery_voltage, 800, 2200, 10, 1);
             if (average_interval > 200) {

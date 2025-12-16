@@ -747,12 +747,12 @@ void loadEEpromSettings()
         }
         
         if(eepromBuffer.max_ramp < 10){
-          ramp_divider = 10 - eepromBuffer.max_ramp;
+          ramp_divider = 9;
           max_ramp_startup = eepromBuffer.max_ramp;
           max_ramp_low_rpm = eepromBuffer.max_ramp;
           max_ramp_high_rpm = eepromBuffer.max_ramp;
         }else{
-          ramp_divider = 1;
+          ramp_divider = 0;
           if((eepromBuffer.max_ramp / 10) < max_ramp_startup){
             max_ramp_startup = eepromBuffer.max_ramp / 10;
           }
@@ -1428,7 +1428,7 @@ void tenKhzRoutine()
                 }
             }
         }
-        if (ramp_count >= ramp_divider) {
+        if (ramp_count > ramp_divider) {
           ramp_count = 0;
 #ifdef VOLTAGE_BASED_RAMP
             uint16_t voltage_based_max_change = map(battery_voltage, 800, 2200, 10, 1);

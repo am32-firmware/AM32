@@ -13,17 +13,24 @@ ENTRY(ResetISR)
 MEMORY
 {
   /* Define each memory region */
+  /*
   FLASH_VECTAB  (rx)  : ORIGIN = 0x0, LENGTH = 512
   FLASH_VERSION (rx)  : ORIGIN = 0x200, LENGTH = 16
   PROGRAM_FLASH (rx)  : ORIGIN = ORIGIN(FLASH_VERSION) + LENGTH(FLASH_VERSION), LENGTH = 123K - 32 - (LENGTH(FLASH_VECTAB) + LENGTH(FLASH_VERSION)) /* 128K bytes (alias Flash) */
-  FILE_NAME     (rx)  : ORIGIN = ORIGIN(PROGRAM_FLASH) + LENGTH(PROGRAM_FLASH) - 32, LENGTH = 32
-  EEPROM        (rx)  : ORIGIN = ORIGIN(PROGRAM_FLASH) + LENGTH(PROGRAM_FLASH), LENGTH = 1K  
-  SRAM (rwx) : ORIGIN = 0x20000000, LENGTH = 0x6000 /* 24K bytes (alias RAM) */  
-  SRAMX0 (rwx) : ORIGIN = 0x4000000, LENGTH = 0x2000 /* 8K bytes (alias RAM2) */  
-  SRAMX1 (rwx) : ORIGIN = 0x4002000, LENGTH = 0x1000 /* 4K bytes (alias RAM3) */  
+  /*FILE_NAME     (rx)  : ORIGIN = ORIGIN(PROGRAM_FLASH) + LENGTH(PROGRAM_FLASH) - 32, LENGTH = 32
+  EEPROM        (rx)  : ORIGIN = ORIGIN(PROGRAM_FLASH) + LENGTH(PROGRAM_FLASH), LENGTH = 8K  /*0x1e000 - 0x20000*/
+  FLASH_VECTAB  (rx)  : ORIGIN = 0x0, LENGTH = 512
+  FLASH_VERSION (rx)  : ORIGIN = ORIGIN(FLASH_VECTAB) + LENGTH(FLASH_VECTAB), LENGTH = 16
+  PROGRAM_FLASH (rx)  : ORIGIN = ORIGIN(FLASH_VERSION) + LENGTH(FLASH_VERSION), LENGTH = 0x20000 - 32 - 0x2000 - LENGTH(FLASH_VECTAB) - LENGTH(FLASH_VERSION) /* 128K bytes (alias Flash) */
+  FILE_NAME     (rx)  : ORIGIN = ORIGIN(PROGRAM_FLASH) + LENGTH(PROGRAM_FLASH), LENGTH = 32
+  EEPROM        (rx)  : ORIGIN = ORIGIN(FILE_NAME) + LENGTH(FILE_NAME), LENGTH = 0x2000  /*0x1e000 - 0x20000*/
+  SRAM 			(rwx) : ORIGIN = 0x20000000, LENGTH = 0x6000 /* 24K bytes (alias RAM) */  
+  SRAMX0 		(rwx) : ORIGIN = 0x4000000, LENGTH = 0x2000 /* 8K bytes (alias RAM2) */  
+  SRAMX1 		(rwx) : ORIGIN = 0x4002000, LENGTH = 0x1000 /* 4K bytes (alias RAM3) */  
 }
 
   /* Define a symbol for the top of each memory region */
+  /* Used for reference */
   __base_PROGRAM_FLASH = 0x0  ; /* PROGRAM_FLASH */  
   __base_Flash = 0x0 ; /* Flash */  
   __top_PROGRAM_FLASH = 0x0 + 0x20000 ; /* 128K bytes */  

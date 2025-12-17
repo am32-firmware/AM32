@@ -12,6 +12,7 @@
 
 void initAfterJump(void);
 void initCorePeripherals(void);
+void SystemInit(void);
 void SystemClock_Config(void);
 void initGPIO(void);
 void initSPI(void);

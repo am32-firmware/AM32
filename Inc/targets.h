@@ -4913,14 +4913,14 @@
 #define NXP
 #define CPU_FREQUENCY_MHZ   96		//Is the main_clk //Is the CPU/System/Ctimer0 clock
 #ifndef EEPROM_START_ADD
-#define EEPROM_START_ADD  (uint32_t)0x0800F800
+#define EEPROM_START_ADD  (uint32_t)0x1E000		//Flash is 128kB, sector is 8kB
 #endif
 //TODO assign correct timer functions to timers
 #define INTERVAL_TIMER     CTIMER2
 #define TEN_KHZ_TIMER      LPTMR0
 #define UTILITY_TIMER      SysTick
 #define COM_TIMER          CTIMER1
-#define TIM1_AUTORELOAD    8000		//Reloads the PWM at 24kHz. 192MHz clock for FlexPWM
+#define TIM1_AUTORELOAD    4000 //8000		//Reloads the PWM at 24kHz. 192MHz clock for FlexPWM
 
 //Define the DMA channels used
 #define DMA_CH_DshotPWM			0

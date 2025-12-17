@@ -379,7 +379,7 @@ int32_t doPidCalculations(struct fastPID* pidnow, int actual, int target)
 
 void loadEEpromSettings()
 {
-    read_flash_bin(eepromBuffer.buffer, eeprom_address, sizeof(eepromBuffer.buffer));
+//    read_flash_bin(eepromBuffer.buffer, eeprom_address, sizeof(eepromBuffer.buffer));
 
 #ifdef USE_OVERRIDES
     eepromBuffer.eeprom_version = 2;
@@ -408,6 +408,13 @@ void loadEEpromSettings()
     eepromBuffer.sine_mode_power = 6;
     eepromBuffer.telemetry_on_interval = 0;
     eepromBuffer.input_type = 0;	//Sets Dshot input
+
+//    eepromBuffer.auto_advance = 0;
+//    eepromBuffer.dir_reversed = 0;
+//    eepromBuffer.stall_protection = 0;
+//    eepromBuffer.brake_on_stop = 0;
+//    eepromBuffer.rc_car_reverse = 0;
+
 
     eepromBuffer.tune[0] = 0xff;	//Turn off BJ tune
 //    eepromBuffer.tune[0] = 4;
@@ -615,7 +622,7 @@ void loadEEpromSettings()
 
 void saveEEpromSettings()
 {
-//    save_flash_nolib(eepromBuffer.buffer, sizeof(eepromBuffer.buffer), eeprom_address);
+    save_flash_nolib(eepromBuffer.buffer, sizeof(eepromBuffer.buffer), eeprom_address);
 }
 
 uint16_t getSmoothedCurrent()
@@ -1522,6 +1529,19 @@ void runBrushedLoop()
  */
 static void checkDeviceInfo(void)
 {
+#ifdef NXP
+    uint32_t pflashBlockBase  = 0U;
+    uint32_t pflashTotalSize  = 0U;
+    uint32_t pflashSectorSize = 0U;
+
+    //Get flash properties
+    FLASH_API->flash_get_property(&s_flashDriver, kFLASH_PropertyPflashBlockBaseAddr, &pflashBlockBase);
+    FLASH_API->flash_get_property(&s_flashDriver, kFLASH_PropertyPflashSectorSize, &pflashSectorSize);
+    FLASH_API->flash_get_property(&s_flashDriver, kFLASH_PropertyPflashTotalSize, &pflashTotalSize);
+
+    //Set eeprom address to last sector
+    eeprom_address = pflashBlockBase + (pflashTotalSize - pflashSectorSize);
+#else
 #define DEVINFO_MAGIC1 0x5925e3da
 #define DEVINFO_MAGIC2 0x4eb863d9
 
@@ -1547,6 +1567,7 @@ static void checkDeviceInfo(void)
             eeprom_address = 0x0801f800;
             break;
     }
+#endif
 
     // TODO: check pin code and reboot to bootloader if incorrect
 
@@ -1554,17 +1575,19 @@ static void checkDeviceInfo(void)
 
 int main(void)
 {
-    initAfterJump();
-    checkDeviceInfo();
     initCorePeripherals();
+    checkDeviceInfo();
+//    save_flash_nolib(eepromBuffer.buffer, sizeof(eepromBuffer.buffer), eeprom_address);
     loadEEpromSettings();
     enableCorePeripherals();	//TODO set back
+    initAfterJump();
+
 
     if (VERSION_MAJOR != eepromBuffer.version.major || VERSION_MINOR != eepromBuffer.version.minor || EEPROM_VERSION > eepromBuffer.eeprom_version) {
         eepromBuffer.version.major = VERSION_MAJOR;
         eepromBuffer.version.minor = VERSION_MINOR;
         eepromBuffer.eeprom_version = EEPROM_VERSION;
-        saveEEpromSettings();
+//        saveEEpromSettings();		//TODO uncomment this
     }
     
     if (eepromBuffer.dir_reversed == 1) {

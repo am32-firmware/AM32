@@ -33,6 +33,7 @@ extern "C" {
 #include <MCXA153.h>
 #include <stdint.h>
 #include <strings.h>
+#include <string.h>
 #include <targets.h>
 #include "mcxa153_common.h"
 #include "ADC.h"
@@ -43,6 +44,7 @@ extern "C" {
 #include "phaseouts.h"
 #include "serial_telemetry.h"
 #include "timers.h"
+#include "mcxa153_rom_api.h"
 
 /* Private defines
  * -----------------------------------------------------------*/

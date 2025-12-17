@@ -4920,7 +4920,7 @@
 #define TEN_KHZ_TIMER      LPTMR0
 #define UTILITY_TIMER      SysTick
 #define COM_TIMER          CTIMER1
-#define TIM1_AUTORELOAD    4000 //8000		//Reloads the PWM at 24kHz. 192MHz clock for FlexPWM
+#define TIM1_AUTORELOAD    8000		//Reloads the PWM at 24kHz. 192MHz clock for FlexPWM
 
 //Define the DMA channels used
 #define DMA_CH_DshotPWM			0

@@ -1587,7 +1587,7 @@ int main(void)
         eepromBuffer.version.major = VERSION_MAJOR;
         eepromBuffer.version.minor = VERSION_MINOR;
         eepromBuffer.eeprom_version = EEPROM_VERSION;
-//        saveEEpromSettings();		//TODO uncomment this
+        saveEEpromSettings();
     }
     
     if (eepromBuffer.dir_reversed == 1) {

@@ -303,6 +303,7 @@ fastPID stallPid = { // 1khz loop time
 };
 
 EEprom_t eepromBuffer;
+volatile uint32_t polling_mode_changeover;
 volatile uint8_t ramp_divider;
 volatile uint8_t max_ramp_startup = RAMP_SPEED_STARTUP;
 volatile uint8_t max_ramp_low_rpm = RAMP_SPEED_LOW_RPM;
@@ -311,6 +312,7 @@ char send_esc_info_flag;
 uint32_t eeprom_address = EEPROM_START_ADD; 
 uint16_t prop_brake_duty_cycle = 0;
 uint16_t ledcounter = 0;
+uint16_t ramp_count;
 uint32_t process_time = 0;
 uint32_t start_process = 0;
 uint16_t one_khz_loop_counter = 0;
@@ -610,6 +612,7 @@ void loadEEpromSettings()
     }
     if (eepromBuffer.advance_level < 4) {         // old format needs to be converted to 0-32 range
         temp_advance = (eepromBuffer.advance_level<<3);
+        eepromBuffer.advance_level = temp_advance + 10;
     }
     if (eepromBuffer.advance_level < 43 && eepromBuffer.advance_level > 9 ) { // new format subtract 10 from advance
         temp_advance = eepromBuffer.advance_level - 10;
@@ -638,6 +641,9 @@ void loadEEpromSettings()
     motor_kv = (eepromBuffer.motor_kv * 40) + 20;
 #ifdef THREE_CELL_MAX
 		motor_kv =  motor_kv / 2;
+#endif
+#ifdef ONE_TWO_CELL_MAX
+		motor_kv =  motor_kv / 16;
 #endif
     setVolume(2);
     if (eepromBuffer.eeprom_version > 0) { // these commands weren't introduced until eeprom version 1.
@@ -741,12 +747,12 @@ void loadEEpromSettings()
         }
         
         if(eepromBuffer.max_ramp < 10){
-          ramp_divider = 10;
+          ramp_divider = 9;
           max_ramp_startup = eepromBuffer.max_ramp;
           max_ramp_low_rpm = eepromBuffer.max_ramp;
           max_ramp_high_rpm = eepromBuffer.max_ramp;
         }else{
-          ramp_divider = 1;
+          ramp_divider = 0;
           if((eepromBuffer.max_ramp / 10) < max_ramp_startup){
             max_ramp_startup = eepromBuffer.max_ramp / 10;
           }
@@ -765,6 +771,11 @@ void loadEEpromSettings()
         high_rpm_level = motor_kv / 12 / (32 / eepromBuffer.motor_poles);				
     }
     reverse_speed_threshold = map(motor_kv, 300, 3000, 1000, 500);
+    if (eepromBuffer.bi_direction){
+      polling_mode_changeover = POLLING_MODE_THRESHOLD / 2;
+    }else{
+      polling_mode_changeover = POLLING_MODE_THRESHOLD;
+    }
 }
 
 void saveEEpromSettings()
@@ -849,7 +860,7 @@ void commutate()
     __enable_irq();
     changeCompInput();
 #ifndef NO_POLLING_START
-	if (average_interval > 2500) {
+	if (average_interval > polling_mode_changeover + 500) {
       old_routine = 1;
    }
 #endif
@@ -1298,6 +1309,7 @@ void tenKhzRoutine()
     duty_cycle = duty_cycle_setpoint;
     tenkhzcounter++;
     ledcounter++;
+    ramp_count++;
     one_khz_loop_counter++;
     if (!armed) {
         if (cell_count == 0) {
@@ -1416,7 +1428,8 @@ void tenKhzRoutine()
                 }
             }
         }
-        if (tenkhzcounter % ramp_divider == 0) {
+        if (ramp_count > ramp_divider) {
+          ramp_count = 0;
 #ifdef VOLTAGE_BASED_RAMP
             uint16_t voltage_based_max_change = map(battery_voltage, 800, 2200, 10, 1);
             if (average_interval > 200) {
@@ -1583,7 +1596,7 @@ void zcfoundroutine()
             enableCompInterrupts(); // enable interrupt
         }
     } else {
-       if (commutation_interval < POLLING_MODE_THRESHOLD) {
+       if (commutation_interval < polling_mode_changeover) {
             old_routine = 0;
             enableCompInterrupts(); // enable interrupt
         }
@@ -1842,15 +1855,20 @@ e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation
      }
 #endif
 #endif
-
 if(zero_crosses < 5){
-	  min_bemf_counts_up = TARGET_MIN_BEMF_COUNTS * 2;
-		min_bemf_counts_down = TARGET_MIN_BEMF_COUNTS * 2;
+    if(eepromBuffer.bi_direction){
+     min_bemf_counts_up = TARGET_MIN_BEMF_COUNTS + 1;
+     min_bemf_counts_down = TARGET_MIN_BEMF_COUNTS + 1;
+   }else{
+     min_bemf_counts_up = TARGET_MIN_BEMF_COUNTS * 2;
+     min_bemf_counts_down = TARGET_MIN_BEMF_COUNTS * 2;
+   }
 }else{
-	 min_bemf_counts_up = TARGET_MIN_BEMF_COUNTS;
-	min_bemf_counts_down = TARGET_MIN_BEMF_COUNTS;
+	  min_bemf_counts_up = TARGET_MIN_BEMF_COUNTS;
+	  min_bemf_counts_down = TARGET_MIN_BEMF_COUNTS;
 }
-        RELOAD_WATCHDOG_COUNTER();
+
+       RELOAD_WATCHDOG_COUNTER();
 
         if (eepromBuffer.variable_pwm == 1) {      // uses range defined by pwm frequency setting
             tim1_arr = map(commutation_interval, 96, 200, TIMER1_MAX_ARR / 2,
@@ -2003,7 +2021,11 @@ if(zero_crosses < 5){
 #ifdef ARTERY
             ADC_DMA_Callback();
             adc_ordinary_software_trigger_enable(ADC1, TRUE);
+    #ifdef USE_NTC
+            converted_degrees = getNTCDegrees(ADC_raw_ntc);
+    #else     
             converted_degrees = getConvertedDegrees(ADC_raw_temp);
+    #endif
 #endif
 #ifdef WCH
             startADCConversion( );

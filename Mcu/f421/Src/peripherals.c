@@ -41,6 +41,9 @@ void initCorePeripherals(void)
 #ifdef USE_LED_STRIP
     WS2812_Init();
 #endif
+#ifdef USE_RGB_LED
+    LED_GPIO_init();
+#endif 
 }
 
 void initAfterJump(void) { __enable_irq(); }
@@ -228,42 +231,6 @@ void UN_TIM_Init(void)
     IC_TIMER_REGISTER->ctrl1_bit.tmren = TRUE;
 }
 
-#ifdef USE_RGB_LED // has 3 color led
-void LED_GPIO_init()
-{
-    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
-
-    /* GPIO Ports Clock Enable */
-    LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOB);
-
-    LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_8);
-    LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_5);
-    LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_3);
-
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_8;
-    GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
-    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_5;
-    GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
-    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_3;
-    GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
-    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-    LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-}
-
-#endif
-
 void reloadWatchDogCounter()
 {
     WDT->cmd = WDT_CMD_RELOAD;
@@ -285,6 +252,42 @@ void resetInputCaptureTimer()
     IC_TIMER_REGISTER->cval = 0;
 }
 
+#ifdef USE_RGB_LED // has 3 color led
+void LED_GPIO_init()
+{
+    /* GPIO Ports Clock Enable */
+    crm_periph_clock_enable(CRM_GPIOA_PERIPH_CLOCK, TRUE);
+    crm_periph_clock_enable(CRM_GPIOB_PERIPH_CLOCK, TRUE);
+
+    gpio_mode_QUICK(RED_PORT, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, RED_PIN);
+
+    gpio_mode_QUICK(GREEN_PORT, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, GREEN_PIN);
+
+    gpio_mode_QUICK(BLUE_PORT, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, BLUE_PIN);    
+}
+
+void setIndividualRGBLed(uint8_t red, uint8_t green, uint8_t blue){
+
+  if(red > 0){   
+    RED_PORT->clr = RED_PIN;
+  }else{
+    RED_PORT->scr = RED_PIN;
+  }
+  if(green > 0){
+    GREEN_PORT->clr = GREEN_PIN;
+  }else{
+    GREEN_PORT->scr = GREEN_PIN;
+  }
+  if(blue > 0){
+    BLUE_PORT->clr = BLUE_PIN;
+  }else{
+    BLUE_PORT->scr = BLUE_PIN;;
+  }
+}
+
+#endif
+
+
 void enableCorePeripherals()
 {
     tmr_channel_enable(TMR1, TMR_SELECT_CHANNEL_1, TRUE);
@@ -297,12 +300,6 @@ void enableCorePeripherals()
     TMR1->ctrl1_bit.tmren = TRUE;
     TMR1->brk_bit.oen = TRUE;
     TMR1->swevt |= TMR_OVERFLOW_SWTRIG;
-#ifdef USE_RGB_LED
-    LED_GPIO_init();
-    GPIOB->scr = LL_GPIO_PIN_8; // turn on red
-    GPIOB->clr = LL_GPIO_PIN_5;
-    GPIOB->clr = LL_GPIO_PIN_3; //
-#endif
 
 #ifndef BRUSHED_MODE
     COM_TIMER->ctrl1_bit.tmren = TRUE;

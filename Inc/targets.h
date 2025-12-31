@@ -596,7 +596,6 @@
 #define HARDWARE_GROUP_AT_F
 #define USE_SERIAL_TELEMETRY
 #define USE_PA14_TELEMETRY
-#define PA6_NTC_ONLY
 #endif
 
 #ifdef F4A_AIO_F421
@@ -650,7 +649,6 @@
 #define HARDWARE_GROUP_AT_E
 #define USE_SERIAL_TELEMETRY
 #define USE_PA14_TELEMETRY
-#define PA6_NTC_ONLY
 #endif
 
 #ifdef F4A_RUSH_F421
@@ -671,7 +669,6 @@
 #define HARDWARE_GROUP_AT_E
 #define USE_SERIAL_TELEMETRY
 //#define USE_PA14_TELEMETRY
-#define PA6_NTC_ONLY
 #endif
 
 #ifdef F4A_EXTCOMP_F421

@@ -9,7 +9,6 @@ Usage:
     python generate_eeprom.py                        # Use local Inc/eeprom.json
     python generate_eeprom.py --url                  # Fetch from https://am32.ca/eeprom
     python generate_eeprom.py path/to/schema.json    # Use specified file
-    python generate_eeprom.py --offsets              # Generate offset constants to stdout
 """
 
 import json
@@ -169,25 +168,6 @@ def generate_header(schema: dict) -> str:
     return '\n'.join(lines)
 
 
-def generate_offsets_header(schema: dict) -> str:
-    """Generate a header with offset constants for validation."""
-    fields = schema['fields']
-
-    lines = []
-    lines.append(f"// AM32 EEPROM offset constants - AUTO-GENERATED")
-    lines.append(f"// Use these for compile-time validation")
-    lines.append("")
-    lines.append("#pragma once")
-    lines.append("")
-
-    for name, field in sorted(fields.items(), key=lambda x: x[1]['offset']):
-        const_name = ''.join(['_' + c.lower() if c.isupper() else c for c in name]).lstrip('_').upper()
-        lines.append(f"#define EEPROM_OFFSET_{const_name} {field['offset']}")
-
-    lines.append("")
-    return '\n'.join(lines)
-
-
 def main():
     # Parse arguments
     args = [a for a in sys.argv[1:] if not a.startswith('--')]
@@ -203,13 +183,10 @@ def main():
 
     schema = load_schema(source)
 
-    if '--offsets' in flags:
-        print(generate_offsets_header(schema))
-    else:
-        header_content = generate_header(schema)
-        with open(OUTPUT_FILE, 'w') as f:
-            f.write(header_content)
-        print(f"Generated {OUTPUT_FILE}")
+    header_content = generate_header(schema)
+    with open(OUTPUT_FILE, 'w') as f:
+        f.write(header_content)
+    print(f"Generated {OUTPUT_FILE}")
 
 
 if __name__ == '__main__':

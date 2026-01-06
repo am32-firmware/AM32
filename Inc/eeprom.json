@@ -43,7 +43,8 @@
       "type": "uint8",
       "name": "EEPROM Version",
       "description": "Layout revision number",
-      "readOnly": true
+      "readOnly": true,
+      "cName": "eeprom_version"
     },
 
     "bootloaderVersion": {
@@ -123,7 +124,8 @@
       "type": "bool",
       "name": "Disable Stick Calibration",
       "description": "Disable automatic throttle range calibration",
-      "minEepromVersion": 3
+      "minEepromVersion": 3,
+      "cName": "disable_stick_calibration"
     },
 
     "absoluteVoltageCutoff": {
@@ -134,6 +136,7 @@
       "description": "Fixed voltage cutoff threshold (when low voltage mode = Absolute)",
       "unit": "V",
       "minEepromVersion": 3,
+      "cName": "absolute_voltage_cutoff",
       "raw": {
         "min": 1,
         "max": 100
@@ -150,14 +153,21 @@
     "currentPidP": {
       "offset": 9,
       "size": 1,
-      "type": "uint8",
+      "type": "number",
       "name": "Current PID P",
-      "description": "Proportional gain for current control loop",
+      "description": "Proportional gain for current control loop (firmware applies factor of 2)",
       "minEepromVersion": 3,
       "cName": "current_P",
       "raw": {
         "min": 0,
         "max": 255
+      },
+      "display": {
+        "min": 0,
+        "max": 510,
+        "factor": 2,
+        "offset": 0,
+        "decimals": 0
       }
     },
 
@@ -166,7 +176,7 @@
       "size": 1,
       "type": "uint8",
       "name": "Current PID I",
-      "description": "Integral gain for current control loop",
+      "description": "Integral gain for current control loop (no conversion factor)",
       "minEepromVersion": 3,
       "cName": "current_I",
       "raw": {
@@ -178,14 +188,21 @@
     "currentPidD": {
       "offset": 11,
       "size": 1,
-      "type": "uint8",
+      "type": "number",
       "name": "Current PID D",
-      "description": "Derivative gain for current control loop",
+      "description": "Derivative gain for current control loop (firmware applies factor of 2)",
       "minEepromVersion": 3,
       "cName": "current_D",
       "raw": {
         "min": 0,
         "max": 255
+      },
+      "display": {
+        "min": 0,
+        "max": 510,
+        "factor": 2,
+        "offset": 0,
+        "decimals": 0
       }
     },
 
@@ -197,9 +214,10 @@
       "description": "Active braking duty cycle",
       "unit": "%",
       "minEepromVersion": 3,
+      "cName": "active_brake_power",
       "raw": {
-        "min": 1,
-        "max": 5
+        "min": 0,
+        "max": 10
       }
     },
 
@@ -278,7 +296,8 @@
       "size": 1,
       "type": "bool",
       "name": "Stuck Rotor Protection",
-      "description": "Stop motor if rotor is stuck"
+      "description": "Stop motor if rotor is stuck",
+      "cName": "stuck_rotor_protection"
     },
 
     "timingAdvance": {
@@ -328,6 +347,7 @@
       "name": "PWM Frequency",
       "description": "Base PWM switching frequency",
       "unit": "kHz",
+      "cName": "pwm_frequency",
       "versions": {
         "default": {
           "raw": {
@@ -351,6 +371,7 @@
       "name": "Startup Power",
       "description": "Power level during motor startup",
       "unit": "%",
+      "cName": "startup_power",
       "raw": {
         "min": 50,
         "max": 150
@@ -363,6 +384,7 @@
       "type": "number",
       "name": "Motor KV",
       "description": "Motor KV rating (RPM per volt)",
+      "cName": "motor_kv",
       "raw": {
         "min": 0,
         "max": 255
@@ -382,6 +404,7 @@
       "type": "uint8",
       "name": "Motor Poles",
       "description": "Number of motor magnetic poles",
+      "cName": "motor_poles",
       "raw": {
         "min": 2,
         "max": 36
@@ -391,9 +414,15 @@
     "brakeOnStop": {
       "offset": 28,
       "size": 1,
-      "type": "bool",
+      "type": "enum",
       "name": "Brake on Stop",
-      "description": "Apply brake when throttle is at minimum"
+      "description": "Braking behavior when throttle is at minimum",
+      "cName": "brake_on_stop",
+      "values": [
+        { "raw": 0, "name": "Off", "description": "No braking when stopped" },
+        { "raw": 1, "name": "Brake", "description": "Apply brake when throttle is at minimum" },
+        { "raw": 2, "name": "Active Brake", "description": "Active braking mode (requires arming)" }
+      ]
     },
 
     "stallProtection": {
@@ -401,7 +430,8 @@
       "size": 1,
       "type": "bool",
       "name": "Stall Protection",
-      "description": "Anti-stall protection during low-speed operation"
+      "description": "Anti-stall protection during low-speed operation",
+      "cName": "stall_protection"
     },
 
     "beepVolume": {
@@ -410,6 +440,7 @@
       "type": "uint8",
       "name": "Beep Volume",
       "description": "Startup beep volume level",
+      "cName": "beep_volume",
       "raw": {
         "min": 0,
         "max": 11
@@ -477,11 +508,11 @@
       "cName": "servo.neutral",
       "raw": {
         "min": 0,
-        "max": 256
+        "max": 255
       },
       "display": {
         "min": 1374,
-        "max": 1630,
+        "max": 1629,
         "factor": 1,
         "offset": 1374,
         "decimals": 0
@@ -584,6 +615,7 @@
       "type": "uint8",
       "name": "Drag Brake Strength",
       "description": "Brake strength when throttle released",
+      "cName": "drag_brake_strength",
       "raw": {
         "min": 1,
         "max": 10
@@ -653,6 +685,7 @@
       "type": "uint8",
       "name": "Sine Mode Power",
       "description": "Power level during sine mode startup",
+      "cName": "sine_mode_power",
       "raw": {
         "min": 1,
         "max": 10
@@ -665,6 +698,7 @@
       "type": "enum",
       "name": "Input Type",
       "description": "ESC input protocol",
+      "cName": "input_type",
       "values": [
         { "raw": 0, "name": "Auto", "description": "Automatically detect input protocol" },
         { "raw": 1, "name": "DShot", "description": "DShot digital protocol" },
@@ -717,7 +751,7 @@
       "cName": "can.esc_index",
       "raw": {
         "min": 0,
-        "max": 15
+        "max": 32
       }
     },
 
@@ -736,9 +770,14 @@
       "size": 1,
       "type": "uint8",
       "name": "CAN Telemetry Rate",
-      "description": "CAN telemetry transmission rate",
+      "description": "CAN telemetry transmission rate (Hz)",
+      "unit": "Hz",
       "minEepromVersion": 4,
-      "cName": "can.telem_rate"
+      "cName": "can.telem_rate",
+      "raw": {
+        "min": 0,
+        "max": 200
+      }
     },
 
     "canRequireZeroThrottle": {
@@ -757,8 +796,13 @@
       "type": "uint8",
       "name": "CAN Filter Hz",
       "description": "CAN input filter frequency",
+      "unit": "Hz",
       "minEepromVersion": 4,
-      "cName": "can.filter_hz"
+      "cName": "can.filter_hz",
+      "raw": {
+        "min": 0,
+        "max": 100
+      }
     },
 
     "canDebugRate": {
@@ -766,9 +810,14 @@
       "size": 1,
       "type": "uint8",
       "name": "CAN Debug Rate",
-      "description": "CAN debug message rate",
+      "description": "CAN debug message rate (Hz)",
+      "unit": "Hz",
       "minEepromVersion": 4,
-      "cName": "can.debug_rate"
+      "cName": "can.debug_rate",
+      "raw": {
+        "min": 0,
+        "max": 200
+      }
     },
 
     "canTermEnable": {

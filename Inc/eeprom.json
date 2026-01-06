@@ -462,7 +462,7 @@
       "type": "number",
       "name": "Servo Low Threshold",
       "description": "Minimum servo pulse width for zero throttle",
-      "unit": "µs",
+      "unit": "us",
       "cName": "servo.low_threshold",
       "raw": {
         "min": 0,
@@ -483,7 +483,7 @@
       "type": "number",
       "name": "Servo High Threshold",
       "description": "Maximum servo pulse width for full throttle",
-      "unit": "µs",
+      "unit": "us",
       "cName": "servo.high_threshold",
       "raw": {
         "min": 0,
@@ -504,7 +504,7 @@
       "type": "number",
       "name": "Servo Neutral",
       "description": "Servo pulse width for neutral position (3D mode)",
-      "unit": "µs",
+      "unit": "us",
       "cName": "servo.neutral",
       "raw": {
         "min": 0,

@@ -104,6 +104,9 @@ void SystemInit(void)
 	if (status) {
 		__asm volatile ("nop");
 	}
+
+	//Enable cache function
+	modifyReg32(&SYSCON->LPCAC_CTRL, SYSCON_LPCAC_CTRL_DIS_LPCAC(1), 0);
 }
 
 /*

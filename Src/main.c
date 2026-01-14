@@ -1,6 +1,3 @@
-#define USE_OVERRIDES
-
-
 #include "main.h"
 #include "ADC.h"
 #include "IO.h"
@@ -55,6 +52,8 @@ void zcfoundroutine(void);
 // enables two channels for brushed control 
 //#define GIMBAL_MODE     // also
 // sinusoidal_startup needs to be on, maps input to sinusoidal angle.
+
+//#define USE_OVERRIDES
 
 //===========================================================================
 //=============================  Defaults =============================
@@ -379,12 +378,15 @@ int32_t doPidCalculations(struct fastPID* pidnow, int actual, int target)
 
 void loadEEpromSettings()
 {
-//    read_flash_bin(eepromBuffer.buffer, eeprom_address, sizeof(eepromBuffer.buffer));
+    read_flash_bin(eepromBuffer.buffer, eeprom_address, sizeof(eepromBuffer.buffer));
 
 #ifdef USE_OVERRIDES
-    eepromBuffer.eeprom_version = 2;
-//    eepromBuffer.version.major = 1;
- //   eepromBuffer.version.minor = 23;
+//	eepromBuffer.reserved_0 = 3;
+//    eepromBuffer.eeprom_version = 2; //2;
+//    eepromBuffer.reserved_1 = 2;
+//    eepromBuffer.version.major = 4;
+//    eepromBuffer.version.minor = 5;
+
     eepromBuffer.comp_pwm = 1;
     eepromBuffer.variable_pwm = 0;
 
@@ -1577,11 +1579,9 @@ int main(void)
 {
     initCorePeripherals();
     checkDeviceInfo();
-//    save_flash_nolib(eepromBuffer.buffer, sizeof(eepromBuffer.buffer), eeprom_address);
     loadEEpromSettings();
     enableCorePeripherals();	//TODO set back
     initAfterJump();
-
 
     if (VERSION_MAJOR != eepromBuffer.version.major || VERSION_MINOR != eepromBuffer.version.minor || EEPROM_VERSION > eepromBuffer.eeprom_version) {
         eepromBuffer.version.major = VERSION_MAJOR;

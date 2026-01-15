@@ -132,10 +132,16 @@ void computeDshotDMA()
             if (dpulse[11] == 1) {
                 send_telemetry = 1;
             }
-            if(programming_mode > 0){  
-                if(programming_mode == 1){ // begin programming mode
-                    position = tocheck;    // eepromBuffer position
-                    programming_mode = 2;
+            if (programming_mode > 0) {
+                if (programming_mode == 1) { // begin programming mode
+                    if (tocheck < sizeof(eepromBuffer.buffer)) {
+                        position = tocheck;    // eepromBuffer position
+                        programming_mode = 2;
+                    } else {
+                        // Invalid position - reset to safe state and signal error
+                        programming_mode = 0;
+                        playBeaconTune3();  // Signal error with beep
+                    }
                     return;
                 }
                if(programming_mode == 2){
@@ -145,8 +151,11 @@ void computeDshotDMA()
                 }
                 if(programming_mode == 3){
                     if(tocheck == 37){  // commit new values to eeprom. must use save settings to make permanent.
-                    eepromBuffer.buffer[position] = new_byte;
-                    programming_mode = 0;
+                        // Safety check: verify position is still in bounds before write
+                        if (position < sizeof(eepromBuffer.buffer)) {
+                            eepromBuffer.buffer[position] = new_byte;
+                        }
+                        programming_mode = 0;
                   }
                 }
                 return; // don't process dshot signal when in programming mode

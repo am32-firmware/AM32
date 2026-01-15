@@ -69,6 +69,31 @@ uint8_t programming_mode;
 uint16_t position;
 uint8_t  new_byte;
 
+/**
+ * Decode and process DShot protocol data from DMA buffer.
+ *
+ * DShot is a digital protocol that encodes 16 bits per frame:
+ * - Bits 0-10: Throttle value (0-2047) or command (1-47)
+ * - Bit 11: Telemetry request flag
+ * - Bits 12-15: 4-bit CRC checksum
+ *
+ * This function:
+ * 1. Reads timer capture values from dma_buffer (populated by DMA from input pin)
+ * 2. Validates frame timing (frametime must be within expected range)
+ * 3. Decodes pulse widths to binary bits (pulse > half-frame-time = 1, else 0)
+ * 4. Verifies CRC checksum to detect transmission errors
+ * 5. Auto-detects inverted DShot signals (when not armed)
+ * 6. Handles programming mode for EEPROM configuration via DShot
+ * 7. Extracts throttle commands (48-2047) or special commands (1-47)
+ * 8. Manages EDT arming protocol
+ *
+ * Programming mode operates in 3 steps (command sequence):
+ * - Step 1: Receive EEPROM buffer position (0-191)
+ * - Step 2: Receive new byte value to write
+ * - Step 3: Commit on confirmation (value 37)
+ *
+ * Called from main loop when compute_dshot_flag is set by DMA complete interrupt.
+ */
 void computeDshotDMA()
 {
     dshot_frametime = dma_buffer[31] - dma_buffer[0];

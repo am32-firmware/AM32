@@ -100,15 +100,15 @@ void CTIMER0_IRQHandler(void)
 	//If this is the case, it must be that this is an invalid timeout in the first Dshot bit
 	//So if this is not the case, clear the timer interrupt as the timeout is valid
 	//Also check if the destination address is the first element of the dma_buffer
-//	if (!((CTIMER0->CR[1] > CTIMER0->CR[2]) && (DMA0->CH[DMA_CH_DshotPWM].TCD_DADDR == (uint32_t)&dma_buffer))) {
-////		resetInputCaptureTimer();
-//		CTIMER0->TC = 0;
-//	}
-//	else
-//	{
-//		//TODO remove this
-//		GPIO3->PTOR = (1 << 28);	//ENC_I
-//	}
+	if (!((CTIMER0->CR[1] > CTIMER0->CR[2]) && (DMA0->CH[DMA_CH_DshotPWM].TCD_DADDR == (uint32_t)&dma_buffer))) {
+//		resetInputCaptureTimer();
+		CTIMER0->TC = 0;
+	}
+	else
+	{
+		//TODO remove this
+		GPIO3->PTOR = (1 << 28);	//ENC_I
+	}
 
 	//Set the major loop count and addresses again to prevent unintended DMA request from CTIMER match register
 	//Set current and beginning major loop count to 8
@@ -132,11 +132,11 @@ void CTIMER0_IRQHandler(void)
 	//This is because the DMA triggers after seeing a rising and falling or a falling and rising after each other.
 	//This means that the timeout could happen in between the first bit of a Dshot frame,
 	//causing the first rising/falling time to be missing.
-	modifyReg32(&CTIMER0->TC, CTIMER_TC_TCVAL_MASK, CTIMER_TC_TCVAL(CTIMER0->CR[1]));
+//	modifyReg32(&CTIMER0->TC, CTIMER_TC_TCVAL_MASK, CTIMER_TC_TCVAL(CTIMER0->CR[1]));
 
 	//Check for inverted Dshot
-//	if (!armed && dshot) {
-	if (!armed) {
+	if (!armed && dshot) {
+//	if (!armed) {
 		if (is_inverted_dshot == 0) {
 			//Check if signal pin is high
 			if (getInputPinState()) {
@@ -277,6 +277,9 @@ void DMA_CH2_IRQHandler(void)
 	modifyReg32(&DMA0->CH[DMA_CH_UART].CH_CSR, DMA_CH_CSR_DONE_MASK, DMA_CH_CSR_DONE(1));
 }
 
+/*
+ * @brief 	LPSPI interrupt after SPI transfer complete
+ */
 void LPSPI0_IRQHandler(void)
 {
 	//Clear Transfer complete flag
@@ -284,9 +287,9 @@ void LPSPI0_IRQHandler(void)
 
 	//Set PWM/Dshot input pin to timer capture/compare input
 	//Enable input buffer and disable pull-up/down resistor
-	modifyReg32(&INPUT_PIN_PORT->PCR[INPUT_PIN],
-			PORT_PCR_MUX_MASK | PORT_PCR_IBE_MASK | PORT_PCR_PE_MASK | PORT_PCR_PS_MASK,
-			PORT_PCR_MUX(INPUT_PIN_ALT_FUNC) | PORT_PCR_IBE(1) | PORT_PCR_PE(0) | PORT_PCR_PS(1));
+//	modifyReg32(&INPUT_PIN_PORT->PCR[INPUT_PIN],
+//			PORT_PCR_MUX_MASK | PORT_PCR_IBE_MASK | PORT_PCR_PE_MASK | PORT_PCR_PS_MASK,
+//			PORT_PCR_MUX(INPUT_PIN_ALT_FUNC) | PORT_PCR_IBE(1) | PORT_PCR_PE(0) | PORT_PCR_PS(1));
 
 //	out_put = 0;
 
@@ -303,8 +306,8 @@ void LPSPI0_IRQHandler(void)
 	//Reset timer and enable interrupt on Match1 event
 //	modifyReg32(&CTIMER0->MCR, CTIMER_MCR_MR1I_MASK | CTIMER_MCR_MR1R_MASK, CTIMER_MCR_MR1I(1));
 
-//	transfercomplete();
-//
+	transfercomplete();
+
 //	input_ready = 1;
 
 //	receiveDshotDma();

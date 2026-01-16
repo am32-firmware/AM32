@@ -31,8 +31,8 @@ void receiveDshotDma()
 		CTIMER0->MR[1] = 10000 / (CTIMER0->PR + 1);
 
 		//Reset timer and enable interrupt on Match1 event
-//		modifyReg32(&CTIMER0->MCR, 0, CTIMER_MCR_MR1I(1) | CTIMER_MCR_MR1R(1));
-		modifyReg32(&CTIMER0->MCR, CTIMER_MCR_MR1I_MASK | CTIMER_MCR_MR1R_MASK, CTIMER_MCR_MR1I(1));
+		modifyReg32(&CTIMER0->MCR, 0, CTIMER_MCR_MR1I(1) | CTIMER_MCR_MR1R(1));
+//		modifyReg32(&CTIMER0->MCR, CTIMER_MCR_MR1I_MASK | CTIMER_MCR_MR1R_MASK, CTIMER_MCR_MR1I(1));
 
 	} else {
 		//Disable interrupt and reset on Match1 event

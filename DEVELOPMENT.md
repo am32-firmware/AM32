@@ -8,11 +8,19 @@ The project supports **ARM (STM32 / GD32 / AT32)** and **WCH RISC-V (CH32)** mic
 
 - Install Git, Cmake, Ninja, Python3
 
+For ARM targets
+
 ```bash
 git clone https://github.com/am32-firmware/AM32
 cd AM32
 cmake --preset arm
 cmake --build --preset build-arm
+```
+
+for WCH RISCV targets
+```bash
+cmake --preset wch-riscv
+cmake --build --preset build-wch
 ```
 
 ## 1. How the Build System Works
@@ -61,11 +69,16 @@ The build system relies on strict naming rules.
 
 | MCU  | File                                        |
 | ---- | ------------------------------------------- |
+| E230 | `cmake/targets/arm/target_e230.cmake`       |
+| F031 | `cmake/targets/arm/target_f031.cmake`       |
+| F051 | `cmake/targets/arm/target_f051.cmake`       |
 | F415 | `cmake/targets/arm/target_f415.cmake`       |
+| F421 | `cmake/targets/arm/target_f421.cmake`       |
+| G031 | `cmake/targets/arm/target_g031.cmake`       |
+| G071 | `cmake/targets/arm/target_g071.cmake`       |
 | G431 | `cmake/targets/arm/target_g431.cmake`       |
+| L431 | `cmake/targets/arm/target_l431.cmake`       |
 | V203 | `cmake/targets/wch_riscv/target_v203.cmake` |
-
-The `FAMILY` argument **must match the suffix** used in `targets.h`.
 
 ### CAN targets
 
@@ -281,28 +294,7 @@ This guarantees traceability and prevents confusion with unofficial builds.
 
 ---
 
-## 11. Project Structure
-
-```
-CMakeLists.txt              Main entry point
-CMakePresets.json           ARM / WCH environments
-cmake/
- ├─ manage_tools.cmake      Toolchain download logic
- ├─ modules/
- │   ├─ TargetFactory.cmake Core target generation
- │   ├─ TargetUtils.cmake  Helpers (sources, parsing)
- │   ├─ VersionUtils.cmake Version & git handling
- │   └─ VscodeGenerator.cmake Debug config generation
- └─ targets/
-     ├─ arm/
-     └─ wch_riscv/
-Inc/targets.h               Master board list
-Mcu/                         MCU-specific code
-```
-
----
-
-## 12. How to Add a New Board
+## 11. How to Add a New Board
 
 1. Edit `Inc/targets.h`
 2. Add a board definition containing the MCU suffix:
@@ -322,7 +314,7 @@ CMake will automatically generate the new target.
 
 ---
 
-## 13. How to Add a New MCU Family
+## 12. How to Add a New MCU Family
 
 1. Create `Mcu/f722/`
 
@@ -331,7 +323,7 @@ CMake will automatically generate the new target.
    * startup code
    * drivers
    * `ldscript.ld`
-   * optional `ldscript_CAN.ld`
+   * optional `ldscript_CAN.ld` for CAN support
    * SVD file
 
 3. Create `cmake/targets/arm/target_f722.cmake`
@@ -340,7 +332,7 @@ CMake will automatically generate the new target.
 
 ---
 
-## 14. How to Add a New Architecture
+## 13. How to Add a New Architecture
 
 1. Create toolchain file:
 

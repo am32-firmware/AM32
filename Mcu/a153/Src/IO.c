@@ -24,14 +24,13 @@ void receiveDshotDma()
 
 	if (buffersize > 3) {
 		//Resets PWM/Dshot timer to 0. Needed for Dshot to work properly.
-		resetInputCaptureTimer();
-//		CTIMER0->TC = 0;
+		CTIMER0->TC = 0;
 
 		//Set match1 value to higher then the minimum Dshot300 frame time which is around 53us, so take at least 53us.
-		CTIMER0->MR[1] = 10000 / (CTIMER0->PR + 1);
+		//Set timeout value to 5500 clock ticks at Dshot300 (Prescaler is 1 then)
+		CTIMER0->MR[1] = 11000 / (CTIMER0->PR + 1);
 
 		//Reset timer and enable interrupt on Match1 event
-//		modifyReg32(&CTIMER0->MCR, 0, CTIMER_MCR_MR1I(1) | CTIMER_MCR_MR1R(1));
 		modifyReg32(&CTIMER0->MCR, CTIMER_MCR_MR1I_MASK | CTIMER_MCR_MR1R_MASK, CTIMER_MCR_MR1I(1));
 
 	} else {
@@ -69,12 +68,6 @@ void sendDshotDma()
 	//Set output variable for state machine
 	out_put = 1;
 
-	//Reset Dshot timer to prevent a timeout from happening during Dshot sending
-//	resetInputCaptureTimer();
-
-	//Disable interrupt and reset on Match1 event
-//	modifyReg32(&CTIMER0->MCR, CTIMER_MCR_MR1I_MASK | CTIMER_MCR_MR1R_MASK, 0);
-
 	//Change Dshot pin to SPI0_SDI
 	modifyReg32(&INPUT_PIN_PORT->PCR[INPUT_PIN],
 			PORT_PCR_MUX_MASK | PORT_PCR_IBE_MASK | PORT_PCR_PE_MASK | PORT_PCR_PS_MASK,
@@ -111,9 +104,6 @@ uint8_t getInputPinState()
 			PORT_PCR_MUX_MASK | PORT_PCR_IBE_MASK | PORT_PCR_PE_MASK | PORT_PCR_PS_MASK,
 			PORT_PCR_MUX(0) | PORT_PCR_IBE(1) | PORT_PCR_PE(0) | PORT_PCR_PS(1));
 
-	//Set INPUT_PIN to input
-//	modifyReg32(&INPUT_PIN_GPIO->PDDR, (1 << INPUT_PIN), 0);
-
 	//Read INPUT_PIN value
 	uint8_t readPinData = INPUT_PIN_GPIO->PDR[INPUT_PIN];
 
@@ -125,12 +115,6 @@ uint8_t getInputPinState()
 
 	return readPinData;
 }
-
-//void setInputPolarityRising()
-//{
-//    LL_TIM_IC_SetPolarity(IC_TIMER_REGISTER, IC_TIMER_CHANNEL,
-//        LL_TIM_IC_POLARITY_RISING);
-//}
 
 void setInputPullDown()
 {
@@ -147,10 +131,6 @@ void setInputPullUp()
 			PORT_PCR_PE_MASK | PORT_PCR_PS_MASK,
 			PORT_PCR_PE(1) | PORT_PCR_PS(1));
 }
-
-//void enableHalfTransferInt() {
-//	LL_DMA_EnableIT_HT(DMA1, INPUT_DMA_CHANNEL);
-//}
 
 void setInputPullNone()
 {

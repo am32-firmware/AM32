@@ -90,13 +90,10 @@ void initDshotPWMTimer(void)
 	CTIMER0->MR[0] = 0;
 
 	//Set match1 value to higher then the minimum Dshot300 frame time which is around 53us, so take at least 53us.
-	//Functional clock is 96MHz. So Dshot300 frame is around 5000 clock ticks.
+	//Functional clock is 96MHz. So Dshot300 frame is around 5000 clock ticks. So set timeout value at 5500 clock ticks (57us).
 	//Set match event to trigger at twice the frame time.
 	//And correct for prescaler.
-	CTIMER0->MR[1] = 10000 / (CTIMER0->PR + 1);
-
-	//Reset timer and enable interrupt on Match1 event
-//	modifyReg32(&CTIMER0->MCR, 0, CTIMER_MCR_MR1I(1) | CTIMER_MCR_MR1R(1));
+	CTIMER0->MR[1] = 11000 / (CTIMER0->PR + 1);
 
 	//Enable interrupt on Match1 event
 	modifyReg32(&CTIMER0->MCR, 0, CTIMER_MCR_MR1I(1));
@@ -110,16 +107,6 @@ void initDshotPWMTimer(void)
 	modifyReg32(&CTIMER0->CTCR,
 			CTIMER_CTCR_ENCC_MASK | CTIMER_CTCR_SELCC_MASK,
 			CTIMER_CTCR_ENCC(1) | CTIMER_CTCR_SELCC(5));
-
-	//Configure capture control register so capture value register is loaded on CR1 falling edge and CR2 rising edge
-//	modifyReg32(&CTIMER0->CCR,
-//			CTIMER_CCR_CAP2RE_MASK | CTIMER_CCR_CAP1FE_MASK,
-//			CTIMER_CCR_CAP2RE(1) | CTIMER_CCR_CAP1FE(1));
-//
-//	//Clear timer counter on capture channel 2 rising edge
-//	modifyReg32(&CTIMER0->CTCR,
-//			CTIMER_CTCR_ENCC_MASK | CTIMER_CTCR_SELCC_MASK,
-//			CTIMER_CTCR_ENCC(1) | CTIMER_CTCR_SELCC(4));
 
 	//Enable interrupt
 	__NVIC_SetPriority(CTIMER0_IRQn, 1);	//set interrupt priority to 1
@@ -158,19 +145,12 @@ void initComTimer(void)
 
 	//Enable reset on match0 event.
 	//Do not yet enable interrupt on match0 event, as this causes the commutation to start and stagnate, drawing lots of current!
-//	modifyReg32(&CTIMER1->MCR,
-//			CTIMER_MCR_MR0R_MASK | CTIMER_MCR_MR0I_MASK,
-//			CTIMER_MCR_MR0R(1) | CTIMER_MCR_MR0I(1));
 	modifyReg32(&CTIMER1->MCR,
 				CTIMER_MCR_MR0R_MASK | CTIMER_MCR_MR0I_MASK,
 				CTIMER_MCR_MR0R(1));
 
 	//Set shadow match0 event at 30Hz
-//	CTIMER1->MSR[0] = 65535;
 	CTIMER1->MR[0] = 65535;
-
-	//Reloads match register with shadow register when counter is reset to 0
-//	modifyReg32(&CTIMER1->MCR, CTIMER_MCR_MR0RL_MASK, CTIMER_MCR_MR0RL(1));
 
 	//Enable interrupt
 	__NVIC_SetPriority(CTIMER1_IRQn, 0);	//set interrupt priority to 0

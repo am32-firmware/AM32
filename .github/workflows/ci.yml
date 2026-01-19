@@ -1,0 +1,170 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # -----------------------------------------------------------------------------
+  # JOB 1: MATRIX GENERATOR
+  # Queries CMake to see which targets are valid and active.
+  # -----------------------------------------------------------------------------
+  setup-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+            submodules: false # Don't fetch submodules here (saves bandwidth/time)
+            fetch-depth: 1    # Only fetch the latest commit
+
+      # mocking toolchain manager to prevent fetching all the havy ARM and risc toolchain - not requried to build targets matrix
+      - name: Mock Toolchain Manager
+        run: echo "" > cmake/manage_tools.cmake
+
+      - name: Generate Target Matrix
+        id: set-matrix
+        run: |
+          python3 - << 'EOF'
+          import subprocess
+          import json
+          import os
+
+          # Configuration: Define your presets here
+          presets = [
+              {"name": "arm",   "configure": "arm",       "build": "build-arm"},
+              {"name": "riscv", "configure": "wch-riscv", "build": "build-wch"}
+          ]
+
+          targets = []
+          print("--- Querying CMake for Targets ---")
+
+          for p in presets:
+              print(f"Checking preset: {p['name']}...")
+              
+              # 1. Run CMake (Dry Run)
+              # We pass -DCMAKE_C_COMPILER=gcc to force using the pre-installed system compiler.
+              # This prevents CMake from erroring out if your specific cross-compiler isn't downloaded yet.
+              # Here it doesn't matter as we simply grabbing parsed targets from log only.
+              cmd = [
+                  "cmake", "--preset", p['configure'],
+                  "-DCMAKE_TOOLCHAIN_FILE=", # this will skip toolchain setting from presets 
+                  "-DCMAKE_C_COMPILER=gcc", 
+                  "-DCMAKE_ASM_COMPILER=gcc"
+              ]
+              
+              try:
+                  # Capture both stdout and stderr
+                  result = subprocess.run(cmd, capture_output=True, text=True)
+                  
+                  # 2. Parse Output for our "Beacon"
+                  # We look for lines containing: "TARGET:BOARD_NAME"
+                  for line in result.stdout.splitlines():
+                      if "TARGET:" in line:
+                          parts = line.split("TARGET:")
+                          if len(parts) > 1:
+                              board_name = parts[1].strip()
+                              
+                              # Avoid duplicates if multiple presets somehow print the same target
+                              if not any(t['name'] == board_name for t in targets):
+                                  print(f"Found: {board_name} ({p['name']})")
+                                  targets.append({
+                                      "name": board_name,
+                                      "configure": p['configure'],
+                                      "build_preset": p['build']
+                                  })
+                              
+              except Exception as e:
+                  print(f"Error running CMake for {p['name']}: {e}")
+
+          if not targets:
+              print("Error: No targets found! Check CMake logs for 'TARGET:' messages.")
+              exit(1)
+
+          # 3. Output JSON
+          matrix_json = json.dumps({"include": targets})
+          print(f"Total Targets: {len(targets)}")
+          
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"matrix={matrix_json}")
+          EOF
+
+  # -----------------------------------------------------------------------------
+  # JOB 2: THE BUILD
+  # -----------------------------------------------------------------------------
+  build:
+    needs: setup-matrix
+    name: AM32_${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.setup-matrix.outputs.matrix) }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with: { submodules: recursive }
+      
+      - name: Install Tools
+        run: sudo apt-get update && sudo apt-get install -y ninja-build cmake python3
+
+      # Reuse the cache to speed up tool installation across 50+ jobs
+      - name: Restore Tools Cache
+        uses: actions/cache@v4
+        with:
+          path: tools/
+          key: ${{ runner.os }}-am32-tools-${{ hashFiles('cmake/manage_tools.cmake') }}
+          restore-keys: ${{ runner.os }}-am32-tools-
+
+      - name: Setup toolset
+        run: cmake -P cmake/manage_tools.cmake
+
+      # CALCULATE VERSION 
+      # Tag -> v2.20, Commit -> Short Hash (a1b2c3d)
+      - name: Determine Version
+        id: version
+        run: |
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/}
+          else
+            VERSION=$(git rev-parse --short HEAD)
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Computed version suffix: $VERSION"
+
+      - name: Configure
+        run: cmake --preset ${{ matrix.configure }}
+
+      - name: Build Target
+        run: cmake --build --preset ${{ matrix.build_preset }} --target ${{ matrix.name }}
+
+      # RENAME & FLATTEN
+      # Finds the CMake output (AM32_TARGET_X.XX.hex)
+      # Renames it to AM32_TARGET_GITHASH.hex for clarity in CI artifacts
+      - name: Prepare Artifact
+        run: |
+          mkdir -p staging
+          
+          # Find the generated hex file
+          HEX_FILE=$(find build -name "*.hex" | head -n 1)
+          
+          if [ -z "$HEX_FILE" ]; then
+            echo "Error: No .hex file found!"
+            exit 1
+          fi
+          
+          # New Name: AM32_TARGET_GITHASH.hex
+          NEW_NAME="AM32_${{ matrix.name }}_${{ env.VERSION }}.hex"
+          
+          cp "$HEX_FILE" "staging/$NEW_NAME"
+          echo "Prepared: staging/$NEW_NAME"
+
+      # UPLOAD
+      # Result: A zip file named AM32_TARGET_VER.hex.zip containing ONE file.
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AM32_${{ matrix.name }}_${{ env.VERSION }}.hex
+          path: staging/*.hex

@@ -1,7 +1,6 @@
 obj/
 downloads/
-tools/
-.vscode
+tools/*
 Keil_Projects/*.uvgui.*
 Keil_Projects/*.uvguix.*
 Keil_Projects/Objects
@@ -15,5 +14,36 @@ Keil_Projects/Listings
 *~
 *.map
 *.o
+*.asm
 .DS_Store
-.vscode/settings.json
+
+# CMake Build Folders
+build/
+build_arm/
+build_riscv/
+build_all/
+cmake-build-*/
+
+# CMake Generated Files
+compile_commands.json
+.ninja_log
+.ninja_deps
+CMakeCache.txt
+CMakeFiles/
+*.cmake
+!cmake/*.cmake
+!cmake/modules/*.cmake
+!cmake/targets/arm/*.cmake
+!cmake/targets/wch_riscv/*.cmake
+!cmake/toolchains/*.cmake
+
+# IDE Files
+.vscode/*
+!.vscode/tasks.json
+!.vscode/extensions.json
+!.vscode/settings.json 
+# Note: We usually ignore launch.json because it is now auto-generated!
+.vscode/launch.json
+
+!tools/scripts
+!tools/openocd-at32f421.cfg

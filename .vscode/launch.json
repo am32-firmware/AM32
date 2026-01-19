@@ -1,68 +1,145 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-      // STLink configuration
-      {
-        "name": "AM32 STLink",
-        "cwd": "${workspaceFolder}",
-        "executable": "${workspaceFolder}/obj/debug.elf",
-        "liveWatch": {
-            "enabled": true,
-            "samplesPerSecond": 4,
-	},
-	"svdFile": "obj/debug.svd",
-        "request": "launch",
-        "type": "cortex-debug",
-        "servertype": "openocd",
-	      "configFiles": [
-	    "${workspaceFolder}/obj/openocd.cfg",
-        ],
-	      "showDevDebugOutput": "none",
-        "osx": {
-            "serverpath": "${workspaceFolder}/tools/macos/openocd/bin/openocd",
-            "armToolchainPath": "${workspaceFolder}/tools/macos/xpack-arm-none-eabi-gcc-10.3.1-2.3/bin"
+        {
+            "name": "Debug GD32 E230",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "executable": "${command:cmake.launchTargetPath}",
+            "serverpath": "/Users/marcinczeczko/Private/drones/AM32/tools/openocd-arm/bin/openocd",
+            "gdbPath": "/Users/marcinczeczko/Private/drones/AM32/tools/gcc-arm/bin/arm-none-eabi-gdb",
+            "configFiles": [ "${workspaceFolder}//Users/marcinczeczko/Private/drones/AM32/Mcu/e230/openocd.cfg" ],
+            "svdFile": "${workspaceFolder}/Mcu/e230/GD32E230.svd",
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": "none"
         },
-        "linux": {
-            "serverpath": "${workspaceFolder}/tools/linux/openocd/bin/openocd",
-            "armToolchainPath": "${workspaceFolder}/tools/linux/xpack-arm-none-eabi-gcc-10.3.1-2.3/bin"
+        {
+            "name": "Debug STM32 F031",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "executable": "${command:cmake.launchTargetPath}",
+            "serverpath": "/Users/marcinczeczko/Private/drones/AM32/tools/openocd-arm/bin/openocd",
+            "gdbPath": "/Users/marcinczeczko/Private/drones/AM32/tools/gcc-arm/bin/arm-none-eabi-gdb",
+            "configFiles": [ "${workspaceFolder}//Users/marcinczeczko/Private/drones/AM32/Mcu/f031/openocd.cfg" ],
+            "svdFile": "${workspaceFolder}/Mcu/f031/STM32F0x1.svd",
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": "none"
         },
-        "windows": {
-            "serverpath": "${workspaceFolder}\\tools\\windows\\openocd\\bin\\openocd",
-            "armToolchainPath": "${workspaceFolder}\\tools\\windows\\xpack-arm-none-eabi-gcc-10.3.1-2.3\\bin"
+        {
+            "name": "Debug STM32 F051",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "executable": "${command:cmake.launchTargetPath}",
+            "serverpath": "/Users/marcinczeczko/Private/drones/AM32/tools/openocd-arm/bin/openocd",
+            "gdbPath": "/Users/marcinczeczko/Private/drones/AM32/tools/gcc-arm/bin/arm-none-eabi-gdb",
+            "configFiles": [ "${workspaceFolder}//Users/marcinczeczko/Private/drones/AM32/Mcu/f051/openocd.cfg" ],
+            "svdFile": "${workspaceFolder}/Mcu/f051/STM32F0x1.svd",
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": "none"
+        },
+        {
+            "name": "Debug AT32 F415",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "executable": "${command:cmake.launchTargetPath}",
+            "serverpath": "/Users/marcinczeczko/Private/drones/AM32/tools/openocd-arm/bin/openocd",
+            "gdbPath": "/Users/marcinczeczko/Private/drones/AM32/tools/gcc-arm/bin/arm-none-eabi-gdb",
+            "configFiles": [ "${workspaceFolder}//Users/marcinczeczko/Private/drones/AM32/Mcu/f415/openocd.cfg" ],
+            "svdFile": "${workspaceFolder}/Mcu/f415/AT32F415xx_v2.svd",
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": "none"
+        },
+        {
+            "name": "Debug AT32 F421",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "executable": "${command:cmake.launchTargetPath}",
+            "serverpath": "/Users/marcinczeczko/Private/drones/AM32/tools/openocd-arm/bin/openocd",
+            "gdbPath": "/Users/marcinczeczko/Private/drones/AM32/tools/gcc-arm/bin/arm-none-eabi-gdb",
+            "configFiles": [ "${workspaceFolder}//Users/marcinczeczko/Private/drones/AM32/Mcu/f421/openocd.cfg" ],
+            "svdFile": "${workspaceFolder}/Mcu/f421/AT32F421xx_v2.svd",
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": "none"
+        },
+        {
+            "name": "Debug STM32 G031",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "executable": "${command:cmake.launchTargetPath}",
+            "serverpath": "/Users/marcinczeczko/Private/drones/AM32/tools/openocd-arm/bin/openocd",
+            "gdbPath": "/Users/marcinczeczko/Private/drones/AM32/tools/gcc-arm/bin/arm-none-eabi-gdb",
+            "configFiles": [ "${workspaceFolder}//Users/marcinczeczko/Private/drones/AM32/Mcu/g031/openocd.cfg" ],
+            "svdFile": "${workspaceFolder}/Mcu/g031/STM32F0x1.svd",
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": "none"
+        },
+        {
+            "name": "Debug STM32 G071",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "executable": "${command:cmake.launchTargetPath}",
+            "serverpath": "/Users/marcinczeczko/Private/drones/AM32/tools/openocd-arm/bin/openocd",
+            "gdbPath": "/Users/marcinczeczko/Private/drones/AM32/tools/gcc-arm/bin/arm-none-eabi-gdb",
+            "configFiles": [ "${workspaceFolder}//Users/marcinczeczko/Private/drones/AM32/Mcu/g071/openocd.cfg" ],
+            "svdFile": "${workspaceFolder}/Mcu/g031/STM32G071.svd",
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": "none"
+        },
+        {
+            "name": "Debug STM32 G431",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "executable": "${command:cmake.launchTargetPath}",
+            "serverpath": "/Users/marcinczeczko/Private/drones/AM32/tools/openocd-arm/bin/openocd",
+            "gdbPath": "/Users/marcinczeczko/Private/drones/AM32/tools/gcc-arm/bin/arm-none-eabi-gdb",
+            "configFiles": [ "${workspaceFolder}//Users/marcinczeczko/Private/drones/AM32/Mcu/g431/openocd.cfg" ],
+            "svdFile": "${workspaceFolder}/Mcu/g431/STM32G431xx.svd",
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": "none"
+        },
+        {
+            "name": "Debug STM32 L431",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "executable": "${command:cmake.launchTargetPath}",
+            "serverpath": "/Users/marcinczeczko/Private/drones/AM32/tools/openocd-arm/bin/openocd",
+            "gdbPath": "/Users/marcinczeczko/Private/drones/AM32/tools/gcc-arm/bin/arm-none-eabi-gdb",
+            "configFiles": [ "${workspaceFolder}//Users/marcinczeczko/Private/drones/AM32/Mcu/l431/openocd.cfg" ],
+            "svdFile": "${workspaceFolder}/Mcu/l431/STM32L4x1.svd",
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": "none"
+        },
+        {
+            "name": "Debug CH32V203 (WCH RISC-V)",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "executable": "${command:cmake.launchTargetPath}",
+            "serverpath": "/Users/marcinczeczko/Private/drones/AM32/tools/openocd-wch-riscv/bin/openocd",
+            "gdbPath": "/Users/marcinczeczko/Private/drones/AM32/tools/gcc-wch-riscv/bin/riscv-none-embed-gdb",
+            "configFiles": [ "${workspaceFolder}//Users/marcinczeczko/Private/drones/AM32/Mcu/v203/openocd.cfg" ],
+            "svdFile": "${workspaceFolder}/Mcu/v203/CH32V203xx.svd",
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": "none"
         }
-      },
-
-      // JLink configuration
-      {
-        "type": "cortex-debug",
-        "request": "launch",
-        "name": "AM32 JLink",
-	"svdFile": "obj/debug.svd",
-	"cwd": "${workspaceRoot}",
-	      "device" : "-AT32F421K8U7",
-        "osx": {
-            "gdbPath": "${workspaceRoot}/tools/macos/xpack-arm-none-eabi-gcc-10.3.1-2.3/bin/arm-none-eabi-gdb"
-        },
-        "linux": {
-            "gdbPath": "${workspaceRoot}/tools/linux/xpack-arm-none-eabi-gcc-10.3.1-2.3/bin/arm-none-eabi-gdb"
-        },
-        "windows": {
-            "gdbPath": "${workspaceRoot}\\tools\\windows\\xpack-arm-none-eabi-gcc-10.3.1-2.3\\bin\\arm-none-eabi-gdb"
-        },
-        "executable": "${workspaceRoot}/obj/debug.elf",
-	      "showDevDebugOutput": "raw",
-        "servertype" : "jlink",
-        "swoConfig": {
-          "enabled": false,
-        },
-        "serialNumber": "", 
-        "liveWatch": {
-          "enabled": true,
-          "samplesPerSecond": 4
-        }
-      }
     ]
-  }
+}

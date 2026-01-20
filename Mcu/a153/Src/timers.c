@@ -292,8 +292,11 @@ void enableTenKHzTimer(void)
 inline void resetInputCaptureTimer(void)
 {
 	//Reset timer counter
+	//Synchronously resets Timer Counter and Prescaler after next positive edge of CTIMER function clock.
+	//So, delay at least one operation when CPU clock is 96MHz
 	modifyReg32(&CTIMER0->TCR, 0, CTIMER_TCR_CRST(1));
-	delayMicros(2);
+//	delayMicros(2);
+	__asm volatile ("nop");
 	modifyReg32(&CTIMER0->TCR, CTIMER_TCR_CRST_MASK, 0);
 }
 

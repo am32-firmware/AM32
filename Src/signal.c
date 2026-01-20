@@ -132,11 +132,16 @@ void transfercomplete()
 #endif
 
     if (inputSet == 0) {
+		//TODO remove this
+//		GPIO3->PTOR = (1 << 27);	//ENC_A
+
         detectInput();
         receiveDshotDma();
         return;
     }
     if (inputSet == 1) {
+    	//TODO remove this
+//    	GPIO3->PTOR = (1 << 28);	//ENC_I
 
         if (dshot_telemetry) {
             if (out_put) {

@@ -232,10 +232,6 @@ void initDMA_SPI(void)
 
 	//Freeze clock configuration registers access
 	modifyReg32(&SYSCON->CLKUNLOCK, 0, SYSCON_CLKUNLOCK_UNLOCK(1));
-
-	//Set DMA destination address to LPSPI0 Transmit Data register
-
-	//Set DMA source address to GCR buffer
 }
 
 /*
@@ -268,7 +264,7 @@ void enableDMA_DshotPWM(void)
 	//Clear DMA channel 0 interrupt flag
 	modifyReg32(&DMA0->CH[DMA_CH_DshotPWM].CH_INT, 0, DMA_CH_INT_INT(1));
 
-//	//Enable DMA hardware request
+	//Enable DMA hardware request
 	modifyReg32(&DMA0->CH[DMA_CH_DshotPWM].CH_CSR, DMA_CH_CSR_ERQ_MASK, DMA_CH_CSR_ERQ(1));
 
 }
@@ -297,20 +293,7 @@ void doDshotCorrection(void)
 {
 	//If larger than 3 it must be Dshot. PWM input does not need correction
 	if (buffersize > 3) {
-		//TODO remove this
-//		volatile uint32_t dshot_time_diffs[32];
-//		volatile uint32_t decoded_dshot_data[32];
-//		for (int i = 0; i < 32; i++) {
-//			dshot_time_diffs[i] = dma_buffer[(i << 1) + 1] - dma_buffer[(i << 1)];
-//			decoded_dshot_data[i] = dshot_time_diffs[i] > 38;
-//		}
-
 		int sum = dma_buffer[1];
-
-		//TODO remove this
-//		sum = decoded_dshot_data[1];
-//		sum = dma_buffer[1];
-
 		int temp_sum = sum;
 
 		for (int i = 1; i < (buffersize / 2); i++) {

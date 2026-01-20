@@ -64,12 +64,6 @@ void save_flash_nolib(uint8_t *data, int length, uint32_t add){
 		__asm volatile ("nop");
 	}
 
-//	//Clear cache
-//	modifyReg32(&SYSCON->LPCAC_CTRL, 0, SYSCON_LPCAC_CTRL_CLR_LPCAC(1));
-//
-//	//Unclear cache
-//	modifyReg32(&SYSCON->LPCAC_CTRL, SYSCON_LPCAC_CTRL_CLR_LPCAC(1), 0);
-
 	//Check if verify program found failed data
 	if ((failed_data_addr != 0) || (failed_data != 0)) {
 		__asm volatile ("nop");

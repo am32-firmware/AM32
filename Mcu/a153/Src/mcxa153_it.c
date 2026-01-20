@@ -35,6 +35,7 @@ extern uint32_t average_packet_length;
 extern uint8_t average_count;
 
 extern char dshot;
+extern volatile char sync_dshot;
 
 /*
  * @brief 	Comparator 0 interrupt handler. Is called after a compare event has occurred.
@@ -78,12 +79,26 @@ void CTIMER0_IRQHandler(void)
 {
 	uint32_t flags = CTIMER0->IR;
 
-	//Check if capture 1 is larger than capture 2.
-	//If this is the case, it must be that this is an invalid timeout in the first Dshot bit
-	//So if this is not the case, clear the timer interrupt as the timeout is valid and reset DMA
-	//Also check if the destination address is the first element of the dma_buffer
-	if (!((CTIMER0->CR[1] > CTIMER0->CR[2]) && (DMA0->CH[DMA_CH_DshotPWM].TCD_DADDR == (uint32_t)&dma_buffer))) {
-		CTIMER0->TC = 0;
+	//TODO remove this
+	GPIO3->PTOR = (1 << 27);	//ENC_A
+
+	//If input type is dshot reset DMA to capture new Dshot frame correctly
+	if (!servoPwm && sync_dshot) {
+		//If capture 2 is larger than capture 1 or if the DMA destination address is not the first timing value of
+		//the dma_buffer, the timeout is valid.
+		//Otherwise the timeout has happened in the first Dshot bit and thus the timeout is invalid and should be ignored.
+//		if ((CTIMER0->CR[1] < CTIMER0->CR[2]) || (DMA0->CH[DMA_CH_DshotPWM].TCD_DADDR != (uint32_t)&dma_buffer)) {
+//		if (!((CTIMER0->CR[1] > CTIMER0->CR[2]) && (DMA0->CH[DMA_CH_DshotPWM].TCD_DADDR == (uint32_t)&dma_buffer))) {
+//		if ((CTIMER0->CR[1] < CTIMER0->CR[2]) && ((DMA0->CH[DMA_CH_DshotPWM].TCD_CITER_ELINKNO & DMA_TCD_CITER_ELINKNO_CITER_MASK) == (uint16_t)((buffersize / 2) - 1))) {
+//		if (CTIMER0->CR[1] < CTIMER0->CR[2]) {
+		sync_dshot = 0;
+
+		//Reset timer counter
+//			CTIMER0->TC = 0;
+		resetInputCaptureTimer();
+
+		//TODO remove this
+//			GPIO3->PTOR = (1 << 27);	//ENC_A
 
 		//Set the major loop count and addresses again to prevent unintended DMA request from CTIMER match register
 		//Set current and beginning major loop count to 8
@@ -102,42 +117,51 @@ void CTIMER0_IRQHandler(void)
 
 		//Set destination address
 		DMA0->CH[DMA_CH_DshotPWM].TCD_DADDR = (uint32_t)&dma_buffer;
+	}
 
-		//Check for inverted Dshot
-		if (!armed && dshot) {
-			if (is_inverted_dshot == 0) {
-				//Check if signal pin is high
-				if (getInputPinState()) {
-					//Do average filter
-					signal_pin_high_count++;
-					if (signal_pin_high_count > 100) {
-						is_inverted_dshot = 1;
+	//Check for inverted Dshot
+//	if (!armed && dshot) {
+	if (!armed && !servoPwm) {
+		if (is_inverted_dshot == 0) {
+			//Check if signal pin is high
+			if (getInputPinState()) {
+				//Do average filter
+				signal_pin_high_count++;
 
-						//Configure CTIMER
-						//Configure capture control register so capture value register is loaded on CR1 falling edge and CR2 rising edge
-						modifyReg32(&CTIMER0->CCR,
-								CTIMER_CCR_CAP1RE_MASK | CTIMER_CCR_CAP2RE_MASK | CTIMER_CCR_CAP1FE_MASK | CTIMER_CCR_CAP2FE_MASK,
-								CTIMER_CCR_CAP2RE(1) | CTIMER_CCR_CAP1FE(1));
+				//TODO remove this
+				GPIO3->PTOR = (1 << 28);	//ENC_I
+				if (signal_pin_high_count > 100) {
+					is_inverted_dshot = 1;
 
-						//Clear timer counter on capture channel 2 rising edge
-						modifyReg32(&CTIMER0->CTCR,
-								CTIMER_CTCR_ENCC_MASK | CTIMER_CTCR_SELCC_MASK,
-								CTIMER_CTCR_ENCC(1) | CTIMER_CTCR_SELCC(4));
+					//Configure CTIMER
+					//Configure capture control register so capture value register is loaded on CR1 falling edge and CR2 rising edge
+					modifyReg32(&CTIMER0->CCR,
+							CTIMER_CCR_CAP1RE_MASK | CTIMER_CCR_CAP2RE_MASK | CTIMER_CCR_CAP1FE_MASK | CTIMER_CCR_CAP2FE_MASK,
+							CTIMER_CCR_CAP2RE(1) | CTIMER_CCR_CAP1FE(1));
 
-						//Reset input detect state so it detects inverted Dshot correctly
-						inputSet = 0;
-						armed = 0;
-						average_packet_length = 0;
-						average_count = 0;
-						zero_input_count = 0;
-						ic_timer_prescaler = (CPU_FREQUENCY_MHZ / 8);
-						dshot_frametime_high = 50000;
-						dshot_frametime_low = 0;
-					}
+					//Clear timer counter on capture channel 2 rising edge
+					modifyReg32(&CTIMER0->CTCR,
+							CTIMER_CTCR_ENCC_MASK | CTIMER_CTCR_SELCC_MASK,
+							CTIMER_CTCR_ENCC(1) | CTIMER_CTCR_SELCC(4));
+
+					//Reset input detect state so it detects inverted Dshot correctly
+					inputSet = 0;
+					armed = 0;
+					average_packet_length = 0;
+					average_count = 0;
+					zero_input_count = 0;
+					ic_timer_prescaler = (CPU_FREQUENCY_MHZ / 5);
+					dshot_frametime_high = 50000;
+					dshot_frametime_low = 0;
+
+					//TODO remove this
+//					GPIO3->PTOR = (1 << 27);	//ENC_A
 				}
 			}
 		}
 	}
+//		}
+//	}
 
 	//Clear interrupt flags
 	CTIMER0->IR = flags;
@@ -190,6 +214,12 @@ void DMA_CH0_IRQHandler(void)
 
 	//Convert to correct Dshot/PWM timing data format
 	doDshotCorrection();
+
+	//TODO remove this
+//	GPIO3->PTOR = (1 << 28);	//ENC_I
+
+	//TODO remove this
+//	GPIO3->PTOR = (1 << 27);	//ENC_A
 
 	//Call transfercomplete
 	transfercomplete();

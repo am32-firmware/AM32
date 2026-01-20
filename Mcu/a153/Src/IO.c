@@ -7,12 +7,13 @@
 
 #include "IO.h"
 
-char ic_timer_prescaler = (CPU_FREQUENCY_MHZ / 8);	//Used to detect input type (Dshot300, Dshot600 and PWM400). Divide by 8 is best for MCXA153 at 96MHz CPU
+char ic_timer_prescaler = (CPU_FREQUENCY_MHZ / 5);	//Used to detect input type (Dshot300, Dshot600 and PWM400). Divide by 8 is best for MCXA153 at 96MHz CPU
 uint32_t dma_buffer[64] = { 0 };
 char out_put = 0;
 uint8_t buffer_padding = 0;
 
 extern volatile uint32_t gcrnumber;
+volatile char sync_dshot = 0;
 
 void receiveDshotDma()
 {
@@ -22,9 +23,16 @@ void receiveDshotDma()
 	//Set prescaler
 	CTIMER0->PR = ic_timer_prescaler;
 
+	//Set sync_dshot to enable syncing with dshot stream
+	sync_dshot = 1;
+
+	//TODO remove this
+//	GPIO3->PTOR = (1 << 28);	//ENC_I
+
 	if (buffersize > 3) {
 		//Resets PWM/Dshot timer to 0. Needed for Dshot to work properly.
-		CTIMER0->TC = 0;
+//		CTIMER0->TC = 0;
+		resetInputCaptureTimer();
 
 		//Set match1 value to higher then the minimum Dshot300 frame time which is around 53us, so take at least 53us.
 		//Set timeout value to 5500 clock ticks at Dshot300 (Prescaler is 1 then)

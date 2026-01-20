@@ -1,8 +1,8 @@
 /*
  * mcxa153_it.c
  *
- *  Created on: 12 Nov 2024
- *      Author: nxg09992
+ *  Created on: 14 Nov 2024
+ *      Author: Youri
  */
 
 #include "mcxa153_it.h"
@@ -79,26 +79,13 @@ void CTIMER0_IRQHandler(void)
 {
 	uint32_t flags = CTIMER0->IR;
 
-	//TODO remove this
-	GPIO3->PTOR = (1 << 27);	//ENC_A
-
-	//If input type is dshot reset DMA to capture new Dshot frame correctly
+	//If input type is not PWM and sync_dshot is enabled, reset Dshot timer and DMA to sync with Dshot frame correctly
 	if (!servoPwm && sync_dshot) {
-		//If capture 2 is larger than capture 1 or if the DMA destination address is not the first timing value of
-		//the dma_buffer, the timeout is valid.
-		//Otherwise the timeout has happened in the first Dshot bit and thus the timeout is invalid and should be ignored.
-//		if ((CTIMER0->CR[1] < CTIMER0->CR[2]) || (DMA0->CH[DMA_CH_DshotPWM].TCD_DADDR != (uint32_t)&dma_buffer)) {
-//		if (!((CTIMER0->CR[1] > CTIMER0->CR[2]) && (DMA0->CH[DMA_CH_DshotPWM].TCD_DADDR == (uint32_t)&dma_buffer))) {
-//		if ((CTIMER0->CR[1] < CTIMER0->CR[2]) && ((DMA0->CH[DMA_CH_DshotPWM].TCD_CITER_ELINKNO & DMA_TCD_CITER_ELINKNO_CITER_MASK) == (uint16_t)((buffersize / 2) - 1))) {
-//		if (CTIMER0->CR[1] < CTIMER0->CR[2]) {
+		//Disable sync dshot
 		sync_dshot = 0;
 
 		//Reset timer counter
-//			CTIMER0->TC = 0;
 		resetInputCaptureTimer();
-
-		//TODO remove this
-//			GPIO3->PTOR = (1 << 27);	//ENC_A
 
 		//Set the major loop count and addresses again to prevent unintended DMA request from CTIMER match register
 		//Set current and beginning major loop count to 8
@@ -119,8 +106,8 @@ void CTIMER0_IRQHandler(void)
 		DMA0->CH[DMA_CH_DshotPWM].TCD_DADDR = (uint32_t)&dma_buffer;
 	}
 
-	//Check for inverted Dshot
-//	if (!armed && dshot) {
+	//Check for inverted Dshot. If inverted Dshot, configure timer capture for inverted Dshot
+	//If not armed and not PWM input
 	if (!armed && !servoPwm) {
 		if (is_inverted_dshot == 0) {
 			//Check if signal pin is high
@@ -128,8 +115,6 @@ void CTIMER0_IRQHandler(void)
 				//Do average filter
 				signal_pin_high_count++;
 
-				//TODO remove this
-				GPIO3->PTOR = (1 << 28);	//ENC_I
 				if (signal_pin_high_count > 100) {
 					is_inverted_dshot = 1;
 
@@ -153,15 +138,10 @@ void CTIMER0_IRQHandler(void)
 					ic_timer_prescaler = (CPU_FREQUENCY_MHZ / 5);
 					dshot_frametime_high = 50000;
 					dshot_frametime_low = 0;
-
-					//TODO remove this
-//					GPIO3->PTOR = (1 << 27);	//ENC_A
 				}
 			}
 		}
 	}
-//		}
-//	}
 
 	//Clear interrupt flags
 	CTIMER0->IR = flags;
@@ -214,12 +194,6 @@ void DMA_CH0_IRQHandler(void)
 
 	//Convert to correct Dshot/PWM timing data format
 	doDshotCorrection();
-
-	//TODO remove this
-//	GPIO3->PTOR = (1 << 28);	//ENC_I
-
-	//TODO remove this
-//	GPIO3->PTOR = (1 << 27);	//ENC_A
 
 	//Call transfercomplete
 	transfercomplete();

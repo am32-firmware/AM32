@@ -1,8 +1,8 @@
 /*
  * peripherals.c
  *
- *  Created on: Sep. 26, 2020
- *      Author: Alka
+ *  Created on: 14 Nov 2024
+ *      Author: Youri
  */
 
 #include "peripherals.h"
@@ -287,13 +287,9 @@ void initSPI(void)
 	modifyReg32(&SYSCON->CLKUNLOCK, SYSCON_CLKUNLOCK_UNLOCK(1), 0);
 
 	//Select FRO_HF as clock for LPSPI0, which is 192MHz, see SystemClock_Config()
-//	modifyReg32(&MRCC0->MRCC_LPSPI0_CLKSEL, MRCC_MRCC_LPSPI0_CLKSEL_MUX_MASK, MRCC_MRCC_LPSPI0_CLKSEL_MUX(1));
 	modifyReg32(&MRCC0->MRCC_LPSPI0_CLKSEL, MRCC_MRCC_LPSPI0_CLKSEL_MUX_MASK, MRCC_MRCC_LPSPI0_CLKSEL_MUX(0));
 
 	//Enable LPSPI0 and set divider to 4, so clock frequency is 48MHz
-//	modifyReg32(&MRCC0->MRCC_LPSPI0_CLKDIV,
-//			MRCC_MRCC_LPSPI0_CLKDIV_HALT_MASK | MRCC_MRCC_LPSPI0_CLKDIV_DIV_MASK,
-//			MRCC_MRCC_LPSPI0_CLKDIV_DIV(3));
 	modifyReg32(&MRCC0->MRCC_LPSPI0_CLKDIV,
 			MRCC_MRCC_LPSPI0_CLKDIV_HALT_MASK | MRCC_MRCC_LPSPI0_CLKDIV_DIV_MASK,
 			MRCC_MRCC_LPSPI0_CLKDIV_DIV(0));
@@ -318,12 +314,9 @@ void initSPI(void)
 			LPSPI_CFGR1_PINCFG(3) | LPSPI_CFGR1_MASTER(1) | LPSPI_CFGR1_OUTCFG(1));
 
 	//Set CCR
-//	modifyReg32(&LPSPI0->CCR, 0, LPSPI_CCR_SCKDIV(1));
-//	LPSPI0->CCR = LPSPI_CCR_SCKDIV(1) | LPSPI_CCR_DBT(1) | LPSPI_CCR_PCSSCK(1) | LPSPI_CCR_SCKPCS(1);
 	LPSPI0->CCR = 0;
 
 	//Set TX watermark to 1 word
-//	modifyReg32(&LPSPI0->FCR, LPSPI_FCR_TXWATER_MASK, LPSPI_FCR_TXWATER(1));
 	LPSPI0->FCR = LPSPI_FCR_TXWATER(0);
 
 	//Set prescaler to 8, in the end it will be 16 due to an additional value doubling.

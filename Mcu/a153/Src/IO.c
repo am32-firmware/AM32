@@ -1,8 +1,8 @@
 /*
  * IO.c
  *
- *  Created on: Sep. 26, 2020
- *      Author: Alka
+ *  Created on: 14 Nov 2024
+ *      Author: Youri
  */
 
 #include "IO.h"
@@ -23,15 +23,11 @@ void receiveDshotDma()
 	//Set prescaler
 	CTIMER0->PR = ic_timer_prescaler;
 
-	//Set sync_dshot to enable syncing with dshot stream
+	//Set sync_dshot to enable syncing with dshot frame
 	sync_dshot = 1;
-
-	//TODO remove this
-//	GPIO3->PTOR = (1 << 28);	//ENC_I
 
 	if (buffersize > 3) {
 		//Resets PWM/Dshot timer to 0. Needed for Dshot to work properly.
-//		CTIMER0->TC = 0;
 		resetInputCaptureTimer();
 
 		//Set match1 value to higher then the minimum Dshot300 frame time which is around 53us, so take at least 53us.

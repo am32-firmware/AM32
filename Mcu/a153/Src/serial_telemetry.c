@@ -1,8 +1,8 @@
 /*
  * serial_telemetry.c
  *
- *  Created on: May 13, 2020
- *      Author: Alka
+ *  Created on: 14 Nov 2024
+ *      Author: Youri
  */
 
 #include "serial_telemetry.h"

@@ -2,7 +2,7 @@
  * DMA.c
  *
  *  Created on: 14 Nov 2024
- *      Author: nxg09992
+ *      Author: Youri
  */
 
 #include "DMA.h"

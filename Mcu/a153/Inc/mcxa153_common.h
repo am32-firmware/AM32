@@ -1,8 +1,8 @@
 /*
  * mcxa153_common.h
  *
- *  Created on: 13 Nov 2024
- *      Author: nxg09992
+ *  Created on: 14 Nov 2024
+ *      Author: Youri
  */
 
 #ifndef MCU_A153_INC_MCXA153_COMMON_H_

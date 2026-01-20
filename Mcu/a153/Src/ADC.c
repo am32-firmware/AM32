@@ -1,8 +1,8 @@
 /*
  * ADC.c
  *
- *  Created on: May 20, 2020
- *      Author: Alka
+ *  Created on: 14 Nov 2024
+ *      Author: Youri
  */
 
 #include "ADC.h"

@@ -2,7 +2,7 @@
  * DMA.h
  *
  *  Created on: 14 Nov 2024
- *      Author: nxg09992
+ *      Author: Youri
  */
 
 #ifndef MCU_A153_INC_DMA_H_

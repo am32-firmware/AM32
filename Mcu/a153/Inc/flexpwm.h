@@ -1,8 +1,8 @@
 /*
  * flexpwm.h
  *
- *  Created on: 13 Nov 2024
- *      Author: nxg09992
+ *  Created on: 14 Nov 2024
+ *      Author: Youri
  */
 
 #ifndef MCU_A153_SRC_FLEXPWM_H_

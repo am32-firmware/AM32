@@ -1,8 +1,8 @@
 /*
  * flexpwm.c
  *
- *  Created on: 13 Nov 2024
- *      Author: nxg09992
+ *  Created on: 14 Nov 2024
+ *      Author: Youri
  */
 
 #include "flexpwm.h"

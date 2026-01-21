@@ -8,13 +8,42 @@ function(am32_generate_launch_json)
         set(EXT "")
     endif()
 
-    # Tool Definitions
-    set(ARM_GDB   "${CMAKE_SOURCE_DIR}/tools/gcc-arm/bin/arm-none-eabi-gdb${EXT}")
-    set(ARM_OCD   "${CMAKE_SOURCE_DIR}/tools/openocd-arm/bin/openocd${EXT}")
-    
-    # Pointing to the WCH specific directories
+    # --------------------------------------------------------------------------
+    # ARM TOOLS (Standard Paths)
+    # --------------------------------------------------------------------------
+    set(ARM_GDB "${CMAKE_SOURCE_DIR}/tools/gcc-arm/bin/arm-none-eabi-gdb${EXT}")
+    set(ARM_OCD "${CMAKE_SOURCE_DIR}/tools/openocd-arm/bin/openocd${EXT}")
+
+    # --------------------------------------------------------------------------
+    # WCH RISC-V TOOLS (Dynamic Detection)
+    # --------------------------------------------------------------------------
+    # Start with default 'local' paths (Linux/Mac)
     set(WCH_RISCV_GDB "${CMAKE_SOURCE_DIR}/tools/gcc-wch-riscv/bin/riscv-none-embed-gdb${EXT}")
     set(WCH_RISCV_OCD "${CMAKE_SOURCE_DIR}/tools/openocd-wch-riscv/bin/openocd${EXT}")
+
+    if(CMAKE_SYSTEM_PROCESSOR STREQUAL "riscv")
+        # We are building WCH, so CMake already knows these paths!
+        get_filename_component(WCH_BIN_DIR "${CMAKE_C_COMPILER}" DIRECTORY)
+        set(WCH_GDB "${WCH_BIN_DIR}/riscv-none-embed-gdb${EXT}")
+        set(WCH_OCD "${AM32_OPENOCD_EXECUTABLE}")
+
+    else()
+        set(WCH_GDB "${CMAKE_SOURCE_DIR}/tools/gcc-wch-riscv/bin/riscv-none-embed-gdb${EXT}")
+        set(WCH_OCD "${CMAKE_SOURCE_DIR}/tools/openocd-wch-riscv/bin/openocd${EXT}")
+
+        if(DEFINED ENV{AM32_WCH_TOOLCHAIN_PATH})
+            file(TO_CMAKE_PATH "$ENV{AM32_WCH_TOOLCHAIN_PATH}" WCH_ENV_ROOT)
+            
+            # Use Env path for GDB
+            set(WCH_GDB "${WCH_ENV_ROOT}/bin/riscv-none-embed-gdb${EXT}")
+            
+            # Use Env path for OpenOCD (Look in likely sibling folders)
+            get_filename_component(WCH_ENV_PARENT "${WCH_ENV_ROOT}" DIRECTORY)
+            if(EXISTS "${WCH_ENV_PARENT}/OpenOCD/bin/openocd${EXT}")
+                set(WCH_OCD "${WCH_ENV_PARENT}/OpenOCD/bin/openocd${EXT}")
+            endif()
+        endif()
+    endif()
 
     set(CONFIGS "")
 
@@ -37,7 +66,7 @@ function(am32_generate_launch_json)
             \"executable\": \"\${command:cmake.launchTargetPath}\",
             \"serverpath\": \"${OCD_PATH}\",
             \"gdbPath\": \"${GDB_PATH}\",
-            \"configFiles\": [ \"\${workspaceFolder}/${TARGET_CFG}\" ],
+            \"configFiles\": [ \"\${workspaceFolder}${TARGET_CFG}\" ],
             \"svdFile\": \"\${workspaceFolder}/${SVD_FILE}\",
             \"runToEntryPoint\": \"main\",
             \"showDevDebugOutput\": \"none\"

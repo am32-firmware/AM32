@@ -116,6 +116,10 @@ function(add_am32_target)
     )
     target_compile_options(${LOGICAL_TARGET} PRIVATE ${ARG_CPU_FLAGS} ${COMMON_COMPILE_FLAGS})
 
+    # Create the Listing Command (Source + Assembly)
+    # We use -S to intermix source code and -d to disassemble
+    set(LISTING_CMD ${CMAKE_OBJDUMP} -S -d ${ELF_FILE} > ${OUTPUT_FILENAME}.lst)
+
     # Linker
     if(IS_CAN_TARGET)
         if(ARG_CAN_LINKER_SCRIPT)
@@ -138,11 +142,25 @@ function(add_am32_target)
     # Post-Build
     set(BANNER_MSG "================ [ ${OUTPUT_FILENAME} ] ================")
 
+    # Determine how to run the dump command with redirection
+    if(CMAKE_HOST_WIN32)
+        # Windows (cmd.exe handles >)
+        file(TO_NATIVE_PATH "${CMAKE_OBJDUMP}" OBJDUMP_NATIVE)
+        set(DUMP_COMMAND cmd /c "\"${OBJDUMP_NATIVE}\" -S -d ${ELF_FILE} > ${OUTPUT_FILENAME}.lst")
+    else()
+        # Linux/macOS (sh handles >)
+        set(DUMP_COMMAND sh -c "${CMAKE_OBJDUMP} -S -d ${ELF_FILE} > ${OUTPUT_FILENAME}.lst")
+    endif()
+
     if(IS_CAN_TARGET)
         add_custom_command(TARGET ${LOGICAL_TARGET} POST_BUILD
             COMMAND ${CMAKE_OBJCOPY} -O binary ${ELF_FILE} ${OUTPUT_FILENAME}.bin
             COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/Src/DroneCAN/set_app_signature.py ${OUTPUT_FILENAME}.bin ${ELF_FILE}
             COMMAND ${CMAKE_OBJCOPY} ${ELF_FILE} -O ihex ${OUTPUT_FILENAME}.hex
+
+            COMMAND ${CMAKE_COMMAND} -E echo "Generating Listing: ${OUTPUT_FILENAME}.lst"
+            COMMAND ${DUMP_COMMAND}
+            COMMAND ${CMAKE_COMMAND} -E echo "Created annotated assembly: ${OUTPUT_FILENAME}.lst"
 
             COMMAND ${CMAKE_COMMAND} -E echo "${BANNER_MSG}"
             COMMAND ${CMAKE_SIZE} ${ELF_FILE}
@@ -152,6 +170,12 @@ function(add_am32_target)
             COMMAND ${CMAKE_OBJCOPY} -O binary ${ELF_FILE} ${OUTPUT_FILENAME}.bin
             COMMAND ${CMAKE_OBJCOPY} ${ELF_FILE} -O ihex ${OUTPUT_FILENAME}.hex
 
+            # ADD THIS LINE:
+            COMMAND ${CMAKE_COMMAND} -E echo "Generating Listing: ${OUTPUT_FILENAME}.lst"
+            # Use 'cmd /c' on Windows or 'sh -c' on Linux to handle the '>' redirection
+            COMMAND ${DUMP_COMMAND}
+            COMMAND ${CMAKE_COMMAND} -E echo "Created annotated assembly: ${OUTPUT_FILENAME}.lst"
+
             COMMAND ${CMAKE_COMMAND} -E echo "${BANNER_MSG}"
             COMMAND ${CMAKE_SIZE} ${ELF_FILE}
         )
@@ -159,17 +183,21 @@ function(add_am32_target)
 
     # Flash Target
     if(ARG_OCD_CONFIG_FILE)
-        if(CMAKE_HOST_WIN32)
-            set(EXE_EXT ".exe")
-        else()
-            set(EXE_EXT "")
-        endif()
 
-        # We manually construct the path because we know where manage_tools.cmake put it
-        if(ARG_ARCH STREQUAL "WCH_RISCV")
-            set(TOOL_OPENOCD "${CMAKE_SOURCE_DIR}/tools/openocd-wch-riscv/bin/openocd${EXE_EXT}")
+        if(AM32_OPENOCD_EXECUTABLE)
+             set(TOOL_OPENOCD "${AM32_OPENOCD_EXECUTABLE}")
         else()
-            set(TOOL_OPENOCD "${CMAKE_SOURCE_DIR}/tools/openocd-arm/bin/openocd${EXE_EXT}")
+            if(CMAKE_HOST_WIN32)
+                set(EXE_EXT ".exe")
+            else()
+                set(EXE_EXT "")
+            endif()
+
+            if(ARG_ARCH STREQUAL "WCH_RISCV")
+                set(TOOL_OPENOCD "${CMAKE_SOURCE_DIR}/tools/openocd-wch-riscv/bin/openocd${EXE_EXT}")
+            else()
+                set(TOOL_OPENOCD "${CMAKE_SOURCE_DIR}/tools/openocd-arm/bin/openocd${EXE_EXT}")
+            endif()
         endif()
 
         add_custom_target(flash_${LOGICAL_TARGET}

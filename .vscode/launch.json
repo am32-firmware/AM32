@@ -10,7 +10,7 @@
             "executable": "${command:cmake.launchTargetPath}",
             "serverpath": "/Users/marcinczeczko/Private/drones/AM32/tools/openocd-arm/bin/openocd",
             "gdbPath": "/Users/marcinczeczko/Private/drones/AM32/tools/gcc-arm/bin/arm-none-eabi-gdb",
-            "configFiles": [ "${workspaceFolder}//Users/marcinczeczko/Private/drones/AM32/Mcu/e230/openocd.cfg" ],
+            "configFiles": [ "${workspaceFolder}/Users/marcinczeczko/Private/drones/AM32/Mcu/e230/openocd.cfg" ],
             "svdFile": "${workspaceFolder}/Mcu/e230/GD32E230.svd",
             "runToEntryPoint": "main",
             "showDevDebugOutput": "none"
@@ -24,7 +24,7 @@
             "executable": "${command:cmake.launchTargetPath}",
             "serverpath": "/Users/marcinczeczko/Private/drones/AM32/tools/openocd-arm/bin/openocd",
             "gdbPath": "/Users/marcinczeczko/Private/drones/AM32/tools/gcc-arm/bin/arm-none-eabi-gdb",
-            "configFiles": [ "${workspaceFolder}//Users/marcinczeczko/Private/drones/AM32/Mcu/f031/openocd.cfg" ],
+            "configFiles": [ "${workspaceFolder}/Users/marcinczeczko/Private/drones/AM32/Mcu/f031/openocd.cfg" ],
             "svdFile": "${workspaceFolder}/Mcu/f031/STM32F0x1.svd",
             "runToEntryPoint": "main",
             "showDevDebugOutput": "none"
@@ -38,7 +38,7 @@
             "executable": "${command:cmake.launchTargetPath}",
             "serverpath": "/Users/marcinczeczko/Private/drones/AM32/tools/openocd-arm/bin/openocd",
             "gdbPath": "/Users/marcinczeczko/Private/drones/AM32/tools/gcc-arm/bin/arm-none-eabi-gdb",
-            "configFiles": [ "${workspaceFolder}//Users/marcinczeczko/Private/drones/AM32/Mcu/f051/openocd.cfg" ],
+            "configFiles": [ "${workspaceFolder}/Users/marcinczeczko/Private/drones/AM32/Mcu/f051/openocd.cfg" ],
             "svdFile": "${workspaceFolder}/Mcu/f051/STM32F0x1.svd",
             "runToEntryPoint": "main",
             "showDevDebugOutput": "none"
@@ -52,7 +52,7 @@
             "executable": "${command:cmake.launchTargetPath}",
             "serverpath": "/Users/marcinczeczko/Private/drones/AM32/tools/openocd-arm/bin/openocd",
             "gdbPath": "/Users/marcinczeczko/Private/drones/AM32/tools/gcc-arm/bin/arm-none-eabi-gdb",
-            "configFiles": [ "${workspaceFolder}//Users/marcinczeczko/Private/drones/AM32/Mcu/f415/openocd.cfg" ],
+            "configFiles": [ "${workspaceFolder}/Users/marcinczeczko/Private/drones/AM32/Mcu/f415/openocd.cfg" ],
             "svdFile": "${workspaceFolder}/Mcu/f415/AT32F415xx_v2.svd",
             "runToEntryPoint": "main",
             "showDevDebugOutput": "none"
@@ -66,7 +66,7 @@
             "executable": "${command:cmake.launchTargetPath}",
             "serverpath": "/Users/marcinczeczko/Private/drones/AM32/tools/openocd-arm/bin/openocd",
             "gdbPath": "/Users/marcinczeczko/Private/drones/AM32/tools/gcc-arm/bin/arm-none-eabi-gdb",
-            "configFiles": [ "${workspaceFolder}//Users/marcinczeczko/Private/drones/AM32/Mcu/f421/openocd.cfg" ],
+            "configFiles": [ "${workspaceFolder}/Users/marcinczeczko/Private/drones/AM32/Mcu/f421/openocd.cfg" ],
             "svdFile": "${workspaceFolder}/Mcu/f421/AT32F421xx_v2.svd",
             "runToEntryPoint": "main",
             "showDevDebugOutput": "none"
@@ -80,7 +80,7 @@
             "executable": "${command:cmake.launchTargetPath}",
             "serverpath": "/Users/marcinczeczko/Private/drones/AM32/tools/openocd-arm/bin/openocd",
             "gdbPath": "/Users/marcinczeczko/Private/drones/AM32/tools/gcc-arm/bin/arm-none-eabi-gdb",
-            "configFiles": [ "${workspaceFolder}//Users/marcinczeczko/Private/drones/AM32/Mcu/g031/openocd.cfg" ],
+            "configFiles": [ "${workspaceFolder}/Users/marcinczeczko/Private/drones/AM32/Mcu/g031/openocd.cfg" ],
             "svdFile": "${workspaceFolder}/Mcu/g031/STM32F0x1.svd",
             "runToEntryPoint": "main",
             "showDevDebugOutput": "none"
@@ -94,7 +94,7 @@
             "executable": "${command:cmake.launchTargetPath}",
             "serverpath": "/Users/marcinczeczko/Private/drones/AM32/tools/openocd-arm/bin/openocd",
             "gdbPath": "/Users/marcinczeczko/Private/drones/AM32/tools/gcc-arm/bin/arm-none-eabi-gdb",
-            "configFiles": [ "${workspaceFolder}//Users/marcinczeczko/Private/drones/AM32/Mcu/g071/openocd.cfg" ],
+            "configFiles": [ "${workspaceFolder}/Users/marcinczeczko/Private/drones/AM32/Mcu/g071/openocd.cfg" ],
             "svdFile": "${workspaceFolder}/Mcu/g031/STM32G071.svd",
             "runToEntryPoint": "main",
             "showDevDebugOutput": "none"
@@ -108,7 +108,7 @@
             "executable": "${command:cmake.launchTargetPath}",
             "serverpath": "/Users/marcinczeczko/Private/drones/AM32/tools/openocd-arm/bin/openocd",
             "gdbPath": "/Users/marcinczeczko/Private/drones/AM32/tools/gcc-arm/bin/arm-none-eabi-gdb",
-            "configFiles": [ "${workspaceFolder}//Users/marcinczeczko/Private/drones/AM32/Mcu/g431/openocd.cfg" ],
+            "configFiles": [ "${workspaceFolder}/Users/marcinczeczko/Private/drones/AM32/Mcu/g431/openocd.cfg" ],
             "svdFile": "${workspaceFolder}/Mcu/g431/STM32G431xx.svd",
             "runToEntryPoint": "main",
             "showDevDebugOutput": "none"
@@ -122,7 +122,7 @@
             "executable": "${command:cmake.launchTargetPath}",
             "serverpath": "/Users/marcinczeczko/Private/drones/AM32/tools/openocd-arm/bin/openocd",
             "gdbPath": "/Users/marcinczeczko/Private/drones/AM32/tools/gcc-arm/bin/arm-none-eabi-gdb",
-            "configFiles": [ "${workspaceFolder}//Users/marcinczeczko/Private/drones/AM32/Mcu/l431/openocd.cfg" ],
+            "configFiles": [ "${workspaceFolder}/Users/marcinczeczko/Private/drones/AM32/Mcu/l431/openocd.cfg" ],
             "svdFile": "${workspaceFolder}/Mcu/l431/STM32L4x1.svd",
             "runToEntryPoint": "main",
             "showDevDebugOutput": "none"
@@ -136,7 +136,7 @@
             "executable": "${command:cmake.launchTargetPath}",
             "serverpath": "/Users/marcinczeczko/Private/drones/AM32/tools/openocd-wch-riscv/bin/openocd",
             "gdbPath": "/Users/marcinczeczko/Private/drones/AM32/tools/gcc-wch-riscv/bin/riscv-none-embed-gdb",
-            "configFiles": [ "${workspaceFolder}//Users/marcinczeczko/Private/drones/AM32/Mcu/v203/openocd.cfg" ],
+            "configFiles": [ "${workspaceFolder}/Users/marcinczeczko/Private/drones/AM32/Mcu/v203/openocd.cfg" ],
             "svdFile": "${workspaceFolder}/Mcu/v203/CH32V203xx.svd",
             "runToEntryPoint": "main",
             "showDevDebugOutput": "none"

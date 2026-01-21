@@ -72,95 +72,117 @@ set(WCH_GCC_DIR "${TOOLS_DIR}/gcc-wch-riscv")
 set(WCH_OCD_DIR "${TOOLS_DIR}/openocd-wch-riscv")
 set(WCH_CACHE_FILE "${DOWNLOADS_DIR}/wch_toolchain.archive")
 
-if(NOT EXISTS "${WCH_GCC_DIR}" OR NOT EXISTS "${WCH_OCD_DIR}")
-    message(STATUS "[Tools] WCH RISC-V Tools missing. Installing...")
 
-    # 1. Download (Same as before)
-    if(NOT EXISTS "${WCH_CACHE_FILE}")
-        if(CMAKE_HOST_WIN32)
-            set(MRS_ID "1823552948062416898")
-        elseif(CMAKE_HOST_APPLE)
-            set(MRS_ID "1991353229960581122")
+if(CMAKE_HOST_WIN32)
+    if(DEFINED ENV{AM32_WCH_TOOLCHAIN_PATH} AND EXISTS "$ENV{AM32_WCH_TOOLCHAIN_PATH}")
+        message(STATUS "[Tools] WCH Toolchain is already installed under: $ENV{AM32_WCH_TOOLCHAIN_PATH}")
+    else()
+        message(STATUS "----------------------------------------------------------------")
+        message(STATUS "[Tools] WCH RISC-V Toolchain not configured correctly.")
+        
+        if(DEFINED ENV{AM32_WCH_TOOLCHAIN_PATH})
+            message(STATUS "        Env Var 'AM32_WCH_TOOLCHAIN_PATH' is set but the path does not exist.")
+            message(STATUS "        Current Value: $ENV{AM32_WCH_TOOLCHAIN_PATH}")
         else()
-            set(MRS_ID "1993872528621211649")
+            message(STATUS "        Env Var 'AM32_WCH_TOOLCHAIN_PATH' is missing.")
         endif()
-        
-        set(API_URL "https://api.mounriver.com/mountriver/api/version/fetchRecentOpenOcdUrl?resourceId=${MRS_ID}")
-        file(DOWNLOAD "${API_URL}" "${DOWNLOADS_DIR}/mrs.json")
-        file(READ "${DOWNLOADS_DIR}/mrs.json" JSON)
-        string(REGEX MATCH "\"result\":[ \t]*\"([^\"]+)\"" _ ${JSON})
-        set(DL_URL ${CMAKE_MATCH_1})
-        file(REMOVE "${DOWNLOADS_DIR}/mrs.json")
-        
-        message(STATUS "[Tools] Downloading WCH Toolchain...")
-        file(DOWNLOAD "${DL_URL}" "${WCH_CACHE_FILE}" SHOW_PROGRESS)
+
+        message(STATUS "        ")
+        message(STATUS "        Automatic download is disabled for Windows.")
+        message(STATUS "        Please install MounRiver Studio first.")
+        message(STATUS "        Then set AM32_WCH_TOOLCHAIN_PATH environment variable to the toolchain location.")
+        message(STATUS "        See DEVELOPMENT.md for detailed instructions.")
+        message(STATUS "----------------------------------------------------------------")
     endif()
-
-    message(STATUS "[Tools] Extracting WCH Toolchain...")
-    
-    # 2. Extract
-    set(TEMP_ROOT "${TOOLS_DIR}/riscv_temp_extract")
-    if(EXISTS "${TEMP_ROOT}")
-        file(REMOVE_RECURSE "${TEMP_ROOT}")
-    endif()
-    file(MAKE_DIRECTORY "${TEMP_ROOT}")
-    file(ARCHIVE_EXTRACT INPUT "${WCH_CACHE_FILE}" DESTINATION "${TEMP_ROOT}")
-
-    # 3. Smart Search for GCC (Recursive, depth-agnostic)
-    #    We search for the binary name anywhere.
-    file(GLOB_RECURSE GCC_FOUND "${TEMP_ROOT}/riscv-none-embed-gcc*")
-    
-    set(FINAL_GCC_BIN "")
-    foreach(ITEM ${GCC_FOUND})
-        # Filter: Ensure it is inside a 'bin' folder to avoid picking up unrelated files
-        if(ITEM MATCHES "/bin/riscv-none-embed-gcc")
-            set(FINAL_GCC_BIN "${ITEM}")
-            break()
-        endif()
-    endforeach()
-
-    if(FINAL_GCC_BIN)
-        get_filename_component(GCC_BIN_DIR "${FINAL_GCC_BIN}" DIRECTORY)
-        get_filename_component(GCC_ROOT "${GCC_BIN_DIR}/.." ABSOLUTE)
-        
-        if(EXISTS "${WCH_GCC_DIR}") 
-            file(REMOVE_RECURSE "${WCH_GCC_DIR}")
-        endif()
-        file(RENAME "${GCC_ROOT}" "${WCH_GCC_DIR}")
-    else()
-        message(FATAL_ERROR "[Tools] Failed to locate 'riscv-none-embed-gcc' in extracted archive!")
-    endif()
-
-
-    # 4. Smart Search for OpenOCD
-    #    We search for the binary name anywhere.
-    file(GLOB_RECURSE OCD_FOUND "${TEMP_ROOT}/openocd*")
-    
-    set(FINAL_OCD_BIN "")
-    foreach(ITEM ${OCD_FOUND})
-        # Filter: Ensure it is inside 'bin' and ends with 'openocd' (or .exe)
-        # We avoid 'openocd.cfg' or folder names
-        if(ITEM MATCHES "/bin/openocd(\\.exe)?$")
-            set(FINAL_OCD_BIN "${ITEM}")
-            break()
-        endif()
-    endforeach()
-
-    if(FINAL_OCD_BIN)
-        get_filename_component(OCD_BIN_DIR "${FINAL_OCD_BIN}" DIRECTORY)
-        get_filename_component(OCD_ROOT "${OCD_BIN_DIR}/.." ABSOLUTE)
-        
-        if(EXISTS "${WCH_OCD_DIR}") 
-            file(REMOVE_RECURSE "${WCH_OCD_DIR}")
-        endif()
-        file(RENAME "${OCD_ROOT}" "${WCH_OCD_DIR}")
-    else()
-        message(FATAL_ERROR "[Tools] Failed to locate 'openocd' in extracted archive!")
-    endif()
-
-    # Cleanup
-    file(REMOVE_RECURSE "${TEMP_ROOT}")
-
 else()
-    message(STATUS "[Tools] WCH RISC-V Tools present.")
+    if(NOT EXISTS "${WCH_GCC_DIR}" OR NOT EXISTS "${WCH_OCD_DIR}")
+        message(STATUS "[Tools] WCH RISC-V Tools missing. Installing...")
+
+        # 1. Download (Same as before)
+        if(NOT EXISTS "${WCH_CACHE_FILE}")
+            if(CMAKE_HOST_APPLE)
+                set(MRS_ID "1991353229960581122")
+            else() # Linux
+                set(MRS_ID "1993872528621211649")
+            endif()
+            
+            set(API_URL "https://api.mounriver.com/mountriver/api/version/fetchRecentOpenOcdUrl?resourceId=${MRS_ID}")
+            file(DOWNLOAD "${API_URL}" "${DOWNLOADS_DIR}/mrs.json")
+            file(READ "${DOWNLOADS_DIR}/mrs.json" JSON)
+            string(REGEX MATCH "\"result\":[ \t]*\"([^\"]+)\"" _ ${JSON})
+            set(DL_URL ${CMAKE_MATCH_1})
+            file(REMOVE "${DOWNLOADS_DIR}/mrs.json")
+            
+            message(STATUS "[Tools] Downloading WCH Toolchain...")
+            file(DOWNLOAD "${DL_URL}" "${WCH_CACHE_FILE}" SHOW_PROGRESS)
+        endif()
+
+        message(STATUS "[Tools] Extracting WCH Toolchain...")
+        
+        # 2. Extract
+        set(TEMP_ROOT "${TOOLS_DIR}/riscv_temp_extract")
+        if(EXISTS "${TEMP_ROOT}")
+            file(REMOVE_RECURSE "${TEMP_ROOT}")
+        endif()
+        file(MAKE_DIRECTORY "${TEMP_ROOT}")
+        file(ARCHIVE_EXTRACT INPUT "${WCH_CACHE_FILE}" DESTINATION "${TEMP_ROOT}")
+
+        # 3. Smart Search for GCC (Recursive, depth-agnostic)
+        #    We search for the binary name anywhere.
+        file(GLOB_RECURSE GCC_FOUND "${TEMP_ROOT}/riscv-none-embed-gcc*")
+        
+        set(FINAL_GCC_BIN "")
+        foreach(ITEM ${GCC_FOUND})
+            # Filter: Ensure it is inside a 'bin' folder to avoid picking up unrelated files
+            if(ITEM MATCHES "/bin/riscv-none-embed-gcc")
+                set(FINAL_GCC_BIN "${ITEM}")
+                break()
+            endif()
+        endforeach()
+
+        if(FINAL_GCC_BIN)
+            get_filename_component(GCC_BIN_DIR "${FINAL_GCC_BIN}" DIRECTORY)
+            get_filename_component(GCC_ROOT "${GCC_BIN_DIR}/.." ABSOLUTE)
+            
+            if(EXISTS "${WCH_GCC_DIR}") 
+                file(REMOVE_RECURSE "${WCH_GCC_DIR}")
+            endif()
+            file(RENAME "${GCC_ROOT}" "${WCH_GCC_DIR}")
+        else()
+            message(FATAL_ERROR "[Tools] Failed to locate 'riscv-none-embed-gcc' in extracted archive!")
+        endif()
+
+
+        # 4. Smart Search for OpenOCD
+        #    We search for the binary name anywhere.
+        file(GLOB_RECURSE OCD_FOUND "${TEMP_ROOT}/openocd*")
+        
+        set(FINAL_OCD_BIN "")
+        foreach(ITEM ${OCD_FOUND})
+            # Filter: Ensure it is inside 'bin' and ends with 'openocd' (or .exe)
+            # We avoid 'openocd.cfg' or folder names
+            if(ITEM MATCHES "/bin/openocd(\\.exe)?$")
+                set(FINAL_OCD_BIN "${ITEM}")
+                break()
+            endif()
+        endforeach()
+
+        if(FINAL_OCD_BIN)
+            get_filename_component(OCD_BIN_DIR "${FINAL_OCD_BIN}" DIRECTORY)
+            get_filename_component(OCD_ROOT "${OCD_BIN_DIR}/.." ABSOLUTE)
+            
+            if(EXISTS "${WCH_OCD_DIR}") 
+                file(REMOVE_RECURSE "${WCH_OCD_DIR}")
+            endif()
+            file(RENAME "${OCD_ROOT}" "${WCH_OCD_DIR}")
+        else()
+            message(FATAL_ERROR "[Tools] Failed to locate 'openocd' in extracted archive!")
+        endif()
+
+        # Cleanup
+        file(REMOVE_RECURSE "${TEMP_ROOT}")
+
+    else()
+        message(STATUS "[Tools] WCH RISC-V Tools present.")
+    endif()
 endif()

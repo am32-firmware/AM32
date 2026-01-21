@@ -20,6 +20,7 @@ find_program(CMAKE_CXX_COMPILER arm-none-eabi-g++)
 find_program(CMAKE_ASM_COMPILER arm-none-eabi-gcc)
 find_program(CMAKE_OBJCOPY arm-none-eabi-objcopy)
 find_program(CMAKE_SIZE arm-none-eabi-size)
+find_program(CMAKE_OBJDUMP arm-none-eabi-objdump)
 
 # Lock down search modes
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)

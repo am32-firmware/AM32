@@ -30,6 +30,7 @@ compile_commands.json
 .ninja_deps
 CMakeCache.txt
 CMakeFiles/
+CmakeUserPresets.json
 *.cmake
 !cmake/*.cmake
 !cmake/modules/*.cmake

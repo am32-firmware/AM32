@@ -1,127 +1,44 @@
 # AM32 Development Guide
 
-This document explains **how the AM32 firmware build system works**, how to use it effectively, and how to extend it safely.
+## 1. Prerequisites
 
-The project supports **ARM (STM32 / GD32 / AT32)** and **WCH RISC-V (CH32)** microcontrollers using a unified, reproducible CMake-based build system.
+You need the base build tools installed on your system.
 
-## TL;DR; Quick Start
+* **ARM Toolchain:** Downloaded automatically by CMake.
+* **WCH RISC-V Toolchain:**
+  * **Linux/macOS:** Downloaded automatically by CMake.
+  * **Windows:** Requires manual installation of **MounRiver Studio**.
 
-- Install Git, Cmake, Ninja, Python3
-
-For ARM targets
-
-```bash
-git clone https://github.com/am32-firmware/AM32
-cd AM32
-cmake --preset arm
-cmake --build --preset build-arm
-```
-
-for WCH RISCV targets
-```bash
-cmake --preset wch-riscv
-cmake --build --preset build-wch
-```
-
-## 1. How the Build System Works
-
-AM32 uses a **family → board** generation model.
-
-### Core idea
-
-* **MCU Family** (e.g. `F415`, `G431`, `V203`) defines:
-
-  * CPU architecture and compiler flags
-  * linker scripts
-  * startup code and drivers
-  * OpenOCD + SVD configuration
-
-* **Boards** are declared in **`Inc/targets.h`**
-
-  * Each board name becomes **one firmware target**
-  * CMake does **not** contain a manual list of boards
-
-* During configuration:
-
-  1. CMake scans `targets.h`
-  2. Boards are grouped by MCU suffix (`_F415`, `_G431`, `_V203`, …)
-  3. One executable is generated **per board**
-
-There is no duplication of rules and no per-board CMake logic.
-
-## 2. Naming Conventions
-
-The build system relies on strict naming rules.
-
-### Board names
-
-* Must be defined in `Inc/targets.h`
-* Must contain an MCU suffix:
-
-  * `_F031`, `_F051`, `_F415`, `_G431`, `_V203`, etc.
-* Example:
-
-  ```
-  AM32REF_F051
-  ```
-
-### MCU family files
-
-| MCU  | File                                        |
-| ---- | ------------------------------------------- |
-| E230 | `cmake/targets/arm/target_e230.cmake`       |
-| F031 | `cmake/targets/arm/target_f031.cmake`       |
-| F051 | `cmake/targets/arm/target_f051.cmake`       |
-| F415 | `cmake/targets/arm/target_f415.cmake`       |
-| F421 | `cmake/targets/arm/target_f421.cmake`       |
-| G031 | `cmake/targets/arm/target_g031.cmake`       |
-| G071 | `cmake/targets/arm/target_g071.cmake`       |
-| G431 | `cmake/targets/arm/target_g431.cmake`       |
-| L431 | `cmake/targets/arm/target_l431.cmake`       |
-| V203 | `cmake/targets/wch_riscv/target_v203.cmake` |
-
-### CAN targets
-
-* Board name must end with `_CAN`
-* Automatically:
-
-  * switches linker script
-  * adds CAN sources
-* If `_CAN` is used but no CAN linker script exists → **configure error**
-
-## 3. Prerequisites
-
-The build system **automatically downloads**:
-
-* ARM GCC
-* WCH RISC-V GCC
-* OpenOCD for ARM and WCH version.
-
-You only need base build tools.
-
----
 
 ### Windows
 
-#### Option 1: PowerShell (recommended)
+#### Step 1: Install Base Tools (via Winget)
 
-Open **PowerShell as Administrator**:
+Open **PowerShell as Administrator** and run:
 
 ```powershell
 winget install Git.Git
 winget install Kitware.CMake
 winget install Ninja-build.Ninja
-winget install Python.Python.3
+winget install Python.Python.3.12
+
 ```
 
-Restart your terminal or VS Code after installation.
+#### Step 2: Install WCH Toolchain (MounRiver Studio)
 
-#### Option 2: Manual installation
+The build system on Windows relies on the official MounRiver Studio toolchain.
 
-1. Git: [https://git-scm.com/download/win](https://git-scm.com/download/win)
-2. CMake: [https://cmake.org/download/](https://cmake.org/download/) (enable *Add to PATH*)
-3. Ninja: [https://github.com/ninja-build/ninja/releases](https://github.com/ninja-build/ninja/releases)
-4. Python 3: [https://www.python.org/downloads/](https://www.python.org/downloads/) (enable *Add to PATH*)
+1. Download and install **MounRiver_Studio_Setup_V230.zip** from [http://www.mounriver.com/download](http://www.mounriver.com/download).
+2. **Run the IDE once** to ensure it downloads toolchains.
+3. **Set the Environment Variable:**
+Tell CMake where the toolchain is located. Update the path below to match your installation (point to the `RISC-V Embedded GCC` folder).
+**In PowerShell (User Scope):**
+```powershell
+[System.Environment]::SetEnvironmentVariable("AM32_WCH_TOOLCHAIN_PATH", "C:\MounRiver\MounRiver_Studio2\resources\app\resources\win32\components\WCH", "User")
+```
+Or set the actual path in case of non standard installation destination.
+
+*Restart your terminal or VS Code after running this command.*
 
 ---
 
@@ -144,204 +61,153 @@ sudo apt install cmake ninja-build python3 git build-essential
 
 ---
 
-## 4. Configure vs Build
+## 2. Quick Start
 
-### Configure step
+1. **Clone the repository:**
+```sh
+git clone https://github.com/am32-firmware/AM32
+cd AM32
 
-For ARM Targets
-```bash
-cmake --preset arm
 ```
 
-For WCH RISC-V Targets
-```bash
-cmake --preset wch-riscv
+2. **Open in VS Code:**
+```sh
+code .
 ```
 
-This step:
+3. **Install Recommended Extensions:**
+VS Code will prompt you to install extensions (C/C++, CMake Tools, Cortex-Debug). Click **Install All**.
+4. **Wait for Configuration:**
+* Select your preset in the status bar (e.g., `ARM` or `WCH RISC-V`).
+* CMake will configure the project.
 
-* downloads toolchains (first run only)
-* scans `targets.h`
-* generates **all firmware targets**
-* generates `.vscode/launch.json`
-* creates `compile_commands.json` for IntelliSense
-
-### Build all targets
-
-ARM targets
-```bash
-cmake --build --preset build-arm
-```
-
-WCH RISC-V targets
-```bash
-cmake --build --preset build-wch
-```
-
-This step:
-
-* compiles firmware
-* produces `.elf`, `.bin`, `.hex`
-* prints memory usage
-
-**Configure is required only once per change in structure.**
+* *Note:* If choosing `ARM`, tools will download automatically. If choosing `WCH`, it will verify your MounRiver path on Windows, but will download for MacOs/Linux.
 
 ---
 
-## 5. VS Code Setup
+## 3. How the Build System Works
 
-1. Install VS Code
-2. Open the AM32 repository root
-3. Install recommended extensions:
+AM32 uses a **family → board** generation model.
 
-   * C/C++
-   * CMake Tools
-   * Cortex-Debug
+### Core idea
 
----
+* **MCU Family** (e.g. `F415`, `G431`, `V203`) defines:
+* CPU architecture and flags
+* Linker scripts
+* Startup code and drivers
+* OpenOCD + SVD configuration
 
-## 6. Building in VS Code
+* **Boards** are declared in **`Inc/targets.h`**:
+* Each board name becomes **one firmware target**.
+* CMake does **not** contain a manual list of boards.
 
-### 1. Select Configure Preset
+* **Generation Process:**
+1. CMake scans `targets.h`.
+2. Boards are grouped by MCU suffix (`_F415`, `_G431`, `_V203`, …).
+3. One executable is generated **per board**.
 
-Bottom status bar → **CMake: No Kit Selected**
 
-* `ARM` → STM32 / GD32 / AT32
-* `WCH RISC-V` → CH32V203
+### Managing Target Visibility (Skip Lists)
 
-### 2. Configure
+The main `CMakeLists.txt` contains two lists that control which boards are built. This helps keep the release clean while allowing development on experimental hardware.
 
-VS Code usually auto-configures.
-If not:
+1. **`TARGET_SKIP_LIST` (Broken / Deprecated)**
+* Targets in this list are **never built**, neither locally nor in CI.
+* Use this for boards that are known to be broken, deprecated, or require hardware fixes.
 
-```
-CMake: Configure
-```
+2. **`TARGET_RELEASE_SKIP_LIST` (Private / Test)**
+* Targets in this list are built during **CI / Local Development** but are **excluded from Official Releases**.
+* Use this for:
+  * Private hardware prototypes.
+  * Test boards not ready for the public.
+* *Control Variable:* `AM32_OFFICIAL_RELEASE` (passed by GitHub Actions during release builds).
 
-> First configure may take several minutes due to toolchain downloads.
+To add a target to either list, simply edit the `set(...)` block in the root `CMakeLists.txt`.
 
-### 3. Build
+### Naming Conventions
 
-* Click **Build** in status bar
-* Or press **F7**
+* **Board Names:** Must be defined in `Inc/targets.h` and contain a valid MCU suffix.
+* *Example:* `AM32REF_F051`
 
-This builds **all boards for the selected architecture**.
-
----
-
-## 7. Debugging in VS Code
-
-1. Open **Run and Debug** (Ctrl+Shift+D)
-2. Select a configuration (e.g. *Debug STM32 F4*)
-3. Press **F5**
-
-This:
-
-* flashes firmware via OpenOCD
-* attaches GDB
-* loads SVD for register view
-
-Ensure:
-
-* ST-Link (ARM) or WCH-Link (RISC-V) is connected
-* no other OpenOCD instance is running
+* **CAN Targets:** Must end with `_CAN`.
+* Automatically switches linker scripts and includes CAN sources.
 
 ---
 
-## 8. Command Line Usage
+## 4. Building & Flashing
 
-### Configure
+### Command Line Usage
+
+**Configure:**
 
 ```bash
-cmake --preset arm
-cmake --preset wch-riscv
+cmake --preset arm          # Configure for ARM (STM32/AT32/GD32)
+cmake --preset wch-riscv    # Configure for WCH (CH32V203)
+
 ```
 
-### Build
+**Build:**
 
 ```bash
-cmake --build --preset build-arm
-cmake --build --preset build-arm --target AM32REF_F051
-cmake --build --preset build-arm --verbose
+cmake --build --preset build-arm   # Build all ARM targets
+cmake --build --preset build-wch   # Build all WCH targets
+
 ```
 
----
-
-## 9. Flashing from CLI
-
-Flashing uses **build directories**, not presets.
+**Flash Specific Target:**
 
 ```bash
 cmake --build --preset build-arm --target flash_AM32REF_F051
+
 ```
 
----
+### VS Code Usage
 
-## 10. Firmware Versioning & Reproducibility
-
-* Version comes from `Inc/version.h`
-* Git hash is embedded in firmware
-* **Clean build**
-
-  * commit timestamp used
-  * identical commit → identical binary
-* **Dirty build**
-
-  * `-dirty` suffix
-  * system time used
-
-This guarantees traceability and prevents confusion with unofficial builds.
+1. **Select Preset:** Click **CMake: [No Kit Selected]** in the status bar and choose `ARM` or `WCH RISC-V`.
+2. **Build:** Press **F7** (Build All).
+3. **Debug:** Go to **Run and Debug (Ctrl+Shift+D)**, select a target (e.g., *Debug STM32 F031*), and press **F5**.
 
 ---
 
-## 11. How to Add a New Board
+## 5. Firmware Versioning
 
-1. Edit `Inc/targets.h`
+* **Version Number:** Defined in `Inc/version.h`.
+* **Git Hash:** Embedded automatically.
+* **Clean Build:** Uses git commit timestamp. Identical commits produce identical binaries.
+* **Dirty Build:** Suffixes `-dirty` and uses system time.
+
+---
+
+## 6. How to Extend the Project
+
+### A. How to Add a New Board
+
+1. Edit `Inc/targets.h`.
 2. Add a board definition containing the MCU suffix:
-
 ```c
 #ifdef MY_NEW_BOARD_F415
 #define FILE_NAME "MY_NEW_BOARD_F415"
 #endif
 ```
 
-3. Reconfigure:
+3. **Reconfigure CMake** (VS Code: *Developer: Reload Window* or *Delete Cache and Reconfigure*).
+4. The new target `AM32_MY_NEW_BOARD_F415_...` will appear automatically.
 
-   * VS Code: *Delete Cache and Reconfigure*
-   * CLI: `cmake --preset arm`
+### B. How to Add a New MCU Family
 
-CMake will automatically generate the new target.
+1. Create `Mcu/f722/` folder.
+2. Add necessary files:
+* Startup code (`.s`)
+* Drivers / HAL
+* `ldscript.ld` (and optional `ldscript_CAN.ld`)
+* SVD file for debugging
 
----
+3. Create `cmake/targets/arm/target_f722.cmake` (you can use existing targets as an example)
+4. Reconfigure. The build system will auto-register the new family logic.
 
-## 12. How to Add a New MCU Family
+### C. How to Add a New Architecture
 
-1. Create `Mcu/f722/`
-
-2. Add:
-
-   * startup code
-   * drivers
-   * `ldscript.ld`
-   * optional `ldscript_CAN.ld` for CAN support
-   * SVD file
-
-3. Create `cmake/targets/arm/target_f722.cmake`
-
-4. Reconfigure — no registration required.
-
----
-
-## 13. How to Add a New Architecture
-
-1. Create toolchain file:
-
-   ```
-   cmake/toolchains/xtensa-esp32.cmake
-   ```
-
-2. Extend toolchain selection logic in `CMakeLists.txt`
-
-3. Add preset to `CMakePresets.json`
-
-4. Create `cmake/targets/<arch>/target_*.cmake`
+1. Create a toolchain file: e.g.: `cmake/toolchains/xtensa-esp32.cmake`.
+2. Extend toolchain selection logic in `CMakeLists.txt`.
+3. Add a new preset to `CMakePresets.json`.
+4. Create target logic in `cmake/targets/<arch>/target_*.cmake`.

@@ -69,6 +69,31 @@ uint8_t programming_mode;
 uint16_t position;
 uint8_t  new_byte;
 
+/**
+ * Decode and process DShot protocol data from DMA buffer.
+ *
+ * DShot is a digital protocol that encodes 16 bits per frame:
+ * - Bits 0-10: Throttle value (0-2047) or command (1-47)
+ * - Bit 11: Telemetry request flag
+ * - Bits 12-15: 4-bit CRC checksum
+ *
+ * This function:
+ * 1. Reads timer capture values from dma_buffer (populated by DMA from input pin)
+ * 2. Validates frame timing (frametime must be within expected range)
+ * 3. Decodes pulse widths to binary bits (pulse > half-frame-time = 1, else 0)
+ * 4. Verifies CRC checksum to detect transmission errors
+ * 5. Auto-detects inverted DShot signals (when not armed)
+ * 6. Handles programming mode for EEPROM configuration via DShot
+ * 7. Extracts throttle commands (48-2047) or special commands (1-47)
+ * 8. Manages EDT arming protocol
+ *
+ * Programming mode operates in 3 steps (command sequence):
+ * - Step 1: Receive EEPROM buffer position (0-191)
+ * - Step 2: Receive new byte value to write
+ * - Step 3: Commit on confirmation (value 37)
+ *
+ * Called from main loop when compute_dshot_flag is set by DMA complete interrupt.
+ */
 void computeDshotDMA()
 {
     dshot_frametime = dma_buffer[31] - dma_buffer[0];
@@ -107,10 +132,16 @@ void computeDshotDMA()
             if (dpulse[11] == 1) {
                 send_telemetry = 1;
             }
-            if(programming_mode > 0){  
-                if(programming_mode == 1){ // begin programming mode
-                    position = tocheck;    // eepromBuffer position
-                    programming_mode = 2;
+            if (programming_mode > 0) {
+                if (programming_mode == 1) { // begin programming mode
+                    if (tocheck < sizeof(eepromBuffer.buffer)) {
+                        position = tocheck;    // eepromBuffer position
+                        programming_mode = 2;
+                    } else {
+                        // Invalid position - reset to safe state and signal error
+                        programming_mode = 0;
+                        playBeaconTune3();  // Signal error with beep
+                    }
                     return;
                 }
                if(programming_mode == 2){
@@ -120,8 +151,11 @@ void computeDshotDMA()
                 }
                 if(programming_mode == 3){
                     if(tocheck == 37){  // commit new values to eeprom. must use save settings to make permanent.
-                    eepromBuffer.buffer[position] = new_byte;
-                    programming_mode = 0;
+                        // Safety check: verify position is still in bounds before write
+                        if (position < sizeof(eepromBuffer.buffer)) {
+                            eepromBuffer.buffer[position] = new_byte;
+                        }
+                        programming_mode = 0;
                   }
                 }
                 return; // don't process dshot signal when in programming mode

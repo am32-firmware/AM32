@@ -1,0 +1,81 @@
+name: Release
+
+on:
+  push:
+    tags: [ 'v*' ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    name: Build ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: "ARM"
+            configure: "arm"
+            build_preset: "build-arm"
+            artifact_name: "firmware-arm"
+          - name: "WCH RISC-V"
+            configure: "wch-riscv"
+            build_preset: "build-wch"
+            artifact_name: "firmware-riscv"
+
+    steps:
+    - uses: actions/checkout@v4
+      with: { submodules: recursive }
+    
+    - name: Install Tools
+      run: sudo apt-get update && sudo apt-get install -y ninja-build cmake python3
+
+    - name: Restore Tools Cache
+      uses: actions/cache@v4
+      with:
+        path: tools/
+        key: ${{ runner.os }}-am32-tools-${{ hashFiles('cmake/manage_tools.cmake') }}
+        restore-keys: ${{ runner.os }}-am32-tools-
+
+    - name: Setup toolset
+      run: cmake -P cmake/manage_tools.cmake
+    
+    - name: Configure & Build
+      run: |
+        cmake --preset ${{ matrix.configure }} -DAM32_OFFICIAL_RELEASE=ON
+        cmake --build --preset ${{ matrix.build_preset }}
+
+    # Upload directly (Python cleanup script is no longer needed!)
+    - name: Upload for Release
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.artifact_name }}
+        path: build/**/*.hex
+
+  publish:
+    name: Publish Release
+    needs: build-release
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: firmware
+        merge-multiple: true
+
+    - name: Package Assets
+      run: |
+        cd firmware
+        find . -type f -name "*.hex" -exec mv {} . \;
+        find . -type d -empty -delete
+        sha256sum *.hex > checksums.txt
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          firmware/*.hex
+          firmware/checksums.txt
+        draft: true
+        generate_release_notes: true

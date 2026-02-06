@@ -4,9 +4,10 @@
 #
 ###############################################################
 
+GCC_VERSION:=14.2.1-1.1
 
 ifeq ($(OS),Windows_NT)
-ARM_SDK_PREFIX:=tools/windows/xpack-arm-none-eabi-gcc-10.3.1-2.3/bin/arm-none-eabi-
+ARM_SDK_PREFIX:=tools/windows/xpack-arm-none-eabi-gcc-$(GCC_VERSION)/bin/arm-none-eabi-
 SHELL:=cmd.exe
 CP:=tools\\windows\\make\\bin\\cp
 DSEP:=\\
@@ -21,7 +22,7 @@ else
 # MacOS and Linux
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
-ARM_SDK_PREFIX:=tools/macos/xpack-arm-none-eabi-gcc-10.3.1-2.3/bin/arm-none-eabi-
+ARM_SDK_PREFIX:=tools/macos/xpack-arm-none-eabi-gcc-$(GCC_VERSION)/bin/arm-none-eabi-
 CP:=cp
 DSEP:=/
 NUL:=/dev/null
@@ -32,7 +33,7 @@ FGREP:=fgrep
 OSDIR:=macos
 else
 # assume Linux
-ARM_SDK_PREFIX:=tools/linux/xpack-arm-none-eabi-gcc-10.3.1-2.3/bin/arm-none-eabi-
+ARM_SDK_PREFIX:=tools/linux/xpack-arm-none-eabi-gcc-$(GCC_VERSION)/bin/arm-none-eabi-
 CP:=cp
 DSEP:=/
 NUL:=/dev/null

@@ -362,7 +362,11 @@ uint32_t REV_Id = 0;
 
 uint16_t armed_timeout_count;
 uint16_t reverse_speed_threshold = 1500;
+#if DRONECAN_SUPPORT
+uint32_t desync_happened = 0;
+#else
 uint8_t desync_happened = 0;
+#endif
 char maximum_throttle_change_ramp = 1;
 
 char crawler_mode = 0; // no longer used //

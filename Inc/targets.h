@@ -2290,6 +2290,22 @@
 #define USE_SERIAL_TELEMETRY
 #endif
 
+#ifdef YARI_F051
+#define FILE_NAME "YARI_F051"
+#define FIRMWARE_NAME "YARI ESC"
+#define DEAD_TIME 45
+#define HARDWARE_GROUP_F0_B
+#define MILLIVOLT_PER_AMP 50
+#define CURRENT_OFFSET 25
+#define TARGET_VOLTAGE_DIVIDER 110
+#define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_6
+#define VOLTAGE_ADC_PIN LL_GPIO_PIN_6
+#define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_3
+#define CURRENT_ADC_PIN LL_GPIO_PIN_3
+#define USE_SERIAL_TELEMETRY
+#define TARGET_MIN_BEMF_COUNTS 3
+#endif
+
 /*******************************   G071 Targets
  * *********************************/
 

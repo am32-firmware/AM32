@@ -248,5 +248,8 @@ void LPSPI0_IRQHandler(void)
 
 	//Call transfercomplete
 	transfercomplete();
+
+	//Set input_ready so processDshot is called in main loop
+	input_ready = 1;
 }
 

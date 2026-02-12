@@ -78,23 +78,23 @@ void sendDshotDma()
 			PORT_PCR_MUX(2) | PORT_PCR_IBE(0) | PORT_PCR_PE(1) | PORT_PCR_PS(1));
 
 	//Functional LPSPI0 clock is 12MHz. To get 5/4 x Dshot bit rate, SPI prescaler should be:
-	//Dshot600 => prescaler = 8
-	//Dshot300 => prescaler = 16
+	//Dshot600 => 750kbit => prescaler = 8
+	//Dshot300 => 375kbit => prescaler = 16
 
-	//Check if Dshot600
+	//Check if Dshot300
 	if (ic_timer_prescaler) {
-		//Set transmit prescaler to 8 for Dshot600
-		//Set framesize to 21 bits
-		modifyReg32(&LPSPI0->TCR,
-				LPSPI_TCR_PRESCALE_MASK | LPSPI_TCR_FRAMESZ_MASK,
-				LPSPI_TCR_PRESCALE(3) | LPSPI_TCR_FRAMESZ(20) | LPSPI_TCR_RXMSK(1));
-	//Is Dshot300
-	} else {
 		//Set transmit prescaler to 16 for Dshot300
 		//Set framesize to 21 bits
 		modifyReg32(&LPSPI0->TCR,
 				LPSPI_TCR_PRESCALE_MASK | LPSPI_TCR_FRAMESZ_MASK,
 				LPSPI_TCR_PRESCALE(4) | LPSPI_TCR_FRAMESZ(20) | LPSPI_TCR_RXMSK(1));
+	//Is Dshot600
+	} else {
+		//Set transmit prescaler to 8 for Dshot600
+		//Set framesize to 21 bits
+		modifyReg32(&LPSPI0->TCR,
+				LPSPI_TCR_PRESCALE_MASK | LPSPI_TCR_FRAMESZ_MASK,
+				LPSPI_TCR_PRESCALE(3) | LPSPI_TCR_FRAMESZ(20) | LPSPI_TCR_RXMSK(1));
 	}
 
 	//Send GCR data to LPSPI FIFO

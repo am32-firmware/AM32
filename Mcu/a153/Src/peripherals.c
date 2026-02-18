@@ -286,10 +286,10 @@ void initSPI(void)
 	//Unlock clock configuration registers access
 	modifyReg32(&SYSCON->CLKUNLOCK, SYSCON_CLKUNLOCK_UNLOCK(1), 0);
 
-	//Select FRO_HF as clock for LPSPI0, which is 192MHz, see SystemClock_Config()
+	//Select FRO_12M as clock for LPSPI0, which is 12MHz, see SystemClock_Config()
 	modifyReg32(&MRCC0->MRCC_LPSPI0_CLKSEL, MRCC_MRCC_LPSPI0_CLKSEL_MUX_MASK, MRCC_MRCC_LPSPI0_CLKSEL_MUX(0));
 
-	//Enable LPSPI0 and set divider to 4, so clock frequency is 48MHz
+	//Enable LPSPI0 and set divider to 1, so clock frequency is 12MHz
 	modifyReg32(&MRCC0->MRCC_LPSPI0_CLKDIV,
 			MRCC_MRCC_LPSPI0_CLKDIV_HALT_MASK | MRCC_MRCC_LPSPI0_CLKDIV_DIV_MASK,
 			MRCC_MRCC_LPSPI0_CLKDIV_DIV(0));
@@ -321,7 +321,7 @@ void initSPI(void)
 
 	//Set prescaler to 8, in the end it will be 16 due to an additional value doubling.
 	//Baud rate will be 750kbit/s at 12MHz functional clock
-	//Set frame size to 32.
+	//Set frame size to 21.
 	//Mask RX so we do not receive any data.
 	modifyReg32(&LPSPI0->TCR,
 			LPSPI_TCR_PRESCALE_MASK | LPSPI_TCR_FRAMESZ_MASK,

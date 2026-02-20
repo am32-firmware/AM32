@@ -2647,9 +2647,7 @@
 #define CURRENT_OFFSET          1650 //0	//millivolts
 #define MILLIVOLT_PER_AMP       200 //20
 #define USE_SERIAL_TELEMETRY
-#define USE_INTERNAL_AMP
 #define USE_LED_STRIP
-#define RESET 					0 //TODO find out what to do with this
 #endif
 
 #ifdef  CRAWLMASTER_F031
@@ -4461,7 +4459,7 @@
 
 #endif
 
-//TODO add correct data
+//NXP hardware group of the MCXA153
 #ifdef     HARDWARE_GROUP_NXP_MCXA153
 
 #define    MCU_A153
@@ -4474,15 +4472,14 @@
 #define    INPUT_PIN_ALT_FUNC		5		//CTIMER Capture input
 
 //This is the Dshot/PWM timer
-#define    IC_TIMER_CHANNEL    		LL_TIM_CHANNEL_CH1 //TODO is this needed for us?
 #define    IC_TIMER_REGISTER    	CTIMER0
 
 //This is the DMA used for the Dshot/PWM data transfer
 #define    INPUT_DMA_CHANNEL       	0 				//DMA channel 0
 #define    IC_DMA_IRQ_NAME         	DMA_CH0_IRQn
 
-//TODO set correct port pins
-#define PHASE_A_PIN_LOW       		0	//Pin number
+//Assign the pins/PORTs/GPIOs for each gate signal
+#define PHASE_A_PIN_LOW       		0		//Pin number
 #define PHASE_A_PORT_LOW   			PORT3	//PORT number
 #define PHASE_A_GPIO_LOW   			GPIO3	//GPIO number
 #define PHASE_A_PIN_HIGH       		1
@@ -4513,17 +4510,14 @@
 #define COMMON_COMP0_INP	0		//P2.2 COMP0_IN0
 #define COMMON_COMP1_INP	0		//P2.3 COMP1_IN0
 
-//TODO set correct UART pins and module
+//Assign UART pins and module
 #define SERIAL_TELEMETRY				LPUART1
 #define SERIAL_TELEMETRY_MODULE 		1
 #define SERIAL_TELEMETRY_TX_PORT 		PORT1	//P1.9
 #define SERIAL_TELEMETRY_TX_PIN 		9
 #define SERIAL_TELEMETRY_TX_ALT_FUNC 	2
-//#define SERIAL_TELEMETRY_RX_PORT 		PORT2
-//#define SERIAL_TELEMETRY_RX_PIN 		9
-//#define SERIAL_TELEMETRY_RX_ALT_FUNC 	3
 
-//TODO set correct ADC pins and channels
+//Assign ADC pins and channels
 #define CURRENT_SENSE_ADC_PIN     	7		//P2.7
 #define VOLTAGE_SENSE_ADC_PIN      	16		//P2.16
 #define SENSE_ADC_PORT 				PORT2
@@ -4908,7 +4902,7 @@
 #define USE_ADC
 #endif
 
-//TODO add correct data
+//NXP MCXA153/133
 #ifdef MCU_A153
 //#define STMICRO
 #define NXP
@@ -4916,7 +4910,8 @@
 #ifndef EEPROM_START_ADD
 #define EEPROM_START_ADD  (uint32_t)0x1E000		//Flash is 128kB, sector is 8kB
 #endif
-//TODO assign correct timer functions to timers
+
+//Assign correct timer functions to timers
 #define INTERVAL_TIMER     CTIMER2
 #define TEN_KHZ_TIMER      LPTMR0
 #define UTILITY_TIMER      SysTick
@@ -4934,14 +4929,14 @@
 #ifndef TARGET_MIN_BEMF_COUNTS
 #define TARGET_MIN_BEMF_COUNTS 3
 #endif
-//TODO Set to correct interrupt routines
+
+//Assign interrupt routines
 #define COM_TIMER_IRQ 				CTIMER1_IRQn
 #define DSHOT_PRIORITY_THRESHOLD 	60
 #define COMP0_IRQ 					CMP0_IRQn
 #define COMP1_IRQ 					CMP1_IRQn
 #define USE_ADC
 #endif
-
 
 #ifdef MCU_CH32V203
 #define WCH

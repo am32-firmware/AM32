@@ -1727,7 +1727,6 @@ e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation
     	input_ready = 0;
 	}
 #else
-	//TODO add our NXP here. Use input_ready for Dshot
 	if (input_ready) {
 		processDshot();
 		input_ready = 0;

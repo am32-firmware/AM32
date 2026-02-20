@@ -45,6 +45,7 @@ extern "C" {
 #include "serial_telemetry.h"
 #include "timers.h"
 #include "mcxa153_rom_api.h"
+#include "apa102.h"
 
 /* Private defines
  * -----------------------------------------------------------*/

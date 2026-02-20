@@ -41,6 +41,10 @@ void initCorePeripherals(void)
 	initDMA_UART();
 #endif
 
+#ifdef USE_LED_STRIP
+	init_apa102();
+#endif
+
 	NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);	//TODO check if this is needed or what it does
 
 }
@@ -289,7 +293,7 @@ void initSPI(void)
 	//Select FRO_12M as clock for LPSPI0, which is 12MHz, see SystemClock_Config()
 	modifyReg32(&MRCC0->MRCC_LPSPI0_CLKSEL, MRCC_MRCC_LPSPI0_CLKSEL_MUX_MASK, MRCC_MRCC_LPSPI0_CLKSEL_MUX(0));
 
-	//Enable LPSPI0 and set divider to 1, so clock frequency is 12MHz
+	//Enable LPSPI0 and set divider to 0, so clock frequency is 12MHz
 	modifyReg32(&MRCC0->MRCC_LPSPI0_CLKDIV,
 			MRCC_MRCC_LPSPI0_CLKDIV_HALT_MASK | MRCC_MRCC_LPSPI0_CLKDIV_DIV_MASK,
 			MRCC_MRCC_LPSPI0_CLKDIV_DIV(0));

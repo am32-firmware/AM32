@@ -17,8 +17,10 @@
 #include <string.h>
 #include <assert.h>
 
+#ifndef NXP
 #ifdef USE_LED_STRIP
 #include "WS2812.h"
+#endif
 #endif
 
 #ifdef USE_CRSF_INPUT

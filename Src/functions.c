@@ -86,6 +86,8 @@ void delayMicros(uint32_t micros)
 
 /*
   delay in millis, convenience wrapper around delayMicros
+  Note: For a long delay, say 100ms, there is a possibility that it goes into a nested delay
+  	  	  due to the tenKhzRoutine also calling the delay function.
  */
 void delayMillis(uint32_t millis)
 {

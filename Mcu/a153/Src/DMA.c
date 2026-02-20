@@ -216,25 +216,6 @@ void initDMA_UART(void)
 }
 
 /*
- * @brief 	Initializes DMA for sending Extended Dshot Telemetry (EDT) data to SPI FIFO for transfer over signal pin.
- * 			Gets DMA request in sendDshotDma().
- */
-void initDMA_SPI(void)
-{
-	//Unlock clock configuration registers access
-	modifyReg32(&SYSCON->CLKUNLOCK, SYSCON_CLKUNLOCK_UNLOCK(1), 0);
-
-	//Enable peripheral clocks
-	MRCC0->MRCC_GLB_CC0_SET = MRCC_MRCC_GLB_RST0_DMA(1);
-
-	//Release peripherals from reset
-	MRCC0->MRCC_GLB_RST0_SET = MRCC_MRCC_GLB_RST0_DMA(1);
-
-	//Freeze clock configuration registers access
-	modifyReg32(&SYSCON->CLKUNLOCK, 0, SYSCON_CLKUNLOCK_UNLOCK(1));
-}
-
-/*
  * @brief 	Enables the DMA and re-initializes the addresses and major loop count
  * 			(this is needed due to unwanted triggering)
  */

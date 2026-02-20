@@ -2648,6 +2648,7 @@
 #define MILLIVOLT_PER_AMP       200 //20
 #define USE_SERIAL_TELEMETRY
 #define USE_INTERNAL_AMP
+#define USE_LED_STRIP
 #define RESET 					0 //TODO find out what to do with this
 #endif
 

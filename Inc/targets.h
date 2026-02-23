@@ -2290,6 +2290,24 @@
 #define USE_SERIAL_TELEMETRY
 #endif
 
+/*******************************   G051 Targets
+ * *********************************/
+#ifdef VIMDRONES_S50_G051
+#define FILE_NAME "VIMDRONES_S50_G051"
+#define FIRMWARE_NAME "VM_S50_G051"
+#define DEAD_TIME 120
+#define HARDWARE_GROUP_G0_A
+#define SIXTY_FOUR_KB_MEMORY
+#define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_6
+#define VOLTAGE_ADC_PIN LL_GPIO_PIN_6
+#define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_5
+#define CURRENT_ADC_PIN LL_GPIO_PIN_5
+#define TARGET_VOLTAGE_DIVIDER 110
+#define MILLIVOLT_PER_AMP 10
+#define CURRENT_OFFSET 3
+#define USE_SERIAL_TELEMETRY
+#endif
+
 /*******************************   G071 Targets
  * *********************************/
 

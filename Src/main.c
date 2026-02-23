@@ -426,7 +426,7 @@ uint32_t last_average_interval;
 int e_com_time;
 
 uint16_t ADC_smoothed_input = 0;
-uint8_t degrees_celsius;
+int16_t degrees_celsius;
 int16_t converted_degrees;
 uint8_t temperature_offset;
 uint16_t ADC_raw_temp;
@@ -2082,6 +2082,7 @@ if(zero_crosses < 5){
         if (newinput > 2000) {
             newinput = 2000;
         }
+        input_ready = 1;
 #endif
         stuckcounter = 0;
         if (stepper_sine == 0) {

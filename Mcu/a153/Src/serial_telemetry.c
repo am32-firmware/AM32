@@ -89,6 +89,19 @@ void enable_telem_UART(void)
  */
 void send_telem_DMA(uint8_t bytes)
 {
+	//Sets the amount of major loop counts to handle before DMA transfer complete
+	modifyReg16(&DMA0->CH[DMA_CH_UART].TCD_CITER_ELINKNO, DMA_TCD_CITER_ELINKNO_CITER_MASK,
+			DMA_TCD_CITER_ELINKNO_CITER(bytes));
+
+	//Sets the amount of major loop counts after a DMA transfer completes
+	//i.e. the CITER register gets this BITER value after DMA transfer complete
+	modifyReg16(&DMA0->CH[DMA_CH_UART].TCD_BITER_ELINKNO, DMA_TCD_BITER_ELINKNO_BITER_MASK,
+			DMA_TCD_BITER_ELINKNO_BITER(bytes));
+
+	//Set last source address adjustment to 0 bytes
+	//Adds this value to the source address when the major loop is complete.
+	DMA0->CH[DMA_CH_UART].TCD_SLAST_SDA = -bytes;
+
 	//Enable DMA hardware request
 	modifyReg32(&DMA0->CH[DMA_CH_UART].CH_CSR, DMA_CH_CSR_ERQ_MASK, DMA_CH_CSR_ERQ(1));
 }

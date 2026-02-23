@@ -2643,12 +2643,14 @@
 #define NEED_INPUT_READY
 #define DEAD_TIME               70
 #define HARDWARE_GROUP_NXP_MCXA153
-#define TARGET_VOLTAGE_DIVIDER  457
-#define CURRENT_OFFSET          1650 //0	//millivolts
-#define MILLIVOLT_PER_AMP       200 //20
+#define TARGET_VOLTAGE_DIVIDER  100	//10k and 100k, but end voltage is in centivolts
+#define CURRENT_OFFSET          0 	//millivolts
+#define MILLIVOLT_PER_AMP       20
 #define USE_SERIAL_TELEMETRY
 #define USE_LED_STRIP
-#define RESET 0	//Not used for anything but needed to build correctly
+#define NUM_LEDS 1		//Amount of APA102 RGB LEDS
+#define BRIGHTNESS 3	//Can be from 0 to 31
+#define RESET 0			//Not used for anything but needed to build correctly
 #endif
 
 #ifdef  CRAWLMASTER_F031

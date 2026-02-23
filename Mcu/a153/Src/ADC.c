@@ -165,7 +165,7 @@ void initADC(void)
 #else
 	modifyReg32(&ADC0->CMD[2].CMDH,
 			ADC_CMDH_NEXT_MASK | ADC_CMDH_STS_MASK,
-			ADC_CMDH_NEXT(4) | ADC_CMDH_STS(2));
+			ADC_CMDH_NEXT(4) | ADC_CMDH_LOOP(1) | ADC_CMDH_AVGS(8) | ADC_CMDH_STS(6));
 
 	//Set CMD4 for measured optional input
 	modifyReg32(&ADC0->CMD[3].CMDL,

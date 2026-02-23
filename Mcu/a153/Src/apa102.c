@@ -7,9 +7,6 @@
 
 #include "apa102.h"
 
-#define NUM_LEDS 1
-#define BRIGHTNESS 31	//Can be from 0 to 31
-
 /*
  * @brief 	Initialize SPI1 for RGB led use.
  * 			SPI uses functional clock of 12MHz

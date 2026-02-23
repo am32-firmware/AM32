@@ -30,6 +30,7 @@ extern uint16_t battery_voltage;
 extern int16_t actual_current;
 extern uint16_t e_rpm;
 extern uint32_t average_interval;
+extern int16_t degrees_celsius;
 
 
 #ifdef STMICRO

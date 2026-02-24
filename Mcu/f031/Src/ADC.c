@@ -27,11 +27,15 @@ void ADC_DMA_Callback()
     ADC_raw_input = ADCDataDMA[0];
 
 #else
-
+if(VOLTAGE_ADC_CHANNEL < CURRENT_ADC_CHANNEL){
+    ADC_raw_temp = ADCDataDMA[2];
+    ADC_raw_volts = ADCDataDMA[0];
+    ADC_raw_current = ADCDataDMA[1];
+} else {
     ADC_raw_temp = ADCDataDMA[2];
     ADC_raw_volts = ADCDataDMA[1];
     ADC_raw_current = ADCDataDMA[0];
-
+}
 #endif
 }
 
@@ -143,11 +147,9 @@ void ADC_Init(void)
 #ifdef USE_ADC_INPUT
     LL_ADC_REG_SetSequencerChAdd(ADC1, LL_ADC_CHANNEL_2);
 #endif
-#ifndef USE_TIMER_2_CHANNEL_1
     LL_ADC_REG_SetSequencerChAdd(ADC1, VOLTAGE_ADC_CHANNEL);
     /** Configure Regular Channel
      */
-#endif
     LL_ADC_REG_SetSequencerChAdd(ADC1, CURRENT_ADC_CHANNEL);
     /** Configure Regular Channel
      */

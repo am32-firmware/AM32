@@ -25,10 +25,10 @@ void enableHalfTransferInt();
 void setInputPullNone();
 
 extern char bi_direction;
-extern char inputSet;
+extern volatile char inputSet;
 extern char dshot;
-extern char servoPwm;
-extern char send_telemetry;
+extern volatile char servoPwm;
+extern volatile char send_telemetry;
 extern uint8_t degrees_celsius;
 
 extern uint16_t ADC_raw_volts;

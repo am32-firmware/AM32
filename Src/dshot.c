@@ -49,7 +49,7 @@ char EDT_ARMED = 0;
 int shift_amount = 0;
 uint32_t gcrnumber;
 extern int zero_crosses;
-extern char send_telemetry;
+extern volatile char send_telemetry;
 extern uint8_t max_duty_cycle_change;
 int dshot_full_number;
 extern char play_tone_flag;

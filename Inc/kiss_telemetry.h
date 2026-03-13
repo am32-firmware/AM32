@@ -5,7 +5,7 @@
 
 typedef struct __attribute__((packed))
 {
-    uint8_t temperature; // temperature in Celcius
+    int8_t temperature; // temperature in Celcius
     uint8_t voltage_h; // voltage in centivolts
     uint8_t voltage_l;
     uint8_t current_h; // current in centiamps

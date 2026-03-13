@@ -262,7 +262,7 @@ void make_dshot_package(uint16_t com_time)
                 telem_scheduler.voltage_count = 0;
             }
             else if (telem_scheduler.temp_count >= TEMP_EDT_RATE_DIVISOR) {
-                extended_frame_to_send = 0b0010 << 8 | degrees_celsius;
+                extended_frame_to_send = 0b0010 << 8 | (uint8_t)degrees_celsius;
                 telem_scheduler.temp_count = 0;
             }
         }

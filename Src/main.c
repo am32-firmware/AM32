@@ -1671,6 +1671,9 @@ static void checkDeviceInfo(void)
 #define DEVINFO_MAGIC1 0x5925e3da
 #define DEVINFO_MAGIC2 0x4eb863d9
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+
     const struct devinfo {
         uint32_t magic1;
         uint32_t magic2;
@@ -1694,6 +1697,7 @@ static void checkDeviceInfo(void)
             break;
     }
 
+#pragma GCC diagnostic pop
     // TODO: check pin code and reboot to bootloader if incorrect
 
 }

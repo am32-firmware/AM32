@@ -107,6 +107,7 @@ extern char armed;
 extern uint32_t commutation_interval;
 extern uint8_t auto_advance_level;
 extern uint16_t low_cell_volt_cutoff;
+extern uint32_t desync_happened;
 
 static uint16_t last_can_input;
 static struct {
@@ -1039,7 +1040,7 @@ static void send_ESCStatus(void)
     uint8_t buffer[UAVCAN_EQUIPMENT_ESC_STATUS_MAX_SIZE];
 
     // make up some synthetic status data
-    pkt.error_count = 0;
+    pkt.error_count = desync_happened;  // fill desync count here
     pkt.voltage = battery_voltage * 0.01;
 
     pkt.current = (current.sum/(float)current.count) * 0.01;

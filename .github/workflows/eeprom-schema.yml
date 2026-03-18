@@ -1,0 +1,64 @@
+name: EEPROM Schema Validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Inc/eeprom.json'
+      - 'Inc/eeprom.h'
+      - 'generate_eeprom.py'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'Inc/eeprom.json'
+      - 'Inc/eeprom.h'
+      - 'generate_eeprom.py'
+
+jobs:
+  validate:
+    name: Validate Schema
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Validate JSON syntax
+        run: python -c "import json; json.load(open('Inc/eeprom.json'))"
+
+      - name: Generate header and compare
+        run: |
+          # Save committed version
+          cp Inc/eeprom.h /tmp/committed.h
+
+          # Regenerate from schema
+          python generate_eeprom.py Inc/eeprom.json
+
+          # Strip timestamp line (line 2) for comparison since it changes on each generation
+          sed '2d' /tmp/committed.h > /tmp/committed_clean.h
+          sed '2d' Inc/eeprom.h > /tmp/generated_clean.h
+
+          if ! diff -q /tmp/committed_clean.h /tmp/generated_clean.h > /dev/null; then
+            echo "::error::Inc/eeprom.h does not match the schema. Please regenerate:"
+            echo "::error::  python generate_eeprom.py Inc/eeprom.json"
+            echo ""
+            echo "Diff:"
+            diff /tmp/committed_clean.h /tmp/generated_clean.h || true
+            exit 1
+          fi
+
+          echo "eeprom.h matches the schema"
+
+  notify-schema-update:
+    name: Schema Update Notice
+    runs-on: ubuntu-latest
+    needs: validate
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Post update reminder
+        run: |
+          echo "::notice title=Schema Updated::Inc/eeprom.json has been merged to main. Remember to update the hosted schema at am32.ca/eeprom"

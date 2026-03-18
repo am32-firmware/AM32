@@ -12,7 +12,6 @@ extern char inputSet;
 extern char dshot;
 extern char servoPwm;
 extern char send_telemetry;
-extern uint8_t degrees_celsius;
 extern char crawler_mode;
 
 extern uint16_t ADC_raw_volts;

@@ -61,7 +61,7 @@ void sendDshotDma()
     IC_TIMER_REGISTER->CCER = 0x3;
 
     IC_TIMER_REGISTER->PSC = output_timer_prescaler;
-    IC_TIMER_REGISTER->ARR = 92;
+    IC_TIMER_REGISTER->ARR = 108;
     out_put = 1;
     LL_TIM_GenerateEvent_UPDATE(IC_TIMER_REGISTER);
 

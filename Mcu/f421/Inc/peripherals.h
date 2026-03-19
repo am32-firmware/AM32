@@ -48,3 +48,4 @@ void reloadWatchDogCounter(void);
 void generatePwmTimerEvent(void);
 void UN_TIM_Init(void);
 void LED_GPIO_init(void);
+void setIndividualRGBLed(uint8_t red, uint8_t green, uint8_t blue);

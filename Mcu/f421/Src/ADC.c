@@ -1,58 +1,43 @@
 
 #include "ADC.h"
-
+#include "ntc_tables.h"
 #include "functions.h"
 #include "targets.h"
 
 #ifdef USE_ADC
 
-#ifdef PA6_NTC_ONLY
-uint16_t ADCDataDMA[1];
-#else
-#ifdef USE_ADC_INPUT
-uint16_t ADCDataDMA[4];
+
+#if defined(USE_ADC_INPUT) || defined(USE_NTC)
+uint16_t ADCDataDMA[5];
 #else
 uint16_t ADCDataDMA[4];
 #endif
-#endif
+
 
 extern uint16_t ADC_raw_temp;
 extern uint16_t ADC_raw_volts;
 extern uint16_t ADC_raw_current;
 extern uint16_t ADC_raw_input;
-
-#ifdef USE_NTC
-int NTC_table[65] = {
-  400, 332, 264, 230, 208, 192, 180, 170, 161, 
-  154, 147, 141, 136, 131, 127, 122, 119, 115, 
-  111, 108, 105, 102, 99, 96, 94, 91, 88, 86, 
-  84, 81, 79, 77, 74, 72, 70, 68, 66, 63, 61, 
-  59, 57, 55, 53, 50, 48, 46, 44, 41, 39, 37, 
-  34, 32, 29, 26, 23, 20, 16, 13, 9, 4, -1, 
-  -8, -16, -29, -42
-};
-#endif
+extern uint16_t ADC_raw_ntc;
 
 void ADC_DMA_Callback()
 { // read dma buffer and set extern variables
-#ifdef PA6_NTC_ONLY
-    ADC_raw_temp = ADCDataDMA[0];
-#else
 #ifdef USE_ADC_INPUT
     ADC_raw_temp = ADCDataDMA[3];
     ADC_raw_volts = ADCDataDMA[1] / 2;
     ADC_raw_current = ADCDataDMA[2];
     ADC_raw_input = ADCDataDMA[0];
 #else
+  #ifdef USE_NTC
+    ADC_raw_ntc = ADCDataDMA[4];
     ADC_raw_temp = ADCDataDMA[3];
-#ifdef PA6_VOLTAGE
-    ADC_raw_volts = ADCDataDMA[1];
-    ADC_raw_current = ADCDataDMA[0];
-#else
     ADC_raw_volts = ADCDataDMA[0];
     ADC_raw_current = ADCDataDMA[1];
-#endif
-#endif
+  #else
+    ADC_raw_temp = ADCDataDMA[3];
+    ADC_raw_volts = ADCDataDMA[0];
+    ADC_raw_current = ADCDataDMA[1];
+  #endif
 #endif
 }
 
@@ -65,7 +50,7 @@ void ADC_Init(void)
 #endif
     gpio_mode_QUICK(GPIOA, GPIO_MODE_ANALOG, GPIO_PULL_NONE, VOLTAGE_ADC_PIN);
 #ifdef USE_NTC
-    gpio_mode_QUICK(GPIOA, GPIO_MODE_ANALOG, GPIO_PULL_NONE, TEMP_ADC_PIN);
+    gpio_mode_QUICK(GPIOA, GPIO_MODE_ANALOG, GPIO_PULL_NONE, NTC_ADC_PIN);
 #endif 
 
 
@@ -74,8 +59,8 @@ void ADC_Init(void)
     // nvic_irq_enable(DMA1_Channel1_IRQn, 3, 0);
     dma_reset(DMA1_CHANNEL1);
     dma_default_para_init(&dma_init_struct);
-#ifdef PA6_NTC_ONLY
-    dma_init_struct.buffer_size = 1;
+#ifdef USE_NTC
+    dma_init_struct.buffer_size = 5;
 #else
     dma_init_struct.buffer_size = 4;
 #endif
@@ -101,10 +86,14 @@ void ADC_Init(void)
     adc_base_struct.sequence_mode = TRUE;
     adc_base_struct.repeat_mode = TRUE;
     adc_base_struct.data_align = ADC_RIGHT_ALIGNMENT;
-#ifdef PA6_NTC_ONLY
-    adc_base_struct.ordinary_channel_length = 1;
+#ifdef USE_NTC
+    adc_base_struct.ordinary_channel_length = 5;
     adc_base_config(ADC1, &adc_base_struct);
-    adc_ordinary_channel_set(ADC1, ADC_CHANNEL_6, 1, ADC_SAMPLETIME_28_5);
+    adc_ordinary_channel_set(ADC1, VOLTAGE_ADC_CHANNEL, 1, ADC_SAMPLETIME_28_5);
+    adc_ordinary_channel_set(ADC1, CURRENT_ADC_CHANNEL, 2, ADC_SAMPLETIME_28_5);
+    adc_ordinary_channel_set(ADC1, ADC_CHANNEL_17, 3, ADC_SAMPLETIME_28_5);
+    adc_ordinary_channel_set(ADC1, TEMP_ADC_CHANNEL, 4, ADC_SAMPLETIME_239_5);
+    adc_ordinary_channel_set(ADC1, NTC_ADC_CHANNEL, 5, ADC_SAMPLETIME_28_5);
 #else
     adc_base_struct.ordinary_channel_length = 4;
     adc_base_config(ADC1, &adc_base_struct);
@@ -127,16 +116,18 @@ void ADC_Init(void)
         ;
 }
 
+#ifdef USE_NTC
+int16_t getNTCDegrees(uint16_t ntcrawtemp){
+  int p1,p2;
+  p1 = NTC_table[ (ntcrawtemp >> 6)  ];
+  p2 = NTC_table[ (ntcrawtemp >> 6)+1];
+  return p1 - ( (p1-p2) * (ntcrawtemp & 0x003F) ) / 64;
+}
+#endif
+
 int16_t getConvertedDegrees(uint16_t adcrawtemp)
 {
-#ifdef USE_NTC 
-  int p1,p2;
-  p1 = NTC_table[ (adcrawtemp >> 6)  ];
-  p2 = NTC_table[ (adcrawtemp >> 6)+1];
-  return p1 - ( (p1-p2) * (adcrawtemp & 0x003F) ) / 64;
-#else
     return (12800 - (int32_t)adcrawtemp * 33000 / 4096) / -42 + 25;
-#endif
 }
 
 #endif // USE_ADC

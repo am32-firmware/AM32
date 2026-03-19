@@ -318,7 +318,7 @@ uint32_t start_process = 0;
 uint16_t one_khz_loop_counter = 0;
 uint16_t target_e_com_time_high;
 uint16_t target_e_com_time_low;
-uint8_t compute_dshot_flag = 0;
+volatile uint8_t compute_dshot_flag = 0;
 uint8_t crsf_input_channel = 1;
 uint8_t crsf_output_PWM_channel = 2;
 uint8_t telemetry_interval_ms = 30;
@@ -421,7 +421,7 @@ uint16_t throttle_max_at_low_rpm = 400;
 uint16_t throttle_max_at_high_rpm = 2000;
 
 uint16_t commutation_intervals[6] = { 0 };
-uint32_t average_interval = 0;
+volatile uint32_t average_interval = 0;
 uint32_t last_average_interval;
 int e_com_time;
 
@@ -435,11 +435,11 @@ uint16_t ADC_raw_current;
 uint16_t ADC_raw_input;
 uint16_t ADC_raw_ntc;
 uint8_t PROCESS_ADC_FLAG = 0;
-char send_telemetry = 0;
+volatile char send_telemetry = 0;
 char telemetry_done = 0;
 char prop_brake_active = 0;
 
-char dshot_telemetry = 0;
+volatile char dshot_telemetry = 0;
 
 uint8_t last_dshot_command = 0;
 char old_routine = 1;
@@ -460,7 +460,7 @@ uint8_t filter_level = 5;
 uint8_t running = 0;
 uint16_t advance = 0;
 uint8_t advancedivisor = 6;
-char rising = 1;
+volatile char rising = 1;
 
 ////Space Vector PWM ////////////////
 // const int pwmSin[] ={128, 132, 136, 140, 143, 147, 151, 155, 159, 162, 166,
@@ -533,29 +533,29 @@ uint8_t bad_count_threshold = CPU_FREQUENCY_MHZ / 24;
 uint8_t dshotcommand;
 uint16_t armed_count_threshold = 1000;
 
-char armed = 0;
+volatile char armed = 0;
 uint16_t zero_input_count = 0;
 
 uint16_t input = 0;
-uint16_t newinput = 0;
-char inputSet = 0;
+volatile uint16_t newinput = 0;
+volatile char inputSet = 0;
 char dshot = 0;
-char servoPwm = 0;
-uint32_t zero_crosses;
+volatile char servoPwm = 0;
+volatile uint32_t zero_crosses;
 
-uint8_t zcfound = 0;
+volatile uint8_t zcfound = 0;
 
-uint8_t bemfcounter;
+volatile uint8_t bemfcounter;
 uint8_t min_bemf_counts_up = TARGET_MIN_BEMF_COUNTS;
 uint8_t min_bemf_counts_down = TARGET_MIN_BEMF_COUNTS;
 
-uint16_t lastzctime;
-uint16_t thiszctime;
+volatile uint16_t lastzctime;
+volatile uint16_t thiszctime;
 
-uint16_t duty_cycle = 0;
+volatile uint16_t duty_cycle = 0;
 char step = 1;
-uint32_t commutation_interval = 12500;
-uint16_t waitTime = 0;
+volatile uint32_t commutation_interval = 12500;
+volatile uint16_t waitTime = 0;
 uint16_t signaltimeout = 0;
 uint8_t ubAnalogWatchdogStatus = RESET;
 

@@ -103,8 +103,8 @@ static void can_printf(const char *fmt, ...);
   access to settings from main.c
  */
 extern uint16_t motor_kv;
-extern char armed;
-extern uint32_t commutation_interval;
+extern volatile char armed;
+extern volatile uint32_t commutation_interval;
 extern uint8_t auto_advance_level;
 extern uint16_t low_cell_volt_cutoff;
 

@@ -42,13 +42,23 @@ void setCaptureCompare()
 }
 
 void playBJNote(uint16_t freq, uint16_t bduration)
-{
+{ // hz and ms
+#ifdef NXP
+    uint32_t PWM_IPBUS_CLOCK_HZ = 192000000;
+
+    SET_ACTUAL_PRESCALER_PWM(7);								//Set prescaler to 128 (max)
+    SET_AUTO_RELOAD_PWM((PWM_IPBUS_CLOCK_HZ / 128) / freq);	//Set PWM reload time to corresponding frequency
+    SET_DUTY_CYCLE_ALL(beep_volume);							//Set beep volume (between 0 and 22, see setVolume())
+
+#else
     uint16_t timerOne_reload;
     SET_PRESCALER_PWM(9);
     timerOne_reload = (uint16_t)(CPU_FREQUENCY_MHZ * 100000 / freq);
     SET_AUTO_RELOAD_PWM(timerOne_reload);
     SET_DUTY_CYCLE_ALL(beep_volume * timerOne_reload/TIM1_AUTORELOAD);
     delayMillis(bduration);
+
+#endif
 }
 
 uint16_t getBlueJayNoteFrequency(uint8_t bjarrayfreq)
@@ -113,7 +123,9 @@ comStep(3);
     playBlueJayTune();
     } else {
         SET_AUTO_RELOAD_PWM(TIM1_AUTORELOAD);
+        delayMillis(1);
         setCaptureCompare();
+
         comStep(3); // activate a pwm channel
         SET_PRESCALER_PWM(55); // frequency of beep
         delayMillis(200); // duration of beep
@@ -213,12 +225,16 @@ void playInputTune()
     RELOAD_WATCHDOG_COUNTER();
     SET_PRESCALER_PWM(80);
     setCaptureCompare();
+
     comStep(3);
     delayMillis(100);
+
     SET_PRESCALER_PWM(70);
     delayMillis(100);
+
     SET_PRESCALER_PWM(40);
     delayMillis(100);
+
     allOff();
     SET_PRESCALER_PWM(0);
     signaltimeout = 0;

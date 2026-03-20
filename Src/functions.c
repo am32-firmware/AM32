@@ -58,6 +58,9 @@ static inline uint16_t get_timer_us16(void) {
     return TIMER_CNT(UTILITY_TIMER);
 #elif defined(ARTERY)
     return UTILITY_TIMER->cval;
+#elif defined(NXP)
+    //Return nothing since NXP micro-tick works differently
+    return 0;
 #elif defined(WCH)
     return UTILITY_TIMER->CNT>>1;
 #else
@@ -66,23 +69,35 @@ static inline uint16_t get_timer_us16(void) {
 }
 
 /*
-  delay by microseconds, max 65535
+ * @brief 	Delay in micros
  */
 void delayMicros(uint32_t micros)
 {
-    const uint16_t cval_start = get_timer_us16();
-    while ((uint16_t)(get_timer_us16() - cval_start) < (uint16_t)micros) {
-    }
+    //Set delay value
+	modifyReg32(&UTICK0->CTRL, UTICK_CTRL_DELAYVAL_MASK, UTICK_CTRL_DELAYVAL(micros));
+
+	//Wait until micro-tick timer is finished
+	while (!(UTICK0->STAT & UTICK_STAT_INTR_MASK)) {}
+
+	//Clear UTICK interrupt flag
+	UTICK0->STAT = UTICK_STAT_INTR(1);
 }
+
 
 /*
   delay in millis, convenience wrapper around delayMicros
+  Note: For a long delay, say 100ms, there is a possibility that it goes into a nested delay
+  	  	  due to the tenKhzRoutine also calling the delay function.
  */
 void delayMillis(uint32_t millis)
 {
+#ifdef NXP
+	delayMicros(1000UL * millis);
+#else
     while (millis-- > 0) {
         delayMicros(1000UL);
     }
+#endif
 }
 
 uint8_t update_crc8(uint8_t crc, uint8_t crc_seed)

@@ -2082,6 +2082,7 @@ if(zero_crosses < 5){
         if (newinput > 2000) {
             newinput = 2000;
         }
+        input_ready = 1;       
 #endif
         stuckcounter = 0;
         if (stepper_sine == 0) {

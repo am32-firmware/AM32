@@ -2176,7 +2176,7 @@ if(zero_crosses < 5){
 #else
 
             if (input > 48 && armed) {
-
+                PROCESS_ADC_FLAG = 1;
                 if (input > 48 && input < 137) { // sine wave stepper
 
                     if (do_once_sinemode) {

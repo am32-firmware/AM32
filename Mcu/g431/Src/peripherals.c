@@ -489,9 +489,9 @@ void enableCorePeripherals()
 
 #ifdef USE_RGB_LED
     LED_GPIO_init();
-    GPIOB->BRR = LL_GPIO_PIN_8; // turn on red
-    GPIOB->BSRR = LL_GPIO_PIN_5;
-    GPIOB->BSRR = LL_GPIO_PIN_3; //
+    RED_PORT->BRR = RED_PIN; // turn on red
+    GREEN_PORT->BSRR = GREEN_PIN;
+    BLUE_PORT->BSRR = BLUE_PIN;
 #endif
 
 #ifndef BRUSHED_MODE
@@ -524,3 +524,55 @@ void enableCorePeripherals()
 		 LL_GPIO_SetPinMode(RPM_PULSE_PORT, RPM_PULSE_PIN, LL_GPIO_MODE_OUTPUT);
 #endif
 }
+
+#ifdef USE_RGB_LED
+
+#define GPIO_PORT_AHB2_CLK(port) \
+    (1U << (((uint32_t)(port) - (uint32_t)GPIOA) / ((uint32_t)GPIOB - (uint32_t)GPIOA)))
+
+void LED_GPIO_init()
+{
+    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+
+    LL_AHB2_GRP1_EnableClock(
+        GPIO_PORT_AHB2_CLK(RED_PORT) |
+        GPIO_PORT_AHB2_CLK(GREEN_PORT) |
+        GPIO_PORT_AHB2_CLK(BLUE_PORT));
+
+    LL_GPIO_ResetOutputPin(RED_PORT, RED_PIN);
+    LL_GPIO_ResetOutputPin(GREEN_PORT, GREEN_PIN);
+    LL_GPIO_ResetOutputPin(BLUE_PORT, BLUE_PIN);
+
+    GPIO_InitStruct.Pin = RED_PIN;
+    GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+    LL_GPIO_Init(RED_PORT, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = GREEN_PIN;
+    LL_GPIO_Init(GREEN_PORT, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = BLUE_PIN;
+    LL_GPIO_Init(BLUE_PORT, &GPIO_InitStruct);
+}
+
+void setIndividualRGBLed(uint8_t red, uint8_t green, uint8_t blue)
+{
+    if (red > 0) {
+        RED_PORT->BRR = RED_PIN;
+    } else {
+        RED_PORT->BSRR = RED_PIN;
+    }
+    if (green > 0) {
+        GREEN_PORT->BRR = GREEN_PIN;
+    } else {
+        GREEN_PORT->BSRR = GREEN_PIN;
+    }
+    if (blue > 0) {
+        BLUE_PORT->BRR = BLUE_PIN;
+    } else {
+        BLUE_PORT->BSRR = BLUE_PIN;
+    }
+}
+#endif

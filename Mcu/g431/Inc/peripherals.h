@@ -50,3 +50,5 @@ void setPWMCompare3(uint16_t comparethree);
 void enableCorePeripherals(void);
 void reloadWatchDogCounter(void);
 void generatePwmTimerEvent(void);
+void LED_GPIO_init(void);
+void setIndividualRGBLed(uint8_t red, uint8_t green, uint8_t blue);

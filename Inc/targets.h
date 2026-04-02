@@ -384,6 +384,9 @@
 #define BLUE_PORT   GPIOC
 #define BLUE_PIN    LL_GPIO_PIN_8
 
+#define CAN_TERM_PIN GPIO_PORT_PIN(2, 12) // PC12
+#define CAN_TERM_POLARITY 1 // active high
+
 #define USE_HSE
 #undef HSE_VALUE
 #define HSE_VALUE 8000000

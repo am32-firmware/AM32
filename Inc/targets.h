@@ -387,6 +387,11 @@
 #define CAN_TERM_PIN GPIO_PORT_PIN(2, 12) // PC12
 #define CAN_TERM_POLARITY 1 // active high
 
+#define CAN_TX_PIN LL_GPIO_PIN_9
+#define CAN_TX_PORT GPIOB
+#define CAN_RX_PIN LL_GPIO_PIN_11
+#define CAN_RX_PORT GPIOA
+
 #define USE_HSE
 #undef HSE_VALUE
 #define HSE_VALUE 8000000
@@ -5253,7 +5258,15 @@
 #ifndef AF_C_LOW
   #define AF_C_LOW LL_GPIO_AF_6
 #endif
- 
+#ifndef CAN_TX_PIN
+  #define CAN_TX_PIN LL_GPIO_PIN_12
+  #define CAN_TX_PORT GPIOA
+#endif
+#ifndef CAN_RX_PIN
+  #define CAN_RX_PIN LL_GPIO_PIN_11
+  #define CAN_RX_PORT GPIOA
+#endif
+
 #define DSHOT_PRIORITY_THRESHOLD 60
 #define COM_TIMER_IRQ TIM1_UP_TIM16_IRQn
 #endif

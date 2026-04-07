@@ -47,7 +47,7 @@ char send_EDT_deinit;
 char EDT_ARM_ENABLE = 0;
 char EDT_ARMED = 0;
 int shift_amount = 0;
-uint32_t gcrnumber;
+volatile uint32_t gcrnumber;
 extern int zero_crosses;
 extern char send_telemetry;
 extern uint8_t max_duty_cycle_change;
@@ -68,6 +68,12 @@ uint16_t halfpulsetime = 0;
 uint8_t programming_mode;
 uint16_t position;
 uint8_t  new_byte;
+
+//TODO remove this
+uint32_t avg_data_arr[100];
+uint32_t avg_window = 100;
+uint32_t avg_data = 0;
+uint8_t avg_idx = 0;
 
 void computeDshotDMA()
 {
@@ -314,13 +320,10 @@ void make_dshot_package(uint16_t com_time)
 
     // GCR RLL encode 16 to 20 bit
 
-    gcrnumber = gcr_encode_table[(dshot_full_number >> 12)]
-            << 15 // first set of four digits
-        | gcr_encode_table[(((1 << 4) - 1) & (dshot_full_number >> 8))]
-            << 10 // 2nd set of 4 digits
-        | gcr_encode_table[(((1 << 4) - 1) & (dshot_full_number >> 4))]
-            << 5 // 3rd set of four digits
-        | gcr_encode_table[(((1 << 4) - 1) & (dshot_full_number >> 0))]; // last four digits
+    gcrnumber = gcr_encode_table[(dshot_full_number >> 12)] << 15 // first set of four digits
+        | gcr_encode_table[(0xf & (dshot_full_number >> 8))] << 10 // 2nd set of 4 digits
+        | gcr_encode_table[(0xf & (dshot_full_number >> 4))] << 5 // 3rd set of four digits
+        | gcr_encode_table[(0xf & (dshot_full_number >> 0))]; // last four digits
 // GCR RLL encode 20 to 21bit output
 #if defined(MCU_F051) || defined(MCU_F031) || defined(MCU_CH32V203)
     gcr[1 + buffer_padding] = 64;
@@ -330,12 +333,19 @@ void make_dshot_package(uint16_t com_time)
                   // output timer.
     }
     gcr[buffer_padding] = 0;
+#elif defined(NXP)
+    //Do grey encoding
+    //Apparently GCR RLL is not done here but Grey encoding.
+    uint32_t binary = gcrnumber;
+    while (gcrnumber >>= 1) {
+        binary ^= gcrnumber;
+    }
+    gcrnumber = binary;
 #else
     gcr[1 + buffer_padding] = 128;
     for (int i = 19; i >= 0; i--) { // each digit in gcrnumber
-        gcr[buffer_padding + 20 - i + 1] = ((((gcrnumber & 1 << i)) >> i) ^ (gcr[buffer_padding + 20 - i] >> 7))
-            << 7; // exclusive ored with number before it multiplied by 64 to match
-                  // output timer.
+    	// exclusive ored with number before it multiplied by 64 to match output timer.
+        gcr[buffer_padding + 20 - i + 1] = ((((gcrnumber & 1 << i)) >> i) ^ (gcr[buffer_padding + 20 - i] >> 7)) << 7;
     }
     gcr[buffer_padding] = 0;
 #endif

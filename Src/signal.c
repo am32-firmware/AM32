@@ -130,13 +130,13 @@ void transfercomplete()
         }
     }
 #endif
+
     if (inputSet == 0) {
         detectInput();
         receiveDshotDma();
         return;
     }
     if (inputSet == 1) {
-
         if (dshot_telemetry) {
             if (out_put) {
                 make_dshot_package(e_com_time);
@@ -226,6 +226,7 @@ void checkDshot()
         inputSet = 1;
     }
 }
+
 void checkServo()
 {
     if (smallestnumber > 200 && smallestnumber < 20000) {

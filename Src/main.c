@@ -1,220 +1,3 @@
-
-/* AM32- multi-purpose brushless controller firmware for the stm32f051 */
-
-//===========================================================================
-//=============================== Changelog =================================
-//===========================================================================
-/*
- * 1.54 Changelog;
- * --Added firmware name to targets and firmware version to main
- * --added two more dshot to beacons 1-3 currently working
- * --added KV option to firmware, low rpm power protection is based on KV
- * --start power now controls minimum idle power as well as startup strength.
- * --change default timing to 22.5
- * --Lowered default minimum idle setting to 1.5 percent duty cycle, slider
-range from 1-2.
- * --Added dshot commands to save settings and reset ESC.
- *
- *1.56 Changelog.
- * -- added check to stall protection to wait until after 40 zero crosses to fix
-high startup throttle hiccup.
- * -- added TIMER 1 update interrupt and PWM changes are done once per pwm
-period
- * -- reduce commutation interval averaging length
- * -- reduce false positive filter level to 2 and eliminate threshold where
-filter is stopped.
- * -- disable interrupt before sounds
- * -- disable TIM1 interrupt during stepper sinusoidal mode
- * -- add 28us delay for dshot300
- * -- report 0 rpm until the first 10 successful steps.
- * -- move serial ADC telemetry calculations and desync check to 10Khz
-interrupt.
- *
- * 1.57
- * -- remove spurious commutations and rpm data at startup by polling for longer
-interval on startup
- *
- * 1.58
- * -- move signal timeout to 10khz routine and set armed timeout to one quarter
-second 2500 / 10000
- * 1.59
- * -- moved comp order definitions to target.h
- * -- fixed update version number if older than new version
- * -- cleanup, moved all input and output to IO.c
- * -- moved comparator functions to comparator.c
- * -- removed ALOT of useless variables
- * -- added siskin target
- * -- moved pwm changes to 10khz routine
- * -- moved basic functions to functions.c
- * -- moved peripherals setup to periherals.c
- * -- added crawler mode settings
- *
- * 1.60
- * -- added sine mode hysteresis
- * -- increased power in stall protection and lowered start rpm for crawlers
- * -- removed onehot125 from crawler mode
- * -- reduced maximum startup power from 400 to 350
- * -- change minimum duty cycle to DEAD_TIME
- * -- version and name moved to permanent spot in FLASH memory, thanks mikeller
- *
- * 1.61
- * -- moved duty cycle calculation to 10khz and added max change option.
- * -- decreased maximum interval change to 25%
- * -- reduce wait time on fast acceleration (fast_accel)
- * -- added check in interrupt for early zero cross
- *
- * 1.62
- * --moved control to 10khz loop
- * --changed condition for low rpm filter for duty cycle from || to &&
- * --introduced max deceleration and set it to 20ms to go from 100 to 0
- * --added configurable servo throttle ranges
- *
- *
- *1.63
- *-- increase time for zero cross error detection below 250us commutation
-interval
- *-- increase max change a low rpm x10
- *-- set low limit of throttle ramp to a lower point and increase upper range
- *-- change desync event from full restart to just lower throttle.
-
- *1.64
- * --added startup check for continuous high signal, reboot to enter bootloader.
- *-- added brake on stop from eeprom
- *-- added stall protection from eeprom
- *-- added motor pole divider for sinusoidal and low rpm power protection
- *-- fixed dshot commands, added confirmation beeps and removed blocking
-behavior
- *--
- *1.65
- *-- Added 32 millisecond telemetry output
- *-- added low voltage cutoff , divider value and cutoff voltage needs to be
-added to eeprom
- *-- added beep to indicate cell count if low voltage active
- *-- added current reading on pa3 , conversion factor needs to be added to
-eeprom
- *-- fixed servo input capture to only read positive pulse to handle higher
-refresh rates.
- *-- disabled oneshot 125.
- *-- extended servo range to match full output range of receivers
- *-- added RC CAR style reverse, proportional brake on first reverse , double
-tap to change direction
- *-- added brushed motor control mode
- *-- added settings to EEPROM version 1
- *-- add gimbal control option.
- *--
- *1.66
- *-- move idwg init to after input tune
- *-- remove reset after save command -- dshot
- *-- added wraith32 target
- *-- added average pulse check for signal detection
- *--
- *1.67
- *-- Rework file structure for multiple MCU support
- *-- Add g071 mcu
- *--
- *1.68
- *--increased allowed average pulse length to avoid double startup
- *1.69
- *--removed line re-enabling comparator after disabling.
- *1.70 fix dshot for Kiss FC
- *1.71 fix dshot for Ardupilot / Px4 FC
- *1.72 Fix telemetry output and add 1 second arming.
- *1.73 Fix false arming if no signal. Remove low rpm throttle protection below
-300kv *1.74 Add Sine Mode range and drake brake strength adjustment *1.75
-Disable brake on stop for PWM_ENABLE_BRIDGE Removed automatic brake on stop on
-neutral for RC car proportional brake. Adjust sine speed and stall protection
-speed to more closely match makefile fixes from Cruwaller Removed gd32 build,
-until firmware is functional *1.76 Adjust g071 PWM frequency, and startup power
-to be same frequency as f051. Reduce number of polling back emf checks for g071
- *1.77 increase PWM frequency range to 8-48khz
- *1.78 Fix bluejay tunes frequency and speed.
-           Fix g071 Dead time
-           Increment eeprom version
- *1.79 Add stick throttle calibration routine
-           Add variable for telemetry interval
- *1.80 -Enable Comparator blanking for g071 on timer 1 channel 4
-           -add hardware group F for Iflight Blitz
-           -adjust parameters for pwm frequency
-           -add sine mode power variable and eeprom setting
-           -fix telemetry rpm during sine mode
-           -fix sounds for extended pwm range
-           -Add adjustable braking strength when driving
- *1.81 -Add current limiting PID loop
-           -fix current sense scale
-           -Increase brake power on maximum reverse ( car mode only)
-           -Add HK and Blpwr targets
-           -Change low kv motor throttle limit
-           -add reverse speed threshold changeover based on motor kv
-           -doubled filter length for motors under 900kv
-*1.82  -Add speed control pid loop.
-*1.83  -Add stall protection pid loop.
-           -Improve sine mode transition.
-           -decrease speed step re-entering sine mode
-           -added fixed duty cycle and speed mode build option
-           -added rpm_controlled by input signal ( to be added to config tool )
-*1.84  -Change PID value to int for faster calculations
-           -Enable two channel brushed motor control for dual motors
-           -Add current limit max duty cycle
-*1.85  -fix current limit not allowing full rpm on g071 or low pwm frequency
-                -remove unused brake on stop conditional
-*1.86  - create do-once in sine mode instead of setting pwm mode each time.
-*1.87  - fix fixed mode max rpm limits
-*1.88  - Fix stutter on sine mode re-entry due to position reset
-*1.89  - Fix drive by rpm mode scaling.
-           - Fix dshot px4 timings
-*1.90  - Disable comp interrupts for brushed mode
-           - Re-enter polling mode after prop strike or desync
-           - add G071 "N" variant
-           - add preliminary Extended Dshot
-*1.91  - Reset average interval time on desync only after 100 zero crosses
-*1.92  - Move g071 comparator blanking to TIM1 OC5
-           - Increase ADC read frequency and current sense filtering
-           - Add addressable LED strip for G071 targets
-*1.93  - Optimization for build process
-       - Add firmware file name to each target hex file
-       -fix extended telemetry not activating dshot600
-       -fix low voltage cuttoff timeout
-*1.94  - Add selectable input types
-*1.95  - reduce timeout to 0.5 seconds when armed
-*1.96  - Improved erpm accuracy dshot and serial telemetry, thanks Dj-Uran
-             - Fix PID loop integral.
-                 - add overcurrent low voltage cuttoff to brushed mode.
-*1.97    - enable input pullup
-*1.98    - Dshot erpm rounding compensation.
-*1.99    - Add max duty cycle change to individual targets ( will later become
-an settings option)
-                 - Fix dshot telemetry delay f4 and e230 mcu
-*2.00    - Cleanup of target structure
-*2.01    - Increase 10khztimer to 20khz, increase max duty cycle change.
-*2.02	 - Increase startup power for inverted output targets.
-*2.03    - Move chime from dshot direction change commands to save command.
-*2.04    - Fix current protection, max duty cycle not increasing
-                 - Fix double startup chime
-                 - Change current averaging method for more precision
-                 - Fix startup ramp speed adjustment
-*2.05		 - Fix ramp tied to input frequency
-*2.06    - fix input pullups
-         - Remove half xfer insterrupt from servo routine
-                                 - update running brake and brake on stop
-*2.07    - Dead time change f4a
-*2.08		 - Move zero crosss timing
-*2.09    - filter out short zero crosses
-*2.10    - Polling only below commutation intverval of 1500-2000us
-				 - fix tune frequency again
-*2.11    - RC-Car mode fix
-*2.12    - Reduce Advance on hard braking
-*2.13    - Remove Input capture filter for dshot2400
-         - Change dshot 300 speed detection threshold 
-*2.14    - Reduce G071 zero cross checks
-         - Assign all mcu's duty cycle resolution 2000 steps
-*2.15    - Enforce 1/2 commutation interval as minimum for g071
-         - Revert timing change on braking
-				 - Add per target over-ride option to max duty cycle change.
-				 - todo fix signal detection
-*2.16    - add L431 
-				 - add variable auto timing
-				 - add droneCAN
-*/
 #include "main.h"
 #include "ADC.h"
 #include "IO.h"
@@ -234,8 +17,10 @@ an settings option)
 #include <string.h>
 #include <assert.h>
 
+#ifndef NXP
 #ifdef USE_LED_STRIP
 #include "WS2812.h"
+#endif
 #endif
 
 #ifdef USE_CRSF_INPUT
@@ -258,7 +43,8 @@ void zcfoundroutine(void);
 //#define FIXED_DUTY_MODE_POWER 100     //
 // 0-100 percent not used in fixed speed mode
 
-// #define FIXED_SPEED_MODE  // bypasses input signal and runs at a fixed rpm
+//TODO use this to bypass Dshot for testing
+//#define FIXED_SPEED_MODE  // bypasses input signal and runs at a fixed rpm
 // using the speed control loop PID 
 //#define FIXED_SPEED_MODE_RPM  1000  //
 // intended final rpm , ensure pole pair numbers are entered correctly in config
@@ -268,6 +54,8 @@ void zcfoundroutine(void);
 // enables two channels for brushed control 
 //#define GIMBAL_MODE     // also
 // sinusoidal_startup needs to be on, maps input to sinusoidal angle.
+
+//#define USE_OVERRIDES
 
 //===========================================================================
 //=============================  Defaults =============================
@@ -301,7 +89,7 @@ fastPID stallPid = { // 1khz loop time
     .integral_limit = 10000,
     .output_limit = 50000
 };
-
+uint8_t step_incremented = 0;
 EEprom_t eepromBuffer;
 volatile uint32_t polling_mode_changeover;
 volatile uint8_t ramp_divider;
@@ -429,7 +217,11 @@ uint16_t ADC_smoothed_input = 0;
 int16_t degrees_celsius;
 int16_t converted_degrees;
 uint8_t temperature_offset;
+#ifdef NXP	//TODO make raw temperature of 32-bit
+uint16_t ADC_raw_temp[2] = {0};
+#else
 uint16_t ADC_raw_temp;
+#endif
 uint16_t ADC_raw_volts;
 uint16_t ADC_raw_current;
 uint16_t ADC_raw_input;
@@ -559,7 +351,7 @@ uint16_t waitTime = 0;
 uint16_t signaltimeout = 0;
 uint8_t ubAnalogWatchdogStatus = RESET;
 
-#ifdef NEED_INPUT_READY
+#if defined(NEED_INPUT_READY) || defined(NXP)
 volatile char input_ready = 0;
 #endif
 
@@ -592,6 +384,66 @@ int32_t doPidCalculations(struct fastPID* pidnow, int actual, int target)
 void loadEEpromSettings()
 {
     read_flash_bin(eepromBuffer.buffer, eeprom_address, sizeof(eepromBuffer.buffer));
+
+#ifdef USE_OVERRIDES
+//	eepromBuffer.reserved_0 = 3;
+//    eepromBuffer.eeprom_version = 2; //2;
+//    eepromBuffer.reserved_1 = 2;
+//    eepromBuffer.version.major = 4;
+//    eepromBuffer.version.minor = 5;
+
+    eepromBuffer.comp_pwm = 1;
+    eepromBuffer.variable_pwm = 0;
+
+    eepromBuffer.stuck_rotor_protection = 0;//1;	//Causes input = 0; when this is 1
+    eepromBuffer.advance_level = 3;
+    eepromBuffer.pwm_frequency = 24;
+    eepromBuffer.startup_power = 100;
+    eepromBuffer.motor_kv = 1;
+    eepromBuffer.motor_poles = 14;//14;
+    eepromBuffer.beep_volume = 5;
+    eepromBuffer.servo.low_threshold = 128;
+    eepromBuffer.servo.high_threshold = 128;
+    eepromBuffer.servo.neutral = 128;
+    eepromBuffer.servo.dead_band = 50;
+    eepromBuffer.low_cell_volt_cutoff = 50;
+    eepromBuffer.sine_mode_changeover_thottle_level = 15;
+    eepromBuffer.drag_brake_strength = 10;
+    eepromBuffer.driving_brake_strength = 10;
+    eepromBuffer.limits.temperature = 141;
+    eepromBuffer.limits.current = 102;
+    eepromBuffer.sine_mode_power = 6;
+    eepromBuffer.telemetry_on_interval = 0;
+    eepromBuffer.input_type = 0;	//Sets Dshot input
+
+//    eepromBuffer.auto_advance = 0;
+//    eepromBuffer.dir_reversed = 0;
+//    eepromBuffer.stall_protection = 0;
+//    eepromBuffer.brake_on_stop = 0;
+//    eepromBuffer.rc_car_reverse = 0;
+
+
+    eepromBuffer.tune[0] = 0xff;	//Turn off BJ tune
+//    eepromBuffer.tune[0] = 4;
+//    eepromBuffer.tune[1] = 5;
+//    eepromBuffer.tune[2] = 108;
+//    eepromBuffer.tune[3] = 108;
+
+    eepromBuffer.tune[4] = 250;	//duration
+    eepromBuffer.tune[5] = 10;	//frequency
+    eepromBuffer.tune[6] = 250;
+    eepromBuffer.tune[7] = 10;
+    eepromBuffer.tune[8] = 250;
+    eepromBuffer.tune[9] = 50;
+    eepromBuffer.tune[10] = 250;
+    eepromBuffer.tune[11] = 50;
+    eepromBuffer.tune[12] = 250;
+    eepromBuffer.tune[13] = 100;
+    eepromBuffer.tune[14] = 250;
+    eepromBuffer.tune[15] = 100;
+
+#endif
+
     if(eepromBuffer.eeprom_version < EEPROM_VERSION){
       eepromBuffer.max_ramp = 160;    // 0.1% per ms to 25% per ms 
       eepromBuffer.minimum_duty_cycle = 1; // 0.2% to 51 percent
@@ -697,10 +549,17 @@ void loadEEpromSettings()
 #ifdef GIGADEVICES
         TIMER_CCHP(TIMER0) |= dead_time_override;
 #endif
+#ifdef NXP
+    	for (int submodule = 0; submodule <= 2; submodule++) {
+    		FLEXPWM0->SM[submodule].DTCNT0 = PWM_DTCNT0_DTCNT0(dead_time_override);	//PWMA deadtime
+    		FLEXPWM0->SM[submodule].DTCNT1 = PWM_DTCNT1_DTCNT1(dead_time_override);	//PWMB deadtime
+    	}
+#endif
 #ifdef WCH
             TIM1->BDTR |= dead_time_override;
 #endif
         }
+
         if (eepromBuffer.limits.temperature < 70 || eepromBuffer.limits.temperature > 140) {
             eepromBuffer.limits.temperature = 255;
         }
@@ -712,12 +571,11 @@ void loadEEpromSettings()
         currentPid.Kp = eepromBuffer.current_P*2;
         currentPid.Ki = eepromBuffer.current_I;
         currentPid.Kd = eepromBuffer.current_D*2;
-        
+
         if (eepromBuffer.sine_mode_power == 0 || eepromBuffer.sine_mode_power > 10) {
             eepromBuffer.sine_mode_power = 5;
         }
 
-        // unsinged int cant be less than 0
         if (eepromBuffer.input_type < 10) {
             switch (eepromBuffer.input_type) {
             case AUTO_IN:
@@ -810,6 +668,7 @@ void getBemfState()
         current_state = PHASE_B_EXTI_PORT->IDR & PHASE_B_EXTI_PIN;
     }
 #else
+    //Get current comparator output level
     current_state = !getCompOutputLevel(); // polarity reversed
 #endif
     if (rising) {
@@ -867,25 +726,34 @@ void commutate()
     bemfcounter = 0;
     zcfound = 0;
     commutation_intervals[step - 1] = commutation_interval; // just used to calulate average
-    
+
 #ifdef USE_PULSE_OUT
 	if(step == 1 || step == 4  ){
-    WRITE_REG(RPM_PULSE_PORT->ODR, READ_REG(RPM_PULSE_PORT->ODR) ^ RPM_PULSE_PIN);
+		WRITE_REG(RPM_PULSE_PORT->ODR, READ_REG(RPM_PULSE_PORT->ODR) ^ RPM_PULSE_PIN);
 	}
 #endif
 }
 
+/*
+ * @brief 	Called by the COM_TIMER interrupt handler after the set wait time
+ * 			This computes how much to advance in a commutation step.
+ * 			This disables the COM_TIMER interrupt.
+ * 			Then it enables the comparator to generate its interrupt.
+ */
 void PeriodElapsedCallback()
 {
     DISABLE_COM_TIMER_INT(); // disable interrupt
+
     commutate();
     commutation_interval = ((commutation_interval)+((lastzctime + thiszctime) >> 1))>>1;
+
   	if (!eepromBuffer.auto_advance) {
 	  advance = (commutation_interval * temp_advance) >> 6; // 60 divde 64 0.9375 degree increments
 	} else {
 	  advance = (commutation_interval * auto_advance_level) >> 6; // 60 divde 64 0.9375 degree increments
     }
     waitTime = (commutation_interval >> 1) - advance;
+//    waitTime = (commutation_interval >> 2) - advance;	//This does not improve
     if (!old_routine) {
         enableCompInterrupts(); // enable comp interrupt
     }
@@ -894,6 +762,11 @@ void PeriodElapsedCallback()
     }
 }
 
+/*
+ * @brief 	Called by the comparator interrupt handler.
+ * 			Disables the comparator interrupt.
+ * 			Enables the COM_TIMER and sets it to generate an interrupt after the wait time.
+ */
 void interruptRoutine()
 {
 //   if (average_interval > 125) {
@@ -909,6 +782,7 @@ void interruptRoutine()
 //        }
 //    }
         for (int i = 0; i < filter_level; i++) {
+
 #if defined(MCU_F031) || defined(MCU_G031)
             if (((current_GPIO_PORT->IDR & current_GPIO_PIN) == !(rising))) {
 #else
@@ -917,6 +791,7 @@ void interruptRoutine()
                 return;
             }
         }
+
     __disable_irq();
     maskPhaseInterrupts();
     lastzctime = thiszctime;
@@ -929,7 +804,7 @@ void interruptRoutine()
 void startMotor()
 {
     if (running == 0) {
-        commutate();
+    	commutate();
         commutation_interval = 10000;
         SET_INTERVAL_TIMER_COUNT(5000);
         running = 1;
@@ -1203,7 +1078,7 @@ if (!stepper_sine && armed) {
             if (!eepromBuffer.comp_pwm) {
                 duty_cycle_setpoint = 0;
                 if (!running) {
-                    old_routine = 1;
+                	old_routine = 1;
                     zero_crosses = 0;
                     if (eepromBuffer.brake_on_stop) {
                         fullBrake();
@@ -1231,7 +1106,6 @@ if (!stepper_sine && armed) {
                 }
             } else {
                 if (!running) {
-
                     old_routine = 1;
                     zero_crosses = 0;
                     bad_count = 0;
@@ -1560,7 +1434,7 @@ void advanceincrement()
 
 void zcfoundroutine()
 { // only used in polling mode, blocking routine.
-    thiszctime = INTERVAL_TIMER_COUNT;
+	thiszctime = INTERVAL_TIMER_COUNT;
     SET_INTERVAL_TIMER_COUNT(0);
     commutation_interval = (thiszctime + (3 * commutation_interval)) / 4;
     advance = (temp_advance * commutation_interval) >> 6; //   7.5 degree increments
@@ -1579,6 +1453,11 @@ void zcfoundroutine()
 #ifdef MCU_AT32
 		COM_TIMER->pr = waitTime;
 #endif
+#ifdef NXP
+//	COM_TIMER->MSR[0] = waitTime;
+	COM_TIMER->MR[0] = waitTime;
+#endif
+
     commutate();
     bemfcounter = 0;
     bad_count = 0;
@@ -1668,6 +1547,19 @@ void runBrushedLoop()
  */
 static void checkDeviceInfo(void)
 {
+#ifdef NXP
+    uint32_t pflashBlockBase  = 0U;
+    uint32_t pflashTotalSize  = 0U;
+    uint32_t pflashSectorSize = 0U;
+
+    //Get flash properties
+    FLASH_API->flash_get_property(&s_flashDriver, kFLASH_PropertyPflashBlockBaseAddr, &pflashBlockBase);
+    FLASH_API->flash_get_property(&s_flashDriver, kFLASH_PropertyPflashSectorSize, &pflashSectorSize);
+    FLASH_API->flash_get_property(&s_flashDriver, kFLASH_PropertyPflashTotalSize, &pflashTotalSize);
+
+    //Set eeprom address to last sector
+    eeprom_address = pflashBlockBase + (pflashTotalSize - pflashSectorSize);
+#else
 #define DEVINFO_MAGIC1 0x5925e3da
 #define DEVINFO_MAGIC2 0x4eb863d9
 
@@ -1693,6 +1585,7 @@ static void checkDeviceInfo(void)
             eeprom_address = 0x0801f800;
             break;
     }
+#endif
 
     // TODO: check pin code and reboot to bootloader if incorrect
 
@@ -1700,12 +1593,11 @@ static void checkDeviceInfo(void)
 
 int main(void)
 {
-
-    initAfterJump();
-    checkDeviceInfo();
     initCorePeripherals();
-    enableCorePeripherals();
+    checkDeviceInfo();
     loadEEpromSettings();
+    enableCorePeripherals();	//TODO set back
+    initAfterJump();
 
     if (VERSION_MAJOR != eepromBuffer.version.major || VERSION_MINOR != eepromBuffer.version.minor || EEPROM_VERSION > eepromBuffer.eeprom_version) {
         eepromBuffer.version.major = VERSION_MAJOR;
@@ -1843,16 +1735,16 @@ e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation
 #endif
 
 #ifdef NEED_INPUT_READY
- #ifdef MCU_F031
-    if (input_ready) {
-    setInput(); 
-    input_ready = 0;
-    }
+#if defined(MCU_F031)
+	if (input_ready) {
+    	setInput();
+    	input_ready = 0;
+	}
 #else
-    if (input_ready) {
-     processDshot();
-     input_ready = 0;
-     }
+	if (input_ready) {
+		processDshot();
+		input_ready = 0;
+	}
 #endif
 #endif
 if(zero_crosses < 5){
@@ -1981,15 +1873,29 @@ if(zero_crosses < 5){
         }
 
 #if !defined(MCU_G031) && !defined(NEED_INPUT_READY)
-        if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD)) {
-             NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
-             NVIC_SetPriority(COM_TIMER_IRQ, 1);
-             NVIC_SetPriority(COMPARATOR_IRQ, 1);
-         } else {
-             NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
-             NVIC_SetPriority(COM_TIMER_IRQ, 0);
-             NVIC_SetPriority(COMPARATOR_IRQ, 0);
-         }
+#ifdef NXP
+	if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD)) {
+		NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
+		NVIC_SetPriority(COM_TIMER_IRQ, 1);
+		NVIC_SetPriority(COMP0_IRQ, 1);
+		NVIC_SetPriority(COMP1_IRQ, 1);
+	} else {
+		NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
+		NVIC_SetPriority(COM_TIMER_IRQ, 0);
+		NVIC_SetPriority(COMP0_IRQ, 0);
+		NVIC_SetPriority(COMP1_IRQ, 0);
+	}
+#else
+	if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD)) {
+		NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
+		NVIC_SetPriority(COM_TIMER_IRQ, 1);
+		NVIC_SetPriority(COMPARATOR_IRQ, 1);
+	} else {
+		NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
+		NVIC_SetPriority(COM_TIMER_IRQ, 0);
+		NVIC_SetPriority(COMPARATOR_IRQ, 0);
+	}
+#endif
 #endif
         if (send_telemetry) {
 #ifdef USE_SERIAL_TELEMETRY
@@ -2027,14 +1933,32 @@ if(zero_crosses < 5){
             converted_degrees = getConvertedDegrees(ADC_raw_temp);
     #endif
 #endif
+#ifdef NXP
+            //Call ADC_DMA callback to get raw data
+            ADC_DMA_Callback();
+
+            //Convert temperature data to actual temperature in degrees Celsius
+            converted_degrees = computeTemperature(ADC_raw_temp[0], ADC_raw_temp[1]);
+
+            //Start ADC conversion
+            startADCConversion();
+#endif
 #ifdef WCH
             startADCConversion( );
             converted_degrees = getConvertedDegrees(ADC_raw_temp);
 #endif
             degrees_celsius = converted_degrees;
+#ifdef NXP
+            //MCXA has 16-bit ADC data
+            battery_voltage = ((7 * battery_voltage) + ((ADC_raw_volts * 3300 / 65535 * VOLTAGE_DIVIDER) / 100)) / 8;
+            smoothed_raw_current = getSmoothedCurrent();
+            //Actual current is in 10mA, so 1 = 10mA
+            actual_current = (((smoothed_raw_current * 3300 / 65535) - CURRENT_OFFSET) * 100) / (MILLIVOLT_PER_AMP);
+#else
             battery_voltage = ((7 * battery_voltage) + ((ADC_raw_volts * 3300 / 4095 * VOLTAGE_DIVIDER) / 100)) >> 3;
             smoothed_raw_current = getSmoothedCurrent();
             actual_current = ((smoothed_raw_current * 3300 / 41) - (CURRENT_OFFSET * 100)) / (MILLIVOLT_PER_AMP);
+#endif
             if (actual_current < 0) {
                 actual_current = 0;
             }             
@@ -2098,8 +2022,8 @@ if(zero_crosses < 5){
                                                // high_rpm_level, set to a
                                                // consvervative number in source.
             }else{
-							duty_cycle_maximum = 2000;
-						}
+				duty_cycle_maximum = 2000;
+			}
 
             if (degrees_celsius > eepromBuffer.limits.temperature) {
               duty_cycle_maximum = map(degrees_celsius, eepromBuffer.limits.temperature - 10, eepromBuffer.limits.temperature + 10,

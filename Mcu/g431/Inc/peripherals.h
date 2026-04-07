@@ -42,6 +42,7 @@ void MX_TIM17_Init(void);
 void MX_TIM16_Init(void);
 void MX_IWDG_Init(void);
 void MX_TIM6_Init(void);
+void MX_TIM7_Init(void);
 void MX_TIM15_Init(void);
 void resetInputCaptureTimer();
 void setPWMCompare1(uint16_t compareone);

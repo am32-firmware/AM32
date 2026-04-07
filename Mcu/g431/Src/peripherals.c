@@ -34,11 +34,18 @@ void initCorePeripherals(void)
     MX_COMP2_Init();
     MX_TIM1_Init();
     MX_TIM2_Init();
+#ifdef USE_TIMER_16_CHANNEL_1
     MX_TIM16_Init();
+    MX_TIM7_Init();
+#else
+    MX_TIM16_Init();
+#endif
     MX_COMP1_Init();
     MX_TIM17_Init();
     MX_TIM6_Init();
+#ifdef USE_TIMER_15_CHANNEL_1
     MX_TIM15_Init();
+#endif
 #ifdef USE_SERIAL_TELEMETRY
     telem_UART_Init();
 #endif
@@ -335,6 +342,7 @@ void MX_TIM2_Init(void)
  * @param None
  * @retval None
  */
+#ifdef USE_TIMER_15_CHANNEL_1
 void MX_TIM15_Init(void)
 {
     LL_TIM_InitTypeDef TIM_InitStruct = { 0 };
@@ -381,7 +389,67 @@ void MX_TIM15_Init(void)
     LL_TIM_IC_SetFilter(TIM15, LL_TIM_CHANNEL_CH1, LL_TIM_IC_FILTER_FDIV1);
     LL_TIM_IC_SetPolarity(TIM15, LL_TIM_CHANNEL_CH1, LL_TIM_IC_POLARITY_BOTHEDGE);
 }
+#endif
 
+#ifdef USE_TIMER_16_CHANNEL_1
+void MX_TIM16_Init(void)
+{
+    LL_TIM_InitTypeDef TIM_InitStruct = { 0 };
+    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+
+    LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM16);
+
+    LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOB);
+    /**TIM16 GPIO Configuration
+    PB4   ------> TIM16_CH1 (AF1)
+    */
+    GPIO_InitStruct.Pin = INPUT_PIN;
+    GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
+    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+    GPIO_InitStruct.Alternate = LL_GPIO_AF_1;
+    LL_GPIO_Init(INPUT_PIN_PORT, &GPIO_InitStruct);
+
+    LL_DMA_SetPeriphRequest(DMA1, LL_DMA_CHANNEL_1, LL_DMAMUX_REQ_TIM16_CH1);
+    LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_1,
+        LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
+    LL_DMA_SetChannelPriorityLevel(DMA1, LL_DMA_CHANNEL_1, LL_DMA_PRIORITY_LOW);
+    LL_DMA_SetMode(DMA1, LL_DMA_CHANNEL_1, LL_DMA_MODE_NORMAL);
+    LL_DMA_SetPeriphIncMode(DMA1, LL_DMA_CHANNEL_1, LL_DMA_PERIPH_NOINCREMENT);
+    LL_DMA_SetMemoryIncMode(DMA1, LL_DMA_CHANNEL_1, LL_DMA_MEMORY_INCREMENT);
+    LL_DMA_SetPeriphSize(DMA1, LL_DMA_CHANNEL_1, LL_DMA_PDATAALIGN_HALFWORD);
+    LL_DMA_SetMemorySize(DMA1, LL_DMA_CHANNEL_1, LL_DMA_MDATAALIGN_WORD);
+
+    TIM_InitStruct.Prescaler = 10;
+    TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
+    TIM_InitStruct.Autoreload = 65535;
+    TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
+    TIM_InitStruct.RepetitionCounter = 0;
+    LL_TIM_Init(TIM16, &TIM_InitStruct);
+    LL_TIM_DisableARRPreload(TIM16);
+    LL_TIM_IC_SetActiveInput(TIM16, LL_TIM_CHANNEL_CH1,
+        LL_TIM_ACTIVEINPUT_DIRECTTI);
+    LL_TIM_IC_SetPrescaler(TIM16, LL_TIM_CHANNEL_CH1, LL_TIM_ICPSC_DIV1);
+    LL_TIM_IC_SetFilter(TIM16, LL_TIM_CHANNEL_CH1, LL_TIM_IC_FILTER_FDIV1);
+    LL_TIM_IC_SetPolarity(TIM16, LL_TIM_CHANNEL_CH1, LL_TIM_IC_POLARITY_BOTHEDGE);
+}
+
+void MX_TIM7_Init(void)
+{
+    LL_TIM_InitTypeDef TIM_InitStruct = { 0 };
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM7);
+    NVIC_SetPriority(TIM7_IRQn,
+        NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
+    NVIC_EnableIRQ(TIM7_IRQn);
+    TIM_InitStruct.Prescaler = (PCLK_MHZ/2) - 1;
+    TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
+    TIM_InitStruct.Autoreload = 65535;
+    TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
+    LL_TIM_Init(TIM7, &TIM_InitStruct);
+    LL_TIM_DisableARRPreload(TIM7);
+}
+#else
 void MX_TIM16_Init(void)
 {
     LL_TIM_InitTypeDef TIM_InitStruct = { 0 };
@@ -397,6 +465,7 @@ void MX_TIM16_Init(void)
     LL_TIM_Init(TIM16, &TIM_InitStruct);
     LL_TIM_DisableARRPreload(TIM16);
 }
+#endif
 
 /**
  * @brief TIM17 Initialization Function

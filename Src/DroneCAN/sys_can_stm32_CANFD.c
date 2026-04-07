@@ -383,18 +383,24 @@ static void can_init(void)
  */
 void sys_can_init(void)
 {
-  // Setup CAN RX and TX pins
-  // assumes PA11/PA12 for FDCAN1
-  LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
-
   LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
-  GPIO_InitStruct.Pin = LL_GPIO_PIN_11 | LL_GPIO_PIN_12;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
   GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
   GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
   GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_VERY_HIGH;
   GPIO_InitStruct.Alternate = LL_GPIO_AF_9; // AF9 for FDCAN1
-  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  // Enable GPIO clocks for CAN pins
+  LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
+  LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOB);
+
+  // CAN RX pin
+  GPIO_InitStruct.Pin = CAN_RX_PIN;
+  LL_GPIO_Init(CAN_RX_PORT, &GPIO_InitStruct);
+
+  // CAN TX pin
+  GPIO_InitStruct.Pin = CAN_TX_PIN;
+  LL_GPIO_Init(CAN_TX_PORT, &GPIO_InitStruct);
 
   can_init();
 

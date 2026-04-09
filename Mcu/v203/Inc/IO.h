@@ -26,7 +26,7 @@ void setInputPullNone();
 
 extern char bi_direction;
 extern volatile char inputSet;
-extern volatile char dshot;
+extern char dshot;
 extern volatile char servoPwm;
 extern volatile char send_telemetry;
 extern volatile int16_t degrees_celsius;

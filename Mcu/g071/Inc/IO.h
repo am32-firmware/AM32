@@ -28,6 +28,5 @@ extern volatile char inputSet;
 extern char dshot;
 extern volatile char servoPwm;
 extern volatile char send_telemetry;
-extern uint8_t degrees_celsius;
-
+extern volatile int16_t degrees_celsius;
 extern uint16_t ADC_raw_volts;

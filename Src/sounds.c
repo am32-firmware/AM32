@@ -19,6 +19,7 @@
 
 uint8_t beep_volume;
 
+
 void pause(uint16_t ms)
 {
     SET_DUTY_CYCLE_ALL(0);
@@ -32,74 +33,84 @@ void setVolume(uint8_t volume)
     if (volume > 11) {
         volume = 11;
     }
-    beep_volume = volume * 2; // volume variable from 0 - 11 equates to CCR value of 0-22
+    beep_volume = volume * 3; // volume variable from 0 - 11 equates to CCR value of 0-33
 }
 
 void setCaptureCompare()
 {
-    SET_DUTY_CYCLE_ALL(beep_volume); // volume of the beep, (duty cycle) don't go
-                                     // above 25 out of 2000
+    SET_DUTY_CYCLE_ALL(beep_volume); // volume of the beep, (duty cycle) 
 }
 
 void playBJNote(uint16_t freq, uint16_t bduration)
-{ // hz and ms
-    uint16_t timerOne_reload = TIM1_AUTORELOAD;
-
-    SET_PRESCALER_PWM(10);
-    timerOne_reload = CPU_FREQUENCY_MHZ*100000 / freq;
-
+{
+    uint16_t timerOne_reload;
+    SET_PRESCALER_PWM(9);
+    timerOne_reload = (uint16_t)(CPU_FREQUENCY_MHZ * 100000 / freq);
     SET_AUTO_RELOAD_PWM(timerOne_reload);
-    SET_DUTY_CYCLE_ALL(beep_volume * timerOne_reload / TIM1_AUTORELOAD); // volume of the beep, (duty cycle) don't
-                                                                         // go above 25 out of 2000
+    SET_DUTY_CYCLE_ALL(beep_volume * timerOne_reload/TIM1_AUTORELOAD);
     delayMillis(bduration);
 }
 
 uint16_t getBlueJayNoteFrequency(uint8_t bjarrayfreq)
 {
-    return 11000000 / (bjarrayfreq * 247 + 4000);
+    return (uint16_t)(10000000 / ((uint32_t)bjarrayfreq * 247 + 4000));
 }
 
-void playBlueJayTune()
+void playBlueJayTune(void)
 {
-    uint8_t full_time_count = 0;
-    uint16_t duration;
+    uint8_t  full_time_count = 0;
+    uint32_t duration;          
     uint16_t frequency;
+    uint8_t  t4, t3;
     comStep(3);
-    // read_flash_bin(blueJayTuneBuffer , eeprom_address + 48 , 128);
-    // first 4 bytes are reserved for rtttl duration, octave, beat, tempo
+
     for (int i = 4; i < 128; i += 2) {
         RELOAD_WATCHDOG_COUNTER();
         signaltimeout = 0;
+        t4 = eepromBuffer.tune[i];
+        t3 = eepromBuffer.tune[i + 1];
+        if (t4 == 0 && t3 == 0) {
+            break;
+        }
 
-        if (eepromBuffer.tune[i] == 255) {
+        if (t4 == 255 && t3 != 0) {
             full_time_count++;
 
+        } else if (t3 == 0) {
+            duration = (uint32_t)full_time_count * 255 + t4;
+            SET_DUTY_CYCLE_ALL(0);
+            delayMillis((uint16_t)duration);
+            full_time_count = 0;
+
         } else {
-            if (eepromBuffer.tune[i + 1] == 0) {
-                duration = full_time_count * 254 + eepromBuffer.tune[i];
-                SET_DUTY_CYCLE_ALL(0);
-                delayMillis(duration);
-            } else {
-                frequency = getBlueJayNoteFrequency(eepromBuffer.tune[i + 1]);
-                duration = ((full_time_count * 254 + eepromBuffer.tune[i]) * (100000 / frequency)) / 100;
-                playBJNote(frequency, duration);
-            }
+            uint32_t total_pulses = (uint32_t)full_time_count * 255 + t4;
+            uint32_t t3_period    = (uint32_t)t3 * 247 + 4000;
+            duration              = (total_pulses * t3_period) / 11000;
+
+            frequency = getBlueJayNoteFrequency(t3);
+            playBJNote(frequency, (uint16_t)duration);
             full_time_count = 0;
         }
+        if(eepromBuffer.tune[3] > 239 ){
+        SET_DUTY_CYCLE_ALL(0);
+        delayMillis(10*(255 - eepromBuffer.tune[3]));
     }
-    allOff(); // turn all channels low again
-    SET_PRESCALER_PWM(0); // set prescaler back to 0.
+    }
+
+    allOff();
+    SET_PRESCALER_PWM(0);
     SET_AUTO_RELOAD_PWM(TIMER1_MAX_ARR);
     signaltimeout = 0;
     RELOAD_WATCHDOG_COUNTER();
 }
 
+
 void playStartupTune()
 {
     __disable_irq();
-
-    if (eepromBuffer.tune[0] != ERASED_FLASH_BYTE) {
-        playBlueJayTune();
+comStep(3);
+  if (eepromBuffer.tune[0] != ERASED_FLASH_BYTE) {
+    playBlueJayTune();
     } else {
         SET_AUTO_RELOAD_PWM(TIM1_AUTORELOAD);
         setCaptureCompare();

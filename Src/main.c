@@ -426,7 +426,7 @@ uint32_t last_average_interval;
 int e_com_time;
 
 uint16_t ADC_smoothed_input = 0;
-int16_t degrees_celsius;
+volatile int16_t degrees_celsius;
 int16_t converted_degrees;
 uint8_t temperature_offset;
 uint16_t ADC_raw_temp;

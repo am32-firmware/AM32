@@ -391,6 +391,8 @@
 #define CAN_TERM_PIN GPIO_PORT_PIN(2, 12) // PC12
 #define CAN_TERM_POLARITY 1 // active high
 
+#define EEPROM_START_ADD (uint32_t)0x0801F800
+
 #define CAN_TX_PIN LL_GPIO_PIN_9
 #define CAN_TX_PORT GPIOB
 #define CAN_RX_PIN LL_GPIO_PIN_11

@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        // Core C/C++ Support (IntelliSense, Debugging)
+        "ms-vscode.cpptools",
+        "ms-vscode.cpptools-themes",
+        // CMake Integration (Essential for your build system)
+        "ms-vscode.cmake-tools",
+        // Embedded Debugging (Required for the launch.json we generated)
+        "marus25.cortex-debug"
+    ]
+}

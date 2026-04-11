@@ -49,7 +49,7 @@ char EDT_ARMED = 0;
 int shift_amount = 0;
 uint32_t gcrnumber;
 extern int zero_crosses;
-extern char send_telemetry;
+extern volatile char send_telemetry;
 extern uint8_t max_duty_cycle_change;
 int dshot_full_number;
 extern char play_tone_flag;
@@ -262,7 +262,7 @@ void make_dshot_package(uint16_t com_time)
                 telem_scheduler.voltage_count = 0;
             }
             else if (telem_scheduler.temp_count >= TEMP_EDT_RATE_DIVISOR) {
-                extended_frame_to_send = 0b0010 << 8 | degrees_celsius;
+                extended_frame_to_send = 0b0010 << 8 | (uint8_t)degrees_celsius;
                 telem_scheduler.temp_count = 0;
             }
         }

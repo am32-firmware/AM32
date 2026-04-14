@@ -383,18 +383,24 @@ static void can_init(void)
  */
 void sys_can_init(void)
 {
-  // Setup CAN RX and TX pins
-  // assumes PA11/PA12 for FDCAN1
-  LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
-
   LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
-  GPIO_InitStruct.Pin = LL_GPIO_PIN_11 | LL_GPIO_PIN_12;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
   GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
   GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
   GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_VERY_HIGH;
   GPIO_InitStruct.Alternate = LL_GPIO_AF_9; // AF9 for FDCAN1
-  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  // Enable GPIO clocks for CAN pins
+  LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
+  LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOB);
+
+  // CAN RX pin
+  GPIO_InitStruct.Pin = CAN_RX_PIN;
+  LL_GPIO_Init(CAN_RX_PORT, &GPIO_InitStruct);
+
+  // CAN TX pin
+  GPIO_InitStruct.Pin = CAN_TX_PIN;
+  LL_GPIO_Init(CAN_TX_PORT, &GPIO_InitStruct);
 
   can_init();
 
@@ -415,6 +421,37 @@ void set_rtc_backup_register(uint8_t idx, uint32_t value)
 {
   volatile uint32_t *bkp = &TAMP->BKP0R;
   bkp[idx] = value;
+}
+
+/*
+  setup a static port/pin
+ */
+void setup_portpin(uint16_t portpin, bool enable)
+{
+    const uint8_t port = portpin >> 8;
+    const uint8_t pin = portpin & 0xff;
+    const uint32_t pinshift = 1U << pin;
+    GPIO_TypeDef *const ports[] = { GPIOA, GPIOB, GPIOC };
+    if (port >= sizeof(ports)/sizeof(ports[0])) {
+        return;
+    }
+    GPIO_TypeDef *pport = ports[port];
+
+    LL_AHB2_GRP1_EnableClock(1U << port);
+
+    if (enable) {
+        LL_GPIO_SetOutputPin(pport, pinshift);
+    } else {
+        LL_GPIO_ResetOutputPin(pport, pinshift);
+    }
+
+    LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+    GPIO_InitStruct.Pin = pinshift;
+    GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+    LL_GPIO_Init(pport, &GPIO_InitStruct);
 }
 
 #endif // DRONECAN_SUPPORT && defined(MCU_G431)

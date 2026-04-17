@@ -379,6 +379,8 @@
 #define MILLIVOLT_PER_AMP 10
 #define CURRENT_OFFSET 1 // millivolts
 #define TARGET_VOLTAGE_DIVIDER 310
+#define RAMP_SPEED_LOW_RPM 1
+#define RAMP_SPEED_HIGH_RPM 1
 // #define NO_POLLING_START
 #define USE_RGB_LED
 #define RED_PORT    GPIOC
@@ -3167,6 +3169,10 @@
 
 #ifndef RAMP_SPEED_HIGH_RPM
 #define RAMP_SPEED_HIGH_RPM 16
+#endif
+
+#ifndef RAMP_DIVIDER
+#define RAMP_DIVIDER 0
 #endif
 
 /************************************ F051 Hardware Groups

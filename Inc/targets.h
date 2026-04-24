@@ -210,6 +210,7 @@
 #define LOOP_FREQUENCY_HZ 20000
 #define USE_LSE
 #define USE_LSE_BYPASS 0
+#define USE_SERIAL_TELEMETRY
 #endif
 
 #ifdef TBS_16S_L431_CAN
@@ -228,6 +229,7 @@
 #define LOOP_FREQUENCY_HZ 20000
 #define USE_LSE
 #define USE_LSE_BYPASS 1
+#define USE_SERIAL_TELEMETRY
 #endif
 
 #ifdef TBS_16S_L431
@@ -243,6 +245,7 @@
 #define LOOP_FREQUENCY_HZ 20000
 #define USE_LSE
 #define USE_LSE_BYPASS 1
+#define USE_SERIAL_TELEMETRY
 #endif
 
 #ifdef  REF_L431

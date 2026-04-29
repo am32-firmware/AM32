@@ -1,0 +1,172 @@
+solution:
+  created-by: uv2csolution@1.6.0
+  created-for: CMSIS-Toolbox@2.12.0
+  compiler: AC6
+  target-types:
+    - type: GEN_64K_G071
+      device: STM32G071K8Ux
+      optimize: debug
+      target-set:
+        - set:
+          images:
+            - project-context: Am32G071
+    - type: DT120_64K_G071
+      device: STM32G071K8Ux
+      optimize: debug
+      target-set:
+        - set:
+          images:
+            - project-context: Am32G071
+    - type: NEUTRONRC_G071
+      device: STM32G071K8Ux
+      optimize: debug
+      target-set:
+        - set:
+          images:
+            - project-context: Am32G071
+    - type: IFLIGHT_BLITZ_G071
+      device: STM32G071K8Ux
+      optimize: debug
+      target-set:
+        - set:
+          images:
+            - project-context: Am32G071
+    - type: AIKON_PRO_G071
+      device: STM32G071K8Ux
+      optimize: debug
+      target-set:
+        - set:
+          images:
+            - project-context: Am32G071
+    - type: TMOTOR_G071
+      device: STM32G071K8Ux
+      optimize: debug
+      target-set:
+        - set:
+          images:
+            - project-context: Am32G071
+          debugger:
+            name: ST-Link@pyOCD
+            clock: 4000000
+            protocol: swd
+    - type: SEQURE_G071
+      device: STM32G071K8Ux
+      optimize: debug
+      target-set:
+        - set:
+          images:
+            - project-context: Am32G071
+    - type: HAKRC_2023_G071
+      device: STM32G071K8Ux
+      optimize: debug
+      target-set:
+        - set:
+          images:
+            - project-context: Am32G071
+    - type: SEQURE_12S_G071
+      device: STM32G071K8Ux
+      optimize: debug
+      target-set:
+        - set:
+          images:
+            - project-context: Am32G071
+    - type: FLYCOLOR_HV3_G071
+      device: STM32G071K8Ux
+      optimize: debug
+      target-set:
+        - set:
+          images:
+            - project-context: Am32G071
+    - type: AORC_GP_G071
+      device: STM32G071K8Ux
+      optimize: debug
+      target-set:
+        - set:
+          images:
+            - project-context: Am32G071
+    - type: AORC_PD_G071
+      device: STM32G071K8Ux
+      optimize: debug
+      target-set:
+        - set:
+          images:
+            - project-context: Am32G071
+    - type: IFLIGHT_12S_G071
+      device: STM32G071K8Ux
+      optimize: debug
+      target-set:
+        - set:
+          images:
+            - project-context: Am32G071
+    - type: IFLIGHT_BLITZ_N_G071
+      device: STM32G071K8Ux
+      optimize: debug
+      target-set:
+        - set:
+          images:
+            - project-context: Am32G071
+    - type: SEQURE_4IN1_G071
+      device: STM32G071K8Ux
+      optimize: debug
+      target-set:
+        - set:
+          images:
+            - project-context: Am32G071
+    - type: NEUTRON_PULLUP_G071
+      device: STM32G071K8Ux
+      optimize: debug
+      target-set:
+        - set:
+          images:
+            - project-context: Am32G071
+    - type: AM32_ESC_G071
+      device: STM32G071K8Ux
+      optimize: debug
+      target-set:
+        - set:
+          images:
+            - project-context: Am32G071
+    - type: IFLIGHT_12S_SINGLE_N_G071
+      device: STM32G071K8Ux
+      optimize: debug
+      target-set:
+        - set:
+          images:
+            - project-context: Am32G071
+    - type: ST_G0_03_N_G071
+      device: STM32G071K8Ux
+      optimize: debug
+      target-set:
+        - set:
+          images:
+            - project-context: Am32G071
+    - type: ST_G0_04_G071
+      device: STM32G071K8Ux
+      optimize: debug
+      target-set:
+        - set:
+          images:
+            - project-context: Am32G071
+    - type: SURFBEE_G071
+      device: STM32G071K8Ux
+      optimize: debug
+      target-set:
+        - set:
+          images:
+            - project-context: Am32G071
+    - type: RRIOT_G071
+      device: STM32G071K8Ux
+      optimize: debug
+      target-set:
+        - set:
+          images:
+            - project-context: Am32G071
+    - type: ESCAPE32REF1_G071
+      device: STM32G071K8Ux
+      optimize: debug
+      target-set:
+        - set:
+          images:
+            - project-context: Am32G071
+  projects:
+    - project: Am32G071.cproject.yml

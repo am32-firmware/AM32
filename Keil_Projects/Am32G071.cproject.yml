@@ -1,0 +1,1587 @@
+project:
+  packs:
+    - pack: Keil::STM32G0xx_DFP@^1.5.0
+  setups:
+    - setup: Options for GEN_64K_G071
+      for-context: +GEN_64K_G071
+      add-path:
+        - ../Mcu/g071/Drivers/CMSIS/Include
+        - ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Inc
+        - ../Mcu/g071/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        - ../Mcu/g071/Inc
+        - ../Inc
+      debug: "on"
+      define:
+        - GEN_64K_G071
+        - USE_FULL_LL_DRIVER
+        - HSE_VALUE: "8000000"
+        - HSE_STARTUP_TIMEOUT: "100"
+        - LSE_STARTUP_TIMEOUT: "5000"
+        - LSE_VALUE: "32768"
+        - EXTERNAL_CLOCK_VALUE: "12288000"
+        - HSI_VALUE: "16000000"
+        - LSI_VALUE: "32000"
+        - VDD_VALUE: "3300"
+        - PREFETCH_ENABLE: "0"
+        - INSTRUCTION_CACHE_ENABLE: "1"
+        - DATA_CACHE_ENABLE: "1"
+        - __MICROLIB
+      define-asm:
+        - __MICROLIB
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -fno-rtti
+            - -funsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --library_type=microlib
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+    - setup: Options for DT120_64K_G071
+      for-context: +DT120_64K_G071
+      add-path:
+        - ../Mcu/g071/Drivers/CMSIS/Include
+        - ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Inc
+        - ../Mcu/g071/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        - ../Mcu/g071/Inc
+        - ../Inc
+      debug: "on"
+      define:
+        - DT120_64K_G071
+        - USE_FULL_LL_DRIVER
+        - HSE_VALUE: "8000000"
+        - HSE_STARTUP_TIMEOUT: "100"
+        - LSE_STARTUP_TIMEOUT: "5000"
+        - LSE_VALUE: "32768"
+        - EXTERNAL_CLOCK_VALUE: "12288000"
+        - HSI_VALUE: "16000000"
+        - LSI_VALUE: "32000"
+        - VDD_VALUE: "3300"
+        - PREFETCH_ENABLE: "0"
+        - INSTRUCTION_CACHE_ENABLE: "1"
+        - DATA_CACHE_ENABLE: "1"
+        - __MICROLIB
+      define-asm:
+        - __MICROLIB
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -fno-rtti
+            - -funsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --library_type=microlib
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+    - setup: Options for NEUTRONRC_G071
+      for-context: +NEUTRONRC_G071
+      add-path:
+        - ../Mcu/g071/Drivers/CMSIS/Include
+        - ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Inc
+        - ../Mcu/g071/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        - ../Mcu/g071/Inc
+        - ../Inc
+      debug: "on"
+      define:
+        - NEUTRONRC_G071
+        - USE_FULL_LL_DRIVER
+        - HSE_VALUE: "8000000"
+        - HSE_STARTUP_TIMEOUT: "100"
+        - LSE_STARTUP_TIMEOUT: "5000"
+        - LSE_VALUE: "32768"
+        - EXTERNAL_CLOCK_VALUE: "12288000"
+        - HSI_VALUE: "16000000"
+        - LSI_VALUE: "32000"
+        - VDD_VALUE: "3300"
+        - PREFETCH_ENABLE: "0"
+        - INSTRUCTION_CACHE_ENABLE: "1"
+        - DATA_CACHE_ENABLE: "1"
+        - __MICROLIB
+      define-asm:
+        - __MICROLIB
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -fno-rtti
+            - -funsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --library_type=microlib
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+    - setup: Options for IFLIGHT_BLITZ_G071
+      for-context: +IFLIGHT_BLITZ_G071
+      add-path:
+        - ../Mcu/g071/Drivers/CMSIS/Include
+        - ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Inc
+        - ../Mcu/g071/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        - ../Mcu/g071/Inc
+        - ../Inc
+      debug: "on"
+      define:
+        - IFLIGHT_BLITZ_G071
+        - USE_FULL_LL_DRIVER
+        - HSE_VALUE: "8000000"
+        - HSE_STARTUP_TIMEOUT: "100"
+        - LSE_STARTUP_TIMEOUT: "5000"
+        - LSE_VALUE: "32768"
+        - EXTERNAL_CLOCK_VALUE: "12288000"
+        - HSI_VALUE: "16000000"
+        - LSI_VALUE: "32000"
+        - VDD_VALUE: "3300"
+        - PREFETCH_ENABLE: "0"
+        - INSTRUCTION_CACHE_ENABLE: "1"
+        - DATA_CACHE_ENABLE: "1"
+        - __MICROLIB
+      define-asm:
+        - __MICROLIB
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -fno-rtti
+            - -funsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --library_type=microlib
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+    - setup: Options for AIKON_PRO_G071
+      for-context: +AIKON_PRO_G071
+      add-path:
+        - ../Mcu/g071/Drivers/CMSIS/Include
+        - ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Inc
+        - ../Mcu/g071/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        - ../Mcu/g071/Inc
+        - ../Inc
+      debug: "on"
+      define:
+        - AIKON_PRO_G071
+        - USE_FULL_LL_DRIVER
+        - HSE_VALUE: "8000000"
+        - HSE_STARTUP_TIMEOUT: "100"
+        - LSE_STARTUP_TIMEOUT: "5000"
+        - LSE_VALUE: "32768"
+        - EXTERNAL_CLOCK_VALUE: "12288000"
+        - HSI_VALUE: "16000000"
+        - LSI_VALUE: "32000"
+        - VDD_VALUE: "3300"
+        - PREFETCH_ENABLE: "0"
+        - INSTRUCTION_CACHE_ENABLE: "1"
+        - DATA_CACHE_ENABLE: "1"
+        - __MICROLIB
+      define-asm:
+        - __MICROLIB
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -fno-rtti
+            - -funsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --library_type=microlib
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+    - setup: Options for TMOTOR_G071
+      for-context: +TMOTOR_G071
+      add-path:
+        - ../Mcu/g071/Drivers/CMSIS/Include
+        - ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Inc
+        - ../Mcu/g071/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        - ../Mcu/g071/Inc
+        - ../Inc
+      debug: "on"
+      define:
+        - TMOTOR_G071
+        - USE_FULL_LL_DRIVER
+        - HSE_VALUE: "8000000"
+        - HSE_STARTUP_TIMEOUT: "100"
+        - LSE_STARTUP_TIMEOUT: "5000"
+        - LSE_VALUE: "32768"
+        - EXTERNAL_CLOCK_VALUE: "12288000"
+        - HSI_VALUE: "16000000"
+        - LSI_VALUE: "32000"
+        - VDD_VALUE: "3300"
+        - PREFETCH_ENABLE: "0"
+        - INSTRUCTION_CACHE_ENABLE: "1"
+        - DATA_CACHE_ENABLE: "1"
+        - __MICROLIB
+      define-asm:
+        - __MICROLIB
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -fno-rtti
+            - -funsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --library_type=microlib
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+    - setup: Options for SEQURE_G071
+      for-context: +SEQURE_G071
+      add-path:
+        - ../Mcu/g071/Drivers/CMSIS/Include
+        - ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Inc
+        - ../Mcu/g071/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        - ../Mcu/g071/Inc
+        - ../Inc
+      debug: "on"
+      define:
+        - SEQURE_G071
+        - USE_FULL_LL_DRIVER
+        - HSE_VALUE: "8000000"
+        - HSE_STARTUP_TIMEOUT: "100"
+        - LSE_STARTUP_TIMEOUT: "5000"
+        - LSE_VALUE: "32768"
+        - EXTERNAL_CLOCK_VALUE: "12288000"
+        - HSI_VALUE: "16000000"
+        - LSI_VALUE: "32000"
+        - VDD_VALUE: "3300"
+        - PREFETCH_ENABLE: "0"
+        - INSTRUCTION_CACHE_ENABLE: "1"
+        - DATA_CACHE_ENABLE: "1"
+        - __MICROLIB
+      define-asm:
+        - __MICROLIB
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -fno-rtti
+            - -funsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --library_type=microlib
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+    - setup: Options for HAKRC_2023_G071
+      for-context: +HAKRC_2023_G071
+      add-path:
+        - ../Mcu/g071/Drivers/CMSIS/Include
+        - ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Inc
+        - ../Mcu/g071/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        - ../Mcu/g071/Inc
+        - ../Inc
+      debug: "on"
+      define:
+        - HAKRC_2023_G071
+        - USE_FULL_LL_DRIVER
+        - HSE_VALUE: "8000000"
+        - HSE_STARTUP_TIMEOUT: "100"
+        - LSE_STARTUP_TIMEOUT: "5000"
+        - LSE_VALUE: "32768"
+        - EXTERNAL_CLOCK_VALUE: "12288000"
+        - HSI_VALUE: "16000000"
+        - LSI_VALUE: "32000"
+        - VDD_VALUE: "3300"
+        - PREFETCH_ENABLE: "0"
+        - INSTRUCTION_CACHE_ENABLE: "1"
+        - DATA_CACHE_ENABLE: "1"
+        - __MICROLIB
+      define-asm:
+        - __MICROLIB
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -fno-rtti
+            - -funsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --library_type=microlib
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+    - setup: Options for SEQURE_12S_G071
+      for-context: +SEQURE_12S_G071
+      add-path:
+        - ../Mcu/g071/Drivers/CMSIS/Include
+        - ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Inc
+        - ../Mcu/g071/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        - ../Mcu/g071/Inc
+        - ../Inc
+      debug: "on"
+      define:
+        - SEQURE_12S_G071
+        - USE_FULL_LL_DRIVER
+        - HSE_VALUE: "8000000"
+        - HSE_STARTUP_TIMEOUT: "100"
+        - LSE_STARTUP_TIMEOUT: "5000"
+        - LSE_VALUE: "32768"
+        - EXTERNAL_CLOCK_VALUE: "12288000"
+        - HSI_VALUE: "16000000"
+        - LSI_VALUE: "32000"
+        - VDD_VALUE: "3300"
+        - PREFETCH_ENABLE: "0"
+        - INSTRUCTION_CACHE_ENABLE: "1"
+        - DATA_CACHE_ENABLE: "1"
+        - __MICROLIB
+      define-asm:
+        - __MICROLIB
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -fno-rtti
+            - -funsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --library_type=microlib
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+    - setup: Options for FLYCOLOR_HV3_G071
+      for-context: +FLYCOLOR_HV3_G071
+      add-path:
+        - ../Mcu/g071/Drivers/CMSIS/Include
+        - ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Inc
+        - ../Mcu/g071/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        - ../Mcu/g071/Inc
+        - ../Inc
+      debug: "on"
+      define:
+        - FLYCOLOR_HV3_G071
+        - USE_FULL_LL_DRIVER
+        - HSE_VALUE: "8000000"
+        - HSE_STARTUP_TIMEOUT: "100"
+        - LSE_STARTUP_TIMEOUT: "5000"
+        - LSE_VALUE: "32768"
+        - EXTERNAL_CLOCK_VALUE: "12288000"
+        - HSI_VALUE: "16000000"
+        - LSI_VALUE: "32000"
+        - VDD_VALUE: "3300"
+        - PREFETCH_ENABLE: "0"
+        - INSTRUCTION_CACHE_ENABLE: "1"
+        - DATA_CACHE_ENABLE: "1"
+        - __MICROLIB
+      define-asm:
+        - __MICROLIB
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -fno-rtti
+            - -funsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --library_type=microlib
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+    - setup: Options for AORC_GP_G071
+      for-context: +AORC_GP_G071
+      add-path:
+        - ../Mcu/g071/Drivers/CMSIS/Include
+        - ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Inc
+        - ../Mcu/g071/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        - ../Mcu/g071/Inc
+        - ../Inc
+      debug: "on"
+      define:
+        - AORC_GP_G071
+        - USE_FULL_LL_DRIVER
+        - HSE_VALUE: "8000000"
+        - HSE_STARTUP_TIMEOUT: "100"
+        - LSE_STARTUP_TIMEOUT: "5000"
+        - LSE_VALUE: "32768"
+        - EXTERNAL_CLOCK_VALUE: "12288000"
+        - HSI_VALUE: "16000000"
+        - LSI_VALUE: "32000"
+        - VDD_VALUE: "3300"
+        - PREFETCH_ENABLE: "0"
+        - INSTRUCTION_CACHE_ENABLE: "1"
+        - DATA_CACHE_ENABLE: "1"
+        - __MICROLIB
+      define-asm:
+        - __MICROLIB
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -fno-rtti
+            - -funsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --library_type=microlib
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+    - setup: Options for AORC_PD_G071
+      for-context: +AORC_PD_G071
+      add-path:
+        - ../Mcu/g071/Drivers/CMSIS/Include
+        - ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Inc
+        - ../Mcu/g071/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        - ../Mcu/g071/Inc
+        - ../Inc
+      debug: "on"
+      define:
+        - AORC_PD_G071
+        - USE_FULL_LL_DRIVER
+        - HSE_VALUE: "8000000"
+        - HSE_STARTUP_TIMEOUT: "100"
+        - LSE_STARTUP_TIMEOUT: "5000"
+        - LSE_VALUE: "32768"
+        - EXTERNAL_CLOCK_VALUE: "12288000"
+        - HSI_VALUE: "16000000"
+        - LSI_VALUE: "32000"
+        - VDD_VALUE: "3300"
+        - PREFETCH_ENABLE: "0"
+        - INSTRUCTION_CACHE_ENABLE: "1"
+        - DATA_CACHE_ENABLE: "1"
+        - __MICROLIB
+      define-asm:
+        - __MICROLIB
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -fno-rtti
+            - -funsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --library_type=microlib
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+    - setup: Options for IFLIGHT_12S_G071
+      for-context: +IFLIGHT_12S_G071
+      add-path:
+        - ../Mcu/g071/Drivers/CMSIS/Include
+        - ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Inc
+        - ../Mcu/g071/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        - ../Mcu/g071/Inc
+        - ../Inc
+      debug: "on"
+      define:
+        - IFLIGHT_12S_G071
+        - USE_FULL_LL_DRIVER
+        - HSE_VALUE: "8000000"
+        - HSE_STARTUP_TIMEOUT: "100"
+        - LSE_STARTUP_TIMEOUT: "5000"
+        - LSE_VALUE: "32768"
+        - EXTERNAL_CLOCK_VALUE: "12288000"
+        - HSI_VALUE: "16000000"
+        - LSI_VALUE: "32000"
+        - VDD_VALUE: "3300"
+        - PREFETCH_ENABLE: "0"
+        - INSTRUCTION_CACHE_ENABLE: "1"
+        - DATA_CACHE_ENABLE: "1"
+        - __MICROLIB
+      define-asm:
+        - __MICROLIB
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -fno-rtti
+            - -funsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --library_type=microlib
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+    - setup: Options for IFLIGHT_BLITZ_N_G071
+      for-context: +IFLIGHT_BLITZ_N_G071
+      add-path:
+        - ../Mcu/g071/Drivers/CMSIS/Include
+        - ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Inc
+        - ../Mcu/g071/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        - ../Mcu/g071/Inc
+        - ../Inc
+      debug: "on"
+      define:
+        - IFLIGHT_BLITZ_N_G071
+        - USE_FULL_LL_DRIVER
+        - HSE_VALUE: "8000000"
+        - HSE_STARTUP_TIMEOUT: "100"
+        - LSE_STARTUP_TIMEOUT: "5000"
+        - LSE_VALUE: "32768"
+        - EXTERNAL_CLOCK_VALUE: "12288000"
+        - HSI_VALUE: "16000000"
+        - LSI_VALUE: "32000"
+        - VDD_VALUE: "3300"
+        - PREFETCH_ENABLE: "0"
+        - INSTRUCTION_CACHE_ENABLE: "1"
+        - DATA_CACHE_ENABLE: "1"
+        - __MICROLIB
+      define-asm:
+        - __MICROLIB
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -fno-rtti
+            - -funsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --library_type=microlib
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+    - setup: Options for SEQURE_4IN1_G071
+      for-context: +SEQURE_4IN1_G071
+      add-path:
+        - ../Mcu/g071/Drivers/CMSIS/Include
+        - ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Inc
+        - ../Mcu/g071/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        - ../Mcu/g071/Inc
+        - ../Inc
+      debug: "on"
+      define:
+        - SEQURE_4IN1_G071
+        - USE_FULL_LL_DRIVER
+        - HSE_VALUE: "8000000"
+        - HSE_STARTUP_TIMEOUT: "100"
+        - LSE_STARTUP_TIMEOUT: "5000"
+        - LSE_VALUE: "32768"
+        - EXTERNAL_CLOCK_VALUE: "12288000"
+        - HSI_VALUE: "16000000"
+        - LSI_VALUE: "32000"
+        - VDD_VALUE: "3300"
+        - PREFETCH_ENABLE: "0"
+        - INSTRUCTION_CACHE_ENABLE: "1"
+        - DATA_CACHE_ENABLE: "1"
+        - __MICROLIB
+      define-asm:
+        - __MICROLIB
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -fno-rtti
+            - -funsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --library_type=microlib
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+    - setup: Options for NEUTRON_PULLUP_G071
+      for-context: +NEUTRON_PULLUP_G071
+      add-path:
+        - ../Mcu/g071/Drivers/CMSIS/Include
+        - ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Inc
+        - ../Mcu/g071/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        - ../Mcu/g071/Inc
+        - ../Inc
+      debug: "on"
+      define:
+        - NEUTRON_PULLUP_G071
+        - USE_FULL_LL_DRIVER
+        - HSE_VALUE: "8000000"
+        - HSE_STARTUP_TIMEOUT: "100"
+        - LSE_STARTUP_TIMEOUT: "5000"
+        - LSE_VALUE: "32768"
+        - EXTERNAL_CLOCK_VALUE: "12288000"
+        - HSI_VALUE: "16000000"
+        - LSI_VALUE: "32000"
+        - VDD_VALUE: "3300"
+        - PREFETCH_ENABLE: "0"
+        - INSTRUCTION_CACHE_ENABLE: "1"
+        - DATA_CACHE_ENABLE: "1"
+        - __MICROLIB
+      define-asm:
+        - __MICROLIB
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -fno-rtti
+            - -funsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --library_type=microlib
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+    - setup: Options for AM32_ESC_G071
+      for-context: +AM32_ESC_G071
+      add-path:
+        - ../Mcu/g071/Drivers/CMSIS/Include
+        - ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Inc
+        - ../Mcu/g071/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        - ../Mcu/g071/Inc
+        - ../Inc
+      debug: "on"
+      define:
+        - AM32_ESC_G071
+        - USE_FULL_LL_DRIVER
+        - HSE_VALUE: "8000000"
+        - HSE_STARTUP_TIMEOUT: "100"
+        - LSE_STARTUP_TIMEOUT: "5000"
+        - LSE_VALUE: "32768"
+        - EXTERNAL_CLOCK_VALUE: "12288000"
+        - HSI_VALUE: "16000000"
+        - LSI_VALUE: "32000"
+        - VDD_VALUE: "3300"
+        - PREFETCH_ENABLE: "0"
+        - INSTRUCTION_CACHE_ENABLE: "1"
+        - DATA_CACHE_ENABLE: "1"
+        - __MICROLIB
+      define-asm:
+        - __MICROLIB
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -fno-rtti
+            - -funsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --library_type=microlib
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+    - setup: Options for IFLIGHT_12S_SINGLE_N_G071
+      for-context: +IFLIGHT_12S_SINGLE_N_G071
+      add-path:
+        - ../Mcu/g071/Drivers/CMSIS/Include
+        - ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Inc
+        - ../Mcu/g071/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        - ../Mcu/g071/Inc
+        - ../Inc
+      debug: "on"
+      define:
+        - IFLIGHT_12S_SINGLE_N_G071
+        - USE_FULL_LL_DRIVER
+        - HSE_VALUE: "8000000"
+        - HSE_STARTUP_TIMEOUT: "100"
+        - LSE_STARTUP_TIMEOUT: "5000"
+        - LSE_VALUE: "32768"
+        - EXTERNAL_CLOCK_VALUE: "12288000"
+        - HSI_VALUE: "16000000"
+        - LSI_VALUE: "32000"
+        - VDD_VALUE: "3300"
+        - PREFETCH_ENABLE: "0"
+        - INSTRUCTION_CACHE_ENABLE: "1"
+        - DATA_CACHE_ENABLE: "1"
+        - __MICROLIB
+      define-asm:
+        - __MICROLIB
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -fno-rtti
+            - -funsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --library_type=microlib
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+    - setup: Options for ST_G0_03_N_G071
+      for-context: +ST_G0_03_N_G071
+      add-path:
+        - ../Mcu/g071/Drivers/CMSIS/Include
+        - ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Inc
+        - ../Mcu/g071/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        - ../Mcu/g071/Inc
+        - ../Inc
+      debug: "on"
+      define:
+        - ST_G0_03_N_G071
+        - USE_FULL_LL_DRIVER
+        - HSE_VALUE: "8000000"
+        - HSE_STARTUP_TIMEOUT: "100"
+        - LSE_STARTUP_TIMEOUT: "5000"
+        - LSE_VALUE: "32768"
+        - EXTERNAL_CLOCK_VALUE: "12288000"
+        - HSI_VALUE: "16000000"
+        - LSI_VALUE: "32000"
+        - VDD_VALUE: "3300"
+        - PREFETCH_ENABLE: "0"
+        - INSTRUCTION_CACHE_ENABLE: "1"
+        - DATA_CACHE_ENABLE: "1"
+        - __MICROLIB
+      define-asm:
+        - __MICROLIB
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -fno-rtti
+            - -funsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --library_type=microlib
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+    - setup: Options for ST_G0_04_G071
+      for-context: +ST_G0_04_G071
+      add-path:
+        - ../Mcu/g071/Drivers/CMSIS/Include
+        - ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Inc
+        - ../Mcu/g071/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        - ../Mcu/g071/Inc
+        - ../Inc
+      debug: "on"
+      define:
+        - ST_G0_04_G071
+        - USE_FULL_LL_DRIVER
+        - HSE_VALUE: "8000000"
+        - HSE_STARTUP_TIMEOUT: "100"
+        - LSE_STARTUP_TIMEOUT: "5000"
+        - LSE_VALUE: "32768"
+        - EXTERNAL_CLOCK_VALUE: "12288000"
+        - HSI_VALUE: "16000000"
+        - LSI_VALUE: "32000"
+        - VDD_VALUE: "3300"
+        - PREFETCH_ENABLE: "0"
+        - INSTRUCTION_CACHE_ENABLE: "1"
+        - DATA_CACHE_ENABLE: "1"
+        - __MICROLIB
+      define-asm:
+        - __MICROLIB
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -fno-rtti
+            - -funsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --library_type=microlib
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+    - setup: Options for SURFBEE_G071
+      for-context: +SURFBEE_G071
+      add-path:
+        - ../Mcu/g071/Drivers/CMSIS/Include
+        - ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Inc
+        - ../Mcu/g071/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        - ../Mcu/g071/Inc
+        - ../Inc
+      debug: "on"
+      define:
+        - SURFBEE_G071
+        - USE_FULL_LL_DRIVER
+        - HSE_VALUE: "8000000"
+        - HSE_STARTUP_TIMEOUT: "100"
+        - LSE_STARTUP_TIMEOUT: "5000"
+        - LSE_VALUE: "32768"
+        - EXTERNAL_CLOCK_VALUE: "12288000"
+        - HSI_VALUE: "16000000"
+        - LSI_VALUE: "32000"
+        - VDD_VALUE: "3300"
+        - PREFETCH_ENABLE: "0"
+        - INSTRUCTION_CACHE_ENABLE: "1"
+        - DATA_CACHE_ENABLE: "1"
+        - __MICROLIB
+      define-asm:
+        - __MICROLIB
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -fno-rtti
+            - -funsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --library_type=microlib
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+    - setup: Options for RRIOT_G071
+      for-context: +RRIOT_G071
+      add-path:
+        - ../Mcu/g071/Drivers/CMSIS/Include
+        - ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Inc
+        - ../Mcu/g071/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        - ../Mcu/g071/Inc
+        - ../Inc
+      debug: "on"
+      define:
+        - RRIOT_G071
+        - USE_FULL_LL_DRIVER
+        - HSE_VALUE: "8000000"
+        - HSE_STARTUP_TIMEOUT: "100"
+        - LSE_STARTUP_TIMEOUT: "5000"
+        - LSE_VALUE: "32768"
+        - EXTERNAL_CLOCK_VALUE: "12288000"
+        - HSI_VALUE: "16000000"
+        - LSI_VALUE: "32000"
+        - VDD_VALUE: "3300"
+        - PREFETCH_ENABLE: "0"
+        - INSTRUCTION_CACHE_ENABLE: "1"
+        - DATA_CACHE_ENABLE: "1"
+        - __MICROLIB
+      define-asm:
+        - __MICROLIB
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -fno-rtti
+            - -funsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --library_type=microlib
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+    - setup: Options for ESCAPE32REF1_G071
+      for-context: +ESCAPE32REF1_G071
+      add-path:
+        - ../Mcu/g071/Drivers/CMSIS/Include
+        - ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Inc
+        - ../Mcu/g071/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        - ../Mcu/g071/Inc
+        - ../Inc
+      debug: "on"
+      define:
+        - ESCAPE32REF1_G071
+        - USE_FULL_LL_DRIVER
+        - HSE_VALUE: "8000000"
+        - HSE_STARTUP_TIMEOUT: "100"
+        - LSE_STARTUP_TIMEOUT: "5000"
+        - LSE_VALUE: "32768"
+        - EXTERNAL_CLOCK_VALUE: "12288000"
+        - HSI_VALUE: "16000000"
+        - LSI_VALUE: "32000"
+        - VDD_VALUE: "3300"
+        - PREFETCH_ENABLE: "0"
+        - INSTRUCTION_CACHE_ENABLE: "1"
+        - DATA_CACHE_ENABLE: "1"
+        - __MICROLIB
+      define-asm:
+        - __MICROLIB
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -fno-rtti
+            - -funsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --library_type=microlib
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+  linker:
+    - script: ../Mcu/g071/Am32_64kb_g071.sct
+  groups:
+    - group: startup
+      files:
+        - file: ../Mcu/g071/Startup/mdk/startup_stm32g071xx.s
+          misc:
+            - ASM:
+                - -masm=auto
+    - group: g071
+      files:
+        - file: ../Mcu/g071/Src/ADC.c
+        - file: ../Mcu/g071/Src/comparator.c
+        - file: ../Mcu/g071/Src/eeprom.c
+        - file: ../Mcu/g071/Src/IO.c
+        - file: ../Mcu/g071/Src/peripherals.c
+        - file: ../Mcu/g071/Src/phaseouts.c
+        - file: ../Mcu/g071/Src/serial_telemetry.c
+        - file: ../Mcu/g071/Src/stm32g0xx_it.c
+        - file: ../Mcu/g071/Src/system_stm32g0xx.c
+        - file: ../Mcu/g071/Src/WS2812.c
+        - file: ../Src/kiss_telemetry.c
+    - group: Src
+      files:
+        - file: ../Src/dshot.c
+        - file: ../Src/functions.c
+        - file: ../Src/main.c
+        - file: ../Src/signal.c
+        - file: ../Src/sounds.c
+        - file: ../Src/firmwareversion.c
+    - group: Drivers
+      files:
+        - file: ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_ll_adc.c
+        - file: ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_ll_comp.c
+        - file: ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_ll_dma.c
+        - file: ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_ll_exti.c
+        - file: ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_ll_gpio.c
+        - file: ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_ll_pwr.c
+        - file: ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_ll_rcc.c
+        - file: ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_ll_tim.c
+        - file: ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_ll_usart.c
+        - file: ../Mcu/g071/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_ll_utils.c

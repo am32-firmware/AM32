@@ -1,0 +1,16 @@
+build-idx:
+  generated-by: csolution version 2.13.0+p3-g40b6564e
+  csolution: Am32G071.csolution.yml
+  cbuild-run: out/Am32G071+ESCAPE32REF1_G071.cbuild-run.yml
+  tmpdir: tmp
+  cprojects:
+    - cproject: Am32G071.cproject.yml
+  cbuilds:
+    - cbuild: out/Am32G071/ESCAPE32REF1_G071/Am32G071+ESCAPE32REF1_G071.cbuild.yml
+      project: Am32G071
+      configuration: +ESCAPE32REF1_G071
+      messages:
+        info:
+          - Am32G071.cbuild-pack.yml - file is already up-to-date
+          - Am32G071+ESCAPE32REF1_G071.cbuild-run.yml - file is already up-to-date
+          - Am32G071+ESCAPE32REF1_G071.cbuild.yml - file generated successfully

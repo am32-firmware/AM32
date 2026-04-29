@@ -227,6 +227,9 @@ an settings option)
 #include "phaseouts.h"
 #include "serial_telemetry.h"
 #include "kiss_telemetry.h"
+#ifdef USE_SERIAL_TELEM_CYCLIC_MOD
+#include "cyclic_telem.h"
+#endif
 #include "signal.h"
 #include "sounds.h"
 #include "targets.h"
@@ -474,6 +477,10 @@ uint16_t ADC_raw_input;
 uint16_t ADC_raw_ntc;
 uint8_t PROCESS_ADC_FLAG = 0;
 char send_telemetry = 0;
+#ifdef USE_SERIAL_TELEM_CYCLIC_MOD
+char send_cyclic_telem = 0;
+uint16_t cyclic_telem_count = 0;
+#endif
 char telemetry_done = 0;
 char prop_brake_active = 0;
 
@@ -1427,6 +1434,13 @@ void tenKhzRoutine()
             telem_ms_count = 0;
         }
     }
+#ifdef USE_SERIAL_TELEM_CYCLIC_MOD
+    cyclic_telem_count++;
+    if (cyclic_telem_count >= CYCLIC_TELEM_INTERVAL) {
+        send_cyclic_telem = 1;
+        cyclic_telem_count = 0;
+    }
+#endif
 
 #ifndef BRUSHED_MODE
 
@@ -2081,10 +2095,16 @@ if(zero_crosses < 5){
             send_telem_DMA(10);
             send_telemetry = 0;
 #endif
-        } else if(send_esc_info_flag ) {
-           makeInfoPacket();
-           send_telem_DMA(49);
-           send_esc_info_flag = 0;
+        } else if (send_esc_info_flag) {
+            makeInfoPacket();
+            send_telem_DMA(49);
+            send_esc_info_flag = 0;
+#ifdef USE_SERIAL_TELEM_CYCLIC_MOD
+        } else if (send_cyclic_telem) {
+            makeCyclicTelemPackage(can_Gp, can_Gr, base_duty_cycle, m_step);
+            send_telem_DMA(10);
+            send_cyclic_telem = 0;
+#endif
         }
         if (PROCESS_ADC_FLAG == 1) { // for adc and telemetry set adc counter at 1khz loop rate
 #if defined(STMICRO)

@@ -310,7 +310,7 @@ void TIM3_IRQHandler(void)
 
 void TIM16_IRQHandler(void)
 {
-    /* USER CODE BEGIN TIM3_IRQn 0 */
+    /* USER CODE BEGIN TIM16_IRQn 0 */
     if (LL_TIM_IsActiveFlag_CC1(TIM16) == 1) {
         LL_TIM_ClearFlag_CC1(TIM16);
     }
@@ -319,10 +319,27 @@ void TIM16_IRQHandler(void)
         LL_TIM_ClearFlag_UPDATE(TIM16);
         // update_interupt++;
     }
-    /* USER CODE END TIM3_IRQn 0 */
-    /* USER CODE BEGIN TIM3_IRQn 1 */
+    /* USER CODE END TIM16_IRQn 0 */
+    /* USER CODE BEGIN TIM16_IRQn 1 */
 
-    /* USER CODE END TIM3_IRQn 1 */
+    /* USER CODE END TIM16_IRQn 1 */
+}
+
+void TIM15_IRQHandler(void)
+{
+    /* USER CODE BEGIN TIM15_IRQn 0 */
+    if (LL_TIM_IsActiveFlag_CC1(TIM15) == 1) {
+        LL_TIM_ClearFlag_CC1(TIM15);
+    }
+
+    if (LL_TIM_IsActiveFlag_UPDATE(TIM15) == 1) {
+        LL_TIM_ClearFlag_UPDATE(TIM15);
+        // update_interupt++;
+    }
+    /* USER CODE END TIM15_IRQn 0 */
+    /* USER CODE BEGIN TIM15_IRQn 1 */
+
+    /* USER CODE END TIM15_IRQn 1 */
 }
 
 void TIM6_DAC_LPTIM1_IRQHandler(void)

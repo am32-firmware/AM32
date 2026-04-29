@@ -39,6 +39,9 @@ void initCorePeripherals(void)
 #ifdef USE_TIMER_16_CHANNEL_1
     MX_TIM16_Init();
 #endif
+#ifdef USE_TIMER_15_CHANNEL_1
+    MX_TIM15_Init();
+#endif
 #ifdef N_VARIANT
     MX_COMP1_Init();
 #endif
@@ -531,6 +534,53 @@ void MX_TIM3_Init(void)
     /* USER CODE BEGIN TIM3_Init 2 */
 
     /* USER CODE END TIM3_Init 2 */
+}
+
+void MX_TIM15_Init(void)
+{
+    LL_TIM_InitTypeDef TIM_InitStruct = { 0 };
+
+    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+
+    /* Peripheral clock enable */
+    LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM15);
+
+    LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOA);
+    /**TIM15 GPIO Configuration
+    PA2   ------> TIM15_CH1
+    */
+    GPIO_InitStruct.Pin = LL_GPIO_PIN_2;
+    GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
+    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+    GPIO_InitStruct.Alternate = LL_GPIO_AF_5;
+    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    LL_DMA_SetPeriphRequest(DMA1, LL_DMA_CHANNEL_1, LL_DMAMUX_REQ_TIM15_CH1);
+    LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_1,
+        LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
+    LL_DMA_SetChannelPriorityLevel(DMA1, LL_DMA_CHANNEL_1, LL_DMA_PRIORITY_LOW);
+    LL_DMA_SetMode(DMA1, LL_DMA_CHANNEL_1, LL_DMA_MODE_NORMAL);
+    LL_DMA_SetPeriphIncMode(DMA1, LL_DMA_CHANNEL_1, LL_DMA_PERIPH_NOINCREMENT);
+    LL_DMA_SetMemoryIncMode(DMA1, LL_DMA_CHANNEL_1, LL_DMA_MEMORY_INCREMENT);
+    LL_DMA_SetPeriphSize(DMA1, LL_DMA_CHANNEL_1, LL_DMA_PDATAALIGN_HALFWORD);
+    LL_DMA_SetMemorySize(DMA1, LL_DMA_CHANNEL_1, LL_DMA_MDATAALIGN_WORD);
+
+    TIM_InitStruct.Prescaler = 10;
+    TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
+    TIM_InitStruct.Autoreload = 65535;
+    TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
+    TIM_InitStruct.RepetitionCounter = 0;
+    LL_TIM_Init(TIM15, &TIM_InitStruct);
+    LL_TIM_DisableARRPreload(TIM15);
+    LL_TIM_SetTriggerOutput(TIM15, LL_TIM_TRGO_RESET);
+    LL_TIM_DisableMasterSlaveMode(TIM15);
+    LL_TIM_IC_SetActiveInput(TIM15, LL_TIM_CHANNEL_CH1,
+        LL_TIM_ACTIVEINPUT_DIRECTTI);
+    LL_TIM_IC_SetPrescaler(TIM15, LL_TIM_CHANNEL_CH1, LL_TIM_ICPSC_DIV1);
+    LL_TIM_IC_SetFilter(TIM15, LL_TIM_CHANNEL_CH1, LL_TIM_IC_FILTER_FDIV1);
+    LL_TIM_IC_SetPolarity(TIM15, LL_TIM_CHANNEL_CH1, LL_TIM_IC_POLARITY_BOTHEDGE);
 }
 
 void MX_TIM16_Init(void)

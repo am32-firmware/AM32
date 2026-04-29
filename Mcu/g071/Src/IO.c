@@ -32,6 +32,12 @@ void receiveDshotDma()
     IC_TIMER_REGISTER->CCMR1 = 0x41;
     IC_TIMER_REGISTER->CCER = 0xa;
 #endif
+#ifdef USE_TIMER_15_CHANNEL_1
+    LL_APB2_GRP1_ForceReset(LL_APB2_GRP1_PERIPH_TIM15);
+    LL_APB2_GRP1_ReleaseReset(LL_APB2_GRP1_PERIPH_TIM15);
+    IC_TIMER_REGISTER->CCMR1 = 0x41;
+    IC_TIMER_REGISTER->CCER = 0xa;
+#endif
 
     IC_TIMER_REGISTER->PSC = ic_timer_prescaler;
     IC_TIMER_REGISTER->ARR = 0xFFFF;
@@ -61,6 +67,13 @@ void sendDshotDma()
     IC_TIMER_REGISTER->CCMR1 = 0x60;
     IC_TIMER_REGISTER->CCER = 0x3;
 #endif
+#ifdef USE_TIMER_15_CHANNEL_1
+    LL_APB2_GRP1_ForceReset(LL_APB2_GRP1_PERIPH_TIM15); // de-init timer 2
+    LL_APB2_GRP1_ReleaseReset(LL_APB2_GRP1_PERIPH_TIM15);
+    IC_TIMER_REGISTER->CCMR1 = 0x60;
+    IC_TIMER_REGISTER->CCER = 0x3;
+#endif
+
     IC_TIMER_REGISTER->PSC = output_timer_prescaler;
     IC_TIMER_REGISTER->ARR = 92;
     out_put = 1;

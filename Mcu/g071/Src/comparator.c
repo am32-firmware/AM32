@@ -45,7 +45,7 @@ medium_speed_set = 1;
         current_EXTI_LINE = PHASE_C_EXTI_LINE;
         active_COMP = PHASE_C_COMP_NUMBER;
 #endif
-        LL_COMP_ConfigInputs(active_COMP, PHASE_C_COMP, LL_COMP_INPUT_PLUS_IO3);
+        LL_COMP_ConfigInputs(active_COMP, PHASE_C_COMP, PHASE_C_COMP_PLUS);
     }
 
     if (step == 2 || step == 5) { // a floating
@@ -53,7 +53,7 @@ medium_speed_set = 1;
         current_EXTI_LINE = PHASE_A_EXTI_LINE;
         active_COMP = PHASE_A_COMP_NUMBER;
 #endif
-        LL_COMP_ConfigInputs(active_COMP, PHASE_A_COMP, LL_COMP_INPUT_PLUS_IO3);
+        LL_COMP_ConfigInputs(active_COMP, PHASE_A_COMP, PHASE_A_COMP_PLUS);
     }
 
     if (step == 3 || step == 6) { // b floating
@@ -61,7 +61,7 @@ medium_speed_set = 1;
         current_EXTI_LINE = PHASE_B_EXTI_LINE;
         active_COMP = PHASE_B_COMP_NUMBER;
 #endif
-        LL_COMP_ConfigInputs(active_COMP, PHASE_B_COMP, LL_COMP_INPUT_PLUS_IO3);
+        LL_COMP_ConfigInputs(active_COMP, PHASE_B_COMP, PHASE_B_COMP_PLUS);
     }
     if (rising) {
         LL_EXTI_DisableRisingTrig_0_31(LL_EXTI_LINE_18);

@@ -106,9 +106,9 @@ void SystemClock_Config(void)
 
 void MX_COMP1_Init(void)
 {
-    /* USER CODE BEGIN COMP2_Init 0 */
+    /* USER CODE BEGIN COMP1_Init 0 */
 
-    /* USER CODE END COMP2_Init 0 */
+    /* USER CODE END COMP1_Init 0 */
 
     LL_COMP_InitTypeDef COMP_InitStruct = { 0 };
 
@@ -116,10 +116,8 @@ void MX_COMP1_Init(void)
 
     LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOA);
     LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOB);
-    /**COMP2 GPIO Configuration
-    PA2   ------> COMP2_INM
-    PA3   ------> COMP2_INP
-    */
+
+#if !defined(FLEX_COMP_PIN_INIT)
     GPIO_InitStruct.Pin = LL_GPIO_PIN_0;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
@@ -129,10 +127,41 @@ void MX_COMP1_Init(void)
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
     LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+#else
+    GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
 
-    /* USER CODE BEGIN COMP2_Init 1 */
+#if defined(COMP1_IO_MINUS_IO1_PORT) && defined(COMP1_IO_MINUS_IO1_PIN)
+    GPIO_InitStruct.Pin = COMP1_IO_MINUS_IO1_PIN;
+    LL_GPIO_Init(COMP1_IO_MINUS_IO1_PORT, &GPIO_InitStruct);
+#endif
+#if defined(COMP1_IO_MINUS_IO2_PORT) && defined(COMP1_IO_MINUS_IO2_PIN)
+    GPIO_InitStruct.Pin = COMP1_IO_MINUS_IO2_PIN;
+    LL_GPIO_Init(COMP1_IO_MINUS_IO2_PORT, &GPIO_InitStruct);
+#endif
+#if defined(COMP1_IO_MINUS_IO3_PORT) && defined(COMP1_IO_MINUS_IO3_PIN)
+    GPIO_InitStruct.Pin = COMP1_IO_MINUS_IO3_PIN;
+    LL_GPIO_Init(COMP1_IO_MINUS_IO3_PORT, &GPIO_InitStruct);
+#endif
+
+#if defined(COMP1_IO_PLUS_IO1_PORT) && defined(COMP1_IO_PLUS_IO1_PIN)
+    GPIO_InitStruct.Pin = COMP1_IO_PLUS_IO1_PIN;
+    LL_GPIO_Init(COMP1_IO_PLUS_IO1_PORT, &GPIO_InitStruct);
+#endif
+#if defined(COMP1_IO_PLUS_IO2_PORT) && defined(COMP1_IO_PLUS_IO2_PIN)
+    GPIO_InitStruct.Pin = COMP1_IO_PLUS_IO2_PIN;
+    LL_GPIO_Init(COMP1_IO_PLUS_IO2_PORT, &GPIO_InitStruct);
+#endif
+#if defined(COMP1_IO_PLUS_IO3_PORT) && defined(COMP1_IO_PLUS_IO3_PIN)
+    GPIO_InitStruct.Pin = COMP1_IO_PLUS_IO3_PIN;
+    LL_GPIO_Init(COMP1_IO_PLUS_IO3_PORT, &GPIO_InitStruct);
+#endif
+#endif
+
+
+    /* USER CODE BEGIN COMP1_Init 1 */
     LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_SYSCFG);
-    /* USER CODE END COMP2_Init 1 */
+    /* USER CODE END COMP1_Init 1 */
     COMP_InitStruct.InputPlus = LL_COMP_INPUT_PLUS_IO3;
     COMP_InitStruct.InputMinus = LL_COMP_INPUT_MINUS_IO3;
     COMP_InitStruct.InputHysteresis = LL_COMP_HYSTERESIS_NONE;
@@ -155,11 +184,11 @@ void MX_COMP1_Init(void)
     }
     LL_EXTI_DisableEvent_0_31(LL_EXTI_LINE_17);
     LL_EXTI_DisableIT_0_31(LL_EXTI_LINE_17);
-    /* USER CODE BEGIN COMP2_Init 2 */
+    /* USER CODE BEGIN COMP1_Init 2 */
     NVIC_SetPriority(ADC1_COMP_IRQn, 0);
     NVIC_EnableIRQ(ADC1_COMP_IRQn);
     //__NVIC_EnableIRQ;
-    /* USER CODE END COMP2_Init 2 */
+    /* USER CODE END COMP1_Init 2 */
 }
 
 void MX_COMP2_Init(void)
@@ -174,10 +203,8 @@ void MX_COMP2_Init(void)
 
     LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOA);
     LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOB);
-    /**COMP2 GPIO Configuration
-    PA2   ------> COMP2_INM
-    PA3   ------> COMP2_INP
-    */
+
+#if !defined(FLEX_COMP_PIN_INIT)
     GPIO_InitStruct.Pin = LL_GPIO_PIN_2;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
@@ -197,6 +224,37 @@ void MX_COMP2_Init(void)
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
     LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+#else
+
+    GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+
+#if defined(COMP2_IO_MINUS_IO1_PORT) && defined(COMP2_IO_MINUS_IO1_PIN)
+    GPIO_InitStruct.Pin = COMP2_IO_MINUS_IO1_PIN;
+    LL_GPIO_Init(COMP2_IO_MINUS_IO1_PORT, &GPIO_InitStruct);
+#endif
+#if defined(COMP2_IO_MINUS_IO2_PORT) && defined(COMP2_IO_MINUS_IO2_PIN)
+    GPIO_InitStruct.Pin = COMP2_IO_MINUS_IO2_PIN;
+    LL_GPIO_Init(COMP2_IO_MINUS_IO2_PORT, &GPIO_InitStruct);
+#endif
+#if defined(COMP2_IO_MINUS_IO3_PORT) && defined(COMP2_IO_MINUS_IO3_PIN)
+    GPIO_InitStruct.Pin = COMP2_IO_MINUS_IO3_PIN;
+    LL_GPIO_Init(COMP2_IO_MINUS_IO3_PORT, &GPIO_InitStruct);
+#endif
+
+#if defined(COMP2_IO_PLUS_IO1_PORT) && defined(COMP2_IO_PLUS_IO1_PIN)
+    GPIO_InitStruct.Pin = COMP2_IO_PLUS_IO1_PIN;
+    LL_GPIO_Init(COMP2_IO_PLUS_IO1_PORT, &GPIO_InitStruct);
+#endif
+#if defined(COMP2_IO_PLUS_IO2_PORT) && defined(COMP2_IO_PLUS_IO2_PIN)
+    GPIO_InitStruct.Pin = COMP2_IO_PLUS_IO2_PIN;
+    LL_GPIO_Init(COMP2_IO_PLUS_IO2_PORT, &GPIO_InitStruct);
+#endif
+#if defined(COMP2_IO_PLUS_IO3_PORT) && defined(COMP2_IO_PLUS_IO3_PIN)
+    GPIO_InitStruct.Pin = COMP2_IO_PLUS_IO3_PIN;
+    LL_GPIO_Init(COMP2_IO_PLUS_IO3_PORT, &GPIO_InitStruct);
+#endif
+#endif
 
     /* USER CODE BEGIN COMP2_Init 1 */
     LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_SYSCFG);
@@ -828,18 +886,23 @@ void enableCorePeripherals()
     activateADC();
 #endif
 
-#ifndef MCU_F031
     __IO uint32_t wait_loop_index = 0;
-    /* Enable comparator */
-    LL_COMP_Enable(MAIN_COMP);
-#ifdef N_VARIANT // needs comp 1 and 2
-    LL_COMP_Enable(COMP1);
-#endif
+
+    // the compiler should optimize-away this `if` block.
+    if ((PHASE_A_COMP_NUMBER == PHASE_B_COMP_NUMBER) &&
+        (PHASE_B_COMP_NUMBER == PHASE_C_COMP_NUMBER))
+    {
+        LL_COMP_Enable(PHASE_A_COMP_NUMBER);
+    }
+    else
+    {
+        LL_COMP_Enable(COMP1);
+        LL_COMP_Enable(COMP2);
+    }
     wait_loop_index = ((LL_COMP_DELAY_STARTUP_US * (SystemCoreClock / (100000 * 2))) / 10);
     while (wait_loop_index != 0) {
         wait_loop_index--;
     }
-#endif
 
     NVIC_SetPriority(EXTI4_15_IRQn, 2);
     NVIC_EnableIRQ(EXTI4_15_IRQn);

@@ -10,8 +10,8 @@
 #include "common.h"
 #include "targets.h"
 
-COMP_TypeDef* active_COMP = COMP2;
-uint32_t current_EXTI_LINE = LL_EXTI_LINE_18;
+COMP_TypeDef* active_COMP = PHASE_C_COMP_NUMBER;
+uint32_t current_EXTI_LINE = PHASE_C_EXTI_LINE;
 uint8_t medium_speed_set;
 
 uint8_t getCompOutputLevel() { return (active_COMP->CSR >> 30 & 1); }

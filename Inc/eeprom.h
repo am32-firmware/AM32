@@ -67,8 +67,9 @@ typedef union EEprom_u {
             uint8_t term_enable; // 183
             uint8_t reserved[8]; // 184-191
         } can;
+        uint8_t throt_max; // 192
     };
-    uint8_t buffer[192];
+    uint8_t buffer[200];
 } EEprom_t;
 
 extern EEprom_t eepromBuffer;

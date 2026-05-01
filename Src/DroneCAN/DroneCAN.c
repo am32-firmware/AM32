@@ -16,6 +16,7 @@
 #include <eeprom.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "sys_can.h"
 #include <canard.h>
@@ -170,6 +171,7 @@ static const struct parameter {
         { "DRAG_BRAKE_STRENGTH",    T_UINT8, 1, 10,  10, &eepromBuffer.drag_brake_strength},
         { "INPUT_SIGNAL_TYPE",      T_UINT8, 0, 5,   5, &eepromBuffer.input_type},
         { "INPUT_FILTER_HZ",        T_UINT8, 0, 100, 0, &eepromBuffer.can.filter_hz},
+        { "THROTTLE_MAX",           T_UINT8, 0, 100, 100, &eepromBuffer.throt_max},
 #ifdef CAN_TERM_PIN
         { "CAN_TERM_ENABLE",        T_BOOL,  0, 1,   0, &eepromBuffer.can.term_enable},
 #endif
@@ -605,16 +607,25 @@ extern void setInput();
  */
 static void set_input(uint16_t input)
 {
+    uint16_t throt_maxx = eepromBuffer.throt_max * 10; 
+
     if (!armed && input != 0 && eepromBuffer.can.require_arming &&
         dronecan_armed && !eepromBuffer.can.require_zero_throttle) {
         // allow restart if unexpected ESC reboot in flight
         armed = 1;
     }
 
+    if(throt_maxx <= (input-1047)){
+        input = throt_maxx + 1047;
+    }else if((input < 1047) && ((throt_maxx) <= (input-48))){
+        input = throt_maxx + 48;
+    }
+
     const uint16_t unfiltered_input = (dronecan_armed || !eepromBuffer.can.require_arming)? input : 0;
     const uint16_t filtered_input = Filter2P_apply(unfiltered_input, eepromBuffer.can.filter_hz, 1000);
 
     newinput = filtered_input;
+
     last_can_input = unfiltered_input;
     inputSet = 1;
 

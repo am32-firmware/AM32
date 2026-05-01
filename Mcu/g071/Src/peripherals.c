@@ -165,7 +165,7 @@ void MX_COMP1_Init(void)
     COMP_InitStruct.InputPlus = LL_COMP_INPUT_PLUS_IO3;
     COMP_InitStruct.InputMinus = LL_COMP_INPUT_MINUS_IO3;
     COMP_InitStruct.InputHysteresis = LL_COMP_HYSTERESIS_NONE;
-    COMP_InitStruct.OutputPolarity = LL_COMP_OUTPUTPOL_NONINVERTED;
+    COMP_InitStruct.OutputPolarity = COMP_POLARITY;
     COMP_InitStruct.OutputBlankingSource = LL_COMP_BLANKINGSRC_NONE;
     LL_COMP_Init(COMP1, &COMP_InitStruct);
     LL_COMP_SetPowerMode(COMP1, LL_COMP_POWERMODE_HIGHSPEED);
@@ -262,7 +262,7 @@ void MX_COMP2_Init(void)
     COMP_InitStruct.InputPlus = LL_COMP_INPUT_PLUS_IO3;
     COMP_InitStruct.InputMinus = LL_COMP_INPUT_MINUS_IO3;
     COMP_InitStruct.InputHysteresis = LL_COMP_HYSTERESIS_NONE;
-    COMP_InitStruct.OutputPolarity = LL_COMP_OUTPUTPOL_NONINVERTED;
+    COMP_InitStruct.OutputPolarity = COMP_POLARITY;
     COMP_InitStruct.OutputBlankingSource = LL_COMP_BLANKINGSRC_NONE;
     LL_COMP_Init(COMP2, &COMP_InitStruct);
     LL_COMP_SetPowerMode(COMP2, LL_COMP_POWERMODE_HIGHSPEED);

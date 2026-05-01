@@ -3781,6 +3781,9 @@
 
 #define FLEX_COMP_PIN_INIT
 
+// on the ESCape32 reference design, the BEMF->PHASE is inverted compared to other AM32 G071 targets.
+#define COMP_POLARITY               LL_COMP_OUTPUTPOL_INVERTED
+
 // pa0(-)->pa1(+)
 #define PHASE_A_COMP_NUMBER         COMP1
 #define PHASE_A_EXTI_LINE           LL_EXTI_LINE_17
@@ -4995,6 +4998,10 @@
 #define COM_TIMER TIM14
 #define APPLICATION_ADDRESS 0x08001000
 #define EXTI_LINE LL_EXTI_LINE_18
+
+#ifndef COMP_POLARITY
+#define COMP_POLARITY LL_COMP_OUTPUTPOL_NONINVERTED
+#endif
 
 #ifndef PHASE_A_COMP_PLUS
 #define PHASE_A_COMP_PLUS LL_COMP_INPUT_PLUS_IO3

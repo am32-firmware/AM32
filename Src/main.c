@@ -1772,9 +1772,6 @@ static void checkDeviceInfo(void)
     FLASH_API->flash_get_property(&s_flashDriver, kFLASH_PropertyPflashBlockBaseAddr, &pflashBlockBase);
     FLASH_API->flash_get_property(&s_flashDriver, kFLASH_PropertyPflashSectorSize, &pflashSectorSize);
     FLASH_API->flash_get_property(&s_flashDriver, kFLASH_PropertyPflashTotalSize, &pflashTotalSize);
-
-    //Set eeprom address to last sector
-    eeprom_address = pflashBlockBase + (pflashTotalSize - pflashSectorSize);
 #else
 #define DEVINFO_MAGIC1 0x5925e3da
 #define DEVINFO_MAGIC2 0x4eb863d9

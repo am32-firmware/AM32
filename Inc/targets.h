@@ -5373,9 +5373,9 @@
 #ifdef MCU_A153
 //#define STMICRO
 #define NXP
-#define CPU_FREQUENCY_MHZ   96		//Is the main_clk //Is the CPU/System/Ctimer0 clock
+#define CPU_FREQUENCY_MHZ   96		//Is the CPU/System clock, main_clk is 192MHz
 #ifndef EEPROM_START_ADD
-#define EEPROM_START_ADD  (uint32_t)0x1E000		//Flash is 128kB, sector is 8kB
+#define EEPROM_START_ADD  (uint32_t)0xE000		//Flash is 128kB, sector is 8kB, we use 64kB flash
 #endif
 
 //Assign correct timer functions to timers

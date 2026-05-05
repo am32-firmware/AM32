@@ -3,7 +3,7 @@
 
 #include "main.h"
 
-#define CYCLIC_TELEM_INTERVAL 200  // 200 counts x 50us = 10ms at 20kHz ISR
+#define CYCLIC_TELEM_INTERVAL 20  // 20 counts x 50us = 1ms at 20kHz ISR
 
 typedef struct __attribute__((packed))
 {

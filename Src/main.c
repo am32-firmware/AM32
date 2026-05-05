@@ -291,23 +291,39 @@ volatile int16_t can_Gp = 0;    // Pich Value
 volatile int16_t can_Gr = 0;    // Roll Value
 #endif
 
-const int16_t sineLookupTable[] = { // For 7 pp motor
-     0,  149,  295,  434,  563,  680,
-   782,  866,  931,  975,  997,  997,
-   975,  931,  866,  782,  680,  563,
-   434,  295,  149,    0, -149, -295,
-  -434, -563, -680, -782, -866, -931,
-  -975, -997, -997, -975, -931, -866,
-  -782, -680, -563, -434, -295, -149};
+Look// const int16_t sineLookupTable[] = { // For 7 pp motor
+//      0,  149,  295,  434,  563,  680,
+//    782,  866,  931,  975,  997,  997,
+//    975,  931,  866,  782,  680,  563,
+//    434,  295,  149,    0, -149, -295,
+//   -434, -563, -680, -782, -866, -931,
+//   -975, -997, -997, -975, -931, -866,
+//   -782, -680, -563, -434, -295, -149};
 
-const int16_t cosineLookupTable[] = { // For 7 pp motor
-  1000,  989,  956,   901,  826,  733,
-   623,  500,  365,   223,   75,  -75, 
-  -223, -365, -500,  -623, -733, -826,
-  -901, -956, -989, -1000, -989, -956, 
-  -901, -826, -733,  -623, -500, -365, 
-  -223,  -75,    5,   223,  365,  500, 
-   623,  733,  826,   901,  956,  989};
+const int16_t sineLookupTable[] = {  // For 6 pp motor
+0, 174, 342, 500, 643, 766,
+866, 940, 985, 1000, 985, 940,
+866, 766, 643, 500, 342, 174,
+0, -174, -342, -500, -643, -766,
+-866, -940, -985, -1000, -985, -940,
+-866, -766, -643, -500, -342, -174};
+
+// const int16_t cosineLookupTable[] = { // For 7 pp motor
+//   1000,  989,  956,   901,  826,  733,
+//    623,  500,  365,   223,   75,  -75, 
+//   -223, -365, -500,  -623, -733, -826,
+//   -901, -956, -989, -1000, -989, -956, 
+//   -901, -826, -733,  -623, -500, -365, 
+//   -223,  -75,    5,   223,  365,  500, 
+//    623,  733,  826,   901,  956,  989};
+
+const int16_t cosineLookupTable[] = { // For 6 pp motor
+    1000,  985,  940,  866,  766,  643,
+     500,  342,  174,    0, -174, -342,
+    -500, -643, -766, -866, -940, -985,
+   -1000, -985, -940, -866, -766, -643, 
+    -500, -342, -174,    0,  174,  342,
+     500,  643,  766,  866,  940,  985};
 
 
 //===========================================================================
@@ -908,13 +924,13 @@ void commutate()
 #ifdef ENABLE_INTERRUPT_SIGNAL_PIN
         if (forward == 1) {
         m_step++;
-        if (m_step >= 42) { // for 7 pole pair motores
+        if (m_step >= 36) { // for 6 pole pair motores
             m_step = 0;
           }
     } else {
         m_step--;
         if (m_step < 0) {
-            m_step = 6 * 7 - 1; // for 7 pole pair motores
+            m_step = 6 * 6 - 1; // for 6 pole pair motores
         }
     }
 #endif
@@ -2088,6 +2104,15 @@ if(zero_crosses < 5){
              NVIC_SetPriority(COMPARATOR_IRQ, 0);
          }
 #endif
+
+#ifdef USE_SERIAL_TELEM_CYCLIC_MOD
+        if (send_cyclic_telem) {
+            makeCyclicTelemPackage(can_Gp, can_Gr, base_duty_cycle, m_step);
+            send_telem_DMA(10);
+            send_cyclic_telem = 0;
+            send_telemetry = 0;
+        }
+#else
         if (send_telemetry) {
 #ifdef USE_SERIAL_TELEMETRY
             makeTelemPackage((int8_t)degrees_celsius, battery_voltage, actual_current,
@@ -2098,14 +2123,9 @@ if(zero_crosses < 5){
         } else if (send_esc_info_flag) {
             makeInfoPacket();
             send_telem_DMA(49);
-            send_esc_info_flag = 0;
-#ifdef USE_SERIAL_TELEM_CYCLIC_MOD
-        } else if (send_cyclic_telem) {
-            makeCyclicTelemPackage(can_Gp, can_Gr, base_duty_cycle, m_step);
-            send_telem_DMA(10);
-            send_cyclic_telem = 0;
-#endif
+            send_esc_info_flag = 10;
         }
+#endif
         if (PROCESS_ADC_FLAG == 1) { // for adc and telemetry set adc counter at 1khz loop rate
 #if defined(STMICRO)
             ADC_DMA_Callback();

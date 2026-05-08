@@ -118,6 +118,7 @@ static struct {
 extern void saveEEpromSettings(void);
 extern void loadEEpromSettings(void);
 static void set_input(uint16_t input);
+static uint32_t millis32(void);
 
 /*
   the set of parameters to present to the user over DroneCAN
@@ -222,6 +223,23 @@ static void save_settings(void)
 {
     saveEEpromSettings();
     can_printf("saved settings");
+}
+
+/*
+  pending deferred save state. Param sets only mark settings dirty;
+  the main DroneCAN_update loop coalesces bursts into a single flash
+  write once the bus has been quiet for SETTINGS_SAVE_QUIET_MS.
+ */
+#define SETTINGS_SAVE_QUIET_MS 500
+static struct {
+    bool dirty;
+    uint32_t last_change_ms;
+} pending_save;
+
+static void mark_settings_dirty(void)
+{
+    pending_save.dirty = true;
+    pending_save.last_change_ms = millis32();
 }
 
 /*
@@ -395,6 +413,11 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
             armed = 0;
             set_input(0);
         }
+
+        // mark settings dirty; the actual flash write is deferred and
+        // coalesced in DroneCAN_update so a burst of param sets does
+        // not block the CAN stack with repeated slow flash writes
+        mark_settings_dirty();
     }
 
     /*
@@ -1240,6 +1263,15 @@ void DroneCAN_update()
     }
 
     DroneCAN_processTxQueue();
+
+    // perform a deferred settings save once the param bus has been
+    // quiet long enough, and it is safe to write flash
+    if (pending_save.dirty &&
+        (millis32() - pending_save.last_change_ms) >= SETTINGS_SAVE_QUIET_MS &&
+        safe_to_write_settings()) {
+        pending_save.dirty = false;
+        save_settings();
+    }
 
     if (canstats.last_raw_command_us != 0 && ts - canstats.last_raw_command_us > 250000ULL) {
         /*

@@ -21,15 +21,18 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
-
+          node-version: '20'  # 指定你的项目需要的Node.js版本
+          
       - name: Build CI
         shell: bash
         run: |

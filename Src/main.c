@@ -1512,7 +1512,11 @@ void processDshot()
         compute_dshot_flag = 0;
     }
     if (compute_dshot_flag == 2) {
+      if(e_com_time > 65535){    // beyond dshot range
+        make_dshot_package(65535);
+      }else{
         make_dshot_package(e_com_time);
+      }
         compute_dshot_flag = 0;
         return;
     }
@@ -1841,7 +1845,13 @@ int main(void)
 #endif
 
     while (1) {
-e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation_intervals[2] + commutation_intervals[3] + commutation_intervals[4] + commutation_intervals[5]) + 4) >> 1; // COMMUTATION INTERVAL IS 0.5US INCREMENTS
+if(zero_crosses < 24){
+   e_com_time = 65408; // report a low value during startup to avoid false rpm spikes.
+}else{
+   e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation_intervals[2] + commutation_intervals[3] + commutation_intervals[4] + commutation_intervals[5]) + 4) >> 1; // COMMUTATION INTERVAL IS 0.5US INCREMENTS 
+}
+
+
 #if defined(FIXED_DUTY_MODE) || defined(FIXED_SPEED_MODE)
         setInput();
 #endif

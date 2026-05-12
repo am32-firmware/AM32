@@ -7,9 +7,9 @@ extern void sendDshotDma();
 extern void receiveDshotDma();
 extern void signalEdgeRoutine();
 extern void processDshot();
-extern char send_telemetry;
+extern volatile char send_telemetry;
 extern char telemetry_done;
-extern char servoPwm;
+extern volatile char servoPwm;
 extern char dshot;
 int recieved_ints = 0;
 

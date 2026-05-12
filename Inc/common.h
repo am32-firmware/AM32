@@ -49,7 +49,7 @@ extern int e_com_time;
 extern char EDT_ARM_ENABLE;
 extern char EDT_ARMED;
 extern uint16_t send_extended_dshot;
-#ifdef NEED_INPUT_READY
+#if defined(NEED_INPUT_READY) || defined(NXP)
 extern volatile char input_ready;
 #endif
 // typedef struct PID{

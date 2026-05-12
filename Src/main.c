@@ -1726,6 +1726,18 @@ int main(void)
     tim1_arr = TIMER1_MAX_ARR;
     if (!eepromBuffer.comp_pwm) {
         eepromBuffer.use_sine_start = 0; // sine start requires complementary pwm.
+#ifdef STMICRO   
+        TIM1->BDTR = 0x8000;  // no dead time when comp pwm turned off
+#endif
+#ifdef ARTERY
+        TMR1->brk = 0x8000;
+#endif
+#ifdef GIGADEVICES
+        TIMER_CCHP(TIMER0) = 0x8000;
+#endif
+#ifdef WCH
+            TIM1->BDTR = 0x8000;
+#endif       
     }
 
     if (eepromBuffer.rc_car_reverse) { // overrides a whole lot of things!

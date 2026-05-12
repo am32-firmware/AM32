@@ -1044,6 +1044,15 @@
 /***************************************End Generic
  * *****************************************/
 
+#ifdef  FLYCOLOR_F421
+#define FIRMWARE_NAME "FLYCOLOR_F4 "
+#define FILE_NAME "FLYCOLOR_F421"
+#define DEAD_TIME 60
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_540
+#define USE_SERIAL_TELEMETRY
+#endif
+
 #ifdef  MAXKGO_F421
 #define FIRMWARE_NAME "MAXKGO_F4 "
 #define FILE_NAME "MAXKGO_F421"

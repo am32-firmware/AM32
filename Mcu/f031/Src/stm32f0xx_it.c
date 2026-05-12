@@ -34,7 +34,7 @@ extern void transfercomplete(void);
 extern void interruptRoutine();
 extern void PeriodElapsedCallback();
 extern void tenKhzRoutine();
-extern char servoPwm;
+extern volatile char servoPwm;
 
 int update_interupt = 0;
 uint8_t update_count = 0;

@@ -16,13 +16,13 @@
 uint8_t buffer_padding = 7;
 char ic_timer_prescaler = CPU_FREQUENCY_MHZ / 6;
 uint32_t dma_buffer[64] = { 0 };
-char out_put = 0;
+volatile char out_put = 0;
 
 void receiveDshotDma()
 {
 #ifdef USE_TIMER_3_CHANNEL_1
-    RCC->APBRSTR1 |= LL_APB1_GRP1_PERIPH_TIM3;
-    RCC->APBRSTR1 &= ~LL_APB1_GRP1_PERIPH_TIM3;
+    RCC->APB1RSTR1 |= LL_APB1_GRP1_PERIPH_TIM3;
+    RCC->APB1RSTR1 &= ~LL_APB1_GRP1_PERIPH_TIM3;
     IC_TIMER_REGISTER->CCMR1 = 0x41;
     IC_TIMER_REGISTER->CCER = 0xa;
 #else
@@ -49,8 +49,8 @@ void receiveDshotDma()
 void sendDshotDma()
 {
 #ifdef USE_TIMER_3_CHANNEL_1
-    RCC->APBRSTR1 |= LL_APB1_GRP1_PERIPH_TIM3;
-    RCC->APBRSTR1 &= ~LL_APB1_GRP1_PERIPH_TIM3;
+    RCC->APB1RSTR1 |= LL_APB1_GRP1_PERIPH_TIM3;
+    RCC->APB1RSTR1 &= ~LL_APB1_GRP1_PERIPH_TIM3;
     IC_TIMER_REGISTER->CCMR1 = 0x60;
     IC_TIMER_REGISTER->CCER = 0x3;
 #endif

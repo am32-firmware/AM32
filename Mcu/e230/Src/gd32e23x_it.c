@@ -9,12 +9,12 @@ extern void sendDshotDma();
 extern void receiveDshotDma();
 extern void signalEdgeRoutine();
 extern void processDshot();
-extern char send_telemetry;
+extern volatile char send_telemetry;
 extern char telemetry_done;
-extern char servoPwm;
-extern char dshot_telemetry;
-extern char out_put;
-extern char armed;
+extern volatile char servoPwm;
+extern volatile char dshot_telemetry;
+extern volatile char out_put;
+extern volatile char armed;
 
 uint16_t interrupt_time = 0;
 

@@ -25,12 +25,11 @@ void enableHalfTransferInt();
 void setInputPullNone();
 
 extern char bi_direction;
-extern char inputSet;
+extern volatile char inputSet;
 extern char dshot;
-extern char servoPwm;
-extern char send_telemetry;
-extern uint8_t degrees_celsius;
-
+extern volatile char servoPwm;
+extern volatile char send_telemetry;
+extern volatile int16_t degrees_celsius;
 extern uint16_t ADC_raw_volts;
 extern uint16_t servo_low_threshold; // anything below this point considered 0
 extern uint16_t

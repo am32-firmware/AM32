@@ -4,4 +4,4 @@
 #define VERSION_MAJOR 2
 #define VERSION_MINOR 20
 
-#define EEPROM_VERSION 3
+#define EEPROM_VERSION 4

@@ -542,6 +542,7 @@ uint16_t zero_input_count = 0;
 
 uint16_t input = 0;
 volatile uint16_t newinput = 0;
+static volatile uint16_t prev_newinput = 0;
 volatile char inputSet = 0;
 char dshot = 0;
 volatile char servoPwm = 0;
@@ -605,10 +606,10 @@ void loadEEpromSettings()
       eepromBuffer.current_I = 0; // 0-255
       eepromBuffer.current_D = 100; // 0-255
       eepromBuffer.active_brake_power = 0; // 1-5 percent duty cycle
-      eepromBuffer.reserved_eeprom_3[0] = 0; //14-16  for crsf input
+      eepromBuffer.coast_on_zero = 0;
+      eepromBuffer.reserved_eeprom_3[0] = 0;
       eepromBuffer.reserved_eeprom_3[1] = 0;
       eepromBuffer.reserved_eeprom_3[2] = 0;
-      eepromBuffer.reserved_eeprom_3[3] = 0;
     }
     // eepromBuffer.advance_level can either be set to 0-3 with config tools less than 1.90 or 10-42 with 1.90 or above 
     if (eepromBuffer.advance_level > 42 || (eepromBuffer.advance_level < 10 && eepromBuffer.advance_level > 3)){
@@ -1308,8 +1309,36 @@ if (!stepper_sine && armed) {
 #endif
 }
 
+// When the throttle command crosses down through COAST_THRESHOLD  open every
+// phase and mask BEMF immediately so the motor freewheels / coasts to a stop (useful for big folding props)
+#define COAST_THRESHOLD 48
+static void force_coast(void)
+{
+    running = 0;
+    input = 0;
+    newinput = 0;
+    duty_cycle = 0;
+    last_duty_cycle = 0;
+    duty_cycle_setpoint = 0;
+    prop_brake_active = 0;
+    prop_brake_duty_cycle = 0;
+    zero_crosses = 0;
+    bemf_timeout_happened = 0;
+    old_routine = 1;
+    SET_DUTY_CYCLE_ALL(0);
+    allOff();
+    maskPhaseInterrupts();
+}
+
 void tenKhzRoutine()
 { // 20khz as of 2.00 to be renamed
+    if (eepromBuffer.coast_on_zero) {
+        if (newinput < COAST_THRESHOLD && prev_newinput >= COAST_THRESHOLD) {
+            force_coast();
+        }
+        prev_newinput = newinput;
+    }
+
     duty_cycle = duty_cycle_setpoint;
     tenkhzcounter++;
     ledcounter++;

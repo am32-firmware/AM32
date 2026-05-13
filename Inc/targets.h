@@ -5389,11 +5389,8 @@
 #ifndef LED_BRIGHTNESS
 #define LED_BRIGHTNESS 128
 #endif
-#ifndef LED_COUNT 
+#ifndef LED_COUNT
 #define LED_COUNT 1
-#endif
-#ifndef LED_PROFILE
-#define LED_PROFILE LED_PROFILE_SOLID(0, 255, 0)
 #endif
 #endif
 

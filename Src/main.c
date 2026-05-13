@@ -236,6 +236,9 @@ an settings option)
 
 #ifdef USE_LED_STRIP
 #include "WS2812.h"
+#if defined(LED_PROFILE) && !defined(WS2812_NONBLOCKING)
+#error "LED_PROFILE requires a non-blocking WS2812 driver. The driver for this MCU disables IRQs during send and would degrade motor control. Port the driver to DMA or drop LED_PROFILE."
+#endif
 #endif
 
 #ifdef USE_CRSF_INPUT
@@ -1308,7 +1311,7 @@ if (!stepper_sine && armed) {
 #endif
 }
 
-#ifdef USE_LED_STRIP
+#if defined(USE_LED_STRIP) && defined(LED_PROFILE)
 typedef struct {
     uint8_t  mode;
     uint8_t  c1_r, c1_g, c1_b;
@@ -1332,7 +1335,7 @@ static void send_LED_RGB_scaled(uint8_t r, uint8_t g, uint8_t b)
 
 void tenKhzRoutine()
 { // 20khz as of 2.00 to be renamed
-#ifdef USE_LED_STRIP
+#if defined(USE_LED_STRIP) && defined(LED_PROFILE)
     // 1 kHz ms counter for blink timing -- LED I/O stays in main loop.
     static uint8_t led_subtick = 0;
     if (++led_subtick >= 20) {
@@ -1354,6 +1357,11 @@ void tenKhzRoutine()
                     if (armed_timeout_count > LOOP_FREQUENCY_HZ) { // one second
                         if (zero_input_count > 30) {
                             armed = 1;
+#if defined(USE_LED_STRIP) && !defined(LED_PROFILE)
+                            // Legacy LED flow: one-shot green at arming.
+                            delayMicros(1000);
+                            send_LED_RGB(0, 255, 0);
+#endif
 #ifdef USE_RGB_LED
                             setIndividualRGBLed(0,1,0);
 #endif
@@ -1778,6 +1786,10 @@ int main(void)
     GPIOA->BRR = LL_GPIO_PIN_11;
     GPIOA->BSRR = LL_GPIO_PIN_12;    // Pa12 attached to enable on dev board
 #endif
+#if defined(USE_LED_STRIP) && !defined(LED_PROFILE)
+    // Legacy LED flow: one-shot red at boot.
+    send_LED_RGB(125, 0, 0);
+#endif
 #ifdef USE_RGB_LED
      setIndividualRGBLed(1,0,0);
 #endif
@@ -1863,14 +1875,14 @@ int main(void)
   startup_max_duty_cycle = startup_max_duty_cycle + 400;
 #endif
 
-#ifdef USE_LED_STRIP
+#if defined(USE_LED_STRIP) && defined(LED_PROFILE)
     uint8_t  led_was_running = 0xFF;
     uint8_t  led_was_armed   = 0xFF;
     uint8_t  led_blink_phase = 1;
     uint32_t led_last_ms     = 0;
 #endif
     while (1) {
-#ifdef USE_LED_STRIP
+#if defined(USE_LED_STRIP) && defined(LED_PROFILE)
         char led_dirty = 0;
         if (running != led_was_running || armed != led_was_armed) {
             led_was_running = running;

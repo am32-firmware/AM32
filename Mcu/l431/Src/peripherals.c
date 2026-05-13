@@ -12,6 +12,9 @@
 #include "ADC.h"
 #include "serial_telemetry.h"
 #include "targets.h"
+#ifdef USE_LED_STRIP
+#include "WS2812.h"
+#endif
 
 extern char bemf_timeout;
 
@@ -42,6 +45,9 @@ void initCorePeripherals(void)
 #endif
 #ifdef USE_INTERNAL_AMP
      init_OPAMP();
+#endif
+#ifdef USE_LED_STRIP
+    WS2812_Init();
 #endif
 }
 
@@ -738,10 +744,6 @@ void enableCorePeripherals()
     LL_TIM_CC_EnableChannel(IC_TIMER_REGISTER,
         IC_TIMER_CHANNEL); // input capture and output compare
     LL_TIM_EnableCounter(IC_TIMER_REGISTER);
-#endif
-
-#ifdef USE_LED_STRIP
-    send_LED_RGB(255, 0, 0);
 #endif
 
 #ifdef USE_RGB_LED

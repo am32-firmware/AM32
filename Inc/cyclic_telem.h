@@ -3,7 +3,7 @@
 
 #include "main.h"
 
-#define CYCLIC_TELEM_INTERVAL 20  // 20 counts x 50us = 1ms at 20kHz ISR
+#define CYCLIC_TELEM_INTERVAL 30  // 30 counts x 50us = 1.5ms at 20kHz ISR
 
 typedef struct __attribute__((packed))
 {
@@ -16,9 +16,11 @@ typedef struct __attribute__((packed))
     uint8_t base_duty_l; // base_duty_cycle LSB
     uint8_t m_step_h;    // m_step MSB (int16, wraps 0-41)
     uint8_t m_step_l;    // m_step LSB
-    uint8_t crc;         // CRC8 of bytes 0-8
-} cyclic_telem_pkt_t;   // sizeof(cyclic_telem_pkt_t) = 10
+    uint8_t duty_h;      // duty_cycle MSB (uint16, range [0, 2000])
+    uint8_t duty_l;      // duty_cycle LSB
+    uint8_t crc;         // CRC8 of bytes 0-10
+} cyclic_telem_pkt_t;   // sizeof(cyclic_telem_pkt_t) = 12
 
-void makeCyclicTelemPackage(int16_t gp, int16_t gr, uint16_t base_duty, int16_t step);
+void makeCyclicTelemPackage(int16_t gp, int16_t gr, uint16_t base_duty, int16_t step, uint16_t duty);
 
 #endif /* CYCLIC_TELEM_H_ */

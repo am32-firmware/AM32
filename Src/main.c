@@ -291,7 +291,7 @@ volatile int16_t can_Gp = 0;    // Pich Value
 volatile int16_t can_Gr = 0;    // Roll Value
 #endif
 
-Look// const int16_t sineLookupTable[] = { // For 7 pp motor
+// const int16_t sineLookupTable[] = { // For 7 pp motor
 //      0,  149,  295,  434,  563,  680,
 //    782,  866,  931,  975,  997,  997,
 //    975,  931,  866,  782,  680,  563,
@@ -2107,8 +2107,8 @@ if(zero_crosses < 5){
 
 #ifdef USE_SERIAL_TELEM_CYCLIC_MOD
         if (send_cyclic_telem) {
-            makeCyclicTelemPackage(can_Gp, can_Gr, base_duty_cycle, m_step);
-            send_telem_DMA(10);
+            makeCyclicTelemPackage(can_Gp, can_Gr, base_duty_cycle, m_step, duty_cycle);
+            send_telem_DMA(12);
             send_cyclic_telem = 0;
             send_telemetry = 0;
         }

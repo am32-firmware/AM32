@@ -1561,7 +1561,7 @@ void tenKhzRoutine()
                     speed_modulation_factor = 0;
                 }
 
-                duty_cycle = base_duty_cycle - (base_duty_cycle * speed_modulation_factor) / 100;
+                duty_cycle = base_duty_cycle - (base_duty_cycle * speed_modulation_factor) / 1000;
             }
 
 #endif

@@ -1,0 +1,48 @@
+{
+    "version": 6,
+    "configurePresets": [
+        {
+            "name": "base",
+            "hidden": true,
+            "generator": "Ninja",
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            }
+        },
+        {
+            "name": "arm",
+            "inherits": "base",
+            "displayName": "ARM",
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-none-eabi.cmake",
+            "binaryDir": "${sourceDir}/build/build_arm",
+            "cacheVariables": {
+                "ARCH": "ARM"
+            }
+        },
+        {
+            "name": "wch-riscv",
+            "inherits": "base",
+            "displayName": "WCH RISC-V",
+            "binaryDir": "${sourceDir}/build/build_wch_riscv",
+            "toolchainFile": "${sourceDir}/cmake/toolchains/wch-riscv-none-embed.cmake",
+            "cacheVariables": {
+                "ARCH": "WCH_RISCV"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "build-arm",
+            "configurePreset": "arm",
+            "displayName": "Build ARM",
+            "description": "Compiles all ARM firmware targets"
+        },
+        {
+            "name": "build-wch",
+            "configurePreset": "wch-riscv",
+            "displayName": "Build WCH",
+            "description": "Compiles all RISC-V firmware targets"
+        }
+    ]
+}

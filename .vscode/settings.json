@@ -1,0 +1,28 @@
+{
+    // Use Ninja for all platforms (Windows/Linux/Mac). It is much faster.
+    "cmake.generator": "Ninja",
+    // Cmake tools will provide everything for intellisense
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    // Hide some files in project explorer
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+    },
+    // Enable formatting (using the Clang-Format target we added)
+    "editor.formatOnSave": true,
+    "C_Cpp.formatting": "clangFormat",
+    // -------------------------------------------------------------------------
+    // PLATFORM SPECIFIC OVERRIDES (Only if absolutely needed)
+    // -------------------------------------------------------------------------
+    // Generally, you DON'T need these if you installed tools via 
+    // winget/apt/brew as they add themselves to PATH.
+    // But if you have weird setups, you can do this:
+    /*
+    "[windows]": {
+        "cmake.cmakePath": "C:\\Program Files\\CMake\\bin\\cmake.exe"
+    },
+    "[linux]": {
+        "cmake.cmakePath": "/usr/bin/cmake"
+    }
+    */
+}

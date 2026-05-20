@@ -244,10 +244,6 @@ void enableDMA_DshotPWM(void)
 
 	//Clear DMA channel 0 interrupt flag
 	modifyReg32(&DMA0->CH[DMA_CH_DshotPWM].CH_INT, 0, DMA_CH_INT_INT(1));
-
-	//Enable DMA hardware request
-	modifyReg32(&DMA0->CH[DMA_CH_DshotPWM].CH_CSR, DMA_CH_CSR_ERQ_MASK, DMA_CH_CSR_ERQ(1));
-
 }
 
 void enableDMA_ADC(void)

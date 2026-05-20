@@ -7,35 +7,21 @@
 
 #include "mcxa153_it.h"
 
-//TODO check what is not necessary
 extern void transfercomplete();
 extern void PeriodElapsedCallback();
 extern void interruptRoutine();
-extern void doPWMChanges();
 extern void tenKhzRoutine();
-extern void sendDshotDma();
-extern void receiveDshotDma();
-extern void processDshot();
-extern volatile char send_telemetry;
-extern char telemetry_done;
+
 extern char servoPwm;
-extern char dshot_telemetry;
 extern char armed;
-extern char out_put;
-extern volatile uint8_t compute_dshot_flag;
 extern volatile uint32_t average_interval;
-
 extern volatile char input_ready;
-
 volatile int signal_pin_high_count = 0;
 volatile int is_inverted_dshot = 0;
 extern char inputSet;
 extern uint16_t zero_input_count;
 extern uint32_t average_packet_length;
 extern uint8_t average_count;
-
-extern char dshot;
-extern volatile char sync_dshot;
 
 /*
  * @brief 	Comparator 0 interrupt handler. Is called after a compare event has occurred.
@@ -72,39 +58,12 @@ void CMP1_IRQHandler(void)
 }
 
 /*
- * @brief 	DSHOT CTIMER0 interrupt called after a timeout in which no Dshot frame has been detected.
- * 			This is to reset the DMA before a new Dshot frame happens.
+ * @brief 	DSHOT CTIMER0 interrupt called after 10us interval.
+			This is used to detect inverted Dshot and reconfigure the capture timer
  */
 void CTIMER0_IRQHandler(void)
 {
 	uint32_t flags = CTIMER0->IR;
-
-	//If input type is not PWM and sync_dshot is enabled, reset Dshot timer and DMA to sync with Dshot frame correctly
-	if (!servoPwm && sync_dshot) {
-		//Disable sync dshot
-		sync_dshot = 0;
-
-		//Reset timer counter
-		resetInputCaptureTimer();
-
-		//Set the major loop count and addresses again to prevent unintended DMA request from CTIMER match register
-		//Set current and beginning major loop count to 8
-		DMA0->CH[DMA_CH_DshotPWM].TCD_CITER_ELINKNO = DMA_TCD_CITER_ELINKNO_CITER(buffersize / 2);
-
-		//Sets the amount of major loop counts after a DMA transfer completes
-		//i.e. the CITER register gets this BITER value after DMA transfer complete
-		DMA0->CH[DMA_CH_DshotPWM].TCD_BITER_ELINKNO = DMA_TCD_BITER_ELINKNO_BITER(buffersize / 2);
-
-		//Set last destination address adjustment to -8 bytes * the number of DMA requests before transfer complete
-		//Adds this value to the destination address when CITER reaches 0 / DMA transfer is complete
-		DMA0->CH[DMA_CH_DshotPWM].TCD_DLAST_SGA = -(8 * (buffersize / 2));
-
-		//Set source address
-		DMA0->CH[DMA_CH_DshotPWM].TCD_SADDR = (uint32_t)&CTIMER0->CR[1];
-
-		//Set destination address
-		DMA0->CH[DMA_CH_DshotPWM].TCD_DADDR = (uint32_t)&dma_buffer;
-	}
 
 	//Check for inverted Dshot. If inverted Dshot, configure timer capture for inverted Dshot
 	//If not armed and not PWM input
@@ -138,6 +97,10 @@ void CTIMER0_IRQHandler(void)
 					ic_timer_prescaler = (CPU_FREQUENCY_MHZ / 5);
 					dshot_frametime_high = 50000;
 					dshot_frametime_low = 0;
+					newinput = 0;
+
+					//Disable interrupt on Match1 event, so this cannot be called anymore
+					modifyReg32(&CTIMER0->MCR, CTIMER_MCR_MR1I_MASK, 0);
 				}
 			}
 		}
@@ -189,6 +152,9 @@ void DMA_CH0_IRQHandler(void)
 	//Clear DMA error flag
 	DMA0->CH[DMA_CH_DshotPWM].CH_ES = DMA_CH_ES_ERR(1);
 
+	//Disable clearing the timer when capture event occurs
+	modifyReg32(&CTIMER0->CTCR, CTIMER_CTCR_ENCC_MASK, 0);
+
 	//Disable DMA hardware request
 	modifyReg32(&DMA0->CH[DMA_CH_DshotPWM].CH_CSR, DMA_CH_CSR_ERQ_MASK, 0);
 
@@ -200,9 +166,6 @@ void DMA_CH0_IRQHandler(void)
 
 	//Set input_ready so processDshot is called in main loop
 	input_ready = 1;
-
-	//Enable DMA hardware request
-	modifyReg32(&DMA0->CH[DMA_CH_DshotPWM].CH_CSR, DMA_CH_CSR_ERQ_MASK, DMA_CH_CSR_ERQ(1));
 }
 
 /*

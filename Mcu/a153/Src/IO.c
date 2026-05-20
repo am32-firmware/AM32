@@ -23,16 +23,21 @@ void receiveDshotDma()
 	//Set prescaler
 	CTIMER0->PR = ic_timer_prescaler;
 
-	//Set sync_dshot to enable syncing with dshot frame
-	sync_dshot = 1;
+	//Disable clearing the timer when capture event occurs
+	modifyReg32(&CTIMER0->CTCR, CTIMER_CTCR_ENCC_MASK, 0);
+	
+	//Disable DMA hardware request
+	modifyReg32(&DMA0->CH[DMA_CH_DshotPWM].CH_CSR, DMA_CH_CSR_ERQ_MASK, 0);
+
+	//Set PWM/Dshot input pin to timer capture/compare input
+	//Enable input buffer and disable pull-up/down resistor
+	modifyReg32(&INPUT_PIN_PORT->PCR[INPUT_PIN],
+			PORT_PCR_MUX_MASK | PORT_PCR_IBE_MASK | PORT_PCR_PE_MASK | PORT_PCR_PS_MASK,
+			PORT_PCR_MUX(INPUT_PIN_ALT_FUNC) | PORT_PCR_IBE(1) | PORT_PCR_PE(0) | PORT_PCR_PS(1));
 
 	if (buffersize > 3) {
-		//Resets PWM/Dshot timer to 0. Needed for Dshot to work properly.
-		resetInputCaptureTimer();
-
-		//Set match1 value to higher then the minimum Dshot300 frame time which is around 53us, so take at least 53us.
-		//Set timeout value to 5500 clock ticks at Dshot300 (Prescaler is 1 then)
-		CTIMER0->MR[1] = 11000 / (CTIMER0->PR + 1);
+		//Update Match1 event to correct for possible prescaler changes. Should be around 10us.
+		CTIMER0->MR[1] = 1000 / (CTIMER0->PR + 1);
 
 		//Reset timer and enable interrupt on Match1 event
 		modifyReg32(&CTIMER0->MCR, CTIMER_MCR_MR1I_MASK | CTIMER_MCR_MR1R_MASK, CTIMER_MCR_MR1I(1));
@@ -60,11 +65,24 @@ void receiveDshotDma()
 	//Set destination address
 	DMA0->CH[DMA_CH_DshotPWM].TCD_DADDR = (uint32_t)&dma_buffer;
 
-	//Set PWM/Dshot input pin to timer capture/compare input
-	//Enable input buffer and disable pull-up/down resistor
-	modifyReg32(&INPUT_PIN_PORT->PCR[INPUT_PIN],
-			PORT_PCR_MUX_MASK | PORT_PCR_IBE_MASK | PORT_PCR_PE_MASK | PORT_PCR_PS_MASK,
-			PORT_PCR_MUX(INPUT_PIN_ALT_FUNC) | PORT_PCR_IBE(1) | PORT_PCR_PE(0) | PORT_PCR_PS(1));
+	//Resets PWM/Dshot timer to 0.
+	resetInputCaptureTimer();
+
+	// Wait for timer to be larger than 0, otherwise DMA request is triggered.
+	while (CTIMER0->TC == 0)
+	{
+		// Do nothing
+		__asm volatile ("nop");
+	}
+	
+	//Clear CTimer interrupt request to prevent unwanted DMA triggers
+	modifyReg32(&CTIMER0->IR, 0, 0xff);
+
+	//Enable DMA hardware request
+	modifyReg32(&DMA0->CH[DMA_CH_DshotPWM].CH_CSR, DMA_CH_CSR_ERQ_MASK, DMA_CH_CSR_ERQ(1));
+
+	//Enable clearing the timer when capture event occurs
+	modifyReg32(&CTIMER0->CTCR, CTIMER_CTCR_ENCC_MASK, CTIMER_CTCR_ENCC(1));
 }
 
 void sendDshotDma()
@@ -72,7 +90,7 @@ void sendDshotDma()
 	//Set output variable for state machine
 	out_put = 1;
 
-	//Change Dshot pin to SPI0_SDI
+	//Change Dshot pin to SPI0_SDI with pull-up
 	modifyReg32(&INPUT_PIN_PORT->PCR[INPUT_PIN],
 			PORT_PCR_MUX_MASK | PORT_PCR_IBE_MASK | PORT_PCR_PE_MASK | PORT_PCR_PS_MASK,
 			PORT_PCR_MUX(2) | PORT_PCR_IBE(0) | PORT_PCR_PE(1) | PORT_PCR_PS(1));

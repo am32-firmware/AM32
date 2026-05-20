@@ -5,7 +5,7 @@
  *      Author: Alka
  */
 #include "phaseouts.h"
-
+#include "common.h"
 #include "targets.h"
 
 extern char prop_brake_active;
@@ -68,7 +68,7 @@ void proportionalBrake()
 
 void phaseBPWM()
 {
-    if (!eepromBuffer.comp_pwm) { // for future
+    if (!temp_comp_pwm) { // for future
         gpio_mode_QUICK(PHASE_B_GPIO_PORT_LOW, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE,
             PHASE_B_GPIO_LOW);
         GPIO_BC(PHASE_B_GPIO_PORT_LOW) = PHASE_B_GPIO_LOW;
@@ -117,7 +117,7 @@ void phaseBLOW()
 
 void phaseCPWM()
 {
-    if (!eepromBuffer.comp_pwm) {
+    if (!temp_comp_pwm) {
         gpio_mode_QUICK(PHASE_C_GPIO_PORT_LOW, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE,
             PHASE_C_GPIO_LOW);
         GPIO_BC(PHASE_C_GPIO_PORT_LOW) = PHASE_C_GPIO_LOW;
@@ -156,7 +156,7 @@ void phaseCLOW()
 
 void phaseAPWM()
 {
-    if (!eepromBuffer.comp_pwm) {
+    if (!temp_comp_pwm) {
         gpio_mode_QUICK(PHASE_A_GPIO_PORT_LOW, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE,
             PHASE_A_GPIO_LOW);
         GPIO_BC(PHASE_A_GPIO_PORT_LOW) = PHASE_A_GPIO_LOW;
@@ -193,7 +193,7 @@ void phaseALOW()
 //////////////////////////////////PHASE 1//////////////////////
 void phaseBPWM()
 {
-    if (!eepromBuffer.comp_pwm) { // for future
+    if (!temp_comp_pwm) { // for future
                      // gpio_mode_QUICK(PHASE_B_GPIO_PORT_LOW, GPIO_MODE_OUTPUT,
                      // GPIO_PUPD_NONE, PHASE_B_GPIO_LOW);
                      // GPIO_BC(PHASE_B_GPIO_PORT_LOW) = PHASE_B_GPIO_LOW;
@@ -232,7 +232,7 @@ void phaseBLOW()
 
 void phaseCPWM()
 {
-    if (!eepromBuffer.comp_pwm) {
+    if (!temp_comp_pwm) {
         //	gpio_mode_QUICK(PHASE_C_GPIO_PORT_LOW, GPIO_MODE_OUTPUT,
         // GPIO_PUPD_NONE,
         // PHASE_C_GPIO_LOW); GPIO_BC(PHASE_C_GPIO_PORT_LOW) = PHASE_C_GPIO_LOW;
@@ -271,7 +271,7 @@ void phaseCLOW()
 
 void phaseAPWM()
 {
-    if (!eepromBuffer.comp_pwm) {
+    if (!temp_comp_pwm) {
         //	gpio_mode_QUICK(PHASE_A_GPIO_PORT_LOW, GPIO_MODE_OUTPUT,
         // GPIO_PUPD_NONE,
         // PHASE_A_GPIO_LOW); GPIO_BC(PHASE_A_GPIO_PORT_LOW) = PHASE_A_GPIO_LOW;

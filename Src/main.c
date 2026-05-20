@@ -329,6 +329,9 @@ uint16_t stall_protect_target_interval = TARGET_STALL_PROTECTION_INTERVAL;
 uint16_t enter_sine_angle = 180;
 char do_once_sinemode = 0;
 uint8_t auto_advance_level;
+volatile uint8_t zero_throttle_brake_active;
+volatile uint8_t temp_comp_pwm;
+uint8_t brake_countdown;
 
 //============================= Servo Settings ==============================
 uint16_t servo_low_threshold = 1100; // anything below this point considered 0
@@ -608,7 +611,6 @@ void loadEEpromSettings()
       eepromBuffer.reserved_eeprom_3[0] = 0; //14-16  for crsf input
       eepromBuffer.reserved_eeprom_3[1] = 0;
       eepromBuffer.reserved_eeprom_3[2] = 0;
-      eepromBuffer.reserved_eeprom_3[3] = 0;
     }
     // eepromBuffer.advance_level can either be set to 0-3 with config tools less than 1.90 or 10-42 with 1.90 or above 
     if (eepromBuffer.advance_level > 42 || (eepromBuffer.advance_level < 10 && eepromBuffer.advance_level > 3)){
@@ -780,6 +782,7 @@ void loadEEpromSettings()
     }else{
       polling_mode_changeover = POLLING_MODE_THRESHOLD;
     }
+    temp_comp_pwm = eepromBuffer.comp_pwm;
 }
 
 void saveEEpromSettings()
@@ -1468,12 +1471,34 @@ void tenKhzRoutine()
             }
 
         if ((armed && running) && input > 47) {
-            if (eepromBuffer.variable_pwm) {
-            }
+          if(zero_throttle_brake_active){
+            adjusted_duty_cycle = 0;
+          }else{
             adjusted_duty_cycle = ((duty_cycle * tim1_arr) / 2000) + 1;
-
+        }
         } else {
-
+          if(running && input < 47){ // brake on zero throttle behavior while motor is still rotating
+            if(eepromBuffer.brake_on_zero_throttle == 1){   // coast on 0 throttle
+              temp_comp_pwm = 0;                            // tracks rpm until stopped 
+              zero_throttle_brake_active = 1;
+            }
+              if(eepromBuffer.brake_on_zero_throttle == 2){   // motor brake on 0 throttle    
+              temp_comp_pwm = 1;                             // tracks rpm until stopped
+              zero_throttle_brake_active = 1;
+            }
+              if((eepromBuffer.brake_on_zero_throttle > 2) && (eepromBuffer.brake_on_zero_throttle < 10)){   // brake on 0 throttle after 2 + x seconds
+              if(zero_throttle_brake_active == 0){
+                brake_countdown = eepromBuffer.brake_on_zero_throttle - 2;  // brake countdown decremented in 10khz routine
+                tenkhzcounter = 10000; 
+              }
+              if((brake_countdown == 0) && (zero_throttle_brake_active == 1)){
+                zero_crosses = 0;                          // after countdown forces the brake on stop behavior 
+                running = 0;                               // stops tracking rpm
+              }
+              zero_throttle_brake_active = 1;
+              }
+              adjusted_duty_cycle = ((duty_cycle * tim1_arr) / 2000);
+          } else{  // input less than 47 and not running, normal brake on stop behavior
             if (prop_brake_active) {
               adjusted_duty_cycle =  tim1_arr - ((prop_brake_duty_cycle * tim1_arr) / 2000);
             } else {
@@ -1484,6 +1509,7 @@ void tenKhzRoutine()
                 adjusted_duty_cycle = ((duty_cycle * tim1_arr) / 2000);
             }
             }
+          }
         }
         last_duty_cycle = duty_cycle;
         SET_AUTO_RELOAD_PWM(tim1_arr);
@@ -1939,6 +1965,9 @@ if(zero_crosses < 5){
         if (tenkhzcounter > LOOP_FREQUENCY_HZ) { // 1s sample interval 10000
             consumed_current += (actual_current << 16) / 360;
             tenkhzcounter = 0;
+            if(brake_countdown > 0){
+              brake_countdown--;
+            }
         }
 
 #ifndef BRUSHED_MODE
@@ -2142,9 +2171,12 @@ if(zero_crosses < 5){
                 }
             }
 #endif
-            if (INTERVAL_TIMER_COUNT > 45000 && running == 1) {
+            if (INTERVAL_TIMER_COUNT > 45000) {
+              zero_throttle_brake_active = 0;   // reset zero throttle brake on back emf timeout (rotation stop)
+              if(running){
                 bemf_timeout_happened++;
-
+                
+                temp_comp_pwm = eepromBuffer.comp_pwm;
                 maskPhaseInterrupts();
                 old_routine = 1;
                 if (input < 48) {
@@ -2153,6 +2185,7 @@ if(zero_crosses < 5){
                 }
                 zero_crosses = 0;
                 zcfoundroutine();
+              }
             }
         } else { // stepper sine
 

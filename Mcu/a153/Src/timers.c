@@ -89,11 +89,8 @@ void initDshotPWMTimer(void)
 	//Set match0 value to zero
 	CTIMER0->MR[0] = 0;
 
-	//Set match1 value to higher then the minimum Dshot300 frame time which is around 53us, so take at least 53us.
-	//Functional clock is 96MHz. So Dshot300 frame is around 5000 clock ticks. So set timeout value at 5500 clock ticks (57us).
-	//Set match event to trigger at twice the frame time.
-	//And correct for prescaler.
-	CTIMER0->MR[1] = 11000 / (CTIMER0->PR + 1);
+	//Set match1 value to generate an interrupt after timer is reset in receiveDshot() after around 10us.
+	CTIMER0->MR[1] = 1000;	//10us
 
 	//Enable interrupt on Match1 event
 	modifyReg32(&CTIMER0->MCR, 0, CTIMER_MCR_MR1I(1));
@@ -106,7 +103,7 @@ void initDshotPWMTimer(void)
 	//Clear timer counter on capture channel 2 falling edge
 	modifyReg32(&CTIMER0->CTCR,
 			CTIMER_CTCR_ENCC_MASK | CTIMER_CTCR_SELCC_MASK,
-			CTIMER_CTCR_ENCC(1) | CTIMER_CTCR_SELCC(5));
+			CTIMER_CTCR_ENCC(0) | CTIMER_CTCR_SELCC(5));
 
 	//Enable interrupt
 	__NVIC_SetPriority(CTIMER0_IRQn, 1);	//set interrupt priority to 1

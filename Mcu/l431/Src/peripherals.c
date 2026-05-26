@@ -713,6 +713,35 @@ inline void resetInputCaptureTimer()
     IC_TIMER_REGISTER->CNT = 0;
 }
 
+#ifdef ENABLE_INTERRUPT_SIGNAL_PIN
+void SIGNAL_EXTI_init(void)
+{
+    /*
+     * PB3 -> EXTI line 3 -> EXTI3_IRQn (dedicated, no shared IRQ).
+     * AS5047P Index is active-HIGH. Pull-down keeps the line LOW when idle.
+     * The Index pulse at 15 000 RPM is ~3.9 us wide.
+     */
+
+    /* PA2 (Signal Pin) – EXTI2. Disables TIM15 capture first. */
+    LL_TIM_CC_DisableChannel(IC_TIMER_REGISTER, IC_TIMER_CHANNEL);
+    LL_TIM_DisableCounter(IC_TIMER_REGISTER);
+
+    LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
+    LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_2, LL_GPIO_MODE_INPUT);
+    LL_GPIO_SetPinPull(GPIOA, LL_GPIO_PIN_2, LL_GPIO_PULL_DOWN);
+\
+    LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_SYSCFG);
+    LL_SYSCFG_SetEXTISource(LL_SYSCFG_EXTI_PORTA, LL_SYSCFG_EXTI_LINE2);
+
+    LL_EXTI_EnableIT_0_31(LL_EXTI_LINE_2);
+    LL_EXTI_EnableRisingTrig_0_31(LL_EXTI_LINE_2);
+    LL_EXTI_DisableFallingTrig_0_31(LL_EXTI_LINE_2);
+
+    NVIC_SetPriority(EXTI2_IRQn, 2);
+    NVIC_EnableIRQ(EXTI2_IRQn);
+}
+#endif
+
 void enableCorePeripherals()
 {
     LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH1);
@@ -785,4 +814,8 @@ void enableCorePeripherals()
     NVIC_SetPriority(EXTI15_10_IRQn, 2);
     NVIC_EnableIRQ(EXTI15_10_IRQn);
     EXTI->IMR1 |= (1 << 15);
+
+#ifdef ENABLE_INTERRUPT_SIGNAL_PIN
+    SIGNAL_EXTI_init();
+#endif
 }

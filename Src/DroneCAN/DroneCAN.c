@@ -132,14 +132,16 @@ static const struct parameter {
 } parameters[] = {
         // list of settable parameters
         // dronecan specific parameters
-        { "CAN_NODE",               T_UINT8, 0, 127, 0, &eepromBuffer.can.can_node},
-        { "ESC_INDEX",              T_UINT8, 0, 32,  0, &eepromBuffer.can.esc_index},
-        { "TELEM_RATE",             T_UINT8, 0, 200, 25, &eepromBuffer.can.telem_rate},
-        { "DEBUG_RATE",             T_UINT8, 0, 200, 0, &eepromBuffer.can.debug_rate},
-        { "REQUIRE_ARMING",         T_BOOL,  0, 1,   1, &eepromBuffer.can.require_arming},
-        { "REQUIRE_ZERO_THROTTLE",  T_BOOL,  0, 1,   1, &eepromBuffer.can.require_zero_throttle},
-        { "MOTOR_KV",               T_UINT16,20, 10220, 2000, &motor_kv},
-        { "MOTOR_POLES",            T_UINT8, 2, 64,  14, &eepromBuffer.motor_poles},
+        { "CAN_NODE",                 T_UINT8, 0, 127, 0, &eepromBuffer.can.can_node},
+        { "ESC_INDEX",                T_UINT8, 0, 32,  0, &eepromBuffer.can.esc_index},
+        { "CYCLIC_MOULATION_RATIO",   T_UINT8, 0,  7,  1, &eepromBuffer.can.cyclic_mod_ratio},
+        { "USE_CYCLIC_SPEED_CONTROL", T_UINT8, 0,  1,  1, &eepromBuffer.can.use_cyclic_speed_control},
+        { "TELEM_RATE",               T_UINT8, 0, 200, 25, &eepromBuffer.can.telem_rate},
+        { "DEBUG_RATE",               T_UINT8, 0, 200, 0, &eepromBuffer.can.debug_rate},
+        { "REQUIRE_ARMING",           T_BOOL,  0, 1,   1, &eepromBuffer.can.require_arming},
+        { "REQUIRE_ZERO_THROTTLE",    T_BOOL,  0, 1,   1, &eepromBuffer.can.require_zero_throttle},
+        { "MOTOR_KV",                 T_UINT16,20, 10220, 2000, &motor_kv},
+        { "MOTOR_POLES",              T_UINT8, 2, 64,  14, &eepromBuffer.motor_poles},
 
         // motor_kv, low_cell_volt_cutoff, STARTUP_TUNE, CURRENT_LIMIT value need to adjust to dronecan gui tool
         // motor_kv 1k/V
@@ -665,6 +667,16 @@ static void handle_RawCommand(CanardInstance *ins, CanardRxTransfer *transfer)
         const float scaled_value = input_can * (2000.0 / 8192);
         this_input = (uint16_t)(47 + scaled_value);
     }
+
+#ifdef CAN_EXTRA_INPUTS
+    // Pitch and Roll Messages come after the ESC throttle Value
+    const uint8_t ESC_idx = eepromBuffer.can.esc_index;
+
+    // Read pitch Value
+    can_Gp = (int16_t) cmd.cmd.data[ESC_idx + 1] * (1000.0 / 8192.0);
+    can_Gr = (int16_t) cmd.cmd.data[ESC_idx + 2] * (1000.0 / 8192.0);
+
+#endif 
 
     const uint64_t ts = micros64();
     canstats.num_commands++;

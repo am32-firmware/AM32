@@ -25,4 +25,14 @@ extern volatile char inputSet;
 extern char dshot;
 extern volatile char servoPwm;
 
+
+#ifdef ENABLE_INTERRUPT_SIGNAL_PIN
+extern int16_t m_step;
+#endif
+
+#ifdef CAN_EXTRA_INPUTS
+extern volatile int16_t can_Gp; // Pitch
+extern volatile int16_t can_Gr; // Roll
+#endif
+
 void detectInput();

@@ -17,3 +17,4 @@ Keil_Projects/Listings
 *.o
 .DS_Store
 .vscode/settings.json
+CLAUDE.md

@@ -227,6 +227,9 @@ an settings option)
 #include "phaseouts.h"
 #include "serial_telemetry.h"
 #include "kiss_telemetry.h"
+#ifdef USE_SERIAL_TELEM_CYCLIC_MOD
+#include "cyclic_telem.h"
+#endif
 #include "signal.h"
 #include "sounds.h"
 #include "targets.h"
@@ -268,6 +271,60 @@ void zcfoundroutine(void);
 // enables two channels for brushed control 
 //#define GIMBAL_MODE     // also
 // sinusoidal_startup needs to be on, maps input to sinusoidal angle.
+
+//===========================================================================
+//===============  SPEED MODULATION IMPLEMENTATION DEFAULTS =================
+//===========================================================================
+
+// DEFAULTS FOR HOW MOTOR ANGLE POSITION IS RECEIVED
+int16_t m_step = 0; // Counter used to identify mechanicla angle position. 
+                     // Require ENABLE_INTERRUPT_SIGNAL_PIN in targets to be reseted to 0
+int16_t speed_modulation_factor   =    0; //  Modulation Factor used during Cyclic Speed Control  -> 32 bits to account for scallings in computationn
+                                          //  Inside the interval [-100, 100]
+uint16_t max_duty_cycle_before_mod = 2000; // If cyclic Modulation is activated, it is necessary to reserve space for acceleration and deceleration
+                                           // Defined as 2000 * 100 / (100 - eepromBuffer.can.cyclic_mod_ratio * 14) 
+uint16_t min_duty_cycle_before_mod = 100;  // Motor protection to prevent descync. 
+uint16_t base_duty_cycle = 0; // Stores the duty_cycle_setpoint value before modulation
+
+#ifdef CAN_EXTRA_INPUTS
+volatile int16_t can_Gp = 0;    // Pich Value
+volatile int16_t can_Gr = 0;    // Roll Value
+#endif
+
+// const int16_t sineLookupTable[] = { // For 7 pp motor
+//      0,  149,  295,  434,  563,  680,
+//    782,  866,  931,  975,  997,  997,
+//    975,  931,  866,  782,  680,  563,
+//    434,  295,  149,    0, -149, -295,
+//   -434, -563, -680, -782, -866, -931,
+//   -975, -997, -997, -975, -931, -866,
+//   -782, -680, -563, -434, -295, -149};
+
+const int16_t sineLookupTable[] = {  // For 6 pp motor
+0, 174, 342, 500, 643, 766,
+866, 940, 985, 1000, 985, 940,
+866, 766, 643, 500, 342, 174,
+0, -174, -342, -500, -643, -766,
+-866, -940, -985, -1000, -985, -940,
+-866, -766, -643, -500, -342, -174};
+
+// const int16_t cosineLookupTable[] = { // For 7 pp motor
+//   1000,  989,  956,   901,  826,  733,
+//    623,  500,  365,   223,   75,  -75, 
+//   -223, -365, -500,  -623, -733, -826,
+//   -901, -956, -989, -1000, -989, -956, 
+//   -901, -826, -733,  -623, -500, -365, 
+//   -223,  -75,    5,   223,  365,  500, 
+//    623,  733,  826,   901,  956,  989};
+
+const int16_t cosineLookupTable[] = { // For 6 pp motor
+    1000,  985,  940,  866,  766,  643,
+     500,  342,  174,    0, -174, -342,
+    -500, -643, -766, -866, -940, -985,
+   -1000, -985, -940, -866, -766, -643, 
+    -500, -342, -174,    0,  174,  342,
+     500,  643,  766,  866,  940,  985};
+
 
 //===========================================================================
 //=============================  Defaults =============================
@@ -440,6 +497,10 @@ uint16_t ADC_raw_input;
 uint16_t ADC_raw_ntc;
 uint8_t PROCESS_ADC_FLAG = 0;
 volatile char send_telemetry = 0;
+#ifdef USE_SERIAL_TELEM_CYCLIC_MOD
+volatile char send_cyclic_telem = 0;
+uint16_t cyclic_telem_count = 0;
+#endif
 char telemetry_done = 0;
 char prop_brake_active = 0;
 
@@ -863,6 +924,21 @@ void commutate()
     }
     __enable_irq();
     changeCompInput();
+
+#ifdef ENABLE_INTERRUPT_SIGNAL_PIN
+        if (forward == 1) {
+        m_step++;
+        if (m_step >= 36) { // for 6 pole pair motores
+            m_step = 0;
+          }
+    } else {
+        m_step--;
+        if (m_step < 0) {
+            m_step = 6 * 6 - 1; // for 6 pole pair motores
+        }
+    }
+#endif
+
 #ifndef NO_POLLING_START
 	if (average_interval > polling_mode_changeover + 500) {
       old_routine = 1;
@@ -1310,7 +1386,15 @@ if (!stepper_sine && armed) {
 
 void tenKhzRoutine()
 { // 20khz as of 2.00 to be renamed
+#ifdef CAN_EXTRA_INPUTS
+    if (eepromBuffer.can.use_cyclic_speed_control) {
+        base_duty_cycle = duty_cycle_setpoint;
+    }else{
+        duty_cycle = duty_cycle_setpoint;
+    }
+#else
     duty_cycle = duty_cycle_setpoint;
+#endif
     tenkhzcounter++;
     ledcounter++;
     ramp_count++;
@@ -1370,6 +1454,13 @@ void tenKhzRoutine()
             telem_ms_count = 0;
         }
     }
+#ifdef USE_SERIAL_TELEM_CYCLIC_MOD
+    cyclic_telem_count++;
+    if (cyclic_telem_count >= CYCLIC_TELEM_INTERVAL) {
+        send_cyclic_telem = 1;
+        cyclic_telem_count = 0;
+    }
+#endif
 
 #ifndef BRUSHED_MODE
 
@@ -1431,9 +1522,15 @@ void tenKhzRoutine()
                     speedPid.integral = 0;
                 }
             }
-        }
+#ifdef CAN_EXTRA_INPUTS
+            if (eepromBuffer.can.use_cyclic_speed_control) {
+                max_duty_cycle_before_mod =(uint16_t) 2000 * 100 / (100 + eepromBuffer.can.cyclic_mod_ratio * 14); 
+                speed_modulation_factor   = (int16_t) (eepromBuffer.can.cyclic_mod_ratio * (can_Gp * sineLookupTable[m_step] + can_Gr * cosineLookupTable[m_step]) / 10000);
+            }
+#endif
+            }
         if (ramp_count > ramp_divider) {
-          ramp_count = 0;
+            ramp_count = 0;
 #ifdef VOLTAGE_BASED_RAMP
             uint16_t voltage_based_max_change = map(battery_voltage, 800, 2200, 10, 1);
             if (average_interval > 200) {
@@ -1455,6 +1552,22 @@ void tenKhzRoutine()
 #endif
 #ifdef CUSTOM_RAMP
    //         max_duty_cycle_change = eepromBuffer[30];
+#endif
+
+#ifdef CAN_EXTRA_INPUTS
+
+            if (eepromBuffer.can.use_cyclic_speed_control) {
+                if (base_duty_cycle > max_duty_cycle_before_mod){
+                    base_duty_cycle = max_duty_cycle_before_mod;
+                }
+                
+                if (base_duty_cycle < min_duty_cycle_before_mod){
+                    speed_modulation_factor = 0;
+                }
+
+                duty_cycle = base_duty_cycle - (base_duty_cycle * speed_modulation_factor) / 1000;
+            }
+
 #endif
             if ((duty_cycle - last_duty_cycle) > max_duty_cycle_change) {
                 duty_cycle = last_duty_cycle + max_duty_cycle_change;
@@ -1995,6 +2108,15 @@ if(zero_crosses < 5){
              NVIC_SetPriority(COMPARATOR_IRQ, 0);
          }
 #endif
+
+#ifdef USE_SERIAL_TELEM_CYCLIC_MOD
+        if (send_cyclic_telem) {
+            makeCyclicTelemPackage(can_Gp, can_Gr, base_duty_cycle, m_step, duty_cycle);
+            send_telem_DMA(12);
+            send_cyclic_telem = 0;
+            send_telemetry = 0;
+        }
+#else
         if (send_telemetry) {
 #ifdef USE_SERIAL_TELEMETRY
             makeTelemPackage((int8_t)degrees_celsius, battery_voltage, actual_current,
@@ -2002,11 +2124,12 @@ if(zero_crosses < 5){
             send_telem_DMA(10);
             send_telemetry = 0;
 #endif
-        } else if(send_esc_info_flag ) {
-           makeInfoPacket();
-           send_telem_DMA(49);
-           send_esc_info_flag = 0;
+        } else if (send_esc_info_flag) {
+            makeInfoPacket();
+            send_telem_DMA(49);
+            send_esc_info_flag = 10;
         }
+#endif
         if (PROCESS_ADC_FLAG == 1) { // for adc and telemetry set adc counter at 1khz loop rate
 #if defined(STMICRO)
             ADC_DMA_Callback();

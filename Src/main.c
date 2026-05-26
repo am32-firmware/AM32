@@ -271,8 +271,6 @@ void zcfoundroutine(void);
 //#define GIMBAL_MODE     // also
 // sinusoidal_startup needs to be on, maps input to sinusoidal angle.
 
-//#define USE_OVERRIDES
-
 //===========================================================================
 //=============================  Defaults =============================
 //===========================================================================
@@ -604,66 +602,6 @@ int32_t doPidCalculations(struct fastPID* pidnow, int actual, int target)
 void loadEEpromSettings()
 {
     read_flash_bin(eepromBuffer.buffer, eeprom_address, sizeof(eepromBuffer.buffer));
-
-#ifdef USE_OVERRIDES
-//	eepromBuffer.reserved_0 = 3;
-//    eepromBuffer.eeprom_version = 2; //2;
-//    eepromBuffer.reserved_1 = 2;
-//    eepromBuffer.version.major = 4;
-//    eepromBuffer.version.minor = 5;
-
-    eepromBuffer.comp_pwm = 1;
-    eepromBuffer.variable_pwm = 0;
-
-    eepromBuffer.stuck_rotor_protection = 0;//1;	//Causes input = 0; when this is 1
-    eepromBuffer.advance_level = 3;
-    eepromBuffer.pwm_frequency = 24;
-    eepromBuffer.startup_power = 100;
-    eepromBuffer.motor_kv = 1;
-    eepromBuffer.motor_poles = 14;//14;
-    eepromBuffer.beep_volume = 5;
-    eepromBuffer.servo.low_threshold = 128;
-    eepromBuffer.servo.high_threshold = 128;
-    eepromBuffer.servo.neutral = 128;
-    eepromBuffer.servo.dead_band = 50;
-    eepromBuffer.low_cell_volt_cutoff = 50;
-    eepromBuffer.sine_mode_changeover_thottle_level = 15;
-    eepromBuffer.drag_brake_strength = 10;
-    eepromBuffer.driving_brake_strength = 10;
-    eepromBuffer.limits.temperature = 141;
-    eepromBuffer.limits.current = 102;
-    eepromBuffer.sine_mode_power = 6;
-    eepromBuffer.telemetry_on_interval = 0;
-    eepromBuffer.input_type = 0;	//Sets Dshot input
-
-//    eepromBuffer.auto_advance = 0;
-//    eepromBuffer.dir_reversed = 0;
-//    eepromBuffer.stall_protection = 0;
-//    eepromBuffer.brake_on_stop = 0;
-//    eepromBuffer.rc_car_reverse = 0;
-
-
-    eepromBuffer.tune[0] = 0xff;	//Turn off BJ tune
-//    eepromBuffer.tune[0] = 4;
-//    eepromBuffer.tune[1] = 5;
-//    eepromBuffer.tune[2] = 108;
-//    eepromBuffer.tune[3] = 108;
-
-    eepromBuffer.tune[4] = 250;	//duration
-    eepromBuffer.tune[5] = 10;	//frequency
-    eepromBuffer.tune[6] = 250;
-    eepromBuffer.tune[7] = 10;
-    eepromBuffer.tune[8] = 250;
-    eepromBuffer.tune[9] = 50;
-    eepromBuffer.tune[10] = 250;
-    eepromBuffer.tune[11] = 50;
-    eepromBuffer.tune[12] = 250;
-    eepromBuffer.tune[13] = 100;
-    eepromBuffer.tune[14] = 250;
-    eepromBuffer.tune[15] = 100;
-
-#endif
-
     if(eepromBuffer.eeprom_version < EEPROM_VERSION){
       eepromBuffer.max_ramp = 160;    // 0.1% per ms to 25% per ms 
       eepromBuffer.minimum_duty_cycle = 1; // 0.2% to 51 percent

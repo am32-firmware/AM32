@@ -328,7 +328,7 @@ void make_dshot_package(uint16_t com_time)
     }
     gcr[buffer_padding] = 0;
 #elif defined(NXP)
-    //Do grey encoding
+    //Do gray encoding
     //Apparently GCR RLL is not done here but Grey encoding.
     uint32_t binary = gcrnumber;
     while (gcrnumber >>= 1) {

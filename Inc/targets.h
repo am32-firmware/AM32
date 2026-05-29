@@ -39,6 +39,14 @@
 // used to hold a port/pin in a single 16 bit integer
 #define GPIO_PORT_PIN(portnum, pinnum) ((portnum)<<8|(pinnum))
 
+// Disarmed = red. Armed = Green, Spinning = Profile (solid, blink 1 color, blink 2 colors)
+#define LED_MODE_SOLID          0
+#define LED_MODE_BLINK_1_COLOR  1
+#define LED_MODE_BLINK_2_COLOR  2
+#define LED_PROFILE_SOLID(r, g, b) { LED_MODE_SOLID, (uint8_t)(r), (uint8_t)(g), (uint8_t)(b), 0, 0, 0, 0 }
+#define LED_PROFILE_BLINK1(r, g, b, ms) { LED_MODE_BLINK_1_COLOR, (uint8_t)(r), (uint8_t)(g), (uint8_t)(b), 0, 0, 0, (uint16_t)(ms) }
+#define LED_PROFILE_BLINK2(r1, g1, b1, r2, g2, b2, ms) { LED_MODE_BLINK_2_COLOR, (uint8_t)(r1), (uint8_t)(g1), (uint8_t)(b1), (uint8_t)(r2), (uint8_t)(g2), (uint8_t)(b2), (uint16_t)(ms) }
+
 // GLOBAL
 // #define USE_ADC_INPUT
 // #define USE_ALKAS_DEBUG_LED
@@ -4808,6 +4816,12 @@
 #define CURRENT_ADC_CHANNEL         LL_ADC_CHANNEL_8
 #define VOLTAGE_ADC_CHANNEL         LL_ADC_CHANNEL_11
 
+#ifdef USE_LED_STRIP
+#define WS2812_PORT      GPIOB
+#define WS2812_PIN       LL_GPIO_PIN_5
+#define WS2812_AF        LL_GPIO_AF_5
+#endif
+
 #endif
 
 
@@ -4847,12 +4861,16 @@
 #define PHASE_B_COMP LL_COMP_INPUT_MINUS_IO5  // pa5
 #define PHASE_C_COMP LL_COMP_INPUT_MINUS_IO4  // pa4
 #define COMMON_COMP  LL_COMP_INPUT_PLUS_IO1
-//#define USE_LED_STRIP
-//#define WS2812_PIN LL_GPIO_PIN_3
 
 #define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_8
 #define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_11
 #define ADC_CHANNEL_TEMP LL_ADC_CHANNEL_6
+
+#ifdef USE_LED_STRIP
+#define WS2812_PORT      GPIOB
+#define WS2812_PIN       LL_GPIO_PIN_5
+#define WS2812_AF        LL_GPIO_AF_5
+#endif
 
 #endif
 
@@ -4894,6 +4912,12 @@
 
 #define CURRENT_ADC_CHANNEL         LL_ADC_CHANNEL_8
 #define VOLTAGE_ADC_CHANNEL         LL_ADC_CHANNEL_11
+
+#ifdef USE_LED_STRIP
+#define WS2812_PORT      GPIOB
+#define WS2812_PIN       LL_GPIO_PIN_5
+#define WS2812_AF        LL_GPIO_AF_5
+#endif
 
 #endif
 
@@ -4950,6 +4974,12 @@
 
 #define CURRENT_ADC_CHANNEL         LL_ADC_CHANNEL_8
 #define VOLTAGE_ADC_CHANNEL         LL_ADC_CHANNEL_11
+
+#ifdef USE_LED_STRIP
+#define WS2812_PORT      GPIOB
+#define WS2812_PIN       LL_GPIO_PIN_5
+#define WS2812_AF        LL_GPIO_AF_5
+#endif
 
 #endif
 
@@ -5485,6 +5515,15 @@
 // all DroneCAN ESCs use 128k flash layout
 #undef EEPROM_START_ADD
 #define EEPROM_START_ADD (uint32_t)0x0801F800
+#endif
+
+#ifdef USE_LED_STRIP
+#ifndef LED_BRIGHTNESS
+#define LED_BRIGHTNESS 128
+#endif
+#ifndef LED_COUNT
+#define LED_COUNT 1
+#endif
 #endif
 
 #ifndef NOMINAL_PWM

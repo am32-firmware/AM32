@@ -237,6 +237,9 @@ an settings option)
 #ifndef NXP
 #ifdef USE_LED_STRIP
 #include "WS2812.h"
+#if defined(LED_PROFILE) && !defined(WS2812_NONBLOCKING)
+#error "LED_PROFILE requires a non-blocking WS2812 driver. The driver for this MCU disables IRQs during send and would degrade motor control. Port the driver to DMA or drop LED_PROFILE."
+#endif
 #endif
 #endif
 
@@ -1332,8 +1335,39 @@ if (!stepper_sine && armed) {
 #endif
 }
 
+#if defined(USE_LED_STRIP) && defined(LED_PROFILE)
+typedef struct {
+    uint8_t  mode;
+    uint8_t  c1_r, c1_g, c1_b;
+    uint8_t  c2_r, c2_g, c2_b;
+    uint16_t blink_delay_ms;
+} led_profile_t;
+
+static const led_profile_t armed_profile = LED_PROFILE;
+
+volatile uint8_t  led_brightness = LED_BRIGHTNESS;
+volatile uint32_t led_ms_counter = 0;
+
+static void send_LED_RGB_scaled(uint8_t r, uint8_t g, uint8_t b)
+{
+    r = (uint16_t)r * led_brightness / 255;
+    g = (uint16_t)g * led_brightness / 255;
+    b = (uint16_t)b * led_brightness / 255;
+    send_LED_RGB(r, g, b);
+}
+#endif
+
 void tenKhzRoutine()
 { // 20khz as of 2.00 to be renamed
+#if defined(USE_LED_STRIP) && defined(LED_PROFILE)
+    // 1 kHz ms counter for blink timing -- LED I/O stays in main loop.
+    static uint8_t led_subtick = 0;
+    if (++led_subtick >= 20) {
+        led_subtick = 0;
+        led_ms_counter++;
+    }
+#endif
+
     duty_cycle = duty_cycle_setpoint;
     tenkhzcounter++;
     ledcounter++;
@@ -1347,8 +1381,8 @@ void tenKhzRoutine()
                     if (armed_timeout_count > LOOP_FREQUENCY_HZ) { // one second
                         if (zero_input_count > 30) {
                             armed = 1;
-#ifdef USE_LED_STRIP
-                            //	send_LED_RGB(0,0,0);
+#if defined(USE_LED_STRIP) && !defined(LED_PROFILE)
+                            // Legacy LED flow: one-shot green at arming.
                             delayMicros(1000);
                             send_LED_RGB(0, 255, 0);
 #endif
@@ -1800,7 +1834,8 @@ int main(void)
     GPIOA->BRR = LL_GPIO_PIN_11;
     GPIOA->BSRR = LL_GPIO_PIN_12;    // Pa12 attached to enable on dev board
 #endif
-#ifdef USE_LED_STRIP
+#if defined(USE_LED_STRIP) && !defined(LED_PROFILE)
+    // Legacy LED flow: one-shot red at boot.
     send_LED_RGB(125, 0, 0);
 #endif
 #ifdef USE_RGB_LED
@@ -1888,7 +1923,42 @@ int main(void)
   startup_max_duty_cycle = startup_max_duty_cycle + 400;
 #endif
 
+#if defined(USE_LED_STRIP) && defined(LED_PROFILE)
+    uint8_t  led_was_running = 0xFF;
+    uint8_t  led_was_armed   = 0xFF;
+    uint8_t  led_blink_phase = 1;
+    uint32_t led_last_ms     = 0;
+#endif
     while (1) {
+#if defined(USE_LED_STRIP) && defined(LED_PROFILE)
+        char led_dirty = 0;
+        if (running != led_was_running || armed != led_was_armed) {
+            led_was_running = running;
+            led_was_armed   = armed;
+            led_blink_phase = 1;
+            led_last_ms     = led_ms_counter;
+            led_dirty       = 1;
+        }
+        if (running && armed_profile.mode != LED_MODE_SOLID &&
+            (led_ms_counter - led_last_ms) >= armed_profile.blink_delay_ms) {
+            led_last_ms      = led_ms_counter;
+            led_blink_phase ^= 1;
+            led_dirty        = 1;
+        }
+        if (led_dirty) {
+            if (!armed) {
+                send_LED_RGB_scaled(255, 0, 0);
+            } else if (!running) {
+                send_LED_RGB_scaled(0, 255, 0);
+            } else if (armed_profile.mode == LED_MODE_BLINK_1_COLOR && !led_blink_phase) {
+                send_LED_RGB_scaled(0, 0, 0);
+            } else if (armed_profile.mode == LED_MODE_BLINK_2_COLOR && !led_blink_phase) {
+                send_LED_RGB_scaled(armed_profile.c2_r, armed_profile.c2_g, armed_profile.c2_b);
+            } else {
+                send_LED_RGB_scaled(armed_profile.c1_r, armed_profile.c1_g, armed_profile.c1_b);
+            }
+        }
+#endif
 e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation_intervals[2] + commutation_intervals[3] + commutation_intervals[4] + commutation_intervals[5]) + 4) >> 1; // COMMUTATION INTERVAL IS 0.5US INCREMENTS
 #if defined(FIXED_DUTY_MODE) || defined(FIXED_SPEED_MODE)
         setInput();

@@ -721,7 +721,7 @@ void loadEEpromSettings()
             eepromBuffer.limits.temperature = 255;
         }
 
-        if (eepromBuffer.limits.current > 0 && eepromBuffer.limits.current < 100) {
+        if (eepromBuffer.limits.current > 0 && eepromBuffer.limits.current <= 100) {
             use_current_limit = 1;
         }
         

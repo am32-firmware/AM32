@@ -6,9 +6,10 @@
  */
 
 #include "serial_telemetry.h"
+#include "telemetry_protocol.h"
 
 /*
- * @brief 	Initializes LPUART1 at a baud rate of 115200.
+ * @brief 	Initializes LPUART1 at a telemetry baud rate.
  *			Whenever the TX FIFO is empty it will generate a DMA request.
  *			By default the TX transmitter is disabled and the DMA hardware request is also disabled.
  *			Then by enabling the TX transmitter and the DMA hardware request it will immediately transfer all
@@ -47,13 +48,20 @@ void telem_UART_Init()
 	//Set UART1 out of reset
 	modifyReg32(&SERIAL_TELEMETRY->GLOBAL, LPUART_GLOBAL_RST_MASK, 0);
 
-	//SDK config 115200
 	//CLK = 12MHz
-	//SBR = 0x4, OSR = 25
-	//Set OSR=25, SBR=4
-	modifyReg32(&SERIAL_TELEMETRY->BAUD, \
-			LPUART_BAUD_OSR_MASK | LPUART_BAUD_SBR_MASK, \
+#ifdef USE_SPORT_TELEMETRY
+	modifyReg32(&SERIAL_TELEMETRY->BAUD,
+			LPUART_BAUD_OSR_MASK | LPUART_BAUD_SBR_MASK,
+			LPUART_BAUD_OSR(25) | LPUART_BAUD_SBR(8));
+
+	//S.Port uses inverted single-wire serial.
+	modifyReg32(&SERIAL_TELEMETRY->CTRL, 0, LPUART_CTRL_TXINV(1));
+	modifyReg32(&SERIAL_TELEMETRY->STAT, 0, LPUART_STAT_RXINV(1));
+#else
+	modifyReg32(&SERIAL_TELEMETRY->BAUD,
+			LPUART_BAUD_OSR_MASK | LPUART_BAUD_SBR_MASK,
 			LPUART_BAUD_OSR(25) | LPUART_BAUD_SBR(4));
+#endif
 
 	//Enable TX FIFO watermark flag to generate DMA request
 	modifyReg32(&SERIAL_TELEMETRY->BAUD, LPUART_BAUD_TDMAE_MASK, LPUART_BAUD_TDMAE(1));

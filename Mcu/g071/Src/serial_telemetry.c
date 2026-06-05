@@ -6,7 +6,7 @@
  */
 
 #include "serial_telemetry.h"
-#include "kiss_telemetry.h"
+#include "telemetry_protocol.h"
 #include "targets.h"
 #include "common.h"
 
@@ -24,8 +24,13 @@ void telem_UART_Init()
     GPIO_InitStruct.Pin = LL_GPIO_PIN_6;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+#ifdef USE_SPORT_TELEMETRY
+    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_DOWN;
+#else
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_OPENDRAIN;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_UP;
+#endif
     GPIO_InitStruct.Alternate = LL_GPIO_AF_0;
     LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
@@ -50,21 +55,41 @@ void telem_UART_Init()
     LL_DMA_SetMemorySize(DMA1, LL_DMA_CHANNEL_3, LL_DMA_MDATAALIGN_BYTE);
 
     USART_InitStruct.PrescalerValue = LL_USART_PRESCALER_DIV1;
-    USART_InitStruct.BaudRate = 115200;
+    USART_InitStruct.BaudRate = SERIAL_TELEMETRY_BAUDRATE_SELECTED;
     USART_InitStruct.DataWidth = LL_USART_DATAWIDTH_8B;
     USART_InitStruct.StopBits = LL_USART_STOPBITS_1;
     USART_InitStruct.Parity = LL_USART_PARITY_NONE;
+#ifdef USE_SPORT_TELEMETRY
+    USART_InitStruct.TransferDirection = LL_USART_DIRECTION_RX;
+#else
     USART_InitStruct.TransferDirection = LL_USART_DIRECTION_TX_RX;
+#endif
     USART_InitStruct.OverSampling = LL_USART_OVERSAMPLING_16;
     LL_USART_Init(USART1, &USART_InitStruct);
+#ifdef USE_SPORT_TELEMETRY
+    LL_USART_SetTXPinLevel(USART1, LL_USART_TXPIN_LEVEL_INVERTED);
+    LL_USART_SetRXPinLevel(USART1, LL_USART_RXPIN_LEVEL_INVERTED);
+#endif
     LL_USART_SetTXFIFOThreshold(USART1, LL_USART_FIFOTHRESHOLD_1_8);
     LL_USART_SetRXFIFOThreshold(USART1, LL_USART_FIFOTHRESHOLD_1_8);
     LL_USART_DisableFIFO(USART1);
     LL_USART_ConfigHalfDuplexMode(USART1);
+#ifdef USE_SPORT_TELEMETRY
+    LL_USART_SetRxTimeout(USART1, 26U);
+    LL_USART_EnableRxTimeout(USART1);
+#endif
 
     LL_USART_Enable(USART1);
+#ifdef USE_SPORT_TELEMETRY
+    LL_USART_SetTransferDirection(USART1, LL_USART_DIRECTION_RX);
+    LL_USART_EnableIT_RXNE(USART1);
+    LL_USART_EnableIT_RTO(USART1);
+    while (!(LL_USART_IsActiveFlag_REACK(USART1))) {
+    }
+#else
     while ((!(LL_USART_IsActiveFlag_TEACK(USART1))) || (!(LL_USART_IsActiveFlag_REACK(USART1)))) {
     }
+#endif
 
     LL_DMA_ConfigAddresses(
         DMA1, LL_DMA_CHANNEL_3, (uint32_t)aTxBuffer,
@@ -79,6 +104,19 @@ void telem_UART_Init()
 
 void send_telem_DMA(uint8_t bytes)
 { // set data length and enable channel to start transfer
+#ifdef USE_SPORT_TELEMETRY
+    LL_USART_DisableIT_RXNE(USART1);
+    LL_USART_DisableIT_RTO(USART1);
+    LL_USART_DisableIT_TC(USART1);
+    LL_USART_ClearFlag_TC(USART1);
+    LL_USART_DisableDMAReq_TX(USART1);
+    LL_USART_SetTransferDirection(USART1, LL_USART_DIRECTION_TX);
+    LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_3);
+    LL_DMA_ClearFlag_GI3(DMA1);
+    LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_3, bytes);
+    LL_USART_EnableDMAReq_TX(USART1);
+    LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_3);
+#else
     LL_USART_SetTransferDirection(USART1, LL_USART_DIRECTION_TX);
     //  GPIOB->OTYPER &= 0 << 6;
     LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_3, bytes);
@@ -86,4 +124,5 @@ void send_telem_DMA(uint8_t bytes)
 
     LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_3);
     LL_USART_SetTransferDirection(USART1, LL_USART_DIRECTION_RX);
+#endif
 }

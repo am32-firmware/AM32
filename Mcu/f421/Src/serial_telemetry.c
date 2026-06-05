@@ -7,7 +7,7 @@
 
 #include "serial_telemetry.h"
 #include "common.h"
-#include "kiss_telemetry.h"
+#include "telemetry_protocol.h"
 
 void send_telem_DMA(uint8_t bytes)
 { // set data length and enable channel to start transfer
@@ -53,7 +53,7 @@ void telem_UART_Init(void)
  //   DMA1_CHANNEL2->ctrl |= DMA_DTERR_INT;
 
     /* configure usart1 param */
-    usart_init(USART1, 115200, USART_DATA_8BITS, USART_STOP_1_BIT);
+    usart_init(USART1, SERIAL_TELEMETRY_BAUDRATE_SELECTED, USART_DATA_8BITS, USART_STOP_1_BIT);
     usart_transmitter_enable(USART1, TRUE);
     usart_receiver_enable(USART1, TRUE);
     usart_single_line_halfduplex_select(USART1, TRUE);

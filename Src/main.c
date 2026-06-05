@@ -226,7 +226,11 @@ an settings option)
 #include "peripherals.h"
 #include "phaseouts.h"
 #include "serial_telemetry.h"
+#ifdef USE_SPORT_TELEMETRY
+#include "sport_telemetry.h"
+#else
 #include "kiss_telemetry.h"
+#endif
 #include "signal.h"
 #include "sounds.h"
 #include "targets.h"
@@ -2069,14 +2073,20 @@ if(zero_crosses < 5){
 #endif
         if (send_telemetry) {
 #ifdef USE_SERIAL_TELEMETRY
+#ifdef USE_SPORT_TELEMETRY
+            send_telemetry = 0;
+#else
             makeTelemPackage((int8_t)degrees_celsius, battery_voltage, actual_current,
                 (uint16_t)(consumed_current >> 16), e_rpm);
             send_telem_DMA(10);
             send_telemetry = 0;
 #endif
+#endif
         } else if(send_esc_info_flag ) {
+#ifndef USE_SPORT_TELEMETRY
            makeInfoPacket();
            send_telem_DMA(49);
+#endif
            send_esc_info_flag = 0;
         }
         if (PROCESS_ADC_FLAG == 1) { // for adc and telemetry set adc counter at 1khz loop rate

@@ -234,8 +234,10 @@ an settings option)
 #include <string.h>
 #include <assert.h>
 
+#ifndef NXP
 #ifdef USE_LED_STRIP
 #include "WS2812.h"
+#endif
 #endif
 
 #ifdef USE_CRSF_INPUT
@@ -433,7 +435,11 @@ uint16_t ADC_smoothed_input = 0;
 volatile int16_t degrees_celsius;
 int16_t converted_degrees;
 uint8_t temperature_offset;
+#ifdef NXP	// raw temperature uses two 16-bit values
+uint16_t ADC_raw_temp[2] = {0};
+#else
 uint16_t ADC_raw_temp;
+#endif
 uint16_t ADC_raw_volts;
 uint16_t ADC_raw_current;
 uint16_t ADC_raw_input;
@@ -563,7 +569,7 @@ volatile uint16_t waitTime = 0;
 uint16_t signaltimeout = 0;
 uint8_t ubAnalogWatchdogStatus = RESET;
 
-#ifdef NEED_INPUT_READY
+#if defined(NEED_INPUT_READY) || defined(NXP)
 volatile char input_ready = 0;
 #endif
 
@@ -701,6 +707,12 @@ void loadEEpromSettings()
 #ifdef GIGADEVICES
         TIMER_CCHP(TIMER0) |= dead_time_override;
 #endif
+#ifdef NXP
+    	for (int submodule = 0; submodule <= 2; submodule++) {
+    		FLEXPWM0->SM[submodule].DTCNT0 = PWM_DTCNT0_DTCNT0(dead_time_override);	//PWMA deadtime
+    		FLEXPWM0->SM[submodule].DTCNT1 = PWM_DTCNT1_DTCNT1(dead_time_override);	//PWMB deadtime
+    	}
+#endif
 #ifdef WCH
             TIM1->BDTR |= dead_time_override;
 #endif
@@ -814,6 +826,7 @@ void getBemfState()
         current_state = PHASE_B_EXTI_PORT->IDR & PHASE_B_EXTI_PIN;
     }
 #else
+    //Get current comparator output level
     current_state = !getCompOutputLevel(); // polarity reversed
 #endif
     if (rising) {
@@ -879,6 +892,12 @@ void commutate()
 #endif
 }
 
+/*
+ * @brief 	Called by the COM_TIMER interrupt handler after the set wait time
+ * 			This computes how much to advance in a commutation step.
+ * 			This disables the COM_TIMER interrupt.
+ * 			Then it enables the comparator to generate its interrupt.
+ */
 void PeriodElapsedCallback()
 {
     DISABLE_COM_TIMER_INT(); // disable interrupt
@@ -898,6 +917,11 @@ void PeriodElapsedCallback()
     }
 }
 
+/*
+ * @brief 	Called by the comparator interrupt handler.
+ * 			Disables the comparator interrupt.
+ * 			Enables the COM_TIMER and sets it to generate an interrupt after the wait time.
+ */
 void interruptRoutine()
 {
 //   if (average_interval > 125) {
@@ -1512,7 +1536,11 @@ void processDshot()
         compute_dshot_flag = 0;
     }
     if (compute_dshot_flag == 2) {
+      if(e_com_time > 65535){    // beyond dshot range
+        make_dshot_package(65535);
+      }else{
         make_dshot_package(e_com_time);
+      }
         compute_dshot_flag = 0;
         return;
     }
@@ -1583,6 +1611,11 @@ void zcfoundroutine()
 #ifdef MCU_AT32
 		COM_TIMER->pr = waitTime;
 #endif
+#ifdef NXP
+//	COM_TIMER->MSR[0] = waitTime;
+	COM_TIMER->MR[0] = waitTime;
+#endif
+
     commutate();
     bemfcounter = 0;
     bad_count = 0;
@@ -1672,6 +1705,16 @@ void runBrushedLoop()
  */
 static void checkDeviceInfo(void)
 {
+#ifdef NXP
+    uint32_t pflashBlockBase  = 0U;
+    uint32_t pflashTotalSize  = 0U;
+    uint32_t pflashSectorSize = 0U;
+
+    //Get flash properties
+    FLASH_API->flash_get_property(&s_flashDriver, kFLASH_PropertyPflashBlockBaseAddr, &pflashBlockBase);
+    FLASH_API->flash_get_property(&s_flashDriver, kFLASH_PropertyPflashSectorSize, &pflashSectorSize);
+    FLASH_API->flash_get_property(&s_flashDriver, kFLASH_PropertyPflashTotalSize, &pflashTotalSize);
+#else
 #define DEVINFO_MAGIC1 0x5925e3da
 #define DEVINFO_MAGIC2 0x4eb863d9
 
@@ -1697,6 +1740,7 @@ static void checkDeviceInfo(void)
             eeprom_address = 0x0801f800;
             break;
     }
+#endif
 
     // TODO: check pin code and reboot to bootloader if incorrect
 
@@ -1705,11 +1749,19 @@ static void checkDeviceInfo(void)
 int main(void)
 {
 
+#ifdef NXP
+    initCorePeripherals();
+    checkDeviceInfo();
+    loadEEpromSettings();
+    enableCorePeripherals();
+    initAfterJump();
+#else
     initAfterJump();
     checkDeviceInfo();
     initCorePeripherals();
     enableCorePeripherals();
     loadEEpromSettings();
+#endif
 
     if (VERSION_MAJOR != eepromBuffer.version.major || VERSION_MINOR != eepromBuffer.version.minor || EEPROM_VERSION > eepromBuffer.eeprom_version) {
         eepromBuffer.version.major = VERSION_MAJOR;
@@ -1841,7 +1893,13 @@ int main(void)
 #endif
 
     while (1) {
-e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation_intervals[2] + commutation_intervals[3] + commutation_intervals[4] + commutation_intervals[5]) + 4) >> 1; // COMMUTATION INTERVAL IS 0.5US INCREMENTS
+if(zero_crosses < 24){
+   e_com_time = 65408; // report a low value during startup to avoid false rpm spikes.
+}else{
+   e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation_intervals[2] + commutation_intervals[3] + commutation_intervals[4] + commutation_intervals[5]) + 4) >> 1; // COMMUTATION INTERVAL IS 0.5US INCREMENTS 
+}
+
+
 #if defined(FIXED_DUTY_MODE) || defined(FIXED_SPEED_MODE)
         setInput();
 #endif
@@ -1985,6 +2043,19 @@ if(zero_crosses < 5){
         }
 
 #if !defined(MCU_G031) && !defined(NEED_INPUT_READY)
+#ifdef NXP
+	if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD)) {
+		NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
+		NVIC_SetPriority(COM_TIMER_IRQ, 1);
+		NVIC_SetPriority(COMP0_IRQ, 1);
+		NVIC_SetPriority(COMP1_IRQ, 1);
+	} else {
+		NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
+		NVIC_SetPriority(COM_TIMER_IRQ, 0);
+		NVIC_SetPriority(COMP0_IRQ, 0);
+		NVIC_SetPriority(COMP1_IRQ, 0);
+	}
+#else
         if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD)) {
              NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
              NVIC_SetPriority(COM_TIMER_IRQ, 1);
@@ -1994,6 +2065,7 @@ if(zero_crosses < 5){
              NVIC_SetPriority(COM_TIMER_IRQ, 0);
              NVIC_SetPriority(COMPARATOR_IRQ, 0);
          }
+#endif
 #endif
         if (send_telemetry) {
 #ifdef USE_SERIAL_TELEMETRY
@@ -2031,14 +2103,32 @@ if(zero_crosses < 5){
             converted_degrees = getConvertedDegrees(ADC_raw_temp);
     #endif
 #endif
+#ifdef NXP
+            //Call ADC_DMA callback to get raw data
+            ADC_DMA_Callback();
+
+            //Convert temperature data to actual temperature in degrees Celsius
+            converted_degrees = computeTemperature(ADC_raw_temp[0], ADC_raw_temp[1]);
+
+            //Start ADC conversion
+            startADCConversion();
+#endif
 #ifdef WCH
             startADCConversion( );
             converted_degrees = getConvertedDegrees(ADC_raw_temp);
 #endif
             degrees_celsius = converted_degrees;
+#ifdef NXP
+            //MCXA has 16-bit ADC data
+            battery_voltage = ((7 * battery_voltage) + ((ADC_raw_volts * 3300 / 65535 * VOLTAGE_DIVIDER) / 100)) / 8;
+            smoothed_raw_current = getSmoothedCurrent();
+            //Actual current is in 10mA, so 1 = 10mA
+            actual_current = (((smoothed_raw_current * 3300 / 65535) - CURRENT_OFFSET) * 100) / (MILLIVOLT_PER_AMP);
+#else
             battery_voltage = ((7 * battery_voltage) + ((ADC_raw_volts * 3300 / 4095 * VOLTAGE_DIVIDER) / 100)) >> 3;
             smoothed_raw_current = getSmoothedCurrent();
             actual_current = ((smoothed_raw_current * 3300 / 41) - (CURRENT_OFFSET * 100)) / (MILLIVOLT_PER_AMP);
+#endif
             if (actual_current < 0) {
                 actual_current = 0;
             }             

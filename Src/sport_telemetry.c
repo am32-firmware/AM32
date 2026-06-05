@@ -66,19 +66,34 @@ typedef struct sport_config_parameter {
 } sport_config_parameter_t;
 
 static const sport_config_parameter_t sport_config_parameters[] = {
-    { 1U, 27U, 2U, 64U },  // motor_poles
-    { 2U, 17U, 0U, 1U },   // dir_reversed
-    { 3U, 18U, 0U, 1U },   // bi_direction
-    { 4U, 30U, 0U, 11U },  // beep_volume
-    { 5U, 24U, 8U, 144U }, // pwm_frequency
-    { 6U, 5U, 1U, 200U },  // max_ramp
-    { 7U, 6U, 0U, 50U },   // minimum_duty_cycle
-    { 8U, 19U, 0U, 1U },   // use_sine_start
-    { 9U, 20U, 0U, 1U },   // comp_pwm
-    { 10U, 22U, 0U, 1U },  // stuck_rotor_protection
-    { 11U, 25U, 50U, 150U }, // startup_power
-    { 12U, 41U, 1U, 10U }, // drag_brake_strength
-    { 13U, 42U, 1U, 10U }, // driving_brake_strength
+    { 1U,  27U, 2U,   64U  }, // motor_poles
+    { 2U,  17U, 0U,   1U   }, // dir_reversed
+    { 3U,  18U, 0U,   1U   }, // bi_direction
+    { 4U,  30U, 0U,   11U  }, // beep_volume
+    { 5U,  24U, 8U,   144U }, // pwm_frequency
+    { 6U,  5U,  1U,   200U }, // max_ramp
+    { 7U,  6U,  0U,   50U  }, // minimum_duty_cycle
+    { 8U,  19U, 0U,   1U   }, // use_sine_start
+    { 9U,  20U, 0U,   1U   }, // comp_pwm
+    { 10U, 22U, 0U,   1U   }, // stuck_rotor_protection
+    { 11U, 25U, 50U,  150U }, // startup_power
+    { 12U, 41U, 1U,   10U  }, // drag_brake_strength
+    { 13U, 42U, 1U,   10U  }, // driving_brake_strength
+    { 14U, 21U, 0U,   2U   }, // variable_pwm
+    { 15U, 23U, 0U,   30U  }, // advance_level (user 0-30, stored as +10 in eeprom)
+    { 16U, 26U, 0U,   255U }, // motor_kv (raw byte; kV = value*40 + 20)
+    { 17U, 28U, 0U,   1U   }, // brake_on_stop
+    { 18U, 29U, 0U,   1U   }, // stall_protection
+    { 19U, 36U, 0U,   1U   }, // low_voltage_cut_off
+    { 20U, 37U, 0U,   100U }, // low_cell_volt_cutoff (raw; mV/cell = value+250)
+    { 21U, 38U, 0U,   1U   }, // rc_car_reverse
+    { 22U, 39U, 0U,   1U   }, // use_hall_sensors
+    { 23U, 40U, 5U,   25U  }, // sine_mode_changeover_throttle_level
+    { 24U, 43U, 70U,  255U }, // limits.temperature (255 = disabled)
+    { 25U, 44U, 0U,   100U }, // limits.current (0 = disabled)
+    { 26U, 45U, 1U,   10U  }, // sine_mode_power
+    { 27U, 46U, 0U,   5U   }, // input_type
+    { 28U, 47U, 0U,   1U   }, // auto_advance
 };
 
 static void sport_crc_add(uint16_t* crc, uint8_t value)
@@ -155,7 +170,11 @@ static uint8_t sport_config_safe_to_write(void)
 
 static uint16_t sport_config_read_parameter(const sport_config_parameter_t* parameter)
 {
-    return eepromBuffer.buffer[parameter->offset];
+    uint8_t raw = eepromBuffer.buffer[parameter->offset];
+    if (parameter->offset == 23U && raw >= 10U) {
+        return raw - 10U;
+    }
+    return raw;
 }
 
 static void sport_config_write_parameter(const sport_config_parameter_t* parameter, uint16_t value)
@@ -163,7 +182,11 @@ static void sport_config_write_parameter(const sport_config_parameter_t* paramet
     const uint8_t last_dir_reversed = eepromBuffer.dir_reversed;
     const uint8_t last_bi_direction = eepromBuffer.bi_direction;
 
-    eepromBuffer.buffer[parameter->offset] = (uint8_t)value;
+    uint8_t stored = (uint8_t)value;
+    if (parameter->offset == 23U) {
+        stored = (uint8_t)(value + 10U);
+    }
+    eepromBuffer.buffer[parameter->offset] = stored;
 
     if ((last_dir_reversed != eepromBuffer.dir_reversed) || (last_bi_direction != eepromBuffer.bi_direction)) {
         forward = 1 - eepromBuffer.dir_reversed;

@@ -11,7 +11,7 @@ extern uint16_t dshot_frametime_low;
 extern uint32_t gcr[37];
 extern uint8_t buffer_padding;
 extern uint16_t adjusted_input;
-extern uint32_t dma_buffer[64];
+//extern uint32_t dma_buffer[64];
 extern uint8_t dshotcommand;
 extern uint16_t armed_count_threshold;
 extern char forward;
@@ -43,6 +43,11 @@ extern uint32_t current_GPIO_PORT;
 #endif
 #ifdef ARTERY
 extern uint32_t current_GPIO_PORT;
+#endif
+#ifdef GEEHY
+extern uint32_t dma_buffer[32];
+#else
+extern uint32_t dma_buffer[64];
 #endif
 extern uint32_t current_EXTI_LINE;
 extern int e_com_time;

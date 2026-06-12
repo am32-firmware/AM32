@@ -4,6 +4,7 @@
 extern uint8_t get_crc8(uint8_t* Buf, uint8_t BufLen);
 
 uint8_t aTxBuffer[49] __attribute__((aligned(4)));
+uint8_t nbDataToTransmit = sizeof(aTxBuffer);
 
 void makeTelemPackage(int8_t temp, uint16_t voltage, uint16_t current, uint16_t consumption, uint16_t e_rpm)
 {

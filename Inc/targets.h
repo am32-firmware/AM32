@@ -5579,3 +5579,14 @@
 #ifndef POLLING_MODE_THRESHOLD
 #define POLLING_MODE_THRESHOLD 2000
 #endif
+
+// Place hot functions in RAM on MCUs that execute flash with wait states and
+// have spare RAM. The F051 runs flash at 1WS, RAM at 0WS, so commutation and
+// PWM interrupt code runs noticeably faster from RAM. The .ramfunc input
+// section is placed inside .data so the startup data-init copy loads it.
+// noclone keeps LTO constant-propagation clones from escaping the section.
+#ifdef MCU_F051
+#define RAM_FUNC __attribute__((section(".ramfunc"), noclone))
+#else
+#define RAM_FUNC
+#endif

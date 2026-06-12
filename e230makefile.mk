@@ -29,3 +29,6 @@ CFLAGS_$(MCU) += \
 
 
 SRC_$(MCU) := $(foreach dir,$(SRC_DIR_$(MCU)),$(wildcard $(dir)/*.[cs]))
+
+# LTO inlining at -O3 overflows the 27k flash on this MCU, leave it disabled
+LTO_FLAGS_$(MCU) :=

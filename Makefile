@@ -48,6 +48,11 @@ FIRMWARE_VERSION := $(VERSION_MAJOR).$(VERSION_MINOR)
 CFLAGS_BASE := -fsingle-precision-constant -fomit-frame-pointer -ffast-math
 CFLAGS_BASE += -I$(MAIN_INC_DIR) -g3 -O3 -ffunction-sections --specs=nosys.specs
 CFLAGS_BASE += -Wall -Wundef -Wextra -Werror -Wno-unused-parameter -Wno-stringop-truncation
+# link time optimization, inlines across translation units which matters a lot
+# on cortex-m0 where call overhead is high, the whole firmware is compiled and
+# linked in one compiler invocation so this needs no other build changes. An
+# mcu makefile can opt out with LTO_FLAGS_<MCU> := (empty) if flash is tight.
+$(foreach MCU,$(MCU_TYPES),$(eval LTO_FLAGS_$(MCU) ?= -flto))
 
 CFLAGS_COMMON := $(CFLAGS_BASE)
 
@@ -105,8 +110,11 @@ $$($(2)_BASENAME).bin: $$($(2)_BASENAME).elf
 $(eval xLDSCRIPT := $$(if $$(call has_can_suffix,$$(2)),$(LDSCRIPT_CAN_$(1)),$(LDSCRIPT_$(1))))
 $(eval xCFLAGS := $$(if $$(call has_can_suffix,$$(2)),$(CFLAGS_CAN_$(1))))
 $(eval xSRC := $$(if $$(call has_can_suffix,$$(2)),$(SRC_CAN_$(1))))
+# no LTO for DroneCAN builds, gcc 10 LTO trips -Werror=maybe-uninitialized
+# false positives in the canard/dsdl code and CAN targets have ample flash
+$(eval xLTO := $$(if $$(call has_can_suffix,$$(2)),,$(LTO_FLAGS_$(1))))
 
-CFLAGS_$(2) = -DAM32_MCU=\"$(MCU)\" $(MCU_$(1)) -D$(2) $(CFLAGS_$(1)) $(CFLAGS_COMMON) $(xCFLAGS)
+CFLAGS_$(2) = -DAM32_MCU=\"$(MCU)\" $(MCU_$(1)) -D$(2) $(CFLAGS_$(1)) $(CFLAGS_COMMON) $(xLTO) $(xCFLAGS)
 LDFLAGS_$(2) = $(LDFLAGS_COMMON) $(LDFLAGS_$(1)) -T$(xLDSCRIPT)
 
 -include $$($(2)_BASENAME).d

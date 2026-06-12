@@ -62,11 +62,11 @@ void initAfterJump(void)
         ((SYSCFG_TypeDef*)(((uint32_t)0x40000000U) + 0x00010000))->CFGR1 |= ((0x1U << (0U)) | (0x2U << (0U)));
     } while (0);
 
-    if (SysTick_Config(SystemCoreClock / 1000)) {
-        /* Capture error */
-        while (1) {
-        }
-    }
+    // keep the SysTick counter running for anything that polls it but do not
+    // enable its interrupt, the handler is empty and just burns cycles at 1khz
+    SysTick->LOAD = (SystemCoreClock / 1000) - 1;
+    SysTick->VAL = 0;
+    SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_ENABLE_Msk;
     __enable_irq();
 }
 

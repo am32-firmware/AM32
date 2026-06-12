@@ -19,7 +19,7 @@ extern volatile char dshot_telemetry;
 extern volatile char armed;
 extern volatile char out_put;
 extern volatile uint8_t compute_dshot_flag;
-extern volatile uint16_t commutation_interval;
+extern volatile uint32_t commutation_interval;
 
 int interrupt = 0;
 

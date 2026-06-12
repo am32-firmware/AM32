@@ -68,7 +68,8 @@ typedef union EEprom_u {
             uint8_t filter_hz; // 181
             uint8_t debug_rate; // 182
             uint8_t term_enable; // 183
-            uint8_t reserved[8]; // 184-191
+            uint8_t demag_compensation; // 184  0=off 1=low 2=medium 3=high
+            uint8_t reserved[7]; // 185-191
         } can;
     };
     uint8_t buffer[192];

@@ -369,6 +369,15 @@ uint32_t desync_happened = 0;
 #else
 uint8_t desync_happened = 0;
 #endif
+uint8_t demag_comp_level = 0; // 0=off, 1=low, 2=medium, 3=high
+volatile uint16_t demag_duty_limit = 2000; // 2000 = no limit
+volatile uint8_t demag_consecutive = 0;
+uint16_t demag_recovery_rate = 4; // duty counts per 20khz tick
+#if DRONECAN_SUPPORT
+volatile uint32_t demag_happened = 0;
+#else
+volatile uint8_t demag_happened = 0;
+#endif
 char maximum_throttle_change_ramp = 1;
 
 char crawler_mode = 0; // no longer used //
@@ -786,6 +795,21 @@ void loadEEpromSettings()
         low_rpm_level = motor_kv / 100 / (32 / eepromBuffer.motor_poles);
         high_rpm_level = motor_kv / 12 / (32 / eepromBuffer.motor_poles);				
     }
+    if (eepromBuffer.can.demag_compensation > 3) { // erased flash reads 0xff, default off
+        eepromBuffer.can.demag_compensation = 0;
+    }
+    demag_comp_level = eepromBuffer.can.demag_compensation;
+    switch (demag_comp_level) {
+    case 1:
+        demag_recovery_rate = 8;
+        break;
+    case 2:
+        demag_recovery_rate = 4;
+        break;
+    case 3:
+        demag_recovery_rate = 2;
+        break;
+    }
     reverse_speed_threshold = map(motor_kv, 300, 3000, 1000, 500);
     if (eepromBuffer.bi_direction){
       polling_mode_changeover = POLLING_MODE_THRESHOLD / 2;
@@ -948,10 +972,51 @@ void interruptRoutine()
     __disable_irq();
     maskPhaseInterrupts();
     lastzctime = thiszctime;
-    thiszctime = INTERVAL_TIMER_COUNT;  
+    thiszctime = INTERVAL_TIMER_COUNT;
     SET_INTERVAL_TIMER_COUNT(0);
     SET_AND_ENABLE_COM_INT(waitTime+1); // enable COM_TIMER interrupt
     __enable_irq();
+    if (demag_comp_level && !old_routine && running && (zero_crosses > 100)
+        && (commutation_interval < polling_mode_changeover)) {
+        // commutation_interval still holds the expected interval here, it is
+        // only updated from thiszctime later in PeriodElapsedCallback
+        if (thiszctime > (commutation_interval + (commutation_interval >> 1))) { // zero cross over 150 percent late, demag
+#if DRONECAN_SUPPORT
+            demag_happened++;
+#else
+            if (demag_happened < 255) {
+                demag_happened++;
+            }
+#endif
+            if (demag_consecutive < 255) {
+                demag_consecutive++;
+            }
+            uint16_t demag_cut;
+            switch (demag_comp_level) {
+            case 1:
+                demag_cut = (duty_cycle >> 1) + (duty_cycle >> 2); // 75 percent
+                break;
+            case 2:
+                demag_cut = duty_cycle >> 1; // 50 percent
+                break;
+            default:
+                demag_cut = duty_cycle >> 2; // 25 percent
+                break;
+            }
+            if (demag_consecutive >= 3) {
+                demag_cut = minimum_duty_cycle;
+            }
+            if (demag_cut < minimum_duty_cycle) {
+                demag_cut = minimum_duty_cycle;
+            }
+            if (demag_cut < demag_duty_limit) {
+                demag_duty_limit = demag_cut;
+            }
+            SET_DUTY_CYCLE_ALL((demag_duty_limit * tim1_arr) / 2000); // cut power now, winding current must decay
+        } else {
+            demag_consecutive = 0;
+        }
+    }
 }
 
 void startMotor()
@@ -961,6 +1026,8 @@ void startMotor()
         commutation_interval = 10000;
         SET_INTERVAL_TIMER_COUNT(5000);
         running = 1;
+        demag_duty_limit = 2000;
+        demag_consecutive = 0;
     }
     enableCompInterrupts();
 }
@@ -1490,6 +1557,16 @@ void tenKhzRoutine()
             }else{
              duty_cycle = last_duty_cycle;
             }
+
+        if (demag_duty_limit < 2000) { // applied after ramp so the cut is not rate limited
+            if (duty_cycle > demag_duty_limit) {
+                duty_cycle = demag_duty_limit;
+            }
+            demag_duty_limit += demag_recovery_rate;
+            if (demag_duty_limit > 2000) {
+                demag_duty_limit = 2000;
+            }
+        }
 
         if ((armed && running) && input > 47) {
             if (eepromBuffer.variable_pwm) {
@@ -2031,6 +2108,8 @@ if(zero_crosses < 5){
                     average_interval = 5000;
                 }
                 last_duty_cycle = min_startup_duty / 2;
+                demag_duty_limit = 2000; // desync handling takes over from here
+                demag_consecutive = 0;
             }
             desync_check = 0;
             //	}

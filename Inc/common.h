@@ -31,6 +31,8 @@ extern int16_t actual_current;
 extern uint16_t e_rpm;
 extern volatile uint32_t average_interval;
 extern volatile int16_t degrees_celsius;
+extern volatile uint8_t auto_blanking;
+extern volatile uint16_t blanking_length;
 
 #ifdef STMICRO
 extern GPIO_TypeDef* current_GPIO_PORT;

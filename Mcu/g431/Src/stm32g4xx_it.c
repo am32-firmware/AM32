@@ -9,8 +9,10 @@
 extern void transfercomplete();
 extern void PeriodElapsedCallback();
 extern void interruptRoutine();
+extern void demagEdgeRoutine();
 extern void tenKhzRoutine();
 extern void processDshot();
+extern volatile uint8_t auto_blanking;
 
 extern volatile char send_telemetry;
 uint16_t interrupt_time = 0;
@@ -97,6 +99,18 @@ void DMA1_Channel1_IRQHandler(void)
 
 void COMP1_2_3_IRQHandler(void)
 {
+	if (auto_blanking) { // reversed polarity, this is the demag release edge
+		if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_22)) {
+			LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_22);
+			demagEdgeRoutine();
+			return;
+		}
+		if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_21)) {
+			LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_21);
+			demagEdgeRoutine();
+			return;
+		}
+	}
 	if(INTERVAL_TIMER->CNT > (commutation_interval>>1)){
     interrupt++;
     if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_22)) {

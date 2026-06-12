@@ -30,6 +30,7 @@
 extern void transfercomplete();
 extern void PeriodElapsedCallback();
 extern void interruptRoutine();
+extern void demagEdgeRoutine();
 extern void tenKhzRoutine();
 extern void processDshot();
 
@@ -277,10 +278,15 @@ void COMP_IRQHandler(void)
 {
 
     if (LL_EXTI_IsActiveFlag_0_31(EXTI_LINE) != RESET) {
+      if (auto_blanking) { // reversed polarity, this is the demag release edge
+          LL_EXTI_ClearFlag_0_31(EXTI_LINE);
+          demagEdgeRoutine();
+          return;
+      }
       if((INTERVAL_TIMER->CNT) > ((average_interval>>1))){
        LL_EXTI_ClearFlag_0_31(EXTI_LINE);
       interruptRoutine();
-  }else{ 
+  }else{
       if (getCompOutputLevel() == rising){
       LL_EXTI_ClearFlag_0_31(EXTI_LINE);
   }

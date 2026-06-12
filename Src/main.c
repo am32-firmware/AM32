@@ -370,11 +370,8 @@ uint32_t desync_happened = 0;
 uint8_t desync_happened = 0;
 #endif
 uint8_t demag_comp_level = 0; // 0=off, 1=low, 2=medium, 3=high
-volatile uint16_t demag_duty_limit = 2000; // 2000 = no limit
-volatile uint8_t demag_consecutive = 0;
-volatile uint8_t demag_watch = 0; // 0=idle, 1=watching this step, 2=power already cut this step
-volatile uint8_t demag_clamped_samples = 0;
-uint16_t demag_recovery_rate = 4; // duty counts per 20khz tick
+volatile uint16_t blanking_length = 0; // measured demag time in interval timer ticks
+volatile uint8_t auto_blanking = 0; // comparator armed for the demag release edge first
 #if DRONECAN_SUPPORT
 volatile uint32_t demag_happened = 0;
 #else
@@ -416,7 +413,7 @@ uint16_t low_pin_count = 0;
 uint8_t max_duty_cycle_change = 2;
 char fast_accel = 1;
 char fast_deccel = 0;
-uint16_t last_duty_cycle = 0;
+volatile uint16_t last_duty_cycle = 0;
 uint16_t duty_cycle_setpoint = 0;
 char play_tone_flag = 0;
 
@@ -801,17 +798,6 @@ void loadEEpromSettings()
         eepromBuffer.can.demag_compensation = 0;
     }
     demag_comp_level = eepromBuffer.can.demag_compensation;
-    switch (demag_comp_level) {
-    case 1:
-        demag_recovery_rate = 8;
-        break;
-    case 2:
-        demag_recovery_rate = 4;
-        break;
-    case 3:
-        demag_recovery_rate = 2;
-        break;
-    }
     reverse_speed_threshold = map(motor_kv, 300, 3000, 1000, 500);
     if (eepromBuffer.bi_direction){
       polling_mode_changeover = POLLING_MODE_THRESHOLD / 2;
@@ -874,27 +860,6 @@ void getBemfState()
             }
         }
     }
-}
-
-static uint8_t getBemfPostZcState()
-{ // returns 1 while the floating phase reads the post zero cross level. Before
-  // the zero cross this is the demag clamp state, the freewheeling diode holds
-  // the phase at the rail so the comparator already reads as if zc happened
-    uint8_t current_state = 0;
-#if defined(MCU_F031) || defined(MCU_G031)
-    if (step == 1 || step == 4) {
-        current_state = (PHASE_C_EXTI_PORT->IDR & PHASE_C_EXTI_PIN) ? 1 : 0;
-    }
-    if (step == 2 || step == 5) {
-        current_state = (PHASE_A_EXTI_PORT->IDR & PHASE_A_EXTI_PIN) ? 1 : 0;
-    }
-    if (step == 3 || step == 6) {
-        current_state = (PHASE_B_EXTI_PORT->IDR & PHASE_B_EXTI_PIN) ? 1 : 0;
-    }
-#else
-    current_state = !getCompOutputLevel(); // polarity reversed
-#endif
-    return current_state == (uint8_t)rising;
 }
 
 void commutate()
@@ -962,10 +927,6 @@ void PeriodElapsedCallback()
     if (zero_crosses < 10000) {
         zero_crosses++;
     }
-    if (demag_comp_level && !old_routine && running && (zero_crosses > 100)) {
-        demag_watch = 1; // watch this step for excessive demag time
-        demag_clamped_samples = 0;
-    }
 }
 
 /*
@@ -1002,12 +963,51 @@ void interruptRoutine()
     thiszctime = INTERVAL_TIMER_COUNT;
     SET_INTERVAL_TIMER_COUNT(0);
     SET_AND_ENABLE_COM_INT(waitTime+1); // enable COM_TIMER interrupt
+    if (demag_comp_level && (input > 400) && (commutation_interval > 100)) {
+        auto_blanking = 1; // next commutation watches for the demag release edge first
+    }
     __enable_irq();
-    if (demag_watch) {
-        if (demag_watch == 1) { // bemf became visible in time, clean step
-            demag_consecutive = 0;
+}
+
+void demagEdgeRoutine()
+{ // called by the comparator interrupt handler when the reversed polarity edge
+  // fires. This is the moment the freewheeling diode stops clamping the floating
+  // phase, the time from commutation to here is the demag time
+    uint16_t time_since_zc = INTERVAL_TIMER_COUNT;
+    auto_blanking = 0;
+    changeCompInput(); // polarity back to normal to catch the real zero cross
+    if (time_since_zc > waitTime) { // commutation happened at ~waitTime after the last zero cross
+        blanking_length = time_since_zc - waitTime;
+    } else {
+        blanking_length = 0;
+    }
+    if (blanking_length > (average_interval >> 1)) { // demag ran past the expected zero cross point
+#if DRONECAN_SUPPORT
+        demag_happened++;
+#else
+        if (demag_happened < 255) {
+            demag_happened++;
         }
-        demag_watch = 0;
+#endif
+        allOff(); // power off until next commutation, winding current must decay
+        uint16_t demag_cut;
+        switch (demag_comp_level) {
+        case 1:
+            demag_cut = duty_cycle - (duty_cycle >> 2); // cut 25 percent
+            break;
+        case 2:
+            demag_cut = duty_cycle >> 1; // cut 50 percent
+            break;
+        default:
+            demag_cut = duty_cycle >> 2; // cut 75 percent
+            break;
+        }
+        if (demag_cut < minimum_duty_cycle) {
+            demag_cut = minimum_duty_cycle;
+        }
+        last_duty_cycle = demag_cut;
+        duty_cycle = demag_cut;
+        interruptRoutine();
     }
 }
 
@@ -1018,9 +1018,7 @@ void startMotor()
         commutation_interval = 10000;
         SET_INTERVAL_TIMER_COUNT(5000);
         running = 1;
-        demag_duty_limit = 2000;
-        demag_consecutive = 0;
-        demag_watch = 0;
+        auto_blanking = 0;
     }
     enableCompInterrupts();
 }
@@ -1550,16 +1548,6 @@ void tenKhzRoutine()
             }else{
              duty_cycle = last_duty_cycle;
             }
-
-        if (demag_duty_limit < 2000) { // applied after ramp so the cut is not rate limited
-            if (duty_cycle > demag_duty_limit) {
-                duty_cycle = demag_duty_limit;
-            }
-            demag_duty_limit += demag_recovery_rate;
-            if (demag_duty_limit > 2000) {
-                demag_duty_limit = 2000;
-            }
-        }
 
         if ((armed && running) && input > 47) {
             if (eepromBuffer.variable_pwm) {
@@ -2101,8 +2089,7 @@ if(zero_crosses < 5){
                     average_interval = 5000;
                 }
                 last_duty_cycle = min_startup_duty / 2;
-                demag_duty_limit = 2000; // desync handling takes over from here
-                demag_consecutive = 0;
+                auto_blanking = 0;
             }
             desync_check = 0;
             //	}
@@ -2299,58 +2286,17 @@ if(zero_crosses < 5){
                 }
             }
 #endif
-            if (demag_watch == 1) {
-                // bemf must be visible by the last quarter of the expected interval.
-                // If the phase still reads the post zero cross level the winding is
-                // still demagnetizing and the zero cross will be swallowed, so cut
-                // power now while the zero cross can still be caught
-                if (INTERVAL_TIMER_COUNT > (commutation_interval - (commutation_interval >> 2))) {
-                    if (getBemfPostZcState()) {
-                        demag_clamped_samples++;
-                        if ((demag_clamped_samples > 2) && (demag_watch == 1)) {
-                            demag_watch = 2;
-#if DRONECAN_SUPPORT
-                            demag_happened++;
-#else
-                            if (demag_happened < 255) {
-                                demag_happened++;
-                            }
-#endif
-                            if (demag_consecutive < 255) {
-                                demag_consecutive++;
-                            }
-                            uint16_t demag_cut;
-                            switch (demag_comp_level) {
-                            case 1:
-                                demag_cut = (duty_cycle >> 1) + (duty_cycle >> 2); // 75 percent
-                                break;
-                            case 2:
-                                demag_cut = duty_cycle >> 1; // 50 percent
-                                break;
-                            default:
-                                demag_cut = duty_cycle >> 2; // 25 percent
-                                break;
-                            }
-                            if (demag_consecutive >= 3) {
-                                demag_cut = minimum_duty_cycle;
-                            }
-                            if (demag_cut < minimum_duty_cycle) {
-                                demag_cut = minimum_duty_cycle;
-                            }
-                            if (demag_cut < demag_duty_limit) {
-                                demag_duty_limit = demag_cut;
-                            }
-                            SET_DUTY_CYCLE_ALL((demag_duty_limit * tim1_arr) / 2000); // winding current must decay now
-                        }
-                    } else {
-                        demag_clamped_samples = 0;
-                    }
-                }
+            uint32_t interval_threshold;
+            if (zero_crosses > 50) {
+                interval_threshold = average_interval * 4;
+            } else {
+                interval_threshold = 45000;
             }
-            if (INTERVAL_TIMER_COUNT > 45000 && running == 1) {
+            if (INTERVAL_TIMER_COUNT > interval_threshold && running == 1) {
                 bemf_timeout_happened++;
 
                 maskPhaseInterrupts();
+                auto_blanking = 0;
                 old_routine = 1;
                 if (input < 48) {
                     running = 0;

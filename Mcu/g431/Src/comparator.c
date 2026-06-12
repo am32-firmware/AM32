@@ -78,6 +78,17 @@ void changeCompInput()
 
         LL_COMP_ConfigInputs(active_COMP, PHASE_B_COMP, PHASE_B_INPUT_PLUS);
     }
+    if (auto_blanking) { // look for the demag release edge first, reversed polarity
+        if (rising) {
+            LL_EXTI_DisableFallingTrig_0_31(LL_EXTI_LINE_22);
+            LL_EXTI_DisableFallingTrig_0_31(LL_EXTI_LINE_21);
+            LL_EXTI_EnableRisingTrig_0_31(current_EXTI_LINE);
+        } else {
+            LL_EXTI_EnableFallingTrig_0_31(current_EXTI_LINE);
+            LL_EXTI_DisableRisingTrig_0_31(LL_EXTI_LINE_21);
+            LL_EXTI_DisableRisingTrig_0_31(LL_EXTI_LINE_22);
+        }
+    } else {
     if (rising) {
         LL_EXTI_DisableRisingTrig_0_31(LL_EXTI_LINE_22);
         LL_EXTI_DisableRisingTrig_0_31(LL_EXTI_LINE_21);
@@ -86,6 +97,7 @@ void changeCompInput()
         LL_EXTI_EnableRisingTrig_0_31(current_EXTI_LINE);
         LL_EXTI_DisableFallingTrig_0_31(LL_EXTI_LINE_21);
         LL_EXTI_DisableFallingTrig_0_31(LL_EXTI_LINE_22);
+    }
     }
 }
 

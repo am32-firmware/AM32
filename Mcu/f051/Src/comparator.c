@@ -29,6 +29,11 @@ COMP->CSR = COMP->CSR & ~(1<<2);
 }else{
 COMP->CSR  = COMP->CSR | 1<<2;
 }
-  EXTI->RTSR = !rising << 21;
-  EXTI->FTSR = rising << 21;
+  if (auto_blanking) { // look for the demag release edge first, reversed polarity
+    EXTI->RTSR = rising << 21;
+    EXTI->FTSR = !rising << 21;
+  } else {
+    EXTI->RTSR = !rising << 21;
+    EXTI->FTSR = rising << 21;
+  }
 }

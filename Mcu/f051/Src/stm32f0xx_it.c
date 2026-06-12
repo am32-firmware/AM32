@@ -31,6 +31,7 @@
 extern void transfercomplete();
 extern void PeriodElapsedCallback();
 extern void interruptRoutine();
+extern void demagEdgeRoutine();
 extern void doPWMChanges();
 extern void tenKhzRoutine();
 extern void sendDshotDma();
@@ -192,10 +193,15 @@ void DMA1_Channel4_5_IRQHandler(void)
 void ADC1_COMP_IRQHandler(void)
 {
   if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_21) != RESET) {
+      if (auto_blanking) { // reversed polarity, this is the demag release edge
+          EXTI->PR = EXTI_LINE;
+          demagEdgeRoutine();
+          return;
+      }
       if((INTERVAL_TIMER->CNT) > ((average_interval>>1))){
        EXTI->PR = EXTI_LINE;
       interruptRoutine();
-  }else{ 
+  }else{
       if (getCompOutputLevel() == rising){
       EXTI->PR = EXTI_LINE;
   }

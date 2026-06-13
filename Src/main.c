@@ -944,6 +944,12 @@ RAM_FUNC void interruptRoutine()
 //            return;
 //        }
 //    }
+        // Zero-cross confirm: return unless filter_level consecutive reads hold
+        // the post-crossing level. Loop speed sets the sampling window: inlining
+        // getCompOutputLevel removes the per-sample call overhead, and with the
+        // companion RAM-execution change the loop is faster still, shrinking the
+        // window from ~5us to ~1.2us at filter_level 12. Less wall-clock noise
+        // immunity per count; may need bench retuning.
         for (int i = 0; i < filter_level; i++) {
 #if defined(MCU_F031) || defined(MCU_G031)
             if (((current_GPIO_PORT->IDR & current_GPIO_PIN) == !(rising))) {

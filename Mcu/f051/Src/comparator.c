@@ -11,8 +11,6 @@
 
 COMP_TypeDef* active_COMP = COMP1;
 
-uint8_t getCompOutputLevel() { return LL_COMP_ReadOutputLevel(active_COMP); }
-
 RAM_FUNC void maskPhaseInterrupts()
 {
   EXTI->IMR &= ~(1 << 21);

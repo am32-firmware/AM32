@@ -16,7 +16,7 @@ char ic_timer_prescaler = (CPU_FREQUENCY_MHZ / 5);
 // char output_timer_prescaler;
 // int buffersize = 32;
 // int smallestnumber = 20000;
-uint32_t dma_buffer[64];
+volatile uint32_t dma_buffer[64];
 volatile char out_put = 0;
 // char buffer_divider = 44;
 // int dshot_runout_timer = 62500;

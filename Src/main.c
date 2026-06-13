@@ -386,7 +386,7 @@ uint16_t
 char cell_count = 0;
 char brushed_direction_set = 0;
 
-uint16_t tenkhzcounter = 0;
+volatile uint16_t tenkhzcounter = 0;
 int32_t consumed_current = 0;
 int32_t smoothed_raw_current = 0;
 int16_t actual_current = 0;
@@ -418,18 +418,18 @@ uint16_t stall_protect_minimum_duty = DEAD_TIME;
 char desync_check = 0;
 char low_kv_filter_level = 20;
 
-uint16_t tim1_arr = TIM1_AUTORELOAD; // current auto reset value
+volatile uint16_t tim1_arr = TIM1_AUTORELOAD; // current auto reset value
 uint16_t TIMER1_MAX_ARR = TIM1_AUTORELOAD; // maximum auto reset register value
-uint16_t duty_cycle_maximum = 2000; // restricted by temperature or low rpm throttle protect
+volatile uint16_t duty_cycle_maximum = 2000; // restricted by temperature or low rpm throttle protect
 uint16_t low_rpm_level = 20; // thousand erpm used to set range for throttle resrictions
 uint16_t high_rpm_level = 70; //
 uint16_t throttle_max_at_low_rpm = 400;
 uint16_t throttle_max_at_high_rpm = 2000;
 
-uint16_t commutation_intervals[6] = { 0 };
+volatile uint16_t commutation_intervals[6] = { 0 };
 volatile uint32_t average_interval = 0;
 uint32_t last_average_interval;
-int e_com_time;
+volatile int e_com_time;
 
 uint16_t ADC_smoothed_input = 0;
 volatile int16_t degrees_celsius;
@@ -444,7 +444,7 @@ uint16_t ADC_raw_volts;
 uint16_t ADC_raw_current;
 uint16_t ADC_raw_input;
 uint16_t ADC_raw_ntc;
-uint8_t PROCESS_ADC_FLAG = 0;
+volatile uint8_t PROCESS_ADC_FLAG = 0;
 volatile char send_telemetry = 0;
 char telemetry_done = 0;
 char prop_brake_active = 0;
@@ -452,7 +452,7 @@ char prop_brake_active = 0;
 volatile char dshot_telemetry = 0;
 
 uint8_t last_dshot_command = 0;
-char old_routine = 1;
+volatile char old_routine = 1;
 uint16_t adjusted_input = 0;
 
 #define TEMP30_CAL_VALUE ((uint16_t*)((uint32_t)0x1FFFF7B8))
@@ -467,7 +467,7 @@ uint16_t readings[50];
 uint8_t bemf_timeout_happened = 0;
 uint8_t changeover_step = 5;
 uint8_t filter_level = 5;
-uint8_t running = 0;
+volatile uint8_t running = 0;
 uint16_t advance = 0;
 uint8_t advancedivisor = 6;
 volatile char rising = 1;
@@ -529,7 +529,7 @@ int16_t phase_B_position;
 int16_t phase_C_position;
 uint16_t step_delay = 100;
 char stepper_sine = 0;
-char forward = 1;
+volatile char forward = 1;
 uint16_t gate_drive_offset = DEAD_TIME;
 
 uint8_t stuckcounter = 0;
@@ -544,9 +544,9 @@ uint8_t dshotcommand;
 uint16_t armed_count_threshold = 1000;
 
 volatile char armed = 0;
-uint16_t zero_input_count = 0;
+volatile uint16_t zero_input_count = 0;
 
-uint16_t input = 0;
+volatile uint16_t input = 0;
 volatile uint16_t newinput = 0;
 volatile char inputSet = 0;
 char dshot = 0;
@@ -566,7 +566,8 @@ volatile uint16_t duty_cycle = 0;
 char step = 1;
 volatile uint32_t commutation_interval = 12500;
 volatile uint16_t waitTime = 0;
-uint16_t signaltimeout = 0;
+// ISR-written, compared by the main loop signal-loss failsafe
+volatile uint16_t signaltimeout = 0;
 uint8_t ubAnalogWatchdogStatus = RESET;
 
 #if defined(NEED_INPUT_READY) || defined(NXP)

@@ -372,6 +372,9 @@ uint8_t desync_happened = 0;
 uint8_t demag_comp_level = 0; // 0=off, 1=low, 2=medium, 3=high
 volatile uint16_t blanking_length = 0; // measured demag time in interval timer ticks
 volatile uint8_t auto_blanking = 0; // comparator armed for the demag release edge first
+uint8_t active_demag = 0; // circulate demag current through the fet instead of the body diode
+volatile uint8_t active_demag_fet_on = 0;
+volatile uint16_t active_demag_ticks = 0; // fet on time, half of last measured demag time
 #if DRONECAN_SUPPORT
 volatile uint32_t demag_happened = 0;
 #else
@@ -798,6 +801,10 @@ void loadEEpromSettings()
         eepromBuffer.can.demag_compensation = 0;
     }
     demag_comp_level = eepromBuffer.can.demag_compensation;
+    if (eepromBuffer.can.active_demag > 1) { // erased flash reads 0xff, default off
+        eepromBuffer.can.active_demag = 0;
+    }
+    active_demag = eepromBuffer.can.active_demag && demag_comp_level; // needs the demag time measurement running
     reverse_speed_threshold = map(motor_kv, 300, 3000, 1000, 500);
     if (eepromBuffer.bi_direction){
       polling_mode_changeover = POLLING_MODE_THRESHOLD / 2;
@@ -904,6 +911,43 @@ void commutate()
 #endif
 }
 
+#ifdef HAS_PHASE_HIGH
+static void activeDemagFetOn()
+{ // turn on the fet whose body diode is carrying the freewheel current, the
+  // demag current then circulates through the channel instead of the diode
+    if (step == 1 || step == 4) { // c floating
+        if (rising) {
+            phaseCHIGH();
+        } else {
+            phaseCLOW();
+        }
+    } else if (step == 2 || step == 5) { // a floating
+        if (rising) {
+            phaseAHIGH();
+        } else {
+            phaseALOW();
+        }
+    } else { // b floating
+        if (rising) {
+            phaseBHIGH();
+        } else {
+            phaseBLOW();
+        }
+    }
+}
+
+static void activeDemagFetOff()
+{
+    if (step == 1 || step == 4) {
+        phaseCFLOAT();
+    } else if (step == 2 || step == 5) {
+        phaseAFLOAT();
+    } else {
+        phaseBFLOAT();
+    }
+}
+#endif
+
 /*
  * @brief 	Called by the COM_TIMER interrupt handler after the set wait time
  * 			This computes how much to advance in a commutation step.
@@ -913,6 +957,13 @@ void commutate()
 void PeriodElapsedCallback()
 {
     DISABLE_COM_TIMER_INT(); // disable interrupt
+#ifdef HAS_PHASE_HIGH
+    if (active_demag_fet_on) { // second com timer event this step, end of active freewheel
+        activeDemagFetOff();
+        active_demag_fet_on = 0;
+        return;
+    }
+#endif
     commutate();
     commutation_interval = ((commutation_interval)+((lastzctime + thiszctime) >> 1))>>1;
   	if (!eepromBuffer.auto_advance) {
@@ -927,6 +978,15 @@ void PeriodElapsedCallback()
     if (zero_crosses < 10000) {
         zero_crosses++;
     }
+#ifdef HAS_PHASE_HIGH
+    if (active_demag && auto_blanking && running && (active_demag_ticks > 3)) {
+        // the previously conducting fet has been off since comStep at the top of
+        // commutate, several microseconds ago, so no cross conduction risk here
+        activeDemagFetOn();
+        active_demag_fet_on = 1;
+        SET_AND_ENABLE_COM_INT(active_demag_ticks); // schedule the fet off event
+    }
+#endif
 }
 
 /*
@@ -959,6 +1019,12 @@ void interruptRoutine()
         }
     __disable_irq();
     maskPhaseInterrupts();
+#ifdef HAS_PHASE_HIGH
+    if (active_demag_fet_on) { // zero cross arrived before the off event fired
+        activeDemagFetOff();
+        active_demag_fet_on = 0; // must clear or the com timer event below would be eaten
+    }
+#endif
     lastzctime = thiszctime;
     thiszctime = INTERVAL_TIMER_COUNT;
     SET_INTERVAL_TIMER_COUNT(0);
@@ -980,6 +1046,10 @@ void demagEdgeRoutine()
         blanking_length = time_since_zc - waitTime;
     } else {
         blanking_length = 0;
+    }
+    active_demag_ticks = blanking_length >> 1; // active freewheel for half the measured demag time
+    if (active_demag_ticks > (waitTime >> 1)) {
+        active_demag_ticks = waitTime >> 1; // fet always off well before the expected zero cross
     }
     if (blanking_length > (average_interval >> 1)) { // demag ran past the expected zero cross point
 #if DRONECAN_SUPPORT
@@ -1019,6 +1089,7 @@ void startMotor()
         SET_INTERVAL_TIMER_COUNT(5000);
         running = 1;
         auto_blanking = 0;
+        active_demag_fet_on = 0;
     }
     enableCompInterrupts();
 }
@@ -2090,6 +2161,7 @@ if(zero_crosses < 5){
                 }
                 last_duty_cycle = min_startup_duty / 2;
                 auto_blanking = 0;
+                active_demag_fet_on = 0;
             }
             desync_check = 0;
             //	}
@@ -2297,6 +2369,7 @@ if(zero_crosses < 5){
 
                 maskPhaseInterrupts();
                 auto_blanking = 0;
+                active_demag_fet_on = 0;
                 old_routine = 1;
                 if (input < 48) {
                     running = 0;

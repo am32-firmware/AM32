@@ -813,7 +813,7 @@ uint16_t getSmoothedCurrent()
     return smoothedcurrent;
 }
 
-void getBemfState()
+RAM_FUNC void getBemfState()
 {
     uint8_t current_state = 0;
 #if defined(MCU_F031) || defined(MCU_G031)
@@ -851,7 +851,7 @@ void getBemfState()
     }
 }
 
-void commutate()
+RAM_FUNC void commutate()
 {
     if (forward == 1) {
         step++;
@@ -899,7 +899,7 @@ void commutate()
  * 			This disables the COM_TIMER interrupt.
  * 			Then it enables the comparator to generate its interrupt.
  */
-void PeriodElapsedCallback()
+RAM_FUNC void PeriodElapsedCallback()
 {
     DISABLE_COM_TIMER_INT(); // disable interrupt
     commutate();
@@ -923,7 +923,7 @@ void PeriodElapsedCallback()
  * 			Disables the comparator interrupt.
  * 			Enables the COM_TIMER and sets it to generate an interrupt after the wait time.
  */
-void interruptRoutine()
+RAM_FUNC void interruptRoutine()
 {
 //   if (average_interval > 125) {
 //        if ((INTERVAL_TIMER_COUNT < 125) && (duty_cycle < 600) && (zero_crosses < 500)) { // should be impossible, desync?exit anyway
@@ -1333,7 +1333,7 @@ if (!stepper_sine && armed) {
 #endif
 }
 
-void tenKhzRoutine()
+RAM_FUNC void tenKhzRoutine()
 { // 20khz as of 2.00 to be renamed
     HWCI_PERF_CTRL_ENTER();
     duty_cycle = duty_cycle_setpoint;

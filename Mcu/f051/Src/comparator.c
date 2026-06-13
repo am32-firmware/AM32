@@ -13,15 +13,15 @@ COMP_TypeDef* active_COMP = COMP1;
 
 uint8_t getCompOutputLevel() { return LL_COMP_ReadOutputLevel(active_COMP); }
 
-void maskPhaseInterrupts()
+RAM_FUNC void maskPhaseInterrupts()
 {
   EXTI->IMR &= ~(1 << 21);
   EXTI->PR = EXTI_LINE;
 }
 
-void enableCompInterrupts() { EXTI->IMR |= (1 << 21); }
+RAM_FUNC void enableCompInterrupts() { EXTI->IMR |= (1 << 21); }
 
-void changeCompInput()
+RAM_FUNC void changeCompInput()
 {
 
 if((average_interval < 400)){

@@ -725,7 +725,7 @@ void loadEEpromSettings()
             eepromBuffer.limits.temperature = 255;
         }
 
-        if (eepromBuffer.limits.current > 0 && eepromBuffer.limits.current < 100) {
+        if (eepromBuffer.limits.current > 0 && eepromBuffer.limits.current <= 100) {
             use_current_limit = 1;
         }
         
@@ -1897,12 +1897,7 @@ int main(void)
 #endif
 
     while (1) {
-if(zero_crosses < 24){
-   e_com_time = 65408; // report a low value during startup to avoid false rpm spikes.
-}else{
-   e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation_intervals[2] + commutation_intervals[3] + commutation_intervals[4] + commutation_intervals[5]) + 4) >> 1; // COMMUTATION INTERVAL IS 0.5US INCREMENTS 
-}
-
+e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation_intervals[2] + commutation_intervals[3] + commutation_intervals[4] + commutation_intervals[5]) + 4) >> 1; // COMMUTATION INTERVAL IS 0.5US INCREMENTS 
 
 #if defined(FIXED_DUTY_MODE) || defined(FIXED_SPEED_MODE)
         setInput();

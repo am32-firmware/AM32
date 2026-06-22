@@ -81,7 +81,7 @@ static const sport_config_parameter_t sport_config_parameters[] = {
     { 13U, 42U, 1U,   10U  }, // driving_brake_strength
     { 14U, 21U, 0U,   2U   }, // variable_pwm
     { 15U, 23U, 0U,   30U  }, // advance_level (user 0-30, stored as +10 in eeprom)
-    { 16U, 26U, 0U,   255U }, // motor_kv (raw byte; kV = value*40 + 20)
+    { 16U, 26U, 20U,  10220U }, // motor_kv (actual kV; stored as (kV-20)/40)
     { 17U, 28U, 0U,   1U   }, // brake_on_stop
     { 18U, 29U, 0U,   1U   }, // stall_protection
     { 19U, 36U, 0U,   1U   }, // low_voltage_cut_off
@@ -174,6 +174,9 @@ static uint16_t sport_config_read_parameter(const sport_config_parameter_t* para
     if (parameter->offset == 23U && raw >= 10U) {
         return raw - 10U;
     }
+    if (parameter->offset == 26U) {
+        return (uint16_t)raw * 40U + 20U;
+    }
     return raw;
 }
 
@@ -185,6 +188,8 @@ static void sport_config_write_parameter(const sport_config_parameter_t* paramet
     uint8_t stored = (uint8_t)value;
     if (parameter->offset == 23U) {
         stored = (uint8_t)(value + 10U);
+    } else if (parameter->offset == 26U) {
+        stored = (uint8_t)((value - 20U) / 40U);
     }
     eepromBuffer.buffer[parameter->offset] = stored;
 

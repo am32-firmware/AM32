@@ -453,7 +453,7 @@ volatile char dshot_telemetry = 0;
 
 uint8_t last_dshot_command = 0;
 volatile char old_routine = 1;
-uint16_t adjusted_input = 0;
+volatile uint16_t adjusted_input = 0; // ISR-written in setInput(), read in the main loop
 
 #define TEMP30_CAL_VALUE ((uint16_t*)((uint32_t)0x1FFFF7B8))
 #define TEMP110_CAL_VALUE ((uint16_t*)((uint32_t)0x1FFFF7C2))
@@ -528,7 +528,7 @@ int16_t phase_A_position;
 int16_t phase_B_position;
 int16_t phase_C_position;
 uint16_t step_delay = 100;
-char stepper_sine = 0;
+volatile char stepper_sine = 0; // ISR-written in setInput(), read in the main loop
 volatile char forward = 1;
 uint16_t gate_drive_offset = DEAD_TIME;
 

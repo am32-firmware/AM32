@@ -1,0 +1,8 @@
+# Runtime dependencies for the AM32 hardware-CI harness.
+# Install with:  python -m venv .venv && . .venv/bin/activate && pip install -e .[plot,flightstand,dev]
+pyelftools>=0.29
+pyserial>=3.5
+PyYAML>=6.0
+numpy>=1.24
+matplotlib>=3.7
+grpcio>=1.51

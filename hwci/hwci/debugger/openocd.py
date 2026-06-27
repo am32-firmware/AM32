@@ -1,0 +1,158 @@
+"""OpenOCD (ST-Link) debugger backend.
+
+Drives a persistent ``openocd`` process and talks to its Tcl-RPC port (6666) to
+read/write target memory while the firmware runs. Cortex-M memory access goes
+through the AHB-AP and does not require halting the core, which is what makes
+non-intrusive CPU-load/loop-time sampling possible (the same mechanism VS Code
+"live watch" uses; note ``-gdb-max-connections`` in Mcu/f051/openocd.cfg).
+
+Flashing is done with a separate one-shot ``openocd`` invocation so the
+persistent read session is never left in a halted state.
+
+This backend cannot be unit-tested without hardware; the offline test path uses
+:class:`hwci.debugger.base.MockDebugger`. The Tcl-RPC framing and command set
+here follow the documented OpenOCD interface.
+"""
+from __future__ import annotations
+
+import shutil
+import socket
+import struct
+import subprocess
+import time
+
+from .base import Debugger, DebuggerError
+
+# OpenOCD Tcl-RPC terminates every command and reply with this byte.
+_RPC_SEP = b"\x1a"
+
+# Default config matching Mcu/f051/openocd.cfg (ST-Link + STM32F0 target).
+DEFAULT_CONFIGS = ["interface/stlink.cfg", "target/stm32f0x.cfg"]
+APP_LOAD_ADDR = 0x08001000  # AM32 app sits above the bootloader
+
+
+class OpenOcdDebugger(Debugger):
+    def __init__(
+        self,
+        configs: list[str] | None = None,
+        *,
+        openocd_bin: str = "openocd",
+        tcl_port: int = 6666,
+        search_dirs: list[str] | None = None,
+        connect_timeout: float = 10.0,
+    ):
+        self.configs = configs or list(DEFAULT_CONFIGS)
+        self.openocd_bin = openocd_bin
+        self.tcl_port = tcl_port
+        self.search_dirs = search_dirs or []
+        self.connect_timeout = connect_timeout
+        self._proc: subprocess.Popen | None = None
+        self._sock: socket.socket | None = None
+        if shutil.which(openocd_bin) is None:
+            raise DebuggerError(f"{openocd_bin!r} not found on PATH")
+
+    # --- config helpers ----------------------------------------------
+    def _base_args(self) -> list[str]:
+        args = [self.openocd_bin]
+        for d in self.search_dirs:
+            args += ["-s", d]
+        for c in self.configs:
+            args += ["-f", c]
+        return args
+
+    # --- flashing (one-shot) -----------------------------------------
+    def flash(self, bin_path: str, load_addr: int = APP_LOAD_ADDR) -> None:
+        cmd = self._base_args() + [
+            "-c", f"program {{{bin_path}}} 0x{load_addr:08x} verify reset exit",
+        ]
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+        if proc.returncode != 0:
+            raise DebuggerError(
+                f"flash failed (rc={proc.returncode}):\n{proc.stderr}\n{proc.stdout}")
+
+    # --- persistent read session -------------------------------------
+    def open(self) -> "OpenOcdDebugger":
+        """Start openocd (init, no halt) and connect to the Tcl-RPC port."""
+        cmd = self._base_args() + [
+            "-c", f"tcl_port {self.tcl_port}",
+            "-c", "gdb_port disabled",
+            "-c", "telnet_port disabled",
+            "-c", "init",
+            # leave the core running; only attach for background memory access
+        ]
+        self._proc = subprocess.Popen(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        self._connect_rpc()
+        # Ensure the core is running (a fresh attach can leave it halted).
+        try:
+            self._rpc("resume")
+        except DebuggerError:
+            pass
+        return self
+
+    def _connect_rpc(self) -> None:
+        deadline = time.monotonic() + self.connect_timeout
+        last_err: Exception | None = None
+        while time.monotonic() < deadline:
+            try:
+                self._sock = socket.create_connection(
+                    ("127.0.0.1", self.tcl_port), timeout=2.0)
+                return
+            except OSError as e:  # openocd not listening yet
+                last_err = e
+                if self._proc and self._proc.poll() is not None:
+                    out = self._proc.stdout.read() if self._proc.stdout else ""
+                    raise DebuggerError(f"openocd exited early:\n{out}")
+                time.sleep(0.2)
+        raise DebuggerError(f"could not connect to openocd Tcl-RPC: {last_err}")
+
+    def _rpc(self, command: str) -> str:
+        if self._sock is None:
+            raise DebuggerError("RPC session not open; call open() first")
+        self._sock.sendall(command.encode() + _RPC_SEP)
+        chunks = bytearray()
+        while _RPC_SEP not in chunks:
+            data = self._sock.recv(4096)
+            if not data:
+                raise DebuggerError("openocd RPC closed unexpectedly")
+            chunks += data
+        return chunks.split(_RPC_SEP, 1)[0].decode(errors="replace")
+
+    # --- Debugger interface ------------------------------------------
+    def read_memory(self, addr: int, length: int) -> bytes:
+        nwords = (length + 3) // 4
+        # read_memory returns space-separated decimal values (one per word).
+        out = self._rpc(f"read_memory 0x{addr:08x} 32 {nwords}")
+        tokens = out.replace("{", " ").replace("}", " ").split()
+        try:
+            words = [int(t, 0) for t in tokens]
+        except ValueError as e:
+            raise DebuggerError(f"unparseable read_memory reply {out!r}: {e}")
+        if len(words) < nwords:
+            raise DebuggerError(
+                f"short read: wanted {nwords} words, got {len(words)} ({out!r})")
+        return struct.pack(f"<{nwords}I", *words[:nwords])[:length]
+
+    def write_u32(self, addr: int, value: int) -> None:
+        self._rpc(f"mww 0x{addr:08x} 0x{value & 0xFFFFFFFF:08x}")
+
+    def reset_run(self) -> None:
+        self._rpc("reset run")
+
+    def close(self) -> None:
+        try:
+            if self._sock is not None:
+                try:
+                    self._rpc("exit")
+                except DebuggerError:
+                    pass
+                self._sock.close()
+        finally:
+            self._sock = None
+            if self._proc is not None:
+                self._proc.terminate()
+                try:
+                    self._proc.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    self._proc.kill()
+                self._proc = None

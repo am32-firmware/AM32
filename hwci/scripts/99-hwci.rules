@@ -1,0 +1,27 @@
+# udev rules for the AM32 hardware-CI bench.
+# Install: sudo cp 99-hwci.rules /etc/udev/rules.d/ && sudo udevadm control --reload-rules && sudo udevadm trigger
+
+# --- ST-Link debug probes (V2 / V2.1 / V3) -> accessible without root ---
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3744", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3748", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374b", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374d", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374e", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374f", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3753", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3754", MODE="0660", TAG+="uaccess"
+
+# --- SEGGER J-Link (if used instead of ST-Link) ---
+SUBSYSTEM=="usb", ATTRS{idVendor}=="1366", MODE="0660", TAG+="uaccess"
+
+# --- Stable serial-port names ---------------------------------------------
+# Give the ESC telemetry adapter and (optional) external throttle generator
+# stable /dev names so rig.yaml doesn't depend on enumeration order.
+# Find your adapter's attributes with:
+#   udevadm info -a -n /dev/ttyUSB0 | grep -E 'idVendor|idProduct|serial'
+# then fill in idVendor/idProduct and the unique serial below.
+#
+# Example (CP2102 with serial 0001):
+# SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="0001", SYMLINK+="esc-telem"
+# Example (FTDI with serial FT1ABCDE):
+# SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="FT1ABCDE", SYMLINK+="esc-throttle"

@@ -51,6 +51,14 @@ CFLAGS_BASE += -Wall -Wundef -Wextra -Werror -Wno-unused-parameter -Wno-stringop
 
 CFLAGS_COMMON := $(CFLAGS_BASE)
 
+# Hardware-CI performance instrumentation (opt-in, off by default).
+# Build with `make <TARGET> HWCI_PERF=1` to emit the hwci_perf RAM struct that
+# the hardware-CI harness (see hwci/) reads over SWD. Production/release builds
+# leave this unset and are completely unaffected.
+ifeq ($(HWCI_PERF),1)
+CFLAGS_COMMON += -DHWCI_PERF
+endif
+
 # Linker options
 LDFLAGS_COMMON := -specs=nano.specs $(LIBS) -Wl,--gc-sections -Wl,--print-memory-usage
 

@@ -1,0 +1,53 @@
+# Example rig configuration for the AM32 hardware-CI harness.
+# Copy to rig.yaml on the test bench and edit for your wiring.
+# Any field omitted falls back to the defaults in hwci/hwci/config.py (which are
+# the offline simulator), so a minimal real-rig file only needs the non-sim bits.
+
+# --- firmware / build ---
+target: ARK_4IN1_F051          # AM32 build target (FILE_NAME in Inc/targets.h)
+# repo_root: /home/test/AM32   # defaults to the repo this package lives in
+# obj_dir: /home/test/AM32/obj
+# elf_path:                    # auto: newest obj/AM32_<target>_*.elf
+app_load_addr: 0x08001000      # AM32 app sits above the bootloader
+
+# --- debug probe (reads CPU load / loop times over SWD) ---
+debugger_backend: openocd      # openocd | sim
+openocd_bin: openocd
+openocd_configs:               # one channel of the ARK 4IN1 10-pin debug header
+  - interface/stlink.cfg       #   (wire ST-Link to the SWDIO/SWCLK pair you test)
+  - target/stm32f0x.cfg
+# openocd_search_dirs: []      # extra -s dirs if using custom cfgs
+# For J-Link instead, supply interface/jlink.cfg here (M0 has no SWO, so this is
+# still background-memory-read based, not trace).
+
+# --- ESC telemetry (KISS serial, the ARK target has USE_SERIAL_TELEMETRY) ---
+telem_backend: serial          # serial | sim | none
+telem_port: /dev/esc-telem     # udev symlink recommended (see scripts/99-hwci.rules)
+telem_baud: 115200
+
+# --- throttle source (what drives the ESC signal wire) ---
+throttle_backend: flightstand  # flightstand | external | sim
+# For an external DShot/PWM generator instead:
+# throttle_backend: external
+# throttle_port: /dev/esc-throttle
+# throttle_baud: 115200
+
+# --- thrust stand (Tyto Robotics Flight Stand 50) ---
+stand_backend: grpc            # grpc | sim
+stand_host: 127.0.0.1          # host running the Flight Stand Software
+stand_port: 50051
+stand_signals:                 # confirm signal numbers against your .proto
+  thrust: 11                   # FZ (documented by Tyto)
+  torque: null                 # set from your board's input list
+  rpm: null
+  voltage: null
+  current: null
+  esc_output: 0                # actuator id used to command throttle
+  esc_min: 1000.0              # PWM us, or DShot/normalized units
+  esc_max: 2000.0
+  thrust_is_grams: true        # most stands report gram-force
+
+# --- device under test (for the report + eRPM->RPM conversion) ---
+motor_name: "T-Motor F60 Pro V"
+pole_pairs: 7
+prop: "HQ 5x4.3x3"

@@ -473,6 +473,20 @@ uint16_t readings[50];
 
 uint8_t bemf_timeout_happened = 0;
 uint8_t changeover_step = 5;
+// Zero-cross confirmation counts. On the F051 the confirm loop samples the
+// comparator ~3.5x faster with getCompOutputLevel inlined into the
+// RAM-resident ISR (~16 vs ~56 cycles per sample, the out-of-line call went
+// through a RAM-to-flash veneer), so the counts are scaled up to keep the
+// same wall-clock back EMF sampling window as before the inlining.
+#ifdef MCU_F051
+#define ZC_FILTER_MAX 42
+#define ZC_FILTER_RUN_MIN 10
+#define ZC_FILTER_FAST 7
+#else
+#define ZC_FILTER_MAX 12
+#define ZC_FILTER_RUN_MIN 3
+#define ZC_FILTER_FAST 2
+#endif
 uint8_t filter_level = 5;
 volatile uint8_t running = 0;
 uint16_t advance = 0;
@@ -2237,12 +2251,12 @@ if(zero_crosses < 5){
                 throttle_max_at_high_rpm / 2, 1);
             }
             if (zero_crosses < 100 && commutation_interval > 500) {
-              filter_level = 12;
+              filter_level = ZC_FILTER_MAX;
             } else {
-              filter_level = map(average_interval, 100, 500, 3, 12);
+              filter_level = map(average_interval, 100, 500, ZC_FILTER_RUN_MIN, ZC_FILTER_MAX);
             }
             if (commutation_interval < 50) {
-              filter_level = 2;
+              filter_level = ZC_FILTER_FAST;
             }
 
             if (eepromBuffer.auto_advance) {

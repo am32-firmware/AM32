@@ -1,6 +1,7 @@
+// NOTE: main.h is deliberately included before the guard: common.h (pulled
+// in via main.h) needs EEprom_t from this header, and this pre-guard include
+// is what makes that include cycle resolve. Untangle before "fixing".
 #include "main.h"
-
-#pragma once
 
 #ifndef EEPROM_H_
 #define EEPROM_H_

@@ -27,20 +27,31 @@ volatile hwci_perf_t hwci_perf = {
 };
 
 /*
+ * Clear the sticky min/max accumulators so worst-case timing can be measured
+ * for a single test run without power-cycling the ESC. Called for the host
+ * HWCI_CMD_RESET_STATS command, and automatically on the armed 0->1 edge
+ * (the arming tune blocks the control loop for ~300 ms with IRQs off, so the
+ * 16-bit timestamps recorded around it alias to garbage that must not leak
+ * into a run's maxima regardless of when the host issues its reset).
+ */
+void hwci_perf_reset_stats(void)
+{
+    hwci_perf.ctrl_exec_us_max = 0;
+    hwci_perf.ctrl_period_us_max = 0;
+    hwci_perf.ctrl_period_us_min = 0xFFFFu;
+    hwci_perf.main_loop_us_max = 0;
+    hwci_perf.commutation_interval_max = 0;
+}
+
+/*
  * Service a host command. Called from the main loop (low priority) when
- * host_cmd is non-zero. Currently only resets the sticky min/max accumulators
- * so the host can measure worst-case timing for a single test run without
- * power-cycling the ESC. Always clears host_cmd so the command fires once.
+ * host_cmd is non-zero. Always clears host_cmd so the command fires once.
  */
 void hwci_perf_apply_cmd(void)
 {
     switch (hwci_perf.host_cmd) {
     case HWCI_CMD_RESET_STATS:
-        hwci_perf.ctrl_exec_us_max = 0;
-        hwci_perf.ctrl_period_us_max = 0;
-        hwci_perf.ctrl_period_us_min = 0xFFFFu;
-        hwci_perf.main_loop_us_max = 0;
-        hwci_perf.commutation_interval_max = 0;
+        hwci_perf_reset_stats();
         break;
     default:
         break;

@@ -1,7 +1,7 @@
 """Tests for the KISS ESC telemetry decoder."""
 import struct
 
-from hwci.esc_telem import crc8, parse_frame
+from hwci.esc_telem import crc8, encode_frame, parse_frame
 from hwci.esc_telem.kiss import KissStream
 
 
@@ -13,6 +13,27 @@ def _make_frame(temp, volt_cv, cur_ca, cons, erpm100):
 def test_crc8_known_vector():
     # CRC of an all-zero 9-byte body is 0 for this polynomial/init.
     assert crc8(b"\x00" * 9) == 0
+
+
+def test_crc8_table_matches_bitwise_reference():
+    def crc8_bitwise(data):
+        crc = 0
+        for byte in data:
+            crc ^= byte
+            for _ in range(8):
+                crc = ((crc << 1) ^ 0x07) & 0xFF if crc & 0x80 else (crc << 1) & 0xFF
+        return crc
+    for vec in (b"\x01", b"\xff" * 9, bytes(range(9)), b"\xa5\x5a\x00\x42"):
+        assert crc8(vec) == crc8_bitwise(vec)
+
+
+def test_encode_parse_roundtrip():
+    blob = encode_frame(temperature_c=42, voltage_cv=1650, current_ca=1234,
+                        consumption_mah=56, erpm100=200)
+    f = parse_frame(blob)
+    assert f.crc_ok
+    assert (f.temperature_c, f.voltage_v, f.current_a,
+            f.consumption_mah, f.e_rpm) == (42, 16.5, 12.34, 56, 20000)
 
 
 def test_parse_valid_frame():

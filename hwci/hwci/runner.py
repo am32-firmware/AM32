@@ -5,6 +5,11 @@ The runner is source-agnostic: it drives a :class:`ThrottleSource`, reads a
 telemetry. :func:`build_sim_sources` wires all of these to one shared
 :class:`~hwci.sim.RigSimulator` for offline runs; :func:`build_live_sources`
 wires them to OpenOCD + serial + the gRPC stand on the rig.
+
+Safety: the profile's :class:`~hwci.flightstand.base.SafetyLimits` are enforced
+HERE, on every sample, against both the stand reading and the ESC telemetry.
+Backends may additionally enforce them, but the runner check is the one that
+exists on every rig (the vendor gRPC API has no mapped set-limit RPC yet).
 """
 from __future__ import annotations
 
@@ -16,8 +21,7 @@ from typing import Callable, Optional
 from . import perf
 from .config import Profile, RigConfig
 from .esc_telem.kiss import KissFrame, KissStream, parse_frame
-from .flightstand.base import StandSample, ThrustStand
-from .flightstand.simulator import StandSafetyTripped
+from .flightstand.base import SafetyLimits, StandSafetyTripped, StandSample, ThrustStand
 from .model import RunResult, make_row
 from .perf import PerfSample
 from .perf_reader import PerfReader
@@ -30,7 +34,7 @@ TelemSourceFn = Callable[[], Optional[KissFrame]]
 @dataclass
 class Sources:
     throttle: ThrottleSource
-    stand: ThrustStand
+    stand: Optional[ThrustStand]
     perf_source: PerfSourceFn
     telem_source: TelemSourceFn
     perf_reader: Optional[PerfReader] = None
@@ -51,6 +55,70 @@ def _segment_throttle(seg, tick_in_seg: int, n_ticks: int, prev: float) -> float
     return prev + (seg.throttle - prev) * min(1.0, frac)
 
 
+def enforce_safety(limits: SafetyLimits, stand: StandSample | None,
+                   telem: KissFrame | None) -> None:
+    """Host-side safety check against every channel that produced data."""
+    if stand is not None:
+        limits.check(thrust_n=stand.thrust_n, current_a=stand.current_a,
+                     rpm=stand.rpm, voltage_v=stand.voltage_v)
+    if telem is not None:
+        limits.check(current_a=telem.current_a, temp_c=telem.temperature_c)
+
+
+class _CachedPoller:
+    """Background thread that keeps the most recent value of a slow source.
+
+    An SWD struct read through ST-Link costs milliseconds; done inline it
+    would consume the whole tick budget at 100-200 Hz and add jitter to every
+    sample. Read errors are counted, never swallowed silently.
+    """
+
+    def __init__(self, fn, *, interval_s: float = 0.002,
+                 max_age_s: float = 1.0, name: str = "poller"):
+        self._fn = fn
+        self._interval = interval_s
+        self._max_age = max_age_s
+        self._latest = None
+        self._latest_at = float("-inf")
+        self._errors = 0
+        self._last_error: Exception | None = None
+        self._stop = threading.Event()
+        self._thread = threading.Thread(target=self._loop, daemon=True, name=name)
+        self._thread.start()
+
+    def _loop(self) -> None:
+        while not self._stop.is_set():
+            try:
+                value = self._fn()
+            except Exception as e:
+                self._errors += 1
+                self._last_error = e
+            else:
+                self._latest = value
+                self._latest_at = time.monotonic()
+            self._stop.wait(self._interval)
+
+    def latest(self):
+        """Most recent value, or None once the source has been dead for
+        max_age_s (a stale sample repeated forever would defeat the
+        channel-coverage gate downstream)."""
+        if time.monotonic() - self._latest_at > self._max_age:
+            return None
+        return self._latest
+
+    @property
+    def errors(self) -> int:
+        return self._errors
+
+    @property
+    def last_error(self) -> Exception | None:
+        return self._last_error
+
+    def close(self) -> None:
+        self._stop.set()
+        self._thread.join(timeout=1.0)
+
+
 def run_profile(profile: Profile, sources: Sources, *,
                 realtime: bool = True, meta: dict | None = None) -> RunResult:
     period = 1.0 / profile.sample_rate_hz
@@ -61,6 +129,18 @@ def run_profile(profile: Profile, sources: Sources, *,
     if sources.perf_reader is not None:
         sources.perf_reader.reset_stats()  # measure worst-case for THIS run
 
+    # Slow live sources move to a caching poller thread so the tick loop stays
+    # deterministic. The sim path stays inline (cheap and reproducible).
+    perf_poller: _CachedPoller | None = None
+    perf_get: Callable[[], PerfSample | None]
+    telem_errors = 0
+    if realtime and sources.perf_reader is not None:
+        perf_poller = _CachedPoller(sources.perf_source, name="perf-poller")
+        perf_get = perf_poller.latest
+    else:
+        def perf_get():
+            return _safe(sources.perf_source)
+
     start = time.monotonic()
     tick = 0
     prev_throttle = 0.0
@@ -68,33 +148,44 @@ def run_profile(profile: Profile, sources: Sources, *,
         for seg in profile.segments:
             n = max(1, round(seg.duration_s * profile.sample_rate_hz))
             for i in range(n):
-                t = tick * period
+                t_sched = tick * period
                 if realtime:
-                    target = start + t
+                    target = start + t_sched
                     delay = target - time.monotonic()
                     if delay > 0:
                         time.sleep(delay)
                 throttle = _segment_throttle(seg, i, n, prev_throttle)
                 sources.throttle.set(throttle)
-                stand = sources.stand.read_sample()
-                pf = _safe(sources.perf_source)
+                stand = sources.stand.read_sample() if sources.stand is not None else None
+                pf = perf_get()
                 tm = _safe(sources.telem_source)
+                enforce_safety(profile.safety, stand, tm)
+                # Record the ACTUAL sample time: after a host stall the
+                # schedule time would lie about how much wall clock the
+                # sample covers (and corrupt counter-rate math downstream).
+                t = (time.monotonic() - start) if realtime else t_sched
                 rows.append(make_row(t, seg.label, throttle, stand, tm, pf))
                 tick += 1
             prev_throttle = seg.throttle
     except StandSafetyTripped as e:
         aborted = f"safety: {e}"
     finally:
-        sources.throttle.disarm()
+        try:
+            sources.throttle.disarm()
+        finally:
+            if perf_poller is not None:
+                perf_poller.close()
 
     full_meta = {
         "profile": profile.name,
         "sample_rate_hz": profile.sample_rate_hz,
-        "pole_pairs": profile.pole_pairs,
         "n_samples": len(rows),
         "aborted": aborted,
         "wall_time_s": round(time.monotonic() - start, 3),
+        "perf_read_errors": perf_poller.errors if perf_poller is not None else 0,
     }
+    if perf_poller is not None and perf_poller.last_error is not None:
+        full_meta["perf_last_error"] = repr(perf_poller.last_error)
     if meta:
         full_meta.update(meta)
     return RunResult(meta=full_meta, rows=rows)
@@ -118,7 +209,7 @@ def build_sim_sources(rig: RigConfig, profile: Profile, *,
     from .throttle.flightstand_src import FlightStandThrottle
 
     period = 1.0 / profile.sample_rate_hz
-    sim = RigSimulator(params=MotorParams(pole_pairs=profile.pole_pairs,
+    sim = RigSimulator(params=MotorParams(pole_pairs=rig.pole_pairs,
                                           demag_prone=demag_prone))
     stand = SimulatedStand(sim, fixed_dt=period).open()
     stand.set_safety_limits(profile.safety)
@@ -161,27 +252,43 @@ class _SerialTelemetry:
 
 
 def build_live_sources(rig: RigConfig, profile: Profile) -> Sources:
-    """Wire OpenOCD + serial telemetry + gRPC/external throttle on the rig."""
+    """Wire OpenOCD + serial telemetry + gRPC/external throttle on the rig.
+
+    Backend values dispatch STRICTLY: an unknown value raises instead of
+    falling back to a simulator (fabricated data gating a hardware run is the
+    one unrecoverable failure mode). ``none`` disables a channel explicitly.
+    """
     closers: list = []
 
     # --- thrust stand ---
+    stand: ThrustStand | None
     if rig.stand_backend == "grpc":
         from .flightstand.grpc_client import FlightStandGrpc, SignalMap
         sig = SignalMap(**rig.stand_signals) if rig.stand_signals else SignalMap()
         stand = FlightStandGrpc(rig.stand_host, rig.stand_port, signals=sig).open()
+        stand.set_safety_limits(profile.safety)
+        closers.append(stand.close)
+    elif rig.stand_backend == "none":
+        stand = None
     else:
-        from .flightstand.simulator import SimulatedStand
-        stand = SimulatedStand().open()
-    stand.set_safety_limits(profile.safety)
-    closers.append(stand.close)
+        raise ValueError(
+            f"stand_backend {rig.stand_backend!r} is not a live backend "
+            "(expected 'grpc' or 'none')")
 
     # --- throttle source ---
     if rig.throttle_backend == "external":
         from .throttle.external import ExternalSerialThrottle
         throttle = ExternalSerialThrottle(rig.throttle_port, rig.throttle_baud)
-    else:
+    elif rig.throttle_backend == "flightstand":
+        if stand is None:
+            raise ValueError(
+                "throttle_backend 'flightstand' needs stand_backend 'grpc'")
         from .throttle.flightstand_src import FlightStandThrottle
         throttle = FlightStandThrottle(stand, arm_settle_s=profile.arm_settle_s)
+    else:
+        raise ValueError(
+            f"throttle_backend {rig.throttle_backend!r} is not a live backend "
+            "(expected 'flightstand' or 'external')")
     closers.append(throttle.close)
 
     # --- perf struct via debugger ---
@@ -199,6 +306,10 @@ def build_live_sources(rig: RigConfig, profile: Profile) -> Sources:
         perf_reader = PerfReader(dbg, str(elf))
         perf_source = perf_reader.read
         closers.append(dbg.close)
+    elif rig.debugger_backend != "none":
+        raise ValueError(
+            f"debugger_backend {rig.debugger_backend!r} is not a live backend "
+            "(expected 'openocd' or 'none')")
 
     # --- ESC telemetry ---
     telem_source: TelemSourceFn = lambda: None
@@ -206,6 +317,10 @@ def build_live_sources(rig: RigConfig, profile: Profile) -> Sources:
         telem = _SerialTelemetry(rig.telem_port, rig.telem_baud)
         telem_source = telem.latest
         closers.append(telem.close)
+    elif rig.telem_backend != "none":
+        raise ValueError(
+            f"telem_backend {rig.telem_backend!r} is not a live backend "
+            "(expected 'serial' or 'none')")
 
     return Sources(throttle=throttle, stand=stand, perf_source=perf_source,
                    telem_source=telem_source, perf_reader=perf_reader,

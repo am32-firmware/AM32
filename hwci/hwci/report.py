@@ -18,8 +18,9 @@ def render_markdown(metrics: dict, comparison: dict | None = None,
     out.append("# AM32 Hardware-CI Report\n")
     if meta:
         out.append("## Run\n")
-        for k in ("target", "profile", "git_sha", "firmware_version",
-                  "motor", "prop", "timestamp", "aborted"):
+        for k in ("target", "profile", "mode", "git_sha", "firmware_version",
+                  "motor", "prop", "pole_pairs", "timestamp", "aborted",
+                  "perf_read_errors"):
             if k in meta and meta[k] is not None:
                 out.append(f"- **{k}**: {meta[k]}")
         out.append("")

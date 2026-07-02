@@ -5,7 +5,7 @@ import time
 import warnings
 
 from . import elf, perf
-from .debugger.base import Debugger
+from .debugger.base import Debugger, DebuggerError
 
 SYMBOL = "hwci_perf"
 STRUCT_TAG = "hwci_perf_s"
@@ -26,7 +26,7 @@ class PerfReader:
         sym = elf.find_symbol(elf_path, SYMBOL)
         self.address = sym.address
         if sym.size and sym.size != perf.SIZE:
-            warnings.warn(
+            raise perf.PerfDecodeError(
                 f"hwci_perf ELF size {sym.size} != host {perf.SIZE}; "
                 "rebuild firmware or update hwci/hwci/perf.py")
         if check_layout:
@@ -35,8 +35,16 @@ class PerfReader:
     def _check_layout(self) -> None:
         try:
             members = {m.name: m for m in elf.struct_layout(self.elf_path, STRUCT_TAG)}
-        except elf.ElfError:
-            return  # no DWARF -> rely on the canonical layout
+        except elf.StructNotFoundError as e:
+            # DWARF exists but the struct DIE is gone (renamed tag, LTO/-g1
+            # stripping types): decoding would proceed on faith exactly when
+            # the cross-check matters most. Fail hard.
+            raise perf.PerfDecodeError(
+                f"cannot cross-check hwci_perf layout: {e}") from e
+        except elf.ElfError as e:
+            warnings.warn(f"hwci_perf layout cross-check skipped ({e}); "
+                          "relying on the canonical layout in hwci/hwci/perf.py")
+            return
         off = 0
         import struct as _struct
         for name, code in perf.FIELDS:
@@ -53,6 +61,24 @@ class PerfReader:
         data = self.dbg.read_memory(self.address, perf.SIZE)
         return perf.decode(data, host_monotonic=time.monotonic())
 
-    def reset_stats(self) -> None:
-        """Ask the firmware to clear its sticky min/max accumulators."""
-        self.dbg.write_u32(self.address + perf.HOST_CMD_OFFSET, perf.CMD_RESET_STATS)
+    def reset_stats(self, *, verify: bool = True, timeout_s: float = 1.0) -> None:
+        """Ask the firmware to clear its sticky min/max accumulators.
+
+        With ``verify`` (the default) this polls until the firmware consumes
+        the command (it clears ``host_cmd`` within ~64 main-loop iterations).
+        A reset that silently never lands would let the previous run's maxima
+        pollute this run's gated metrics.
+        """
+        cmd_addr = self.address + perf.HOST_CMD_OFFSET
+        self.dbg.write_u32(cmd_addr, perf.CMD_RESET_STATS)
+        if not verify:
+            return
+        deadline = time.monotonic() + timeout_s
+        while time.monotonic() < deadline:
+            val = int.from_bytes(self.dbg.read_memory(cmd_addr, 4), "little")
+            if val == perf.CMD_NONE:
+                return
+            time.sleep(0.01)
+        raise DebuggerError(
+            "firmware did not acknowledge RESET_STATS within "
+            f"{timeout_s}s (is the target running HWCI_PERF firmware?)")

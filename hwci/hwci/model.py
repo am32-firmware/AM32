@@ -23,7 +23,9 @@ COLUMNS = [
     "stand_eff_gf_per_w",
     # ESC KISS telemetry
     "esc_erpm", "esc_voltage_v", "esc_current_a", "esc_temp_c",
-    # firmware perf struct
+    # firmware perf struct (perf_host_t = host monotonic clock at the actual
+    # SWD read, so counter-rate math is immune to sample-loop scheduling jitter)
+    "perf_host_t",
     "perf_ctrl_exec_us_last", "perf_ctrl_exec_us_max",
     "perf_ctrl_period_us_max", "perf_ctrl_period_us_min",
     "perf_main_loop_us_max", "perf_loop_iters", "perf_zero_cross_count",
@@ -60,6 +62,8 @@ def make_row(t: float, segment: str, throttle_cmd: float,
         )
     if perf is not None:
         r = perf.raw
+        if perf.host_monotonic is not None:
+            row["perf_host_t"] = round(perf.host_monotonic, 6)
         row.update(
             perf_ctrl_exec_us_last=r["ctrl_exec_us_last"],
             perf_ctrl_exec_us_max=r["ctrl_exec_us_max"],

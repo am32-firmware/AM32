@@ -11,11 +11,9 @@ import time
 from typing import Callable
 
 from ..sim import MotorParams, RigSimulator
-from .base import SafetyLimits, StandSample, ThrustStand
+from .base import SafetyLimits, StandSafetyTripped, StandSample, ThrustStand
 
-
-class StandSafetyTripped(RuntimeError):
-    pass
+__all__ = ["SimulatedStand", "StandSafetyTripped"]
 
 
 class SimulatedStand(ThrustStand):
@@ -57,13 +55,8 @@ class SimulatedStand(ThrustStand):
         return sample
 
     def _check_limits(self, s: StandSample) -> None:
-        lim = self._limits
-        if lim.max_thrust_n is not None and s.thrust_n > lim.max_thrust_n:
-            raise StandSafetyTripped(f"thrust {s.thrust_n:.1f} N > limit")
-        if lim.max_current_a is not None and s.current_a > lim.max_current_a:
-            raise StandSafetyTripped(f"current {s.current_a:.1f} A > limit")
-        if lim.max_rpm is not None and s.rpm > lim.max_rpm:
-            raise StandSafetyTripped(f"rpm {s.rpm:.0f} > limit")
+        self._limits.check(thrust_n=s.thrust_n, current_a=s.current_a,
+                           rpm=s.rpm, voltage_v=s.voltage_v)
 
     def close(self) -> None:
         self._throttle = 0.0

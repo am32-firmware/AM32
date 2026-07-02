@@ -13,7 +13,13 @@ class BuildArtifacts:
     hex: Path
 
 
-def _find(obj_dir: Path, target: str, ext: str) -> Path | None:
+def find_artifact(obj_dir: Path, target: str, ext: str) -> Path | None:
+    """Newest ``obj/AM32_<target>_*.<ext>`` build artifact, or None.
+
+    The single place that knows the Makefile's artifact naming; RigConfig's
+    ELF resolution reuses it so the flashed binary and the parsed ELF can
+    never be picked by two different rules.
+    """
     hits = sorted(obj_dir.glob(f"AM32_{target}_*.{ext}"))
     return hits[-1] if hits else None
 
@@ -37,7 +43,7 @@ def build_firmware(repo_root: str | Path, target: str, *,
             f"firmware build failed (rc={proc.returncode}):\n"
             f"{proc.stdout[-2000:]}\n{proc.stderr[-2000:]}")
     obj = repo_root / "obj"
-    elf, binf, hexf = (_find(obj, target, e) for e in ("elf", "bin", "hex"))
+    elf, binf, hexf = (find_artifact(obj, target, e) for e in ("elf", "bin", "hex"))
     if elf is None or binf is None:
         raise RuntimeError(f"build produced no artifacts for {target} in {obj}")
     return BuildArtifacts(elf=elf, bin=binf, hex=hexf)

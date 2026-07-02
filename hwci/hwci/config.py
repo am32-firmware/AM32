@@ -1,15 +1,34 @@
-"""Rig and test-profile configuration (YAML-backed)."""
+"""Rig and test-profile configuration (YAML-backed).
+
+Rig configs from files are validated STRICTLY: unknown keys and unknown
+backend values are errors, and simulator backends are rejected in a rig file.
+A typo must never silently turn a hardware run into a simulated one (or drop a
+channel) while CI reports green - use the explicit ``--sim`` flag to simulate.
+"""
 from __future__ import annotations
 
+import dataclasses
 from dataclasses import dataclass, field
 from pathlib import Path
 
 import yaml
 
+from .build import find_artifact
+from .debugger.openocd import APP_LOAD_ADDR, DEFAULT_CONFIGS
 from .flightstand.base import SafetyLimits
 
 PROFILES_DIR = Path(__file__).parent / "profiles"
 DEFAULT_TARGET = "ARK_4IN1_F051"
+
+# Allowed backend values. "sim" entries are valid only for the built-in
+# default RigConfig (offline runs); load_rig() rejects them in a rig file.
+BACKEND_CHOICES: dict[str, set[str]] = {
+    "debugger_backend": {"openocd", "sim", "none"},
+    "telem_backend": {"serial", "sim", "none"},
+    "throttle_backend": {"flightstand", "external", "sim"},
+    "stand_backend": {"grpc", "sim", "none"},
+}
+_SIM_ONLY = {"sim"}
 
 
 @dataclass
@@ -34,6 +53,8 @@ class Profile:
     steady_tail_fraction: float = 0.5   # use last half of a steady segment
     demag_commutation_spike: float = 3.0  # x median commutation interval
     demag_rpm_drop_fraction: float = 0.25  # rpm fell >25% while throttle high
+    # Offline fallback only: on a rig the motor's pole pairs come from
+    # RigConfig (recorded into the run meta), not from the test profile.
     pole_pairs: int = 7
 
     @property
@@ -73,6 +94,16 @@ def profile_from_dict(d: dict) -> Profile:
     )
 
 
+def profile_to_dict(profile: Profile) -> dict:
+    """Serialize a Profile (inverse of :func:`profile_from_dict`).
+
+    Stored in each run's ``meta.json`` so a run directory is self-describing:
+    analysis re-uses the exact profile the run was made with, even if the
+    profile YAML changed since (or was a custom file path).
+    """
+    return dataclasses.asdict(profile)
+
+
 def load_profile(name_or_path: str) -> Profile:
     """Load a profile by built-in name (in profiles/) or by file path."""
     p = Path(name_or_path)
@@ -99,28 +130,28 @@ class RigConfig:
     obj_dir: str | None = None              # default <repo_root>/obj
     elf_path: str | None = None             # default: glob obj for the target
 
-    debugger_backend: str = "sim"           # "openocd" | "sim"
+    debugger_backend: str = "sim"           # "openocd" | "none" (| "sim" offline)
     openocd_configs: list[str] = field(
-        default_factory=lambda: ["interface/stlink.cfg", "target/stm32f0x.cfg"])
+        default_factory=lambda: list(DEFAULT_CONFIGS))
     openocd_search_dirs: list[str] = field(default_factory=list)
     openocd_bin: str = "openocd"
-    app_load_addr: int = 0x08001000
+    app_load_addr: int = APP_LOAD_ADDR
 
-    telem_backend: str = "sim"              # "serial" | "sim" | "none"
+    telem_backend: str = "sim"              # "serial" | "none" (| "sim" offline)
     telem_port: str = "/dev/ttyUSB0"
     telem_baud: int = 115200
 
-    throttle_backend: str = "sim"           # "flightstand" | "external" | "sim"
+    throttle_backend: str = "sim"           # "flightstand" | "external" (| "sim")
     throttle_port: str = "/dev/ttyACM0"
     throttle_baud: int = 115200
 
-    stand_backend: str = "sim"              # "grpc" | "sim"
+    stand_backend: str = "sim"              # "grpc" | "none" (| "sim" offline)
     stand_host: str = "127.0.0.1"
     stand_port: int = 50051
     stand_signals: dict = field(default_factory=dict)
 
     motor_name: str = "sim-motor"
-    pole_pairs: int = 7
+    pole_pairs: int = 7                     # the motor under test (authoritative)
     prop: str = "sim-prop"
 
     def resolved_obj_dir(self) -> Path:
@@ -129,16 +160,42 @@ class RigConfig:
     def resolved_elf(self) -> Path | None:
         if self.elf_path:
             return Path(self.elf_path)
-        hits = sorted(self.resolved_obj_dir().glob(f"AM32_{self.target}_*.elf"))
-        return hits[-1] if hits else None
+        return find_artifact(self.resolved_obj_dir(), self.target, "elf")
+
+    def validate(self, *, allow_sim_backends: bool = True) -> None:
+        for key, choices in BACKEND_CHOICES.items():
+            value = getattr(self, key)
+            if value not in choices:
+                raise ValueError(
+                    f"rig config: {key} = {value!r} is not one of "
+                    f"{sorted(choices)}")
+            if not allow_sim_backends and value in _SIM_ONLY:
+                raise ValueError(
+                    f"rig config: {key} = 'sim' is not allowed in a rig file; "
+                    "use a real backend or 'none' (or run with --sim for a "
+                    "fully simulated run)")
+        if self.throttle_backend == "flightstand" and self.stand_backend == "none":
+            raise ValueError(
+                "rig config: throttle_backend 'flightstand' needs a stand "
+                "(stand_backend 'grpc'); use throttle_backend 'external' on a "
+                "stand-less bench")
 
 
 def load_rig(path: str | None) -> RigConfig:
     if not path:
         return RigConfig()
     data = yaml.safe_load(Path(path).read_text()) or {}
+    known = {f.name for f in dataclasses.fields(RigConfig)}
+    unknown = sorted(set(data) - known)
+    if unknown:
+        raise ValueError(
+            f"rig config {path}: unknown key(s) {unknown}; "
+            f"valid keys: {sorted(known)}")
     cfg = RigConfig()
     for key, value in data.items():
-        if hasattr(cfg, key):
-            setattr(cfg, key, value)
+        setattr(cfg, key, value)
+    # A rig FILE describes hardware: simulator backends in it are almost
+    # certainly a typo'd or half-edited config, and silently simulating a
+    # "hardware" run is the worst possible failure mode.
+    cfg.validate(allow_sim_backends=False)
     return cfg

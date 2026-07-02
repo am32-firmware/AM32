@@ -134,7 +134,12 @@ class OpenOcdDebugger(Debugger):
         return struct.pack(f"<{nwords}I", *words[:nwords])[:length]
 
     def write_u32(self, addr: int, value: int) -> None:
-        self._rpc(f"mww 0x{addr:08x} 0x{value & 0xFFFFFFFF:08x}")
+        # OpenOCD reports failure IN-BAND: a successful mww replies with an
+        # empty string, a failed one with error text (no exception). Swallowing
+        # it would let e.g. a stats-reset silently no-op.
+        out = self._rpc(f"mww 0x{addr:08x} 0x{value & 0xFFFFFFFF:08x}")
+        if out.strip():
+            raise DebuggerError(f"mww 0x{addr:08x} failed: {out.strip()!r}")
 
     def reset_run(self) -> None:
         self._rpc("reset run")

@@ -7,7 +7,6 @@ description: >
   and conservative current/thrust cutoffs.
 sample_rate_hz: 200
 arm_settle_s: 2.0
-pole_pairs: 7
 demag_commutation_spike: 3.0
 demag_rpm_drop_fraction: 0.25
 

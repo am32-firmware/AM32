@@ -6,7 +6,6 @@ description: >
   motor. ~25 s.
 sample_rate_hz: 100
 arm_settle_s: 2.0
-pole_pairs: 7
 
 safety:
   max_current_a: 35.0

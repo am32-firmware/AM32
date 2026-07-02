@@ -46,15 +46,22 @@ def _loop_iter_rate(t: np.ndarray, iters: np.ndarray) -> np.ndarray:
 
 
 def _cpu_load(rows: list[dict]) -> tuple[np.ndarray, float]:
-    t = _col(rows, "t")
+    # Prefer the timestamp taken at the actual SWD read (perf_host_t) over the
+    # sample-loop schedule time: a host stall between ticks would otherwise
+    # attribute too many loop iterations to too little time and corrupt the
+    # rate for that sample.
+    t_host = _col(rows, "perf_host_t")
+    t = t_host if not np.all(np.isnan(t_host)) else _col(rows, "t")
     iters = _col(rows, "perf_loop_iters")
     throttle = _col(rows, "throttle_cmd")
     rate = _loop_iter_rate(t, iters)
+    # Median, not max: one glitched sample must not become the reference the
+    # whole run's load is scaled by.
     idle_mask = (throttle < 0.02) & ~np.isnan(rate)
     if idle_mask.any():
-        idle_rate = float(np.nanmax(rate[idle_mask]))
+        idle_rate = float(np.nanmedian(rate[idle_mask]))
     elif not np.all(np.isnan(rate)):
-        idle_rate = float(np.nanmax(rate))
+        idle_rate = float(np.nanmedian(rate))
     else:
         return np.full(len(rows), np.nan), float("nan")
     if idle_rate <= 0:
@@ -82,10 +89,15 @@ def compute(run: RunResult, profile: Profile) -> dict:
     thrust_gf = _col(rows, "stand_thrust_gf")
     current = _col(rows, "stand_current_a")
     eff = _col(rows, "stand_eff_gf_per_w")
+    stand_rpm = _col(rows, "stand_rpm")
+    stand_v = _col(rows, "stand_voltage_v")
+    stand_pw = _col(rows, "stand_elec_power_w")
     ctrl_exec = _col(rows, "perf_ctrl_exec_us_max")
     ctrl_pmax = _col(rows, "perf_ctrl_period_us_max")
     ctrl_pmin = _col(rows, "perf_ctrl_period_us_min")
     main_max = _col(rows, "perf_main_loop_us_max")
+    perf_iters = _col(rows, "perf_loop_iters")
+    esc_erpm = _col(rows, "esc_erpm")
 
     steady_points = []
     for s in profile.segments:
@@ -98,11 +110,11 @@ def compute(run: RunResult, profile: Profile) -> dict:
         steady_points.append({
             "segment": s.label,
             "throttle": s.throttle,
-            "rpm": round(_nanmean(_col(rows, "stand_rpm")[tail]), 1),
+            "rpm": round(_nanmean(stand_rpm[tail]), 1),
             "thrust_gf": round(_nanmean(thrust_gf[tail]), 2),
             "current_a": round(_nanmean(current[tail]), 3),
-            "voltage_v": round(_nanmean(_col(rows, "stand_voltage_v")[tail]), 3),
-            "elec_power_w": round(_nanmean(_col(rows, "stand_elec_power_w")[tail]), 2),
+            "voltage_v": round(_nanmean(stand_v[tail]), 3),
+            "elec_power_w": round(_nanmean(stand_pw[tail]), 2),
             "eff_gf_per_w": round(_nanmean(eff[tail]), 3),
             "ctrl_exec_us_max": _safe_max(ctrl_exec[tail]),
             "cpu_load_pct": round(_nanmean(load[tail]), 1),
@@ -123,6 +135,13 @@ def compute(run: RunResult, profile: Profile) -> dict:
         "idle_loop_rate_hz": round(idle_rate, 1) if idle_rate == idle_rate else None,
         "demag_events": demag["event_count"],
         "bemf_timeout_samples": demag["bemf_timeout_samples"],
+        # Channel liveness: how many samples each instrumentation channel
+        # actually delivered. The baseline gate fails a run whose coverage
+        # collapsed vs the baseline (dead SWD/telemetry/stand channel).
+        "n_samples": len(rows),
+        "perf_sample_count": int(np.count_nonzero(~np.isnan(perf_iters))),
+        "stand_sample_count": int(np.count_nonzero(~np.isnan(thrust_gf))),
+        "telem_sample_count": int(np.count_nonzero(~np.isnan(esc_erpm))),
     }
     return {"summary": summary, "steady_points": steady_points, "demag": demag}
 
@@ -134,7 +153,9 @@ def detect_demag(run: RunResult, profile: Profile) -> dict:
     bemf = _col(rows, "perf_bemf_timeout")
     stand_rpm = _col(rows, "stand_rpm")
     esc_erpm = _col(rows, "esc_erpm")
-    pp = profile.pole_pairs
+    # Pole pairs are a property of the rig's motor; the run meta records the
+    # rig value at run time. profile.pole_pairs is only the offline fallback.
+    pp = int(run.meta.get("pole_pairs") or profile.pole_pairs)
 
     running = throttle > 0.2
     comm_running = comm[running & ~np.isnan(comm) & (comm > 0)]
@@ -149,13 +170,40 @@ def detect_demag(run: RunResult, profile: Profile) -> dict:
         if not running[i]:
             continue
         anom = False
-        if bemf[i] == 1:
+        # bemf_timeout_happened is an incrementing counter in firmware (1, 2,
+        # ... latched at 102 under stuck-rotor protection), not a boolean.
+        if bemf[i] >= 1:
             bemf_samples += 1
             anom = True
         if comm[i] == comm[i] and comm[i] > spike_thr:
             spike_samples += 1
             anom = True
         flag[i] = anom
+
+    # Stand-RPM collapse while commanded throttle is high and steady: catches
+    # desyncs whose transient firmware flags fall between SWD samples. The
+    # reference is the running max RPM seen since the throttle last moved, so
+    # spool-up after a step never reads as a collapse.
+    rpm_drop_samples = 0
+    frac = profile.demag_rpm_drop_fraction
+    ref_rpm = float("nan")
+    for i in range(len(rows)):
+        high = throttle[i] == throttle[i] and throttle[i] > 0.5
+        steady_cmd = (i > 0 and throttle[i - 1] == throttle[i - 1]
+                      and abs(throttle[i] - throttle[i - 1]) < 0.02)
+        if not (high and steady_cmd):
+            ref_rpm = float("nan")
+            continue
+        r = stand_rpm[i]
+        if r != r:
+            continue
+        if ref_rpm != ref_rpm:
+            ref_rpm = r
+            continue
+        ref_rpm = max(ref_rpm, r)
+        if ref_rpm > 1000.0 and r < ref_rpm * (1.0 - frac):
+            rpm_drop_samples += 1
+            flag[i] = True
 
     # debounce contiguous flagged samples into events (close gaps <= 3)
     events = _events_from_flags(flag, max_gap=3)
@@ -174,6 +222,7 @@ def detect_demag(run: RunResult, profile: Profile) -> dict:
         "events": [{"start_idx": int(a), "end_idx": int(b)} for a, b in events],
         "bemf_timeout_samples": bemf_samples,
         "comm_spike_samples": spike_samples,
+        "rpm_drop_samples": rpm_drop_samples,
         "median_commutation_interval": round(median_comm, 1) if median_comm == median_comm else None,
         "esc_rpm_mismatch_samples": mismatch,
     }

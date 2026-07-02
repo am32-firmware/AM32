@@ -22,6 +22,14 @@ class ElfError(RuntimeError):
     pass
 
 
+class StructNotFoundError(ElfError):
+    """DWARF is present but the requested struct DIE is not.
+
+    Distinct from "no DWARF at all": callers that soft-skip the layout
+    cross-check when debug info is stripped must still HARD-FAIL here - a
+    renamed/dropped struct is exactly the drift the check exists to catch."""
+
+
 def _require_elftools() -> None:
     if not _HAVE_ELFTOOLS:
         raise ElfError(
@@ -89,7 +97,8 @@ def struct_layout(elf_path: str, type_name: str) -> list[Member]:
                 if name_attr.value.decode("utf-8", "replace") != type_name:
                     continue
                 return _members_of(die, cu)
-    raise ElfError(f"struct {type_name!r} not found in DWARF of {elf_path}")
+    raise StructNotFoundError(
+        f"struct {type_name!r} not found in DWARF of {elf_path}")
 
 
 def _members_of(struct_die, cu) -> list[Member]:

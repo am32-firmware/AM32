@@ -100,7 +100,10 @@ per-motor.
 * **Power**: bench supply or battery within the ARK 4IN1's 3–8S range; common
   ground between supply, ESC, stand, and host.
 * **Safety**: set conservative cutoffs in the profile `safety:` block (current,
-  thrust, RPM) — the stand enforces them and the run aborts on breach. Secure
+  thrust, RPM, voltage, temperature) — the **runner enforces them host-side on
+  every sample** (stand reading and ESC telemetry alike) and aborts the run on
+  breach. Also configure the Flight Stand Software's own UI cutoffs as an
+  independent second layer (the vendor set-limit RPC is not mapped yet). Secure
   the motor/prop; use a prop guard; keep clear during demag-stress runs.
 
 ## Software setup (Ubuntu 24.04)
@@ -130,7 +133,7 @@ Verify the harness with **no hardware** at any time:
 
 ```bash
 python -m hwci selftest          # runs ci_smoke in the built-in simulator
-python -m pytest                 # 39 offline tests
+python -m pytest                 # 71 offline tests
 ```
 
 ## Usage
@@ -167,18 +170,33 @@ hwci baseline-save runs/baseline --out baselines/ARK_4IN1_F051.json
 git add baselines/ARK_4IN1_F051.json && git commit -m "hwci: ARK 4IN1 baseline"
 ```
 
+A `--baseline` pointing at a file that doesn't exist yet prints a warning and
+skips the gate (instead of failing), so the very first CI run — including a
+`save_baseline` dispatch — can bootstrap the baseline itself.
+
 `runs/baseline/report.md` is your benchmark: thrust & efficiency per throttle,
 worst-case 20 kHz loop time, CPU load, and zero demag events on the swept ramp.
 Every later change is graded against it.
 
+The regression gate **fails closed**: a metric that is missing/NaN (dead SWD or
+telemetry channel, misconfigured backend) fails its check, and per-channel
+coverage checks (`perf_coverage`, `stand_coverage`, `telem_coverage`) name the
+dead channel explicitly. A green run therefore proves the instrumentation was
+alive, not just that nothing compared worse.
+
 ## CI integration
 
 `.github/workflows/hwci.yml` runs on a self-hosted runner labelled
-`[self-hosted, hwci]` wired to the rig. It triggers on manual dispatch (pick a
-profile) or when a maintainer adds the **`hw-test`** label to a PR, serializes
-hardware access with a concurrency group, posts `report.md` to the job summary,
-uploads the run data, and fails the job on regression. Set the repo/runner
-variable `HWCI_RIG_CONFIG` to the path of `rig.yaml` on the bench.
+`[self-hosted, hwci]` wired to the rig. It is **manual-dispatch only**: the rig
+needs hands-on preparation (battery connected/charged, prop and torque arm
+checked, Flight Stand Software running), so a human always starts the run —
+nothing triggers from pushes, PRs, or labels, and fork code never reaches the
+bench unless a maintainer explicitly enters a PR number in the dispatch form.
+Pick a profile (and optionally a PR number and `save_baseline`) in the form;
+the workflow serializes hardware access with a concurrency group, posts
+`report.md` to the job summary, uploads the run data, and fails the job on
+regression (exit 1) or abort (exit 2). Set the repo/runner variable
+`HWCI_RIG_CONFIG` to the path of `rig.yaml` on the bench.
 
 ## Repo layout
 
@@ -192,7 +210,7 @@ hwci/hwci/throttle/                flight-stand / external / base throttle sourc
 hwci/hwci/sim.py                   offline rig simulator (all 3 channels)
 hwci/hwci/runner.py metrics.py baseline.py report.py config.py cli.py
 hwci/hwci/profiles/*.yaml          test profiles
-hwci/tests/                        39 offline tests (sim + DWARF layout check)
+hwci/tests/                        71 offline tests (sim, DWARF layout, fail-closed gating)
 ```
 
 ## Honest limitations
@@ -202,8 +220,10 @@ hwci/tests/                        39 offline tests (sim + DWARF layout check)
   ship with the Flight Stand Software; confirm them in `_StubAdapter` on the
   bench. Everything else is backend-agnostic and the simulator exercises the
   whole pipeline today.
-* `HWCI_PERF` is validated for the STM32F0 (ARK 4IN1). The hooks are no-ops on
-  other targets unless ported (the timestamp source differs per MCU).
+* `HWCI_PERF` is validated for the STM32F0 (ARK 4IN1). The timestamp macro uses
+  the shared `get_timer_us16()` helper, so STM32/GigaDevice/Artery targets
+  compile with `HWCI_PERF=1`; NXP and WCH are `#error`-gated (no usable
+  free-running 1 µs timer). With the flag unset, every target is untouched.
 * CPU load is a statistical idle-residual figure, not a per-function profile
   (the M0 can't do PC sampling); it's stable and comparable run-to-run, which is
   what regression gating needs.

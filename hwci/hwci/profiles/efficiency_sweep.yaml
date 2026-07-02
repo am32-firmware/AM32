@@ -6,7 +6,6 @@ description: >
   primary efficiency + performance baseline.
 sample_rate_hz: 100
 arm_settle_s: 2.0
-pole_pairs: 7
 steady_tail_fraction: 0.5
 
 safety:

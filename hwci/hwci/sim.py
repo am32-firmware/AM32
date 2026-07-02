@@ -15,11 +15,10 @@ from __future__ import annotations
 
 import math
 import random
-import struct
 from dataclasses import dataclass, field
 
 from . import perf
-from .esc_telem.kiss import crc8
+from .esc_telem.kiss import encode_frame
 from .flightstand.base import StandSample
 
 
@@ -161,14 +160,13 @@ class RigSimulator:
         )
 
     def kiss_bytes(self) -> bytes:
-        temp = int(self.temp_c)
-        volt_cv = int(self.voltage * 100)
-        cur_ca = int(self.current * 100)
-        cons = int(self.consumption_mah) & 0xFFFF
-        erpm100 = int(self.e_rpm / 100) & 0xFFFF
-        body = struct.pack(">bHHHH", max(-128, min(127, temp)),
-                           volt_cv & 0xFFFF, cur_ca & 0xFFFF, cons, erpm100)
-        return body + bytes([crc8(body)])
+        return encode_frame(
+            temperature_c=int(self.temp_c),
+            voltage_cv=int(self.voltage * 100),
+            current_ca=int(self.current * 100),
+            consumption_mah=int(self.consumption_mah),
+            erpm100=int(self.e_rpm / 100),
+        )
 
     def perf_bytes(self) -> bytes:
         p = self.params
@@ -201,7 +199,10 @@ class RigSimulator:
             "armed": 1,
             "running": 1 if self.rpm > 100 else 0,
             "loop_iters": self.loop_iters & 0xFFFFFFFF,
-            "zero_cross_count": self.zero_cross_count & 0xFFFFFFFF,
+            # firmware clamps zero_crosses at 10000 (and resets it on
+            # desync/stop) - mirror the saturation so host logic tested
+            # against the sim cannot assume a monotonic counter
+            "zero_cross_count": min(self.zero_cross_count, 10000),
             "commutation_interval": comm_interval,
             "commutation_interval_max": self._commutation_max,
             "update_count": self.update_count & 0xFFFFFFFF,

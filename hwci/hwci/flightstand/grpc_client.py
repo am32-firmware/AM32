@@ -90,6 +90,14 @@ class _StubAdapter:
         raise NotImplementedError(
             "map _StubAdapter.read_signal() to your proto's sample RPC")
 
+    def read_signals(self, signal_ids: list[int]) -> dict[int, float]:
+        """Read several signals in ONE round-trip if the proto offers a
+        batched/streamed sample RPC - at 100-200 Hz sample rates, five
+        sequential unary calls per tick would blow the tick budget and read
+        thrust and current milliseconds apart (skewing efficiency math).
+        Falls back to per-signal reads until the batched RPC is mapped."""
+        return {sid: self.read_signal(sid) for sid in signal_ids}
+
     def set_output(self, output_id: int, value: float) -> None:
         raise NotImplementedError(
             "map _StubAdapter.set_output() to your proto's set-output RPC")
@@ -129,28 +137,32 @@ class FlightStandGrpc(ThrustStand):
         raw = s.esc_min + throttle * (s.esc_max - s.esc_min)
         self._api.set_output(s.esc_output, raw)
 
-    def _read(self, signal_id: int | None) -> float:
-        if signal_id is None:
-            return 0.0
-        return self._api.read_signal(signal_id)
-
     def read_sample(self) -> StandSample:
         s = self.signals
-        thrust = self._read(s.thrust)
+        wanted = [sid for sid in (s.thrust, s.torque, s.rpm, s.voltage, s.current)
+                  if sid is not None]
+        values = self._api.read_signals(wanted) if wanted else {}
+
+        def _get(signal_id: int | None) -> float:
+            return values.get(signal_id, 0.0) if signal_id is not None else 0.0
+
+        thrust = _get(s.thrust)
         thrust_n = thrust * G0 / 1000.0 if s.thrust_is_grams else thrust
         return StandSample(
             t=time.monotonic(),
             throttle=self._throttle,
             thrust_n=thrust_n,
-            torque_nm=self._read(s.torque),
-            rpm=self._read(s.rpm),
-            voltage_v=self._read(s.voltage),
-            current_a=self._read(s.current),
+            torque_nm=_get(s.torque),
+            rpm=_get(s.rpm),
+            voltage_v=_get(s.voltage),
+            current_a=_get(s.current),
         )
 
     def set_safety_limits(self, limits: SafetyLimits) -> None:
-        # The Flight Stand Software also enforces cutoffs configured in its UI;
-        # mirror critical ones here once the set-limit RPC is mapped.
+        # NOTE: this backend cannot enforce limits itself until the vendor
+        # set-limit RPC is mapped in _StubAdapter. Enforcement happens in the
+        # runner (hwci.runner.enforce_safety) against every sample; configure
+        # the Flight Stand Software's own UI cutoffs as a second layer.
         self._limits = limits
 
     def close(self) -> None:

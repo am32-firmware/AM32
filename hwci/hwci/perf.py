@@ -136,6 +136,10 @@ def decode(data: bytes, *, host_monotonic: float | None = None,
             raise PerfDecodeError(
                 f"struct version {raw['version']} != host-expected {VERSION}; "
                 "rebuild or update hwci/hwci/perf.py")
+        if raw["size"] != SIZE:
+            raise PerfDecodeError(
+                f"struct size {raw['size']} != host-expected {SIZE}; "
+                "firmware/host layout drift - rebuild or update hwci/hwci/perf.py")
     public = {k: raw[k] for k in _PUBLIC}
     return PerfSample(raw=public, host_monotonic=host_monotonic)
 

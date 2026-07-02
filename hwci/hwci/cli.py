@@ -9,6 +9,10 @@ Examples
   hwci baseline-save runs/sweep --out baselines/ARK_4IN1_F051.json
   hwci ci --profile ci_smoke --config rig.yaml \
           --baseline baselines/ARK_4IN1_F051.json --out runs/ci
+
+Mode selection: a run is SIMULATED only when ``--sim`` is passed or no
+``--config`` is given; a rig config always means hardware (and refuses
+simulator backends), so a typo can never silently gate simulated data.
 """
 from __future__ import annotations
 
@@ -22,7 +26,8 @@ from pathlib import Path
 from . import baseline as bl
 from . import metrics as metricsmod
 from . import report as reportmod
-from .config import RigConfig, list_profiles, load_profile, load_rig
+from .config import (Profile, RigConfig, list_profiles, load_profile,
+                     load_rig, profile_from_dict, profile_to_dict)
 from .model import RunResult
 from .runner import build_live_sources, build_sim_sources, run_profile
 
@@ -36,10 +41,16 @@ def _git_sha(repo_root: str) -> str | None:
         return None
 
 
-def _make_meta(rig: RigConfig, profile_name: str, extra: dict | None = None) -> dict:
+def _make_meta(rig: RigConfig, profile: Profile, mode: str,
+               extra: dict | None = None) -> dict:
     meta = {
         "target": rig.target,
-        "profile": profile_name,
+        "profile": profile.name,
+        # Full profile definition: the run dir stays analyzable even if the
+        # profile YAML changes later (or was a custom file path).
+        "profile_def": profile_to_dict(profile),
+        "mode": mode,  # "sim" | "hw" - shown in the report, never inferred later
+        "pole_pairs": rig.pole_pairs,
         "git_sha": _git_sha(rig.repo_root),
         "motor": rig.motor_name,
         "prop": rig.prop,
@@ -50,14 +61,73 @@ def _make_meta(rig: RigConfig, profile_name: str, extra: dict | None = None) -> 
     return meta
 
 
-def _use_sim(args, rig: RigConfig) -> bool:
-    return bool(getattr(args, "sim", False)) or rig.stand_backend == "sim"
+def _use_sim(args) -> bool:
+    """Simulation is explicit: --sim, or no rig config at all."""
+    return bool(getattr(args, "sim", False)) or not getattr(args, "config", None)
 
 
 def _default_out(profile_name: str, sim: bool) -> Path:
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     tag = "sim" if sim else "hw"
     return Path("runs") / f"{profile_name}-{tag}-{stamp}"
+
+
+def _profile_for(result: RunResult) -> Profile:
+    """The exact profile a run was made with (from meta), else by name."""
+    pd = result.meta.get("profile_def")
+    if pd:
+        return profile_from_dict(pd)
+    return load_profile(result.meta.get("profile", "ci_smoke"))
+
+
+def _load_baseline(path: str | None) -> dict | None:
+    if not path:
+        return None
+    p = Path(path)
+    if not p.exists():
+        print(f"WARNING: baseline {p} not found - skipping the regression "
+              "gate (bootstrap run? capture one with 'hwci baseline-save')",
+              file=sys.stderr)
+        return None
+    return bl.load_baseline(p)
+
+
+def _execute(rig: RigConfig, profile: Profile, sim: bool, *,
+             realtime: bool | None = None) -> RunResult:
+    """Build sources, run the profile, always close sources."""
+    sources = (build_sim_sources(rig, profile) if sim
+               else build_live_sources(rig, profile))
+    try:
+        return run_profile(
+            profile, sources,
+            realtime=(not sim) if realtime is None else realtime,
+            meta=_make_meta(rig, profile, "sim" if sim else "hw"))
+    finally:
+        sources.close()
+
+
+def _analyze_and_report(run_dir: Path, result: RunResult, profile: Profile,
+                        baseline_path: str | None, no_plots: bool):
+    """Compute metrics, write metrics.json + report.md, gate vs baseline."""
+    m = metricsmod.compute(result, profile)
+    (run_dir / "metrics.json").write_text(json.dumps(m, indent=2))
+    baseline = _load_baseline(baseline_path)
+    comparison = (bl.compare(m, baseline, current_meta=result.meta)
+                  if baseline is not None else None)
+    reportmod.write_report(run_dir, m, comparison, result.meta,
+                           plots=not no_plots)
+    return m, comparison
+
+
+def _verdict_rc(result: RunResult, comparison: dict | None) -> int:
+    """Exit code: 2 aborted (never trust the data), 1 gate FAIL, 0 PASS."""
+    if result.meta.get("aborted"):
+        print(f"ABORTED: {result.meta['aborted']}", file=sys.stderr)
+        return 2
+    if comparison is not None:
+        print("VERDICT:", "PASS" if comparison["passed"] else "FAIL")
+        return 0 if comparison["passed"] else 1
+    return 0
 
 
 # --------------------------------------------------------------------------
@@ -74,7 +144,7 @@ def cmd_selftest(args) -> int:
     sources = build_sim_sources(rig, profile, demag_prone=True)
     try:
         result = run_profile(profile, sources, realtime=False,
-                             meta=_make_meta(rig, profile.name))
+                             meta=_make_meta(rig, profile, "sim"))
     finally:
         sources.close()
     m = metricsmod.compute(result, profile)
@@ -114,29 +184,20 @@ def cmd_flash(args) -> int:
 
 
 def cmd_run(args) -> int:
-    rig = load_rig(args.config)
+    sim = _use_sim(args)
+    rig = load_rig(args.config) if args.config else RigConfig()
     profile = load_profile(args.profile)
-    sim = _use_sim(args, rig)
-    sources = (build_sim_sources(rig, profile) if sim
-               else build_live_sources(rig, profile))
-    try:
-        result = run_profile(profile, sources, realtime=args.realtime or not sim,
-                             meta=_make_meta(rig, profile.name))
-    finally:
-        sources.close()
+    result = _execute(rig, profile, sim,
+                      realtime=True if args.realtime else None)
     out = Path(args.out) if args.out else _default_out(profile.name, sim)
     result.save(out)
     print(f"saved {len(result.rows)} samples to {out}")
-    if result.meta.get("aborted"):
-        print(f"ABORTED: {result.meta['aborted']}", file=sys.stderr)
-        return 2
-    return 0
+    return _verdict_rc(result, None)
 
 
 def cmd_analyze(args) -> int:
     result = RunResult.load(args.run_dir)
-    profile = load_profile(result.meta.get("profile", "ci_smoke"))
-    m = metricsmod.compute(result, profile)
+    m = metricsmod.compute(result, _profile_for(result))
     (Path(args.run_dir) / "metrics.json").write_text(json.dumps(m, indent=2))
     print(json.dumps(m["summary"], indent=2))
     return 0
@@ -144,8 +205,7 @@ def cmd_analyze(args) -> int:
 
 def cmd_baseline_save(args) -> int:
     result = RunResult.load(args.run_dir)
-    profile = load_profile(result.meta.get("profile", "ci_smoke"))
-    m = metricsmod.compute(result, profile)
+    m = metricsmod.compute(result, _profile_for(result))
     out = args.out or f"baselines/{result.meta.get('target', 'unknown')}.json"
     bl.save_baseline(m, out, meta=result.meta)
     print(f"baseline saved to {out}")
@@ -154,60 +214,42 @@ def cmd_baseline_save(args) -> int:
 
 def cmd_report(args) -> int:
     result = RunResult.load(args.run_dir)
-    profile = load_profile(result.meta.get("profile", "ci_smoke"))
-    m = metricsmod.compute(result, profile)
-    comparison = None
-    if args.baseline:
-        comparison = bl.compare(m, bl.load_baseline(args.baseline))
-    path = reportmod.write_report(args.run_dir, m, comparison, result.meta,
-                                  plots=not args.no_plots)
-    print(f"report written to {path}")
-    if comparison is not None:
-        print("PASS" if comparison["passed"] else "FAIL")
-        return 0 if comparison["passed"] else 1
-    return 0
+    _, comparison = _analyze_and_report(
+        Path(args.run_dir), result, _profile_for(result),
+        args.baseline, args.no_plots)
+    print(f"report written to {Path(args.run_dir) / 'report.md'}")
+    return _verdict_rc(result, comparison)
 
 
 def cmd_ci(args) -> int:
-    rig = load_rig(args.config)
+    sim = _use_sim(args)
+    rig = load_rig(args.config) if args.config else RigConfig()
     profile = load_profile(args.profile)
-    sim = _use_sim(args, rig)
     out = Path(args.out) if args.out else _default_out(profile.name, sim)
 
     if not sim:
         from .build import build_firmware
-        from .debugger.openocd import OpenOcdDebugger
         arts = build_firmware(rig.repo_root, rig.target, hwci_perf=True,
                               arm_sdk_prefix=args.arm_sdk_prefix)
         if rig.debugger_backend == "openocd":
+            from .debugger.openocd import OpenOcdDebugger
             dbg = OpenOcdDebugger(rig.openocd_configs, openocd_bin=rig.openocd_bin,
                                   search_dirs=rig.openocd_search_dirs)
             dbg.flash(str(arts.bin), rig.app_load_addr)
             dbg.close()
+        else:
+            print("WARNING: debugger_backend is not 'openocd' - firmware was "
+                  "built but NOT flashed; testing whatever is on the target",
+                  file=sys.stderr)
         rig.elf_path = str(arts.elf)
 
-    sources = (build_sim_sources(rig, profile) if sim
-               else build_live_sources(rig, profile))
-    try:
-        result = run_profile(profile, sources, realtime=not sim,
-                             meta=_make_meta(rig, profile.name))
-    finally:
-        sources.close()
+    result = _execute(rig, profile, sim)
     result.save(out)
 
-    m = metricsmod.compute(result, profile)
-    (out / "metrics.json").write_text(json.dumps(m, indent=2))
-    comparison = bl.compare(m, bl.load_baseline(args.baseline)) if args.baseline else None
-    reportmod.write_report(out, m, comparison, result.meta, plots=not args.no_plots)
-
+    m, comparison = _analyze_and_report(out, result, profile,
+                                        args.baseline, args.no_plots)
     print(json.dumps(m["summary"], indent=2))
-    if result.meta.get("aborted"):
-        print(f"ABORTED: {result.meta['aborted']}", file=sys.stderr)
-        return 2
-    if comparison is not None:
-        print("VERDICT:", "PASS" if comparison["passed"] else "FAIL")
-        return 0 if comparison["passed"] else 1
-    return 0
+    return _verdict_rc(result, comparison)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -216,7 +258,8 @@ def build_parser() -> argparse.ArgumentParser:
     sub = p.add_subparsers(dest="cmd", required=True)
 
     def add_common(sp):
-        sp.add_argument("--config", help="rig config YAML (default: built-in sim)")
+        sp.add_argument("--config", help="rig config YAML (hardware run); "
+                                         "omit for the built-in simulator")
 
     sp = sub.add_parser("profiles", help="list test profiles")
     sp.set_defaults(func=cmd_profiles)

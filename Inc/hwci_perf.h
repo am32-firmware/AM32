@@ -15,14 +15,25 @@
  * When HWCI_PERF is NOT defined, every macro below expands to a no-op and no
  * struct or code is emitted - production builds are byte-for-byte unaffected.
  *
- * Timestamp source: UTILITY_TIMER (TIM17 on F0) runs free at 1 MHz, i.e. 1 us
- * per tick, 16-bit (wraps every 65.536 ms). All loop/ISR durations measured
- * here are far below the wrap period, so 16-bit unsigned subtraction is exact.
+ * Timestamp source: the free-running 1 MHz utility timer, read through
+ * get_timer_us16() (Inc/functions.h), which handles each vendor family's
+ * register layout. 16-bit (wraps every 65.536 ms); all loop/ISR durations
+ * measured here are far below the wrap period, so 16-bit unsigned subtraction
+ * is exact. Values recorded across a >65 ms blocking event (startup/arming
+ * tunes play with IRQs off inside the control loop) alias - the armed-edge
+ * reset below discards those before a run's measurements start.
  */
 #ifndef HWCI_PERF_H_
 #define HWCI_PERF_H_
 
 #ifdef HWCI_PERF
+
+#if defined(NXP) || defined(WCH)
+/* NXP has no free-running 1 MHz utility timer (get_timer_us16() returns 0).
+ * On WCH the utility timer doubles as INTERVAL_TIMER, which main.c zeroes at
+ * every zero-cross, so mid-measurement resets would corrupt every reading. */
+#error "HWCI_PERF is not supported on this MCU family (needs a free-running 1 MHz utility timer)"
+#endif
 
 #include <stdint.h>
 
@@ -69,12 +80,18 @@ typedef struct hwci_perf_s {
     uint8_t  _pad0;                    /* off 37 : alignment                */
     uint16_t _pad1;                    /* off 38 : align next u32 to off 40 */
 
-    /* --- monotonic counters (host differences these vs wall-clock) --- */
+    /* --- counters ---
+     * loop_iters is monotonic (the host differences it vs wall-clock for the
+     * idle-residual CPU-load estimate). zero_cross_count mirrors main.c's
+     * zero_crosses, which SATURATES at 10000 and resets on desync/stop - it
+     * is a diagnostic value, NOT a monotonic counter. update_count increments
+     * once per snapshot (every HWCI_PERF_SNAPSHOT_DIV main-loop iterations).
+     */
     uint32_t loop_iters;               /* off 40 : while(1) iterations      */
-    uint32_t zero_cross_count;         /* off 44 : zero_crosses mirror      */
+    uint32_t zero_cross_count;         /* off 44 : zero_crosses mirror (sat)*/
     uint32_t commutation_interval;     /* off 48 : raw, 0.5us units         */
     uint32_t commutation_interval_max; /* off 52 : worst-case (slowest)     */
-    uint32_t update_count;             /* off 56 : ++ each main-loop tick   */
+    uint32_t update_count;             /* off 56 : ++ each snapshot         */
     volatile uint32_t host_cmd;        /* off 60 : host writes, fw clears   */
 } hwci_perf_t;                         /* total size: 64 bytes              */
 
@@ -83,10 +100,15 @@ extern volatile hwci_perf_t hwci_perf;
 /* Apply a pending host_cmd (e.g. reset accumulators). Defined in hwci_perf.c. */
 void hwci_perf_apply_cmd(void);
 
+/* Clear the sticky min/max accumulators (host command, and automatically on
+ * the armed 0->1 edge to discard aliased values recorded while the arming
+ * tune blocked the control loop). Defined in hwci_perf.c. */
+void hwci_perf_reset_stats(void);
+
 /* 16-bit microsecond timestamp from the free-running utility timer. Macro (not
- * inline) so it is only evaluated where the device headers / UTILITY_TIMER are
- * already in scope. */
-#define HWCI_NOW_US() ((uint16_t)(UTILITY_TIMER->CNT))
+ * inline) so it is only evaluated where Inc/functions.h is already included
+ * (the struct definition above stays compilable on a host compiler). */
+#define HWCI_NOW_US() get_timer_us16()
 
 /*
  * Control-loop (tenKhzRoutine, 20 kHz) instrumentation. ENTER at the very top,
@@ -117,16 +139,31 @@ void hwci_perf_apply_cmd(void);
 
 /*
  * Background-loop instrumentation. Call once at the top of the main while(1).
- * Measures iteration time, counts iterations (the host derives CPU load from
- * the iteration rate vs an idle baseline), snapshots live state, and services
- * host commands. The snapshot references main.c globals, so this macro must be
- * expanded where those globals are in scope (i.e. in main()).
+ *
+ * Every iteration: measures iteration time and counts iterations (the host
+ * derives CPU load from the iteration rate vs an idle baseline), so the two
+ * hot signals stay exact.
+ *
+ * Every HWCI_PERF_SNAPSHOT_DIV-th iteration only: snapshots live state and
+ * services host commands. The host samples the struct at <= 200 Hz while the
+ * main loop runs at ~100 kHz, so refreshing the snapshot every iteration would
+ * burn ~10-15% of the core's spare cycles on stores that are overwritten
+ * unread - and, worse, depress the idle loop_iters rate that IS the CPU-load
+ * reference. At DIV=64 the snapshot is never staler than ~1 ms.
+ *
+ * The snapshot references main.c globals, so this macro must be expanded
+ * where those globals are in scope (i.e. in main()). ISR-written globals are
+ * cached into a local before use so the compare and the store can't see two
+ * different values (a torn read would let the sticky max go backwards).
  */
+#define HWCI_PERF_SNAPSHOT_DIV 64u
+
 #define HWCI_PERF_MAIN_LOOP()                                                  \
     do {                                                                       \
         uint16_t _n = HWCI_NOW_US();                                           \
         static uint16_t _hwci_main_last;                                       \
         static uint8_t  _hwci_main_init;                                       \
+        static uint8_t  _hwci_prev_armed;                                      \
         if (_hwci_main_init) {                                                 \
             uint16_t _d = (uint16_t)(_n - _hwci_main_last);                    \
             hwci_perf.main_loop_us_last = _d;                                  \
@@ -135,21 +172,28 @@ void hwci_perf_apply_cmd(void);
         _hwci_main_last = _n;                                                  \
         _hwci_main_init = 1;                                                   \
         hwci_perf.loop_iters++;                                                \
-        hwci_perf.input = input;                                               \
-        hwci_perf.duty_cycle = duty_cycle;                                     \
-        hwci_perf.e_rpm = e_rpm;                                               \
-        hwci_perf.voltage_cv = battery_voltage;                                \
-        hwci_perf.current_ca = actual_current;                                 \
-        hwci_perf.temperature_c = degrees_celsius;                            \
-        hwci_perf.bemf_timeout_state = (uint8_t)bemf_timeout_happened;         \
-        hwci_perf.armed = (uint8_t)armed;                                      \
-        hwci_perf.running = (uint8_t)running;                                  \
-        hwci_perf.zero_cross_count = zero_crosses;                            \
-        hwci_perf.commutation_interval = commutation_interval;                \
-        if (commutation_interval > hwci_perf.commutation_interval_max)         \
-            hwci_perf.commutation_interval_max = commutation_interval;         \
-        hwci_perf.update_count++;                                              \
-        if (hwci_perf.host_cmd != HWCI_CMD_NONE) hwci_perf_apply_cmd();        \
+        if ((hwci_perf.loop_iters & (HWCI_PERF_SNAPSHOT_DIV - 1u)) == 0u) {    \
+            uint32_t _ci = commutation_interval;                               \
+            uint8_t _armed = (uint8_t)armed;                                   \
+            hwci_perf.input = input;                                           \
+            hwci_perf.duty_cycle = duty_cycle;                                 \
+            hwci_perf.e_rpm = e_rpm;                                           \
+            hwci_perf.voltage_cv = battery_voltage;                            \
+            hwci_perf.current_ca = actual_current;                             \
+            hwci_perf.temperature_c = degrees_celsius;                         \
+            hwci_perf.bemf_timeout_state = (uint8_t)bemf_timeout_happened;     \
+            hwci_perf.armed = _armed;                                          \
+            hwci_perf.running = (uint8_t)running;                              \
+            hwci_perf.zero_cross_count = zero_crosses;                         \
+            hwci_perf.commutation_interval = _ci;                              \
+            if (_ci > hwci_perf.commutation_interval_max)                      \
+                hwci_perf.commutation_interval_max = _ci;                      \
+            if (_armed && !_hwci_prev_armed)                                   \
+                hwci_perf_reset_stats(); /* drop aliased arming-tune maxima */ \
+            _hwci_prev_armed = _armed;                                         \
+            hwci_perf.update_count++;                                          \
+            if (hwci_perf.host_cmd != HWCI_CMD_NONE) hwci_perf_apply_cmd();    \
+        }                                                                      \
     } while (0)
 
 #else /* !HWCI_PERF - all hooks vanish, no struct, no code */

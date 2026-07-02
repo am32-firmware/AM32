@@ -16,6 +16,10 @@ from dataclasses import dataclass
 G0 = 9.80665  # standard gravity, m/s^2
 
 
+class StandSafetyTripped(RuntimeError):
+    """A profile safety limit was breached; the run must abort immediately."""
+
+
 @dataclass
 class StandSample:
     t: float            # host monotonic timestamp, seconds
@@ -52,12 +56,40 @@ class StandSample:
 
 @dataclass
 class SafetyLimits:
-    """Cutoffs the stand enforces; a breach aborts the test immediately."""
+    """Cutoffs enforced host-side by the runner on every sample (see
+    :func:`hwci.runner.enforce_safety`); a breach aborts the test immediately.
+    Backends may ALSO enforce them (the simulator does; the vendor Flight
+    Stand Software has its own UI cutoffs), but the runner check is the one
+    that is guaranteed to exist on every rig."""
     max_thrust_n: float | None = None
     max_current_a: float | None = None
     max_rpm: float | None = None
     max_voltage_v: float | None = None
     max_motor_temp_c: float | None = None
+
+    def check(self, *, thrust_n: float | None = None,
+              current_a: float | None = None, rpm: float | None = None,
+              voltage_v: float | None = None,
+              temp_c: float | None = None) -> None:
+        """Raise :class:`StandSafetyTripped` if any provided value exceeds
+        its limit. ``None`` values (channel not available) are skipped."""
+        def _over(value, limit):
+            return value is not None and limit is not None and value > limit
+        if _over(thrust_n, self.max_thrust_n):
+            raise StandSafetyTripped(
+                f"thrust {thrust_n:.2f} N > limit {self.max_thrust_n:.2f} N")
+        if _over(current_a, self.max_current_a):
+            raise StandSafetyTripped(
+                f"current {current_a:.1f} A > limit {self.max_current_a:.1f} A")
+        if _over(rpm, self.max_rpm):
+            raise StandSafetyTripped(
+                f"rpm {rpm:.0f} > limit {self.max_rpm:.0f}")
+        if _over(voltage_v, self.max_voltage_v):
+            raise StandSafetyTripped(
+                f"voltage {voltage_v:.2f} V > limit {self.max_voltage_v:.2f} V")
+        if _over(temp_c, self.max_motor_temp_c):
+            raise StandSafetyTripped(
+                f"temp {temp_c:.0f} C > limit {self.max_motor_temp_c:.0f} C")
 
 
 class ThrustStand(abc.ABC):

@@ -22,16 +22,30 @@ from dataclasses import dataclass
 from typing import Iterator
 
 FRAME_LEN = 10
-DEFAULT_BAUD = 115200
+
+
+def _crc8_table() -> bytes:
+    table = bytearray(256)
+    for byte in range(256):
+        crc = byte
+        for _ in range(8):
+            crc = ((crc << 1) ^ 0x07) & 0xFF if crc & 0x80 else (crc << 1) & 0xFF
+        table[byte] = crc
+    return bytes(table)
+
+
+_CRC8_TABLE = _crc8_table()
 
 
 def crc8(data: bytes) -> int:
-    """BLHeli/KISS CRC-8 (poly 0x07, init 0x00), matching Src/functions.c."""
+    """BLHeli/KISS CRC-8 (poly 0x07, init 0x00), matching Src/functions.c.
+
+    Table-driven: the streaming framer runs this once per byte-slide when
+    resynchronising on a noisy line, so the bitwise loop would burn a core.
+    """
     crc = 0
     for byte in data:
-        crc ^= byte
-        for _ in range(8):
-            crc = ((crc << 1) ^ 0x07) & 0xFF if crc & 0x80 else (crc << 1) & 0xFF
+        crc = _CRC8_TABLE[crc ^ byte]
     return crc
 
 
@@ -64,6 +78,19 @@ def parse_frame(data: bytes) -> KissFrame:
     )
 
 
+def encode_frame(*, temperature_c: int, voltage_cv: int, current_ca: int,
+                 consumption_mah: int, erpm100: int) -> bytes:
+    """Build one CRC'd 10-byte frame (inverse of :func:`parse_frame`).
+
+    The single owner of the wire layout for producers (simulator, tests) so
+    an encoder can never drift from the parser."""
+    body = struct.pack(">bHHHH",
+                       max(-128, min(127, temperature_c)),
+                       voltage_cv & 0xFFFF, current_ca & 0xFFFF,
+                       consumption_mah & 0xFFFF, erpm100 & 0xFFFF)
+    return body + bytes([crc8(body)])
+
+
 class KissStream:
     """Incremental framer for the KISS byte stream.
 
@@ -79,28 +106,14 @@ class KissStream:
         self._buf.extend(data)
         while len(self._buf) >= FRAME_LEN:
             window = bytes(self._buf[:FRAME_LEN])
-            frame = parse_frame(window)
-            if frame.crc_ok:
+            # CRC first: on a misaligned/noisy line the framer slides one byte
+            # at a time, and unpacking + constructing a KissFrame per slide
+            # would dominate the telemetry thread.
+            if crc8(window[:FRAME_LEN - 1]) == window[FRAME_LEN - 1]:
                 del self._buf[:FRAME_LEN]
-                yield frame
+                yield parse_frame(window)
             else:
                 del self._buf[:1]  # resync
 
     def reset(self) -> None:
         self._buf.clear()
-
-
-def read_frames(port: str, baud: int = DEFAULT_BAUD, timeout: float = 0.1):
-    """Yield :class:`KissFrame` objects from a serial ``port`` forever.
-
-    Requires ``pyserial``. Intended to run in a background thread inside the
-    runner.
-    """
-    import serial  # local import: only needed on the rig
-
-    stream = KissStream()
-    with serial.Serial(port, baud, timeout=timeout) as ser:
-        while True:
-            chunk = ser.read(64)
-            if chunk:
-                yield from stream.feed(chunk)

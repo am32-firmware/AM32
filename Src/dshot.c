@@ -48,7 +48,6 @@ char EDT_ARM_ENABLE = 0;
 char EDT_ARMED = 0;
 int shift_amount = 0;
 volatile uint32_t gcrnumber;
-extern int zero_crosses;
 extern volatile char send_telemetry;
 extern uint8_t max_duty_cycle_change;
 int dshot_full_number;

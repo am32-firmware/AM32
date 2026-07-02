@@ -41,9 +41,64 @@ def test_efficiency_regression_fails():
 def test_loop_time_regression_fails():
     m = _metrics()
     base = {"metrics": copy.deepcopy(m)}
-    m["summary"]["worst_ctrl_exec_us"] = 48  # over the 45us absolute cap
+    # Well past both the +15% and the +45us absolute slack.
+    m["summary"]["worst_ctrl_exec_us_steady"] = (
+        base["metrics"]["summary"]["worst_ctrl_exec_us_steady"] + 100)
     result = bl.compare(m, base)
     assert not result["passed"]
+
+
+def test_loop_time_gate_prefers_steady_key():
+    m = _metrics()
+    base = {"metrics": copy.deepcopy(m)}
+    # A start-transient spike in the raw run-max must NOT fail the gate when
+    # the steady-window value is unchanged (observed 705 vs 950us run-to-run).
+    m["summary"]["worst_ctrl_exec_us"] = 950
+    result = bl.compare(m, base)
+    assert result["passed"]
+
+
+def test_loop_time_gate_falls_back_without_steady_key():
+    m = _metrics()
+    base = {"metrics": copy.deepcopy(m)}
+    del base["metrics"]["summary"]["worst_ctrl_exec_us_steady"]
+    m["summary"]["worst_ctrl_exec_us"] = (
+        base["metrics"]["summary"]["worst_ctrl_exec_us"] + 100)
+    result = bl.compare(m, base)
+    assert not result["passed"]
+
+
+def test_loop_time_equality_passes():
+    # A baseline must pass against itself even with large absolute values
+    # (950us start transients failed the old <=45us absolute-cap semantics).
+    m = _metrics()
+    base = {"metrics": copy.deepcopy(m)}
+    for k in ("worst_ctrl_exec_us", "worst_ctrl_exec_us_steady"):
+        base["metrics"]["summary"][k] = 950
+        m["summary"][k] = 950
+    assert bl.compare(m, base)["passed"]
+
+
+def test_negative_efficiency_equality_passes():
+    # Naive percent math fails an identical negative value against itself.
+    assert bl._worse_is_lower(-1.0, -1.0, 3.0)
+    assert not bl._worse_is_lower(-1.0, -1.06, 3.0)  # real 6% worsening fails
+    assert bl._worse_is_lower(9.0, 8.8, 3.0)         # positive within 3%
+
+
+def test_noprop_efficiency_noise_not_gated():
+    m = _metrics()
+    base = {"metrics": copy.deepcopy(m)}
+    # No-prop rig: baseline g/W is noise around zero; must not gate at all.
+    base["metrics"]["summary"]["peak_efficiency_gf_per_w"] = -0.218
+    m["summary"]["peak_efficiency_gf_per_w"] = 0.3  # different noise, still ok
+    for p in base["metrics"]["steady_points"]:
+        p["eff_gf_per_w"] = -0.1
+    for p in m["steady_points"]:
+        p["eff_gf_per_w"] = 0.2
+    result = bl.compare(m, base)
+    assert result["passed"]
+    assert any("not gated" in c["note"] for c in result["checks"])
 
 
 def test_new_demag_fails():
@@ -69,10 +124,10 @@ def test_save_and_load(tmp_path):
 def test_missing_current_metric_fails():
     m = _metrics()
     base = {"metrics": copy.deepcopy(m)}
-    m["summary"]["worst_ctrl_exec_us"] = None  # dead perf channel
+    m["summary"]["worst_ctrl_exec_us_steady"] = None  # dead perf channel
     result = bl.compare(m, base)
     assert not result["passed"]
-    assert any(c["name"] == "worst_ctrl_exec_us" and not c["pass"]
+    assert any(c["name"] == "worst_ctrl_exec_us_steady" and not c["pass"]
                for c in result["checks"])
 
 

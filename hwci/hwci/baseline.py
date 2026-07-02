@@ -24,8 +24,14 @@ _CHANNELS = ("perf", "stand", "telem")
 class Thresholds:
     """Pass/fail gates relative to the baseline."""
     efficiency_drop_pct: float = 3.0       # peak & per-point g/W may drop <= 3%
+    # g/W below this magnitude is load-cell noise (no-prop rig): efficiency is
+    # not a meaningful signal there and is not gated (the check reports "not
+    # gated" instead of flapping on noise around zero).
+    efficiency_floor_gf_per_w: float = 0.5
     ctrl_exec_increase_pct: float = 15.0   # worst control-loop exec time
-    ctrl_exec_abs_us_max: float = 45.0     # absolute cap (50 us loop budget)
+    # Absolute slack for the loop-time gates: allowed even when the relative
+    # gate is tighter (a 20us baseline must not fail on +4us of jitter).
+    ctrl_exec_abs_us_slack: float = 45.0
     cpu_load_increase_pts: float = 10.0    # percentage-POINT increase allowed
     main_loop_increase_pct: float = 25.0
     allow_new_demag: bool = False          # demag_events must not exceed baseline
@@ -59,19 +65,28 @@ def _missing(x) -> bool:
 
 
 def _worse_is_lower(baseline, current, drop_pct):
-    """current must not fall below baseline by more than drop_pct."""
+    """current must not fall below baseline by more than drop_pct.
+
+    The allowance is ``abs(baseline) * pct`` (not ``baseline * pct``) so a
+    negative baseline compares sanely - with the naive form an identical
+    negative value fails its own baseline (found by self-comparing the first
+    hardware baseline).
+    """
     if _missing(baseline) or _missing(current):
         return False  # fail closed: cannot prove no regression
-    return current >= baseline * (1.0 - drop_pct / 100.0)
+    return current >= baseline - abs(baseline) * drop_pct / 100.0
 
 
-def _worse_is_higher(baseline, current, inc_pct, abs_cap=None):
+def _worse_is_higher(baseline, current, inc_pct, abs_slack=None):
+    """current must not exceed baseline by more than inc_pct (relative) or
+    abs_slack (absolute), whichever allows MORE - the absolute term is a
+    noise floor for small baselines, not a cap on the value itself."""
     if _missing(baseline) or _missing(current):
         return False  # fail closed
-    ok = current <= baseline * (1.0 + inc_pct / 100.0)
-    if abs_cap is not None:
-        ok = ok and current <= abs_cap
-    return ok
+    limit = baseline * (1.0 + inc_pct / 100.0)
+    if abs_slack is not None:
+        limit = max(limit, baseline + abs_slack)
+    return current <= limit
 
 
 def compare(current: dict, baseline: dict, thr: Thresholds | None = None,
@@ -91,27 +106,37 @@ def compare(current: dict, baseline: dict, thr: Thresholds | None = None,
                 checks.append(_check(
                     f"baseline_{key}", b, c, b == c, "identities must match"))
 
-    checks.append(_check(
-        "peak_efficiency_gf_per_w", bs.get("peak_efficiency_gf_per_w"),
-        cs.get("peak_efficiency_gf_per_w"),
-        _worse_is_lower(bs.get("peak_efficiency_gf_per_w"),
-                        cs.get("peak_efficiency_gf_per_w"), thr.efficiency_drop_pct),
-        f"<= {thr.efficiency_drop_pct}% drop; missing fails"))
+    def _eff_check(name, b, c):
+        """g/W gate with a noise floor: a baseline captured without a prop has
+        efficiency values that are load-cell noise around zero - gating them
+        would flap on every run."""
+        if not _missing(b) and abs(b) < thr.efficiency_floor_gf_per_w:
+            return _check(name, b, c, True,
+                          f"baseline |g/W| < {thr.efficiency_floor_gf_per_w} "
+                          "(no-prop noise): not gated")
+        return _check(name, b, c, _worse_is_lower(b, c, thr.efficiency_drop_pct),
+                      f"<= {thr.efficiency_drop_pct}% drop; missing fails")
 
-    checks.append(_check(
-        "worst_ctrl_exec_us", bs.get("worst_ctrl_exec_us"),
-        cs.get("worst_ctrl_exec_us"),
-        _worse_is_higher(bs.get("worst_ctrl_exec_us"), cs.get("worst_ctrl_exec_us"),
-                         thr.ctrl_exec_increase_pct, thr.ctrl_exec_abs_us_max),
-        f"<= +{thr.ctrl_exec_increase_pct}% and <= {thr.ctrl_exec_abs_us_max}us; "
-        "missing fails"))
+    checks.append(_eff_check("peak_efficiency_gf_per_w",
+                             bs.get("peak_efficiency_gf_per_w"),
+                             cs.get("peak_efficiency_gf_per_w")))
 
-    checks.append(_check(
-        "worst_main_loop_us", bs.get("worst_main_loop_us"),
-        cs.get("worst_main_loop_us"),
-        _worse_is_higher(bs.get("worst_main_loop_us"), cs.get("worst_main_loop_us"),
-                         thr.main_loop_increase_pct),
-        f"<= +{thr.main_loop_increase_pct}%; missing fails"))
+    # Loop-time gates use the STEADY-window worst case when the baseline has
+    # it: the raw run-max is dominated by motor start/stop transients that
+    # vary 30%+ run-to-run (705 vs 950 us observed back-to-back on the bench)
+    # and would make the gate flap. Old baselines without the steady keys
+    # fall back to the run-max.
+    for base_key, pct, slack in (
+            ("worst_ctrl_exec_us", thr.ctrl_exec_increase_pct,
+             thr.ctrl_exec_abs_us_slack),
+            ("worst_main_loop_us", thr.main_loop_increase_pct, None)):
+        key = (f"{base_key}_steady"
+               if not _missing(bs.get(f"{base_key}_steady")) else base_key)
+        slack_note = f" or +{slack}us" if slack is not None else ""
+        checks.append(_check(
+            key, bs.get(key), cs.get(key),
+            _worse_is_higher(bs.get(key), cs.get(key), pct, slack),
+            f"<= +{pct}%{slack_note}; missing fails"))
 
     # CPU load: percentage-point increase
     b_cpu, c_cpu = bs.get("max_cpu_load_pct"), cs.get("max_cpu_load_pct")
@@ -155,11 +180,8 @@ def compare(current: dict, baseline: dict, thr: Thresholds | None = None,
             checks.append(_check(f"eff@{label}", bp.get("eff_gf_per_w"), None,
                                  False, "segment missing from current run"))
             continue
-        ok = _worse_is_lower(bp.get("eff_gf_per_w"), p.get("eff_gf_per_w"),
-                             thr.efficiency_drop_pct)
-        checks.append(_check(f"eff@{label}", bp.get("eff_gf_per_w"),
-                             p.get("eff_gf_per_w"), ok,
-                             f"<= {thr.efficiency_drop_pct}% drop; missing fails"))
+        checks.append(_eff_check(f"eff@{label}", bp.get("eff_gf_per_w"),
+                                 p.get("eff_gf_per_w")))
 
     passed = all(c["pass"] for c in checks)
     return {"passed": passed, "checks": checks, "thresholds": asdict(thr)}

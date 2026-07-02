@@ -46,6 +46,12 @@ class SignalMap:
     rpm: int | None = 15
     voltage: int | None = 6
     current: int | None = 8
+    # Optional temperature channels. Values may be an InputType enum int, or
+    # a string: an input resource name ("/boards/COM3/inputs/29", stable per
+    # board) or a raw signal name ("/signals/37", renumbers on reconnect -
+    # prefer the input name).
+    motor_temp: int | str | None = None
+    fet_temp: int | str | None = None
     # Output (actuator) used to command throttle, and its raw range.
     esc_output: int = 0
     esc_min: float = 1000.0   # raw value of the LOWEST real throttle step
@@ -63,6 +69,10 @@ class SignalMap:
 
 G0 = 9.80665
 RADS_TO_RPM = 60.0 / (2.0 * math.pi)
+
+
+def _k_to_c(kelvin: float | None) -> float | None:
+    return kelvin - 273.15 if kelvin is not None else None
 
 
 class _StubAdapter:
@@ -135,10 +145,12 @@ class _StubAdapter:
         ins = self._stub.ListInputs(self._pb2.ListInputsRequest(),
                                     timeout=self.RPC_TIMEOUT_S).inputs
         self._sig_by_type = {}
+        self._sig_by_input_name = {}
         for i in ins:
             # First input of each type wins, matching the vendor helper's
             # find_input_by_type().
             self._sig_by_type.setdefault(int(i.input_type), i.signal_name)
+            self._sig_by_input_name[i.name] = i.signal_name
 
         outs = self._stub.ListOutputs(self._pb2.ListOutputsRequest(),
                                       timeout=self.RPC_TIMEOUT_S).outputs
@@ -154,18 +166,30 @@ class _StubAdapter:
         """InputType -> signal_name map discovered at connect (diagnostics)."""
         return dict(self._sig_by_type)
 
-    def read_signal(self, signal_id: int) -> float:
+    def _resolve(self, sid) -> str | None:
+        """Channel id -> signal name. int = InputType enum; str = input
+        resource name (preferred, stable) or raw /signals/N name."""
+        if isinstance(sid, str):
+            if sid.startswith("/signals/"):
+                return sid
+            return self._sig_by_input_name.get(sid)
+        return self._sig_by_type.get(sid)
+
+    def read_signal(self, signal_id) -> float:
         return self.read_signals([signal_id]).get(signal_id, 0.0)
 
-    def read_signals(self, signal_ids: list[int]) -> dict[int, float]:
-        """Latest value for each wanted InputType in ONE round trip.
+    def read_signals(self, signal_ids: list) -> dict:
+        """Latest value for each wanted channel in ONE round trip.
 
         ``ListSamples`` returns the most recent sample of every signal;
         inactive samples (sensor off/disconnected) are omitted so the
         caller's 0.0 default and the coverage gate see a dead channel.
         """
-        wanted = {self._sig_by_type[t]: t for t in signal_ids
-                  if t in self._sig_by_type}
+        wanted = {}
+        for sid in signal_ids:
+            name = self._resolve(sid)
+            if name is not None:
+                wanted[name] = sid
         if not wanted:
             return {}
         resp = self._stub.ListSamples(self._pb2.ListSamplesRequest(),
@@ -240,11 +264,12 @@ class FlightStandGrpc(ThrustStand):
 
     def read_sample(self) -> StandSample:
         s = self.signals
-        wanted = [sid for sid in (s.thrust, s.torque, s.rpm, s.voltage, s.current)
+        wanted = [sid for sid in (s.thrust, s.torque, s.rpm, s.voltage,
+                                  s.current, s.motor_temp, s.fet_temp)
                   if sid is not None]
         values = self._api.read_signals(wanted) if wanted else {}
 
-        def _get(signal_id: int | None) -> float:
+        def _get(signal_id) -> float:
             return values.get(signal_id, 0.0) if signal_id is not None else 0.0
 
         thrust = _get(s.thrust)
@@ -260,6 +285,11 @@ class FlightStandGrpc(ThrustStand):
             rpm=rpm,
             voltage_v=_get(s.voltage),
             current_a=_get(s.current),
+            # None (not 0.0) when unmapped/inactive: a dead temp probe must
+            # read as missing, not as a freezing motor. The API is strict SI,
+            # so temperatures arrive in Kelvin.
+            motor_temp_c=_k_to_c(values.get(s.motor_temp)) if s.motor_temp is not None else None,
+            fet_temp_c=_k_to_c(values.get(s.fet_temp)) if s.fet_temp is not None else None,
         )
 
     def set_safety_limits(self, limits: SafetyLimits) -> None:

@@ -92,6 +92,8 @@ def compute(run: RunResult, profile: Profile) -> dict:
     stand_rpm = _col(rows, "stand_rpm")
     stand_v = _col(rows, "stand_voltage_v")
     stand_pw = _col(rows, "stand_elec_power_w")
+    motor_temp = _col(rows, "stand_motor_temp_c")
+    fet_temp = _col(rows, "stand_fet_temp_c")
     ctrl_exec = _col(rows, "perf_ctrl_exec_us_max")
     ctrl_pmax = _col(rows, "perf_ctrl_period_us_max")
     ctrl_pmin = _col(rows, "perf_ctrl_period_us_min")
@@ -117,7 +119,10 @@ def compute(run: RunResult, profile: Profile) -> dict:
             "elec_power_w": round(_nanmean(stand_pw[tail]), 2),
             "eff_gf_per_w": round(_nanmean(eff[tail]), 3),
             "ctrl_exec_us_max": _safe_max(ctrl_exec[tail]),
+            "main_loop_us_max": _safe_max(main_max[tail]),
             "cpu_load_pct": round(_nanmean(load[tail]), 1),
+            "motor_temp_c": round(_nanmean(motor_temp[tail]), 2),
+            "fet_temp_c": round(_nanmean(fet_temp[tail]), 2),
         })
 
     demag = detect_demag(run, profile)
@@ -128,13 +133,25 @@ def compute(run: RunResult, profile: Profile) -> dict:
         "peak_efficiency_gf_per_w": round(
             max((p["eff_gf_per_w"] for p in steady_points), default=float("nan")), 3),
         "worst_ctrl_exec_us": _safe_max(ctrl_exec),
+        # Steady-window worst case: the runner resets the firmware's sticky
+        # accumulators at each steady tail, so these exclude motor start/stop
+        # transients (which vary 30%+ run-to-run) and are the values the
+        # baseline gate compares.
+        "worst_ctrl_exec_us_steady": max(
+            (p["ctrl_exec_us_max"] for p in steady_points
+             if p.get("ctrl_exec_us_max") is not None), default=None),
         "worst_ctrl_period_us": _safe_max(ctrl_pmax),
         "best_ctrl_period_us": _safe_minf(ctrl_pmin),
         "worst_main_loop_us": _safe_max(main_max),
+        "worst_main_loop_us_steady": max(
+            (p["main_loop_us_max"] for p in steady_points
+             if p.get("main_loop_us_max") is not None), default=None),
         "max_cpu_load_pct": round(_safe_maxf(load), 1),
         "idle_loop_rate_hz": round(idle_rate, 1) if idle_rate == idle_rate else None,
         "demag_events": demag["event_count"],
         "bemf_timeout_samples": demag["bemf_timeout_samples"],
+        "max_motor_temp_c": _safe_maxf(motor_temp),
+        "max_fet_temp_c": _safe_maxf(fet_temp),
         # Channel liveness: how many samples each instrumentation channel
         # actually delivered. The baseline gate fails a run whose coverage
         # collapsed vs the baseline (dead SWD/telemetry/stand channel).

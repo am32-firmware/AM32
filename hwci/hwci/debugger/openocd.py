@@ -52,6 +52,10 @@ class OpenOcdDebugger(Debugger):
         self._sock: socket.socket | None = None
         self._log_tail: collections.deque[str] = collections.deque(maxlen=200)
         self._drain_thread: threading.Thread | None = None
+        # The Tcl-RPC socket carries one command/reply at a time; the perf
+        # poller thread and the runner (stat resets at steady tails) both use
+        # it, so serialize access or the reply framing interleaves.
+        self._rpc_lock = threading.Lock()
         if shutil.which(openocd_bin) is None:
             raise DebuggerError(f"{openocd_bin!r} not found on PATH")
 
@@ -130,6 +134,10 @@ class OpenOcdDebugger(Debugger):
         raise DebuggerError(f"could not connect to openocd Tcl-RPC: {last_err}")
 
     def _rpc(self, command: str) -> str:
+        with self._rpc_lock:
+            return self._rpc_locked(command)
+
+    def _rpc_locked(self, command: str) -> str:
         if self._sock is None:
             raise DebuggerError("RPC session not open; call open() first")
         try:

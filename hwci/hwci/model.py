@@ -20,7 +20,7 @@ COLUMNS = [
     # thrust stand
     "stand_thrust_n", "stand_thrust_gf", "stand_torque_nm", "stand_rpm",
     "stand_voltage_v", "stand_current_a", "stand_elec_power_w",
-    "stand_eff_gf_per_w",
+    "stand_eff_gf_per_w", "stand_motor_temp_c", "stand_fet_temp_c",
     # ESC KISS telemetry
     "esc_erpm", "esc_voltage_v", "esc_current_a", "esc_temp_c",
     # firmware perf struct (perf_host_t = host monotonic clock at the actual
@@ -55,6 +55,10 @@ def make_row(t: float, segment: str, throttle_cmd: float,
             stand_elec_power_w=round(stand.elec_power_w, 3),
             stand_eff_gf_per_w=round(stand.efficiency_gf_per_w, 4),
         )
+        if stand.motor_temp_c is not None:
+            row["stand_motor_temp_c"] = round(stand.motor_temp_c, 2)
+        if stand.fet_temp_c is not None:
+            row["stand_fet_temp_c"] = round(stand.fet_temp_c, 2)
     if telem is not None:
         row.update(
             esc_erpm=telem.e_rpm,

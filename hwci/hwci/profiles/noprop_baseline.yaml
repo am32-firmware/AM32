@@ -1,0 +1,27 @@
+name: noprop_baseline
+description: >
+  No-prop performance baseline: steady staircase 10% to 50% throttle. Without a
+  prop there is no meaningful thrust/efficiency, but loop timing, CPU load,
+  commutation health, eRPM-vs-stand-RPM agreement, and no-load current per
+  operating point are all stable regression signals. Capped at 50% (a free
+  1800KV bell on 6S already turns ~22k RPM there); raise only with a load.
+  ~40 s.
+sample_rate_hz: 100
+arm_settle_s: 3.0
+steady_tail_fraction: 0.5
+
+safety:
+  max_current_a: 10.0    # no-load should stay under ~1.5 A; trips on desync/stall
+  max_thrust_n: 3.0      # ~0 expected without a prop; trips on sensor faults
+  max_rpm: 28000         # expected ~22.5k mech at 50%; hard stop above
+  max_motor_temp_c: 80.0 # IR probe on the motor (also gates KISS telem if wired)
+
+segments:
+  - {label: idle,   throttle: 0.00, duration_s: 2.0}
+  - {label: t10,    throttle: 0.10, duration_s: 6.0, ramp: true,  steady: true}
+  - {label: t20,    throttle: 0.20, duration_s: 6.0, steady: true}
+  - {label: t30,    throttle: 0.30, duration_s: 6.0, steady: true}
+  - {label: t40,    throttle: 0.40, duration_s: 6.0, steady: true}
+  - {label: t50,    throttle: 0.50, duration_s: 6.0, steady: true}
+  - {label: rampdn, throttle: 0.00, duration_s: 3.0, ramp: true}
+  - {label: stop,   throttle: 0.00, duration_s: 2.0}

@@ -29,6 +29,8 @@ class StandSample:
     rpm: float          # mechanical RPM
     voltage_v: float
     current_a: float
+    motor_temp_c: float | None = None  # optional probe (None = not fitted)
+    fet_temp_c: float | None = None
 
     @property
     def elec_power_w(self) -> float:

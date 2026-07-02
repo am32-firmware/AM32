@@ -60,7 +60,8 @@ def enforce_safety(limits: SafetyLimits, stand: StandSample | None,
     """Host-side safety check against every channel that produced data."""
     if stand is not None:
         limits.check(thrust_n=stand.thrust_n, current_a=stand.current_a,
-                     rpm=stand.rpm, voltage_v=stand.voltage_v)
+                     rpm=stand.rpm, voltage_v=stand.voltage_v,
+                     temp_c=stand.motor_temp_c)
     if telem is not None:
         limits.check(current_a=telem.current_a, temp_c=telem.temperature_c)
 
@@ -147,6 +148,14 @@ def run_profile(profile: Profile, sources: Sources, *,
     try:
         for seg in profile.segments:
             n = max(1, round(seg.duration_s * profile.sample_rate_hz))
+            # Reset the firmware's sticky min/max accumulators right where a
+            # steady segment's measurement tail begins, so the tail's worst
+            # case reflects THIS operating point - not the spin-up transient
+            # of the run so far (~700-950 us on the bench, varying 30%+
+            # run-to-run, which would drown steady loop-time regressions).
+            tail_reset_tick = (n - max(1, round(n * profile.steady_tail_fraction))
+                               if seg.steady and sources.perf_reader is not None
+                               else None)
             for i in range(n):
                 t_sched = tick * period
                 if realtime:
@@ -154,6 +163,11 @@ def run_profile(profile: Profile, sources: Sources, *,
                     delay = target - time.monotonic()
                     if delay > 0:
                         time.sleep(delay)
+                if tail_reset_tick is not None and i == tail_reset_tick:
+                    try:
+                        sources.perf_reader.reset_stats(verify=False)
+                    except Exception:
+                        pass  # a missed reset degrades one segment, not the run
                 throttle = _segment_throttle(seg, i, n, prev_throttle)
                 sources.throttle.set(throttle)
                 stand = sources.stand.read_sample() if sources.stand is not None else None

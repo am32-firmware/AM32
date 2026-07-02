@@ -105,6 +105,14 @@ per-motor.
   breach. Also configure the Flight Stand Software's own UI cutoffs as an
   independent second layer (the vendor set-limit RPC is not mapped yet). Secure
   the motor/prop; use a prop guard; keep clear during demag-stress runs.
+* **Battery**: pass `--battery-cells N` to `hwci run`/`hwci ci` (e.g. `6` for a
+  6S pack) to refuse to *start* a test when the pack is already at or below
+  `N * --min-cell-voltage` (default 3.3 V/cell, matching AM32 firmware's own
+  low-voltage-cutoff default). This is a pre-flight gate checked once before
+  the throttle is armed — separate from, and in addition to, the per-sample
+  `safety:` limits above. It reads the stand's voltage channel, or the perf
+  struct on a stand-less bench. Opt-in and hardware-only (has no effect under
+  `--sim`, since the simulator's pack has no real cell count).
 
 ## Software setup (Ubuntu 24.04)
 
@@ -154,12 +162,16 @@ python -m pytest                 # 75 offline tests
 hwci profiles                                   # list test profiles
 hwci build --config rig.yaml                    # make ARK_4IN1_F051 HWCI_PERF=1
 hwci flash --config rig.yaml                    # OpenOCD program @ 0x08001000
-hwci run  --profile efficiency_sweep --config rig.yaml --out runs/r1
+hwci run  --profile efficiency_sweep --config rig.yaml --battery-cells 6 --out runs/r1
 hwci analyze runs/r1                            # -> metrics.json
 hwci report runs/r1 --baseline baselines/ARK_4IN1_F051.json
-hwci ci   --profile ci_smoke --config rig.yaml \
+hwci ci   --profile ci_smoke --config rig.yaml --battery-cells 6 \
           --baseline baselines/ARK_4IN1_F051.json --out runs/ci   # full gate
 ```
+
+`--battery-cells` is optional but recommended on hardware runs: it refuses to
+start the test at all if the pack is already too low (see Safety, below),
+instead of arming and collecting a run's worth of data from a sagging supply.
 
 `hwci ci` builds (HWCI_PERF=1) → flashes → runs the profile → computes metrics →
 compares to the baseline → writes `report.md` + `summary.png`, and **exits
@@ -175,9 +187,9 @@ Once wired and configured:
 ```bash
 cd hwci
 # 1. Sanity-check the full path on hardware with the short profile:
-hwci ci --profile ci_smoke --config rig.yaml --out runs/smoke
+hwci ci --profile ci_smoke --config rig.yaml --battery-cells 6 --out runs/smoke
 # 2. Capture the performance baseline:
-hwci ci --profile efficiency_sweep --config rig.yaml --out runs/baseline
+hwci ci --profile efficiency_sweep --config rig.yaml --battery-cells 6 --out runs/baseline
 hwci baseline-save runs/baseline --out baselines/ARK_4IN1_F051.json
 git add baselines/ARK_4IN1_F051.json && git commit -m "hwci: ARK 4IN1 baseline"
 ```

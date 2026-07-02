@@ -28,6 +28,10 @@ on:
         description: "PR number to test (optional: checks out that PR's head instead of the selected branch)"
         type: string
         default: ""
+      battery_cells:
+        description: "Battery cell count on the bench right now (e.g. 6 for 6S); the run refuses to start if pack voltage is too low for this. Leave blank to skip the check."
+        type: string
+        default: "6"
       save_baseline:
         description: Save this run's metrics as the new baseline (artifact)
         type: boolean
@@ -44,6 +48,7 @@ jobs:
     env:
       TARGET: ARK_4IN1_F051
       PROFILE: ${{ inputs.profile }}
+      BATTERY_CELLS: ${{ inputs.battery_cells }}
       # Bench-specific config lives on the runner, not in the repo.
       HWCI_RIG_CONFIG: ${{ vars.HWCI_RIG_CONFIG }}
     steps:
@@ -78,6 +83,11 @@ jobs:
           . .venv/bin/activate
           RUN_DIR="runs/${GITHUB_SHA::8}-${PROFILE}"
           echo "run_dir=hwci/$RUN_DIR" >> "$GITHUB_OUTPUT"
+          # Blank input -> no flag at all (hwci ci makes --battery-cells opt-in).
+          BATTERY_ARGS=()
+          if [ -n "$BATTERY_CELLS" ]; then
+            BATTERY_ARGS=(--battery-cells "$BATTERY_CELLS")
+          fi
           # A missing baseline (first run on a fresh repo) skips the gate with
           # a warning instead of failing, so save_baseline can bootstrap it.
           set +e
@@ -85,6 +95,7 @@ jobs:
             --profile "$PROFILE" \
             --config "${HWCI_RIG_CONFIG:-$HOME/hwci-rig.yaml}" \
             --baseline "baselines/${TARGET}.json" \
+            "${BATTERY_ARGS[@]}" \
             --out "$RUN_DIR"
           rc=$?
           set -e

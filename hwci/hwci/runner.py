@@ -10,6 +10,12 @@ Safety: the profile's :class:`~hwci.flightstand.base.SafetyLimits` are enforced
 HERE, on every sample, against both the stand reading and the ESC telemetry.
 Backends may additionally enforce them, but the runner check is the one that
 exists on every rig (the vendor gRPC API has no mapped set-limit RPC yet).
+
+Pre-flight: :func:`check_battery` gates a hardware run on pack voltage BEFORE
+the throttle is ever armed (see :func:`build_live_sources`). It is opt-in
+(``--battery-cells``) and separate from the per-sample ``SafetyLimits`` above -
+a low-but-not-crashing pack should never even start a test, both to protect
+the pack and because a sagging supply quietly corrupts efficiency data.
 """
 from __future__ import annotations
 
@@ -78,6 +84,51 @@ def enforce_safety(limits: SafetyLimits, stand: StandSample | None,
                      temp_c=stand.motor_temp_c)
     if telem is not None:
         limits.check(current_a=telem.current_a, temp_c=telem.temperature_c)
+
+
+# Default per-cell low-voltage threshold for check_battery(). Matches AM32
+# firmware's own default (Src/main.c: `low_cell_volt_cutoff = 330` -> 3.30
+# V/cell), so the harness refuses to start a test at roughly the same pack
+# voltage the ESC would eventually cut power at mid-run anyway.
+DEFAULT_MIN_CELL_VOLTAGE = 3.3
+
+
+class BatteryTooLowError(RuntimeError):
+    """Raised before a run is armed: the pack is already at/below the
+    minimum for its declared cell count, or its voltage can't be verified at
+    all. Fails closed - a test must not start on a battery this low, both to
+    avoid over-discharging it and because a sagging supply quietly corrupts
+    efficiency data."""
+
+
+def _live_voltage(stand: ThrustStand | None,
+                  perf_source: PerfSourceFn) -> float | None:
+    """Best pack-voltage reading available before the throttle is armed: the
+    stand's HV bus channel if one is wired, else the ESC's own ADC via the
+    perf struct (already alive by the time build_live_sources calls this -
+    it runs after _ensure_app_alive). None if neither is available/readable."""
+    if stand is not None:
+        return stand.read_sample().voltage_v
+    pf = _safe(perf_source)
+    return pf.voltage if pf is not None else None
+
+
+def check_battery(voltage_v: float | None, battery_cells: int,
+                  min_cell_voltage: float = DEFAULT_MIN_CELL_VOLTAGE) -> None:
+    """Refuse to proceed if the pack is at/below a safe minimum for its
+    declared cell count. Only called when the caller passed
+    ``--battery-cells`` - this check is opt-in, not a default gate."""
+    minimum = battery_cells * min_cell_voltage
+    if voltage_v is None:
+        raise BatteryTooLowError(
+            "cannot verify battery voltage before starting (no stand or "
+            "perf voltage channel available on this rig) - wire a voltage "
+            "channel or drop --battery-cells to skip this check")
+    if voltage_v < minimum:
+        raise BatteryTooLowError(
+            f"battery {voltage_v:.2f} V < minimum {minimum:.2f} V for a "
+            f"{battery_cells}S pack at {min_cell_voltage:.2f} V/cell - "
+            "charge or swap the pack before running a test")
 
 
 class _CachedPoller:
@@ -336,12 +387,19 @@ class _SerialTelemetry:
         self._ser.close()
 
 
-def build_live_sources(rig: RigConfig, profile: Profile) -> Sources:
+def build_live_sources(rig: RigConfig, profile: Profile, *,
+                       battery_cells: int | None = None,
+                       min_cell_voltage: float = DEFAULT_MIN_CELL_VOLTAGE) -> Sources:
     """Wire OpenOCD + serial telemetry + gRPC/external throttle on the rig.
 
     Backend values dispatch STRICTLY: an unknown value raises instead of
     falling back to a simulator (fabricated data gating a hardware run is the
     one unrecoverable failure mode). ``none`` disables a channel explicitly.
+
+    If ``battery_cells`` is given, pack voltage is checked against
+    ``battery_cells * min_cell_voltage`` before the throttle is armed (see
+    :func:`check_battery`) - the run refuses to start on a pack that's
+    already too low.
     """
     closers: list = []
 
@@ -410,10 +468,13 @@ def build_live_sources(rig: RigConfig, profile: Profile) -> Sources:
     sources = Sources(throttle=throttle, stand=stand, perf_source=perf_source,
                       telem_source=telem_source, perf_reader=perf_reader,
                       closers=closers)
-    if perf_reader is not None:
-        try:
+    try:
+        if perf_reader is not None:
             _ensure_app_alive(dbg, perf_reader, throttle)
-        except Exception:
-            sources.close()
-            raise
+        if battery_cells is not None:
+            check_battery(_live_voltage(stand, perf_source), battery_cells,
+                         min_cell_voltage)
+    except Exception:
+        sources.close()
+        raise
     return sources

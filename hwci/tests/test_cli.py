@@ -2,8 +2,9 @@
 import argparse
 
 from hwci import cli
-from hwci.config import load_profile
+from hwci.config import RigConfig, load_profile
 from hwci.model import RunResult
+from hwci.runner import DEFAULT_MIN_CELL_VOLTAGE
 
 
 def _ns(**kw):
@@ -40,3 +41,26 @@ def test_selftest_runs_clean(capsys):
     assert rc == 0
     out = capsys.readouterr().out
     assert "steady points" in out
+
+
+def test_run_and_ci_expose_battery_flags_with_defaults():
+    parser = cli.build_parser()
+    run_ns = parser.parse_args(["run", "--profile", "ci_smoke"])
+    assert run_ns.battery_cells is None
+    assert run_ns.min_cell_voltage == DEFAULT_MIN_CELL_VOLTAGE
+
+    ci_ns = parser.parse_args(["ci", "--battery-cells", "6",
+                               "--min-cell-voltage", "3.5"])
+    assert ci_ns.battery_cells == 6
+    assert ci_ns.min_cell_voltage == 3.5
+
+
+def test_battery_check_does_not_apply_in_sim_mode():
+    # The built-in simulator's nominal pack voltage doesn't represent any
+    # particular real cell count, so --battery-cells must be a no-op under
+    # --sim rather than spuriously aborting every simulated/offline run.
+    rig = RigConfig()
+    profile = load_profile("ci_smoke")
+    result = cli._execute(rig, profile, sim=True, battery_cells=6)
+    assert result.meta["aborted"] is None
+    assert result.meta["battery_cells"] == 6  # still recorded for the record

@@ -29,7 +29,8 @@ from . import report as reportmod
 from .config import (Profile, RigConfig, list_profiles, load_profile,
                      load_rig, profile_from_dict, profile_to_dict)
 from .model import RunResult
-from .runner import build_live_sources, build_sim_sources, run_profile
+from .runner import (DEFAULT_MIN_CELL_VOLTAGE, build_live_sources,
+                     build_sim_sources, run_profile)
 
 
 def _git_sha(repo_root: str) -> str | None:
@@ -93,15 +94,24 @@ def _load_baseline(path: str | None) -> dict | None:
 
 
 def _execute(rig: RigConfig, profile: Profile, sim: bool, *,
-             realtime: bool | None = None) -> RunResult:
-    """Build sources, run the profile, always close sources."""
+             realtime: bool | None = None,
+             battery_cells: int | None = None,
+             min_cell_voltage: float = DEFAULT_MIN_CELL_VOLTAGE) -> RunResult:
+    """Build sources, run the profile, always close sources.
+
+    The battery pre-flight check only applies to hardware: a simulated pack
+    doesn't represent any real cell count, so battery_cells is never passed
+    to the simulator sources.
+    """
     sources = (build_sim_sources(rig, profile) if sim
-               else build_live_sources(rig, profile))
+               else build_live_sources(rig, profile, battery_cells=battery_cells,
+                                       min_cell_voltage=min_cell_voltage))
     try:
         return run_profile(
             profile, sources,
             realtime=(not sim) if realtime is None else realtime,
-            meta=_make_meta(rig, profile, "sim" if sim else "hw"))
+            meta=_make_meta(rig, profile, "sim" if sim else "hw",
+                           extra={"battery_cells": battery_cells}))
     finally:
         sources.close()
 
@@ -188,7 +198,9 @@ def cmd_run(args) -> int:
     rig = load_rig(args.config) if args.config else RigConfig()
     profile = load_profile(args.profile)
     result = _execute(rig, profile, sim,
-                      realtime=True if args.realtime else None)
+                      realtime=True if args.realtime else None,
+                      battery_cells=args.battery_cells,
+                      min_cell_voltage=args.min_cell_voltage)
     out = Path(args.out) if args.out else _default_out(profile.name, sim)
     result.save(out)
     print(f"saved {len(result.rows)} samples to {out}")
@@ -243,7 +255,9 @@ def cmd_ci(args) -> int:
                   file=sys.stderr)
         rig.elf_path = str(arts.elf)
 
-    result = _execute(rig, profile, sim)
+    result = _execute(rig, profile, sim,
+                      battery_cells=args.battery_cells,
+                      min_cell_voltage=args.min_cell_voltage)
     result.save(out)
 
     m, comparison = _analyze_and_report(out, result, profile,
@@ -260,6 +274,17 @@ def build_parser() -> argparse.ArgumentParser:
     def add_common(sp):
         sp.add_argument("--config", help="rig config YAML (hardware run); "
                                          "omit for the built-in simulator")
+
+    def add_battery(sp):
+        sp.add_argument("--battery-cells", type=int, metavar="N",
+                        help="LiPo cell count under test (e.g. 6 for a 6S "
+                             "pack); if given, refuses to start when pack "
+                             "voltage is below N * --min-cell-voltage "
+                             "(hardware only - ignored under --sim)")
+        sp.add_argument("--min-cell-voltage", type=float, metavar="V",
+                        default=DEFAULT_MIN_CELL_VOLTAGE,
+                        help="per-cell cutoff volts for --battery-cells "
+                             f"(default: {DEFAULT_MIN_CELL_VOLTAGE})")
 
     sp = sub.add_parser("profiles", help="list test profiles")
     sp.set_defaults(func=cmd_profiles)
@@ -284,6 +309,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     sp = sub.add_parser("run", help="run a profile and save the data")
     add_common(sp)
+    add_battery(sp)
     sp.add_argument("--profile", required=True)
     sp.add_argument("--sim", action="store_true", help="force the simulator")
     sp.add_argument("--realtime", action="store_true", help="pace sim in real time")
@@ -307,6 +333,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     sp = sub.add_parser("ci", help="build+flash+run+analyze+gate (full pipeline)")
     add_common(sp)
+    add_battery(sp)
     sp.add_argument("--profile", default="ci_smoke")
     sp.add_argument("--baseline")
     sp.add_argument("--sim", action="store_true")

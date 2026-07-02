@@ -16,9 +16,13 @@ the throttle is ever armed (see :func:`build_live_sources`). It is opt-in
 (``--battery-cells``) and separate from the per-sample ``SafetyLimits`` above -
 a low-but-not-crashing pack should never even start a test, both to protect
 the pack and because a sagging supply quietly corrupts efficiency data.
+:func:`tare_for_run` then zeroes the load cells on every hardware run that has
+a stand (default-on, ``--no-tare`` to skip) - with the ESC signal already up
+at zero throttle, because AM32 beeps the motor whenever it has no input.
 """
 from __future__ import annotations
 
+import sys
 import threading
 import time
 from dataclasses import dataclass, field
@@ -129,6 +133,32 @@ def check_battery(voltage_v: float | None, battery_cells: int,
             f"battery {voltage_v:.2f} V < minimum {minimum:.2f} V for a "
             f"{battery_cells}S pack at {min_cell_voltage:.2f} V/cell - "
             "charge or swap the pack before running a test")
+
+
+# Pre-run tare choreography. AM32 beeps the motor whenever it sees NO input
+# signal (the disconnect beacon) and again as it arms - each beep is a real
+# torque pulse through the mount, so a tare taken on a signal-less ESC bakes
+# that twitching into the load-cell zero. Bring the signal up at zero
+# throttle FIRST (the beacon stops), wait out the arm tune, and only then
+# zero the load cells on a mechanically quiet rig.
+ARM_TUNE_SETTLE_S = 2.0  # arm tune keeps shaking the motor after arm() returns
+TARE_SETTLE_S = 1.5      # post-tare readings stay noisy for ~1-2 s (bench)
+
+
+def tare_for_run(stand: ThrustStand, throttle: ThrottleSource, *,
+                 settle: Callable[[float], None] = time.sleep) -> float | None:
+    """Zero the load cells with the ESC held quiet at zero throttle (see the
+    choreography note above). Returns the post-tare thrust residual in gf so
+    the caller can surface it, or None if it can't be read - the residual
+    read is best-effort, the tare itself is not."""
+    throttle.arm()             # signal present at zero: beacon stops, ESC arms
+    settle(ARM_TUNE_SETTLE_S)
+    stand.tare()
+    settle(TARE_SETTLE_S)
+    try:
+        return stand.read_sample().thrust_n * 1000.0 / 9.80665
+    except Exception:
+        return None
 
 
 class _CachedPoller:
@@ -389,7 +419,8 @@ class _SerialTelemetry:
 
 def build_live_sources(rig: RigConfig, profile: Profile, *,
                        battery_cells: int | None = None,
-                       min_cell_voltage: float = DEFAULT_MIN_CELL_VOLTAGE) -> Sources:
+                       min_cell_voltage: float = DEFAULT_MIN_CELL_VOLTAGE,
+                       tare: bool = True) -> Sources:
     """Wire OpenOCD + serial telemetry + gRPC/external throttle on the rig.
 
     Backend values dispatch STRICTLY: an unknown value raises instead of
@@ -400,6 +431,12 @@ def build_live_sources(rig: RigConfig, profile: Profile, *,
     ``battery_cells * min_cell_voltage`` before the throttle is armed (see
     :func:`check_battery`) - the run refuses to start on a pack that's
     already too low.
+
+    Unless ``tare`` is False, a stand's load cells are zeroed as the last
+    pre-flight step via :func:`tare_for_run` (ESC signal up at zero throttle
+    first, so AM32's beacon/arm beeps don't shake the cells mid-tare). A tare
+    that fails aborts the run: after any mechanical change an untared cell
+    reads a bogus thrust offset, which is worse than no run.
     """
     closers: list = []
 
@@ -474,6 +511,11 @@ def build_live_sources(rig: RigConfig, profile: Profile, *,
         if battery_cells is not None:
             check_battery(_live_voltage(stand, perf_source), battery_cells,
                          min_cell_voltage)
+        if tare and stand is not None:
+            residual_gf = tare_for_run(stand, throttle)
+            if residual_gf is not None:
+                print(f"tared load cells (ESC armed quiet at zero): "
+                      f"residual {residual_gf:+.1f} gf", file=sys.stderr)
     except Exception:
         sources.close()
         raise

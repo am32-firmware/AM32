@@ -96,22 +96,28 @@ def _load_baseline(path: str | None) -> dict | None:
 def _execute(rig: RigConfig, profile: Profile, sim: bool, *,
              realtime: bool | None = None,
              battery_cells: int | None = None,
-             min_cell_voltage: float = DEFAULT_MIN_CELL_VOLTAGE) -> RunResult:
+             min_cell_voltage: float = DEFAULT_MIN_CELL_VOLTAGE,
+             tare: bool = True) -> RunResult:
     """Build sources, run the profile, always close sources.
 
-    The battery pre-flight check only applies to hardware: a simulated pack
-    doesn't represent any real cell count, so battery_cells is never passed
-    to the simulator sources.
+    The battery and tare pre-flight steps only apply to hardware: a simulated
+    pack doesn't represent any real cell count and simulated load cells have
+    no zero drift, so neither is ever passed to the simulator sources.
     """
     sources = (build_sim_sources(rig, profile) if sim
                else build_live_sources(rig, profile, battery_cells=battery_cells,
-                                       min_cell_voltage=min_cell_voltage))
+                                       min_cell_voltage=min_cell_voltage,
+                                       tare=tare))
+    # Recorded so a drifting thrust offset in saved data can be told apart
+    # from "this run simply wasn't tared".
+    tared = bool(tare) and not sim and rig.stand_backend == "grpc"
     try:
         return run_profile(
             profile, sources,
             realtime=(not sim) if realtime is None else realtime,
             meta=_make_meta(rig, profile, "sim" if sim else "hw",
-                           extra={"battery_cells": battery_cells}))
+                           extra={"battery_cells": battery_cells,
+                                  "tared": tared}))
     finally:
         sources.close()
 
@@ -200,7 +206,8 @@ def cmd_run(args) -> int:
     result = _execute(rig, profile, sim,
                       realtime=True if args.realtime else None,
                       battery_cells=args.battery_cells,
-                      min_cell_voltage=args.min_cell_voltage)
+                      min_cell_voltage=args.min_cell_voltage,
+                      tare=not args.no_tare)
     out = Path(args.out) if args.out else _default_out(profile.name, sim)
     result.save(out)
     print(f"saved {len(result.rows)} samples to {out}")
@@ -257,7 +264,8 @@ def cmd_ci(args) -> int:
 
     result = _execute(rig, profile, sim,
                       battery_cells=args.battery_cells,
-                      min_cell_voltage=args.min_cell_voltage)
+                      min_cell_voltage=args.min_cell_voltage,
+                      tare=not args.no_tare)
     result.save(out)
 
     m, comparison = _analyze_and_report(out, result, profile,
@@ -275,7 +283,7 @@ def build_parser() -> argparse.ArgumentParser:
         sp.add_argument("--config", help="rig config YAML (hardware run); "
                                          "omit for the built-in simulator")
 
-    def add_battery(sp):
+    def add_preflight(sp):
         sp.add_argument("--battery-cells", type=int, metavar="N",
                         help="LiPo cell count under test (e.g. 6 for a 6S "
                              "pack); if given, refuses to start when pack "
@@ -285,6 +293,12 @@ def build_parser() -> argparse.ArgumentParser:
                         default=DEFAULT_MIN_CELL_VOLTAGE,
                         help="per-cell cutoff volts for --battery-cells "
                              f"(default: {DEFAULT_MIN_CELL_VOLTAGE})")
+        sp.add_argument("--no-tare", action="store_true",
+                        help="skip the automatic pre-run load-cell tare "
+                             "(hardware runs tare by default, with the ESC "
+                             "signal held at zero throttle so AM32's "
+                             "no-signal beacon beeps can't shake the cells "
+                             "mid-tare)")
 
     sp = sub.add_parser("profiles", help="list test profiles")
     sp.set_defaults(func=cmd_profiles)
@@ -309,7 +323,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     sp = sub.add_parser("run", help="run a profile and save the data")
     add_common(sp)
-    add_battery(sp)
+    add_preflight(sp)
     sp.add_argument("--profile", required=True)
     sp.add_argument("--sim", action="store_true", help="force the simulator")
     sp.add_argument("--realtime", action="store_true", help="pace sim in real time")
@@ -333,7 +347,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     sp = sub.add_parser("ci", help="build+flash+run+analyze+gate (full pipeline)")
     add_common(sp)
-    add_battery(sp)
+    add_preflight(sp)
     sp.add_argument("--profile", default="ci_smoke")
     sp.add_argument("--baseline")
     sp.add_argument("--sim", action="store_true")

@@ -128,7 +128,11 @@ Then, manually (vendor bits the script can't automate):
    stand's USB into that PC, and launch the software with the `--remote`
    flag so the gRPC API accepts non-local connections. Point `stand_host`
    in `rig.yaml` at that PC. (The GUI is also where you configure the
-   vendor-side safety cutoffs and tare the load cells.)
+   vendor-side safety cutoffs. Load cells don't need a manual tare before
+   each run: `hwci run`/`hwci ci` tare automatically as the last pre-flight
+   step — with the ESC signal already up at zero throttle, because AM32
+   beeps the motor whenever it has no input signal and those beeps shake
+   the cells mid-tare. `--no-tare` skips it.)
 2. Clone Tyto's API repo — it ships **pre-compiled Python stubs**, no protoc
    run needed — and make it importable in the harness venv:
    ```bash

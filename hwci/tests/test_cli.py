@@ -55,6 +55,22 @@ def test_run_and_ci_expose_battery_flags_with_defaults():
     assert ci_ns.min_cell_voltage == 3.5
 
 
+def test_run_and_ci_expose_no_tare_flag():
+    parser = cli.build_parser()
+    assert parser.parse_args(["run", "--profile", "ci_smoke"]).no_tare is False
+    assert parser.parse_args(["ci", "--no-tare"]).no_tare is True
+
+
+def test_sim_runs_are_never_marked_tared():
+    # The simulator has no load cells to zero; meta must say so even when
+    # taring wasn't explicitly disabled, or a sim run dir would claim a
+    # pre-flight step that never happened.
+    rig = RigConfig()
+    profile = load_profile("ci_smoke")
+    result = cli._execute(rig, profile, sim=True)
+    assert result.meta["tared"] is False
+
+
 def test_battery_check_does_not_apply_in_sim_mode():
     # The built-in simulator's nominal pack voltage doesn't represent any
     # particular real cell count, so --battery-cells must be a no-op under

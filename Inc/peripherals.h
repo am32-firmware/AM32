@@ -9,9 +9,20 @@
 #define PERIPHERALS_H_
 
 #include "main.h"
-// per-MCU register macro sheet + family-private init declarations,
-// resolved from Mcu/<mcu>/Inc (per-MCU include path precedes root Inc)
-#include "peripherals_mcu.h"
+#include "targets.h"
+
+// timer/watchdog register macro sheet, selected by the vendor macro the
+// active target defines in targets.h; the NXP port (a153) keeps its
+// equivalents in timers.h/flexpwm.h, reached via its main.h
+#if defined(STMICRO)
+#include "../Mcu/shared/peripherals_macros_stm32_ll.h"
+#elif defined(ARTERY)
+#include "../Mcu/shared/peripherals_macros_at32.h"
+#elif defined(GIGADEVICES)
+#include "../Mcu/shared/peripherals_macros_gd32.h"
+#elif defined(WCH)
+#include "../Mcu/shared/peripherals_macros_ch32.h"
+#endif
 
 void initAfterJump(void);
 void initCorePeripherals(void);

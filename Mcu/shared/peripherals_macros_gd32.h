@@ -1,9 +1,12 @@
 /*
- * peripherals_mcu.h — GD32E230 register macro sheet + private declarations.
+ * peripherals_macros_gd32.h
+ *
+ * Timer/watchdog register macro sheet for the GD32E230 port.
+ * Selected by Inc/peripherals.h via the GIGADEVICES vendor macro.
  */
 
-#ifndef PERIPHERALS_MCU_H_
-#define PERIPHERALS_MCU_H_
+#ifndef PERIPHERALS_MACROS_GD32_H_
+#define PERIPHERALS_MACROS_GD32_H_
 
 #define INTERVAL_TIMER_COUNT (TIMER_CNT(INTERVAL_TIMER))
 #define RELOAD_WATCHDOG_COUNTER() (fwdgt_counter_reload())
@@ -23,17 +26,4 @@
     (TIMER_CH0CV(TIMER0) = newdc, TIMER_CH1CV(TIMER0) = newdc, \
         TIMER_CH2CV(TIMER0) = newdc)
 
-void MX_GPIO_Init(void);
-void MX_DMA_Init(void);
-void COMP_Init(void);
-void TIM0_Init(void);
-void TIMER2_Init(void);
-void TIMER5_Init(void);
-void TIMER15_Init(void);
-void TIMER16_Init(void);
-void TIMER13_Init(void);
-void reloadWatchDogCounter(void);
-void UN_TIM_Init(void);
-void LED_GPIO_init(void);
-
-#endif /* PERIPHERALS_MCU_H_ */
+#endif /* PERIPHERALS_MACROS_GD32_H_ */

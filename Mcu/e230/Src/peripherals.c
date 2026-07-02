@@ -9,6 +9,21 @@
 
 #include "peripherals.h"
 
+// family-private init prototypes (moved from the per-MCU peripherals header)
+void MX_GPIO_Init(void);
+void MX_DMA_Init(void);
+void COMP_Init(void);
+void TIM0_Init(void);
+void TIMER2_Init(void);
+void TIMER5_Init(void);
+void TIMER15_Init(void);
+void TIMER16_Init(void);
+void TIMER13_Init(void);
+void reloadWatchDogCounter(void);
+void UN_TIM_Init(void);
+void LED_GPIO_init(void);
+
+
 #include "ADC.h"
 #include "common.h"
 #include "functions.h"

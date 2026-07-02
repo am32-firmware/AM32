@@ -3,8 +3,8 @@
  *
  * Timer/watchdog register macro sheet shared by the six STM32 families
  * (f031, f051, g031, g071, g431, l431) — their sheets were byte-identical.
- * Included by Mcu/<mcu>/Inc/peripherals_mcu.h; the timer instances behind
- * COM_TIMER/INTERVAL_TIMER come from Inc/targets.h per target.
+ * Selected by Inc/peripherals.h via the STMICRO vendor macro; the timer
+ * instances behind COM_TIMER/INTERVAL_TIMER come from Inc/targets.h.
  */
 
 #ifndef PERIPHERALS_MACROS_STM32_LL_H_

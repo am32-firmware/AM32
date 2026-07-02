@@ -7,6 +7,13 @@
 
 #include "peripherals.h"
 
+// family-private init prototypes (moved from the per-MCU peripherals header)
+void SystemInit(void);
+void SystemClock_Config(void);
+void initGPIO(void);
+void initSPI(void);
+
+
 void initCorePeripherals(void)
 {
 	SystemInit();

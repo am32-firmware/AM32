@@ -9,6 +9,22 @@
 
 #include "peripherals.h"
 
+// family-private init prototypes (moved from the per-MCU peripherals header)
+void SystemClock_Config(void);
+void MX_GPIO_Init(void);
+void MX_DMA_Init(void);
+void MX_COMP1_Init(void);
+void MX_TIM1_Init(void);
+void MX_TIM2_Init(void);
+void MX_TIM16_Init(void);
+void MX_TIM14_Init(void);
+void MX_TIM6_Init(void);
+void MX_TIM17_Init(void);
+void reloadWatchDogCounter(void);
+void UN_TIM_Init(void);
+void LED_GPIO_init(void);
+
+
 #include "ADC.h"
 #include "serial_telemetry.h"
 #include "targets.h"

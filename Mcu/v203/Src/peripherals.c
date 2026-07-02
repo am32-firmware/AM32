@@ -10,6 +10,29 @@
 // PERIPHERAL SETUP
 #include "peripherals.h"
 
+// family-private init prototypes (moved from the per-MCU peripherals header)
+void MX_GPIO_Init(void);
+void MX_DMA_Init(void);
+void AT_COMP_Init(void);
+void TIM1_Init(void);
+void Intervak_TIM4_Init(void);
+void system_clock_config(void);
+void COM_TIM3_Init(void);
+void TenkHz_SysTick_Init(void);
+void TIM10_Init(void);
+void disableComTimerInt(void);
+void enableComTimerInt(void);
+void setAndEnableComInt(uint16_t time);
+uint16_t getintervaTimerCount();
+void setintervaTimerCount(uint16_t intertime);
+void setAutoReloadPWM(uint16_t relval);
+void setDutyCycleAll(uint16_t newdc);
+void reloadWatchDogCounter(void);
+void UN_TIM2_Init(void);
+void setPrescalerPWM(uint16_t presc);
+void LED_GPIO_init(void);
+
+
 #include "ADC.h"
 #include "common.h"
 #include "functions.h"

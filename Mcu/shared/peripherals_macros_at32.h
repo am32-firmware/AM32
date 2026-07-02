@@ -3,7 +3,7 @@
  *
  * Timer/watchdog register macro sheet shared by the AT32 families
  * (f415, f421) — their sheets were byte-identical.
- * Included by Mcu/<mcu>/Inc/peripherals_mcu.h.
+ * Selected by Inc/peripherals.h via the ARTERY vendor macro.
  */
 
 #ifndef PERIPHERALS_MACROS_AT32_H_

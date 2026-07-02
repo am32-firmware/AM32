@@ -18,8 +18,8 @@ extern volatile uint32_t average_interval;
 extern volatile char input_ready;
 volatile int signal_pin_high_count = 0;
 volatile int is_inverted_dshot = 0;
-extern char inputSet;
-extern uint16_t zero_input_count;
+extern volatile char inputSet;
+extern volatile uint16_t zero_input_count;
 extern uint32_t average_packet_length;
 extern uint8_t average_count;
 

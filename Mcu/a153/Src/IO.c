@@ -8,7 +8,7 @@
 #include "IO.h"
 
 char ic_timer_prescaler = (CPU_FREQUENCY_MHZ / 5);	//Used to detect input type (Dshot300, Dshot600 and PWM400). Divide by 8 is best for MCXA153 at 96MHz CPU
-uint32_t dma_buffer[64] = { 0 };
+volatile uint32_t dma_buffer[64] = { 0 };
 char out_put = 0;
 uint8_t buffer_padding = 0;
 

@@ -1,0 +1,14 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Run outputs (data is captured per-run; commit baselines/ only)
+runs/
+rig.yaml
+hwci/flightstand/_generated/
+
+# pip build artifacts
+build/

@@ -1,0 +1,131 @@
+name: Hardware-in-the-loop CI
+
+# Runs the AM32 firmware on a real ARK 4IN1 ESC mounted on a Tyto Robotics
+# Flight Stand, capturing CPU load / loop times (over SWD) and efficiency /
+# demag (thrust stand), then gates the result against a committed baseline.
+#
+# MANUAL TRIGGER ONLY (workflow_dispatch). The rig needs hands-on preparation
+# before every run - battery connected and charged, prop/torque arm checked,
+# Flight Stand Software up - so a human always starts the run; nothing fires
+# automatically from pushes, PRs, or labels. This also means fork code never
+# reaches the self-hosted bench machine unless a maintainer explicitly enters
+# a PR number in the dispatch form.
+#
+# Requires a self-hosted runner labelled [self-hosted, hwci] that is
+# physically wired to the rig and provisioned per hwci/README.md
+# (ARM toolchain, OpenOCD, ST-Link udev rules, Flight Stand Software + gRPC,
+# a rig config at $HWCI_RIG_CONFIG).
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: Test profile to run
+        type: choice
+        default: ci_smoke
+        options: [ci_smoke, efficiency_sweep, demag_step_stress]
+      pr:
+        description: "PR number to test (optional: checks out that PR's head instead of the selected branch)"
+        type: string
+        default: ""
+      battery_cells:
+        description: "Battery cell count on the bench right now (e.g. 6 for 6S); the run refuses to start if pack voltage is too low for this. Leave blank to skip the check."
+        type: string
+        default: "6"
+      save_baseline:
+        description: Save this run's metrics as the new baseline (artifact)
+        type: boolean
+        default: false
+
+concurrency:
+  group: hwci-hardware           # one job at a time owns the physical rig
+  cancel-in-progress: false
+
+jobs:
+  hil:
+    runs-on: [self-hosted, hwci]
+    timeout-minutes: 30
+    env:
+      TARGET: ARK_4IN1_F051
+      PROFILE: ${{ inputs.profile }}
+      BATTERY_CELLS: ${{ inputs.battery_cells }}
+      # Bench-specific config lives on the runner, not in the repo.
+      HWCI_RIG_CONFIG: ${{ vars.HWCI_RIG_CONFIG }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          ref: ${{ inputs.pr != '' && format('refs/pull/{0}/head', inputs.pr) || github.ref }}
+
+      - name: Ensure ARM toolchain
+        shell: bash
+        run: |
+          # make/tools.mk pins ARM_SDK_PREFIX to tools/linux/<xpack>/bin, so a
+          # system arm-none-eabi-gcc on PATH does NOT satisfy the build; install
+          # the pinned SDK whenever the pinned path is missing.
+          if ! ls tools/linux/*/bin/arm-none-eabi-gcc >/dev/null 2>&1; then
+            make arm_sdk_install
+          fi
+
+      - name: Install harness
+        shell: bash
+        working-directory: hwci
+        run: |
+          python3 -m venv .venv
+          . .venv/bin/activate
+          pip install -e '.[plot,flightstand]'
+
+      - name: Run hardware CI
+        id: hil
+        shell: bash
+        working-directory: hwci
+        run: |
+          . .venv/bin/activate
+          RUN_DIR="runs/${GITHUB_SHA::8}-${PROFILE}"
+          echo "run_dir=hwci/$RUN_DIR" >> "$GITHUB_OUTPUT"
+          # Blank input -> no flag at all (hwci ci makes --battery-cells opt-in).
+          BATTERY_ARGS=()
+          if [ -n "$BATTERY_CELLS" ]; then
+            BATTERY_ARGS=(--battery-cells "$BATTERY_CELLS")
+          fi
+          # A missing baseline (first run on a fresh repo) skips the gate with
+          # a warning instead of failing, so save_baseline can bootstrap it.
+          set +e
+          hwci ci \
+            --profile "$PROFILE" \
+            --config "${HWCI_RIG_CONFIG:-$HOME/hwci-rig.yaml}" \
+            --baseline "baselines/${TARGET}.json" \
+            "${BATTERY_ARGS[@]}" \
+            --out "$RUN_DIR"
+          rc=$?
+          set -e
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          exit $rc
+
+      - name: Save baseline (optional)
+        # Runs even when the gate FAILed (rc=1: intentional re-baseline after an
+        # accepted change), but never after an aborted/crashed run (rc >= 2).
+        if: ${{ always() && inputs.save_baseline && contains(fromJSON('["0", "1"]'), steps.hil.outputs.rc) }}
+        shell: bash
+        working-directory: hwci
+        run: |
+          . .venv/bin/activate
+          hwci baseline-save "runs/${GITHUB_SHA::8}-${PROFILE}" \
+            --out "baselines/${TARGET}.json"
+
+      - name: Report to job summary
+        if: always()
+        shell: bash
+        run: |
+          RD="${{ steps.hil.outputs.run_dir }}"
+          if [ -f "$RD/report.md" ]; then cat "$RD/report.md" >> "$GITHUB_STEP_SUMMARY"; fi
+
+      - name: Upload run data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hwci-${{ env.PROFILE }}-${{ github.sha }}
+          path: |
+            ${{ steps.hil.outputs.run_dir }}/
+            hwci/baselines/${{ env.TARGET }}.json
+          retention-days: 90

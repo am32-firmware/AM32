@@ -1,0 +1,22 @@
+name: ci_smoke
+description: >
+  Fast, low-risk gate for CI. Arms, ramps to two modest steady points, returns
+  to idle. Validates the whole pipeline (build/flash/telemetry/perf) and catches
+  gross regressions in loop time, CPU load, and efficiency without stressing the
+  motor. ~25 s.
+sample_rate_hz: 100
+arm_settle_s: 2.0
+
+safety:
+  max_current_a: 35.0
+  max_thrust_n: 15.0
+  max_rpm: 30000
+
+segments:
+  - {label: idle,    throttle: 0.00, duration_s: 2.0}
+  - {label: ramp25,  throttle: 0.25, duration_s: 3.0, ramp: true}
+  - {label: hold25,  throttle: 0.25, duration_s: 5.0, steady: true}
+  - {label: ramp45,  throttle: 0.45, duration_s: 3.0, ramp: true}
+  - {label: hold45,  throttle: 0.45, duration_s: 5.0, steady: true}
+  - {label: rampdn,  throttle: 0.00, duration_s: 3.0, ramp: true}
+  - {label: stop,    throttle: 0.00, duration_s: 2.0}

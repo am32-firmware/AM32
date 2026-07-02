@@ -1,0 +1,202 @@
+{
+  "format_version": 1,
+  "meta": {
+    "aborted": null,
+    "git_sha": "3f8fad7",
+    "mode": "hw",
+    "motor": "JS Technology 2306 1800KV",
+    "n_samples": 3700,
+    "perf_read_errors": 0,
+    "pole_pairs": 7,
+    "profile": "noprop_baseline",
+    "profile_def": {
+      "arm_settle_s": 3.0,
+      "demag_commutation_spike": 3.0,
+      "demag_rpm_drop_fraction": 0.25,
+      "description": "No-prop performance baseline: steady staircase 10% to 50% throttle. Without a prop there is no meaningful thrust/efficiency, but loop timing, CPU load, commutation health, eRPM-vs-stand-RPM agreement, and no-load current per operating point are all stable regression signals. Capped at 50% (a free 1800KV bell on 6S already turns ~22k RPM there); raise only with a load. ~40 s.\n",
+      "name": "noprop_baseline",
+      "pole_pairs": 7,
+      "safety": {
+        "max_current_a": 10.0,
+        "max_motor_temp_c": 80.0,
+        "max_rpm": 28000,
+        "max_thrust_n": 3.0,
+        "max_voltage_v": null
+      },
+      "sample_rate_hz": 100.0,
+      "segments": [
+        {
+          "duration_s": 2.0,
+          "label": "idle",
+          "ramp": false,
+          "steady": false,
+          "throttle": 0.0
+        },
+        {
+          "duration_s": 6.0,
+          "label": "t10",
+          "ramp": true,
+          "steady": true,
+          "throttle": 0.1
+        },
+        {
+          "duration_s": 6.0,
+          "label": "t20",
+          "ramp": false,
+          "steady": true,
+          "throttle": 0.2
+        },
+        {
+          "duration_s": 6.0,
+          "label": "t30",
+          "ramp": false,
+          "steady": true,
+          "throttle": 0.3
+        },
+        {
+          "duration_s": 6.0,
+          "label": "t40",
+          "ramp": false,
+          "steady": true,
+          "throttle": 0.4
+        },
+        {
+          "duration_s": 6.0,
+          "label": "t50",
+          "ramp": false,
+          "steady": true,
+          "throttle": 0.5
+        },
+        {
+          "duration_s": 3.0,
+          "label": "rampdn",
+          "ramp": true,
+          "steady": false,
+          "throttle": 0.0
+        },
+        {
+          "duration_s": 2.0,
+          "label": "stop",
+          "ramp": false,
+          "steady": false,
+          "throttle": 0.0
+        }
+      ],
+      "steady_tail_fraction": 0.5
+    },
+    "prop": "none",
+    "sample_rate_hz": 100.0,
+    "target": "ARK_4IN1_F051",
+    "timestamp": "2026-07-02T14:03:21",
+    "wall_time_s": 37.0
+  },
+  "metrics": {
+    "demag": {
+      "bemf_timeout_samples": 0,
+      "comm_spike_samples": 0,
+      "esc_rpm_mismatch_samples": 0,
+      "event_count": 0,
+      "events": [],
+      "median_commutation_interval": 162.0,
+      "rpm_drop_samples": 0
+    },
+    "steady_points": [
+      {
+        "cpu_load_pct": 39.7,
+        "ctrl_exec_us_max": 76,
+        "current_a": 0.069,
+        "eff_gf_per_w": 2.191,
+        "elec_power_w": 1.69,
+        "fet_temp_c": 25.4,
+        "main_loop_us_max": 138,
+        "motor_temp_c": 24.14,
+        "rpm": 3919.7,
+        "segment": "t10",
+        "throttle": 0.1,
+        "thrust_gf": 2.03,
+        "voltage_v": 24.441
+      },
+      {
+        "cpu_load_pct": 54.4,
+        "ctrl_exec_us_max": 70,
+        "current_a": 0.331,
+        "eff_gf_per_w": 0.438,
+        "elec_power_w": 8.07,
+        "fet_temp_c": 25.77,
+        "main_loop_us_max": 141,
+        "motor_temp_c": 24.22,
+        "rpm": 9357.8,
+        "segment": "t20",
+        "throttle": 0.2,
+        "thrust_gf": 3.6,
+        "voltage_v": 24.414
+      },
+      {
+        "cpu_load_pct": 46.9,
+        "ctrl_exec_us_max": 67,
+        "current_a": 0.542,
+        "eff_gf_per_w": 0.246,
+        "elec_power_w": 13.22,
+        "fet_temp_c": 26.42,
+        "main_loop_us_max": 141,
+        "motor_temp_c": 24.29,
+        "rpm": 13414.6,
+        "segment": "t30",
+        "throttle": 0.3,
+        "thrust_gf": 3.11,
+        "voltage_v": 24.386
+      },
+      {
+        "cpu_load_pct": 49.7,
+        "ctrl_exec_us_max": 65,
+        "current_a": 0.792,
+        "eff_gf_per_w": 0.285,
+        "elec_power_w": 19.29,
+        "fet_temp_c": 27.1,
+        "main_loop_us_max": 146,
+        "motor_temp_c": 24.39,
+        "rpm": 17603.1,
+        "segment": "t40",
+        "throttle": 0.4,
+        "thrust_gf": 2.46,
+        "voltage_v": 24.355
+      },
+      {
+        "cpu_load_pct": 53.2,
+        "ctrl_exec_us_max": 57,
+        "current_a": 0.975,
+        "eff_gf_per_w": 0.124,
+        "elec_power_w": 23.71,
+        "fet_temp_c": 27.72,
+        "main_loop_us_max": 136,
+        "motor_temp_c": 24.53,
+        "rpm": 21744.2,
+        "segment": "t50",
+        "throttle": 0.5,
+        "thrust_gf": 2.93,
+        "voltage_v": 24.322
+      }
+    ],
+    "summary": {
+      "bemf_timeout_samples": 0,
+      "best_ctrl_period_us": 8,
+      "demag_events": 0,
+      "idle_loop_rate_hz": 58527.9,
+      "max_cpu_load_pct": 56.8,
+      "max_current_a": 3.22,
+      "max_fet_temp_c": 28.17,
+      "max_motor_temp_c": 24.69,
+      "max_thrust_gf": 34,
+      "n_samples": 3700,
+      "peak_efficiency_gf_per_w": 2.191,
+      "perf_sample_count": 3700,
+      "stand_sample_count": 3700,
+      "telem_sample_count": 0,
+      "worst_ctrl_exec_us": 597,
+      "worst_ctrl_exec_us_steady": 76,
+      "worst_ctrl_period_us": 599,
+      "worst_main_loop_us": 635,
+      "worst_main_loop_us_steady": 146
+    }
+  }
+}

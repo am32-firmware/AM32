@@ -1,0 +1,40 @@
+name: efficiency_sweep
+description: >
+  Steady-state staircase from 10% to 100% throttle. Each step dwells long enough
+  to settle, and the tail of each is used to compute thrust, electrical power and
+  efficiency (g/W) plus loop time / CPU load at that operating point. This is the
+  primary efficiency + performance baseline.
+
+  Hold time is 6s. It was temporarily 10s while the ARK 4IN1 bench had severe
+  thrust-channel noise (sample CV up to 66%) that turned out to be prop-wake
+  impingement on the stand's mounting plate - the 5" disc sat entirely inside
+  the plate footprint blowing INTO it - not vibration to be averaged away.
+  With the prop reversed to exhaust into free air (thrust CV now 5.5-8.8%),
+  re-analysis of four 10s-hold captures truncated to 6s showed a 3s tail
+  changes gated points (>= 20W) by under +/-2% and leaves run-to-run
+  repeatability statistically unchanged (worst gated-point spread 9.8% vs
+  9.1%), so the extra 4s/point (~40s of motor+battery per sweep) bought
+  nothing. See Thresholds.efficiency_drop_pct in hwci/baseline.py for the
+  matching tolerance history.
+sample_rate_hz: 100
+arm_settle_s: 2.0
+steady_tail_fraction: 0.5
+
+safety:
+  max_current_a: 40.0
+  max_thrust_n: 16.0
+  max_rpm: 32000
+
+segments:
+  - {label: idle,   throttle: 0.00, duration_s: 2.0}
+  - {label: t10,    throttle: 0.10, duration_s: 6.0, ramp: true,  steady: true}
+  - {label: t20,    throttle: 0.20, duration_s: 6.0, steady: true}
+  - {label: t30,    throttle: 0.30, duration_s: 6.0, steady: true}
+  - {label: t40,    throttle: 0.40, duration_s: 6.0, steady: true}
+  - {label: t50,    throttle: 0.50, duration_s: 6.0, steady: true}
+  - {label: t60,    throttle: 0.60, duration_s: 6.0, steady: true}
+  - {label: t70,    throttle: 0.70, duration_s: 6.0, steady: true}
+  - {label: t80,    throttle: 0.80, duration_s: 6.0, steady: true}
+  - {label: t90,    throttle: 0.90, duration_s: 6.0, steady: true}
+  - {label: t100,   throttle: 1.00, duration_s: 6.0, steady: true}
+  - {label: rampdn, throttle: 0.00, duration_s: 4.0, ramp: true}

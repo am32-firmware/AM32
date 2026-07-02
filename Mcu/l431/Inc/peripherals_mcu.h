@@ -1,16 +1,9 @@
 /*
- * peripherals.h
- *
- *  Created on: Sep. 26, 2020
- *      Author: Alka
+ * peripherals_mcu.h — STM32L431 register macro sheet + private declarations.
  */
 
-#ifndef PERIPHERALS_H_
-#define PERIPHERALS_H_
-
-#endif /* PERIPHERALS_H_ */
-
-#include "main.h"
+#ifndef PERIPHERALS_MCU_H_
+#define PERIPHERALS_MCU_H_
 
 #define INTERVAL_TIMER_COUNT (INTERVAL_TIMER->CNT)
 #define RELOAD_WATCHDOG_COUNTER() (LL_IWDG_ReloadCounter(IWDG))
@@ -25,29 +18,20 @@
 #define SET_DUTY_CYCLE_ALL(newdc) \
     (TIM1->CCR1 = newdc, TIM1->CCR2 = newdc, TIM1->CCR3 = newdc)
 
-void initAfterJump(void);
-void initCorePeripherals(void);
 void SystemClock_Config(void);
 void MX_GPIO_Init(void);
 void MX_DMA_Init(void);
-// static void MX_ADC_Init(void);
 void MX_COMP1_Init(void);
 void MX_COMP2_Init(void);
 void MX_TIM1_Init(void);
 void MX_TIM2_Init(void);
-void MX_IWDG_Init(void);
 void MX_TIM16_Init(void);
 void MX_TIM14_Init(void);
 void MX_TIM6_Init(void);
 void MX_TIM7_Init(void);
 void init_OPAMP(void);
-// static void MX_USART1_UART_Init(void);
-void resetInputCaptureTimer();
-void setPWMCompare1(uint16_t compareone);
-void setPWMCompare2(uint16_t comparetwo);
-void setPWMCompare3(uint16_t comparethree);
-void enableCorePeripherals(void);
 void reloadWatchDogCounter(void);
-void generatePwmTimerEvent(void);
 void UN_TIM_Init(void);
 void LED_GPIO_init(void);
+
+#endif /* PERIPHERALS_MCU_H_ */

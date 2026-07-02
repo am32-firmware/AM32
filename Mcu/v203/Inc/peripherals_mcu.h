@@ -1,17 +1,9 @@
 /*
- * peripherals.h
- *
- *  Created on: Sep. 26, 2020
- *      Author: Alka
- *      Modified by TempersLee June,21 2024
+ * peripherals_mcu.h — CH32V203 register macro sheet + private declarations.
  */
 
-#ifndef PERIPHERALS_H_
-#define PERIPHERALS_H_
-
-#endif /* PERIPHERALS_H_ */
-
-#include "main.h"
+#ifndef PERIPHERALS_MCU_H_
+#define PERIPHERALS_MCU_H_
 
 #define INTERVAL_TIMER_COUNT (INTERVAL_TIMER->CNT)
 #define RELOAD_WATCHDOG_COUNTER() ( IWDG->CTLR = 0xAAAA)
@@ -26,17 +18,12 @@
 #define SET_DUTY_CYCLE_ALL(newdc) \
     (TIM1->CH1CVR = newdc, TIM1->CH2CVR = newdc, TIM1->CH3CVR = newdc)
 
-void initAfterJump(void);
-void initCorePeripherals(void);
-// void SystemClock_Config(void);
 void MX_GPIO_Init(void);
 void MX_DMA_Init(void);
-// static void MX_ADC_Init(void);
 void AT_COMP_Init(void);
 void TIM1_Init(void);
 void Intervak_TIM4_Init(void);
 void system_clock_config(void);
-void MX_IWDG_Init(void);
 void COM_TIM3_Init(void);
 void TenkHz_SysTick_Init(void);
 void TIM10_Init(void);
@@ -47,13 +34,9 @@ uint16_t getintervaTimerCount();
 void setintervaTimerCount(uint16_t intertime);
 void setAutoReloadPWM(uint16_t relval);
 void setDutyCycleAll(uint16_t newdc);
-void resetInputCaptureTimer();
-void setPWMCompare1(uint16_t compareone);
-void setPWMCompare2(uint16_t comparetwo);
-void setPWMCompare3(uint16_t comparethree);
-void enableCorePeripherals(void);
 void reloadWatchDogCounter(void);
-void generatePwmTimerEvent(void);
 void UN_TIM2_Init(void);
 void setPrescalerPWM(uint16_t presc);
 void LED_GPIO_init(void);
+
+#endif /* PERIPHERALS_MCU_H_ */

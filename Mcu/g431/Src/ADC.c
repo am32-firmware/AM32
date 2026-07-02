@@ -6,6 +6,11 @@
  */
  #include "ADC.h"
 
+// moved here from the old per-MCU ADC.h; only this file evaluates it
+// and -Wundef makes an undefined USE_TIMEOUT a hard error
+#ifndef USE_TIMEOUT
+#define USE_TIMEOUT 0
+#endif
 
  #ifdef USE_ADC_1_2
  uint16_t ADC1DataDMA[2];

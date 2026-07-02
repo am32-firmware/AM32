@@ -292,7 +292,7 @@ void allOff()
     phaseCFLOAT();
 }
 
-void comStep(char newStep)
+RAM_FUNC void comStep(char newStep)
 {
     switch (newStep) {
     case 1: // A-B

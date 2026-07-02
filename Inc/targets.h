@@ -5591,3 +5591,20 @@
 #ifndef POLLING_MODE_THRESHOLD
 #define POLLING_MODE_THRESHOLD 2000
 #endif
+
+// Place hot functions in RAM on MCUs that execute flash with wait states and
+// have spare RAM. The F051 runs flash at 1WS, RAM at 0WS, so commutation and
+// PWM interrupt code runs noticeably faster from RAM. With gcc the .ramfunc
+// input section is placed inside .data so the startup data-init copy loads
+// it; with Keil/armclang the scatter file places it and scatter-loading
+// copies it before main. noclone keeps gcc LTO constant-propagation clones
+// from escaping the section and is unknown to armclang, so it is gcc-only.
+#ifdef MCU_F051
+#if defined(__GNUC__) && !defined(__clang__)
+#define RAM_FUNC __attribute__((section(".ramfunc"), noclone))
+#else
+#define RAM_FUNC __attribute__((section(".ramfunc")))
+#endif
+#else
+#define RAM_FUNC
+#endif

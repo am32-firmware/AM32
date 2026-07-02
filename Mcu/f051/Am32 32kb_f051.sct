@@ -10,6 +10,8 @@ LR_IROM1 0x08001000 0x00007FFF  {    ; load region size_region
    .ANY (+XO)
   }
   RW_IRAM1 0x200000C0 0x00001F40  {  ; RW data
+   *(.ramfunc)                       ; RAM-executed functions, copied by scatter loading
+   *(.ramfunc*)
    .ANY (+RW +ZI)
   }
 }

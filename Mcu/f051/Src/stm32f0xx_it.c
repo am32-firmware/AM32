@@ -189,7 +189,7 @@ void DMA1_Channel4_5_IRQHandler(void)
  * @brief This function handles ADC and COMP interrupts (COMP interrupts
  * through EXTI lines 21 and 22).
  */
-void ADC1_COMP_IRQHandler(void)
+RAM_FUNC void ADC1_COMP_IRQHandler(void)
 {
   if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_21) != RESET) {
       if((INTERVAL_TIMER->CNT) > ((average_interval>>1))){
@@ -206,7 +206,7 @@ void ADC1_COMP_IRQHandler(void)
 /**
  * @brief This function handles TIM6 global and DAC underrun error interrupts.
  */
-void TIM6_DAC_IRQHandler(void)
+RAM_FUNC void TIM6_DAC_IRQHandler(void)
 {
     if (LL_TIM_IsActiveFlag_UPDATE(TIM6) == 1) {
         LL_TIM_ClearFlag_UPDATE(TIM6);
@@ -217,7 +217,7 @@ void TIM6_DAC_IRQHandler(void)
 /**
  * @brief This function handles TIM14 global interrupt.
  */
-void TIM14_IRQHandler(void)
+RAM_FUNC void TIM14_IRQHandler(void)
 {
     LL_TIM_ClearFlag_UPDATE(TIM14);
     PeriodElapsedCallback();

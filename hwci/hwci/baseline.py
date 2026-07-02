@@ -23,17 +23,23 @@ _CHANNELS = ("perf", "stand", "telem")
 @dataclass
 class Thresholds:
     """Pass/fail gates relative to the baseline."""
-    # peak & per-point g/W may drop this much. 3% was the initial guess but
-    # failed on a same-firmware, same-hardware repeatability check with a
-    # prop installed: two back-to-back efficiency_sweep captures on the
-    # ARK 4IN1 + JS Technology 2306 1800KV + HQProp 5136 differed by up to
-    # 8.7% (t70: 272W) and 8.2% (t90: 438W) at HIGH power, not just the noisy
-    # low-power points - real thrust-stand repeatability, not a regression.
-    # 15% gives ~1.7x margin over the observed worst case; matches the same
-    # margin philosophy used for ctrl_exec_increase_pct below. Single-sample
-    # estimate - tighten once more repeat captures establish the true noise
-    # band.
-    efficiency_drop_pct: float = 15.0
+    # peak & per-point g/W may drop this much. Widened twice from an initial
+    # 3% guess, both times by same-firmware repeatability checks with a prop
+    # installed on the ARK 4IN1 + JS Technology 2306 1800KV + HQProp 5136:
+    #   - 15%: two captures differed up to 8.7%/8.2% (t70 272W, t90 438W)
+    #   - 25%: after that, a capture at ~20k RPM (t60, 113gf mean) swung 20%
+    #     between runs. Root cause: real mechanical vibration/resonance, not
+    #     sensor noise - per-sample thrust coefficient of variation runs
+    #     55-66% at several RPM points even though RPM/current match within
+    #     1% run-to-run (see efficiency_sweep.yaml's hold-duration comment,
+    #     which doubled the averaging window to compensate). 25% gives
+    #     ~1.25x margin over the observed worst case with the OLD 3s tail;
+    #     the longer 5s tail in the profile should reduce real-world swing
+    #     further, but this hasn't been re-verified with a repeat capture.
+    #     Until the vibration source (prop balance? mount? resonance?) is
+    #     physically diagnosed, treat any single-point gate failure here as
+    #     "needs a repeat run to confirm," not an automatic real regression.
+    efficiency_drop_pct: float = 25.0
     # g/W below this magnitude is load-cell noise (no-prop rig): efficiency is
     # not a meaningful signal there and is not gated (the check reports "not
     # gated" instead of flapping on noise around zero).

@@ -22,6 +22,7 @@ from . import perf
 from .config import Profile, RigConfig
 from .esc_telem.kiss import KissFrame, KissStream, parse_frame
 from .flightstand.base import SafetyLimits, StandSafetyTripped, StandSample, ThrustStand
+from .metrics import tail_start_index
 from .model import RunResult, make_row
 from .perf import PerfSample
 from .perf_reader import PerfReader
@@ -46,6 +47,19 @@ class Sources:
                 c()
             except Exception:
                 pass
+
+
+# Ticks of margin between issuing a mid-segment perf-stats reset and the
+# metrics tail window's first sample - see the call site in run_profile for
+# why this must be a margin, not an exact boundary match.
+RESET_MARGIN_TICKS = 20
+
+
+def _tail_reset_tick(n: int, steady_tail_fraction: float) -> int:
+    """Tick within a steady segment to reset perf stats at, strictly before
+    the metrics tail window - computed from the SAME tail_start_index() the
+    metrics module uses, so the two can never disagree by a rounding tick."""
+    return max(0, tail_start_index(n, steady_tail_fraction) - RESET_MARGIN_TICKS)
 
 
 def _segment_throttle(seg, tick_in_seg: int, n_ticks: int, prev: float) -> float:
@@ -148,12 +162,26 @@ def run_profile(profile: Profile, sources: Sources, *,
     try:
         for seg in profile.segments:
             n = max(1, round(seg.duration_s * profile.sample_rate_hz))
-            # Reset the firmware's sticky min/max accumulators right where a
-            # steady segment's measurement tail begins, so the tail's worst
-            # case reflects THIS operating point - not the spin-up transient
-            # of the run so far (~700-950 us on the bench, varying 30%+
-            # run-to-run, which would drown steady loop-time regressions).
-            tail_reset_tick = (n - max(1, round(n * profile.steady_tail_fraction))
+            # Reset the firmware's sticky min/max accumulators BEFORE a
+            # steady segment's measurement tail begins (with a margin - see
+            # _tail_reset_tick), so the tail's worst case reflects THIS
+            # operating point - not the spin-up transient of the run so far
+            # (~700-950 us on the bench, varying 30%+ run-to-run, which would
+            # drown steady loop-time regressions).
+            #
+            # The reset must land strictly BEFORE the tail's first sample,
+            # not AT it: reset_stats() clears the firmware register over an
+            # SWD round trip, and in realtime mode perf_get() reads an
+            # independent background poller's CACHED value (_CachedPoller,
+            # ~2ms interval) - so the tick that ISSUES the reset can still
+            # observe the pre-reset cached sample. Observed on the bench: an
+            # 877us arming-tune-transient value latched at t10's first tick
+            # persisted for the segment's first 5s and was still visible in
+            # the very sample the reset was issued on, making the "steady"
+            # max equal the raw run max. A margin many times the poller
+            # interval (and typical SWD round trip) makes this exclusion
+            # instead of a race.
+            tail_reset_tick = (_tail_reset_tick(n, profile.steady_tail_fraction)
                                if seg.steady and sources.perf_reader is not None
                                else None)
             for i in range(n):

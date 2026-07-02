@@ -54,10 +54,26 @@ def _cpu_load(rows: list[dict]) -> tuple[np.ndarray, float]:
     t = t_host if not np.all(np.isnan(t_host)) else _col(rows, "t")
     iters = _col(rows, "perf_loop_iters")
     throttle = _col(rows, "throttle_cmd")
+    running = _col(rows, "perf_running")
     rate = _loop_iter_rate(t, iters)
     # Median, not max: one glitched sample must not become the reference the
     # whole run's load is scaled by.
-    idle_mask = (throttle < 0.02) & ~np.isnan(rate)
+    #
+    # The reference must be "motor genuinely stopped" (firmware-reported
+    # perf_running == 0), NOT "commanded throttle below a small cutoff": a
+    # segment that RAMPS UP FROM ZERO (e.g. efficiency_sweep's t10, 0%->10%)
+    # commands throttle under any such cutoff for real, non-idle time while
+    # the motor is actively spinning up and commutating - a genuine load, not
+    # idle. Observed on the bench: lengthening t10's hold pushed these
+    # ramp-up samples from ~37% to ~50% of the throttle-based reference pool,
+    # collapsing the reported idle rate from ~60k to ~46k iters/s and
+    # understating max_cpu_load_pct by 10+ points. perf_running falls back to
+    # the throttle heuristic only for run data recorded before that column
+    # existed.
+    if not np.all(np.isnan(running)):
+        idle_mask = (running == 0) & ~np.isnan(rate)
+    else:
+        idle_mask = (throttle < 0.02) & ~np.isnan(rate)
     if idle_mask.any():
         idle_rate = float(np.nanmedian(rate[idle_mask]))
     elif not np.all(np.isnan(rate)):
@@ -70,11 +86,25 @@ def _cpu_load(rows: list[dict]) -> tuple[np.ndarray, float]:
     return np.clip(load, 0.0, 100.0), idle_rate
 
 
+def tail_start_index(n: int, fraction: float) -> int:
+    """First index of the trailing ``fraction`` of ``n`` samples.
+
+    The single source of truth for "where does the steady tail begin" -
+    hwci.runner's mid-segment perf-stats reset computes its own tick relative
+    to THIS function (with a safety margin) specifically so the two can never
+    drift apart. They used to be two independently-rounded formulas that
+    disagreed by a tick in some segment lengths, which is exactly the kind of
+    gap a reset-propagation race can hide in.
+    """
+    if n <= 0:
+        return 0
+    return int(n * (1.0 - fraction))
+
+
 def _tail(idx: np.ndarray, fraction: float) -> np.ndarray:
     if len(idx) == 0:
         return idx
-    start = int(len(idx) * (1.0 - fraction))
-    return idx[start:]
+    return idx[tail_start_index(len(idx), fraction):]
 
 
 def _nanmean(a: np.ndarray) -> float:

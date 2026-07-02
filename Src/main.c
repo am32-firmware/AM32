@@ -423,6 +423,9 @@ volatile uint16_t tim1_arr = TIM1_AUTORELOAD; // current auto reset value
 // Q16 fixed point scale factor equal to tim1_arr / 2000, recomputed in the main
 // loop when tim1_arr changes so the 20khz routine multiplies instead of divides
 volatile uint32_t pwm_to_arr_scale_q16 = ((uint32_t)TIM1_AUTORELOAD << 16) / 2000;
+// Q16 input to duty cycle slopes, computed once at startup for setInput
+volatile uint32_t throttle_duty_slope_q16 = ((uint32_t)(2000 - DEAD_TIME) << 16) / (2047 - 47);
+volatile uint32_t sine_throttle_duty_slope_q16 = ((uint32_t)(2000 - (DEAD_TIME + 40)) << 16) / (2047 - 137);
 uint16_t TIMER1_MAX_ARR = TIM1_AUTORELOAD; // maximum auto reset register value
 volatile uint16_t duty_cycle_maximum = 2000; // restricted by temperature or low rpm throttle protect
 uint16_t low_rpm_level = 20; // thousand erpm used to set range for throttle resrictions
@@ -1199,10 +1202,16 @@ if (!stepper_sine && armed) {
                 last_duty_cycle = min_startup_duty;
             }
 
+            // straight line from (in_min, out_min) to (2047, 2000) using a
+            // startup computed Q16 slope, avoids calling map() at input rate
             if (eepromBuffer.use_sine_start) {
-                duty_cycle_setpoint = map(input, 137, 2047, minimum_duty_cycle+40, 2000);
+                duty_cycle_setpoint = input >= 2047 ? 2000
+                    : input <= 137 ? minimum_duty_cycle + 40
+                    : minimum_duty_cycle + 40 + (uint16_t)(((uint32_t)(input - 137) * sine_throttle_duty_slope_q16) >> 16);
             } else {
-                duty_cycle_setpoint = map(input, 47, 2047, minimum_duty_cycle, 2000);
+                duty_cycle_setpoint = input >= 2047 ? 2000
+                    : input <= 47 ? minimum_duty_cycle
+                    : minimum_duty_cycle + (uint16_t)(((uint32_t)(input - 47) * throttle_duty_slope_q16) >> 16);
             }
 
             if (!eepromBuffer.rc_car_reverse) {
@@ -1900,6 +1909,11 @@ int main(void)
 #endif
 
     uint16_t last_tim1_arr = 0; // force scale factor computation on first pass
+
+    // minimum_duty_cycle is final at this point, precompute the input to duty
+    // cycle slopes so setInput multiplies instead of calling map()
+    throttle_duty_slope_q16 = (((uint32_t)(2000 - minimum_duty_cycle)) << 16) / (2047 - 47);
+    sine_throttle_duty_slope_q16 = (((uint32_t)(2000 - (minimum_duty_cycle + 40))) << 16) / (2047 - 137);
 
     while (1) {
         HWCI_PERF_MAIN_LOOP();

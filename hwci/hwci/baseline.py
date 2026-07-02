@@ -23,23 +23,20 @@ _CHANNELS = ("perf", "stand", "telem")
 @dataclass
 class Thresholds:
     """Pass/fail gates relative to the baseline."""
-    # peak & per-point g/W may drop this much. Widened twice from an initial
-    # 3% guess, both times by same-firmware repeatability checks with a prop
-    # installed on the ARK 4IN1 + JS Technology 2306 1800KV + HQProp 5136:
-    #   - 15%: two captures differed up to 8.7%/8.2% (t70 272W, t90 438W)
-    #   - 25%: after that, a capture at ~20k RPM (t60, 113gf mean) swung 20%
-    #     between runs. Root cause: real mechanical vibration/resonance, not
-    #     sensor noise - per-sample thrust coefficient of variation runs
-    #     55-66% at several RPM points even though RPM/current match within
-    #     1% run-to-run (see efficiency_sweep.yaml's hold-duration comment,
-    #     which doubled the averaging window to compensate). 25% gives
-    #     ~1.25x margin over the observed worst case with the OLD 3s tail;
-    #     the longer 5s tail in the profile should reduce real-world swing
-    #     further, but this hasn't been re-verified with a repeat capture.
-    #     Until the vibration source (prop balance? mount? resonance?) is
-    #     physically diagnosed, treat any single-point gate failure here as
-    #     "needs a repeat run to confirm," not an automatic real regression.
-    efficiency_drop_pct: float = 25.0
+    # peak & per-point g/W may drop this much. History, all measured on the
+    # ARK 4IN1 + JS Technology 2306 1800KV + HQProp 5136 bench:
+    #   - 3% initial guess, then 15%, then 25%: successive same-firmware
+    #     repeatability checks kept swinging 8-20% per point. Root cause
+    #     turned out to be prop-wake impingement on the stand's mounting
+    #     plate (5" disc entirely inside the plate footprint, wake blowing
+    #     into it) - cancelling ~75% of true thrust and buffeting the load
+    #     cell (per-sample CV 55-66%).
+    #   - back to 15% after the prop was reversed to exhaust into free air:
+    #     four interleaved captures (2 firmwares x 2 runs) show worst
+    #     gated-point (>= 20W) run-to-run spread of 9.8%, so 15% is ~1.5x
+    #     the observed worst case. Tighten further only with more repeat
+    #     captures demonstrating headroom.
+    efficiency_drop_pct: float = 15.0
     # g/W below this magnitude is load-cell noise (no-prop rig): efficiency is
     # not a meaningful signal there and is not gated (the check reports "not
     # gated" instead of flapping on noise around zero).

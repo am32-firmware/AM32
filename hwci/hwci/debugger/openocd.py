@@ -15,10 +15,12 @@ here follow the documented OpenOCD interface.
 """
 from __future__ import annotations
 
+import collections
 import shutil
 import socket
 import struct
 import subprocess
+import threading
 import time
 
 from .base import Debugger, DebuggerError
@@ -48,6 +50,8 @@ class OpenOcdDebugger(Debugger):
         self.connect_timeout = connect_timeout
         self._proc: subprocess.Popen | None = None
         self._sock: socket.socket | None = None
+        self._log_tail: collections.deque[str] = collections.deque(maxlen=200)
+        self._drain_thread: threading.Thread | None = None
         if shutil.which(openocd_bin) is None:
             raise DebuggerError(f"{openocd_bin!r} not found on PATH")
 
@@ -82,6 +86,14 @@ class OpenOcdDebugger(Debugger):
         ]
         self._proc = subprocess.Popen(
             cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        # openocd logs continuously to stdout. NOBODY reading the pipe kills
+        # the session: once the 64 KiB pipe buffer fills, openocd blocks on
+        # write and every Tcl-RPC call times out from then on (observed on
+        # the bench as the perf channel dying at the same sample every run).
+        # Drain it forever; keep a tail for error diagnostics.
+        self._drain_thread = threading.Thread(
+            target=self._drain_stdout, daemon=True, name="openocd-drain")
+        self._drain_thread.start()
         self._connect_rpc()
         # Ensure the core is running (a fresh attach can leave it halted).
         try:
@@ -89,6 +101,16 @@ class OpenOcdDebugger(Debugger):
         except DebuggerError:
             pass
         return self
+
+    def _drain_stdout(self) -> None:
+        proc = self._proc
+        if proc is None or proc.stdout is None:
+            return
+        try:
+            for line in proc.stdout:
+                self._log_tail.append(line.rstrip("\n"))
+        except (OSError, ValueError):
+            pass  # pipe closed on shutdown
 
     def _connect_rpc(self) -> None:
         deadline = time.monotonic() + self.connect_timeout
@@ -101,7 +123,8 @@ class OpenOcdDebugger(Debugger):
             except OSError as e:  # openocd not listening yet
                 last_err = e
                 if self._proc and self._proc.poll() is not None:
-                    out = self._proc.stdout.read() if self._proc.stdout else ""
+                    time.sleep(0.1)  # let the drain thread catch the tail
+                    out = "\n".join(self._log_tail)
                     raise DebuggerError(f"openocd exited early:\n{out}")
                 time.sleep(0.2)
         raise DebuggerError(f"could not connect to openocd Tcl-RPC: {last_err}")
@@ -109,13 +132,29 @@ class OpenOcdDebugger(Debugger):
     def _rpc(self, command: str) -> str:
         if self._sock is None:
             raise DebuggerError("RPC session not open; call open() first")
-        self._sock.sendall(command.encode() + _RPC_SEP)
-        chunks = bytearray()
-        while _RPC_SEP not in chunks:
-            data = self._sock.recv(4096)
-            if not data:
-                raise DebuggerError("openocd RPC closed unexpectedly")
-            chunks += data
+        try:
+            self._sock.sendall(command.encode() + _RPC_SEP)
+            chunks = bytearray()
+            while _RPC_SEP not in chunks:
+                data = self._sock.recv(4096)
+                if not data:
+                    raise DebuggerError("openocd RPC closed unexpectedly")
+                chunks += data
+        except (socket.timeout, OSError) as e:
+            # One glitched command desyncs the reply framing (the late reply
+            # would be read as the answer to the NEXT command), so a single
+            # hiccup would poison every subsequent read for the rest of the
+            # run. Rebuild the socket - openocd itself is still fine - and
+            # surface the error for this call only (observed on the bench:
+            # one SWD read timeout at motor spin-up killed the whole perf
+            # channel).
+            try:
+                self._sock.close()
+            except OSError:
+                pass
+            self._sock = None
+            self._connect_rpc()
+            raise DebuggerError(f"openocd RPC error for {command!r}: {e}") from e
         return chunks.split(_RPC_SEP, 1)[0].decode(errors="replace")
 
     # --- Debugger interface ------------------------------------------

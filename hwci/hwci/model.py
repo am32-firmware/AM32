@@ -31,6 +31,8 @@ COLUMNS = [
     "perf_main_loop_us_max", "perf_loop_iters", "perf_zero_cross_count",
     "perf_commutation_interval", "perf_commutation_interval_max",
     "perf_bemf_timeout", "perf_e_rpm",
+    # ESC input/arming state (proves the ESC decoded the throttle protocol)
+    "perf_input", "perf_armed", "perf_running",
 ]
 
 
@@ -76,6 +78,9 @@ def make_row(t: float, segment: str, throttle_cmd: float,
             perf_commutation_interval_max=r["commutation_interval_max"],
             perf_bemf_timeout=r["bemf_timeout_state"],
             perf_e_rpm=perf.e_rpm,
+            perf_input=r["input"],
+            perf_armed=r["armed"],
+            perf_running=r["running"],
         )
     return row
 

@@ -37,19 +37,29 @@ throttle_backend: flightstand  # flightstand | external
 # throttle_baud: 115200
 
 # --- thrust stand (Tyto Robotics Flight Stand 50) ---
+# The Flight Stand Software runs on Windows only. On a Linux bench, run it on
+# a Windows PC on the same network, launched with "--remote", and set
+# stand_host to that PC's IP. The signal ids below are Tyto InputType enum
+# values from flight_stand_api_v1.proto; set a channel to null if your bench
+# lacks that sensor.
 stand_backend: grpc            # grpc | none (perf-only bench: none + throttle external)
-stand_host: 127.0.0.1          # host running the Flight Stand Software
+stand_host: 127.0.0.1          # machine running the Flight Stand Software
 stand_port: 50051
-stand_signals:                 # confirm signal numbers against your .proto
-  thrust: 11                   # FZ (documented by Tyto)
-  torque: null                 # set from your board's input list
-  rpm: null
-  voltage: null
-  current: null
-  esc_output: 0                # actuator id used to command throttle
-  esc_min: 1000.0              # PWM us, or DShot/normalized units
-  esc_max: 2000.0
-  thrust_is_grams: true        # most stands report gram-force
+stand_signals:
+  thrust: 11                   # FORCE_FZ
+  torque: 14                   # TORQUE_MZ
+  rpm: 15                      # ROTATION_SPEED_FREQUENCY (rad/s over the API)
+  voltage: 6                   # VOLTAGE_HV_INPUT
+  current: 8                   # CURRENT_HALL_CURRENT
+  esc_output: 0                # index into ESC-type outputs, sorted by name
+  esc_min: 1000.0              # raw value of the lowest real throttle step
+  esc_max: 2000.0              # raw value of full throttle
+  # esc_zero: 0.0              # REQUIRED for DShot: AM32 arms only on DShot 0,
+                               #   and 1-47 are commands that must never be
+                               #   emitted (DShot: esc_zero 0, esc_min 48,
+                               #   esc_max 2047). Omit for standard PWM.
+  thrust_is_grams: false       # gRPC API is SI (Newtons)
+  rpm_is_rad_per_s: true       # gRPC API reports rotation in rad/s
 
 # --- device under test ---
 # pole_pairs is authoritative here (recorded into each run's meta and used for

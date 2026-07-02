@@ -1,0 +1,23 @@
+name: noprop_smoke
+description: >
+  Bring-up validation with NO propeller installed: arms, holds two gentle
+  throttle points, returns to idle. Verifies throttle path, arming, spin-up,
+  and all data channels with minimal mechanical risk (no-load current is a
+  few amps). Thrust/efficiency numbers are meaningless without a prop - this
+  profile validates the pipeline, not the powertrain. ~20 s.
+sample_rate_hz: 100
+arm_settle_s: 3.0
+
+safety:
+  max_current_a: 8.0     # no-load current should stay well under this
+  max_thrust_n: 2.0      # ~0 expected without a prop; trips on sensor faults
+  max_rpm: 25000         # 1800KV @ 6S free-runs ~45k at 100%; stay low
+
+segments:
+  - {label: idle,    throttle: 0.00, duration_s: 2.0}
+  - {label: ramp10,  throttle: 0.10, duration_s: 2.0, ramp: true}
+  - {label: hold10,  throttle: 0.10, duration_s: 4.0, steady: true}
+  - {label: ramp20,  throttle: 0.20, duration_s: 2.0, ramp: true}
+  - {label: hold20,  throttle: 0.20, duration_s: 4.0, steady: true}
+  - {label: rampdn,  throttle: 0.00, duration_s: 2.0, ramp: true}
+  - {label: stop,    throttle: 0.00, duration_s: 2.0}

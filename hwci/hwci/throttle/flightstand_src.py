@@ -19,3 +19,9 @@ class FlightStandThrottle(ThrottleSource):
 
     def set(self, throttle: float) -> None:
         self.stand.set_throttle(throttle)
+
+    def quiesce(self) -> None:
+        # Deactivate the stand's ESC output entirely: the line is driven to
+        # logic 0, which is what lets the AM32 bootloader exit to the app
+        # (verified on the ARK 4IN1 bench; DShot-at-zero is NOT enough).
+        self.stand.deactivate()

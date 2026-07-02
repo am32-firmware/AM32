@@ -1,24 +1,32 @@
-"""Real Flight Stand gRPC backend.
+"""Real Flight Stand gRPC backend (Tyto Robotics Flight Stand Software API v1).
 
-The Tyto Robotics Flight Stand Software exposes a gRPC API (you install
-``grpcio``/``grpcio-tools`` and generate Python stubs from their ``.proto``).
-The model is: a *board* exposes numbered *input* signals (e.g. thrust FZ = 11)
-and *output* actuators (the ESC/servo throttle).
+Mapped against ``flight_stand_api_v1.proto`` from
+https://gitlab.com/TytoRobotics/flightstand-api (the pre-compiled Python stubs
+in ``languages/python`` of that repo must be importable, e.g. via a ``.pth``
+file in the venv).
 
-Because the upstream ``.proto`` ships with the Flight Stand Software (and is not
-redistributed here), the few proto-specific calls are isolated in
-:class:`_StubAdapter`. Generate the stubs during rig setup (see hwci/README.md)
-into a package and pass its module names; everything above the adapter -- the
-:class:`~hwci.flightstand.base.ThrustStand` interface the runner uses -- is
-backend-agnostic.
+The Tyto model: *boards* (USB measurement units) expose *inputs* (sensors,
+identified by ``InputType``: FORCE_FZ=11 is thrust) and *outputs* (the ESC
+signal, ``OutputType.ESC``). The latest value of every signal comes back in
+one ``ListSamples`` round trip; throttle is commanded with ``UpdateOutput``
+on the output's ``output_target`` field (a µs-style value, 1000-2000 for
+standard PWM).
 
-Until the stubs are generated this backend raises a clear, actionable error;
-the simulator backend is the default so development is never blocked.
+The Flight Stand Software runs on Windows only. For a Linux bench, run it on
+a Windows PC on the same network, launched with ``--remote``, and point
+``stand_host`` at that PC. Units over the API are SI: thrust in Newtons,
+rotation speed in rad/s (converted to RPM here).
+
+The numeric ids in :class:`SignalMap` ARE Tyto ``InputType`` enum values, so
+a rig file maps channels without touching code; ``esc_output`` indexes the
+ESC-type outputs sorted by resource name.
 """
 from __future__ import annotations
 
 import importlib
+import math
 import time
+
 from dataclasses import dataclass
 
 from .base import SafetyLimits, StandSample, ThrustStand
@@ -26,49 +34,77 @@ from .base import SafetyLimits, StandSample, ThrustStand
 
 @dataclass
 class SignalMap:
-    """Maps StandSample fields to the board's numbered input signals.
+    """Maps StandSample fields to Tyto ``InputType`` enum values.
 
-    Confirm these against your stand: open the ``.proto`` (or print the board's
-    inputs via the upstream ``example.py``) and read off the signal numbers.
-    Thrust (FZ) = 11 is documented by Tyto; the rest are placeholders to verify.
+    Defaults follow the proto: FORCE_FZ=11 thrust, TORQUE_MZ=14, ROTATION_
+    SPEED_FREQUENCY=15 (rad/s), VOLTAGE_HV_INPUT=6, CURRENT_HALL_CURRENT=8.
+    Set a channel to ``null``/None in the rig file if the bench lacks it;
+    reads then report 0.0 and the metrics coverage gate flags it.
     """
     thrust: int = 11
-    torque: int | None = None
-    rpm: int | None = None
-    voltage: int | None = None
-    current: int | None = None
+    torque: int | None = 14
+    rpm: int | None = 15
+    voltage: int | None = 6
+    current: int | None = 8
     # Output (actuator) used to command throttle, and its raw range.
     esc_output: int = 0
-    esc_min: float = 1000.0   # e.g. PWM microseconds; or DShot/normalized units
-    esc_max: float = 2000.0
-    thrust_is_grams: bool = True   # many stands report gram-force, not Newtons
+    esc_min: float = 1000.0   # raw value of the LOWEST real throttle step
+    esc_max: float = 2000.0   # raw value of full throttle
+    # Raw value for throttle == 0. Leave None where zero throttle IS esc_min
+    # (standard PWM: 1000 us). For DShot it must be 0: AM32 only arms on
+    # sustained DShot 0 (what an FC sends while disarmed), values 1-47 are
+    # DShot COMMANDS that must never be emitted (a ramp sweeping them could
+    # trigger beacons or even settings changes), and real throttle starts at
+    # 48. So DShot: esc_zero=0, esc_min=48, esc_max=2047.
+    esc_zero: float | None = None
+    thrust_is_grams: bool = False  # gRPC API is SI: Newtons
+    rpm_is_rad_per_s: bool = True  # gRPC API reports rotation in rad/s
 
 
 G0 = 9.80665
+RADS_TO_RPM = 60.0 / (2.0 * math.pi)
 
 
 class _StubAdapter:
-    """The only proto-aware surface. Reconcile names with the actual stubs."""
+    """The only proto-aware surface, mapped to Tyto's FlightStand service."""
+
+    RPC_TIMEOUT_S = 2.0
 
     def __init__(self, host: str, port: int, pb2: str, pb2_grpc: str):
         try:
             self._pb2 = importlib.import_module(pb2)
             self._pb2_grpc = importlib.import_module(pb2_grpc)
+            from google.protobuf import field_mask_pb2
             import grpc
         except ImportError as e:
             raise RuntimeError(
                 "Flight Stand gRPC stubs / grpcio not importable "
-                f"({e}). Generate them during setup:\n"
-                "  pip install grpcio grpcio-tools\n"
-                "  python -m grpc_tools.protoc -I<proto_dir> "
-                "--python_out=<pkg> --grpc_out=<pkg> <proto_dir>/*.proto\n"
-                "then pass pb2/pb2_grpc module names to FlightStandGrpc.") from e
+                f"({e}). Clone https://gitlab.com/TytoRobotics/flightstand-api "
+                "and make languages/python importable (pip install grpcio "
+                "protobuf, then add a .pth file pointing at it).") from e
         self._grpc = grpc
+        self._field_mask_pb2 = field_mask_pb2
         self._channel = grpc.insecure_channel(f"{host}:{port}")
-        # NOTE: stub class name comes from the service name in the .proto.
         self._stub = self._make_stub()
+        self._sig_by_type: dict[int, str] = {}
+        self._esc_outputs: list = []
+        # Fail fast with an actionable message if the core is not running.
+        try:
+            self._stub.GetServerStatus(self._pb2.GetServerStatusRequest(),
+                                       timeout=self.RPC_TIMEOUT_S)
+        except grpc.RpcError as e:
+            raise RuntimeError(
+                f"Flight Stand core not reachable at {host}:{port} "
+                f"({e.code().name}). Start the Flight Stand Software "
+                "(with --remote if it runs on another machine).") from e
+        # A cutoff latched from a previous session blocks output commands.
+        try:
+            self._stub.ClearCutoff(self._pb2.ClearCutoffRequest(),
+                                   timeout=self.RPC_TIMEOUT_S)
+        except grpc.RpcError:
+            pass  # no cutoff to clear
 
-    # --- proto-specific operations (verify against the shipped .proto) ----
+    # --- proto-specific operations ----------------------------------------
     def _make_stub(self):
         # The generated grpc module exposes one <ServiceName>Stub class.
         stub_classes = [v for k, v in vars(self._pb2_grpc).items()
@@ -78,29 +114,91 @@ class _StubAdapter:
         return stub_classes[0](self._channel)
 
     def list_boards(self):
-        """Return available boards. Map to the proto's list/discover RPC."""
-        raise NotImplementedError(
-            "map _StubAdapter.list_boards() to your proto's board-list RPC")
+        """Boards that are connected and ready."""
+        resp = self._stub.ListBoards(self._pb2.ListBoardsRequest(),
+                                     timeout=self.RPC_TIMEOUT_S)
+        boards = [b for b in resp.boards if b.ready]
+        if not boards:
+            raise RuntimeError(
+                "Flight Stand core is running but reports no ready boards - "
+                "check the stand's USB connections on the machine running "
+                "the Flight Stand Software.")
+        return boards
 
     def connect_board(self, board) -> None:
-        raise NotImplementedError(
-            "map _StubAdapter.connect_board() to your proto's connect RPC")
+        """USB boards auto-connect; discover the signal/output mapping.
+
+        Inputs and outputs are discovered across ALL ready boards (the
+        Flight Stand 50 enumerates as separate force and power units), so
+        ``board`` only anchors the error message.
+        """
+        ins = self._stub.ListInputs(self._pb2.ListInputsRequest(),
+                                    timeout=self.RPC_TIMEOUT_S).inputs
+        self._sig_by_type = {}
+        for i in ins:
+            # First input of each type wins, matching the vendor helper's
+            # find_input_by_type().
+            self._sig_by_type.setdefault(int(i.input_type), i.signal_name)
+
+        outs = self._stub.ListOutputs(self._pb2.ListOutputsRequest(),
+                                      timeout=self.RPC_TIMEOUT_S).outputs
+        self._esc_outputs = sorted(
+            (o for o in outs if o.output_type == self._pb2.ESC and not o.closed),
+            key=lambda o: o.name)
+        if not self._esc_outputs:
+            raise RuntimeError(
+                f"no ESC output found on {board.name} (or any board) - "
+                "cannot command throttle")
+
+    def input_types_available(self) -> dict[int, str]:
+        """InputType -> signal_name map discovered at connect (diagnostics)."""
+        return dict(self._sig_by_type)
 
     def read_signal(self, signal_id: int) -> float:
-        raise NotImplementedError(
-            "map _StubAdapter.read_signal() to your proto's sample RPC")
+        return self.read_signals([signal_id]).get(signal_id, 0.0)
 
     def read_signals(self, signal_ids: list[int]) -> dict[int, float]:
-        """Read several signals in ONE round-trip if the proto offers a
-        batched/streamed sample RPC - at 100-200 Hz sample rates, five
-        sequential unary calls per tick would blow the tick budget and read
-        thrust and current milliseconds apart (skewing efficiency math).
-        Falls back to per-signal reads until the batched RPC is mapped."""
-        return {sid: self.read_signal(sid) for sid in signal_ids}
+        """Latest value for each wanted InputType in ONE round trip.
 
-    def set_output(self, output_id: int, value: float) -> None:
-        raise NotImplementedError(
-            "map _StubAdapter.set_output() to your proto's set-output RPC")
+        ``ListSamples`` returns the most recent sample of every signal;
+        inactive samples (sensor off/disconnected) are omitted so the
+        caller's 0.0 default and the coverage gate see a dead channel.
+        """
+        wanted = {self._sig_by_type[t]: t for t in signal_ids
+                  if t in self._sig_by_type}
+        if not wanted:
+            return {}
+        resp = self._stub.ListSamples(self._pb2.ListSamplesRequest(),
+                                      timeout=self.RPC_TIMEOUT_S)
+        out: dict[int, float] = {}
+        for sample in resp.sample_group.samples:
+            t = wanted.get(sample.signal_name)
+            if t is not None and sample.active:
+                out[t] = sample.value
+        return out
+
+    def set_output(self, output_id: int, value: float, *,
+                   active: bool = True) -> None:
+        try:
+            output = self._esc_outputs[output_id]
+        except IndexError:
+            raise RuntimeError(
+                f"esc_output index {output_id} out of range - only "
+                f"{len(self._esc_outputs)} ESC output(s) discovered")
+        target = self._pb2.OutputTarget(active=active, target_value=value,
+                                        rate_limit_per_second=0.0)
+        mask = self._field_mask_pb2.FieldMask(paths=["output_target"])
+        req = self._pb2.UpdateOutputRequest(
+            output=self._pb2.Output(name=output.name, output_target=target),
+            mask=mask)
+        self._stub.UpdateOutput(req, timeout=self.RPC_TIMEOUT_S)
+
+    def tare(self) -> None:
+        self._stub.TareInputs(self._pb2.TareInputsRequest(),
+                              timeout=30.0)  # taring takes a few seconds
+
+    def close_channel(self) -> None:
+        self._channel.close()
 
 
 class FlightStandGrpc(ThrustStand):
@@ -110,8 +208,8 @@ class FlightStandGrpc(ThrustStand):
         port: int = 50051,
         *,
         signals: SignalMap | None = None,
-        pb2_module: str = "flightstand_pb2",
-        pb2_grpc_module: str = "flightstand_pb2_grpc",
+        pb2_module: str = "flight_stand_api_v1_pb2",
+        pb2_grpc_module: str = "flight_stand_api_v1_pb2_grpc",
         board_index: int = 0,
     ):
         self.host = host
@@ -134,7 +232,10 @@ class FlightStandGrpc(ThrustStand):
         throttle = max(0.0, min(1.0, throttle))
         self._throttle = throttle
         s = self.signals
-        raw = s.esc_min + throttle * (s.esc_max - s.esc_min)
+        if throttle <= 0.0 and s.esc_zero is not None:
+            raw = s.esc_zero            # e.g. DShot 0: disarm-idle/motor stop
+        else:
+            raw = s.esc_min + throttle * (s.esc_max - s.esc_min)
         self._api.set_output(s.esc_output, raw)
 
     def read_sample(self) -> StandSample:
@@ -148,26 +249,48 @@ class FlightStandGrpc(ThrustStand):
 
         thrust = _get(s.thrust)
         thrust_n = thrust * G0 / 1000.0 if s.thrust_is_grams else thrust
+        rpm = _get(s.rpm)
+        if s.rpm_is_rad_per_s:
+            rpm *= RADS_TO_RPM
         return StandSample(
             t=time.monotonic(),
             throttle=self._throttle,
             thrust_n=thrust_n,
             torque_nm=_get(s.torque),
-            rpm=_get(s.rpm),
+            rpm=rpm,
             voltage_v=_get(s.voltage),
             current_a=_get(s.current),
         )
 
     def set_safety_limits(self, limits: SafetyLimits) -> None:
         # NOTE: this backend cannot enforce limits itself until the vendor
-        # set-limit RPC is mapped in _StubAdapter. Enforcement happens in the
-        # runner (hwci.runner.enforce_safety) against every sample; configure
-        # the Flight Stand Software's own UI cutoffs as a second layer.
+        # cutoff-condition RPC is mapped in _StubAdapter. Enforcement happens
+        # in the runner (hwci.runner.enforce_safety) against every sample;
+        # configure the Flight Stand Software's own UI cutoffs as a second
+        # layer.
         self._limits = limits
+
+    def deactivate(self) -> None:
+        """Drop the ESC signal entirely (output inactive drives logic 0)."""
+        self._api.set_output(self.signals.esc_output, self.signals.esc_min,
+                             active=False)
+
+    def tare(self) -> None:
+        if self._api is not None:
+            self._api.tare()
 
     def close(self) -> None:
         if self._api is not None:
+            park = (self.signals.esc_zero if self.signals.esc_zero is not None
+                    else self.signals.esc_min)
             try:
-                self._api.set_output(self.signals.esc_output, self.signals.esc_min)
+                # Park at zero throttle, then drop the signal entirely.
+                self._api.set_output(self.signals.esc_output, park)
+                self._api.set_output(self.signals.esc_output, park,
+                                     active=False)
+            except Exception:
+                pass
+            try:
+                self._api.close_channel()
             except Exception:
                 pass

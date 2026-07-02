@@ -115,25 +115,37 @@ cd hwci
 
 Then, manually (vendor bits the script can't automate):
 
-1. Install the **Tyto Flight Stand Software** and enable its Python/gRPC API.
-2. Generate the gRPC stubs from Tyto's `.proto` and make them importable, then
-   reconcile method/signal names in `hwci/hwci/flightstand/grpc_client.py`
-   (the proto-specific calls are isolated in one `_StubAdapter` class):
+1. The **Tyto Flight Stand Software runs on Windows only** (no Linux build as
+   of v2.4.x). Install it on a Windows PC on the bench network, plug the
+   stand's USB into that PC, and launch the software with the `--remote`
+   flag so the gRPC API accepts non-local connections. Point `stand_host`
+   in `rig.yaml` at that PC. (The GUI is also where you configure the
+   vendor-side safety cutoffs and tare the load cells.)
+2. Clone Tyto's API repo — it ships **pre-compiled Python stubs**, no protoc
+   run needed — and make it importable in the harness venv:
    ```bash
-   pip install grpcio grpcio-tools
-   python -m grpc_tools.protoc -I<proto_dir> \
-       --python_out=hwci/flightstand/_generated \
-       --grpc_out=hwci/flightstand/_generated <proto_dir>/*.proto
+   git clone https://gitlab.com/TytoRobotics/flightstand-api ~/flightstand-api
+   .venv/bin/pip install grpcio protobuf
+   echo ~/flightstand-api/languages/python > \
+       .venv/lib/python3*/site-packages/flightstand_api.pth
    ```
+   `hwci/hwci/flightstand/grpc_client.py` is mapped against
+   `flight_stand_api_v1.proto` (Flight Stand Software 2.4.x); the
+   proto-aware calls stay isolated in `_StubAdapter` if Tyto's API moves.
 3. `cp config/rig.example.yaml rig.yaml` and edit ports/host/signal map/motor.
 4. Edit `/etc/udev/rules.d/99-hwci.rules` with your USB-serial serial numbers so
    `/dev/esc-telem` (and `/dev/esc-throttle`) appear.
+5. ESC telemetry only streams if the AM32 EEPROM setting
+   `telemetry_on_interval` is enabled (AM32 configurator: "30ms telemetry").
+   With it off, the KISS channel is silent even when wired correctly. On a
+   bench without the telemetry wire, set `telem_backend: none` — the perf
+   struct still reports eRPM/voltage/current/temperature over SWD.
 
 Verify the harness with **no hardware** at any time:
 
 ```bash
 python -m hwci selftest          # runs ci_smoke in the built-in simulator
-python -m pytest                 # 71 offline tests
+python -m pytest                 # 75 offline tests
 ```
 
 ## Usage
@@ -210,16 +222,25 @@ hwci/hwci/throttle/                flight-stand / external / base throttle sourc
 hwci/hwci/sim.py                   offline rig simulator (all 3 channels)
 hwci/hwci/runner.py metrics.py baseline.py report.py config.py cli.py
 hwci/hwci/profiles/*.yaml          test profiles
-hwci/tests/                        71 offline tests (sim, DWARF layout, fail-closed gating)
+hwci/tests/                        75 offline tests (sim, DWARF layout, fail-closed gating)
 ```
 
 ## Honest limitations
 
-* The **gRPC client** is structured against Tyto's documented model (boards →
-  numbered input signals, thrust FZ=11 → outputs) but the exact rpc/field names
-  ship with the Flight Stand Software; confirm them in `_StubAdapter` on the
-  bench. Everything else is backend-agnostic and the simulator exercises the
-  whole pipeline today.
+* The **gRPC client** is mapped against Tyto's published
+  `flight_stand_api_v1.proto` (Flight Stand Software 2.4.x): inputs are
+  discovered by `InputType` (FORCE_FZ=11 etc.), all signals are read in one
+  `ListSamples` round trip, and throttle goes out via `UpdateOutput` on the
+  ESC output's `output_target`. Tyto guarantees no cross-version API
+  compatibility, so re-check `_StubAdapter` after a Flight Stand Software
+  update. The API reports SI units (Newtons, rad/s) — `thrust_is_grams:
+  false`, `rpm_is_rad_per_s: true` in the signal map.
+* The **AM32 bootloader only jumps to the app when the throttle signal line
+  idles low at boot**. An inactive stand output can leave the line high and
+  park the ESC in the bootloader after every flash or power-cycle (observed
+  on the ARK 4IN1 bench). Live-source bring-up detects this via the perf
+  magic, commands zero throttle, resets the MCU, and waits for the app —
+  see `_ensure_app_alive` in `hwci/runner.py`.
 * `HWCI_PERF` is validated for the STM32F0 (ARK 4IN1). The timestamp macro uses
   the shared `get_timer_us16()` helper, so STM32/GigaDevice/Artery targets
   compile with `HWCI_PERF=1`; NXP and WCH are `#error`-gated (no usable

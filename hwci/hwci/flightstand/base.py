@@ -108,6 +108,9 @@ class ThrustStand(abc.ABC):
     def set_safety_limits(self, limits: SafetyLimits) -> None:  # optional
         pass
 
+    def deactivate(self) -> None:  # optional: drop the ESC signal (line low)
+        pass
+
     def tare(self) -> None:  # optional: zero the load cells
         pass
 

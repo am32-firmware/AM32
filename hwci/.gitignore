@@ -9,3 +9,6 @@ __pycache__/
 runs/
 rig.yaml
 hwci/flightstand/_generated/
+
+# pip build artifacts
+build/

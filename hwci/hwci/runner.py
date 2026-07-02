@@ -223,6 +223,49 @@ def build_sim_sources(rig: RigConfig, profile: Profile, *,
     )
 
 
+def _ensure_app_alive(dbg, perf_reader: PerfReader,
+                      throttle: ThrottleSource) -> None:
+    """Get the ESC out of the AM32 bootloader and into the app.
+
+    The bootloader only jumps to the app when the throttle signal line idles
+    LOW at boot. A floating line reads high, and an ACTIVE DShot output keeps
+    the line high 40-75% of each frame - either way the ESC parks in the
+    bootloader after a flash/power-cycle and the run would produce no perf
+    data and never arm. Detected via the hwci_perf magic: quiesce the
+    throttle source (signal dropped, line driven low), reset, and wait for
+    the app to publish the magic. The throttle is re-activated later by
+    ``arm()``.
+    """
+    from .perf import PerfDecodeError
+
+    def app_alive() -> bool:
+        # Only a decode failure means "bootloader/no instrumentation";
+        # a debugger error is a different fault and must propagate.
+        try:
+            perf_reader.read()
+            return True
+        except PerfDecodeError:
+            return False
+
+    if app_alive():
+        return
+    for _attempt in range(2):
+        throttle.quiesce()  # drop the signal so the line is driven low
+        time.sleep(0.2)     # let the output state settle
+        dbg.reset_run()
+        deadline = time.monotonic() + 8.0  # boot + arming tune
+        while time.monotonic() < deadline:
+            time.sleep(0.25)
+            if app_alive():
+                return
+    raise RuntimeError(
+        "ESC app never came up (hwci_perf magic invalid after reset). "
+        "Either the flashed firmware was built without HWCI_PERF=1, or the "
+        "ESC is stuck in the AM32 bootloader because the throttle signal "
+        "line idles high at reset (check the stand's ESC output wiring and "
+        "that the throttle backend can drive it).")
+
+
 class _SerialTelemetry:
     """Background thread holding the most recent KISS frame from a serial port."""
 
@@ -322,6 +365,13 @@ def build_live_sources(rig: RigConfig, profile: Profile) -> Sources:
             f"telem_backend {rig.telem_backend!r} is not a live backend "
             "(expected 'serial' or 'none')")
 
-    return Sources(throttle=throttle, stand=stand, perf_source=perf_source,
-                   telem_source=telem_source, perf_reader=perf_reader,
-                   closers=closers)
+    sources = Sources(throttle=throttle, stand=stand, perf_source=perf_source,
+                      telem_source=telem_source, perf_reader=perf_reader,
+                      closers=closers)
+    if perf_reader is not None:
+        try:
+            _ensure_app_alive(dbg, perf_reader, throttle)
+        except Exception:
+            sources.close()
+            raise
+    return sources

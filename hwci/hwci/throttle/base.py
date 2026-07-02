@@ -26,6 +26,13 @@ class ThrottleSource(abc.ABC):
     def set(self, throttle: float) -> None:
         """Command throttle in [0, 1]."""
 
+    def quiesce(self) -> None:
+        """Make the signal line idle LOW so the AM32 bootloader will jump to
+        the app on the next ESC reset. Zero throttle is not enough for DShot
+        (frames keep the line high 40-75% of the time); backends that can
+        drop the signal entirely should override this."""
+        self.set(0.0)
+
     def disarm(self) -> None:
         self.set(0.0)
 

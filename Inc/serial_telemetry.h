@@ -1,8 +1,8 @@
 /*
  * serial_telemetry.h
  *
- *  Created on: 14 Nov 2024
- *      Author: Youri
+ *  Created on: May 13, 2020
+ *      Author: Alka
  */
 
 #ifndef SERIAL_TELEMETRY_H_
@@ -11,10 +11,7 @@
 #include "main.h"
 
 void telem_UART_Init(void);
-void enable_telem_UART(void);
 void send_telem_DMA(uint8_t bytes);
-
-void telem_UART_Init_CH4(void);
-void send_telem_DMA_CH4();
+void enable_telem_UART(void); // MCXA153 only
 
 #endif /* SERIAL_TELEMETRY_H_ */

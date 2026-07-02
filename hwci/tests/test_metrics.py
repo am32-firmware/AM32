@@ -50,6 +50,49 @@ def test_spoolup_is_not_a_collapse():
     assert d["rpm_drop_samples"] == 0
 
 
+def test_smooth_rampdown_is_not_a_collapse():
+    # A multi-second ramp-down moves throttle by a tiny amount each 10ms
+    # tick; RPM falling in lockstep with a commanded ramp-down is expected
+    # deceleration, not desync (observed false positive on the bench: a
+    # efficiency_sweep 100%->0% rampdn flagged with zero bemf timeouts,
+    # commutation spikes, or eRPM mismatch).
+    n = 400  # 4s at 100Hz
+    throttle = [1.0 - 1.0 * i / (n - 1) for i in range(n)]  # smooth 1.0 -> 0.0
+    rpm = [28000.0 * t for t in throttle]  # RPM tracks throttle exactly
+    rows = []
+    for i in range(n):
+        rows.append({"t": i * 0.01, "segment": "rampdn",
+                     "throttle_cmd": throttle[i], "stand_rpm": rpm[i]})
+    d = metricsmod.detect_demag(
+        RunResult(rows=rows),
+        Profile(name="synthetic", sample_rate_hz=100.0,
+               segments=[Segment(label="rampdn", throttle=0.0,
+                                 duration_s=4.0, ramp=True)]))
+    assert d["rpm_drop_samples"] == 0
+    assert d["event_count"] == 0
+
+
+def test_collapse_during_ramp_up_still_detected():
+    # The trend-based gate must not blind the detector to a real collapse
+    # that happens to occur while throttle is rising.
+    n = 60
+    throttle = [0.5 + 0.4 * i / (n - 1) for i in range(n)]  # 0.5 -> 0.9 rising
+    rpm = [20000.0 + 100.0 * i for i in range(n)]
+    for i in range(20, 30):
+        rpm[i] = 11000.0  # desync collapse mid-ramp, throttle still rising
+    rows = []
+    for i in range(n):
+        rows.append({"t": i * 0.01, "segment": "rampup",
+                     "throttle_cmd": throttle[i], "stand_rpm": rpm[i]})
+    d = metricsmod.detect_demag(
+        RunResult(rows=rows),
+        Profile(name="synthetic", sample_rate_hz=100.0,
+               segments=[Segment(label="rampup", throttle=0.9,
+                                 duration_s=0.6, ramp=True)]))
+    assert d["rpm_drop_samples"] >= 5
+    assert d["event_count"] >= 1
+
+
 def test_rig_pole_pairs_from_meta_overrides_profile():
     # rig meta says 11 pole pairs; profile default is 7. eRPM 154000 at
     # 14000 stand RPM matches 11pp exactly -> no mismatch when meta is used.

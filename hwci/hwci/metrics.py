@@ -197,18 +197,30 @@ def detect_demag(run: RunResult, profile: Profile) -> dict:
             anom = True
         flag[i] = anom
 
-    # Stand-RPM collapse while commanded throttle is high and steady: catches
-    # desyncs whose transient firmware flags fall between SWD samples. The
-    # reference is the running max RPM seen since the throttle last moved, so
-    # spool-up after a step never reads as a collapse.
+    # Stand-RPM collapse while commanded throttle is high and NOT being
+    # intentionally reduced: catches desyncs whose transient firmware flags
+    # fall between SWD samples. The reference is the running max RPM seen
+    # since the throttle last decreased, so spool-up after a step never
+    # reads as a collapse.
+    #
+    # The gate must check the THROTTLE TREND (falling vs. not), not just the
+    # size of one tick's change: a smooth multi-second ramp-down moves by a
+    # tiny amount each 10ms tick, so a small-delta check like "< 0.02" never
+    # fires and the reference RPM is never invalidated - actual RPM then
+    # falls (correctly, because the ramp commanded it to) while the stale
+    # peak reference stays pinned at the ramp's starting RPM, eventually
+    # tripping the drop threshold. Observed on the bench: efficiency_sweep's
+    # 4s 100%->0% rampdn flagged a false demag event with zero bemf timeouts,
+    # commutation spikes, or eRPM/stand-RPM mismatch - RPM was tracking
+    # throttle exactly as commanded.
     rpm_drop_samples = 0
     frac = profile.demag_rpm_drop_fraction
     ref_rpm = float("nan")
     for i in range(len(rows)):
         high = throttle[i] == throttle[i] and throttle[i] > 0.5
-        steady_cmd = (i > 0 and throttle[i - 1] == throttle[i - 1]
-                      and abs(throttle[i] - throttle[i - 1]) < 0.02)
-        if not (high and steady_cmd):
+        not_decreasing = (i > 0 and throttle[i - 1] == throttle[i - 1]
+                          and throttle[i] >= throttle[i - 1] - 1e-6)
+        if not (high and not_decreasing):
             ref_rpm = float("nan")
             continue
         r = stand_rpm[i]

@@ -28,10 +28,12 @@ def test_identical_metrics_pass():
 def test_efficiency_regression_fails():
     m = _metrics()
     base = {"metrics": copy.deepcopy(m)}
-    # Current efficiency drops 10% -> should fail the 3% gate.
-    m["summary"]["peak_efficiency_gf_per_w"] *= 0.90
+    # 30% drop is well past the 15% gate (widened from an initial 3% guess
+    # after a same-firmware repeatability run showed up to 8.7% swing at
+    # high power on the physical bench - see Thresholds.efficiency_drop_pct).
+    m["summary"]["peak_efficiency_gf_per_w"] *= 0.70
     for p in m["steady_points"]:
-        p["eff_gf_per_w"] *= 0.90
+        p["eff_gf_per_w"] *= 0.70
     result = bl.compare(m, base)
     assert not result["passed"]
     assert any(c["name"] == "peak_efficiency_gf_per_w" and not c["pass"]
@@ -84,6 +86,47 @@ def test_negative_efficiency_equality_passes():
     assert bl._worse_is_lower(-1.0, -1.0, 3.0)
     assert not bl._worse_is_lower(-1.0, -1.06, 3.0)  # real 6% worsening fails
     assert bl._worse_is_lower(9.0, 8.8, 3.0)         # positive within 3%
+
+
+def test_low_power_point_not_gated_even_with_prop():
+    # A real prop can still produce a low-power point (e.g. 10% throttle)
+    # where thrust/power is a ratio of two small noisy numbers - observed on
+    # the bench: 2.3W swung -73% efficiency run-to-run on unchanged hardware.
+    m = _metrics()
+    base = {"metrics": copy.deepcopy(m)}
+    base["metrics"]["steady_points"][0]["elec_power_w"] = 2.3
+    base["metrics"]["steady_points"][0]["eff_gf_per_w"] = 7.72
+    m["steady_points"][0]["elec_power_w"] = 2.3
+    m["steady_points"][0]["eff_gf_per_w"] = 2.05  # -73%, would fail the % gate
+    result = bl.compare(m, base)
+    label = base["metrics"]["steady_points"][0]["segment"]
+    eff_check = next(c for c in result["checks"] if c["name"] == f"eff@{label}")
+    assert eff_check["pass"]
+    assert "not gated" in eff_check["note"]
+
+
+def test_peak_efficiency_excludes_low_power_points():
+    # "Peak" is a max() over throttle points, which amplifies whichever point
+    # is noisiest. If the literal peak sits at a low-power point, the GATE
+    # must recompute peak from points above the power floor instead of
+    # trusting the summary scalar - else it gates pure noise every run.
+    m = _metrics()
+    base = {"metrics": copy.deepcopy(m)}
+    pts_b = base["metrics"]["steady_points"]
+    pts_c = m["steady_points"]
+    assert len(pts_b) >= 2
+    # Low-power point has the highest g/W in both runs (as observed on the
+    # bench) but swings wildly; a real, well-powered point stays stable.
+    pts_b[0]["elec_power_w"], pts_b[0]["eff_gf_per_w"] = 2.3, 50.0
+    pts_c[0]["elec_power_w"], pts_c[0]["eff_gf_per_w"] = 2.3, 5.0
+    pts_b[1]["elec_power_w"], pts_b[1]["eff_gf_per_w"] = 100.0, 1.0
+    pts_c[1]["elec_power_w"], pts_c[1]["eff_gf_per_w"] = 100.0, 1.0
+    result = bl.compare(m, base)
+    peak_check = next(c for c in result["checks"]
+                      if c["name"] == "peak_efficiency_gf_per_w")
+    assert peak_check["baseline"] == 1.0   # not 50.0 - the noisy point excluded
+    assert peak_check["current"] == 1.0
+    assert peak_check["pass"]
 
 
 def test_noprop_efficiency_noise_not_gated():

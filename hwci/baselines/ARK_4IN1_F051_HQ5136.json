@@ -1,0 +1,305 @@
+{
+  "format_version": 1,
+  "meta": {
+    "aborted": null,
+    "git_sha": "7139797",
+    "mode": "hw",
+    "motor": "JS Technology 2306 1800KV",
+    "n_samples": 6600,
+    "perf_read_errors": 0,
+    "pole_pairs": 7,
+    "profile": "efficiency_sweep",
+    "profile_def": {
+      "arm_settle_s": 2.0,
+      "demag_commutation_spike": 3.0,
+      "demag_rpm_drop_fraction": 0.25,
+      "description": "Steady-state staircase from 10% to 100% throttle. Each step dwells long enough to settle, and the tail of each is used to compute thrust, electrical power and efficiency (g/W) plus loop time / CPU load at that operating point. This is the primary efficiency + performance baseline.\n",
+      "name": "efficiency_sweep",
+      "pole_pairs": 7,
+      "safety": {
+        "max_current_a": 40.0,
+        "max_motor_temp_c": null,
+        "max_rpm": 32000,
+        "max_thrust_n": 16.0,
+        "max_voltage_v": null
+      },
+      "sample_rate_hz": 100.0,
+      "segments": [
+        {
+          "duration_s": 2.0,
+          "label": "idle",
+          "ramp": false,
+          "steady": false,
+          "throttle": 0.0
+        },
+        {
+          "duration_s": 6.0,
+          "label": "t10",
+          "ramp": true,
+          "steady": true,
+          "throttle": 0.1
+        },
+        {
+          "duration_s": 6.0,
+          "label": "t20",
+          "ramp": false,
+          "steady": true,
+          "throttle": 0.2
+        },
+        {
+          "duration_s": 6.0,
+          "label": "t30",
+          "ramp": false,
+          "steady": true,
+          "throttle": 0.3
+        },
+        {
+          "duration_s": 6.0,
+          "label": "t40",
+          "ramp": false,
+          "steady": true,
+          "throttle": 0.4
+        },
+        {
+          "duration_s": 6.0,
+          "label": "t50",
+          "ramp": false,
+          "steady": true,
+          "throttle": 0.5
+        },
+        {
+          "duration_s": 6.0,
+          "label": "t60",
+          "ramp": false,
+          "steady": true,
+          "throttle": 0.6
+        },
+        {
+          "duration_s": 6.0,
+          "label": "t70",
+          "ramp": false,
+          "steady": true,
+          "throttle": 0.7
+        },
+        {
+          "duration_s": 6.0,
+          "label": "t80",
+          "ramp": false,
+          "steady": true,
+          "throttle": 0.8
+        },
+        {
+          "duration_s": 6.0,
+          "label": "t90",
+          "ramp": false,
+          "steady": true,
+          "throttle": 0.9
+        },
+        {
+          "duration_s": 6.0,
+          "label": "t100",
+          "ramp": false,
+          "steady": true,
+          "throttle": 1.0
+        },
+        {
+          "duration_s": 4.0,
+          "label": "rampdn",
+          "ramp": true,
+          "steady": false,
+          "throttle": 0.0
+        }
+      ],
+      "steady_tail_fraction": 0.5
+    },
+    "prop": "HQProp 5136 R36-GR-PC",
+    "sample_rate_hz": 100.0,
+    "target": "ARK_4IN1_F051",
+    "timestamp": "2026-07-02T14:13:05",
+    "wall_time_s": 65.997
+  },
+  "metrics": {
+    "demag": {
+      "bemf_timeout_samples": 0,
+      "comm_spike_samples": 0,
+      "esc_rpm_mismatch_samples": 0,
+      "event_count": 0,
+      "events": [],
+      "median_commutation_interval": 131.0,
+      "rpm_drop_samples": 0
+    },
+    "steady_points": [
+      {
+        "cpu_load_pct": 42.0,
+        "ctrl_exec_us_max": 76,
+        "current_a": 0.097,
+        "eff_gf_per_w": 7.72,
+        "elec_power_w": 2.34,
+        "fet_temp_c": 24.71,
+        "main_loop_us_max": 140,
+        "motor_temp_c": 22.77,
+        "rpm": 3776.8,
+        "segment": "t10",
+        "throttle": 0.1,
+        "thrust_gf": 5.8,
+        "voltage_v": 24.294
+      },
+      {
+        "cpu_load_pct": 55.4,
+        "ctrl_exec_us_max": 76,
+        "current_a": 0.783,
+        "eff_gf_per_w": 1.194,
+        "elec_power_w": 18.98,
+        "fet_temp_c": 24.6,
+        "main_loop_us_max": 148,
+        "motor_temp_c": 21.8,
+        "rpm": 8665.7,
+        "segment": "t20",
+        "throttle": 0.2,
+        "thrust_gf": 22.41,
+        "voltage_v": 24.228
+      },
+      {
+        "cpu_load_pct": 49.7,
+        "ctrl_exec_us_max": 61,
+        "current_a": 1.869,
+        "eff_gf_per_w": 0.942,
+        "elec_power_w": 45.06,
+        "fet_temp_c": 24.63,
+        "main_loop_us_max": 135,
+        "motor_temp_c": 21.93,
+        "rpm": 12282.6,
+        "segment": "t30",
+        "throttle": 0.3,
+        "thrust_gf": 42.3,
+        "voltage_v": 24.106
+      },
+      {
+        "cpu_load_pct": 51.5,
+        "ctrl_exec_us_max": 58,
+        "current_a": 3.627,
+        "eff_gf_per_w": 0.801,
+        "elec_power_w": 86.7,
+        "fet_temp_c": 24.73,
+        "main_loop_us_max": 138,
+        "motor_temp_c": 22.47,
+        "rpm": 15679.6,
+        "segment": "t40",
+        "throttle": 0.4,
+        "thrust_gf": 69.38,
+        "voltage_v": 23.905
+      },
+      {
+        "cpu_load_pct": 51.7,
+        "ctrl_exec_us_max": 53,
+        "current_a": 5.851,
+        "eff_gf_per_w": 0.744,
+        "elec_power_w": 138.29,
+        "fet_temp_c": 25.03,
+        "main_loop_us_max": 133,
+        "motor_temp_c": 22.93,
+        "rpm": 18420.3,
+        "segment": "t50",
+        "throttle": 0.5,
+        "thrust_gf": 102.86,
+        "voltage_v": 23.637
+      },
+      {
+        "cpu_load_pct": 53.2,
+        "ctrl_exec_us_max": 64,
+        "current_a": 8.736,
+        "eff_gf_per_w": 0.689,
+        "elec_power_w": 203.47,
+        "fet_temp_c": 25.69,
+        "main_loop_us_max": 142,
+        "motor_temp_c": 23.5,
+        "rpm": 20946.2,
+        "segment": "t60",
+        "throttle": 0.6,
+        "thrust_gf": 140.16,
+        "voltage_v": 23.291
+      },
+      {
+        "cpu_load_pct": 53.3,
+        "ctrl_exec_us_max": 63,
+        "current_a": 11.886,
+        "eff_gf_per_w": 0.678,
+        "elec_power_w": 272.41,
+        "fet_temp_c": 26.97,
+        "main_loop_us_max": 140,
+        "motor_temp_c": 23.92,
+        "rpm": 22995.4,
+        "segment": "t70",
+        "throttle": 0.7,
+        "thrust_gf": 184.68,
+        "voltage_v": 22.919
+      },
+      {
+        "cpu_load_pct": 54.7,
+        "ctrl_exec_us_max": 64,
+        "current_a": 15.545,
+        "eff_gf_per_w": 0.556,
+        "elec_power_w": 350.02,
+        "fet_temp_c": 28.08,
+        "main_loop_us_max": 149,
+        "motor_temp_c": 24.21,
+        "rpm": 24959.0,
+        "segment": "t80",
+        "throttle": 0.8,
+        "thrust_gf": 194.7,
+        "voltage_v": 22.517
+      },
+      {
+        "cpu_load_pct": 57.4,
+        "ctrl_exec_us_max": 73,
+        "current_a": 19.82,
+        "eff_gf_per_w": 0.559,
+        "elec_power_w": 437.94,
+        "fet_temp_c": 29.02,
+        "main_loop_us_max": 154,
+        "motor_temp_c": 24.56,
+        "rpm": 26668.6,
+        "segment": "t90",
+        "throttle": 0.9,
+        "thrust_gf": 245.02,
+        "voltage_v": 22.096
+      },
+      {
+        "cpu_load_pct": 50.0,
+        "ctrl_exec_us_max": 47,
+        "current_a": 25.184,
+        "eff_gf_per_w": 0.518,
+        "elec_power_w": 544.77,
+        "fet_temp_c": 30.08,
+        "main_loop_us_max": 136,
+        "motor_temp_c": 25.6,
+        "rpm": 28363.5,
+        "segment": "t100",
+        "throttle": 1.0,
+        "thrust_gf": 282.35,
+        "voltage_v": 21.631
+      }
+    ],
+    "summary": {
+      "bemf_timeout_samples": 0,
+      "best_ctrl_period_us": 8,
+      "demag_events": 0,
+      "idle_loop_rate_hz": 60942.7,
+      "max_cpu_load_pct": 59.5,
+      "max_current_a": 27.58,
+      "max_fet_temp_c": 30.83,
+      "max_motor_temp_c": 25.85,
+      "max_thrust_gf": 409,
+      "n_samples": 6600,
+      "peak_efficiency_gf_per_w": 7.72,
+      "perf_sample_count": 6600,
+      "stand_sample_count": 6600,
+      "telem_sample_count": 0,
+      "worst_ctrl_exec_us": 811,
+      "worst_ctrl_exec_us_steady": 76,
+      "worst_ctrl_period_us": 813,
+      "worst_main_loop_us": 849,
+      "worst_main_loop_us_steady": 154
+    }
+  }
+}

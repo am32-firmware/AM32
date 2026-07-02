@@ -23,11 +23,28 @@ _CHANNELS = ("perf", "stand", "telem")
 @dataclass
 class Thresholds:
     """Pass/fail gates relative to the baseline."""
-    efficiency_drop_pct: float = 3.0       # peak & per-point g/W may drop <= 3%
+    # peak & per-point g/W may drop this much. 3% was the initial guess but
+    # failed on a same-firmware, same-hardware repeatability check with a
+    # prop installed: two back-to-back efficiency_sweep captures on the
+    # ARK 4IN1 + JS Technology 2306 1800KV + HQProp 5136 differed by up to
+    # 8.7% (t70: 272W) and 8.2% (t90: 438W) at HIGH power, not just the noisy
+    # low-power points - real thrust-stand repeatability, not a regression.
+    # 15% gives ~1.7x margin over the observed worst case; matches the same
+    # margin philosophy used for ctrl_exec_increase_pct below. Single-sample
+    # estimate - tighten once more repeat captures establish the true noise
+    # band.
+    efficiency_drop_pct: float = 15.0
     # g/W below this magnitude is load-cell noise (no-prop rig): efficiency is
     # not a meaningful signal there and is not gated (the check reports "not
     # gated" instead of flapping on noise around zero).
     efficiency_floor_gf_per_w: float = 0.5
+    # Below this baseline electrical power, thrust/power is dominated by
+    # measurement noise even WITH a prop (observed: 10% throttle at 2.3W
+    # swung -73% run-to-run; 20% throttle at 19W swung -20%) - the ratio of
+    # two small noisy numbers, not a meaningful efficiency figure. Applies to
+    # per-point checks AND to which points count toward "peak efficiency"
+    # (excluding them keeps peak from being hijacked by the noisiest point).
+    efficiency_min_power_w: float = 20.0
     ctrl_exec_increase_pct: float = 15.0   # worst control-loop exec time
     # Absolute slack for the loop-time gates: allowed even when the relative
     # gate is tighter (a 20us baseline must not fail on +4us of jitter).
@@ -106,20 +123,52 @@ def compare(current: dict, baseline: dict, thr: Thresholds | None = None,
                 checks.append(_check(
                     f"baseline_{key}", b, c, b == c, "identities must match"))
 
-    def _eff_check(name, b, c):
-        """g/W gate with a noise floor: a baseline captured without a prop has
-        efficiency values that are load-cell noise around zero - gating them
-        would flap on every run."""
+    def _eff_check(name, b, c, power_w=None):
+        """g/W gate with two noise floors, both learned from the bench:
+        a baseline captured without a prop has efficiency values that are
+        load-cell noise around zero (magnitude floor), and even WITH a prop
+        low-power points are a ratio of two small noisy numbers (power
+        floor: 10% throttle at 2.3W swung -73% run-to-run on an unchanged
+        firmware/hardware repeat capture)."""
         if not _missing(b) and abs(b) < thr.efficiency_floor_gf_per_w:
             return _check(name, b, c, True,
                           f"baseline |g/W| < {thr.efficiency_floor_gf_per_w} "
                           "(no-prop noise): not gated")
+        if power_w is not None and not _missing(power_w) and power_w < thr.efficiency_min_power_w:
+            return _check(name, b, c, True,
+                          f"baseline power {power_w:.1f}W < "
+                          f"{thr.efficiency_min_power_w}W: not gated")
         return _check(name, b, c, _worse_is_lower(b, c, thr.efficiency_drop_pct),
                       f"<= {thr.efficiency_drop_pct}% drop; missing fails")
 
-    checks.append(_eff_check("peak_efficiency_gf_per_w",
-                             bs.get("peak_efficiency_gf_per_w"),
-                             cs.get("peak_efficiency_gf_per_w")))
+    # per-point efficiency: gate every segment present in either side; a
+    # steady segment that vanished from the current run fails closed. Needed
+    # here (ahead of the peak check below) because "peak efficiency" for the
+    # gate is recomputed from these points, not trusted from the summary
+    # scalar - see that check for why.
+    base_pts = {p["segment"]: p for p in base.get("steady_points", [])}
+    cur_pts = {p["segment"]: p for p in current.get("steady_points", [])}
+
+    # peak_efficiency_gf_per_w: recomputed from steady_points restricted to
+    # baseline power >= efficiency_min_power_w, NOT taken from the summary
+    # scalar. "Peak" is a max() over all throttle points, and a max amplifies
+    # whichever point is noisiest - on the bench the literal peak was always
+    # the lowest-power point (10% throttle, 2.3W), so gating the raw scalar
+    # gated pure noise every time. Falls back to the scalar for baselines
+    # captured before steady_points existed.
+    if base_pts and cur_pts:
+        base_gate_pts = [p for p in base_pts.values()
+                         if not _missing(p.get("elec_power_w"))
+                         and p["elec_power_w"] >= thr.efficiency_min_power_w]
+        cur_gate_pts = [p for p in cur_pts.values()
+                        if not _missing(p.get("elec_power_w"))
+                        and p["elec_power_w"] >= thr.efficiency_min_power_w]
+        b_peak = max((p["eff_gf_per_w"] for p in base_gate_pts), default=None)
+        c_peak = max((p["eff_gf_per_w"] for p in cur_gate_pts), default=None)
+    else:
+        b_peak = bs.get("peak_efficiency_gf_per_w")
+        c_peak = cs.get("peak_efficiency_gf_per_w")
+    checks.append(_eff_check("peak_efficiency_gf_per_w", b_peak, c_peak))
 
     # Loop-time gates use the STEADY-window worst case when the baseline has
     # it: the raw run-max is dominated by motor start/stop transients that
@@ -170,10 +219,9 @@ def compare(current: dict, baseline: dict, thr: Thresholds | None = None,
             f">= {thr.min_coverage_fraction}x baseline coverage "
             f"(dead {chan} channel?)"))
 
-    # per-point efficiency: gate every segment present in either side; a
-    # steady segment that vanished from the current run fails closed.
-    base_pts = {p["segment"]: p for p in base.get("steady_points", [])}
-    cur_pts = {p["segment"]: p for p in current.get("steady_points", [])}
+    # per-point efficiency (base_pts/cur_pts computed above, ahead of the
+    # peak check): gate every segment present in either side; a steady
+    # segment that vanished from the current run fails closed.
     for label, bp in base_pts.items():
         p = cur_pts.get(label)
         if p is None:
@@ -181,7 +229,7 @@ def compare(current: dict, baseline: dict, thr: Thresholds | None = None,
                                  False, "segment missing from current run"))
             continue
         checks.append(_eff_check(f"eff@{label}", bp.get("eff_gf_per_w"),
-                                 p.get("eff_gf_per_w")))
+                                 p.get("eff_gf_per_w"), bp.get("elec_power_w")))
 
     passed = all(c["pass"] for c in checks)
     return {"passed": passed, "checks": checks, "thresholds": asdict(thr)}

@@ -1,0 +1,27 @@
+name: demag_step_stress
+description: >
+  Aggressive instantaneous throttle steps (no ramp) between low and high to
+  provoke loss of sync / demagnetization. Detection is host-side: RPM/thrust
+  collapse while throttle is commanded high, ESC eRPM vs stand RPM divergence,
+  commutation-interval spikes, and firmware bemf-timeout flags. Run with caution
+  and conservative current/thrust cutoffs.
+sample_rate_hz: 200
+arm_settle_s: 2.0
+demag_commutation_spike: 3.0
+demag_rpm_drop_fraction: 0.25
+
+safety:
+  max_current_a: 45.0
+  max_thrust_n: 16.0
+  max_rpm: 32000
+
+segments:
+  - {label: idle,    throttle: 0.00, duration_s: 2.0}
+  - {label: pre,     throttle: 0.10, duration_s: 3.0, ramp: true}
+  - {label: step90a, throttle: 0.90, duration_s: 2.0}   # snap 10->90
+  - {label: drop10a, throttle: 0.10, duration_s: 2.0}   # snap 90->10
+  - {label: step95,  throttle: 0.95, duration_s: 2.0}
+  - {label: drop10b, throttle: 0.10, duration_s: 2.0}
+  - {label: step100, throttle: 1.00, duration_s: 2.0}
+  - {label: drop05,  throttle: 0.05, duration_s: 2.0}
+  - {label: rampdn,  throttle: 0.00, duration_s: 2.0, ramp: true}

@@ -227,6 +227,7 @@ an settings option)
 #include "phaseouts.h"
 #include "serial_telemetry.h"
 #include "kiss_telemetry.h"
+#include "hwci_perf.h"
 #include "signal.h"
 #include "sounds.h"
 #include "targets.h"
@@ -1334,6 +1335,7 @@ if (!stepper_sine && armed) {
 
 void tenKhzRoutine()
 { // 20khz as of 2.00 to be renamed
+    HWCI_PERF_CTRL_ENTER();
     duty_cycle = duty_cycle_setpoint;
     tenkhzcounter++;
     ledcounter++;
@@ -1527,6 +1529,7 @@ void tenKhzRoutine()
     signaltimeout++;
 
 #endif
+    HWCI_PERF_CTRL_EXIT();
 }
 
 void processDshot()
@@ -1893,6 +1896,7 @@ int main(void)
 #endif
 
     while (1) {
+        HWCI_PERF_MAIN_LOOP();
 e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation_intervals[2] + commutation_intervals[3] + commutation_intervals[4] + commutation_intervals[5]) + 4) >> 1; // COMMUTATION INTERVAL IS 0.5US INCREMENTS 
 
 #if defined(FIXED_DUTY_MODE) || defined(FIXED_SPEED_MODE)

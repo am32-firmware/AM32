@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "am32-hwci"
+version = "0.1.0"
+description = "Hardware-in-the-loop CI harness for AM32 on the ARK 4IN1 ESC"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pyelftools>=0.29",   # read hwci_perf address + DWARF layout from the ELF
+    "pyserial>=3.5",      # KISS telemetry + optional external throttle source
+    "PyYAML>=6.0",        # test profiles / rig config
+    "numpy>=1.24",        # metric math
+]
+
+[project.optional-dependencies]
+plot = ["matplotlib>=3.7"]            # report plots
+flightstand = ["grpcio>=1.51"]        # real Flight Stand gRPC client
+dev = ["pytest>=7.0", "grpcio-tools>=1.51"]
+
+[project.scripts]
+hwci = "hwci.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["hwci*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

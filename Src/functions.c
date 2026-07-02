@@ -48,25 +48,8 @@ uint32_t getAbsDif(int number1, int number2)
     return (uint32_t)result;
 }
 
-/*
-  get current value of UTILITY_TIMER timer as 16bit microseconds
- */
-static inline uint16_t get_timer_us16(void) {
-#if defined(STMICRO)
-    return UTILITY_TIMER->CNT;
-#elif defined(GIGADEVICES)
-    return TIMER_CNT(UTILITY_TIMER);
-#elif defined(ARTERY)
-    return UTILITY_TIMER->cval;
-#elif defined(NXP)
-    //Return nothing since NXP micro-tick works differently
-    return 0;
-#elif defined(WCH)
-    return UTILITY_TIMER->CNT>>1;
-#else
-#error unsupported MCU
-#endif
-}
+/* get_timer_us16() lives in Inc/functions.h so other units (e.g. the HWCI_PERF
+ * instrumentation) share the same per-family utility-timer access. */
 
 /*
   delay by microseconds, max 65535

@@ -1,0 +1,26 @@
+name: jitter_probe
+description: >
+  Short zero-cross jitter probe: holds only the operating points where the
+  jitter metric separates firmwares on this bench (the 21-24k RPM
+  PWM/commutation beat hump plus the high-RPM tail, and t30 as a guard for
+  the region where ark-release measured BETTER than upstream). Roughly a
+  third of an efficiency_sweep's motor/battery time; use it to iterate on
+  zero-cross filter changes, then confirm the final candidate with a full
+  efficiency_sweep against the baseline.
+sample_rate_hz: 100
+arm_settle_s: 2.0
+steady_tail_fraction: 0.5
+
+safety:
+  max_current_a: 40.0
+  max_thrust_n: 16.0
+  max_rpm: 32000
+
+segments:
+  - {label: idle,   throttle: 0.00, duration_s: 2.0}
+  - {label: t30,    throttle: 0.30, duration_s: 6.0, ramp: true,  steady: true}
+  - {label: t60,    throttle: 0.60, duration_s: 6.0, steady: true}
+  - {label: t70,    throttle: 0.70, duration_s: 6.0, steady: true}
+  - {label: t90,    throttle: 0.90, duration_s: 6.0, steady: true}
+  - {label: t100,   throttle: 1.00, duration_s: 6.0, steady: true}
+  - {label: rampdn, throttle: 0.00, duration_s: 4.0, ramp: true}

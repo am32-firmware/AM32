@@ -1,0 +1,21 @@
+name: jitter_probe_mid
+description: >
+  Minimal mid-band jitter probe (t40/t50/t80 only) for interleaved A/B
+  flashing on a partially drained pack: excludes t100 (cutoff headroom) and
+  the already-settled hump points. Compare only against runs taken minutes
+  apart - these mid points shift with pack voltage.
+sample_rate_hz: 100
+arm_settle_s: 2.0
+steady_tail_fraction: 0.5
+
+safety:
+  max_current_a: 40.0
+  max_thrust_n: 16.0
+  max_rpm: 32000
+
+segments:
+  - {label: idle,   throttle: 0.00, duration_s: 2.0}
+  - {label: t40,    throttle: 0.40, duration_s: 6.0, ramp: true,  steady: true}
+  - {label: t50,    throttle: 0.50, duration_s: 6.0, steady: true}
+  - {label: t80,    throttle: 0.80, duration_s: 6.0, steady: true}
+  - {label: rampdn, throttle: 0.00, duration_s: 4.0, ramp: true}

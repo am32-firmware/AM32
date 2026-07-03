@@ -218,7 +218,14 @@ class RigSimulator:
             frac = 0.05 if self.desync_remaining > 0 else 0.005
             if self.settings is not None and self.settings.variable_pwm:
                 frac *= p.variable_pwm_jitter_mult
-            dev = max(1, int(interval * frac * self._rng.uniform(0.3, 1.7)))
+            # Stochastic rounding: the true deviation is often sub-tick
+            # (0.5% of a ~150-tick interval), and plain int()+floor-at-1
+            # quantizes every configuration to the same "1 tick" - hiding
+            # e.g. variable_pwm's jitter penalty from the accumulated mean.
+            raw_dev = interval * frac * self._rng.uniform(0.3, 1.7)
+            dev = int(raw_dev)
+            if self._rng.random() < (raw_dev - dev):
+                dev += 1
             self.zc_count = (self.zc_count + n_comm) & 0xFFFFFFFF
             self.zc_jitter_sum = (self.zc_jitter_sum + dev * n_comm) & 0xFFFFFFFF
             self.zc_interval_sum = (self.zc_interval_sum + interval * n_comm) & 0xFFFFFFFF

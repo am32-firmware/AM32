@@ -1,0 +1,30 @@
+name: tune_probe
+description: >
+  Short efficiency probe for the auto settings tuner: idle, a two-step
+  low-throttle warmup, then four steady points long enough for a meaningful
+  tail window, then ramp down (~28 s). Points below ~20 W electrical are
+  measurement noise on the bench (see Thresholds.efficiency_min_power_w in
+  hwci/baseline.py), so the probe spends its dwell where the objective
+  actually scores. The warmup mirrors the efficiency_sweep staircase: the
+  motor must already be spinning before commanded throttle crosses the demag
+  detector's 0.2 "running" threshold, or the spool-up's long commutation
+  intervals read as spike events. A tune spec can override the points, dwell
+  and safety limits (probe: block) without editing this file.
+sample_rate_hz: 100
+arm_settle_s: 2.0
+steady_tail_fraction: 0.5
+
+safety:
+  max_current_a: 40.0
+  max_thrust_n: 16.0
+  max_rpm: 32000
+
+segments:
+  - {label: idle,   throttle: 0.00, duration_s: 2.0}
+  - {label: w10,    throttle: 0.10, duration_s: 1.5, ramp: true}
+  - {label: w20,    throttle: 0.20, duration_s: 1.5}
+  - {label: t30,    throttle: 0.30, duration_s: 6.0, steady: true}
+  - {label: t50,    throttle: 0.50, duration_s: 6.0, steady: true}
+  - {label: t70,    throttle: 0.70, duration_s: 6.0, steady: true}
+  - {label: t90,    throttle: 0.90, duration_s: 6.0, steady: true}
+  - {label: rampdn, throttle: 0.00, duration_s: 2.0, ramp: true}

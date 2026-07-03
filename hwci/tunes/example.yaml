@@ -1,0 +1,82 @@
+# Example AM32 auto-tune spec for `hwci tune` (ARK 4IN1 + 5" prop bench).
+#
+# Validation is STRICT: unknown keys or parameters fail loudly (like rig
+# configs) - a typo must never silently become "use the default".
+#
+# Budget note: each probe trial is ~28 s of motor time plus flash+reboot;
+# this spec runs roughly 35-40 trials (~25 min of spinning) before finals.
+name: ark4in1-5inch
+description: >
+  Tune advance/pwm/mode/ramp for the JS 2306 1800KV + HQProp 5136 on the
+  ARK 4IN1 bench, maximizing g/W at the cruise-heavy weighting below.
+
+battery_cells: 4
+
+pack:
+  min_resting_cell_v: 3.5     # resting gate between trials (not the 3.3 abs min)
+  prompt_on_swap: true        # pause and wait for a pack swap (else clean exit)
+
+thermal:
+  max_start_fet_temp_c: 60.0  # cool-down gate before each trial
+
+probe:
+  # Four steady points x dwell (labels are the objective's weight keys).
+  points: {t30: 0.30, t50: 0.50, t70: 0.70, t90: 0.90}
+  dwell_s: 6.0
+  safety:
+    max_current_a: 40.0
+    max_thrust_n: 16.0
+    max_rpm: 32000
+
+objective:
+  weights: {t30: 1.0, t50: 2.0, t70: 1.0, t90: 0.5}
+  min_power_w: 20.0           # points below this are bench noise - never scored
+  noise_floor_pct: 3.0        # scores within 3% tie-break on jitter/temp/default
+
+constraints:
+  max_demag_events: 0
+  max_bemf_timeout_samples: 0
+  jitter_max_regression_pct: 25.0   # vs the session's default-settings anchor
+  max_fet_temp_c: 90.0
+  max_motor_temp_c: 95.0
+  startup:
+    cycles: 5
+    max_failed: 0
+    spin_throttle: 0.15
+    min_rpm: 1000
+
+anchors_every: 5              # re-run the incumbent every N trials (drift anchor)
+
+parameters:
+  advance_level:              # eeprom offset 23, firmware-valid 10..42
+    values: [14, 18, 22, 26, 30, 34, 38]
+    refine_step: 2
+  pwm_frequency:              # offset 24, valid 8..144; >48 buys nothing here
+    values: [8, 16, 24, 48]
+  variable_pwm: {values: [0, 1, 2]}       # offset 21
+  auto_advance: {values: [0, 1]}          # offset 47
+  max_ramp: {values: [160, 80, 40]}       # offset 5, listed best-first
+
+stages:
+  - name: advance
+    sweep: advance_level
+  - name: pwm
+    sweep: pwm_frequency
+    fixed: {variable_pwm: 0}  # sweep the base frequency with scaling off
+  - name: modes
+    ab_candidates:            # built on the sweep winners ({} = incumbent)
+      - {}
+      - {variable_pwm: 1}
+      - {variable_pwm: 2}
+      - {auto_advance: 1}
+    repeats: 2                # interleaved: A B C D | A B C D
+  - name: ramp
+    sweep: max_ramp
+    constraint_only: true     # first value with zero failures wins
+    profile: tune_step        # inline step-stress (steps from a spinning state)
+
+finals:
+  profile: efficiency_sweep   # full sweep, winner vs default
+  pattern: ABBA
+  repeats: 2
+  startup_check: true

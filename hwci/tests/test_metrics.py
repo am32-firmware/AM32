@@ -199,3 +199,72 @@ def test_zc_jitter_none_when_no_commutations_accumulate():
     )
     m = metricsmod.compute(RunResult(rows=rows), _profile())
     assert m["steady_points"][0]["zc_jitter_pct"] is None
+
+
+def _startup_profile(n=3):
+    segs = [Segment(label="idle", throttle=0.0, duration_s=0.5)]
+    for i in range(1, n + 1):
+        segs.append(Segment(label=f"start{i}", throttle=0.08, duration_s=1.0))
+        segs.append(Segment(label=f"off{i}", throttle=0.0, duration_s=0.5))
+    return Profile(name="synthetic-start", sample_rate_hz=100.0, segments=segs)
+
+
+def _startup_rows(outcomes, ticks_per_start=100, ticks_per_off=50, run_delay=20):
+    """Rows for idle + N start/off cycles; outcomes[i] says attempt i starts."""
+    rows, t = [], 0.0
+    def add(label, n, running, erpm):
+        nonlocal t
+        for j in range(n):
+            rows.append({"t": t, "segment": label, "throttle_cmd": 0.08,
+                         "perf_running": running(j), "perf_e_rpm": erpm(j)})
+            t += 0.01
+    add("idle", 50, lambda j: 0, lambda j: 0)
+    for i, ok in enumerate(outcomes, start=1):
+        if ok:
+            add(f"start{i}", ticks_per_start,
+                lambda j: 1 if j >= run_delay else 0,
+                lambda j: 21000 if j >= run_delay else 0)
+        else:
+            add(f"start{i}", ticks_per_start, lambda j: 0, lambda j: 0)
+        add(f"off{i}", ticks_per_off, lambda j: 0, lambda j: 0)
+    return rows
+
+
+def test_startup_stats_counts_failures_and_times():
+    prof = _startup_profile(3)
+    rows = _startup_rows([True, False, True], run_delay=20)
+    st = metricsmod.startup_stats(RunResult(rows=rows), prof)
+    assert st["attempts"] == 3
+    assert st["failures"] == 1
+    assert st["time_to_run_ms_max"] == 200.0  # 20 ticks at 100 Hz
+    fails = [a for a in st["per_attempt"] if not a["success"]]
+    assert [a["segment"] for a in fails] == ["start2"]
+
+
+def test_startup_requires_running_and_erpm_together():
+    # A stale running flag with no eRPM (or vice versa) is not a start.
+    prof = _startup_profile(1)
+    rows = _startup_rows([True])
+    for r in rows:
+        if r["segment"] == "start1":
+            r["perf_e_rpm"] = 0  # running asserted but motor not turning
+    st = metricsmod.startup_stats(RunResult(rows=rows), prof)
+    assert st["failures"] == 1
+
+
+def test_startup_stats_zero_for_profiles_without_start_segments():
+    st = metricsmod.startup_stats(
+        RunResult(rows=_rows(20, perf_running=lambda i: 1)), _profile())
+    assert st["attempts"] == 0 and st["failures"] == 0
+
+
+def test_compute_summary_carries_start_outcomes():
+    prof = _startup_profile(2)
+    rows = _startup_rows([True, False])
+    m = metricsmod.compute(RunResult(rows=rows), prof)
+    assert m["summary"]["start_attempts"] == 2
+    assert m["summary"]["start_failures"] == 1
+    # profiles without start segments report None, not 0-failures-implied-pass
+    m2 = metricsmod.compute(RunResult(rows=_rows(20)), _profile())
+    assert m2["summary"]["start_attempts"] is None
+    assert m2["summary"]["start_failures"] is None

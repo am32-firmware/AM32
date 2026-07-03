@@ -211,6 +211,7 @@ def compute(run: RunResult, profile: Profile) -> dict:
         })
 
     demag = detect_demag(run, profile)
+    starts = startup_stats(run, profile)
 
     summary = {
         "max_thrust_gf": _safe_max(thrust_gf),
@@ -243,6 +244,10 @@ def compute(run: RunResult, profile: Profile) -> dict:
              if p.get("zc_jitter_max_pct") is not None), default=None),
         "demag_events": demag["event_count"],
         "bemf_timeout_samples": demag["bemf_timeout_samples"],
+        # start-attempt outcomes; None/0 unless the profile has start* segments
+        "start_attempts": starts["attempts"] or None,
+        "start_failures": starts["failures"] if starts["attempts"] else None,
+        "start_time_to_run_ms_max": starts["time_to_run_ms_max"],
         "max_motor_temp_c": _safe_maxf(motor_temp),
         "max_fet_temp_c": _safe_maxf(fet_temp),
         # Channel liveness: how many samples each instrumentation channel
@@ -253,7 +258,54 @@ def compute(run: RunResult, profile: Profile) -> dict:
         "stand_sample_count": int(np.count_nonzero(~np.isnan(thrust_gf))),
         "telem_sample_count": int(np.count_nonzero(~np.isnan(esc_erpm))),
     }
-    return {"summary": summary, "steady_points": steady_points, "demag": demag}
+    return {"summary": summary, "steady_points": steady_points, "demag": demag,
+            "startup": starts}
+
+
+def startup_stats(run: RunResult, profile: Profile) -> dict:
+    """Start-attempt outcomes for profiles with ``start*``-labeled segments.
+
+    A start attempt succeeds when the firmware asserts ``perf_running`` AND
+    reports live eRPM within its segment (both together, so a stale running
+    flag from a previous cycle can't count). Failures are the metric that a
+    zero-cross filter change would move first: startup is open-loop drive
+    with the weakest BEMF, and none of the steady-state sweep gates see it.
+
+    Returns zeroed counts (not an error) for profiles without start segments,
+    so compute() can call it unconditionally.
+    """
+    rows = run.rows
+    seg = np.array([r.get("segment") for r in rows], dtype=object)
+    running = _col(rows, "perf_running")
+    erpm = _col(rows, "perf_e_rpm")
+    t = _col(rows, "t")
+
+    attempts = []
+    for s in profile.segments:
+        if not s.label.startswith("start"):
+            continue
+        idx = np.where(seg == s.label)[0]
+        if idx.size == 0:
+            continue
+        ok = idx[(running[idx] == 1) & (erpm[idx] >= 1000)]
+        if ok.size:
+            attempts.append({
+                "segment": s.label, "success": True,
+                "time_to_run_ms": round((t[ok[0]] - t[idx[0]]) * 1000.0, 1),
+            })
+        else:
+            attempts.append({
+                "segment": s.label, "success": False, "time_to_run_ms": None,
+            })
+
+    times = [a["time_to_run_ms"] for a in attempts if a["success"]]
+    return {
+        "attempts": len(attempts),
+        "failures": sum(1 for a in attempts if not a["success"]),
+        "time_to_run_ms_max": max(times) if times else None,
+        "time_to_run_ms_mean": round(sum(times) / len(times), 1) if times else None,
+        "per_attempt": attempts,
+    }
 
 
 def detect_demag(run: RunResult, profile: Profile) -> dict:

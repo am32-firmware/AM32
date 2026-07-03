@@ -48,6 +48,17 @@ class Thresholds:
     # per-point checks AND to which points count toward "peak efficiency"
     # (excluding them keeps peak from being hijacked by the noisiest point).
     efficiency_min_power_w: float = 20.0
+    # Zero-cross jitter (zc_jitter_pct per steady point, percentage POINTS of
+    # commutation interval). A coarse guardrail, not a precision gate: the
+    # 21-24k RPM PWM/commutation beat band swings with battery state on the
+    # SAME firmware (t60 measured 2-20% across pack states; t30 2.5-9.0),
+    # so the allowance is sized to never flag a same-firmware repeat -
+    # baseline + max(75%, +8 points). It catches gross regressions (a broken
+    # filter reads 2x+ everywhere); subtle shifts like PR #14's +6-8 points
+    # in the beat band still need an interleaved same-pack A/B to resolve.
+    # Points stable across pack state on this bench: t90/t100 (+-0.2 pts).
+    zc_jitter_increase_pct: float = 75.0
+    zc_jitter_abs_slack_pts: float = 8.0
     ctrl_exec_increase_pct: float = 15.0   # worst control-loop exec time
     # Absolute slack for the loop-time gates: allowed even when the relative
     # gate is tighter (a 20us baseline must not fail on +4us of jitter).
@@ -233,6 +244,28 @@ def compare(current: dict, baseline: dict, thr: Thresholds | None = None,
             continue
         checks.append(_eff_check(f"eff@{label}", bp.get("eff_gf_per_w"),
                                  p.get("eff_gf_per_w"), bp.get("elec_power_w")))
+
+    # per-point zero-cross jitter. Unlike the gates above this must NOT fail
+    # closed on a missing BASELINE value: baselines captured before the v2
+    # perf struct have no jitter data, and that must read as "not gated",
+    # never as a regression. A missing CURRENT value with a gated baseline
+    # still fails (dead perf channel / firmware without the jitter fields).
+    for label, bp in base_pts.items():
+        b_jit = bp.get("zc_jitter_pct")
+        if _missing(b_jit):
+            checks.append(_check(f"zc_jitter@{label}", None, None, True,
+                                 "baseline predates v2 jitter data: not gated"))
+            continue
+        p = cur_pts.get(label)
+        c_jit = p.get("zc_jitter_pct") if p else None
+        checks.append(_check(
+            f"zc_jitter@{label}", b_jit, c_jit,
+            _worse_is_higher(b_jit, c_jit, thr.zc_jitter_increase_pct,
+                             thr.zc_jitter_abs_slack_pts),
+            f"<= +{thr.zc_jitter_increase_pct}% or "
+            f"+{thr.zc_jitter_abs_slack_pts} points (coarse guardrail: "
+            "beat-band points swing with pack state; use an interleaved "
+            "A/B for subtle deltas); missing current fails"))
 
     passed = all(c["pass"] for c in checks)
     return {"passed": passed, "checks": checks, "thresholds": asdict(thr)}

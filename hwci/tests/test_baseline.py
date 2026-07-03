@@ -211,3 +211,59 @@ def test_missing_steady_segment_fails():
     m["steady_points"] = m["steady_points"][:-1]  # a segment produced no data
     result = bl.compare(m, base)
     assert not result["passed"]
+
+
+def test_zc_jitter_regression_fails():
+    m = _metrics()
+    base = {"metrics": copy.deepcopy(m)}
+    # Force a known baseline value, then a gross regression: past both the
+    # +75% relative and the +8-point absolute slack.
+    for p in base["metrics"]["steady_points"]:
+        p["zc_jitter_pct"] = 5.0
+    for p in m["steady_points"]:
+        p["zc_jitter_pct"] = 20.0
+    result = bl.compare(m, base)
+    assert not result["passed"]
+    assert any(c["name"].startswith("zc_jitter@") and not c["pass"]
+               for c in result["checks"])
+
+
+def test_zc_jitter_pack_state_swing_passes():
+    # Same-firmware swings observed on the bench (t30 2.5 -> 9.0 across pack
+    # states) must not flap the gate: within baseline + 8 points.
+    m = _metrics()
+    base = {"metrics": copy.deepcopy(m)}
+    for p in base["metrics"]["steady_points"]:
+        p["zc_jitter_pct"] = 2.5
+    for p in m["steady_points"]:
+        p["zc_jitter_pct"] = 9.0
+    result = bl.compare(m, base)
+    assert all(c["pass"] for c in result["checks"]
+               if c["name"].startswith("zc_jitter@"))
+
+
+def test_zc_jitter_not_gated_for_pre_v2_baseline():
+    # Baselines captured before the v2 perf struct carry no jitter data;
+    # that must read "not gated", never a fail-closed regression.
+    m = _metrics()
+    base = {"metrics": copy.deepcopy(m)}
+    for p in base["metrics"]["steady_points"]:
+        p.pop("zc_jitter_pct", None)
+    result = bl.compare(m, base)
+    jit = [c for c in result["checks"] if c["name"].startswith("zc_jitter@")]
+    assert jit and all(c["pass"] for c in jit)
+    assert all("not gated" in c["note"] for c in jit)
+
+
+def test_zc_jitter_missing_current_fails():
+    # Baseline has jitter, current run doesn't (dead perf channel or firmware
+    # without the v2 fields): fail closed like the other gated metrics.
+    m = _metrics()
+    base = {"metrics": copy.deepcopy(m)}
+    for p in base["metrics"]["steady_points"]:
+        p["zc_jitter_pct"] = 5.0
+    for p in m["steady_points"]:
+        p["zc_jitter_pct"] = None
+    result = bl.compare(m, base)
+    assert any(c["name"].startswith("zc_jitter@") and not c["pass"]
+               for c in result["checks"])

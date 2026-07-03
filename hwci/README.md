@@ -184,6 +184,75 @@ non-zero on regression** so CI fails the build.
 Built-in profiles: `ci_smoke` (fast gate), `efficiency_sweep` (10–100 %
 staircase, the primary baseline), `demag_step_stress` (aggressive steps).
 
+## Auto-tuning AM32 settings (`hwci tune`)
+
+Given a motor/prop on the rig, `hwci tune` automatically searches the AM32
+EEPROM settings (`advance_level`, `pwm_frequency`, `variable_pwm`,
+`auto_advance`, `max_ramp`, …) for the combination that maximizes efficiency
+(g/W), subject to hard constraints: no demag/desync/bemf timeouts, zero-cross
+jitter not regressed vs the default settings, temperatures bounded, and
+reliable startup. **No rebuild per trial**: AM32 reads its 192-byte EEprom
+page once at boot, so each trial one-shot-flashes the page over SWD (+ reset)
+and runs a ~28 s probe. The live page address is read from the firmware's
+`eeprom_address` global (the bootloader can relocate it) and the field
+offsets are cross-checked against the flashed ELF's DWARF before anything is
+written. Trial blobs are seeded from the device's current page and mutate
+only the tuned bytes, so version/identity bytes and rig calibration survive.
+
+```bash
+hwci tune --spec tunes/example.yaml --config rig.yaml --battery-cells 4 \
+          --out runs/tune-1            # hardware
+hwci tune --spec tunes/example.yaml --sim --out runs/tune-sim   # offline dry run
+hwci tune --resume runs/tune-1        # continue an interrupted session
+```
+
+**Spec format** (`tunes/example.yaml`, strict validation — unknown keys or
+parameters fail loudly): `parameters:` declares the tunable fields and their
+grids (unknown-to-hwci fields can be addressed with an explicit `offset:`);
+`stages:` runs coordinate sweeps (`sweep:` one parameter, others at the
+incumbent, optional `refine_step` around the argmax) and A/B mode stages
+(`ab_candidates:` with interleaved `repeats`); `objective:` weights the
+steady probe points (points under `min_power_w` are bench noise and never
+score); `constraints:` are hard disqualifiers, never traded against score. A
+`constraint_only: true` sweep (e.g. `max_ramp` on the step-stress profile)
+tries values in listed order and picks the first with zero failures — list
+them best-first.
+
+**Noise handling**: same-firmware g/W spread reaches ~10 % on the bench and
+the pack sags within a session, so the incumbent is re-run every
+`anchors_every` trials and every score is reported raw *and* normalized to
+the interpolation between surrounding anchors (cancels drift). Candidates
+within `noise_floor_pct` of the best tie-break toward lower jitter, then
+lower FET temperature, then closest-to-default. The finals run winner vs
+default in interleaved ABBA blocks on the full efficiency sweep (plus a
+startup-reliability check); the winner is confirmed only with a positive
+median paired delta and zero constraint failures — otherwise
+`best_settings.bin` keeps the defaults.
+
+**Session dir / resume**: `runs/tune-1/` holds `manifest.json` (atomically
+rewritten after every trial), `spec.yaml`, `base_settings.bin`, one standard
+run dir per trial under `trials/T007-advance_level_22/` (plus its
+`settings.bin` + `trial.json`), and at the end `report.md`,
+`best_settings.bin`, `settings_diff.md`. `--resume` replays the
+deterministic plan: completed trials are reused from disk, partial trial
+dirs are quarantined as `*.incomplete` and redone, and the incumbent page is
+re-programmed first (a crash may have left arbitrary trial settings
+flashed).
+
+**Pack swaps**: when the resting voltage drops below
+`battery_cells * pack.min_resting_cell_v`, the session checkpoints and
+prompts you to swap the pack (recorded as a `pack_event`; ABBA blocks that
+straddle a swap are discarded and restarted). With `--no-prompt` it exits
+cleanly (code 3) instead — swap, then `--resume`.
+
+The settings page is also scriptable directly:
+
+```bash
+hwci settings read  --config rig.yaml --bin page.bin   # dump current page
+hwci settings diff  --config rig.yaml --bin other.bin  # exit 1 if different
+hwci settings write --config rig.yaml --bin page.bin   # flash + verify
+```
+
 ## Capturing the first baseline
 
 Once wired and configured:

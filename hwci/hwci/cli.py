@@ -23,6 +23,8 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+import yaml
+
 from . import baseline as bl
 from . import metrics as metricsmod
 from . import report as reportmod
@@ -274,6 +276,143 @@ def cmd_ci(args) -> int:
     return _verdict_rc(result, comparison)
 
 
+def cmd_tune(args) -> int:
+    from . import tuner as tunermod
+
+    if args.resume:
+        out = Path(args.resume)
+        manifest = json.loads((out / "manifest.json").read_text())
+        spec_text = (out / "spec.yaml").read_text()
+        spec = tunermod.tune_spec_from_dict(yaml.safe_load(spec_text))
+        sim = manifest.get("mode") == "sim"
+        config_path = manifest.get("config_path")
+        rig = (load_rig(config_path) if (config_path and not sim)
+               else RigConfig())
+        battery_cells = manifest.get("battery_cells")
+        resume = True
+    else:
+        if not args.spec:
+            print("error: hwci tune needs --spec (or --resume)", file=sys.stderr)
+            return 2
+        spec_text = Path(args.spec).read_text()
+        spec = tunermod.load_tune_spec(args.spec)
+        sim = _use_sim(args)
+        rig = load_rig(args.config) if args.config else RigConfig()
+        out = Path(args.out) if args.out else _default_out(
+            f"tune-{spec.name}", sim)
+        config_path = args.config
+        battery_cells = args.battery_cells
+        resume = False
+
+    backend = (tunermod.SimTuneBackend(rig) if sim
+               else tunermod.HwTuneBackend(rig))
+    try:
+        tuner = tunermod.Tuner(
+            spec, backend, out, spec_text=spec_text,
+            battery_cells=battery_cells, no_prompt=args.no_prompt,
+            resume=resume, config_path=config_path)
+        result = tuner.run()
+    except tunermod.TunePaused as e:
+        print(f"PAUSED: {e}", file=sys.stderr)
+        return 3
+    finally:
+        backend.close()
+    print(f"report: {out / 'report.md'}\n"
+          f"best settings: {out / 'best_settings.bin'} "
+          f"({'winner' if result['confirmed'] else 'default kept'})")
+    return 0
+
+
+# Persistent in-process simulated settings page for `hwci settings --sim`,
+# so read/write/diff round-trip within one process (tests, demos).
+_SIM_SETTINGS_DEVICE = None
+
+
+def _sim_settings_device():
+    from .debugger.base import MockDebugger
+    from .settings import DEFAULT_EEPROM_ADDRESS, default_blob
+
+    class _Device(MockDebugger):
+        def flash(self, bin_path: str, load_addr: int) -> None:
+            super().flash(bin_path, load_addr)
+            self.poke(load_addr, Path(bin_path).read_bytes())
+
+    global _SIM_SETTINGS_DEVICE
+    if _SIM_SETTINGS_DEVICE is None:
+        _SIM_SETTINGS_DEVICE = _Device(base=DEFAULT_EEPROM_ADDRESS, size=192)
+        _SIM_SETTINGS_DEVICE.poke(DEFAULT_EEPROM_ADDRESS, default_blob())
+    return _SIM_SETTINGS_DEVICE, DEFAULT_EEPROM_ADDRESS
+
+
+def cmd_settings(args) -> int:
+    from . import settings as st
+
+    sim = _use_sim(args)
+    if sim:
+        dbg, addr = _sim_settings_device()
+        closer = lambda: None  # noqa: E731 - kept alive across invocations
+        flash = dbg.flash
+    else:
+        from .debugger.openocd import OpenOcdDebugger
+        rig = load_rig(args.config)
+        elf = rig.resolved_elf()
+        if elf is None:
+            print(f"error: no ELF for target {rig.target}; the live "
+                  "eeprom_address is resolved from the flashed ELF",
+                  file=sys.stderr)
+            return 2
+        make = lambda: OpenOcdDebugger(  # noqa: E731
+            rig.openocd_configs, openocd_bin=rig.openocd_bin,
+            search_dirs=rig.openocd_search_dirs)
+        dbg = make().open()
+        closer = dbg.close
+        addr = st.resolve_eeprom_address(dbg, str(elf))
+
+        def flash(bin_path: str, load_addr: int) -> None:
+            # One-shot flash must not race the open Tcl-RPC session on the
+            # same ST-Link: close, program+reset, reopen to verify.
+            nonlocal dbg, closer
+            dbg.close()
+            make().flash(bin_path, load_addr)
+            dbg = make().open()
+            closer = dbg.close
+
+    try:
+        current = st.Settings.from_device(dbg, addr)
+        if args.action == "read":
+            print(f"eeprom @ 0x{addr:08x}  sha256 {current.sha256()[:16]}")
+            for name, value in current.describe().items():
+                print(f"  {name:16s} = {value:3d}   "
+                      f"({st.EEPROM_FIELDS[name].description})")
+            if args.bin:
+                current.to_bin(args.bin)
+                print(f"saved page to {args.bin}")
+            return 0
+        if not args.bin:
+            print(f"error: hwci settings {args.action} needs --bin",
+                  file=sys.stderr)
+            return 2
+        other = st.Settings.from_bin(args.bin)
+        if args.action == "diff":
+            diff = current.diff(other)
+            for name, a, b in diff:
+                print(f"  {name:16s} device={a:3d}  {args.bin}={b:3d}")
+            print(f"{len(diff)} byte(s) differ" if diff
+                  else "no differences")
+            return 1 if diff else 0
+        # write
+        flash(str(Path(args.bin)), addr)
+        readback = st.Settings.from_device(dbg, addr)
+        if readback != other:
+            print("ERROR: readback after write does not match the file",
+                  file=sys.stderr)
+            return 1
+        print(f"wrote {args.bin} to eeprom @ 0x{addr:08x} (verified)")
+        return 0
+    finally:
+        closer()
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="hwci", description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -344,6 +483,33 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--baseline")
     sp.add_argument("--no-plots", action="store_true")
     sp.set_defaults(func=cmd_report)
+
+    sp = sub.add_parser(
+        "tune", help="auto-tune AM32 EEPROM settings for the motor/prop")
+    add_common(sp)
+    sp.add_argument("--spec", help="tune spec YAML (see hwci/tunes/example.yaml)")
+    sp.add_argument("--out", help="session directory (default: runs/tune-...)")
+    sp.add_argument("--sim", action="store_true", help="force the simulator")
+    sp.add_argument("--battery-cells", type=int, metavar="N",
+                    help="LiPo cell count; gates every trial on resting pack "
+                         "voltage (overrides the spec's battery_cells)")
+    sp.add_argument("--no-prompt", action="store_true",
+                    help="never wait for input: checkpoint and exit cleanly "
+                         "(exit code 3) instead of prompting for a pack swap")
+    sp.add_argument("--resume", metavar="DIR",
+                    help="resume a checkpointed session from its directory "
+                         "(spec/config/mode are reloaded from the session)")
+    sp.set_defaults(func=cmd_tune)
+
+    sp = sub.add_parser(
+        "settings", help="read/write/diff the AM32 EEPROM settings page")
+    sp.add_argument("action", choices=["read", "write", "diff"])
+    add_common(sp)
+    sp.add_argument("--bin", help="192-byte settings blob (read: save to; "
+                                  "write/diff: source)")
+    sp.add_argument("--sim", action="store_true",
+                    help="in-process simulated page (offline)")
+    sp.set_defaults(func=cmd_settings)
 
     sp = sub.add_parser("ci", help="build+flash+run+analyze+gate (full pipeline)")
     add_common(sp)

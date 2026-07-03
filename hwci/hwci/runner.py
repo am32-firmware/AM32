@@ -325,15 +325,26 @@ def _safe(fn):
 # Source builders
 # --------------------------------------------------------------------------
 def build_sim_sources(rig: RigConfig, profile: Profile, *,
-                      demag_prone: bool = True) -> Sources:
-    """All three channels fed by one RigSimulator (deterministic, no hardware)."""
+                      demag_prone: bool = True,
+                      sim=None, settings_blob: bytes | None = None) -> Sources:
+    """All three channels fed by one RigSimulator (deterministic, no hardware).
+
+    ``sim`` optionally supplies an existing :class:`~hwci.sim.RigSimulator` so
+    one simulator (pack state, temperature, RNG) persists across multiple
+    runs - the auto-tuner's trials share a rig exactly like hardware does.
+    ``settings_blob`` installs a 192-byte AM32 settings page on it (decoded by
+    :class:`~hwci.sim.SimSettings`, the sim's analogue of flash+reset).
+    """
     from .flightstand.simulator import SimulatedStand
-    from .sim import MotorParams, RigSimulator
+    from .sim import MotorParams, RigSimulator, SimSettings
     from .throttle.flightstand_src import FlightStandThrottle
 
     period = 1.0 / profile.sample_rate_hz
-    sim = RigSimulator(params=MotorParams(pole_pairs=rig.pole_pairs,
-                                          demag_prone=demag_prone))
+    if sim is None:
+        sim = RigSimulator(params=MotorParams(pole_pairs=rig.pole_pairs,
+                                              demag_prone=demag_prone))
+    if settings_blob is not None:
+        sim.set_settings(SimSettings.from_blob(settings_blob))
     stand = SimulatedStand(sim, fixed_dt=period).open()
     stand.set_safety_limits(profile.safety)
     throttle = FlightStandThrottle(stand, arm_settle_s=0.0)

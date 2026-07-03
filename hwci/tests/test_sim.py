@@ -63,3 +63,20 @@ def test_no_demag_when_not_prone():
     _settle(rig, 0.1, n=50)
     rig.step(0.005, 1.0)
     assert rig.desync_count == 0
+
+
+def test_perf_channel_carries_zc_jitter_accumulators():
+    rig = RigSimulator(noise=0.0)
+    _settle(rig, 0.7)
+    a = perf.decode(rig.perf_bytes()).raw
+    _settle(rig, 0.7)
+    b = perf.decode(rig.perf_bytes()).raw
+    # monotonic sums, growing while running
+    assert b["zc_count"] > a["zc_count"] > 0
+    assert b["zc_jitter_sum"] > a["zc_jitter_sum"]
+    assert b["zc_interval_sum"] > a["zc_interval_sum"]
+    # mean fractional jitter is the sim's modeled ~0.5% of the interval
+    mean_pct = 100.0 * (b["zc_jitter_sum"] - a["zc_jitter_sum"]) / (
+        b["zc_interval_sum"] - a["zc_interval_sum"])
+    assert 0.1 < mean_pct < 2.0
+    assert b["zc_jitter_max"] >= 1

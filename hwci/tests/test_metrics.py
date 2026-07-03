@@ -139,3 +139,63 @@ def test_cpu_load_prefers_perf_host_t():
     assert abs(idle_rate - 120000.0) < 1500.0
     import numpy as np
     assert np.nanmax(load) < 5.0
+
+
+def test_zc_jitter_from_accumulator_deltas():
+    # 100 commutations per tick at a 200-tick mean interval with 2 ticks of
+    # mean deviation -> 1.0% jitter, computed from first/last snapshot deltas.
+    n = 100
+    rows = _rows(
+        n,
+        perf_zc_count=lambda i: 100 * i,
+        perf_zc_jitter_sum=lambda i: 2 * 100 * i,
+        perf_zc_interval_sum=lambda i: 200 * 100 * i,
+        perf_zc_jitter_max=lambda i: 9,
+    )
+    m = metricsmod.compute(RunResult(rows=rows), _profile())
+    pt = m["steady_points"][0]
+    assert pt["zc_jitter_pct"] == 1.0
+    assert pt["zc_jitter_max_pct"] == 4.5  # 9 / 200
+    assert m["summary"]["worst_zc_jitter_pct"] == 1.0
+    assert m["summary"]["worst_zc_jitter_max_pct"] == 4.5
+
+
+def test_zc_jitter_survives_u32_wrap():
+    # interval_sum wraps u32 mid-window (it grows ~2M ticks/s on hardware);
+    # modular differencing must keep the ratio exact.
+    n = 100
+    start = (1 << 32) - 200 * 100 * 50  # wraps halfway through the run
+    rows = _rows(
+        n,
+        perf_zc_count=lambda i: 100 * i,
+        perf_zc_jitter_sum=lambda i: 2 * 100 * i,
+        perf_zc_interval_sum=lambda i: (start + 200 * 100 * i) % (1 << 32),
+        perf_zc_jitter_max=lambda i: 9,
+    )
+    m = metricsmod.compute(RunResult(rows=rows), _profile())
+    assert m["steady_points"][0]["zc_jitter_pct"] == 1.0
+
+
+def test_zc_jitter_none_for_v1_runs():
+    # Runs captured on pre-v2 firmware have no zc columns: the metric must
+    # report None (unavailable), never 0 (which would read as "perfect").
+    rows = _rows(50, perf_loop_iters=lambda i: 1200 * i)
+    m = metricsmod.compute(RunResult(rows=rows), _profile())
+    pt = m["steady_points"][0]
+    assert pt["zc_jitter_pct"] is None
+    assert pt["zc_jitter_max_pct"] is None
+    assert m["summary"]["worst_zc_jitter_pct"] is None
+
+
+def test_zc_jitter_none_when_no_commutations_accumulate():
+    # Counters present but frozen (motor stopped / startup-gated): no window
+    # delta, so the metric is unavailable rather than 0/0 noise.
+    rows = _rows(
+        50,
+        perf_zc_count=lambda i: 5000,
+        perf_zc_jitter_sum=lambda i: 777,
+        perf_zc_interval_sum=lambda i: 999999,
+        perf_zc_jitter_max=lambda i: 3,
+    )
+    m = metricsmod.compute(RunResult(rows=rows), _profile())
+    assert m["steady_points"][0]["zc_jitter_pct"] is None

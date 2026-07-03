@@ -10,7 +10,7 @@ from hwci import elf, perf  # noqa: E402
 
 def test_find_symbol(host_perf_elf):
     sym = elf.find_symbol(host_perf_elf, "hwci_perf")
-    assert sym.size == perf.SIZE == 64
+    assert sym.size == perf.SIZE == 80
 
 
 def test_dwarf_layout_matches_canonical(host_perf_elf):

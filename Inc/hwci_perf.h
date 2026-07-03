@@ -40,7 +40,8 @@
 /* ASCII "HWC1" in little-endian memory order - lets the host locate/validate
  * the struct either by ELF symbol or by scanning RAM for the magic. */
 #define HWCI_PERF_MAGIC   0x31435748u
-#define HWCI_PERF_VERSION 1u
+/* v2: appended the zero-cross jitter block (zc_*) after host_cmd. */
+#define HWCI_PERF_VERSION 2u
 
 /* Commands the host may write to hwci_perf.host_cmd (cleared by firmware). */
 #define HWCI_CMD_NONE          0u
@@ -93,7 +94,17 @@ typedef struct hwci_perf_s {
     uint32_t commutation_interval_max; /* off 52 : worst-case (slowest)     */
     uint32_t update_count;             /* off 56 : ++ each snapshot         */
     volatile uint32_t host_cmd;        /* off 60 : host writes, fw clears   */
-} hwci_perf_t;                         /* total size: 64 bytes              */
+
+    /* --- v2: zero-cross timing jitter (fed by HWCI_PERF_ZC) ---
+     * Appended AFTER host_cmd so its offset (60) is identical in v1 and v2
+     * firmware: during an A/B session the host must be able to issue
+     * RESET_STATS to whichever vintage is flashed without a layout lookup. */
+    uint32_t zc_count;                 /* off 64 : commutations accumulated */
+    uint32_t zc_jitter_sum;            /* off 68 : sum |deviation|, ticks   */
+    uint32_t zc_interval_sum;          /* off 72 : sum raw interval, ticks  */
+    uint16_t zc_jitter_max;            /* off 76 : worst single deviation   */
+    uint16_t _pad2;                    /* off 78 : keep sizeof 4-aligned    */
+} hwci_perf_t;                         /* total size: 80 bytes              */
 
 extern volatile hwci_perf_t hwci_perf;
 
@@ -135,6 +146,49 @@ void hwci_perf_reset_stats(void);
         uint16_t _e = (uint16_t)(HWCI_NOW_US() - _hwci_ctrl_t0);               \
         hwci_perf.ctrl_exec_us_last = _e;                                      \
         if (_e > hwci_perf.ctrl_exec_us_max) hwci_perf.ctrl_exec_us_max = _e;  \
+    } while (0)
+
+/*
+ * Zero-cross jitter instrumentation. Call once per commutation, at the END of
+ * PeriodElapsedCallback() - never from interruptRoutine(), so the comparator
+ * ISR whose detection timing this metric characterizes is not perturbed by
+ * the act of measuring it. When PeriodElapsedCallback runs, thiszctime holds
+ * the newest raw zero-cross interval (INTERVAL_TIMER ticks; interruptRoutine
+ * zeroes the timer at every accepted crossing).
+ *
+ * The deviation is taken against the interval SIX commutations earlier - the
+ * same motor phase and comparator edge one electrical revolution back.
+ * Adjacent steps differ systematically (phase/comparator-edge asymmetry), so
+ * a tick-to-tick delta would bury detection noise under that fixed
+ * alternation; the 6-back reference cancels it.
+ *
+ * Accumulation is gated on zero_crosses >= 100, the same "stable running"
+ * threshold the zero-cross filter tiers use: startup seeds (interval forced
+ * to 10000) and post-desync recovery (firmware zeroes zero_crosses on
+ * desync) stay out of the sums, and the history ring refills during the
+ * gated-out span. zc_count/zc_jitter_sum/zc_interval_sum are monotonic - the
+ * host differences consecutive SWD snapshots (wrap-safe u32, like
+ * loop_iters), so delta(jitter_sum)/delta(interval_sum) over a window is the
+ * mean fractional jitter with every commutation counted, immune to the 200 Hz
+ * host sampling rate. zc_jitter_max is sticky and cleared alongside the other
+ * maxima by hwci_perf_reset_stats().
+ */
+#define HWCI_PERF_ZC()                                                         \
+    do {                                                                       \
+        static uint16_t _zc_hist[6];                                           \
+        static uint8_t _zc_idx;                                                \
+        uint16_t _t = thiszctime;                                              \
+        uint16_t _ref = _zc_hist[_zc_idx];                                     \
+        _zc_hist[_zc_idx] = _t;                                                \
+        if (++_zc_idx == 6u) _zc_idx = 0u;                                     \
+        if (zero_crosses >= 100) {                                             \
+            uint16_t _d = (_t >= _ref) ? (uint16_t)(_t - _ref)                 \
+                                       : (uint16_t)(_ref - _t);                \
+            hwci_perf.zc_count++;                                              \
+            hwci_perf.zc_jitter_sum += _d;                                     \
+            hwci_perf.zc_interval_sum += _t;                                   \
+            if (_d > hwci_perf.zc_jitter_max) hwci_perf.zc_jitter_max = _d;    \
+        }                                                                      \
     } while (0)
 
 /*
@@ -200,6 +254,7 @@ void hwci_perf_reset_stats(void);
 
 #define HWCI_PERF_CTRL_ENTER() do {} while (0)
 #define HWCI_PERF_CTRL_EXIT()  do {} while (0)
+#define HWCI_PERF_ZC()         do {} while (0)
 #define HWCI_PERF_MAIN_LOOP()  do {} while (0)
 
 #endif /* HWCI_PERF */

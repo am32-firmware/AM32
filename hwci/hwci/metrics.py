@@ -111,6 +111,52 @@ def _nanmean(a: np.ndarray) -> float:
     return float(np.nanmean(a)) if a.size and not np.all(np.isnan(a)) else float("nan")
 
 
+_U32 = 1 << 32
+
+
+def _wrap32(a: float, b: float) -> int:
+    """b - a for firmware u32 counters, correct across a single wraparound."""
+    return (int(b) - int(a)) % _U32
+
+
+def zc_jitter_window(count: np.ndarray, jsum: np.ndarray, isum: np.ndarray,
+                     jmax: np.ndarray, idx: np.ndarray) -> dict:
+    """Zero-cross jitter over the sample window ``idx``.
+
+    The firmware accumulates |interval deviation| and raw interval per
+    commutation into monotonic u32 sums (struct v2, see HWCI_PERF_ZC in
+    Inc/hwci_perf.h), so differencing the first and last valid snapshot in the
+    window yields per-commutation means with EVERY commutation counted -
+    immune to the ~200 Hz host sampling rate, which is far below the multi-kHz
+    commutation rate. Returns:
+
+    * ``mean_pct``  - mean |deviation| as % of mean interval (the headline
+      zero-cross detection noise figure),
+    * ``max_pct``   - worst single deviation (sticky firmware max, reset by
+      the runner at each steady tail) as % of mean interval,
+    * both ``None`` when the firmware predates v2 or the window saw no
+      accumulated commutations (motor stopped / startup-gated).
+    """
+    none = {"mean_pct": None, "max_pct": None}
+    if idx.size == 0:
+        return none
+    valid = idx[~np.isnan(count[idx]) & ~np.isnan(jsum[idx]) & ~np.isnan(isum[idx])]
+    if valid.size < 2:
+        return none
+    a, b = valid[0], valid[-1]
+    n = _wrap32(count[a], count[b])
+    d_int = _wrap32(isum[a], isum[b])
+    if n <= 0 or d_int <= 0:
+        return none
+    d_jit = _wrap32(jsum[a], jsum[b])
+    mean_interval = d_int / n
+    out = {"mean_pct": round(100.0 * d_jit / d_int, 3), "max_pct": None}
+    m = jmax[valid]
+    if not np.all(np.isnan(m)):
+        out["max_pct"] = round(100.0 * float(np.nanmax(m)) / mean_interval, 2)
+    return out
+
+
 def compute(run: RunResult, profile: Profile) -> dict:
     rows = run.rows
     seg = np.array([r.get("segment") for r in rows], dtype=object)
@@ -130,6 +176,10 @@ def compute(run: RunResult, profile: Profile) -> dict:
     main_max = _col(rows, "perf_main_loop_us_max")
     perf_iters = _col(rows, "perf_loop_iters")
     esc_erpm = _col(rows, "esc_erpm")
+    zc_count = _col(rows, "perf_zc_count")
+    zc_jsum = _col(rows, "perf_zc_jitter_sum")
+    zc_isum = _col(rows, "perf_zc_interval_sum")
+    zc_jmax = _col(rows, "perf_zc_jitter_max")
 
     steady_points = []
     for s in profile.segments:
@@ -139,6 +189,7 @@ def compute(run: RunResult, profile: Profile) -> dict:
         tail = _tail(idx, profile.steady_tail_fraction)
         if tail.size == 0:
             continue
+        jitter = zc_jitter_window(zc_count, zc_jsum, zc_isum, zc_jmax, tail)
         steady_points.append({
             "segment": s.label,
             "throttle": s.throttle,
@@ -153,6 +204,10 @@ def compute(run: RunResult, profile: Profile) -> dict:
             "cpu_load_pct": round(_nanmean(load[tail]), 1),
             "motor_temp_c": round(_nanmean(motor_temp[tail]), 2),
             "fet_temp_c": round(_nanmean(fet_temp[tail]), 2),
+            # zero-cross detection noise (report-only for now: gate once the
+            # bench has repeat captures establishing its run-to-run spread)
+            "zc_jitter_pct": jitter["mean_pct"],
+            "zc_jitter_max_pct": jitter["max_pct"],
         })
 
     demag = detect_demag(run, profile)
@@ -178,6 +233,14 @@ def compute(run: RunResult, profile: Profile) -> dict:
              if p.get("main_loop_us_max") is not None), default=None),
         "max_cpu_load_pct": round(_safe_maxf(load), 1),
         "idle_loop_rate_hz": round(idle_rate, 1) if idle_rate == idle_rate else None,
+        # Worst steady-point zero-cross jitter (mean-of-window %, and worst
+        # single deviation %). Report-only: not compared by baseline.compare.
+        "worst_zc_jitter_pct": max(
+            (p["zc_jitter_pct"] for p in steady_points
+             if p.get("zc_jitter_pct") is not None), default=None),
+        "worst_zc_jitter_max_pct": max(
+            (p["zc_jitter_max_pct"] for p in steady_points
+             if p.get("zc_jitter_max_pct") is not None), default=None),
         "demag_events": demag["event_count"],
         "bemf_timeout_samples": demag["bemf_timeout_samples"],
         "max_motor_temp_c": _safe_maxf(motor_temp),

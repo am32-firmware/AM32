@@ -62,6 +62,11 @@ class RigSimulator:
         self.desync_count = 0
         self._ctrl_exec_max = 0
         self._commutation_max = 0
+        # zero-cross jitter accumulators (perf struct v2)
+        self.zc_count = 0
+        self.zc_jitter_sum = 0
+        self.zc_interval_sum = 0
+        self.zc_jitter_max = 0
 
     # --- model -------------------------------------------------------
     def _rpm_max(self) -> float:
@@ -97,7 +102,19 @@ class RigSimulator:
 
         # bookkeeping that the perf struct exposes
         erev_per_s = self.rpm * p.pole_pairs / 60.0
-        self.zero_cross_count += int(erev_per_s * 6.0 * dt)
+        n_comm = int(erev_per_s * 6.0 * dt)
+        self.zero_cross_count += n_comm
+        # zero-cross jitter accumulators: firmware gates on zero_crosses >=
+        # 100 (startup/desync-recovery excluded), deviation ~0.5% of the
+        # commutation interval in clean running, ballooning during a desync
+        if n_comm > 0 and self.zero_cross_count >= 100:
+            interval = int((1.0 / (erev_per_s * 6.0)) / 0.5e-6)
+            frac = 0.05 if self.desync_remaining > 0 else 0.005
+            dev = max(1, int(interval * frac * self._rng.uniform(0.3, 1.7)))
+            self.zc_count = (self.zc_count + n_comm) & 0xFFFFFFFF
+            self.zc_jitter_sum = (self.zc_jitter_sum + dev * n_comm) & 0xFFFFFFFF
+            self.zc_interval_sum = (self.zc_interval_sum + interval * n_comm) & 0xFFFFFFFF
+            self.zc_jitter_max = min(max(self.zc_jitter_max, dev), 0xFFFF)
         # idle loop iterations: ~120 kHz when idle, dropping with motor load
         idle_hz = 120000.0 * (1.0 - 0.25 * throttle)
         self.loop_iters += int(idle_hz * dt)
@@ -207,4 +224,8 @@ class RigSimulator:
             "commutation_interval_max": self._commutation_max,
             "update_count": self.update_count & 0xFFFFFFFF,
             "host_cmd": 0,
+            "zc_count": self.zc_count,
+            "zc_jitter_sum": self.zc_jitter_sum,
+            "zc_interval_sum": self.zc_interval_sum,
+            "zc_jitter_max": self.zc_jitter_max,
         })

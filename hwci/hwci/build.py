@@ -46,4 +46,18 @@ def build_firmware(repo_root: str | Path, target: str, *,
     elf, binf, hexf = (find_artifact(obj, target, e) for e in ("elf", "bin", "hex"))
     if elf is None or binf is None:
         raise RuntimeError(f"build produced no artifacts for {target} in {obj}")
+    if hwci_perf:
+        # The Makefile does not encode HWCI_PERF in object paths, so a prior
+        # non-instrumented build leaves up-to-date objects and this "build"
+        # silently packages firmware WITHOUT the perf struct (caught on the
+        # bench: flashed an ELF with no hwci_perf symbol). Verify, don't hope.
+        try:
+            from . import elf as elfmod
+            elfmod.find_symbol(str(elf), "hwci_perf")
+        except ImportError:
+            pass  # no pyelftools: PerfReader will catch it at run time
+        except Exception as e:
+            raise RuntimeError(
+                f"{elf} lacks the hwci_perf symbol - stale non-instrumented "
+                f"objects in obj/ (run 'make clean' and rebuild): {e}") from e
     return BuildArtifacts(elf=elf, bin=binf, hex=hexf)

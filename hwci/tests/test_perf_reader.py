@@ -69,6 +69,24 @@ def test_layout_check_passes_for_real_header(host_perf_elf):
     assert reader.address > 0
 
 
+def test_v1_firmware_reads_and_resets(host_perf_elf_v1):
+    # The A side of an A/B session runs old firmware with the 64-byte v1
+    # struct: the reader must size its SWD read from the ELF, decode without
+    # the zc_* fields, pass the DWARF layout cross-check against the v1
+    # canonical table, and land RESET_STATS at the version-stable offset 60.
+    reader, dbg = _reader_with_mock(host_perf_elf_v1)
+    assert reader._read_size == perf.SIZE_BY_VERSION[1]
+    dbg.poke(reader.address, perf.encode(
+        {"ctrl_exec_us_max": 33, "loop_iters": 999}, version=1))
+    sample = reader.read()
+    assert sample.ctrl_exec_us_max == 33
+    assert sample.loop_iters == 999
+    assert "zc_count" not in sample.raw
+    reader.reset_stats(verify=False)
+    word = dbg.read_memory(reader.address + perf.HOST_CMD_OFFSET, 4)
+    assert int.from_bytes(word, "little") == perf.CMD_RESET_STATS
+
+
 def test_missing_struct_die_fails_hard(host_perf_elf, monkeypatch):
     # DWARF present but the struct tag gone (rename/LTO): decoding on faith is
     # exactly the drift the cross-check exists to catch -> must raise.

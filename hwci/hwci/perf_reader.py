@@ -25,10 +25,15 @@ class PerfReader:
         self.elf_path = elf_path
         sym = elf.find_symbol(elf_path, SYMBOL)
         self.address = sym.address
-        if sym.size and sym.size != perf.SIZE:
+        # The ELF's struct size identifies the firmware's layout version: an
+        # A/B session flashes old firmware whose struct predates newer fields,
+        # and the harness must keep reading it (perf.decode is version-aware).
+        known = set(perf.SIZE_BY_VERSION.values())
+        if sym.size and sym.size not in known:
             raise perf.PerfDecodeError(
-                f"hwci_perf ELF size {sym.size} != host {perf.SIZE}; "
-                "rebuild firmware or update hwci/hwci/perf.py")
+                f"hwci_perf ELF size {sym.size} matches no known version "
+                f"({sorted(known)}); rebuild firmware or update hwci/hwci/perf.py")
+        self._read_size = sym.size or perf.SIZE
         if check_layout:
             self._check_layout()
 
@@ -45,9 +50,12 @@ class PerfReader:
             warnings.warn(f"hwci_perf layout cross-check skipped ({e}); "
                           "relying on the canonical layout in hwci/hwci/perf.py")
             return
+        # Pick the canonical layout matching the firmware's vintage by probing
+        # for a v2-only member, then verify every field of THAT layout.
+        fields = perf.FIELDS if "zc_count" in members else perf.FIELDS_V1
         off = 0
         import struct as _struct
-        for name, code in perf.FIELDS:
+        for name, code in fields:
             size = _struct.calcsize(code)
             if not name.startswith("_pad"):
                 m = members.get(name)
@@ -58,7 +66,7 @@ class PerfReader:
             off += size
 
     def read(self) -> perf.PerfSample:
-        data = self.dbg.read_memory(self.address, perf.SIZE)
+        data = self.dbg.read_memory(self.address, self._read_size)
         return perf.decode(data, host_monotonic=time.monotonic())
 
     def reset_stats(self, *, verify: bool = True, timeout_s: float = 1.0) -> None:

@@ -30,6 +30,10 @@ COLUMNS = [
     "perf_ctrl_period_us_max", "perf_ctrl_period_us_min",
     "perf_main_loop_us_max", "perf_loop_iters", "perf_zero_cross_count",
     "perf_commutation_interval", "perf_commutation_interval_max",
+    # zero-cross jitter accumulators (struct v2+; blank when the flashed
+    # firmware predates them - metrics treat blank as "metric unavailable")
+    "perf_zc_count", "perf_zc_jitter_sum", "perf_zc_interval_sum",
+    "perf_zc_jitter_max",
     "perf_bemf_timeout", "perf_e_rpm",
     # ESC input/arming state (proves the ESC decoded the throttle protocol)
     "perf_input", "perf_armed", "perf_running",
@@ -86,6 +90,13 @@ def make_row(t: float, segment: str, throttle_cmd: float,
             perf_armed=r["armed"],
             perf_running=r["running"],
         )
+        if "zc_count" in r:  # struct v2+
+            row.update(
+                perf_zc_count=r["zc_count"],
+                perf_zc_jitter_sum=r["zc_jitter_sum"],
+                perf_zc_interval_sum=r["zc_interval_sum"],
+                perf_zc_jitter_max=r["zc_jitter_max"],
+            )
     return row
 
 

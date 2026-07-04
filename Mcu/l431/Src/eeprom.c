@@ -18,7 +18,7 @@ uint32_t FLASH_FKEY2 =0xCDEF89AB;
   write to flash, done as a RAM function to allow for DroneCAN fw update
  */
 void save_flash_nolib(uint8_t *data, int length, uint32_t add){
-    if ((add & 0x7) != 0 || (length & 0x7)) {
+    if (length <= 0 || (add & 0x7) != 0 || (length & 0x7)) {
         // address and length must be on 8 byte boundary
 	return;
     }

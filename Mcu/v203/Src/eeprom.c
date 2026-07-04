@@ -10,7 +10,7 @@
 
 void save_flash_nolib(uint8_t* data, int length, uint32_t add)
 {
-    if ((add & 0x03) != 0 || (length & 0x03) != 0 || (length+(add&0xFF)) > page_size) {
+    if (length <= 0 || (add & 0x03) != 0 || (length & 0x03) != 0 || (length+(add&0xFF)) > page_size) {
         return;
     }
 

@@ -52,7 +52,9 @@ class PerfReader:
             return
         # Pick the canonical layout matching the firmware's vintage by probing
         # for version-marker members, then verify every field of THAT layout.
-        if "zc_confirm_reject" in members:
+        if "zc_phase_hist" in members:
+            fields = perf.FIELDS_V4
+        elif "zc_confirm_reject" in members:
             fields = perf.FIELDS_V3
         elif "zc_count" in members:
             fields = perf.FIELDS_V2

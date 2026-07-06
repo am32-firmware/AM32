@@ -110,3 +110,16 @@ def host_perf_elf_v1(tmp_path_factory):
 @pytest.fixture(scope="session")
 def host_perf_elf_v2(tmp_path_factory):
     return _compile_probe(tmp_path_factory, "perf_elf_v2", _PROBE_V2_C)
+
+
+# Frozen copy of the v3 struct (confirm-reject counter, pre v4 phase
+# histogram), for the decode-compat regression like the v1/v2 probes.
+_PROBE_V3_C = _PROBE_V2_C.replace(
+    "uint16_t zc_jitter_max; uint16_t _pad2;",
+    "uint16_t zc_jitter_max; uint16_t _pad2;\n    uint32_t zc_confirm_reject;"
+).replace(".version = 2,", ".version = 3,")
+
+
+@pytest.fixture(scope="session")
+def host_perf_elf_v3(tmp_path_factory):
+    return _compile_probe(tmp_path_factory, "perf_elf_v3", _PROBE_V3_C)

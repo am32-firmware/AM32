@@ -93,3 +93,16 @@ def test_perf_channel_carries_confirm_reject_counter():
     ratio = (b["zc_confirm_reject"] - a["zc_confirm_reject"]) / (
         b["zc_count"] - a["zc_count"])
     assert 0.001 < ratio < 0.05
+
+
+def test_perf_channel_carries_phase_histogram():
+    rig = RigSimulator(noise=0.0)
+    _settle(rig, 0.7)
+    a = perf.decode(rig.perf_bytes()).raw["zc_phase_hist"]
+    _settle(rig, 0.7)
+    b = perf.decode(rig.perf_bytes()).raw["zc_phase_hist"]
+    delta = [(y - x) % 65536 for x, y in zip(a, b)]
+    assert sum(delta) > 0
+    # the sim locks 20% of edges onto the throttle-derived bin
+    peak = int(0.7 * 32) & 31
+    assert max(range(32), key=delta.__getitem__) == peak

@@ -9,7 +9,8 @@ from hwci import perf
 def test_layout_sizes():
     assert perf.SIZE_BY_VERSION[1] == 64
     assert perf.SIZE_BY_VERSION[2] == 80
-    assert perf.SIZE == perf.SIZE_BY_VERSION[3] == 84
+    assert perf.SIZE_BY_VERSION[3] == 84
+    assert perf.SIZE == perf.SIZE_BY_VERSION[4] == 148
 
 
 def test_host_cmd_offset_matches_layout():
@@ -111,9 +112,11 @@ def test_negative_current_is_signed():
 
 
 def test_v3_roundtrip_confirm_reject():
-    blob = perf.encode({"zc_confirm_reject": 424242})
+    blob = perf.encode({"zc_confirm_reject": 424242}, version=3)
     assert len(blob) == 84
-    assert perf.decode(blob).raw["zc_confirm_reject"] == 424242
+    s = perf.decode(blob)
+    assert s.raw["zc_confirm_reject"] == 424242
+    assert "zc_phase_hist" not in s.raw
 
 
 def test_v2_roundtrip_has_no_reject_key():
@@ -124,3 +127,11 @@ def test_v2_roundtrip_has_no_reject_key():
     s = perf.decode(blob)
     assert s.raw["zc_count"] == 7
     assert "zc_confirm_reject" not in s.raw
+
+
+def test_v4_roundtrip_phase_histogram():
+    hist = tuple((i * 7) % 65536 for i in range(32))
+    blob = perf.encode({"zc_phase_hist": hist})
+    assert len(blob) == 148
+    s = perf.decode(blob)
+    assert s.raw["zc_phase_hist"] == hist

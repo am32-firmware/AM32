@@ -181,6 +181,54 @@ def counter_per_zc(counter: np.ndarray, count: np.ndarray,
     return round(_wrap32(counter[a], counter[b]) / n, 4)
 
 
+_U16 = 1 << 16
+
+
+def zc_phase_window(rows: list[dict], idx: np.ndarray) -> dict | None:
+    """PWM-phase histogram of accepted zero-crossings over window ``idx``.
+
+    ``perf_zc_phase_hist`` is a semicolon-joined vector of 32 monotonic u16
+    bin counters (firmware wraps them naturally); differencing the first and
+    last valid snapshot per-bin (mod 2^16) gives the exact distribution of
+    the window's accepted-edge PWM phases. Interpretation:
+
+    * flat histogram - commutation free-runs against PWM (no correlation),
+    * strong peaks - ZC<->PWM phase locking (the injection-locking
+      hypothesis for the beat-band jitter hump; PR #23's blanking gate
+      measured 3.3x edge-window enrichment at t30 before being refuted).
+
+    Returns ``hist`` (32 deltas), ``total``, ``peak_bin`` and ``peak_ratio``
+    (max bin / uniform expectation; 1.0 = flat), or ``None`` when the
+    firmware predates v4 or nothing accumulated.
+    """
+    if idx.size == 0:
+        return None
+    def parse(r):
+        v = r.get("perf_zc_phase_hist")
+        if v in (None, ""):
+            return None
+        try:
+            bins = [int(float(x)) for x in str(v).split(";")]
+        except ValueError:
+            return None
+        return bins if len(bins) > 1 else None
+    valid = [(i, parse(rows[i])) for i in idx]
+    valid = [(i, b) for i, b in valid if b is not None]
+    if len(valid) < 2:
+        return None
+    (_, a), (_, b) = valid[0], valid[-1]
+    if len(a) != len(b):
+        return None
+    hist = [(y - x) % _U16 for x, y in zip(a, b)]
+    total = sum(hist)
+    if total <= 0:
+        return None
+    peak_bin = max(range(len(hist)), key=hist.__getitem__)
+    uniform = total / len(hist)
+    return {"hist": hist, "total": total, "peak_bin": peak_bin,
+            "peak_ratio": round(hist[peak_bin] / uniform, 2)}
+
+
 def compute(run: RunResult, profile: Profile) -> dict:
     rows = run.rows
     seg = np.array([r.get("segment") for r in rows], dtype=object)
@@ -236,6 +284,13 @@ def compute(run: RunResult, profile: Profile) -> dict:
             # rejected edges per accepted zero-cross (report-only, v3+)
             "confirm_rejects_per_zc": counter_per_zc(zc_reject, zc_count, tail),
         })
+        # PWM-phase distribution of accepted ZC edges (report-only, v4+)
+        phase = zc_phase_window(rows, tail)
+        steady_points[-1]["zc_phase_peak_ratio"] = (
+            phase["peak_ratio"] if phase else None)
+        steady_points[-1]["zc_phase_peak_bin"] = (
+            phase["peak_bin"] if phase else None)
+        steady_points[-1]["zc_phase_hist"] = phase["hist"] if phase else None
 
     demag = detect_demag(run, profile)
     starts = startup_stats(run, profile)

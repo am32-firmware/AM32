@@ -36,6 +36,8 @@ COLUMNS = [
     "perf_zc_jitter_max",
     # confirm-loop rejection counter (struct v3+; blank on older firmware)
     "perf_zc_confirm_reject",
+    # 32-bin PWM-phase histogram, semicolon-joined (struct v4+)
+    "perf_zc_phase_hist",
     "perf_bemf_timeout", "perf_e_rpm",
     # ESC input/arming state (proves the ESC decoded the throttle protocol)
     "perf_input", "perf_armed", "perf_running",
@@ -101,6 +103,10 @@ def make_row(t: float, segment: str, throttle_cmd: float,
             )
         if "zc_confirm_reject" in r:  # struct v3+
             row.update(perf_zc_confirm_reject=r["zc_confirm_reject"])
+        if "zc_phase_hist" in r:  # struct v4+
+            # one CSV cell, not 32 columns; _coerce leaves it a string on load
+            row["perf_zc_phase_hist"] = ";".join(
+                str(v) for v in r["zc_phase_hist"])
     return row
 
 

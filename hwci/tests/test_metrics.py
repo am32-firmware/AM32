@@ -305,3 +305,30 @@ def test_steady_state_comm_spike_still_detected():
     d = metricsmod.detect_demag(RunResult(rows=rows), _profile())
     assert d["comm_spike_samples"] >= 8
     assert d["event_count"] >= 1
+
+
+def test_confirm_rejects_per_zc_from_deltas():
+    # 100 commutations and 3 rejects per tick -> 0.03 rejects per ZC.
+    rows = _rows(
+        100,
+        perf_zc_count=lambda i: 100 * i,
+        perf_zc_jitter_sum=lambda i: 100 * i,
+        perf_zc_interval_sum=lambda i: 200 * 100 * i,
+        perf_zc_jitter_max=lambda i: 5,
+        perf_zc_confirm_reject=lambda i: 3 * i,
+    )
+    m = metricsmod.compute(RunResult(rows=rows), _profile())
+    assert m["steady_points"][0]["confirm_rejects_per_zc"] == 0.03
+
+
+def test_confirm_rejects_none_for_v2_runs():
+    # Runs from pre-v3 firmware have no reject column: None, never 0.
+    rows = _rows(
+        50,
+        perf_zc_count=lambda i: 100 * i,
+        perf_zc_jitter_sum=lambda i: 100 * i,
+        perf_zc_interval_sum=lambda i: 200 * 100 * i,
+        perf_zc_jitter_max=lambda i: 5,
+    )
+    m = metricsmod.compute(RunResult(rows=rows), _profile())
+    assert m["steady_points"][0]["confirm_rejects_per_zc"] is None

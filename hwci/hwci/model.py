@@ -34,6 +34,8 @@ COLUMNS = [
     # firmware predates them - metrics treat blank as "metric unavailable")
     "perf_zc_count", "perf_zc_jitter_sum", "perf_zc_interval_sum",
     "perf_zc_jitter_max",
+    # confirm-loop rejection counter (struct v3+; blank on older firmware)
+    "perf_zc_confirm_reject",
     "perf_bemf_timeout", "perf_e_rpm",
     # ESC input/arming state (proves the ESC decoded the throttle protocol)
     "perf_input", "perf_armed", "perf_running",
@@ -97,6 +99,8 @@ def make_row(t: float, segment: str, throttle_cmd: float,
                 perf_zc_interval_sum=r["zc_interval_sum"],
                 perf_zc_jitter_max=r["zc_jitter_max"],
             )
+        if "zc_confirm_reject" in r:  # struct v3+
+            row.update(perf_zc_confirm_reject=r["zc_confirm_reject"])
     return row
 
 

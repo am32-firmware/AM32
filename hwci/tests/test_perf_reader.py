@@ -97,3 +97,19 @@ def test_missing_struct_die_fails_hard(host_perf_elf, monkeypatch):
     dbg = MockDebugger(base=addr, size=perf.SIZE + 256)
     with pytest.raises(perf.PerfDecodeError):
         PerfReader(dbg, host_perf_elf)
+
+
+def test_v2_firmware_reads_and_resets(host_perf_elf_v2):
+    # v2 vintage (jitter block, no confirm-reject counter): the reader must
+    # size its read from the ELF, pass the DWARF cross-check against the v2
+    # canonical table, decode without the v3 key, and land RESET_STATS at
+    # the version-stable offset 60.
+    reader, dbg = _reader_with_mock(host_perf_elf_v2)
+    assert reader._read_size == perf.SIZE_BY_VERSION[2]
+    dbg.poke(reader.address, perf.encode({"zc_count": 55}, version=2))
+    sample = reader.read()
+    assert sample.raw["zc_count"] == 55
+    assert "zc_confirm_reject" not in sample.raw
+    reader.reset_stats(verify=False)
+    word = dbg.read_memory(reader.address + perf.HOST_CMD_OFFSET, 4)
+    assert int.from_bytes(word, "little") == perf.CMD_RESET_STATS

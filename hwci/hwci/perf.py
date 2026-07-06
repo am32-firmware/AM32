@@ -22,7 +22,7 @@ from dataclasses import dataclass
 
 # ASCII "HWC1" little-endian == 0x31435748
 MAGIC = 0x31435748
-VERSION = 2
+VERSION = 3
 
 # (name, struct_code).  Order and codes must match Inc/hwci_perf.h exactly.
 # Pad fields are decoded then dropped from the public dict.
@@ -57,7 +57,7 @@ FIELDS_V1: list[tuple[str, str]] = [
 ]
 
 # v2 appends the zero-cross jitter block (see HWCI_PERF_ZC in Inc/hwci_perf.h).
-FIELDS: list[tuple[str, str]] = FIELDS_V1 + [
+FIELDS_V2: list[tuple[str, str]] = FIELDS_V1 + [
     ("zc_count", "I"),
     ("zc_jitter_sum", "I"),
     ("zc_interval_sum", "I"),
@@ -65,7 +65,15 @@ FIELDS: list[tuple[str, str]] = FIELDS_V1 + [
     ("_pad2", "H"),
 ]
 
-FIELDS_BY_VERSION: dict[int, list[tuple[str, str]]] = {1: FIELDS_V1, 2: FIELDS}
+# v3 appends the confirm-loop rejection counter (HWCI_PERF_CONFIRM_REJECT).
+FIELDS_V3: list[tuple[str, str]] = FIELDS_V2 + [
+    ("zc_confirm_reject", "I"),
+]
+
+FIELDS = FIELDS_V3
+
+FIELDS_BY_VERSION: dict[int, list[tuple[str, str]]] = {
+    1: FIELDS_V1, 2: FIELDS_V2, 3: FIELDS_V3}
 
 
 def _format(fields: list[tuple[str, str]]) -> str:
@@ -76,7 +84,7 @@ _FORMAT_BY_VERSION = {v: _format(f) for v, f in FIELDS_BY_VERSION.items()}
 SIZE_BY_VERSION = {v: struct.calcsize(fmt) for v, fmt in _FORMAT_BY_VERSION.items()}
 
 _FORMAT = _FORMAT_BY_VERSION[VERSION]
-SIZE = SIZE_BY_VERSION[VERSION]  # 80 bytes (v1: 64)
+SIZE = SIZE_BY_VERSION[VERSION]  # 84 bytes (v2: 80, v1: 64)
 _NAMES = [name for name, _ in FIELDS]
 
 # magic + version + size header, enough to pick the right layout for the rest.

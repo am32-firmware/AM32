@@ -947,6 +947,7 @@ RAM_FUNC void PeriodElapsedCallback()
  */
 RAM_FUNC void interruptRoutine()
 {
+    HWCI_PERF_ZC_PHASE_CAPTURE(); // TIM1 phase at ISR entry, pre-confirm
 //   if (average_interval > 125) {
 //        if ((INTERVAL_TIMER_COUNT < 125) && (duty_cycle < 600) && (zero_crosses < 500)) { // should be impossible, desync?exit anyway
 //           return;
@@ -1003,10 +1004,11 @@ RAM_FUNC void interruptRoutine()
     __disable_irq();
     maskPhaseInterrupts();
     lastzctime = thiszctime;
-    thiszctime = INTERVAL_TIMER_COUNT;  
+    thiszctime = INTERVAL_TIMER_COUNT;
     SET_INTERVAL_TIMER_COUNT(0);
     SET_AND_ENABLE_COM_INT(waitTime+1); // enable COM_TIMER interrupt
     __enable_irq();
+    HWCI_PERF_ZC_PHASE_COMMIT(); // accepted edge: bin its PWM phase
 }
 
 void startMotor()

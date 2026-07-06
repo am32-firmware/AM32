@@ -69,6 +69,10 @@ class RigSimulator:
         self.zc_jitter_max = 0
         # confirm-loop rejection counter (perf struct v3)
         self.zc_confirm_reject = 0
+        # PWM-phase histogram of accepted ZCs (perf struct v4): the sim
+        # models mild phase locking - 20% of edges pile onto one bin
+        self.zc_phase_hist = [0] * 32
+        self._phase_rr = 0
 
     # --- model -------------------------------------------------------
     def _rpm_max(self) -> float:
@@ -123,6 +127,18 @@ class RigSimulator:
             reject_frac = 0.2 if self.desync_remaining > 0 else 0.01
             n_rej = int(n_comm * reject_frac + self._rng.random())
             self.zc_confirm_reject = (self.zc_confirm_reject + n_rej) & 0xFFFFFFFF
+            # v4 phase histogram: 80% uniform across bins (round-robin the
+            # integer remainder), 20% locked onto the throttle-derived bin
+            peak_bin = int(self.throttle * 32) & 31
+            per_bin, rem = divmod(int(n_comm * 0.8), 32)
+            for i in range(32):
+                self.zc_phase_hist[i] = (self.zc_phase_hist[i] + per_bin) & 0xFFFF
+            self.zc_phase_hist[self._phase_rr] = (
+                self.zc_phase_hist[self._phase_rr] + rem) & 0xFFFF
+            self._phase_rr = (self._phase_rr + 1) & 31
+            n_peak = int(n_comm * 0.2 + self._rng.random())
+            self.zc_phase_hist[peak_bin] = (
+                self.zc_phase_hist[peak_bin] + n_peak) & 0xFFFF
         # idle loop iterations: ~120 kHz when idle, dropping with motor load
         idle_hz = 120000.0 * (1.0 - 0.25 * throttle)
         self.loop_iters += int(idle_hz * dt)
@@ -237,4 +253,5 @@ class RigSimulator:
             "zc_interval_sum": self.zc_interval_sum,
             "zc_jitter_max": self.zc_jitter_max,
             "zc_confirm_reject": self.zc_confirm_reject,
+            "zc_phase_hist": tuple(self.zc_phase_hist),
         })

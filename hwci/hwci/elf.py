@@ -119,18 +119,48 @@ def _members_of(struct_die, cu) -> list[Member]:
     return members
 
 
-def _base_type(member_die, cu) -> tuple[int, bool]:
-    type_ref = member_die.attributes.get("DW_AT_type")
-    if type_ref is None:
-        return 0, False
-    die = cu.get_DIE_from_refaddr(type_ref.value + cu.cu_offset)
-    # Walk through typedef/const/volatile qualifiers to the base type.
+def _strip_qualifiers(die, cu):
+    """Walk through typedef/const/volatile qualifiers to the base type."""
     while die.tag in ("DW_TAG_typedef", "DW_TAG_const_type",
                       "DW_TAG_volatile_type"):
         nxt = die.attributes.get("DW_AT_type")
         if nxt is None:
-            return 0, False
+            return None
         die = cu.get_DIE_from_refaddr(nxt.value + cu.cu_offset)
+    return die
+
+
+def _base_type(member_die, cu) -> tuple[int, bool]:
+    type_ref = member_die.attributes.get("DW_AT_type")
+    if type_ref is None:
+        return 0, False
+    die = _strip_qualifiers(
+        cu.get_DIE_from_refaddr(type_ref.value + cu.cu_offset), cu)
+    if die is None:
+        return 0, False
+    if die.tag == "DW_TAG_array_type":
+        # total size = element size x count; the array DIE itself usually
+        # carries no DW_AT_byte_size (e.g. the v4 zc_phase_hist[32] member)
+        count = 0
+        for child in die.iter_children():
+            if child.tag == "DW_TAG_subrange_type":
+                cnt = child.attributes.get("DW_AT_count")
+                ub = child.attributes.get("DW_AT_upper_bound")
+                if cnt is not None:
+                    count = cnt.value
+                elif ub is not None:
+                    count = ub.value + 1
+        elem_ref = die.attributes.get("DW_AT_type")
+        if elem_ref is None or count == 0:
+            return 0, False
+        die = _strip_qualifiers(
+            cu.get_DIE_from_refaddr(elem_ref.value + cu.cu_offset), cu)
+        if die is None:
+            return 0, False
+        size_attr = die.attributes.get("DW_AT_byte_size")
+        enc_attr = die.attributes.get("DW_AT_encoding")
+        return ((size_attr.value if size_attr is not None else 0) * count,
+                bool(enc_attr and enc_attr.value in _ENCODING_SIGNED))
     size_attr = die.attributes.get("DW_AT_byte_size")
     size = size_attr.value if size_attr is not None else 0
     enc_attr = die.attributes.get("DW_AT_encoding")

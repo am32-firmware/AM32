@@ -26,6 +26,11 @@ volatile hwci_perf_t hwci_perf = {
     .host_cmd = HWCI_CMD_NONE,
 };
 
+/* Phase-binning factor for the v4 histogram; 0 = not yet computed (the
+ * commit macro skips binning). The main-loop snapshot keeps it tracking
+ * tim1_arr. */
+volatile uint32_t hwci_zc_phase_scale_q16 = 0;
+
 /*
  * Clear the sticky min/max accumulators so worst-case timing can be measured
  * for a single test run without power-cycling the ESC. Called for the host

@@ -42,8 +42,13 @@
 #define HWCI_PERF_MAGIC   0x31435748u
 /* v2: appended the zero-cross jitter block (zc_*) after host_cmd.
  * v3: appended zc_confirm_reject after the v2 jitter block (host_cmd stays
- *     frozen at offset 60). */
-#define HWCI_PERF_VERSION 3u
+ *     frozen at offset 60).
+ * v4: appended the 32-bin PWM-phase histogram of accepted zero-crossings. */
+#define HWCI_PERF_VERSION 4u
+
+/* PWM-phase histogram bins (power of two: the binning multiply-shift and the
+ * host's modular math both assume it). */
+#define HWCI_ZC_PHASE_BINS 32u
 
 /* Commands the host may write to hwci_perf.host_cmd (cleared by firmware). */
 #define HWCI_CMD_NONE          0u
@@ -113,9 +118,27 @@ typedef struct hwci_perf_s {
      * rejected-edges-per-accepted-commutation ratio - the live monitor for
      * the F051 glitch-tolerant confirm loop's reject mechanism. */
     uint32_t zc_confirm_reject;        /* off 80 : confirm-loop early-outs  */
-} hwci_perf_t;                         /* total size: 84 bytes              */
+
+    /* --- v4: PWM-phase histogram of accepted zero-crossings ---
+     * bin = TIM1 phase (CNT/ARR) of the comparator edge at ISR entry, 32
+     * bins across the PWM period. Each bin is a monotonic u16 event counter
+     * that wraps naturally; the host differences consecutive snapshots
+     * per-bin (mod 2^16), so the per-window histogram is exact as long as
+     * one bin gains < 65536 events between 200 Hz reads (it gains < 100).
+     * Uniform phase distribution = commutation free-running vs PWM; strong
+     * peaks = ZC<->PWM phase correlation (injection locking) - the
+     * discriminator for the beat-band jitter hump investigation (PR #23
+     * found 3.3x edge-window enrichment at t30). */
+    uint16_t zc_phase_hist[HWCI_ZC_PHASE_BINS]; /* off 84..147              */
+} hwci_perf_t;                         /* total size: 148 bytes             */
 
 extern volatile hwci_perf_t hwci_perf;
+
+/* Q16 phase-binning factor, (HWCI_ZC_PHASE_BINS << 16) / (tim1_arr + 1).
+ * Recomputed from the main loop (HWCI_PERF_MAIN_LOOP snapshot branch, one
+ * soft division per ~1 ms, never in an ISR); 0 until first computed, which
+ * the commit macro treats as "histogram off". Defined in hwci_perf.c. */
+extern volatile uint32_t hwci_zc_phase_scale_q16;
 
 /* Apply a pending host_cmd (e.g. reset accumulators). Defined in hwci_perf.c. */
 void hwci_perf_apply_cmd(void);
@@ -209,6 +232,33 @@ void hwci_perf_reset_stats(void);
 #define HWCI_PERF_CONFIRM_REJECT() do { hwci_perf.zc_confirm_reject++; } while (0)
 
 /*
+ * PWM-phase histogram of accepted zero-crossings (F051 only: reads TIM1
+ * registers directly). CAPTURE at the TOP of interruptRoutine() - the CNT
+ * read must happen at ISR entry, before the confirm loop's wall-clock window
+ * smears it (the capture is a local, so a rejected edge simply discards it).
+ * COMMIT after the zero-cross is accepted, outside the IRQ-masked timing
+ * section: one 32x32 multiply, shift, bounds check and u16 increment.
+ * Gated on zero_crosses >= 100 like HWCI_PERF_ZC (same "stable running"
+ * threshold), and on the Q16 scale being initialized.
+ */
+#if defined(MCU_F051)
+#define HWCI_PERF_ZC_PHASE_CAPTURE() uint16_t _hwci_zc_phase_cnt = (uint16_t)TIM1->CNT
+#define HWCI_PERF_ZC_PHASE_COMMIT()                                            \
+    do {                                                                       \
+        uint32_t _s = hwci_zc_phase_scale_q16;                                 \
+        if (_s != 0u && zero_crosses >= 100) {                                 \
+            uint32_t _bin = ((uint32_t)_hwci_zc_phase_cnt * _s) >> 16;         \
+            if (_bin < HWCI_ZC_PHASE_BINS) {                                   \
+                hwci_perf.zc_phase_hist[_bin]++;                               \
+            }                                                                  \
+        }                                                                      \
+    } while (0)
+#else
+#define HWCI_PERF_ZC_PHASE_CAPTURE() do {} while (0)
+#define HWCI_PERF_ZC_PHASE_COMMIT()  do {} while (0)
+#endif
+
+/*
  * Background-loop instrumentation. Call once at the top of the main while(1).
  *
  * Every iteration: measures iteration time and counts iterations (the host
@@ -262,6 +312,10 @@ void hwci_perf_reset_stats(void);
             if (_armed && !_hwci_prev_armed)                                   \
                 hwci_perf_reset_stats(); /* drop aliased arming-tune maxima */ \
             _hwci_prev_armed = _armed;                                         \
+            /* phase-binning factor: one soft division per snapshot (~1 ms), \
+             * tracks variable-PWM tim1_arr changes automatically */          \
+            hwci_zc_phase_scale_q16 =                                          \
+                ((uint32_t)HWCI_ZC_PHASE_BINS << 16) / ((uint32_t)tim1_arr + 1u); \
             hwci_perf.update_count++;                                          \
             if (hwci_perf.host_cmd != HWCI_CMD_NONE) hwci_perf_apply_cmd();    \
         }                                                                      \
@@ -269,11 +323,13 @@ void hwci_perf_reset_stats(void);
 
 #else /* !HWCI_PERF - all hooks vanish, no struct, no code */
 
-#define HWCI_PERF_CTRL_ENTER()     do {} while (0)
-#define HWCI_PERF_CTRL_EXIT()      do {} while (0)
-#define HWCI_PERF_ZC()             do {} while (0)
-#define HWCI_PERF_MAIN_LOOP()      do {} while (0)
-#define HWCI_PERF_CONFIRM_REJECT() do {} while (0)
+#define HWCI_PERF_CTRL_ENTER()       do {} while (0)
+#define HWCI_PERF_CTRL_EXIT()        do {} while (0)
+#define HWCI_PERF_ZC()               do {} while (0)
+#define HWCI_PERF_MAIN_LOOP()        do {} while (0)
+#define HWCI_PERF_CONFIRM_REJECT()   do {} while (0)
+#define HWCI_PERF_ZC_PHASE_CAPTURE() do {} while (0)
+#define HWCI_PERF_ZC_PHASE_COMMIT()  do {} while (0)
 
 #endif /* HWCI_PERF */
 

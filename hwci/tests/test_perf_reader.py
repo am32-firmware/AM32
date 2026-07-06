@@ -113,3 +113,15 @@ def test_v2_firmware_reads_and_resets(host_perf_elf_v2):
     reader.reset_stats(verify=False)
     word = dbg.read_memory(reader.address + perf.HOST_CMD_OFFSET, 4)
     assert int.from_bytes(word, "little") == perf.CMD_RESET_STATS
+
+
+def test_v3_firmware_reads_and_resets(host_perf_elf_v3):
+    reader, dbg = _reader_with_mock(host_perf_elf_v3)
+    assert reader._read_size == perf.SIZE_BY_VERSION[3]
+    dbg.poke(reader.address, perf.encode({"zc_confirm_reject": 9}, version=3))
+    sample = reader.read()
+    assert sample.raw["zc_confirm_reject"] == 9
+    assert "zc_phase_hist" not in sample.raw
+    reader.reset_stats(verify=False)
+    word = dbg.read_memory(reader.address + perf.HOST_CMD_OFFSET, 4)
+    assert int.from_bytes(word, "little") == perf.CMD_RESET_STATS

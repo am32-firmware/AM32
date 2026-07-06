@@ -332,3 +332,41 @@ def test_confirm_rejects_none_for_v2_runs():
     )
     m = metricsmod.compute(RunResult(rows=rows), _profile())
     assert m["steady_points"][0]["confirm_rejects_per_zc"] is None
+
+
+def _hist_str(bins):
+    return ";".join(str(b & 0xFFFF) for b in bins)
+
+
+def test_zc_phase_window_from_deltas():
+    # Bin 5 gains 300/tick, every other bin 10/tick -> strong peak at 5.
+    def hist(i):
+        return _hist_str([300 * i if b == 5 else 10 * i for b in range(32)])
+    rows = _rows(100, perf_zc_phase_hist=hist)
+    m = metricsmod.compute(RunResult(rows=rows), _profile())
+    pt = m["steady_points"][0]
+    assert pt["zc_phase_peak_bin"] == 5
+    # peak/uniform: 300 / ((300 + 31*10)/32) = 15.7x
+    assert 15.0 < pt["zc_phase_peak_ratio"] < 16.5
+    assert len(pt["zc_phase_hist"]) == 32
+
+
+def test_zc_phase_window_survives_u16_bin_wrap():
+    # A bin sitting just under 2^16 wraps mid-window; per-bin modular
+    # differencing must keep its delta exact.
+    def hist(i):
+        return _hist_str([(65500 + 40 * i) if b == 0 else 100 * i
+                          for b in range(32)])
+    rows = _rows(50, perf_zc_phase_hist=hist)
+    m = metricsmod.compute(RunResult(rows=rows), _profile())
+    pt = m["steady_points"][0]
+    h = pt["zc_phase_hist"]
+    assert h[0] == 40 * 24  # 24 tail ticks (tail = last half of 49 deltas)
+
+
+def test_zc_phase_none_for_pre_v4_runs():
+    rows = _rows(50, perf_zc_count=lambda i: 100 * i)
+    m = metricsmod.compute(RunResult(rows=rows), _profile())
+    pt = m["steady_points"][0]
+    assert pt["zc_phase_peak_ratio"] is None
+    assert pt["zc_phase_hist"] is None

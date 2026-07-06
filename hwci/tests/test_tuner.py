@@ -405,3 +405,39 @@ def test_climb_rejected_for_ab_and_constraint_stages():
     with pytest.raises(TuneSpecError, match="search"):
         tune_spec_from_dict(small_spec(stages=[
             {"name": "a", "sweep": "advance_level", "search": "bogus"}]))
+
+
+# --------------------------------------------------------------------------
+# baseline health gate: a session must not run against a broken reference
+# --------------------------------------------------------------------------
+def bad_safety_spec():
+    # impossible current limit: every run aborts -> baseline disqualified
+    return small_spec(probe={"dwell_s": 1.0,
+                             "safety": {"max_current_a": 0.001}})
+
+
+def test_baseline_disqualified_twice_pauses_session(tmp_path):
+    import json
+    from hwci.tuner import TunePaused
+    with pytest.raises(TunePaused, match="baseline"):
+        run_tune(tmp_path, bad_safety_spec(), make_backend())
+    m = json.loads((tmp_path / "tune" / "manifest.json").read_text())
+    # ledger quarantined so a resume re-runs the baseline fresh, and no
+    # jitter reference was taken from the disqualified runs
+    assert m["trials"] == []
+    assert m["jitter_reference"] is None
+
+
+def test_baseline_pause_then_resume_completes(tmp_path):
+    from hwci.tuner import TunePaused
+    with pytest.raises(TunePaused):
+        run_tune(tmp_path, bad_safety_spec(), make_backend())
+    # "fix the limits", then resume the same session directory
+    spec = tune_spec_from_dict(small_spec())
+    t = Tuner(spec, make_backend(), tmp_path / "tune",
+              no_prompt=True, resume=True, log=lambda s: None)
+    result = t.run()
+    assert result["winner_overrides"] is not None
+    import json
+    m = json.loads((tmp_path / "tune" / "manifest.json").read_text())
+    assert m["jitter_reference"] is not None

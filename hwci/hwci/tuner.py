@@ -1296,11 +1296,29 @@ class Tuner:
         # against, and its score anchors the whole session.
         e = self._trial(TrialPlan(stage="baseline", kind="baseline",
                                   overrides={}, profile=probe_profile(spec)))
+        if e.get("disqualified"):
+            self.log(f"WARNING: baseline run disqualified: "
+                     f"{e['disqualified']}; retrying once")
+            e = self._trial(TrialPlan(stage="baseline", kind="baseline",
+                                      overrides={},
+                                      profile=probe_profile(spec), repeat=1))
+        if e.get("disqualified"):
+            # Everything downstream leans on this run: the jitter gate's
+            # reference, drift normalization, and the finals' default legs.
+            # Bench experience: a session run past a broken baseline burns
+            # every trial and ends unconfirmable. Quarantine the baseline
+            # entries so a resume re-runs them fresh after the fix.
+            self._quarantine_from(0)
+            raise TunePaused(
+                "baseline (default settings) disqualified twice: "
+                f"{e['disqualified']} - fix the rig or spec limits, then "
+                f"resume with 'hwci tune --resume {self.out}'")
         if self.manifest["jitter_reference"] is None:
             self.manifest["jitter_reference"] = e.get("jitter_pct")
+            if e.get("jitter_pct") is None:
+                self.log("WARNING: baseline has no zc-jitter data; the "
+                         "jitter regression gate is OFF for this session")
             self._save()
-        if e.get("disqualified"):
-            self.log(f"WARNING: baseline run disqualified: {e['disqualified']}")
 
         for stage in spec.stages:
             if stage.constraint_only:

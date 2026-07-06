@@ -1,0 +1,88 @@
+# Quick AM32 auto-tune spec: a coarse pass in ~10-12 min of bench time
+# (vs ~45-60 min for example.yaml).
+#
+# Budget: ~10 probe trials (~7 min inc. flashes) + one ABBA finals block on
+# the short probe profile (~3 min) + startup check. Cut down from
+# example.yaml by: coarser grids (3-point advance, 2-point pwm, no refine),
+# a 3-point probe with 4 s dwells, one A/B repeat, no ramp stage, finals on
+# tune_probe instead of the full efficiency_sweep, and 1 finals repeat.
+#
+# Caveat: the bench's same-firmware efficiency spread is up to 9.8 % at
+# >= 20 W (see hwci/baseline.py), and this spec scores most candidates from
+# a single run. Treat the winner as a starting point; confirm with
+# example.yaml (or at least rerun finals) before trusting small deltas.
+name: ark4in1-5inch-quick
+description: >
+  Coarse advance/pwm/mode pass for the JS 2306 1800KV + HQProp 5136 on the
+  ARK 4IN1 bench. Fast, single-shot scoring - indicative, not confirmatory.
+
+battery_cells: 6
+
+pack:
+  min_resting_cell_v: 3.5
+  prompt_on_swap: true
+
+thermal:
+  max_start_fet_temp_c: 60.0
+
+probe:
+  # Three steady points, shorter dwells; t90 dropped (worst heat/pack cost
+  # per unit of objective weight in example.yaml). t60, NOT t70: on a fresh
+  # 6S pack t70 arrives at ~172-176k eRPM (~24.5-25k rotor) where the
+  # default advance desyncs 8/8 on this bench (eRPM collapse + 47-80 A
+  # spike); t60 (150k) and t90 (192k+) hold/arrive clean.
+  points: {t30: 0.30, t50: 0.50, t60: 0.60}
+  dwell_s: 4.0
+  safety:
+    max_current_a: 40.0
+    max_thrust_n: 16.0
+    max_rpm: 32000
+
+objective:
+  weights: {t30: 1.0, t50: 2.0, t60: 1.0}
+  min_power_w: 20.0
+  noise_floor_pct: 3.0
+
+constraints:
+  max_demag_events: 0
+  max_bemf_timeout_samples: 0
+  jitter_max_regression_pct: 25.0
+  max_fet_temp_c: 90.0
+  max_motor_temp_c: 95.0
+  startup:
+    cycles: 3
+    max_failed: 0
+    spin_throttle: 0.15
+    min_rpm: 1000
+
+anchors_every: 6
+
+parameters:
+  advance_level: {values: [18, 26, 34]}   # coarse 3-point grid, no refine
+  pwm_frequency: {values: [16, 24]}
+  variable_pwm: {values: [0, 1]}
+
+stages:
+  - name: advance
+    sweep: advance_level
+    search: climb             # hill-climb from the incumbent: usually skips
+                              # the far side of the grid entirely
+  - name: pwm
+    sweep: pwm_frequency
+    fixed: {variable_pwm: 0}
+  - name: modes
+    ab_candidates:
+      - {}
+      - {variable_pwm: 1}
+    repeats: 1
+  - name: ramp
+    measure: ramp_rate        # 2 trials (~1 min): measure the powertrain
+                              # step response, compute max_ramp, verify on
+                              # the step-stress profile
+    margin: 0.8
+
+finals:
+  profile: tune_probe   # short probe instead of the full efficiency sweep
+  pattern: ABBA
+  repeats: 1
+  startup_check: true

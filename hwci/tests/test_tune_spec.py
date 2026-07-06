@@ -32,7 +32,7 @@ def test_example_spec_loads():
     spec = load_tune_spec(REPO_ROOT / "hwci" / "tunes" / "example.yaml")
     assert {s.name for s in spec.stages} == {"advance", "pwm", "modes", "ramp"}
     assert spec.parameters["advance_level"].refine_step == 2
-    assert spec.stages[3].constraint_only
+    assert spec.stages[3].measure == "ramp_rate"
 
 
 def test_name_is_required():

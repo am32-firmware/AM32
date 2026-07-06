@@ -3,14 +3,17 @@
 # Validation is STRICT: unknown keys or parameters fail loudly (like rig
 # configs) - a typo must never silently become "use the default".
 #
-# Budget note: each probe trial is ~28 s of motor time plus flash+reboot;
-# this spec runs roughly 35-40 trials (~25 min of spinning) before finals.
+# Budget note: each probe trial is ~26 s of motor time plus flash+reboot;
+# with hill-climb sweeps (search: climb) this spec runs roughly 20-25
+# trials (~15 min of spinning) before finals. Dwell/repeat/anchor budgets
+# are sized to the post-prop-flip bench (thrust CV 5.5-8.8%; the wake no
+# longer impinges on the mounting plate).
 name: ark4in1-5inch
 description: >
   Tune advance/pwm/mode/ramp for the JS 2306 1800KV + HQProp 5136 on the
   ARK 4IN1 bench, maximizing g/W at the cruise-heavy weighting below.
 
-battery_cells: 4
+battery_cells: 6
 
 pack:
   min_resting_cell_v: 3.5     # resting gate between trials (not the 3.3 abs min)
@@ -21,15 +24,21 @@ thermal:
 
 probe:
   # Four steady points x dwell (labels are the objective's weight keys).
-  points: {t30: 0.30, t50: 0.50, t70: 0.70, t90: 0.90}
-  dwell_s: 6.0
+  # 4 s dwell = 2 s steady tail: offline truncation of four 10 s captures
+  # showed a 3 s tail moves gated points < +/-2%, and the post-prop-flip
+  # bench is quieter still.
+  # t60, NOT t70: on a fresh 6S pack t70 arrives at ~172-176k eRPM
+  # (~24.5-25k rotor) where the default advance desyncs 8/8 on this bench;
+  # t60 (150k) holds clean and t90 (192k+) arrives clean above the band.
+  points: {t30: 0.30, t50: 0.50, t60: 0.60, t90: 0.90}
+  dwell_s: 4.0
   safety:
     max_current_a: 40.0
     max_thrust_n: 16.0
     max_rpm: 32000
 
 objective:
-  weights: {t30: 1.0, t50: 2.0, t70: 1.0, t90: 0.5}
+  weights: {t30: 1.0, t50: 2.0, t60: 1.0, t90: 0.5}
   min_power_w: 20.0           # points below this are bench noise - never scored
   noise_floor_pct: 3.0        # scores within 3% tie-break on jitter/temp/default
 
@@ -45,7 +54,7 @@ constraints:
     spin_throttle: 0.15
     min_rpm: 1000
 
-anchors_every: 5              # re-run the incumbent every N trials (drift anchor)
+anchors_every: 6              # re-run the incumbent every N trials (drift anchor)
 
 parameters:
   advance_level:              # eeprom offset 23, firmware-valid 10..42
@@ -55,13 +64,17 @@ parameters:
     values: [8, 16, 24, 48]
   variable_pwm: {values: [0, 1, 2]}       # offset 21
   auto_advance: {values: [0, 1]}          # offset 47
-  max_ramp: {values: [160, 80, 40]}       # offset 5, listed best-first
 
 stages:
+  # climb: hill-climb the sorted values from the incumbent instead of
+  # testing the whole grid - efficiency is unimodal in advance and pwm
+  # frequency, so this typically tests 3-4 values instead of 7.
   - name: advance
     sweep: advance_level
+    search: climb
   - name: pwm
     sweep: pwm_frequency
+    search: climb
     fixed: {variable_pwm: 0}  # sweep the base frequency with scaling off
   - name: modes
     ab_candidates:            # built on the sweep winners ({} = incumbent)
@@ -71,12 +84,15 @@ stages:
       - {auto_advance: 1}
     repeats: 2                # interleaved: A B C D | A B C D
   - name: ramp
-    sweep: max_ramp
-    constraint_only: true     # first value with zero failures wins
-    profile: tune_step        # inline step-stress (steps from a spinning state)
+    measure: ramp_rate        # measure the powertrain step response once
+                              # (tau, transient A per % duty lead), COMPUTE
+                              # max_ramp from the physics, verify on the
+                              # step-stress profile (0.7x back-off on fail)
+    margin: 0.8               # keep 80% of the physics-derived rate
 
 finals:
   profile: efficiency_sweep   # full sweep, winner vs default
   pattern: ABBA
-  repeats: 2
+  repeats: 1                  # one ABBA block (2 paired deltas) - sized to
+                              # the quieter post-prop-flip bench
   startup_check: true

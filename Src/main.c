@@ -948,6 +948,13 @@ RAM_FUNC void PeriodElapsedCallback()
 RAM_FUNC void interruptRoutine()
 {
     HWCI_PERF_ZC_PHASE_CAPTURE(); // TIM1 phase at ISR entry, pre-confirm
+#ifdef MCU_F051
+    // PWM phase (TIM1 CNT) at the edge, sampled before the confirm loop's
+    // wall-clock window advances it: the turn-on-pileup compensation below
+    // keys off where the comparator edge actually appeared, not where it was
+    // finally accepted.
+    uint16_t zc_pwm_cnt = (uint16_t)TIM1->CNT;
+#endif
 //   if (average_interval > 125) {
 //        if ((INTERVAL_TIMER_COUNT < 125) && (duty_cycle < 600) && (zero_crosses < 500)) { // should be impossible, desync?exit anyway
 //           return;
@@ -1001,11 +1008,39 @@ RAM_FUNC void interruptRoutine()
             }
         }
 #endif
+#ifdef MCU_F051
+    // Turn-on-pileup timestamp compensation. A zero-cross that physically
+    // occurs during the PWM off-window (freewheel) is invisible to the
+    // comparator and is only registered at the next turn-on (CNT wraps to 0),
+    // quantizing the timestamp to the PWM grid; those corrupted intervals feed
+    // waitTime and the commutation loop hunts, amplifying the quantization into
+    // the measured jitter hump (bench: ~23% at t60/t70 where the commutation
+    // rate beats against the 24 kHz PWM). When an accepted edge lands in the
+    // first ~2 phase bins after turn-on (cnt < arr/16) and there is an off-
+    // window (duty < 100%), the true crossing lay on average half the off-
+    // window earlier. Back-date thiszctime by that half-window AND carry the
+    // same offset into the interval timer's reset, so the loop tracks the
+    // estimated true crossing rather than the grid position and stops hunting.
+    // Units: INTERVAL_TIMER (TIM2) is 2 MHz and TIM1 is 48 MHz, so one INTERVAL
+    // tick is 24 TIM1 ticks; half an off-window of N TIM1 ticks is N/48 INTERVAL
+    // ticks, computed as (N * 1365) >> 16 to keep a soft divide out of the ISR.
+    uint16_t zc_grid_comp = 0;
+    if (zero_crosses >= 100 && zc_pwm_cnt < (uint16_t)(tim1_arr >> 4)
+            && adjusted_duty_cycle < tim1_arr) {
+        zc_grid_comp = (uint16_t)(((uint32_t)(tim1_arr - adjusted_duty_cycle)
+                                   * 1365u) >> 16);
+    }
+#endif
     __disable_irq();
     maskPhaseInterrupts();
     lastzctime = thiszctime;
+#ifdef MCU_F051
+    thiszctime = (uint16_t)(INTERVAL_TIMER_COUNT - zc_grid_comp);
+    SET_INTERVAL_TIMER_COUNT(zc_grid_comp);
+#else
     thiszctime = INTERVAL_TIMER_COUNT;
     SET_INTERVAL_TIMER_COUNT(0);
+#endif
     SET_AND_ENABLE_COM_INT(waitTime+1); // enable COM_TIMER interrupt
     __enable_irq();
     HWCI_PERF_ZC_PHASE_COMMIT(); // accepted edge: bin its PWM phase

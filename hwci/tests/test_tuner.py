@@ -281,3 +281,71 @@ def test_startup_stats_uses_perf_erpm_when_stand_is_dead():
              "perf_e_rpm": 4000 * 7} for i in range(150)]
     result = RunResult(meta={"pole_pairs": 7}, rows=rows)
     assert startup_stats(result, profile, min_rpm=1000.0)["failed"] == 0
+
+
+# --------------------------------------------------------------------------
+# probe/step profile safety shape (bench-learned: snap transients trip the
+# 40 A harness limit - 43-75 A observed on a 0.5->0.7 snap on the 6S bench)
+# --------------------------------------------------------------------------
+def test_probe_profile_ramps_into_large_steps():
+    from hwci.tuner import probe_profile
+    spec = tune_spec_from_dict(small_spec(
+        probe={"dwell_s": 1.0,
+               "points": {"t30": 0.30, "t50": 0.50, "t70": 0.70}}))
+    labels = [s.label for s in probe_profile(spec).segments]
+    # w20->t30 is a 10% step: no ramp; the 20% steps each get one
+    assert "r_t30" not in labels
+    assert labels.index("r_t50") == labels.index("t50") - 1
+    assert labels.index("r_t70") == labels.index("t70") - 1
+
+
+def test_probe_profile_ramp_segments_are_not_steady():
+    from hwci.tuner import probe_profile
+    spec = tune_spec_from_dict(small_spec(
+        probe={"dwell_s": 1.0, "points": {"t30": 0.30, "t70": 0.70}}))
+    p = probe_profile(spec)
+    r70 = next(s for s in p.segments if s.label == "r_t70")
+    assert r70.ramp and not r70.steady and r70.throttle == 0.70
+
+
+def test_default_tune_probe_yaml_ramps_into_large_steps():
+    from hwci.tuner import probe_profile
+    spec = tune_spec_from_dict(small_spec())   # no points override
+    labels = [s.label for s in probe_profile(spec).segments]
+    for pt in ("t50", "t70", "t90"):
+        assert f"r_{pt}" in labels
+    assert "r_t30" not in labels
+
+
+def test_step_profile_current_limit_has_snap_headroom():
+    from hwci.tuner import step_profile
+    spec = tune_spec_from_dict(small_spec(
+        probe={"dwell_s": 1.0,
+               "safety": {"max_current_a": 40.0, "max_thrust_n": 16.0}}))
+    p = step_profile(spec)
+    # deliberate 0.3->0.95 snaps peak near 50 A on the bench: headroom to 55,
+    # while the other limits pass through unchanged
+    assert p.safety.max_current_a == 55.0
+    assert p.safety.max_thrust_n == 16.0
+    spec_hi = tune_spec_from_dict(small_spec(
+        probe={"dwell_s": 1.0, "safety": {"max_current_a": 70.0}}))
+    assert step_profile(spec_hi).safety.max_current_a == 70.0
+
+
+# --------------------------------------------------------------------------
+# session end leaves the device on the verdict settings
+# --------------------------------------------------------------------------
+def test_device_left_on_base_page_when_not_confirmed(tmp_path):
+    backend = make_backend(advance_optimum=26.0)   # optimum AT the default
+    _, result = run_tune(tmp_path, small_spec(), backend)
+    if not result["confirmed"]:
+        base = (tmp_path / "tune" / "base_settings.bin").read_bytes()
+        assert backend.read_page() == base
+
+
+def test_device_left_on_winner_when_confirmed(tmp_path):
+    backend = make_backend(advance_optimum=33.0)
+    _, result = run_tune(tmp_path, small_spec(), backend)
+    assert result["confirmed"]
+    assert backend.read_page() == \
+        (tmp_path / "tune" / "best_settings.bin").read_bytes()

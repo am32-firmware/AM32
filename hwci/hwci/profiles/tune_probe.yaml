@@ -2,7 +2,7 @@ name: tune_probe
 description: >
   Short efficiency probe for the auto settings tuner: idle, a two-step
   low-throttle warmup, then four steady points long enough for a meaningful
-  tail window, then ramp down (~28 s). Points below ~20 W electrical are
+  tail window, then ramp down (~31 s). Points below ~20 W electrical are
   measurement noise on the bench (see Thresholds.efficiency_min_power_w in
   hwci/baseline.py), so the probe spends its dwell where the objective
   actually scores. The warmup mirrors the efficiency_sweep staircase: the
@@ -19,12 +19,18 @@ safety:
   max_thrust_n: 16.0
   max_rpm: 32000
 
+# Ramp segments between measured points: a 0.5->0.7 snap drew a 43-75 A
+# one-sample transient on the 6S bench (harness abort at 40 A); unramped
+# 10% steps (w20->t30, efficiency_sweep's staircase) are proven safe.
 segments:
   - {label: idle,   throttle: 0.00, duration_s: 2.0}
   - {label: w10,    throttle: 0.10, duration_s: 1.5, ramp: true}
   - {label: w20,    throttle: 0.20, duration_s: 1.5}
   - {label: t30,    throttle: 0.30, duration_s: 6.0, steady: true}
+  - {label: r_t50,  throttle: 0.50, duration_s: 1.0, ramp: true}
   - {label: t50,    throttle: 0.50, duration_s: 6.0, steady: true}
+  - {label: r_t70,  throttle: 0.70, duration_s: 1.0, ramp: true}
   - {label: t70,    throttle: 0.70, duration_s: 6.0, steady: true}
+  - {label: r_t90,  throttle: 0.90, duration_s: 1.0, ramp: true}
   - {label: t90,    throttle: 0.90, duration_s: 6.0, steady: true}
   - {label: rampdn, throttle: 0.00, duration_s: 2.0, ramp: true}

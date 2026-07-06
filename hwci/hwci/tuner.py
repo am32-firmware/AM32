@@ -290,9 +290,20 @@ def probe_profile(spec: TuneSpec) -> Profile:
             {"label": "w10", "throttle": 0.10, "duration_s": 1.5, "ramp": True},
             {"label": "w20", "throttle": 0.20, "duration_s": 1.5},
         ]
+        prev = 0.20
         for label, thr in spec.probe.points.items():
-            segs.append({"label": label, "throttle": float(thr),
+            thr = float(thr)
+            # Steps > 10% throttle get a ramp segment: a 0.5->0.7 snap drew a
+            # 43-75 A one-sample transient on the 6S bench (harness abort at
+            # 40 A), while efficiency_sweep's unramped 10% staircase is
+            # bench-proven safe. The dwell stays constant-throttle so the
+            # steady tail is unaffected.
+            if abs(thr - prev) > 0.10 + 1e-9:
+                segs.append({"label": f"r_{label}", "throttle": thr,
+                             "duration_s": 1.0, "ramp": True})
+            segs.append({"label": label, "throttle": thr,
                          "duration_s": spec.probe.dwell_s, "steady": True})
+            prev = thr
         segs.append({"label": "rampdn", "throttle": 0.0, "duration_s": 2.0,
                      "ramp": True})
         d["segments"] = segs
@@ -351,7 +362,16 @@ def step_profile(spec: TuneSpec) -> Profile:
             {"label": "hold30c", "throttle": 0.30, "duration_s": 2.0},
             {"label": "rampdn", "throttle": 0.0, "duration_s": 1.5, "ramp": True},
         ],
-        "safety": spec.probe.safety or None,
+        # The snaps are the point of this profile, and a legitimate
+        # 0.3->0.95 snap transient peaks near 50 A on the 6S bench (see
+        # demag_step_stress.yaml's 55 A precedent). Probe-level current
+        # limits would abort every candidate on that transient before demag
+        # is even assessed, so give the current limit snap headroom; all
+        # other probe safety limits apply unchanged.
+        "safety": {**(spec.probe.safety or {}),
+                   "max_current_a": max(
+                       (spec.probe.safety or {}).get("max_current_a") or 0.0,
+                       55.0)},
     })
 
 
@@ -551,7 +571,11 @@ class SimTuneBackend(TuneBackend):
                   meta: dict, *, battery_cells: int | None,
                   min_cell_voltage: float) -> tuple[RunResult, dict]:
         resting_v = self._resting_voltage()
-        if battery_cells:
+        # Gate only on an injected voltage_fn (pack-drain tests): the sim's
+        # nominal battery doesn't represent a real cell count, same reason
+        # `hwci run`/`ci` ignore --battery-cells under --sim. A hardware
+        # spec's battery_cells must not stop a sim dry-run of the same spec.
+        if battery_cells and self.voltage_fn is not None:
             check_battery(resting_v, battery_cells, min_cell_voltage)
         self.program(blob, bin_path)
         verified = self.read_page() == blob
@@ -1228,7 +1252,10 @@ class Tuner:
         result = self._run_finals()
         best = (self.base.apply(result["winner_overrides"], self._offsets)
                 if result["confirmed"] else self.base)
-        best.to_bin(self.out / "best_settings.bin")
+        # Leave the DEVICE on the session's verdict too: the last finals
+        # trial flashed the unconfirmed winner, which would silently stay
+        # active while the report says "default kept".
+        self.backend.program(best.to_bytes(), self.out / "best_settings.bin")
         (self.out / "settings_diff.md").write_text(self._diff_md(best))
         (self.out / "report.md").write_text(self._report_md(result))
         pdf = reportmod.write_tune_pdf(

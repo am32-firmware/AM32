@@ -441,3 +441,97 @@ def test_baseline_pause_then_resume_completes(tmp_path):
     import json
     m = json.loads((tmp_path / "tune" / "manifest.json").read_text())
     assert m["jitter_reference"] is not None
+
+
+# --------------------------------------------------------------------------
+# mech-ramp measure stage (measure: ramp_rate)
+# --------------------------------------------------------------------------
+def _step_rows(tau_s=0.08, base_rpm=60000.0, hi_rpm=140000.0,
+               base_i=3.0, pk_i=20.0, hi_i=8.0, dt=0.005):
+    """Synthetic tune_ramp_measure rows: first-order eRPM rise, current
+    spike decaying with the same tau."""
+    import math
+    rows = []
+    t = 0.0
+    def emit(seg, thr, dur, rpm_fn, i_fn):
+        nonlocal t
+        t0 = t
+        while t < t0 + dur:
+            rows.append({"t": t, "segment": seg, "throttle_cmd": thr,
+                         "perf_e_rpm": rpm_fn(t - t0),
+                         "stand_current_a": i_fn(t - t0)})
+            t += dt
+    emit("hold_lo", 0.20, 1.0, lambda dt_: base_rpm, lambda dt_: base_i)
+    emit("step_up", 0.55, 2.0,
+         lambda dt_: base_rpm + (hi_rpm - base_rpm) * (1 - math.exp(-dt_ / tau_s)),
+         lambda dt_: hi_i + (pk_i - hi_i) * math.exp(-dt_ / tau_s))
+    emit("drop", 0.20, 1.0, lambda dt_: base_rpm, lambda dt_: base_i)
+    emit("step_up2", 0.55, 2.0,
+         lambda dt_: base_rpm + (hi_rpm - base_rpm) * (1 - math.exp(-dt_ / tau_s)),
+         lambda dt_: hi_i + (pk_i - hi_i) * math.exp(-dt_ / tau_s))
+    return rows
+
+
+def test_mech_ramp_stats_recovers_plant_constants():
+    from hwci.tuner import mech_ramp_stats
+    s = mech_ramp_stats(_step_rows(tau_s=0.08))
+    assert s is not None
+    assert 60 <= s["tau_ms"] <= 100          # 80 ms +/- sampling grain
+    # k = (peak - base) / step_pct = (20 - 3) / 35
+    assert s["k_a_per_pct"] == pytest.approx(17.0 / 35.0, rel=0.15)
+    assert s["rpm_hi"] > s["rpm_lo"]
+
+
+def test_mech_ramp_stats_none_without_a_real_step():
+    from hwci.tuner import mech_ramp_stats
+    flat = [{"t": i * 0.005, "segment": s, "throttle_cmd": 0.2,
+             "perf_e_rpm": 60000.0, "stand_current_a": 3.0}
+            for s in ("hold_lo", "step_up") for i in range(100)]
+    assert mech_ramp_stats(flat) is None
+
+
+def test_compute_max_ramp_math_and_clamping():
+    from hwci.tuner import compute_max_ramp
+    stats = {"tau_ms": 50.0, "k_a_per_pct": 0.5}
+    # lead = 30/0.5 = 60%; rate = 60/50 = 1.2 %/ms -> 12 in 0.1%/ms units
+    assert compute_max_ramp(stats, current_budget_a=30.0, lo=1, hi=160,
+                            margin=1.0) == 12
+    assert compute_max_ramp(stats, current_budget_a=30.0, lo=1, hi=160,
+                            margin=0.5) == 6
+    assert compute_max_ramp(stats, current_budget_a=1e9, lo=1, hi=160,
+                            margin=1.0) == 160    # clamped to field max
+    assert compute_max_ramp(stats, current_budget_a=0.0, lo=4, hi=160,
+                            margin=1.0) == 4      # clamped to field min
+
+
+def test_measure_stage_spec_validation():
+    with pytest.raises(TuneSpecError, match="exactly one"):
+        tune_spec_from_dict(small_spec(stages=[
+            {"name": "r", "measure": "ramp_rate", "sweep": "max_ramp"}]))
+    with pytest.raises(TuneSpecError, match="ramp_rate"):
+        tune_spec_from_dict(small_spec(stages=[
+            {"name": "r", "measure": "bogus"}]))
+    with pytest.raises(TuneSpecError, match="margin"):
+        tune_spec_from_dict(small_spec(stages=[
+            {"name": "r", "measure": "ramp_rate", "margin": 5.0}]))
+
+
+def test_e2e_measure_stage_sets_max_ramp(tmp_path):
+    import json
+    spec_d = small_spec(stages=[
+        {"name": "ramp", "measure": "ramp_rate", "margin": 0.8}])
+    backend = make_backend(demag_prone=False)
+    _, result = run_tune(tmp_path, spec_d, backend)
+    m = json.loads((tmp_path / "tune" / "manifest.json").read_text())
+    st = m["stages"]["ramp"]
+    assert st["measured"] is not None
+    assert st["measured"]["tau_ms"] > 0
+    assert st["computed_max_ramp"] is not None
+    from hwci.settings import resolve_field
+    f = resolve_field("max_ramp", None)
+    assert f.lo <= st["computed_max_ramp"] <= f.hi
+    # verify trial ran and the incumbent picked up the winner
+    kinds = [t["kind"] for t in m["trials"] if t["stage"] == "ramp"]
+    assert kinds[0] == "measure" and "verify" in kinds
+    if st["winner"] is not None:
+        assert m["incumbent"]["max_ramp"] == st["winner"]["max_ramp"]

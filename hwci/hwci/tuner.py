@@ -157,6 +157,11 @@ class StageSpec:
     # list from the incumbent (valid for unimodal responses like advance or
     # pwm frequency - typically halves the trial count of a wide grid).
     search: str = "grid"
+    # "ramp_rate": measure the powertrain (mech time constant + transient
+    # current per % of duty lead) with one instrumented step run, COMPUTE
+    # max_ramp from the physics, then verify it on the step-stress profile.
+    measure: str | None = None
+    margin: float = 0.8       # fraction of the physics-derived rate to keep
 
 
 @dataclass
@@ -237,10 +242,22 @@ def tune_spec_from_dict(data: dict) -> TuneSpec:
         if s.name in seen:
             raise TuneSpecError(f"tune spec: duplicate stage name {s.name!r}")
         seen.add(s.name)
-        if bool(s.sweep) == bool(s.ab_candidates):
+        if sum(map(bool, (s.sweep, s.ab_candidates, s.measure))) != 1:
             raise TuneSpecError(
                 f"tune spec: stage {s.name!r} needs exactly one of "
-                "'sweep' or 'ab_candidates'")
+                "'sweep', 'ab_candidates' or 'measure'")
+        if s.measure is not None and s.measure != "ramp_rate":
+            raise TuneSpecError(
+                f"tune spec: stage {s.name!r} measure {s.measure!r} is not "
+                "'ramp_rate'")
+        if s.measure and s.constraint_only:
+            raise TuneSpecError(
+                f"tune spec: stage {s.name!r}: 'measure' and "
+                "'constraint_only' are mutually exclusive")
+        if not 0.1 <= s.margin <= 2.0:
+            raise TuneSpecError(
+                f"tune spec: stage {s.name!r} margin {s.margin} outside "
+                "[0.1, 2.0]")
         if s.search not in ("grid", "climb"):
             raise TuneSpecError(
                 f"tune spec: stage {s.name!r} search {s.search!r} is not "
@@ -385,6 +402,130 @@ def step_profile(spec: TuneSpec) -> Profile:
                        (spec.probe.safety or {}).get("max_current_a") or 0.0,
                        55.0)},
     })
+
+
+def ramp_measure_profile(spec: TuneSpec) -> Profile:
+    """Measurement profile for the mech-ramp stage: two moderate snap steps
+    from a spinning state (0.20 -> 0.55), sampled at 200 Hz.
+
+    The trial runs with max_ramp at the field maximum so firmware duty slew
+    is not the limiter: the eRPM rise time is then the POWERTRAIN's (rotor
+    inertia + prop aero load), and the current overshoot measures how much
+    a leading duty costs. Two reps -> median estimates. The step tops out
+    at 0.55 to stay clear of high-RPM sync margins (this bench desyncs
+    arriving at fresh-pack t70)."""
+    safety = dict(spec.probe.safety or {})
+    # deliberate snaps: same transient headroom rationale as step_profile
+    safety["max_current_a"] = max(safety.get("max_current_a") or 0.0, 55.0)
+    return profile_from_dict({
+        "name": "tune_ramp_measure",
+        "description": "inline powertrain step-response measurement "
+                       "(auto-tuner mech-ramp stage)",
+        "sample_rate_hz": 200.0,
+        "segments": [
+            {"label": "idle",     "throttle": 0.00, "duration_s": 2.0},
+            {"label": "spool",    "throttle": 0.20, "duration_s": 2.0,
+             "ramp": True},
+            {"label": "hold_lo",  "throttle": 0.20, "duration_s": 1.5},
+            {"label": "step_up",  "throttle": 0.55, "duration_s": 2.5},
+            {"label": "drop",     "throttle": 0.20, "duration_s": 2.0},
+            {"label": "step_up2", "throttle": 0.55, "duration_s": 2.5},
+            {"label": "rampdn",   "throttle": 0.00, "duration_s": 1.5,
+             "ramp": True},
+        ],
+        "safety": safety,
+    })
+
+
+def mech_ramp_stats(rows: list[dict]) -> Optional[dict]:
+    """Powertrain step-response estimates from a ``tune_ramp_measure`` run.
+
+    Per step: first-order time constant ``tau_ms`` (63.2% eRPM crossing),
+    mechanical slew (step height / tau) and the transient-current slope
+    ``k_a_per_pct`` (peak current overshoot per % of commanded duty step -
+    an upper bound on A per % of duty-lead, since the lead at the current
+    peak is at most the full step). Median across steps; None if no usable
+    step was found.
+    """
+    def fget(r, key):
+        v = r.get(key)
+        try:
+            return float(v) if v not in (None, "") else None
+        except (TypeError, ValueError):
+            return None
+
+    segs: dict[str, list[dict]] = {}
+    for r in rows:
+        segs.setdefault(str(r.get("segment")), []).append(r)
+
+    ests = []
+    for lbl, prev_lbl in (("step_up", "hold_lo"), ("step_up2", "drop")):
+        step, prev = segs.get(lbl), segs.get(prev_lbl)
+        if not step or not prev:
+            continue
+        tail = prev[-max(1, len(prev) // 5):]
+        base_rpm = statistics.median(
+            [v for r in tail if (v := fget(r, "perf_e_rpm")) is not None]
+            or [float("nan")])
+        base_i = statistics.median(
+            [v for r in tail if (v := fget(r, "stand_current_a")) is not None]
+            or [0.0])
+        plat = step[-max(1, len(step) // 3):]
+        hi_rpm = statistics.median(
+            [v for r in plat if (v := fget(r, "perf_e_rpm")) is not None]
+            or [float("nan")])
+        hi_i = statistics.median(
+            [v for r in plat if (v := fget(r, "stand_current_a")) is not None]
+            or [0.0])
+        if not (base_rpm == base_rpm and hi_rpm == hi_rpm):   # NaN guard
+            continue
+        rise = hi_rpm - base_rpm
+        if rise < 1000.0:            # no real step -> nothing to measure
+            continue
+        t0 = fget(step[0], "t")
+        thr0 = fget(prev[-1], "throttle_cmd") or 0.0
+        thr1 = fget(step[-1], "throttle_cmd") or 0.0
+        step_pct = abs(thr1 - thr0) * 100.0
+        if t0 is None or step_pct < 5.0:
+            continue
+        target = base_rpm + 0.632 * rise
+        t63 = next((t for r in step
+                    if (v := fget(r, "perf_e_rpm")) is not None
+                    and v >= target and (t := fget(r, "t")) is not None), None)
+        if t63 is None:
+            continue
+        tau_ms = max((t63 - t0) * 1000.0, 5.0)   # floor at sampling grain
+        i_pk = max([v for r in step
+                    if (t := fget(r, "t")) is not None and t <= t0 + 0.5
+                    and (v := fget(r, "stand_current_a")) is not None]
+                   or [base_i])
+        ests.append({
+            "tau_ms": tau_ms,
+            "slew_erpm_per_s": rise / (tau_ms / 1000.0),
+            "k_a_per_pct": max(i_pk - base_i, 0.1) / step_pct,
+            "i_peak_a": i_pk,
+            "i_hi_a": hi_i,
+            "rpm_lo": base_rpm,
+            "rpm_hi": hi_rpm,
+        })
+    if not ests:
+        return None
+    return {k: statistics.median([e[k] for e in ests]) for k in ests[0]}
+
+
+def compute_max_ramp(stats: dict, *, current_budget_a: float,
+                     lo: int, hi: int, margin: float = 0.8) -> int:
+    """max_ramp (0.1 %/ms units) from step-response physics.
+
+    During a duty ramp at rate r the duty leads the mechanical state by
+    ~r*tau once quasi-steady, and the transient current is ~k * lead. The
+    fastest ramp whose worst-case transient stays inside the budget is
+    r = budget / (k * tau); margin keeps a fraction of it.
+    """
+    lead_pct = current_budget_a / max(stats["k_a_per_pct"], 1e-3)
+    rate_pct_per_ms = lead_pct / max(stats["tau_ms"], 1.0)
+    setting = int(round(rate_pct_per_ms * 10.0 * margin))
+    return max(lo, min(hi, setting))
 
 
 def startup_stats(result: RunResult, profile: Profile,
@@ -1187,6 +1328,79 @@ class Tuner:
             if moved:
                 break   # went uphill one way; the other side is downhill
 
+    def _trial_rows(self, entry: dict) -> list[dict]:
+        import csv
+        path = self.out / entry.get("dir", "") / "samples.csv"
+        with open(path, newline="") as f:
+            return list(csv.DictReader(f))
+
+    def _run_measure_stage(self, stage: StageSpec) -> None:
+        """Physics-based max_ramp: measure the powertrain's step response
+        once (firmware slew unrestricted), compute the fastest ramp whose
+        worst-case transient stays inside the current budget, then VERIFY
+        it on the step-stress profile (backing off 0.7x on failure)."""
+        f = resolve_field("max_ramp", None)
+        e = self._trial(TrialPlan(
+            stage=stage.name, kind="measure",
+            overrides=self._merged(stage, {"max_ramp": f.hi}),
+            profile=ramp_measure_profile(self.spec)))
+        indices = [e["index"]]
+        stats = None
+        if e.get("disqualified"):
+            self.log(f"stage {stage.name}: measurement run disqualified "
+                     f"({e['disqualified']}); keeping incumbent max_ramp")
+        else:
+            stats = mech_ramp_stats(self._trial_rows(e))
+            if stats is None:
+                self.log(f"stage {stage.name}: no usable step response in "
+                         "the measurement run; keeping incumbent max_ramp")
+
+        winner_val = None
+        computed = None
+        if stats is not None:
+            limit = ramp_measure_profile(self.spec).safety.max_current_a
+            budget = max(0.75 * (limit or 55.0) - stats["i_hi_a"], 5.0)
+            computed = compute_max_ramp(stats, current_budget_a=budget,
+                                        lo=f.lo, hi=f.hi,
+                                        margin=stage.margin)
+            self.log(
+                f"stage {stage.name}: tau {stats['tau_ms']:.0f} ms, slew "
+                f"{stats['slew_erpm_per_s']:.0f} eRPM/s, "
+                f"k {stats['k_a_per_pct']:.2f} A/%, budget {budget:.1f} A "
+                f"-> max_ramp {computed}")
+            v = computed
+            while True:
+                ev = self._trial(TrialPlan(
+                    stage=stage.name, kind="verify",
+                    overrides=self._merged(stage, {"max_ramp": v}),
+                    profile=step_profile(self.spec)))
+                indices.append(ev["index"])
+                if not ev.get("disqualified"):
+                    winner_val = v
+                    break
+                nxt = max(f.lo, int(v * 0.7))
+                if nxt == v:
+                    break               # already at the floor: no winner
+                self.log(f"stage {stage.name}: verify failed at max_ramp "
+                         f"{v}; backing off to {nxt}")
+                v = nxt
+
+        if winner_val is not None:
+            self.manifest["incumbent"] = self._merged(
+                stage, {"max_ramp": winner_val})
+        self.manifest["stages"][stage.name] = {
+            "winner": (None if winner_val is None
+                       else {"max_ramp": winner_val}),
+            "winner_score": None,
+            "measured": (None if stats is None
+                         else {k: round(v, 3) for k, v in stats.items()}),
+            "computed_max_ramp": computed,
+            "trials": indices,
+        }
+        self._save()
+        self.log(f"stage {stage.name}: winner "
+                 f"{None if winner_val is None else {'max_ramp': winner_val}}")
+
     def _run_constraint_stage(self, stage: StageSpec) -> None:
         """Constraint-only sweep (e.g. max_ramp on a step profile): values are
         tried in listed order (list them best-first); the first value with
@@ -1321,7 +1535,9 @@ class Tuner:
             self._save()
 
         for stage in spec.stages:
-            if stage.constraint_only:
+            if stage.measure:
+                self._run_measure_stage(stage)
+            elif stage.constraint_only:
                 self._run_constraint_stage(stage)
             else:
                 self._run_scored_stage(stage)

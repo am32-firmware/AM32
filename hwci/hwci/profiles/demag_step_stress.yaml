@@ -11,7 +11,11 @@ demag_commutation_spike: 3.0
 demag_rpm_drop_fraction: 0.25
 
 safety:
-  max_current_a: 45.0
+  # Snap-step transients measured on the ARK 4IN1 + HQ5136 fresh-pack bench:
+  # 10->90 peaks 42 A, 10->95 peaks ~49 A - the original 45 A default aborted
+  # the run at step95. 55 A clears the observed transients with margin while
+  # still bounding a genuine desync current runaway.
+  max_current_a: 55.0
   max_thrust_n: 16.0
   max_rpm: 32000
 

@@ -1,6 +1,7 @@
 """Render run metrics + regression comparison to Markdown (and optional plots)."""
 from __future__ import annotations
 
+import textwrap
 from pathlib import Path
 
 
@@ -146,9 +147,45 @@ def write_tune_pdf(out_dir: str | Path, manifest: dict, result: dict,
     return pdf_path
 
 
-_PAGE = (8.27, 11.69)   # A4 portrait, inches
+_PAGE = (8.27, 11.69)        # A4 portrait, inches
+_PAGE_LS = (11.69, 8.27)     # A4 landscape (wide tables)
 _CONFIRMED_GREEN = "#1a7f37"
 _DEFAULT_GRAY = "#57606a"
+_BORDER_GRAY = "#d0d7de"
+_HEADER_BG = "#f6f8fa"
+
+
+def _wrap(v, width: int) -> str:
+    s = _fmt(v) if not isinstance(v, str) else v
+    return "\n".join(textwrap.wrap(s, width)) if len(s) > width else s
+
+
+def _place_table(ax, rows: list, cols: list, widths: list,
+                 fontsize: float = 8.0, line_h: float = 0.032) -> None:
+    """Left-aligned table pinned to the top of ``ax`` with EXPLICIT column
+    width fractions (auto_set_column_width lets wide tables overflow the
+    page and clip - seen on real trial tables). Cell text may contain
+    newlines (pre-wrapped); row heights follow the tallest cell."""
+    ax.axis("off")
+    if not rows:
+        ax.text(0.5, 0.5, "(none)", ha="center", va="center",
+                transform=ax.transAxes, color=_DEFAULT_GRAY)
+        return
+    tbl = ax.table(cellText=rows, colLabels=cols, cellLoc="left",
+                   colLoc="left", loc="upper left", colWidths=widths)
+    tbl.auto_set_font_size(False)
+    tbl.set_fontsize(fontsize)
+    lines_in_row: dict[int, int] = {}
+    for (r, _c), cell in tbl.get_celld().items():
+        n = cell.get_text().get_text().count("\n") + 1
+        lines_in_row[r] = max(lines_in_row.get(r, 1), n)
+    for (r, _c), cell in tbl.get_celld().items():
+        cell.set_height(line_h * (lines_in_row[r] + 0.6))
+        cell.set_edgecolor(_BORDER_GRAY)
+        cell.PAD = 0.02
+        if r == 0:
+            cell.set_facecolor(_HEADER_BG)
+            cell.set_text_props(fontweight="bold")
 
 
 def _pdf_cover_page(plt, pdf, manifest: dict, result: dict, diff_rows: list):
@@ -192,7 +229,7 @@ def _pdf_cover_page(plt, pdf, manifest: dict, result: dict, diff_rows: list):
 
     ov = result.get("winner_overrides") or {}
     detail = [
-        f"winner overrides: {ov or '{} (default)'}",
+        f"winner overrides: {_fmt_ov(ov)}",
         (f"median paired delta: {_fmt(result.get('median_paired_delta'))} g/W "
          f"over {len(result.get('paired_deltas') or [])} ABBA pairs"),
         f"winner constraint failures: {result.get('winner_constraint_failures', 0)}",
@@ -212,27 +249,41 @@ def _pdf_cover_page(plt, pdf, manifest: dict, result: dict, diff_rows: list):
         rows = [[name, _fmt(a), _fmt(b)] for name, a, b in diff_rows]
     else:
         rows = [["(no change — default settings won)", "", ""]]
-    ax_t = fig.add_axes([0.06, 0.08, 0.88, 0.35])
-    ax_t.axis("off")
-    tbl = ax_t.table(cellText=rows,
-                     colLabels=["setting", "default", "best"],
-                     colLoc="left", cellLoc="left", loc="upper left")
-    _style_table(tbl, header_cols=3)
+    _place_table(fig.add_axes([0.06, 0.29, 0.60, 0.15]), rows,
+                 ["setting", "default", "best"], [0.50, 0.25, 0.25],
+                 line_h=0.10)
+
+    # -- stage winners (was its own near-empty page) --
+    fig.text(0.06, 0.25, "Stage winners", fontsize=13,
+             fontweight="bold", va="top")
+    stage_rows = [[name, _wrap(_fmt_ov(s.get("winner")), 58),
+                   _fmt(s.get("winner_score"))]
+                  for name, s in manifest.get("stages", {}).items()]
+    _place_table(fig.add_axes([0.06, 0.05, 0.88, 0.18]), stage_rows,
+                 ["stage", "winner", "score (g/W, norm)"],
+                 [0.15, 0.62, 0.23], line_h=0.085)
     pdf.savefig(fig)
     plt.close(fig)
 
 
 def _pdf_progress_page(plt, pdf, manifest: dict, result: dict):
+    from matplotlib.ticker import MaxNLocator
+    from matplotlib.transforms import blended_transform_factory
+
     trials = [t for t in manifest.get("trials", []) if not t.get("discarded")]
     fig, (ax_prog, ax_abba) = plt.subplots(2, 1, figsize=_PAGE)
     fig.suptitle("Tuning progress", fontsize=18, fontweight="bold", x=0.06,
                  ha="left", y=0.97)
 
-    # scored trials: raw + normalized g/W vs trial index
+    # scored trials: raw + normalized g/W vs trial index; anchors (incumbent
+    # re-runs) marked distinctly so drift is readable at a glance
     idx_raw = [(t["index"], t["score_raw"]) for t in trials
                if t.get("score_raw") is not None]
     idx_norm = [(t["index"], t["score_norm"]) for t in trials
                 if t.get("score_norm") is not None]
+    anchors = [(t["index"], t["score_raw"]) for t in trials
+               if t.get("kind") == "anchor"
+               and t.get("score_raw") is not None]
     dq = [t["index"] for t in trials if t.get("disqualified")]
 
     if idx_raw:
@@ -242,12 +293,38 @@ def _pdf_progress_page(plt, pdf, manifest: dict, result: dict):
         xs, ys = zip(*idx_norm)
         ax_prog.plot(xs, ys, "s--", color="#bf8700",
                      label="drift-normalized g/W", ms=4)
+    if anchors:
+        xs, ys = zip(*anchors)
+        ax_prog.plot(xs, ys, "o", mfc="white", mec="#0969da", ms=8,
+                     ls="none", label="anchor (incumbent re-run)")
     if dq:
-        ymin = min([y for _, y in idx_raw], default=0)
-        ax_prog.plot(dq, [ymin] * len(dq), "x", color="#cf222e", ms=8,
-                     label="disqualified")
-    ax_prog.set(xlabel="trial index", ylabel="objective (g/W)",
-                title="Objective per trial")
+        # park DQ markers in their own band under the data instead of on
+        # top of the minimum score (they have no score of their own)
+        ys = [y for _, y in idx_raw + idx_norm]
+        lo, hi = (min(ys), max(ys)) if ys else (0.0, 1.0)
+        band = lo - 0.08 * (hi - lo or 1.0)
+        ax_prog.plot(dq, [band] * len(dq), "x", color="#cf222e", ms=8,
+                     mew=2, ls="none", label="disqualified (no score)")
+
+    # stage bands: alternating background + label per contiguous stage
+    trans = blended_transform_factory(ax_prog.transData, ax_prog.transAxes)
+    spans: list[tuple[str, int, int]] = []
+    for t in sorted(trials, key=lambda t: t["index"]):
+        if spans and spans[-1][0] == t["stage"]:
+            spans[-1] = (t["stage"], spans[-1][1], t["index"])
+        else:
+            spans.append((t["stage"], t["index"], t["index"]))
+    for i, (name, a, b) in enumerate(spans):
+        if i % 2:
+            ax_prog.axvspan(a - 0.5, b + 0.5, color="#afb8c1", alpha=0.15,
+                            lw=0)
+        ax_prog.text((a + b) / 2.0, 1.015, name, transform=trans,
+                     ha="center", va="bottom", fontsize=8,
+                     color=_DEFAULT_GRAY)
+
+    ax_prog.set(xlabel="trial index", ylabel="objective (g/W)")
+    ax_prog.set_title("Objective per trial", pad=22)
+    ax_prog.xaxis.set_major_locator(MaxNLocator(integer=True))
     if idx_raw or idx_norm or dq:
         ax_prog.legend(loc="best", fontsize=8)
     ax_prog.grid(True, alpha=0.3)
@@ -257,12 +334,13 @@ def _pdf_progress_page(plt, pdf, manifest: dict, result: dict):
     if deltas:
         colors = ["#1a7f37" if d > 0 else "#cf222e" for d in deltas]
         ax_abba.bar(range(1, len(deltas) + 1), deltas, color=colors,
-                    alpha=0.8)
+                    alpha=0.8, width=0.5)
         med = result.get("median_paired_delta")
         if med is not None:
             ax_abba.axhline(med, ls="--", color="#0969da",
                             label=f"median {med:g} g/W")
         ax_abba.axhline(0, color="#57606a", lw=0.8)
+        ax_abba.set_xticks(list(range(1, len(deltas) + 1)))
         ax_abba.legend(loc="best", fontsize=8)
     else:
         ax_abba.text(0.5, 0.5, "no ABBA paired deltas", ha="center",
@@ -286,15 +364,15 @@ def _fmt_ov(ov) -> str:
     return str(ov)
 
 
-def _pdf_tables_pages(plt, pdf, manifest: dict):
-    # stages table
-    stages = manifest.get("stages", {})
-    stage_rows = [[name, _fmt_ov(s.get("winner")), _fmt(s.get("winner_score"))]
-                  for name, s in stages.items()]
-    _table_page(plt, pdf, "Stage winners", stage_rows,
-                ["stage", "winner", "score (g/W, norm)"])
+_TRIAL_COLS = ["#", "stage", "kind", "overrides", "raw g/W", "norm g/W",
+               "disqualified"]
+_TRIAL_WIDTHS = [0.04, 0.09, 0.11, 0.40, 0.075, 0.075, 0.21]
 
-    # trials table (paginated)
+
+def _pdf_tables_pages(plt, pdf, manifest: dict):
+    # trials table: landscape + explicit widths + wrapped text (a portrait
+    # auto-width table clipped both edges on real sessions), paginated on a
+    # LINE budget so wrapped disqualification reasons don't overflow a page
     trial_rows = []
     for e in manifest.get("trials", []):
         dq = "; ".join(e["disqualified"]) if e.get("disqualified") else ""
@@ -302,46 +380,27 @@ def _pdf_tables_pages(plt, pdf, manifest: dict):
             dq = (dq + " " if dq else "") + "(discarded: pack swap)"
         trial_rows.append([
             _fmt(e.get("index")), _fmt(e.get("stage")), _fmt(e.get("kind")),
-            _fmt_ov(e.get("overrides")), _fmt(e.get("score_raw")),
-            _fmt(e.get("score_norm")), dq])
-    cols = ["#", "stage", "kind", "overrides", "raw g/W", "norm g/W",
-            "disqualified"]
-    per_page = 26
-    if not trial_rows:
-        _table_page(plt, pdf, "Trials", [], cols)
-        return
-    for i in range(0, len(trial_rows), per_page):
-        chunk = trial_rows[i:i + per_page]
-        title = "Trials" if i == 0 else f"Trials (cont. {i // per_page + 1})"
-        _table_page(plt, pdf, title, chunk, cols)
+            _wrap(_fmt_ov(e.get("overrides")), 62), _fmt(e.get("score_raw")),
+            _fmt(e.get("score_norm")), _wrap(dq, 38)])
 
+    pages: list[list[list[str]]] = [[]]
+    lines = 0
+    for row in trial_rows:
+        n = max(cell.count("\n") + 1 for cell in row)
+        if pages[-1] and lines + n > 30:
+            pages.append([])
+            lines = 0
+        pages[-1].append(row)
+        lines += n
 
-def _table_page(plt, pdf, title: str, rows: list, cols: list):
-    fig = plt.figure(figsize=_PAGE)
-    fig.text(0.06, 0.955, title, fontsize=18, fontweight="bold", va="top")
-    ax = fig.add_axes([0.04, 0.04, 0.92, 0.86])
-    ax.axis("off")
-    if not rows:
-        ax.text(0.5, 0.5, "(none)", ha="center", va="center",
-                transform=ax.transAxes, color=_DEFAULT_GRAY)
-    else:
-        tbl = ax.table(cellText=rows, colLabels=cols, cellLoc="left",
-                       colLoc="left", loc="upper center")
-        _style_table(tbl, header_cols=len(cols))
-    pdf.savefig(fig)
-    plt.close(fig)
-
-
-def _style_table(tbl, *, header_cols: int) -> None:
-    tbl.auto_set_font_size(False)
-    tbl.set_fontsize(8)
-    tbl.auto_set_column_width(list(range(header_cols)))
-    tbl.scale(1, 1.4)
-    for (r, _c), cell in tbl.get_celld().items():
-        cell.set_edgecolor("#d0d7de")
-        if r == 0:
-            cell.set_facecolor("#f6f8fa")
-            cell.set_text_props(fontweight="bold")
+    for i, chunk in enumerate(pages):
+        fig = plt.figure(figsize=_PAGE_LS)
+        title = "Trials" if i == 0 else f"Trials (cont. {i + 1})"
+        fig.text(0.04, 0.94, title, fontsize=18, fontweight="bold", va="top")
+        _place_table(fig.add_axes([0.04, 0.05, 0.92, 0.80]), chunk,
+                     _TRIAL_COLS, _TRIAL_WIDTHS, line_h=0.026)
+        pdf.savefig(fig)
+        plt.close(fig)
 
 
 def _write_plots(run_dir: Path, metrics: dict) -> None:

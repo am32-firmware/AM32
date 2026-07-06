@@ -157,6 +157,30 @@ def zc_jitter_window(count: np.ndarray, jsum: np.ndarray, isum: np.ndarray,
     return out
 
 
+def counter_per_zc(counter: np.ndarray, count: np.ndarray,
+                   idx: np.ndarray) -> float | None:
+    """Ratio of a monotonic per-event counter to accepted commutations over
+    the sample window ``idx``.
+
+    Both are firmware u32 counters differenced wrap-safe between the first
+    and last valid snapshot (same scheme as :func:`zc_jitter_window`). Used
+    for ``confirm_rejects_per_zc``: rejected comparator edges per accepted
+    zero-cross - the live monitor for the F051 glitch-tolerant confirm's
+    reject mechanism (rare in clean running; balloons under real noise).
+    ``None`` when the firmware predates the counter or nothing accumulated.
+    """
+    if idx.size == 0:
+        return None
+    valid = idx[~np.isnan(counter[idx]) & ~np.isnan(count[idx])]
+    if valid.size < 2:
+        return None
+    a, b = valid[0], valid[-1]
+    n = _wrap32(count[a], count[b])
+    if n <= 0:
+        return None
+    return round(_wrap32(counter[a], counter[b]) / n, 4)
+
+
 def compute(run: RunResult, profile: Profile) -> dict:
     rows = run.rows
     seg = np.array([r.get("segment") for r in rows], dtype=object)
@@ -180,6 +204,7 @@ def compute(run: RunResult, profile: Profile) -> dict:
     zc_jsum = _col(rows, "perf_zc_jitter_sum")
     zc_isum = _col(rows, "perf_zc_interval_sum")
     zc_jmax = _col(rows, "perf_zc_jitter_max")
+    zc_reject = _col(rows, "perf_zc_confirm_reject")
 
     steady_points = []
     for s in profile.segments:
@@ -208,6 +233,8 @@ def compute(run: RunResult, profile: Profile) -> dict:
             # bench has repeat captures establishing its run-to-run spread)
             "zc_jitter_pct": jitter["mean_pct"],
             "zc_jitter_max_pct": jitter["max_pct"],
+            # rejected edges per accepted zero-cross (report-only, v3+)
+            "confirm_rejects_per_zc": counter_per_zc(zc_reject, zc_count, tail),
         })
 
     demag = detect_demag(run, profile)

@@ -80,3 +80,16 @@ def test_perf_channel_carries_zc_jitter_accumulators():
         b["zc_interval_sum"] - a["zc_interval_sum"])
     assert 0.1 < mean_pct < 2.0
     assert b["zc_jitter_max"] >= 1
+
+
+def test_perf_channel_carries_confirm_reject_counter():
+    rig = RigSimulator(noise=0.0)
+    _settle(rig, 0.7)
+    a = perf.decode(rig.perf_bytes()).raw
+    _settle(rig, 0.7)
+    b = perf.decode(rig.perf_bytes()).raw
+    assert b["zc_confirm_reject"] > a["zc_confirm_reject"] > 0
+    # clean running: rejects stay a small fraction of accepted ZCs
+    ratio = (b["zc_confirm_reject"] - a["zc_confirm_reject"]) / (
+        b["zc_count"] - a["zc_count"])
+    assert 0.001 < ratio < 0.05

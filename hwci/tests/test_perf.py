@@ -8,7 +8,8 @@ from hwci import perf
 
 def test_layout_sizes():
     assert perf.SIZE_BY_VERSION[1] == 64
-    assert perf.SIZE == perf.SIZE_BY_VERSION[2] == 80
+    assert perf.SIZE_BY_VERSION[2] == 80
+    assert perf.SIZE == perf.SIZE_BY_VERSION[3] == 84
 
 
 def test_host_cmd_offset_matches_layout():
@@ -107,3 +108,19 @@ def test_negative_current_is_signed():
     blob = perf.encode({"current_ca": -150})
     s = perf.decode(blob)
     assert s.current == pytest.approx(-1.5)
+
+
+def test_v3_roundtrip_confirm_reject():
+    blob = perf.encode({"zc_confirm_reject": 424242})
+    assert len(blob) == 84
+    assert perf.decode(blob).raw["zc_confirm_reject"] == 424242
+
+
+def test_v2_roundtrip_has_no_reject_key():
+    # v2 firmware (pre confirm-reject counter) must keep decoding, without
+    # the v3 key - the A side of an A/B session runs exactly this layout.
+    blob = perf.encode({"zc_count": 7}, version=2)
+    assert len(blob) == perf.SIZE_BY_VERSION[2]
+    s = perf.decode(blob)
+    assert s.raw["zc_count"] == 7
+    assert "zc_confirm_reject" not in s.raw

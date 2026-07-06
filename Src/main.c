@@ -982,6 +982,7 @@ RAM_FUNC void interruptRoutine()
             for (int i = 0; i < filter_level; i++) {
                 if (getCompOutputLevel() == rising) {
                     if (++bad > tolerance) {
+                        HWCI_PERF_CONFIRM_REJECT();
                         return;
                     }
                 }
@@ -994,6 +995,7 @@ RAM_FUNC void interruptRoutine()
 #else
             if (getCompOutputLevel() == rising) {
 #endif
+                HWCI_PERF_CONFIRM_REJECT();
                 return;
             }
         }

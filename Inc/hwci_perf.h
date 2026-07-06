@@ -40,8 +40,10 @@
 /* ASCII "HWC1" in little-endian memory order - lets the host locate/validate
  * the struct either by ELF symbol or by scanning RAM for the magic. */
 #define HWCI_PERF_MAGIC   0x31435748u
-/* v2: appended the zero-cross jitter block (zc_*) after host_cmd. */
-#define HWCI_PERF_VERSION 2u
+/* v2: appended the zero-cross jitter block (zc_*) after host_cmd.
+ * v3: appended zc_confirm_reject after the v2 jitter block (host_cmd stays
+ *     frozen at offset 60). */
+#define HWCI_PERF_VERSION 3u
 
 /* Commands the host may write to hwci_perf.host_cmd (cleared by firmware). */
 #define HWCI_CMD_NONE          0u
@@ -104,7 +106,14 @@ typedef struct hwci_perf_s {
     uint32_t zc_interval_sum;          /* off 72 : sum raw interval, ticks  */
     uint16_t zc_jitter_max;            /* off 76 : worst single deviation   */
     uint16_t _pad2;                    /* off 78 : keep sizeof 4-aligned    */
-} hwci_perf_t;                         /* total size: 80 bytes              */
+
+    /* --- v3: zero-cross confirm rejections (fed by HWCI_PERF_CONFIRM_REJECT)
+     * Monotonic like the v2 sums: the host differences consecutive
+     * snapshots, so delta(reject)/delta(zc_count) over a window is the
+     * rejected-edges-per-accepted-commutation ratio - the live monitor for
+     * the F051 glitch-tolerant confirm loop's reject mechanism. */
+    uint32_t zc_confirm_reject;        /* off 80 : confirm-loop early-outs  */
+} hwci_perf_t;                         /* total size: 84 bytes              */
 
 extern volatile hwci_perf_t hwci_perf;
 
@@ -192,6 +201,14 @@ void hwci_perf_reset_stats(void);
     } while (0)
 
 /*
+ * Zero-cross confirm rejection counter. Fires on the confirm loop's
+ * early-out reject (an edge whose window failed confirmation and was handed
+ * back to the comparator). Runs in the comparator ISR, but only on the
+ * reject path - a single volatile u32 increment, off the hot accept path.
+ */
+#define HWCI_PERF_CONFIRM_REJECT() do { hwci_perf.zc_confirm_reject++; } while (0)
+
+/*
  * Background-loop instrumentation. Call once at the top of the main while(1).
  *
  * Every iteration: measures iteration time and counts iterations (the host
@@ -252,10 +269,11 @@ void hwci_perf_reset_stats(void);
 
 #else /* !HWCI_PERF - all hooks vanish, no struct, no code */
 
-#define HWCI_PERF_CTRL_ENTER() do {} while (0)
-#define HWCI_PERF_CTRL_EXIT()  do {} while (0)
-#define HWCI_PERF_ZC()         do {} while (0)
-#define HWCI_PERF_MAIN_LOOP()  do {} while (0)
+#define HWCI_PERF_CTRL_ENTER()     do {} while (0)
+#define HWCI_PERF_CTRL_EXIT()      do {} while (0)
+#define HWCI_PERF_ZC()             do {} while (0)
+#define HWCI_PERF_MAIN_LOOP()      do {} while (0)
+#define HWCI_PERF_CONFIRM_REJECT() do {} while (0)
 
 #endif /* HWCI_PERF */
 

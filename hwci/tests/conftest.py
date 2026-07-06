@@ -51,6 +51,33 @@ int main(void){ return (int)hwci_perf.size; }
 """
 
 
+# Frozen copy of the v2 struct (zero-cross jitter block, pre v3 confirm-reject
+# counter), so the host keeps decoding v2 firmware: an A/B bench session
+# flashes vintages with exactly this layout.
+_PROBE_V2_C = """\
+#include <stdint.h>
+typedef struct hwci_perf_s {
+    uint32_t magic; uint16_t version; uint16_t size;
+    uint16_t ctrl_exec_us_last; uint16_t ctrl_exec_us_max;
+    uint16_t ctrl_period_us_last; uint16_t ctrl_period_us_max;
+    uint16_t ctrl_period_us_min;
+    uint16_t main_loop_us_last; uint16_t main_loop_us_max;
+    uint16_t input; uint16_t duty_cycle; uint16_t e_rpm;
+    uint16_t voltage_cv; int16_t current_ca; int16_t temperature_c;
+    uint8_t bemf_timeout_state; uint8_t armed; uint8_t running;
+    uint8_t _pad0; uint16_t _pad1;
+    uint32_t loop_iters; uint32_t zero_cross_count;
+    uint32_t commutation_interval; uint32_t commutation_interval_max;
+    uint32_t update_count; volatile uint32_t host_cmd;
+    uint32_t zc_count; uint32_t zc_jitter_sum; uint32_t zc_interval_sum;
+    uint16_t zc_jitter_max; uint16_t _pad2;
+} hwci_perf_t;
+volatile hwci_perf_t hwci_perf = {
+  .magic = 0x31435748u, .version = 2, .size = (uint16_t)sizeof(hwci_perf_t) };
+int main(void){ return (int)hwci_perf.size; }
+"""
+
+
 def _compile_probe(tmp_path_factory, name: str, source: str,
                    include_dir=None) -> str:
     pytest.importorskip("elftools")
@@ -78,3 +105,8 @@ def host_perf_elf(tmp_path_factory):
 @pytest.fixture(scope="session")
 def host_perf_elf_v1(tmp_path_factory):
     return _compile_probe(tmp_path_factory, "perf_elf_v1", _PROBE_V1_C)
+
+
+@pytest.fixture(scope="session")
+def host_perf_elf_v2(tmp_path_factory):
+    return _compile_probe(tmp_path_factory, "perf_elf_v2", _PROBE_V2_C)

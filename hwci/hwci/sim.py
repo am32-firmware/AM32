@@ -67,6 +67,8 @@ class RigSimulator:
         self.zc_jitter_sum = 0
         self.zc_interval_sum = 0
         self.zc_jitter_max = 0
+        # confirm-loop rejection counter (perf struct v3)
+        self.zc_confirm_reject = 0
 
     # --- model -------------------------------------------------------
     def _rpm_max(self) -> float:
@@ -115,6 +117,12 @@ class RigSimulator:
             self.zc_jitter_sum = (self.zc_jitter_sum + dev * n_comm) & 0xFFFFFFFF
             self.zc_interval_sum = (self.zc_interval_sum + interval * n_comm) & 0xFFFFFFFF
             self.zc_jitter_max = min(max(self.zc_jitter_max, dev), 0xFFFF)
+            # confirm rejects: rare in clean running, balloon during a desync.
+            # Stochastic rounding: the per-tick expectation (~0.8 rejects) is
+            # below 1, so a plain int() would truncate every tick to zero.
+            reject_frac = 0.2 if self.desync_remaining > 0 else 0.01
+            n_rej = int(n_comm * reject_frac + self._rng.random())
+            self.zc_confirm_reject = (self.zc_confirm_reject + n_rej) & 0xFFFFFFFF
         # idle loop iterations: ~120 kHz when idle, dropping with motor load
         idle_hz = 120000.0 * (1.0 - 0.25 * throttle)
         self.loop_iters += int(idle_hz * dt)
@@ -228,4 +236,5 @@ class RigSimulator:
             "zc_jitter_sum": self.zc_jitter_sum,
             "zc_interval_sum": self.zc_interval_sum,
             "zc_jitter_max": self.zc_jitter_max,
+            "zc_confirm_reject": self.zc_confirm_reject,
         })

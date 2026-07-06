@@ -51,8 +51,13 @@ class PerfReader:
                           "relying on the canonical layout in hwci/hwci/perf.py")
             return
         # Pick the canonical layout matching the firmware's vintage by probing
-        # for a v2-only member, then verify every field of THAT layout.
-        fields = perf.FIELDS if "zc_count" in members else perf.FIELDS_V1
+        # for version-marker members, then verify every field of THAT layout.
+        if "zc_confirm_reject" in members:
+            fields = perf.FIELDS_V3
+        elif "zc_count" in members:
+            fields = perf.FIELDS_V2
+        else:
+            fields = perf.FIELDS_V1
         off = 0
         import struct as _struct
         for name, code in fields:

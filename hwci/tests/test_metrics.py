@@ -268,3 +268,40 @@ def test_compute_summary_carries_start_outcomes():
     m2 = metricsmod.compute(RunResult(rows=_rows(20)), _profile())
     assert m2["summary"]["start_attempts"] is None
     assert m2["summary"]["start_failures"] is None
+
+
+def test_spoolup_intervals_after_step_are_not_spikes():
+    # First hardware run of demag_step_stress: a 10->90 snap spools from low
+    # RPM where commutation intervals are honestly several times the
+    # high-RPM-dominated median - flagged 2 false demag events with zero
+    # corroborating signals. Long intervals within the settle window after a
+    # commanded step-up must not count as spikes.
+    n = 200  # 2 s at 100 Hz
+    throttle = [0.1] * 50 + [0.9] * 150          # snap at i=50
+    comm = [500.0] * 50 + [400.0] * 30 + [100.0] * 120  # long during spool
+    rows = []
+    for i in range(n):
+        rows.append({"t": i * 0.01, "segment": "step", "throttle_cmd": throttle[i],
+                     "perf_commutation_interval": comm[i]})
+    d = metricsmod.detect_demag(
+        RunResult(rows=rows),
+        Profile(name="synthetic", sample_rate_hz=100.0,
+                segments=[Segment(label="step", throttle=0.9, duration_s=2.0)]))
+    assert d["comm_spike_samples"] == 0
+    assert d["event_count"] == 0
+
+
+def test_steady_state_comm_spike_still_detected():
+    # The step-up suppression must not blind the detector to a real spike
+    # long after the last throttle increase.
+    n = 400
+    comm = [100.0] * n
+    for i in range(300, 310):
+        comm[i] = 900.0  # 9x median, 2.5 s after the only step-up
+    rows = []
+    for i in range(n):
+        rows.append({"t": i * 0.01, "segment": "hold", "throttle_cmd": 0.9,
+                     "perf_commutation_interval": comm[i]})
+    d = metricsmod.detect_demag(RunResult(rows=rows), _profile())
+    assert d["comm_spike_samples"] >= 8
+    assert d["event_count"] >= 1

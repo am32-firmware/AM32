@@ -324,6 +324,28 @@ def detect_demag(run: RunResult, profile: Profile) -> dict:
     median_comm = float(np.median(comm_running)) if comm_running.size else float("nan")
     spike_thr = median_comm * profile.demag_commutation_spike if median_comm == median_comm else np.inf
 
+    # A commutation interval is only a meaningful "spike" when the motor is
+    # NOT legitimately slow. After a commanded upward throttle step the motor
+    # spools from low RPM, where intervals are honestly several times the
+    # run-median (which high-RPM samples dominate) - the first hardware run
+    # of demag_step_stress flagged 2 events from exactly this, with zero bemf
+    # timeouts / RPM drops / eRPM mismatch corroborating (10->90 snap, sync
+    # held throughout). Suppress the spike check while commanded throttle
+    # rose within the last second; real desyncs during a step-up still trip
+    # the firmware bemf-timeout flag and the eRPM-vs-stand-RPM mismatch,
+    # which stay active here.
+    dt = float(np.nanmedian(np.diff(_col(rows, "t")))) if len(rows) > 1 else 0.01
+    settle = max(1, int(round(1.0 / dt))) if dt > 0 else 100
+    since_step_up = settle  # treat run start as settled
+    stepped_up = np.zeros(len(rows), dtype=bool)
+    for i in range(len(rows)):
+        if i > 0 and throttle[i] == throttle[i] and throttle[i - 1] == throttle[i - 1] \
+                and throttle[i] > throttle[i - 1] + 1e-6:
+            since_step_up = 0
+        else:
+            since_step_up += 1
+        stepped_up[i] = since_step_up < settle
+
     # per-sample anomaly flag
     flag = np.zeros(len(rows), dtype=bool)
     bemf_samples = 0
@@ -337,7 +359,7 @@ def detect_demag(run: RunResult, profile: Profile) -> dict:
         if bemf[i] >= 1:
             bemf_samples += 1
             anom = True
-        if comm[i] == comm[i] and comm[i] > spike_thr:
+        if comm[i] == comm[i] and comm[i] > spike_thr and not stepped_up[i]:
             spike_samples += 1
             anom = True
         flag[i] = anom

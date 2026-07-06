@@ -153,6 +153,10 @@ class StageSpec:
     repeats: int = 1
     profile: str | None = None                  # None -> tune probe
     constraint_only: bool = False
+    # "grid" tests every listed value; "climb" hill-climbs the sorted value
+    # list from the incumbent (valid for unimodal responses like advance or
+    # pwm frequency - typically halves the trial count of a wide grid).
+    search: str = "grid"
 
 
 @dataclass
@@ -237,6 +241,14 @@ def tune_spec_from_dict(data: dict) -> TuneSpec:
             raise TuneSpecError(
                 f"tune spec: stage {s.name!r} needs exactly one of "
                 "'sweep' or 'ab_candidates'")
+        if s.search not in ("grid", "climb"):
+            raise TuneSpecError(
+                f"tune spec: stage {s.name!r} search {s.search!r} is not "
+                "'grid' or 'climb'")
+        if s.search == "climb" and (not s.sweep or s.constraint_only):
+            raise TuneSpecError(
+                f"tune spec: stage {s.name!r}: 'climb' only applies to "
+                "scored sweep stages")
         if s.sweep and s.sweep not in params:
             raise TuneSpecError(
                 f"tune spec: stage {s.name!r} sweeps unknown parameter "
@@ -1079,11 +1091,20 @@ class Tuner:
                 param.name, param.offset)
             if inc_val not in values:
                 values.append(inc_val)
-            for order, v in enumerate(values):
+
+            def test_value(v: int) -> dict:
                 ent = [candidate(self._merged(stage, {param.name: v}), r)
                        for r in range(stage.repeats)]
-                cands.append({"overrides": self._merged(stage, {param.name: v}),
-                              "value": v, "entries": ent, "order": order})
+                c = {"overrides": self._merged(stage, {param.name: v}),
+                     "value": v, "entries": ent, "order": len(cands)}
+                cands.append(c)
+                return c
+
+            if stage.search == "climb":
+                self._climb(sorted(values), inc_val, test_value)
+            else:
+                for v in values:
+                    test_value(v)
             if param.refine_step:
                 # Refine around the raw ARGMAX (not the tie-break winner: the
                 # tie set spans the whole noise floor and would wander).
@@ -1127,6 +1148,44 @@ class Tuner:
         self._save()
         self.log(f"stage {stage.name}: winner "
                  f"{None if winner is None else winner['overrides']}")
+
+    @staticmethod
+    def _climb(ordered: list[int], start_val: int,
+               test_value: Callable[[int], dict]) -> None:
+        """Hill-climb a sorted value list from the value nearest ``start_val``.
+
+        Valid for unimodal responses (advance, pwm frequency): walk in the
+        first improving direction and stop at the first non-improvement -
+        for a wide grid this typically tests 3-4 values instead of all of
+        them. Raw single-value scores are compared (same basis the grid
+        sweep's refine step uses); a disqualified value reads as worse than
+        any qualified one, so the climb walks away from constraint
+        violations instead of stopping on them.
+        """
+        def raw(c: dict) -> Optional[float]:
+            if any(e.get("disqualified") for e in c["entries"]):
+                return None
+            vals = [e["score_raw"] for e in c["entries"]
+                    if e.get("score_raw") is not None]
+            return statistics.median(vals) if vals else None
+
+        def better(a: dict, b: dict) -> bool:
+            ra, rb = raw(a), raw(b)
+            return rb is not None and (ra is None or rb > ra)
+
+        i = min(range(len(ordered)), key=lambda k: abs(ordered[k] - start_val))
+        cur = test_value(ordered[i])
+        moved = False
+        for direction in (1, -1):
+            j = i + direction
+            while 0 <= j < len(ordered):
+                nxt = test_value(ordered[j])
+                if not better(cur, nxt):
+                    break
+                cur, moved = nxt, True
+                j += direction
+            if moved:
+                break   # went uphill one way; the other side is downhill
 
     def _run_constraint_stage(self, stage: StageSpec) -> None:
         """Constraint-only sweep (e.g. max_ramp on a step profile): values are

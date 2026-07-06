@@ -5,8 +5,9 @@ import yaml
 
 from hwci.model import RunResult
 from hwci.sim import MotorParams
-from hwci.tuner import (SimTuneBackend, Tuner, objective_score, startup_stats,
-                        startup_profile, tune_spec_from_dict)
+from hwci.tuner import (SimTuneBackend, Tuner, TuneSpecError,
+                        objective_score, startup_stats, startup_profile,
+                        tune_spec_from_dict)
 
 
 def small_spec(**extra) -> dict:
@@ -349,3 +350,58 @@ def test_device_left_on_winner_when_confirmed(tmp_path):
     assert result["confirmed"]
     assert backend.read_page() == \
         (tmp_path / "tune" / "best_settings.bin").read_bytes()
+
+
+# --------------------------------------------------------------------------
+# hill-climb sweep (search: climb)
+# --------------------------------------------------------------------------
+def climb_spec(**extra):
+    d = small_spec(stages=[
+        {"name": "advance", "sweep": "advance_level", "search": "climb",
+         "fixed": {}},
+    ])
+    d.update(extra)
+    return d
+
+
+def test_climb_finds_injected_optimum(tmp_path):
+    backend = make_backend(advance_optimum=33.0)
+    _, result = run_tune(tmp_path, climb_spec(), backend)
+    # grid every 4 + refine step 2: within one refine step of the optimum
+    assert abs(result["winner_overrides"]["advance_level"] - 33) <= 2
+
+
+def test_climb_tests_fewer_values_than_grid(tmp_path):
+    import json
+    backend = make_backend(advance_optimum=33.0)
+    run_tune(tmp_path, climb_spec(), backend)
+    m = json.loads((tmp_path / "tune" / "manifest.json").read_text())
+    swept = {e["overrides"].get("advance_level")
+             for e in m["trials"]
+             if e["stage"] == "advance" and e["kind"] == "trial"}
+    # 7-value grid (+2 refine): the climb from the default (26) toward 33
+    # must never visit the far low end
+    assert 14 not in swept and 18 not in swept
+    assert len(swept) < 7
+
+
+def test_climb_walks_downhill_direction_too(tmp_path):
+    # optimum BELOW the default: first (upward) direction fails immediately,
+    # the climb must then walk down and still find it
+    backend = make_backend(advance_optimum=17.0)
+    _, result = run_tune(tmp_path, climb_spec(), backend)
+    assert abs(result["winner_overrides"]["advance_level"] - 17) <= 3
+
+
+def test_climb_rejected_for_ab_and_constraint_stages():
+    with pytest.raises(TuneSpecError, match="climb"):
+        tune_spec_from_dict(small_spec(stages=[
+            {"name": "m", "ab_candidates": [{}, {"variable_pwm": 1}],
+             "search": "climb"}]))
+    with pytest.raises(TuneSpecError, match="climb"):
+        tune_spec_from_dict(small_spec(stages=[
+            {"name": "r", "sweep": "max_ramp", "constraint_only": True,
+             "search": "climb"}]))
+    with pytest.raises(TuneSpecError, match="search"):
+        tune_spec_from_dict(small_spec(stages=[
+            {"name": "a", "sweep": "advance_level", "search": "bogus"}]))

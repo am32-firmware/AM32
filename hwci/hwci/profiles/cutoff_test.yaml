@@ -1,0 +1,27 @@
+name: cutoff_test
+description: >
+  One-off undervoltage-cutoff live test (PR #27 / upstream #386). Requires the
+  ESC EEPROM set to absolute cutoff mode with the threshold BETWEEN the pack's
+  resting voltage and its loaded sag at t90 (firmware needs ~10 s of sustained
+  undervoltage before latching - any bounce above threshold resets the count).
+  Expected: motor cuts ~10-11 s into the t90cut hold, and t30dead stays dead
+  (firmware forces input=0/armed=0 every ADC cycle once latched). Recovery is
+  an SWD reset. Restore the real threshold afterwards.
+sample_rate_hz: 100
+arm_settle_s: 2.0
+steady_tail_fraction: 0.5
+
+safety:
+  max_current_a: 40.0
+  max_thrust_n: 16.0
+  max_rpm: 32000
+
+segments:
+  - {label: idle,    throttle: 0.00, duration_s: 2.0}
+  - {label: spinup,  throttle: 0.50, duration_s: 3.0, ramp: true}
+  # ramp (not snap) into the high hold: a 0.5->0.9 step on a fresh pack drew
+  # a 40 A transient that tripped the harness current safety
+  - {label: rampup,  throttle: 0.90, duration_s: 3.0, ramp: true}
+  - {label: t90cut,  throttle: 0.90, duration_s: 16.0}
+  - {label: t30dead, throttle: 0.30, duration_s: 5.0}
+  - {label: rampdn,  throttle: 0.00, duration_s: 2.0, ramp: true}

@@ -317,8 +317,10 @@ def cmd_tune(args) -> int:
         return 3
     finally:
         backend.close()
-    print(f"report: {out / 'report.md'}\n"
-          f"best settings: {out / 'best_settings.bin'} "
+    pdf = out / "tune_report.pdf"
+    print(f"report: {out / 'report.md'}"
+          + (f"\nPDF report: {pdf}" if pdf.exists() else "")
+          + f"\nbest settings: {out / 'best_settings.bin'} "
           f"({'winner' if result['confirmed'] else 'default kept'})")
     return 0
 

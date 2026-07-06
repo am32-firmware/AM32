@@ -233,7 +233,10 @@ median paired delta and zero constraint failures — otherwise
 rewritten after every trial), `spec.yaml`, `base_settings.bin`, one standard
 run dir per trial under `trials/T007-advance_level_22/` (plus its
 `settings.bin` + `trial.json`), and at the end `report.md`,
-`best_settings.bin`, `settings_diff.md`. `--resume` replays the
+`best_settings.bin`, `settings_diff.md`, and — when the `plot` extra
+(matplotlib) is installed — a `tune_report.pdf` (verdict, settings diff,
+per-trial objective + ABBA-delta plots, and the full stage/trial tables).
+`--resume` replays the
 deterministic plan: completed trials are reused from disk, partial trial
 dirs are quarantined as `*.incomplete` and redone, and the incumbent page is
 re-programmed first (a crash may have left arbitrary trial settings

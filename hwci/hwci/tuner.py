@@ -50,6 +50,7 @@ import numpy as np
 import yaml
 
 from . import metrics as metricsmod
+from . import report as reportmod
 from .config import (PROFILES_DIR, Profile, RigConfig, load_profile,
                      profile_from_dict, profile_to_dict)
 from .debugger.base import MockDebugger
@@ -1230,6 +1231,11 @@ class Tuner:
         best.to_bin(self.out / "best_settings.bin")
         (self.out / "settings_diff.md").write_text(self._diff_md(best))
         (self.out / "report.md").write_text(self._report_md(result))
+        pdf = reportmod.write_tune_pdf(
+            self.out, self.manifest, result, self.base.diff(best),
+            log=self.log)
+        if pdf is not None:
+            self.log(f"PDF report: {pdf}")
         self.log(f"winner {result['winner_overrides'] or '{}'} "
                  f"{'CONFIRMED' if result['confirmed'] else 'NOT confirmed'} "
                  f"(median paired delta: {result['median_paired_delta']})")

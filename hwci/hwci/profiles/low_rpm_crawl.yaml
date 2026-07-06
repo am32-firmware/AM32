@@ -1,0 +1,27 @@
+name: low_rpm_crawl
+description: >
+  Weak-BEMF crawl: spin up at 10% then step DOWN through 8/6/4/3% holds.
+  Descending order avoids testing cold starts at throttles below reliable
+  spin-up (startup_reliability covers starts). On the ARK 4IN1 bench these
+  points hold the zero-cross filter in its ZC_FILTER_MAX tier and the
+  map-tier boundary (commutation interval > 500 ticks below ~5.7k RPM),
+  the region steady sweeps and the beat-band probes never exercise. Watch
+  zc_jitter_pct per point and demag/bemf counters; a stall shows up as
+  perf_running dropping and an eRPM/stand-RPM mismatch.
+sample_rate_hz: 100
+arm_settle_s: 2.0
+steady_tail_fraction: 0.5
+
+safety:
+  max_current_a: 15.0
+  max_thrust_n: 6.0
+  max_rpm: 15000
+
+segments:
+  - {label: idle,   throttle: 0.00, duration_s: 2.0}
+  - {label: spinup, throttle: 0.10, duration_s: 4.0, ramp: true}
+  - {label: t8,     throttle: 0.08, duration_s: 6.0, steady: true}
+  - {label: t6,     throttle: 0.06, duration_s: 6.0, steady: true}
+  - {label: t4,     throttle: 0.04, duration_s: 6.0, steady: true}
+  - {label: t3,     throttle: 0.03, duration_s: 6.0, steady: true}
+  - {label: rampdn, throttle: 0.00, duration_s: 3.0, ramp: true}

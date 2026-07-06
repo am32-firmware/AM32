@@ -199,3 +199,109 @@ def test_zc_jitter_none_when_no_commutations_accumulate():
     )
     m = metricsmod.compute(RunResult(rows=rows), _profile())
     assert m["steady_points"][0]["zc_jitter_pct"] is None
+
+
+def _startup_profile(n=3):
+    segs = [Segment(label="idle", throttle=0.0, duration_s=0.5)]
+    for i in range(1, n + 1):
+        segs.append(Segment(label=f"start{i}", throttle=0.08, duration_s=1.0))
+        segs.append(Segment(label=f"off{i}", throttle=0.0, duration_s=0.5))
+    return Profile(name="synthetic-start", sample_rate_hz=100.0, segments=segs)
+
+
+def _startup_rows(outcomes, ticks_per_start=100, ticks_per_off=50, run_delay=20):
+    """Rows for idle + N start/off cycles; outcomes[i] says attempt i starts."""
+    rows, t = [], 0.0
+    def add(label, n, running, erpm):
+        nonlocal t
+        for j in range(n):
+            rows.append({"t": t, "segment": label, "throttle_cmd": 0.08,
+                         "perf_running": running(j), "perf_e_rpm": erpm(j)})
+            t += 0.01
+    add("idle", 50, lambda j: 0, lambda j: 0)
+    for i, ok in enumerate(outcomes, start=1):
+        if ok:
+            add(f"start{i}", ticks_per_start,
+                lambda j: 1 if j >= run_delay else 0,
+                lambda j: 21000 if j >= run_delay else 0)
+        else:
+            add(f"start{i}", ticks_per_start, lambda j: 0, lambda j: 0)
+        add(f"off{i}", ticks_per_off, lambda j: 0, lambda j: 0)
+    return rows
+
+
+def test_startup_stats_counts_failures_and_times():
+    prof = _startup_profile(3)
+    rows = _startup_rows([True, False, True], run_delay=20)
+    st = metricsmod.startup_stats(RunResult(rows=rows), prof)
+    assert st["attempts"] == 3
+    assert st["failures"] == 1
+    assert st["time_to_run_ms_max"] == 200.0  # 20 ticks at 100 Hz
+    fails = [a for a in st["per_attempt"] if not a["success"]]
+    assert [a["segment"] for a in fails] == ["start2"]
+
+
+def test_startup_requires_running_and_erpm_together():
+    # A stale running flag with no eRPM (or vice versa) is not a start.
+    prof = _startup_profile(1)
+    rows = _startup_rows([True])
+    for r in rows:
+        if r["segment"] == "start1":
+            r["perf_e_rpm"] = 0  # running asserted but motor not turning
+    st = metricsmod.startup_stats(RunResult(rows=rows), prof)
+    assert st["failures"] == 1
+
+
+def test_startup_stats_zero_for_profiles_without_start_segments():
+    st = metricsmod.startup_stats(
+        RunResult(rows=_rows(20, perf_running=lambda i: 1)), _profile())
+    assert st["attempts"] == 0 and st["failures"] == 0
+
+
+def test_compute_summary_carries_start_outcomes():
+    prof = _startup_profile(2)
+    rows = _startup_rows([True, False])
+    m = metricsmod.compute(RunResult(rows=rows), prof)
+    assert m["summary"]["start_attempts"] == 2
+    assert m["summary"]["start_failures"] == 1
+    # profiles without start segments report None, not 0-failures-implied-pass
+    m2 = metricsmod.compute(RunResult(rows=_rows(20)), _profile())
+    assert m2["summary"]["start_attempts"] is None
+    assert m2["summary"]["start_failures"] is None
+
+
+def test_spoolup_intervals_after_step_are_not_spikes():
+    # First hardware run of demag_step_stress: a 10->90 snap spools from low
+    # RPM where commutation intervals are honestly several times the
+    # high-RPM-dominated median - flagged 2 false demag events with zero
+    # corroborating signals. Long intervals within the settle window after a
+    # commanded step-up must not count as spikes.
+    n = 200  # 2 s at 100 Hz
+    throttle = [0.1] * 50 + [0.9] * 150          # snap at i=50
+    comm = [500.0] * 50 + [400.0] * 30 + [100.0] * 120  # long during spool
+    rows = []
+    for i in range(n):
+        rows.append({"t": i * 0.01, "segment": "step", "throttle_cmd": throttle[i],
+                     "perf_commutation_interval": comm[i]})
+    d = metricsmod.detect_demag(
+        RunResult(rows=rows),
+        Profile(name="synthetic", sample_rate_hz=100.0,
+                segments=[Segment(label="step", throttle=0.9, duration_s=2.0)]))
+    assert d["comm_spike_samples"] == 0
+    assert d["event_count"] == 0
+
+
+def test_steady_state_comm_spike_still_detected():
+    # The step-up suppression must not blind the detector to a real spike
+    # long after the last throttle increase.
+    n = 400
+    comm = [100.0] * n
+    for i in range(300, 310):
+        comm[i] = 900.0  # 9x median, 2.5 s after the only step-up
+    rows = []
+    for i in range(n):
+        rows.append({"t": i * 0.01, "segment": "hold", "throttle_cmd": 0.9,
+                     "perf_commutation_interval": comm[i]})
+    d = metricsmod.detect_demag(RunResult(rows=rows), _profile())
+    assert d["comm_spike_samples"] >= 8
+    assert d["event_count"] >= 1

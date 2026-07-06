@@ -211,6 +211,7 @@ def compute(run: RunResult, profile: Profile) -> dict:
         })
 
     demag = detect_demag(run, profile)
+    starts = startup_stats(run, profile)
 
     summary = {
         "max_thrust_gf": _safe_max(thrust_gf),
@@ -243,6 +244,10 @@ def compute(run: RunResult, profile: Profile) -> dict:
              if p.get("zc_jitter_max_pct") is not None), default=None),
         "demag_events": demag["event_count"],
         "bemf_timeout_samples": demag["bemf_timeout_samples"],
+        # start-attempt outcomes; None/0 unless the profile has start* segments
+        "start_attempts": starts["attempts"] or None,
+        "start_failures": starts["failures"] if starts["attempts"] else None,
+        "start_time_to_run_ms_max": starts["time_to_run_ms_max"],
         "max_motor_temp_c": _safe_maxf(motor_temp),
         "max_fet_temp_c": _safe_maxf(fet_temp),
         # Channel liveness: how many samples each instrumentation channel
@@ -253,7 +258,54 @@ def compute(run: RunResult, profile: Profile) -> dict:
         "stand_sample_count": int(np.count_nonzero(~np.isnan(thrust_gf))),
         "telem_sample_count": int(np.count_nonzero(~np.isnan(esc_erpm))),
     }
-    return {"summary": summary, "steady_points": steady_points, "demag": demag}
+    return {"summary": summary, "steady_points": steady_points, "demag": demag,
+            "startup": starts}
+
+
+def startup_stats(run: RunResult, profile: Profile) -> dict:
+    """Start-attempt outcomes for profiles with ``start*``-labeled segments.
+
+    A start attempt succeeds when the firmware asserts ``perf_running`` AND
+    reports live eRPM within its segment (both together, so a stale running
+    flag from a previous cycle can't count). Failures are the metric that a
+    zero-cross filter change would move first: startup is open-loop drive
+    with the weakest BEMF, and none of the steady-state sweep gates see it.
+
+    Returns zeroed counts (not an error) for profiles without start segments,
+    so compute() can call it unconditionally.
+    """
+    rows = run.rows
+    seg = np.array([r.get("segment") for r in rows], dtype=object)
+    running = _col(rows, "perf_running")
+    erpm = _col(rows, "perf_e_rpm")
+    t = _col(rows, "t")
+
+    attempts = []
+    for s in profile.segments:
+        if not s.label.startswith("start"):
+            continue
+        idx = np.where(seg == s.label)[0]
+        if idx.size == 0:
+            continue
+        ok = idx[(running[idx] == 1) & (erpm[idx] >= 1000)]
+        if ok.size:
+            attempts.append({
+                "segment": s.label, "success": True,
+                "time_to_run_ms": round((t[ok[0]] - t[idx[0]]) * 1000.0, 1),
+            })
+        else:
+            attempts.append({
+                "segment": s.label, "success": False, "time_to_run_ms": None,
+            })
+
+    times = [a["time_to_run_ms"] for a in attempts if a["success"]]
+    return {
+        "attempts": len(attempts),
+        "failures": sum(1 for a in attempts if not a["success"]),
+        "time_to_run_ms_max": max(times) if times else None,
+        "time_to_run_ms_mean": round(sum(times) / len(times), 1) if times else None,
+        "per_attempt": attempts,
+    }
 
 
 def detect_demag(run: RunResult, profile: Profile) -> dict:
@@ -272,6 +324,28 @@ def detect_demag(run: RunResult, profile: Profile) -> dict:
     median_comm = float(np.median(comm_running)) if comm_running.size else float("nan")
     spike_thr = median_comm * profile.demag_commutation_spike if median_comm == median_comm else np.inf
 
+    # A commutation interval is only a meaningful "spike" when the motor is
+    # NOT legitimately slow. After a commanded upward throttle step the motor
+    # spools from low RPM, where intervals are honestly several times the
+    # run-median (which high-RPM samples dominate) - the first hardware run
+    # of demag_step_stress flagged 2 events from exactly this, with zero bemf
+    # timeouts / RPM drops / eRPM mismatch corroborating (10->90 snap, sync
+    # held throughout). Suppress the spike check while commanded throttle
+    # rose within the last second; real desyncs during a step-up still trip
+    # the firmware bemf-timeout flag and the eRPM-vs-stand-RPM mismatch,
+    # which stay active here.
+    dt = float(np.nanmedian(np.diff(_col(rows, "t")))) if len(rows) > 1 else 0.01
+    settle = max(1, int(round(1.0 / dt))) if dt > 0 else 100
+    since_step_up = settle  # treat run start as settled
+    stepped_up = np.zeros(len(rows), dtype=bool)
+    for i in range(len(rows)):
+        if i > 0 and throttle[i] == throttle[i] and throttle[i - 1] == throttle[i - 1] \
+                and throttle[i] > throttle[i - 1] + 1e-6:
+            since_step_up = 0
+        else:
+            since_step_up += 1
+        stepped_up[i] = since_step_up < settle
+
     # per-sample anomaly flag
     flag = np.zeros(len(rows), dtype=bool)
     bemf_samples = 0
@@ -285,7 +359,7 @@ def detect_demag(run: RunResult, profile: Profile) -> dict:
         if bemf[i] >= 1:
             bemf_samples += 1
             anom = True
-        if comm[i] == comm[i] and comm[i] > spike_thr:
+        if comm[i] == comm[i] and comm[i] > spike_thr and not stepped_up[i]:
             spike_samples += 1
             anom = True
         flag[i] = anom

@@ -50,6 +50,17 @@ def render_markdown(metrics: dict, comparison: dict | None = None,
             out.append("| " + " | ".join(_fmt(p.get(c)) for c in cols) + " |")
         out.append("")
 
+    st = metrics.get("startup", {})
+    if st.get("attempts"):
+        out.append("## Start attempts\n")
+        out.append(f"- attempts: {st['attempts']}, **failures: {st['failures']}**")
+        out.append(f"- time to running: mean {_fmt(st.get('time_to_run_ms_mean'))} ms, "
+                   f"max {_fmt(st.get('time_to_run_ms_max'))} ms")
+        fails = [a["segment"] for a in st.get("per_attempt", []) if not a["success"]]
+        if fails:
+            out.append(f"- failed segments: {', '.join(fails)}")
+        out.append("")
+
     d = metrics.get("demag", {})
     out.append("## Demag / desync\n")
     out.append(f"- events: **{d.get('event_count', 0)}**")

@@ -1,0 +1,40 @@
+name: startup_reliability
+description: >
+  Repeated cold starts at low throttle: ten arm->spin->stop cycles. Startup is
+  the open-loop-to-closed-loop handoff where BEMF is weakest and the
+  zero-cross filter runs at its ZC_FILTER_MAX tier, so this is the profile
+  that exercises the risk side of zero-cross filter changes (e.g. the F051
+  glitch-tolerant confirm) which steady sweeps never touch. Host-side metrics
+  count failed starts (perf_running never asserted during a start segment)
+  and time-to-run per attempt; see startup_stats in hwci/metrics.py.
+sample_rate_hz: 100
+arm_settle_s: 2.0
+steady_tail_fraction: 0.5
+
+safety:
+  max_current_a: 20.0
+  max_thrust_n: 8.0
+  max_rpm: 20000
+
+segments:
+  - {label: idle,    throttle: 0.00, duration_s: 2.0}
+  - {label: start1,  throttle: 0.08, duration_s: 3.0}
+  - {label: off1,    throttle: 0.00, duration_s: 2.5}
+  - {label: start2,  throttle: 0.08, duration_s: 3.0}
+  - {label: off2,    throttle: 0.00, duration_s: 2.5}
+  - {label: start3,  throttle: 0.08, duration_s: 3.0}
+  - {label: off3,    throttle: 0.00, duration_s: 2.5}
+  - {label: start4,  throttle: 0.08, duration_s: 3.0}
+  - {label: off4,    throttle: 0.00, duration_s: 2.5}
+  - {label: start5,  throttle: 0.08, duration_s: 3.0}
+  - {label: off5,    throttle: 0.00, duration_s: 2.5}
+  - {label: start6,  throttle: 0.08, duration_s: 3.0}
+  - {label: off6,    throttle: 0.00, duration_s: 2.5}
+  - {label: start7,  throttle: 0.08, duration_s: 3.0}
+  - {label: off7,    throttle: 0.00, duration_s: 2.5}
+  - {label: start8,  throttle: 0.08, duration_s: 3.0}
+  - {label: off8,    throttle: 0.00, duration_s: 2.5}
+  - {label: start9,  throttle: 0.08, duration_s: 3.0}
+  - {label: off9,    throttle: 0.00, duration_s: 2.5}
+  - {label: start10, throttle: 0.08, duration_s: 3.0}
+  - {label: off10,   throttle: 0.00, duration_s: 2.5}

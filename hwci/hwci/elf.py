@@ -101,19 +101,89 @@ def struct_layout(elf_path: str, type_name: str) -> list[Member]:
         f"struct {type_name!r} not found in DWARF of {elf_path}")
 
 
+def union_layout(elf_path: str, type_name: str) -> list[Member]:
+    """Read the flattened member layout of ``union <type_name>`` from DWARF.
+
+    Unlike :func:`struct_layout` this RECURSES into struct-typed members:
+    AM32's ``EEprom_u`` wraps all named settings in an anonymous first struct
+    member (and nests ``version``/``servo``/``limits``/``can`` sub-structs),
+    so a plain child walk would only see the anonymous member and ``buffer``.
+    Nested named structs contribute dotted names (``version.major``); the
+    anonymous wrapper contributes no prefix. Returns members in offset order.
+    """
+    _require_elftools()
+    with open(elf_path, "rb") as fh:
+        elf = ELFFile(fh)
+        if not elf.has_dwarf_info():
+            raise ElfError(f"{elf_path}: no DWARF info")
+        dwarf = elf.get_dwarf_info()
+        for cu in dwarf.iter_CUs():
+            for die in cu.iter_DIEs():
+                if die.tag != "DW_TAG_union_type":
+                    continue
+                name_attr = die.attributes.get("DW_AT_name")
+                if name_attr is None:
+                    continue
+                if name_attr.value.decode("utf-8", "replace") != type_name:
+                    continue
+                members = _flatten_members(die, cu, base=0, prefix="")
+                members.sort(key=lambda m: m.offset)
+                return members
+    raise StructNotFoundError(
+        f"union {type_name!r} not found in DWARF of {elf_path}")
+
+
+def _member_offset(member_die) -> int:
+    offset = member_die.attributes.get("DW_AT_data_member_location")
+    offset_val = offset.value if offset is not None else 0
+    if isinstance(offset_val, list):  # location expression form
+        # DW_OP_plus_uconst <n> => [0x23, n]
+        offset_val = offset_val[1] if len(offset_val) > 1 else 0
+    return offset_val
+
+
+def _strip_typedefs(die, cu):
+    """Walk through typedef/const/volatile DIEs to the underlying type."""
+    while die is not None and die.tag in (
+            "DW_TAG_typedef", "DW_TAG_const_type", "DW_TAG_volatile_type"):
+        nxt = die.attributes.get("DW_AT_type")
+        if nxt is None:
+            return None
+        die = cu.get_DIE_from_refaddr(nxt.value + cu.cu_offset)
+    return die
+
+
+def _flatten_members(agg_die, cu, base: int, prefix: str) -> list[Member]:
+    members: list[Member] = []
+    for child in agg_die.iter_children():
+        if child.tag != "DW_TAG_member":
+            continue
+        name_attr = child.attributes.get("DW_AT_name")
+        name = (name_attr.value.decode("utf-8", "replace")
+                if name_attr is not None else None)
+        offset = base + _member_offset(child)
+        type_ref = child.attributes.get("DW_AT_type")
+        tdie = (_strip_typedefs(
+                    cu.get_DIE_from_refaddr(type_ref.value + cu.cu_offset), cu)
+                if type_ref is not None else None)
+        if tdie is not None and tdie.tag == "DW_TAG_structure_type":
+            sub_prefix = f"{prefix}{name}." if name else prefix
+            members += _flatten_members(tdie, cu, offset, sub_prefix)
+            continue
+        size, signed = _base_type(child, cu)
+        members.append(Member(name=prefix + (name or f"anon@{offset}"),
+                              offset=offset, size=size, signed=signed))
+    return members
+
+
 def _members_of(struct_die, cu) -> list[Member]:
     members: list[Member] = []
     for child in struct_die.iter_children():
         if child.tag != "DW_TAG_member":
             continue
         name = child.attributes["DW_AT_name"].value.decode("utf-8", "replace")
-        offset = child.attributes.get("DW_AT_data_member_location")
-        offset_val = offset.value if offset is not None else 0
-        if isinstance(offset_val, list):  # location expression form
-            # DW_OP_plus_uconst <n> => [0x23, n]
-            offset_val = offset_val[1] if len(offset_val) > 1 else 0
         size, signed = _base_type(child, cu)
-        members.append(Member(name=name, offset=offset_val,
+        members.append(Member(name=name, offset=_member_offset(child),
                               size=size, signed=signed))
     members.sort(key=lambda m: m.offset)
     return members

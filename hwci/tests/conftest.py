@@ -123,3 +123,36 @@ _PROBE_V3_C = _PROBE_V2_C.replace(
 @pytest.fixture(scope="session")
 def host_perf_elf_v3(tmp_path_factory):
     return _compile_probe(tmp_path_factory, "perf_elf_v3", _PROBE_V3_C)
+
+
+# EEprom settings probe: compiles the REAL Inc/eeprom.h on the host so the
+# DWARF union-walk cross-check in hwci.settings is tested against the actual
+# firmware layout. eeprom.h starts with `#include "main.h"` (an MCU-specific
+# header), so the header is copied next to a stub main.h that only provides
+# <stdint.h> - all EEprom_t needs. Members are uint8_t, so host and Cortex-M0
+# layouts are identical.
+_PROBE_EEPROM_C = """\
+#include "eeprom.h"
+EEprom_t eepromBuffer;
+void read_flash_bin(uint8_t* data, uint32_t add, int out_buff_len) {(void)data;(void)add;(void)out_buff_len;}
+void save_flash_nolib(uint8_t* data, int length, uint32_t add) {(void)data;(void)length;(void)add;}
+int main(void){ return (int)sizeof(EEprom_t); }
+"""
+
+
+@pytest.fixture(scope="session")
+def host_eeprom_elf(tmp_path_factory):
+    if not (HEADER_DIR / "eeprom.h").exists():
+        pytest.skip("Inc/eeprom.h not found")
+    pytest.importorskip("elftools")
+    if _CC is None:
+        pytest.skip("no host C compiler available")
+    d = tmp_path_factory.mktemp("eeprom_elf")
+    (d / "main.h").write_text("#include <stdint.h>\n")
+    (d / "eeprom.h").write_text((HEADER_DIR / "eeprom.h").read_text())
+    src = d / "probe.c"
+    src.write_text(_PROBE_EEPROM_C)
+    out = d / "probe.elf"
+    subprocess.run([_CC, "-g", "-O0", f"-I{d}", str(src), "-o", str(out)],
+                   check=True, capture_output=True)
+    return str(out)

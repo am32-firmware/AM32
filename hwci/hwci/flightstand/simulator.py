@@ -8,10 +8,12 @@ and perf-struct sources so all three channels stay consistent (see
 from __future__ import annotations
 
 import time
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 
-from ..sim import MotorParams, RigSimulator
 from .base import SafetyLimits, StandSafetyTripped, StandSample, ThrustStand
+
+if TYPE_CHECKING:  # runtime import is lazy: hwci.sim itself imports
+    from ..sim import MotorParams, RigSimulator   # this package (StandSample)
 
 __all__ = ["SimulatedStand", "StandSafetyTripped"]
 
@@ -19,12 +21,16 @@ __all__ = ["SimulatedStand", "StandSafetyTripped"]
 class SimulatedStand(ThrustStand):
     def __init__(
         self,
-        rig: RigSimulator | None = None,
+        rig: "RigSimulator | None" = None,
         *,
         clock: Callable[[], float] = time.monotonic,
         fixed_dt: float | None = None,
-        params: MotorParams | None = None,
+        params: "MotorParams | None" = None,
     ):
+        # Imported here, not at module top: hwci.sim imports this package for
+        # StandSample, so a top-level import is a cycle that makes
+        # `import hwci.sim` fail whenever it happens to run first.
+        from ..sim import MotorParams, RigSimulator
         self.rig = rig or RigSimulator(params=params or MotorParams())
         self._clock = clock
         self._fixed_dt = fixed_dt

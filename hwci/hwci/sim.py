@@ -20,6 +20,30 @@ from dataclasses import dataclass, field
 from . import perf
 from .esc_telem.kiss import encode_frame
 from .flightstand.base import StandSample
+from .settings import Settings
+
+
+@dataclass(frozen=True)
+class SimSettings:
+    """The AM32 settings the simulator responds to, decoded from the SAME
+    192-byte blob :mod:`hwci.settings` writes to hardware - one decoder for
+    both paths, so a tuner bug in blob encoding shows up offline too."""
+    advance_level: int = 26
+    pwm_frequency: int = 24
+    variable_pwm: int = 1
+    auto_advance: int = 0
+    startup_power: int = 100
+    max_ramp: int = 160
+
+    @classmethod
+    def from_blob(cls, blob: bytes) -> "SimSettings":
+        s = Settings(blob)
+        return cls(advance_level=s.get("advance_level"),
+                   pwm_frequency=s.get("pwm_frequency"),
+                   variable_pwm=s.get("variable_pwm"),
+                   auto_advance=s.get("auto_advance"),
+                   startup_power=s.get("startup_power"),
+                   max_ramp=s.get("max_ramp"))
 
 
 @dataclass
@@ -40,6 +64,25 @@ class MotorParams:
     demag_step_threshold: float = 0.35   # throttle jump that can desync
     demag_current_a: float = 18.0        # current above which a jump desyncs
     desync_ticks: int = 8
+    # --- settings response (active only when RigSimulator.settings is set) --
+    # Phenomenological, tuner-testable shapes: efficiency has an interior
+    # maximum in timing advance (gaussian) and in log2 PWM frequency; the
+    # optima are injectable so tests can move the "truth" and check the tuner
+    # finds it.
+    advance_optimum: float = 26.0        # eeprom advance_level units (10..42)
+    advance_sigma: float = 8.0
+    advance_eff_depth: float = 0.10      # efficiency lost far from optimum
+    auto_advance_equiv: float = 18.0     # auto_advance scores as this advance
+    pwm_optimum_khz: float = 24.0
+    pwm_sigma_log2: float = 1.0
+    pwm_eff_depth: float = 0.05
+    variable_pwm_low_bonus: float = 0.015   # small efficiency bonus...
+    variable_pwm_low_throttle: float = 0.45  # ...below this throttle
+    variable_pwm_jitter_mult: float = 1.4    # ...at a small ZC-jitter cost
+    # start attempts fail with probability (fail_ref - startup_power)/scale
+    # (clipped to [0, 0.9]): 50 -> 0.5, 100 -> ~0.12, 150 -> 0.
+    startup_fail_ref: float = 115.0
+    startup_fail_scale: float = 130.0
 
 
 @dataclass
@@ -47,9 +90,13 @@ class RigSimulator:
     params: MotorParams = field(default_factory=MotorParams)
     seed: int = 1234
     noise: float = 0.01  # fractional measurement noise
+    # AM32 settings under test; None = legacy behaviour (no settings model),
+    # which stays bit-identical so settings-less runs are unaffected.
+    settings: SimSettings | None = None
 
     def __post_init__(self):
         self._rng = random.Random(self.seed)
+        self._start_blocked = False
         self.rpm = 0.0
         self.throttle = 0.0
         self._prev_cmd = 0.0
@@ -75,9 +122,43 @@ class RigSimulator:
         self._phase_rr = 0
 
     # --- model -------------------------------------------------------
+    def set_settings(self, settings: SimSettings | None) -> None:
+        """Install the AM32 settings under test (the sim's "reboot into new
+        settings"); also clears any blocked-start latch from the previous
+        trial, like the real MCU reset would."""
+        self.settings = settings
+        self._start_blocked = False
+
     def _rpm_max(self) -> float:
         p = self.params
         return p.kv * p.batt_voltage * p.throttle_rpm_fraction
+
+    def _settings_eff_factor(self) -> float:
+        """Efficiency multiplier (<= 1 + small bonus) from the settings model."""
+        s = self.settings
+        if s is None:
+            return 1.0
+        p = self.params
+        adv = p.auto_advance_equiv if s.auto_advance else float(s.advance_level)
+        g_adv = math.exp(-((adv - p.advance_optimum) ** 2)
+                         / (2.0 * p.advance_sigma ** 2))
+        g_pwm = math.exp(-(math.log2(max(s.pwm_frequency, 1) / p.pwm_optimum_khz) ** 2)
+                         / (2.0 * p.pwm_sigma_log2 ** 2))
+        factor = ((1.0 - p.advance_eff_depth * (1.0 - g_adv))
+                  * (1.0 - p.pwm_eff_depth * (1.0 - g_pwm)))
+        if s.variable_pwm and self.throttle < p.variable_pwm_low_throttle:
+            factor *= 1.0 + p.variable_pwm_low_bonus
+        return factor
+
+    def _demag_step_threshold(self) -> float:
+        """Effective throttle-jump threshold for a desync: a low max_ramp
+        slew-limits the duty step the firmware actually applies, so the jump
+        needed to shed sync scales up as max_ramp comes down (deterministic
+        realization of "low max_ramp reduces desync probability")."""
+        p = self.params
+        if self.settings is None or self.settings.max_ramp <= 0:
+            return p.demag_step_threshold
+        return p.demag_step_threshold * (160.0 / self.settings.max_ramp)
 
     def step(self, dt: float, throttle: float) -> None:
         p = self.params
@@ -87,9 +168,28 @@ class RigSimulator:
         # Detect a demag/desync trigger: a big, fast throttle increase into a
         # high-current regime on a demag-prone motor.
         target_rpm = throttle * self._rpm_max()
+
+        # Startup reliability model (settings runs only): each stopped->spin
+        # transition is a start attempt that fails with a probability set by
+        # startup_power; a failed start leaves the rotor twitching at ~zero
+        # RPM until the throttle is dropped and a new attempt begins.
+        if self.settings is not None:
+            if self._start_blocked:
+                if throttle <= 0.02:
+                    self._start_blocked = False
+                target_rpm = 0.0
+            elif (throttle > 0.02 and self._prev_cmd <= 0.02
+                    and self.rpm < 200.0):
+                p_fail = max(0.0, min(0.9, (p.startup_fail_ref
+                                            - self.settings.startup_power)
+                                     / p.startup_fail_scale))
+                if self._rng.random() < p_fail:
+                    self._start_blocked = True
+                    target_rpm = 0.0
+
         provisional_current = self._current_for_rpm(target_rpm, p.batt_voltage)
         if (p.demag_prone and self.desync_remaining == 0
-                and cmd_jump > p.demag_step_threshold
+                and cmd_jump > self._demag_step_threshold()
                 and provisional_current > p.demag_current_a):
             self.desync_remaining = p.desync_ticks
             self.desync_count += 1
@@ -116,7 +216,16 @@ class RigSimulator:
         if n_comm > 0 and self.zero_cross_count >= 100:
             interval = int((1.0 / (erev_per_s * 6.0)) / 0.5e-6)
             frac = 0.05 if self.desync_remaining > 0 else 0.005
-            dev = max(1, int(interval * frac * self._rng.uniform(0.3, 1.7)))
+            if self.settings is not None and self.settings.variable_pwm:
+                frac *= p.variable_pwm_jitter_mult
+            # Stochastic rounding: the true deviation is often sub-tick
+            # (0.5% of a ~150-tick interval), and plain int()+floor-at-1
+            # quantizes every configuration to the same "1 tick" - hiding
+            # e.g. variable_pwm's jitter penalty from the accumulated mean.
+            raw_dev = interval * frac * self._rng.uniform(0.3, 1.7)
+            dev = int(raw_dev)
+            if self._rng.random() < (raw_dev - dev):
+                dev += 1
             self.zc_count = (self.zc_count + n_comm) & 0xFFFFFFFF
             self.zc_jitter_sum = (self.zc_jitter_sum + dev * n_comm) & 0xFFFFFFFF
             self.zc_interval_sum = (self.zc_interval_sum + interval * n_comm) & 0xFFFFFFFF
@@ -153,7 +262,8 @@ class RigSimulator:
         torque = p.cq * rpm * rpm
         omega = rpm * 2.0 * math.pi / 60.0
         mech = torque * omega
-        elec = mech / p.motor_efficiency + p.idle_power_w
+        elec = mech / (p.motor_efficiency * self._settings_eff_factor()) \
+            + p.idle_power_w
         return elec / max(v, 1.0)
 
     # --- derived measurements ---------------------------------------

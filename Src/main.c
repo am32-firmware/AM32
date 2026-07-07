@@ -2166,7 +2166,7 @@ if(zero_crosses < 5){
                 }
             }
             if (eepromBuffer.low_voltage_cut_off == 2 ){   // absolute cut off
-              if (battery_voltage <  eepromBuffer.absolute_voltage_cutoff) {
+              if (battery_voltage <  (eepromBuffer.absolute_voltage_cutoff * 50)) {
                 low_voltage_count++;    
                 } else {
                   if(!LOW_VOLTAGE_CUTOFF){

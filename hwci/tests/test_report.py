@@ -1,4 +1,5 @@
 """Auto-tune PDF report rendering (report.write_tune_pdf)."""
+import json
 import sys
 
 import pytest
@@ -69,6 +70,33 @@ def test_write_tune_pdf_paginates_many_trials(tmp_path):
                "discarded": False} for i in range(60)]
     p = report.write_tune_pdf(tmp_path, _manifest(trials=trials), _result(), [])
     assert _is_pdf(p)
+
+
+def test_render_tune_raw_markdown_includes_trial_metrics(tmp_path):
+    trial_dir = tmp_path / "trials" / "T000-baseline"
+    trial_dir.mkdir(parents=True)
+    (trial_dir / "metrics.json").write_text(json.dumps({
+        "summary": {"max_current_a": 12.3, "n_samples": 42},
+        "demag": {"event_count": 1},
+        "startup": {"attempts": 2, "failures": 0},
+        "steady_points": [{"segment": "s50", "rpm": 1000.0,
+                           "eff_gf_per_w": 4.2}],
+    }))
+    manifest = _manifest(trials=[{
+        "index": 0, "stage": "baseline", "kind": "baseline",
+        "profile": "probe", "overrides": {}, "score_raw": 4.2,
+        "score_norm": 4.2, "disqualified": None, "discarded": False,
+        "dir": "trials/T000-baseline",
+    }])
+
+    md = report.render_tune_raw_markdown(tmp_path, manifest)
+
+    assert "## Run summary raw data" in md
+    assert "max_current_a" in md
+    assert "demag.event_count" in md
+    assert "startup.attempts" in md
+    assert "## Steady-point raw data" in md
+    assert "eff_gf_per_w" in md
 
 
 def test_write_tune_pdf_skips_gracefully_without_matplotlib(tmp_path, monkeypatch):

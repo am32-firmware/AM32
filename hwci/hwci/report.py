@@ -1,6 +1,7 @@
 """Render run metrics + regression comparison to Markdown (and optional plots)."""
 from __future__ import annotations
 
+import json
 import textwrap
 from pathlib import Path
 
@@ -104,7 +105,8 @@ def write_report(run_dir: str | Path, metrics: dict,
 # Auto-tune PDF report
 # --------------------------------------------------------------------------
 def write_tune_pdf(out_dir: str | Path, manifest: dict, result: dict,
-                   diff_rows: list | None = None, *,
+                   diff_rows: list | None = None,
+                   settings_rows: list | None = None, *,
                    log=None) -> Path | None:
     """Render one auto-tune session to a multi-page PDF (``tune_report.pdf``).
 
@@ -114,6 +116,7 @@ def write_tune_pdf(out_dir: str | Path, manifest: dict, result: dict,
     report is written by the caller regardless).
 
     ``diff_rows`` is the ``Settings.diff`` output ``[(name, default, best)]``.
+    ``settings_rows`` is the full default/best tunable setting table.
     """
     def _log(msg: str) -> None:
         if log is not None:
@@ -135,8 +138,10 @@ def write_tune_pdf(out_dir: str | Path, manifest: dict, result: dict,
     try:
         with PdfPages(pdf_path) as pdf:
             _pdf_cover_page(plt, pdf, manifest, result, diff_rows or [])
+            _pdf_settings_pages(plt, pdf, settings_rows or [])
             _pdf_progress_page(plt, pdf, manifest, result)
             _pdf_tables_pages(plt, pdf, manifest)
+            _pdf_raw_data_pages(plt, pdf, out_dir, manifest)
     except Exception as e:
         _log(f"PDF report failed to render: {e}")
         try:
@@ -355,6 +360,24 @@ def _pdf_progress_page(plt, pdf, manifest: dict, result: dict):
     plt.close(fig)
 
 
+def _pdf_settings_pages(plt, pdf, settings_rows: list) -> None:
+    if not settings_rows:
+        return
+    rows = [[_fmt(r.get("setting")), _fmt(r.get("offset")),
+             _fmt(r.get("default")), _fmt(r.get("best")),
+             "yes" if r.get("changed") else ""]
+            for r in settings_rows]
+    for i, chunk in enumerate(_paginate_rows(rows, 34)):
+        fig = plt.figure(figsize=_PAGE_LS)
+        title = "Full settings" if i == 0 else f"Full settings (cont. {i + 1})"
+        fig.text(0.04, 0.94, title, fontsize=18, fontweight="bold", va="top")
+        _place_table(fig.add_axes([0.04, 0.05, 0.92, 0.80]), chunk,
+                     ["setting", "offset", "default", "best", "changed"],
+                     [0.42, 0.10, 0.16, 0.16, 0.12], line_h=0.026)
+        pdf.savefig(fig)
+        plt.close(fig)
+
+
 def _fmt_ov(ov) -> str:
     """Compact one-line overrides: {'a': 1, 'b': 2} -> 'a=1, b=2'."""
     if not ov:
@@ -367,6 +390,142 @@ def _fmt_ov(ov) -> str:
 _TRIAL_COLS = ["#", "stage", "kind", "overrides", "raw g/W", "norm g/W",
                "disqualified"]
 _TRIAL_WIDTHS = [0.04, 0.09, 0.11, 0.40, 0.075, 0.075, 0.21]
+
+
+def _fmt_raw(v) -> str:
+    if isinstance(v, (dict, list)):
+        return json.dumps(v, sort_keys=True)
+    return _fmt(v)
+
+
+def _md_cell(v) -> str:
+    return _fmt_raw(v).replace("|", "\\|").replace("\n", "<br>")
+
+
+def _load_trial_metrics(out_dir: str | Path,
+                        manifest: dict) -> list[tuple[dict, dict]]:
+    out = []
+    root = Path(out_dir)
+    for e in manifest.get("trials", []):
+        path = root / e.get("dir", "") / "metrics.json"
+        try:
+            metrics = json.loads(path.read_text())
+        except Exception as exc:
+            metrics = {"_load_error": f"{path}: {exc}"}
+        out.append((e, metrics))
+    return out
+
+
+def _paginate_rows(rows: list[list[str]],
+                   line_budget: int) -> list[list[list[str]]]:
+    pages: list[list[list[str]]] = [[]]
+    lines = 0
+    for row in rows:
+        n = max(cell.count("\n") + 1 for cell in row)
+        if pages[-1] and lines + n > line_budget:
+            pages.append([])
+            lines = 0
+        pages[-1].append(row)
+        lines += n
+    return pages
+
+
+def _iter_run_metrics(metrics: dict):
+    for name, value in metrics.get("summary", {}).items():
+        yield name, value
+    for section in ("demag", "startup"):
+        block = metrics.get(section)
+        if not isinstance(block, dict):
+            continue
+        for name, value in block.items():
+            yield f"{section}.{name}", value
+
+
+def render_tune_raw_markdown(out_dir: str | Path, manifest: dict) -> str:
+    """Long-form high-level raw metrics from every tune trial."""
+    data = _load_trial_metrics(out_dir, manifest)
+    out: list[str] = []
+    out.append("## Run summary raw data\n")
+    out.append("| # | stage | kind | profile | metric | value |")
+    out.append("|---|---|---|---|---|---|")
+    for e, metrics in data:
+        if metrics.get("_load_error"):
+            out.append(f"| {e.get('index')} | {_md_cell(e.get('stage'))} | "
+                       f"{_md_cell(e.get('kind'))} | {_md_cell(e.get('profile'))} | "
+                       f"metrics.json | {_md_cell(metrics['_load_error'])} |")
+            continue
+        for name, value in _iter_run_metrics(metrics):
+            out.append(f"| {e.get('index')} | {_md_cell(e.get('stage'))} | "
+                       f"{_md_cell(e.get('kind'))} | {_md_cell(e.get('profile'))} | "
+                       f"{_md_cell(name)} | {_md_cell(value)} |")
+    out.append("")
+
+    out.append("## Steady-point raw data\n")
+    out.append("| # | stage | kind | profile | segment | metric | value |")
+    out.append("|---|---|---|---|---|---|---|")
+    for e, metrics in data:
+        if metrics.get("_load_error"):
+            continue
+        for point in metrics.get("steady_points", []):
+            segment = point.get("segment")
+            for name, value in point.items():
+                if name == "segment":
+                    continue
+                out.append(f"| {e.get('index')} | {_md_cell(e.get('stage'))} | "
+                           f"{_md_cell(e.get('kind'))} | "
+                           f"{_md_cell(e.get('profile'))} | "
+                           f"{_md_cell(segment)} | {_md_cell(name)} | "
+                           f"{_md_cell(value)} |")
+    out.append("")
+    return "\n".join(out)
+
+
+def _pdf_metric_rows(out_dir: str | Path,
+                     manifest: dict) -> tuple[list[list[str]], list[list[str]]]:
+    summary_rows = []
+    steady_rows = []
+    for e, metrics in _load_trial_metrics(out_dir, manifest):
+        stage_kind = f"{e.get('stage')}/{e.get('kind')}"
+        if metrics.get("_load_error"):
+            summary_rows.append([_fmt(e.get("index")), _wrap(stage_kind, 22),
+                                 _fmt(e.get("profile")), "metrics.json",
+                                 _wrap(metrics["_load_error"], 70)])
+            continue
+        for name, value in _iter_run_metrics(metrics):
+            summary_rows.append([_fmt(e.get("index")), _wrap(stage_kind, 22),
+                                 _fmt(e.get("profile")), _wrap(name, 28),
+                                 _wrap(_fmt_raw(value), 60)])
+        for point in metrics.get("steady_points", []):
+            segment = point.get("segment")
+            for name, value in point.items():
+                if name == "segment":
+                    continue
+                steady_rows.append([_fmt(e.get("index")), _wrap(stage_kind, 20),
+                                    _wrap(_fmt(segment), 18), _wrap(name, 28),
+                                    _wrap(_fmt_raw(value), 56)])
+    return summary_rows, steady_rows
+
+
+def _pdf_raw_data_pages(plt, pdf, out_dir: str | Path, manifest: dict) -> None:
+    summary_rows, steady_rows = _pdf_metric_rows(out_dir, manifest)
+    for title, rows, cols, widths in (
+            ("Run summary raw data", summary_rows,
+             ["#", "stage/kind", "profile", "metric", "value"],
+             [0.05, 0.18, 0.12, 0.28, 0.37]),
+            ("Steady-point raw data", steady_rows,
+             ["#", "stage/kind", "segment", "metric", "value"],
+             [0.05, 0.18, 0.16, 0.28, 0.33])):
+        if not rows:
+            continue
+        for i, chunk in enumerate(_paginate_rows(rows, 30)):
+            fig = plt.figure(figsize=_PAGE_LS)
+            page_title = title if i == 0 else f"{title} (cont. {i + 1})"
+            fig.text(0.04, 0.94, page_title, fontsize=18,
+                     fontweight="bold", va="top")
+            _place_table(fig.add_axes([0.04, 0.05, 0.92, 0.80]), chunk,
+                         cols, widths, fontsize=7.2, line_h=0.026)
+            pdf.savefig(fig)
+            plt.close(fig)
 
 
 def _pdf_tables_pages(plt, pdf, manifest: dict):
@@ -383,17 +542,7 @@ def _pdf_tables_pages(plt, pdf, manifest: dict):
             _wrap(_fmt_ov(e.get("overrides")), 62), _fmt(e.get("score_raw")),
             _fmt(e.get("score_norm")), _wrap(dq, 38)])
 
-    pages: list[list[list[str]]] = [[]]
-    lines = 0
-    for row in trial_rows:
-        n = max(cell.count("\n") + 1 for cell in row)
-        if pages[-1] and lines + n > 30:
-            pages.append([])
-            lines = 0
-        pages[-1].append(row)
-        lines += n
-
-    for i, chunk in enumerate(pages):
+    for i, chunk in enumerate(_paginate_rows(trial_rows, 30)):
         fig = plt.figure(figsize=_PAGE_LS)
         title = "Trials" if i == 0 else f"Trials (cont. {i + 1})"
         fig.text(0.04, 0.94, title, fontsize=18, fontweight="bold", va="top")

@@ -1545,15 +1545,17 @@ class Tuner:
         result = self._run_finals()
         best = (self.base.apply(result["winner_overrides"], self._offsets)
                 if result["confirmed"] else self.base)
+        settings_rows = self._settings_rows(best)
         # Leave the DEVICE on the session's verdict too: the last finals
         # trial flashed the unconfirmed winner, which would silently stay
         # active while the report says "default kept".
         self.backend.program(best.to_bytes(), self.out / "best_settings.bin")
         (self.out / "settings_diff.md").write_text(self._diff_md(best))
-        (self.out / "report.md").write_text(self._report_md(result))
+        (self.out / "report.md").write_text(
+            self._report_md(result, settings_rows))
         pdf = reportmod.write_tune_pdf(
             self.out, self.manifest, result, self.base.diff(best),
-            log=self.log)
+            settings_rows=settings_rows, log=self.log)
         if pdf is not None:
             self.log(f"PDF report: {pdf}")
         self.log(f"winner {result['winner_overrides'] or '{}'} "
@@ -1573,7 +1575,28 @@ class Tuner:
         out.append("")
         return "\n".join(out)
 
-    def _report_md(self, result: dict) -> str:
+    def _settings_rows(self, best: Settings) -> list[dict]:
+        names = set(self.base.describe()) | set(best.describe()) \
+            | set(self.spec.parameters)
+
+        def field_offset(name: str) -> int:
+            return resolve_field(name, self._offsets.get(name)).offset
+
+        rows = []
+        for name in sorted(names, key=field_offset):
+            offset = self._offsets.get(name)
+            default = self.base.get(name, offset)
+            chosen = best.get(name, offset)
+            rows.append({
+                "setting": name,
+                "offset": field_offset(name),
+                "default": default,
+                "best": chosen,
+                "changed": default != chosen,
+            })
+        return rows
+
+    def _report_md(self, result: dict, settings_rows: list[dict]) -> str:
         m = self.manifest
         out = [f"# AM32 auto-tune report: {m['spec_name']}\n"]
         out.append(f"- **mode**: {m['mode']}")
@@ -1594,6 +1617,13 @@ class Tuner:
         if result.get("startup") is not None:
             st = result["startup"]
             out.append(f"- startup: {st['failed']}/{st['cycles']} failed")
+        out.append("\n## Full settings (default -> best)\n")
+        out.append("| setting | offset | default | best | changed |")
+        out.append("|---|---:|---:|---:|---|")
+        for row in settings_rows:
+            changed = "yes" if row["changed"] else ""
+            out.append(f"| `{row['setting']}` | {row['offset']} | "
+                       f"{row['default']} | {row['best']} | {changed} |")
         out.append("\n## Stages\n")
         out.append("| stage | winner | score (g/W, normalized) |")
         out.append("|---|---|---|")
@@ -1611,6 +1641,7 @@ class Tuner:
                        f"`{e['overrides']}` | {e['score_raw']} | "
                        f"{e['score_norm']} | {dq} |")
         out.append("")
+        out.append(reportmod.render_tune_raw_markdown(self.out, m))
         return "\n".join(out)
 
 

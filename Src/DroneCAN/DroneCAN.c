@@ -1249,8 +1249,11 @@ void DroneCAN_update()
         canstats.last_raw_command_us = 0;
         set_input(0);
     }
-    if (ts - last_heartbeat_us > TARGET_PERIOD_US) {
-        // ensure at least 1kHz signal is seen by main code
+    if (canstats.last_raw_command_us != 0 && ts - last_heartbeat_us > TARGET_PERIOD_US) {
+        /*
+          ensure at least 1kHz signal is seen by main code, but only
+          once we have received a RawCommand
+         */
         set_input(last_can_input);
         last_heartbeat_us = ts;
     }

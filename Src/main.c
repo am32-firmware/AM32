@@ -2162,6 +2162,16 @@ if(zero_crosses < 5){
             startADCConversion( );
             converted_degrees = getConvertedDegrees(ADC_raw_temp);
 #endif
+
+	#ifdef USE_LMT87
+				converted_degrees = getLMT87Degrees(ADC_raw_ntc);
+    #endif            
+#ifdef EPROPELLED_6S_G431_4in1
+	#ifdef USE_NTC
+				converted_degrees =  getNTCDegrees(ADC_raw_ntc);
+	#endif
+#endif
+
             degrees_celsius = converted_degrees;
 #ifdef NXP
             //MCXA has 16-bit ADC data

@@ -5,6 +5,7 @@
  *      Author: Alka
  */
  #include "ADC.h"
+#include "ntc_tables.h"
 
 
  #ifdef USE_ADC_1_2
@@ -226,6 +227,9 @@ void ADC_Init(void){
   LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_ADC12);
 
   LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
+#ifdef EPROPELLED_6S_G431_4in1
+  LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOF);
+#endif
   /**ADC2 GPIO Configuration
   PA6   ------> ADC2_IN3
   PA7   ------> ADC2_IN4
@@ -236,6 +240,9 @@ void ADC_Init(void){
   GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
   LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+#ifdef EPROPELLED_6S_G431_4in1
+  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+#endif
   
   GPIO_InitStruct.Pin = VOLTAGE_ADC_PIN;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
@@ -246,6 +253,9 @@ void ADC_Init(void){
   GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
   LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+#ifdef EPROPELLED_6S_G431_4in1
+  LL_GPIO_Init(GPIOF, &GPIO_InitStruct);
+#endif
 
 
   /*BEGIN ADC1 SETUP */
@@ -303,8 +313,14 @@ void ADC_Init(void){
   LL_ADC_SetCommonPathInternalCh(__LL_ADC_COMMON_INSTANCE(ADC1), LL_ADC_PATH_INTERNAL_TEMPSENSOR);
 
   LL_ADC_REG_SetSequencerRanks(ADC1, LL_ADC_REG_RANK_2, NTC_ADC_CHANNEL);
+#if defined(EPROPELLED_6S_G431_SINGLE) || defined(EPROPELLED_6S_G431_4in1)
+  LL_ADC_SetChannelSamplingTime(ADC1, NTC_ADC_CHANNEL, LL_ADC_SAMPLINGTIME_47CYCLES_5);
+  LL_ADC_SetChannelSingleDiff(ADC1, NTC_ADC_CHANNEL, LL_ADC_SINGLE_ENDED);
+#else
   LL_ADC_SetChannelSamplingTime(ADC1, VOLTAGE_ADC_CHANNEL, LL_ADC_SAMPLINGTIME_47CYCLES_5);
   LL_ADC_SetChannelSingleDiff(ADC1, VOLTAGE_ADC_CHANNEL, LL_ADC_SINGLE_ENDED);
+#endif
+
  
 
   /*ADC 2 setup */
@@ -341,6 +357,17 @@ void ADC_Init(void){
     wait_loop_index--;
   }
 
+  #if defined(EPROPELLED_6S_G431_SINGLE) || defined(EPROPELLED_6S_G431_4in1)
+
+  LL_ADC_REG_SetSequencerRanks(ADC2, LL_ADC_REG_RANK_1, VOLTAGE_ADC_CHANNEL);
+  LL_ADC_SetChannelSamplingTime(ADC2, VOLTAGE_ADC_CHANNEL, LL_ADC_SAMPLINGTIME_2CYCLES_5);
+  LL_ADC_SetChannelSingleDiff(ADC2, VOLTAGE_ADC_CHANNEL, LL_ADC_SINGLE_ENDED);
+
+  LL_ADC_REG_SetSequencerRanks(ADC2, LL_ADC_REG_RANK_2, CURRENT_ADC_CHANNEL);
+  LL_ADC_SetChannelSamplingTime(ADC2, CURRENT_ADC_CHANNEL, LL_ADC_SAMPLINGTIME_47CYCLES_5);
+  LL_ADC_SetChannelSingleDiff(ADC2, CURRENT_ADC_CHANNEL, LL_ADC_SINGLE_ENDED);
+
+  #else
   LL_ADC_REG_SetSequencerRanks(ADC2, LL_ADC_REG_RANK_1, LL_ADC_CHANNEL_3);
   LL_ADC_SetChannelSamplingTime(ADC2, LL_ADC_CHANNEL_3, LL_ADC_SAMPLINGTIME_2CYCLES_5);
   LL_ADC_SetChannelSingleDiff(ADC2, LL_ADC_CHANNEL_3, LL_ADC_SINGLE_ENDED);
@@ -348,6 +375,8 @@ void ADC_Init(void){
   LL_ADC_REG_SetSequencerRanks(ADC2, LL_ADC_REG_RANK_2, LL_ADC_CHANNEL_4);
   LL_ADC_SetChannelSamplingTime(ADC2, LL_ADC_CHANNEL_4, LL_ADC_SAMPLINGTIME_47CYCLES_5);
   LL_ADC_SetChannelSingleDiff(ADC2, LL_ADC_CHANNEL_4, LL_ADC_SINGLE_ENDED);
+  #endif
+
 }
 #else
 
@@ -463,5 +492,117 @@ void ADC_Init(void)
   LL_ADC_SetChannelSingleDiff(ADC1, CURRENT_ADC_CHANNEL, LL_ADC_SINGLE_ENDED);
 #endif  
    
+}
+#endif
+
+#ifdef USE_LMT87
+typedef struct {
+    int16_t temp_c;
+    uint16_t mv;
+} lmt87_entry_t;
+
+/*
+ * LMT87 approximate table.
+ * Generated from:
+ * Vtemp = 2230.8 - 13.582 * (T - 30) - 0.00433 * (T - 30)^2
+ *
+ * Table is sorted from cold to hot.
+ * Voltage decreases as temperature increases.
+ */
+static const lmt87_entry_t lmt87_table[] = {
+    {  0, 3290 },//Original value is -50 but saturated to 0 due to uint8 in serial telemetry 
+    {  0, 3160 },//Original value is -40
+    {  0, 3030 },//Original value is -30
+    {  0, 2899 },//Original value is -20
+    {  0, 2767 },//Original value is -10
+    {    0, 2634 },
+    {   10, 2501 },
+    {   20, 2366 },
+    {   30, 2231 },
+    {   40, 2095 },
+    {   50, 1957 },
+    {   60, 1819 },
+    {   70, 1681 },
+    {   80, 1541 },
+    {   90, 1400 },
+    {  100, 1259 },
+    {  110, 1117 },
+    {  120,  973 },
+    {  130,  829 },
+    {  140,  684 },
+    {  150,  539 },
+};
+#define LMT87_TABLE_SIZE   (sizeof(lmt87_table) / sizeof(lmt87_table[0]))
+#define ADC_VREF_MV        3300
+#define ADC_MAX_COUNT      4095
+
+int16_t getLMT87Degrees(uint16_t adc_raw)
+{
+    uint32_t vtemp_mv;
+    uint32_t i;
+
+    /*
+     * Convert 12-bit ADC raw value to millivolts.
+     * Example: 2614 -> about 2106 mV with 3.3V reference.
+     */
+    vtemp_mv = ((uint32_t)adc_raw * ADC_VREF_MV) / ADC_MAX_COUNT;
+
+    /*
+     * Clamp cold side.
+     * If voltage is higher than table maximum, sensor is colder than table range.
+     */
+    if (vtemp_mv >= lmt87_table[0].mv) {
+        return lmt87_table[0].temp_c;
+    }
+
+    /*
+     * Clamp hot side.
+     * If voltage is lower than table minimum, sensor is hotter than table range.
+     */
+    if (vtemp_mv <= lmt87_table[LMT87_TABLE_SIZE - 1].mv) {
+        return lmt87_table[LMT87_TABLE_SIZE - 1].temp_c;
+    }
+
+    /*
+     * Find the two table points around vtemp_mv.
+     * Table voltage decreases as temperature increases.
+     */
+    for (i = 0; i < (LMT87_TABLE_SIZE - 1); i++) {
+        uint16_t mv_high = lmt87_table[i].mv;
+        uint16_t mv_low  = lmt87_table[i + 1].mv;
+
+        if ((vtemp_mv <= mv_high) && (vtemp_mv >= mv_low)) {
+            int16_t temp_low_c  = lmt87_table[i].temp_c;
+            int16_t temp_high_c = lmt87_table[i + 1].temp_c;
+
+            /*
+             * Linear interpolation.
+             *
+             * Because voltage decreases with temperature:
+             *
+             * temp = temp_low_c +
+             *        ((mv_high - vtemp_mv) * temperature_step) /
+             *        (mv_high - mv_low)
+             */
+            return temp_low_c +
+                   (int16_t)(((uint32_t)(mv_high - vtemp_mv) *
+                              (uint32_t)(temp_high_c - temp_low_c)) /
+                              (uint32_t)(mv_high - mv_low));
+        }
+    }
+
+    /*
+     * Should not reach here because of clamp checks.
+     */
+    return lmt87_table[LMT87_TABLE_SIZE - 1].temp_c;
+}
+#endif
+
+#ifdef USE_NTC
+int16_t getNTCDegrees(uint16_t ntcrawtemp){
+  int p1,p2;
+  p1 = NTC_table[ (ntcrawtemp >> 6)  ];
+  p2 = NTC_table[ (ntcrawtemp >> 6)+1];
+  return p1 - ( (p1-p2) * (ntcrawtemp & 0x003F) ) / 64;
 }
 #endif

@@ -22,6 +22,10 @@ void Configure_ADC();
 
 void Activate_ADC();
 
+#ifdef USE_LMT87
+int16_t getLMT87Degrees(uint16_t adc_raw);
+#endif
+int16_t getNTCDegrees(uint16_t ntcrawtemp);
 #ifndef USE_TIMEOUT
 #define USE_TIMEOUT 0
 #endif

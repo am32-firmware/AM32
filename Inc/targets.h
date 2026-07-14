@@ -45,6 +45,9 @@
 // #define GD32SKYSTARS25
 // #define GD32SKYSTARS30
 // #define GD32SKYSTARS40
+// #define EPROPELLED_6S_G431_SINGLE
+// #define EPROPELLED_6S_G431_4in1
+
 #endif
 
 // used to hold a port/pin in a single 16 bit integer
@@ -54,6 +57,33 @@
 // #define USE_ADC_INPUT
 // #define USE_ALKAS_DEBUG_LED
 
+#ifdef EPROPELLED_6S_G431_SINGLE
+#define FIRMWARE_NAME "EPROPG4_40A"
+#define FILE_NAME "EPROPELLED_6S_G431_SINGLE"
+#define DEAD_TIME 120
+#define HARDWARE_GROUP_G4_E
+#define TARGET_STALL_PROTECTION_INTERVAL 20000
+#define USE_SERIAL_TELEMETRY
+#define USE_RGB_LED						// USE RGB instead
+#define CURRENT_OFFSET            1650
+#define MILLIVOLT_PER_AMP         -9      // Really it is 8.8; negative because current polarity is inverted on Single ESC
+#define TARGET_VOLTAGE_DIVIDER    107
+#define USE_LMT87
+#endif
+
+#ifdef EPROPELLED_6S_G431_4in1
+#define FIRMWARE_NAME "EPROPG4_40A"
+#define FILE_NAME "EPROPELLED_6S_G431_4in1"
+#define DEAD_TIME 120
+#define HARDWARE_GROUP_G4_F
+#define TARGET_STALL_PROTECTION_INTERVAL 20000
+#define USE_SERIAL_TELEMETRY
+#define USE_RGB_LED						// USE RGB instead
+#define CURRENT_OFFSET            1650
+#define MILLIVOLT_PER_AMP         13      // Really it is 13.2
+#define TARGET_VOLTAGE_DIVIDER    105
+#define USE_NTC
+#endif
 
 #ifdef LUMENIER_12S_F421
 #define FIRMWARE_NAME "Lumenier 12s"
@@ -4351,7 +4381,163 @@
 #define PHASE_A_EXTI_LINE LL_EXTI_LINE_22
 #define PHASE_A_COMP_NUMBER COMP2
 
+#endif
 
+#ifdef HARDWARE_GROUP_G4_E
+
+#define MCU_G431  //This is like a pointer to all setting of G431
+
+#define INPUT_PIN LL_GPIO_PIN_2
+#define INPUT_PIN_PORT GPIOA
+#define IC_TIMER_CHANNEL LL_TIM_CHANNEL_CH1
+#define IC_TIMER_REGISTER TIM15
+#define IC_TIMER_POINTER htim15
+
+#define USE_TIMER_15_CHANNEL_1	 //Set up for Dshot throttle
+#define INPUT_DMA_CHANNEL LL_DMA_CHANNEL_1
+#define DMA_HANDLE_TYPE_DEF hdma_tim15_ch1
+#define IC_DMA_IRQ_NAME DMA1_Channel1_IRQn
+
+#define PHASE_A_GPIO_LOW LL_GPIO_PIN_9 //INLA
+#define PHASE_A_GPIO_PORT_LOW GPIOB
+#define AF_A_LOW LL_GPIO_AF_12
+#define PHASE_A_GPIO_HIGH LL_GPIO_PIN_10 //INHA
+#define PHASE_A_GPIO_PORT_HIGH GPIOA
+
+#define PHASE_B_GPIO_LOW LL_GPIO_PIN_0 //INLB
+#define PHASE_B_GPIO_PORT_LOW GPIOB
+#define PHASE_B_GPIO_HIGH LL_GPIO_PIN_9 //INHB
+#define PHASE_B_GPIO_PORT_HIGH GPIOA
+
+#define PHASE_C_GPIO_LOW LL_GPIO_PIN_13	//INLC
+#define PHASE_C_GPIO_PORT_LOW GPIOC
+#define AF_C_LOW  LL_GPIO_AF_4
+#define PHASE_C_GPIO_HIGH LL_GPIO_PIN_8 //INHC
+#define PHASE_C_GPIO_PORT_HIGH GPIOA
+
+#define PHASE_A_COMP LL_COMP_INPUT_MINUS_IO2 // pa0
+#define PHASE_B_COMP LL_COMP_INPUT_MINUS_IO1 // pa4
+#define PHASE_C_COMP LL_COMP_INPUT_MINUS_IO1 // pa5
+
+#define PHASE_A_INPUT_PLUS  LL_COMP_INPUT_PLUS_IO1  //pa1
+#define PHASE_B_INPUT_PLUS  LL_COMP_INPUT_PLUS_IO1  //pa1
+#define PHASE_C_INPUT_PLUS  LL_COMP_INPUT_PLUS_IO2  //pa3
+
+#define PHASE_A_EXTI_LINE LL_EXTI_LINE_21
+#define PHASE_A_COMP_NUMBER COMP1
+
+#define PHASE_B_EXTI_LINE LL_EXTI_LINE_21
+#define PHASE_B_COMP_NUMBER COMP1
+
+#define PHASE_C_EXTI_LINE LL_EXTI_LINE_22
+#define PHASE_C_COMP_NUMBER COMP2
+
+/*ADC PIN DEFINITIONS*/
+#define VOLTAGE_ADC_PIN 				LL_GPIO_PIN_6		//VSENVM PA6
+#define VOLTAGE_ADC_CHANNEL 			LL_ADC_CHANNEL_3
+#define CURRENT_ADC_PIN 				LL_GPIO_PIN_7		//ISENA PA7
+#define CURRENT_ADC_CHANNEL 			LL_ADC_CHANNEL_4
+#define NTC_ADC_PIN 					LL_GPIO_PIN_1		//TEMPERATURE PB1
+#define NTC_ADC_CHANNEL 				LL_ADC_CHANNEL_12
+#define USE_ADC_1_2
+
+
+#define USE_8323RH_ENABLE
+#define WS2812_PIN 						LL_GPIO_PIN_3		//Not populated now
+#define RED_PORT    					GPIOB
+#define RED_PIN     					LL_GPIO_PIN_2
+#define GREEN_PORT  					GPIOB
+#define GREEN_PIN   					LL_GPIO_PIN_10
+#define BLUE_PORT   					GPIOB
+#define BLUE_PIN    					LL_GPIO_PIN_11
+
+/* Configure DRV8323RH  */
+#define NFAULT_PIN            LL_GPIO_PIN_4          
+#define NFAULT_PORT           GPIOB
+#define ENABLE_PIN            LL_GPIO_PIN_5          
+#define ENABLE_PORT           GPIOB
+
+//#define USE_HSE
+#undef HSE_VALUE
+#define HSE_VALUE 						16000000
+//#define USE_HSE_BYPASS 0
+#endif
+
+#ifdef HARDWARE_GROUP_G4_F
+
+#define MCU_G431  //This is like a pointer to all setting of G431
+
+#define INPUT_PIN LL_GPIO_PIN_4
+#define INPUT_PIN_PORT GPIOB
+#define IC_TIMER_CHANNEL LL_TIM_CHANNEL_CH1
+#define IC_TIMER_REGISTER TIM3
+#define IC_TIMER_POINTER htim3
+
+#define USE_TIMER_3_CHANNEL_1	 //Set up for Dshot throttle
+#define INPUT_DMA_CHANNEL LL_DMA_CHANNEL_1
+#define DMA_HANDLE_TYPE_DEF hdma_tim3_ch1
+#define IC_DMA_IRQ_NAME DMA1_Channel1_IRQn
+
+#define PHASE_A_GPIO_LOW LL_GPIO_PIN_0 //INLA
+#define PHASE_A_GPIO_PORT_LOW GPIOF
+#define AF_A_LOW LL_GPIO_AF_6
+#define PHASE_A_GPIO_HIGH LL_GPIO_PIN_10 //INHA
+#define PHASE_A_GPIO_PORT_HIGH GPIOA
+
+#define PHASE_B_GPIO_LOW LL_GPIO_PIN_0 //INLB
+#define PHASE_B_GPIO_PORT_LOW GPIOB
+#define PHASE_B_GPIO_HIGH LL_GPIO_PIN_9 //INHB
+#define PHASE_B_GPIO_PORT_HIGH GPIOA
+
+#define PHASE_C_GPIO_LOW LL_GPIO_PIN_7	//INLC
+#define PHASE_C_GPIO_PORT_LOW GPIOA
+#define AF_C_LOW  LL_GPIO_AF_6
+#define PHASE_C_GPIO_HIGH LL_GPIO_PIN_8 //INHC
+#define PHASE_C_GPIO_PORT_HIGH GPIOA
+
+#define PHASE_A_COMP LL_COMP_INPUT_MINUS_IO2 // pa0
+#define PHASE_B_COMP LL_COMP_INPUT_MINUS_IO1 // pa4
+#define PHASE_C_COMP LL_COMP_INPUT_MINUS_IO1 // pa5
+
+#define PHASE_A_INPUT_PLUS  LL_COMP_INPUT_PLUS_IO1  //pa1
+#define PHASE_B_INPUT_PLUS  LL_COMP_INPUT_PLUS_IO1  //pa1
+#define PHASE_C_INPUT_PLUS  LL_COMP_INPUT_PLUS_IO2  //pa3
+
+#define PHASE_A_EXTI_LINE LL_EXTI_LINE_21
+#define PHASE_A_COMP_NUMBER COMP1
+
+#define PHASE_B_EXTI_LINE LL_EXTI_LINE_21
+#define PHASE_B_COMP_NUMBER COMP1
+
+#define PHASE_C_EXTI_LINE LL_EXTI_LINE_22
+#define PHASE_C_COMP_NUMBER COMP2
+
+/*ADC PIN DEFINITIONS*/
+#define VOLTAGE_ADC_PIN 				LL_GPIO_PIN_6		//VSENVM PA6  ADC2_IN3,
+#define VOLTAGE_ADC_CHANNEL 			LL_ADC_CHANNEL_3
+#define CURRENT_ADC_PIN 				LL_GPIO_PIN_1		//ISENVM  PF1 ADC2_IN10
+#define CURRENT_ADC_CHANNEL 			LL_ADC_CHANNEL_10
+#define NTC_ADC_PIN 					LL_GPIO_PIN_2		//TEMPERATURE PA2  ADC1_IN3,
+#define NTC_ADC_CHANNEL 				LL_ADC_CHANNEL_3
+#define USE_ADC_1_2
+
+#define WS2812_PIN 						LL_GPIO_PIN_3		//Not populated now
+#define RED_PORT    					GPIOA
+#define RED_PIN     					LL_GPIO_PIN_15
+#define GREEN_PORT  					GPIOB
+#define GREEN_PIN   					LL_GPIO_PIN_3
+#define BLUE_PORT   					GPIOB
+#define BLUE_PIN    					LL_GPIO_PIN_5
+
+#define NFAULT_PIN            LL_GPIO_PIN_7
+#define NFAULT_PORT           GPIOB
+#define ENABLE_PIN            LL_GPIO_PIN_5          
+#define ENABLE_PORT           GPIOB
+
+//#define USE_HSE
+#undef HSE_VALUE
+#define HSE_VALUE 						16000000
+//#define USE_HSE_BYPASS 0
 #endif
 
 /************************************ G031 Hardware Groups

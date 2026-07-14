@@ -267,6 +267,9 @@ void MX_TIM1_Init(void)
     LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOF);
     LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
     LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOB);
+#ifdef EPROPELLED_6S_G431_SINGLE
+    LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOC);
+#endif
 
     /**TIM1 GPIO Configuration   */
     GPIO_InitStruct.Pin = PHASE_A_GPIO_LOW;
@@ -351,16 +354,29 @@ void MX_TIM2_Init(void)
     /**TIM3 GPIO Configuration
     PB4   ------> TIM3_CH1
     */
-    GPIO_InitStruct.Pin = LL_GPIO_PIN_4;
+	#ifdef EPROPELLED_6S_G431_4in1
+	    GPIO_InitStruct.Pin = INPUT_PIN;
+	#else
+	    GPIO_InitStruct.Pin = LL_GPIO_PIN_4;
+	#endif 
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
     GPIO_InitStruct.Alternate = LL_GPIO_AF_2;
-    LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    #ifdef EPROPELLED_6S_G431_4in1
+	LL_GPIO_Init(INPUT_PIN_PORT, &GPIO_InitStruct);
+	#else
+	LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+	#endif
 
-    LL_DMA_SetPeriphRequest(DMA1, LL_DMA_CHANNEL_1, LL_DMAMUX_REQ_TIM3_CH1);
-    LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_1, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
+    #ifdef EPROPELLED_6S_G431_4in1
+    	LL_DMA_SetPeriphRequest(DMA1, INPUT_DMA_CHANNEL, LL_DMAMUX_REQ_TIM3_CH1);
+    	LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_1, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
+	#else
+    	LL_DMA_SetPeriphRequest(DMA1, LL_DMA_CHANNEL_1, LL_DMAMUX_REQ_TIM3_CH1);
+    	LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_1, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
+	#endif
     LL_DMA_SetChannelPriorityLevel(DMA1, LL_DMA_CHANNEL_1, LL_DMA_PRIORITY_LOW);
     LL_DMA_SetMode(DMA1, LL_DMA_CHANNEL_1, LL_DMA_MODE_NORMAL);
     LL_DMA_SetPeriphIncMode(DMA1, LL_DMA_CHANNEL_1, LL_DMA_PERIPH_NOINCREMENT);
@@ -509,6 +525,84 @@ void resetInputCaptureTimer()
     IC_TIMER_REGISTER->PSC = 0;
     IC_TIMER_REGISTER->CNT = 0;
 }
+#ifdef USE_RGB_LED // has 3 color led
+void LED_GPIO_init(void)
+{
+    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+
+    /* GPIO Ports Clock Enable */
+    LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOB);
+	LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
+
+    LL_GPIO_ResetOutputPin(RED_PORT, RED_PIN);
+    LL_GPIO_ResetOutputPin(BLUE_PORT, BLUE_PIN);
+    LL_GPIO_ResetOutputPin(GREEN_PORT, GREEN_PIN);
+
+    GPIO_InitStruct.Pin = RED_PIN;
+    GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+    LL_GPIO_Init(RED_PORT, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = BLUE_PIN;
+    GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+    LL_GPIO_Init(BLUE_PORT, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = GREEN_PIN;
+    GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+    LL_GPIO_Init(GREEN_PORT, &GPIO_InitStruct);
+}
+void setIndividualRGBLed(uint8_t red, uint8_t green, uint8_t blue){
+
+    if(red){
+        RED_PORT->BRR = RED_PIN;
+    }else{
+        RED_PORT->BSRR = RED_PIN;
+    }
+    if(green){
+        GREEN_PORT->BRR = GREEN_PIN;
+    }else{
+        GREEN_PORT->BSRR = GREEN_PIN;
+    }
+        if(blue){
+    BLUE_PORT->BRR = BLUE_PIN;
+    }else{
+    BLUE_PORT->BSRR = BLUE_PIN;
+        }
+}
+#endif
+
+#ifdef USE_8323RH_NFAULT
+void initnFault()
+{
+    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+    GPIO_InitStruct.Pin = NFAULT_PIN;
+    GPIO_InitStruct.Mode = LL_GPIO_MODE_INPUT;
+    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_UP;
+    LL_GPIO_Init(NFAULT_PORT, &GPIO_InitStruct);
+}
+#endif
+
+#ifdef USE_8323RH_ENABLE // Disable gate driver when disarmed
+void initEnable()
+{
+    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+    GPIO_InitStruct.Pin = ENABLE_PIN;
+    GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+    LL_GPIO_Init(ENABLE_PORT, &GPIO_InitStruct);
+    ENABLE_PORT->BSRR = ENABLE_PIN;
+}
+#endif
 
 void enableCorePeripherals()
 {
@@ -538,6 +632,11 @@ void enableCorePeripherals()
     GPIOB->BRR = LL_GPIO_PIN_8; // turn on red
     GPIOB->BSRR = LL_GPIO_PIN_5;
     GPIOB->BSRR = LL_GPIO_PIN_3; //
+    #if defined(EPROPELLED_6S_G431_SINGLE) || defined(EPROPELLED_6S_G431_4in1)
+        GPIOB->BRR = RED_PIN; // turn on red
+        GPIOB->BSRR = GREEN_PIN;
+        GPIOB->BSRR = BLUE_PIN; 
+    #endif
 #endif
 
 #ifndef BRUSHED_MODE
@@ -559,6 +658,12 @@ void enableCorePeripherals()
     ADC_Init();
     enableADC_DMA();
     activateADC();
+#endif
+#ifdef USE_8323RH_NFAULT
+    initnFault();
+#endif
+#ifdef USE_8323RH_ENABLE
+    initEnable();
 #endif
     LL_COMP_Enable(COMP2);
     LL_COMP_Enable(COMP1);

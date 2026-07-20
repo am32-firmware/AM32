@@ -8,7 +8,7 @@
 
 #include "serial_telemetry.h"
 #include "common.h"
-#include "kiss_telemetry.h"
+#include "telemetry_protocol.h"
 
 void telem_UART_Init()
 {
@@ -53,13 +53,17 @@ void telem_UART_Init()
   LL_DMA_SetMemorySize(DMA1, LL_DMA_CHANNEL_4, LL_DMA_MDATAALIGN_BYTE);
 
 
-  USART_InitStruct.BaudRate = 115200;
+  USART_InitStruct.BaudRate = SERIAL_TELEMETRY_BAUDRATE_SELECTED;
   USART_InitStruct.DataWidth = LL_USART_DATAWIDTH_8B;
   USART_InitStruct.StopBits = LL_USART_STOPBITS_1;
   USART_InitStruct.Parity = LL_USART_PARITY_NONE;
   USART_InitStruct.TransferDirection = LL_USART_DIRECTION_TX_RX;
   USART_InitStruct.OverSampling = LL_USART_OVERSAMPLING_16;
   LL_USART_Init(USART1, &USART_InitStruct);
+#ifdef USE_SPORT_TELEMETRY
+  LL_USART_SetTXPinLevel(USART1, LL_USART_TXPIN_LEVEL_INVERTED);
+  LL_USART_SetRXPinLevel(USART1, LL_USART_RXPIN_LEVEL_INVERTED);
+#endif
   LL_USART_ConfigHalfDuplexMode(USART1);
 
 

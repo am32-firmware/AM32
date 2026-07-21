@@ -383,6 +383,7 @@ uint16_t telem_ms_count;
 uint16_t VOLTAGE_DIVIDER = TARGET_VOLTAGE_DIVIDER; // 100k upper and 10k lower resistor in divider
 uint16_t
     battery_voltage; // scale in volts * 10.  1260 is a battery voltage of 12.60
+uint16_t mpp_target_voltage = 0; // MPP tracker target, same scale as battery_voltage (centivolts). 0 = tracker disabled
 char cell_count = 0;
 char brushed_direction_set = 0;
 
@@ -615,6 +616,7 @@ void loadEEpromSettings()
       eepromBuffer.reserved_eeprom_3[1] = 0;
       eepromBuffer.reserved_eeprom_3[2] = 0;
       eepromBuffer.reserved_eeprom_3[3] = 0;
+      eepromBuffer.mppt_target_voltage = 0; // MPP tracker disabled by default
     }
     // eepromBuffer.advance_level can either be set to 0-3 with config tools less than 1.90 or 10-42 with 1.90 or above 
     if (eepromBuffer.advance_level > 42 || (eepromBuffer.advance_level < 10 && eepromBuffer.advance_level > 3)){
@@ -635,6 +637,22 @@ void loadEEpromSettings()
     } else {
       tim1_arr = TIM1_AUTORELOAD;
       SET_AUTO_RELOAD_PWM(tim1_arr);
+    }
+    // MPP tracker: pick the deci-volt preset (50-200 = 5.0-20.0V). The EEPROM
+    // field wins; MPPT_DEFAULT_VOLTAGE (targets.h) is an optional compile-time
+    // fallback for bench testing when the EEPROM has none set. Convert to
+    // centivolts to match the battery_voltage scale; anything outside 5.0-20.0V
+    // leaves the tracker disabled.
+    uint16_t mppt_preset = eepromBuffer.mppt_target_voltage;
+#if MPPT_DEFAULT_VOLTAGE
+    if (mppt_preset == 0) {
+        mppt_preset = MPPT_DEFAULT_VOLTAGE;
+    }
+#endif
+    if (mppt_preset >= 50 && mppt_preset <= 200) {
+        mpp_target_voltage = mppt_preset * 10;
+    } else {
+        mpp_target_voltage = 0;
     }
     if(eepromBuffer.minimum_duty_cycle < 51 && eepromBuffer.minimum_duty_cycle > 0){
     minimum_duty_cycle = eepromBuffer.minimum_duty_cycle * 10;
@@ -1332,9 +1350,59 @@ if (!stepper_sine && armed) {
 #endif
 }
 
+// ---- Constant-voltage MPP tracker tuning (bench-tune for your panel/board) ----
+#ifndef MPPT_UPDATE_DIVIDER
+#define MPPT_UPDATE_DIVIDER 10 // run the voltage integrator every N ticks of this routine (~1-2kHz)
+#endif
+#ifndef MPPT_GAIN_DEN
+#define MPPT_GAIN_DEN 24 // integrator gain denominator; larger = slower / gentler regulation
+#endif
+
 void tenKhzRoutine()
 { // 20khz as of 2.00 to be renamed
     duty_cycle = duty_cycle_setpoint;
+#ifndef BRUSHED_MODE
+    // -----------------------------------------------------------------------
+    // Constant-voltage MPP tracker (throttle-capped trim)
+    //
+    // Holds the panel/input voltage (battery_voltage, centivolts) at the
+    // configured target by trimming the throttle-commanded duty cycle DOWN.
+    // The throttle setpoint stays the hard ceiling - the tracker only ever
+    // subtracts, never adds. When the panel sits ABOVE target it has spare
+    // capacity, so the trim shrinks and duty climbs back toward the ceiling to
+    // load the panel and pull its voltage down; when the panel sags BELOW
+    // target the trim grows and duty backs off so the panel can recover.
+    // Active only while armed, running and throttle-commanded, and only when a
+    // valid target (5.0-20.0V) is configured via eepromBuffer.mppt_target_voltage.
+    // -----------------------------------------------------------------------
+    static int32_t mppt_trim = 0; // integrator state, in duty units * MPPT_GAIN_DEN
+    static uint16_t mppt_sub_count = 0;
+    if (mpp_target_voltage && armed && running && input > 47) {
+        if (++mppt_sub_count >= MPPT_UPDATE_DIVIDER) {
+            mppt_sub_count = 0;
+            // integrate (target - measured): grows the trim when V is low, shrinks it when V is high
+            mppt_trim += (int32_t)mpp_target_voltage - (int32_t)battery_voltage;
+            int32_t trim_max = (int32_t)duty_cycle * MPPT_GAIN_DEN; // anti-windup: never trim past 0 duty
+            if (mppt_trim < 0) {
+                mppt_trim = 0;
+            } else if (mppt_trim > trim_max) {
+                mppt_trim = trim_max;
+            }
+        }
+        uint16_t reduction = (uint16_t)(mppt_trim / MPPT_GAIN_DEN);
+        if (reduction > duty_cycle) {
+            reduction = duty_cycle; // throttle ceiling may have dropped since the last integrator step
+        }
+        duty_cycle -= reduction;
+        // keep the motor commutating, but never let the floor push duty above the throttle ceiling
+        if (duty_cycle < minimum_duty_cycle && minimum_duty_cycle <= duty_cycle_setpoint) {
+            duty_cycle = minimum_duty_cycle;
+        }
+    } else {
+        mppt_trim = 0;
+        mppt_sub_count = 0;
+    }
+#endif
     tenkhzcounter++;
     ledcounter++;
     ramp_count++;

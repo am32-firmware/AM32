@@ -5618,3 +5618,12 @@
 #ifndef POLLING_MODE_THRESHOLD
 #define POLLING_MODE_THRESHOLD 2000
 #endif
+
+// Constant-voltage MPP tracker: optional compile-time default target voltage.
+// Lets you flash-and-test a board without setting mppt_target_voltage through
+// the configurator. Same encoding as the EEPROM field: 50-200 = 5.0-20.0V in
+// 0.1V steps. Applied only when the EEPROM has no valid target (byte == 0), so
+// a value written by the configurator still wins. 0 = disabled (default).
+#ifndef MPPT_DEFAULT_VOLTAGE
+#define MPPT_DEFAULT_VOLTAGE 0
+#endif

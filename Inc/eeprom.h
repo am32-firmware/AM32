@@ -9,7 +9,7 @@ typedef union EEprom_u {
     struct {
         uint8_t reserved_0; //0
         uint8_t eeprom_version; //1
-        uint8_t reserved_1; //2
+        uint8_t mppt_target_voltage; //2  MPP tracker target voltage: 50-200 = 5.0-20.0V in 0.1V steps, 0 = disabled
         struct {        
             uint8_t major; //3
             uint8_t minor; //4

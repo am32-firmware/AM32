@@ -1,0 +1,20 @@
+{
+    "comment": "real-hardware reference values for the calibration CI: SEQURE G431 + EMAX GT2215/10. Values from the bench captures in this directory; tolerances cover the documented model residuals plus CI run-to-run scatter.",
+    "steady": {
+        "levels": {"0.10": 2115, "0.20": 4028, "0.30": 5836, "0.40": 7572, "0.50": 9210},
+        "tolerance_pct": 5.0
+    },
+    "square": {
+        "down_ms": {"0.060": 80, "0.090": 111, "0.120": 136, "0.150": 140, "0.180": 176, "0.210": 183, "0.240": 166},
+        "down_tolerance_ms": 30,
+        "down_tolerance_pct": 25,
+        "up_flat_ms": [20, 55]
+    },
+    "chirp": {
+        "accel_3db_hz": 11.6,
+        "brake_3db_hz": 3.2,
+        "tolerance_pct": 25
+    },
+    "desync_budget": 12,
+    "chirp_start_retries": 2
+}

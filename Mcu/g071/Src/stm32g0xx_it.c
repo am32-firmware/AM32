@@ -77,6 +77,7 @@
 extern void transfercomplete();
 extern void PeriodElapsedCallback();
 extern void interruptRoutine();
+extern void demagEdgeRoutine();
 extern void tenKhzRoutine();
 extern void processDshot();
 
@@ -236,6 +237,28 @@ void DMA1_Channel2_3_IRQHandler(void)
  */
 void ADC1_COMP_IRQHandler(void)
 {
+  if (auto_blanking) { // reversed polarity, this is the demag release edge
+    if (LL_EXTI_IsActiveFallingFlag_0_31(LL_EXTI_LINE_18)) {
+      LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_18);
+      demagEdgeRoutine();
+      return;
+    }
+    if (LL_EXTI_IsActiveRisingFlag_0_31(LL_EXTI_LINE_18)) {
+      LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_18);
+      demagEdgeRoutine();
+      return;
+    }
+    if (LL_EXTI_IsActiveFallingFlag_0_31(LL_EXTI_LINE_17)) {
+      LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_17);
+      demagEdgeRoutine();
+      return;
+    }
+    if (LL_EXTI_IsActiveRisingFlag_0_31(LL_EXTI_LINE_17)) {
+      LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_17);
+      demagEdgeRoutine();
+      return;
+    }
+  }
   if (LL_EXTI_IsActiveFallingFlag_0_31(LL_EXTI_LINE_18)) {
     if((INTERVAL_TIMER->CNT) > (average_interval >> 1)){
       LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_18);

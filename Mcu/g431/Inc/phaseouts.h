@@ -18,5 +18,15 @@ void allpwm();
 void proportionalBrake();
 void twoChannelForward();
 void twoChannelReverse();
+void phaseAHIGH();
+void phaseBHIGH();
+void phaseCHIGH();
+void phaseALOW();
+void phaseBLOW();
+void phaseCLOW();
+void phaseAFLOAT();
+void phaseBFLOAT();
+void phaseCFLOAT();
+#define HAS_PHASE_HIGH
 
 #endif /* INC_PHASEOUTS_H_ */

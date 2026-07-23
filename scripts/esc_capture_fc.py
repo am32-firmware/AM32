@@ -11,9 +11,10 @@ enabled) to the same JSONL schema as the DroneCAN tools, so
 esc_analyze/esc_square/esc_chirp fit work unchanged.
 
 Betaflight prerequisites (CLI):
-  set motor_pwm_protocol = DSHOT300   # or DSHOT600
+  set motor_pwm_protocol = DSHOT600   # or DSHOT300
   set dshot_bidir = ON
   set motor_poles = <your motor's pole count>
+  set serial_update_rate_hz = 1000    # the default caps telemetry near 50Hz
   set dshot_edt = ON                  # BF 4.4+, for volt/curr/temp
   save
 
@@ -156,12 +157,27 @@ class BetaflightBackend(object):
         print('ESC ready: rpm=%u volt=%.0f temp=%.0fC' %
               (t['rpm'], t['volt'], t['temp']))
         self.spin_for(self.args.arm_time)
+        self._enable_edt()
         if not self.edt_seen:
             # without EDT frames there is no current or temperature to
             # check, so those aborts can never fire
             print('WARNING: no EDT telemetry (voltage/current/temperature) - '
-                  '--max-current and --max-temp protection are INACTIVE.\n'
-                  '         enable it with: set dshot_edt = ON (BF 4.4+)')
+                  '--max-current and --max-temp protection are INACTIVE')
+
+    def _enable_edt(self):
+        '''ask the ESC for extended telemetry. Betaflight only sends the
+        enable when it arms, which never happens in motor test mode, so
+        the command goes out over MSP instead. The firmware only accepts
+        it while armed with the motor stopped, which is where we are'''
+        if self.edt_seen:
+            return
+        for _ in range(6):
+            self.port.send_dshot_command(msp.DSHOT_CMD_EDT_ENABLE)
+            self.spin_for(0.5)
+            if self.edt_seen:
+                t = self.last_telem
+                print('EDT active: volt=%.0f temp=%.0fC' % (t['volt'], t['temp']))
+                return
 
     def set_param(self, name, value):
         # ESC params are DroneCAN-only; FC-attached ESCs keep their

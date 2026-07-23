@@ -91,12 +91,21 @@ software as the only way to stop the motor.
 Betaflight setup (CLI, then `save`):
 
 ```
-set motor_pwm_protocol = DSHOT300   # or DSHOT600
+set motor_pwm_protocol = DSHOT600   # or DSHOT300
 set dshot_bidir = ON
 set motor_poles = 14                # your motor's pole count
+set serial_update_rate_hz = 1000    # see below - the default caps telemetry at ~50Hz
 set dshot_edt = ON                  # BF 4.4+: EDT volt/current/temp
 feature -3D                         # 3D mode makes 1000 full reverse
+save
 ```
+
+`serial_update_rate_hz` matters: Betaflight answers one MSP request per
+serial task tick, so the default of 100 yields about 50 telemetry
+samples per second whatever the tool asks for — enough for steady
+levels, but too slow for the chirp. Raising it to 1000 gives the full
+200 Hz the capture tools request, matching the DroneCAN captures.
+Measured on an H743: 49 Hz at the default, 200 Hz at 1000.
 
 The capture battery, ESC on motor output 1 (`--poles` must match the
 motor and the FC setting: it scales every logged rpm):
@@ -117,9 +126,12 @@ Differences from the DroneCAN path:
 - EDT values are coarse: Betaflight passes the DShot telemetry through
   nearly raw, so voltage lands in whole volts and current in 0.5 A
   steps. Note your bench supply readings alongside the capture
-- without `dshot_edt` there is no voltage/current/temperature at all,
-  and `--max-current`/`--max-temp` cannot protect anything; the tool
-  warns when it sees no EDT frames
+- Betaflight only sends the EDT enable command when it arms, which
+  never happens during a motor test, so the tool sends it itself over
+  MSP once the ESC is armed and stopped. If no EDT frames appear it
+  says so: `--max-current`/`--max-temp` cannot protect anything
+  without them. EDT resolution is coarse — voltage in whole volts and
+  current in 0.5 A steps — so low currents read as zero
 - Betaflight never marks its DShot telemetry stale: if the ESC's
   replies stop arriving it keeps serving the last values it decoded.
   The tool notices when telemetry fails to respond to a throttle

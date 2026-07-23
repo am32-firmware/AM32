@@ -30,6 +30,12 @@ MSP_MOTOR_TELEMETRY = 139
 MSP_SET_MOTOR = 214
 MSP_SET_PASSTHROUGH = 245
 
+# MSP v2 functions
+MSP2_SEND_DSHOT_COMMAND = 0x3003
+
+DSHOT_CMD_EDT_ENABLE = 13
+ALL_MOTORS = 255
+
 PERM_ID_ARM = 0        # BOXARM permanent id
 FEATURE_3D = 1 << 12   # 3D mode: motor value 1000 means full reverse
 
@@ -40,6 +46,22 @@ def frame(cmd, payload=b''):
     for b in hdr + payload:
         ck ^= b
     return b'$M<' + hdr + payload + bytes([ck])
+
+
+def _crc8_dvb_s2(crc, b):
+    crc ^= b
+    for _ in range(8):
+        crc = ((crc << 1) ^ 0xD5) & 0xFF if crc & 0x80 else (crc << 1) & 0xFF
+    return crc
+
+
+def frame_v2(function, payload=b''):
+    '''MSP v2 frame ($X<), needed for the 16 bit function numbers'''
+    body = struct.pack('<BHH', 0, function, len(payload)) + payload
+    crc = 0
+    for b in body:
+        crc = _crc8_dvb_s2(crc, b)
+    return b'$X<' + body + bytes([crc])
 
 
 class MspPort(object):
@@ -71,6 +93,14 @@ class MspPort(object):
     def send(self, cmd, payload=b''):
         '''fire and forget; replies arrive via the reader thread'''
         self.ser.write(frame(cmd, payload))
+
+    def send_dshot_command(self, command, motor=ALL_MOTORS, repeats=1):
+        '''queue a DShot command into the motor output stream. The FC
+        only accepts this while disarmed, which is where this tool
+        operates'''
+        self.ser.write(frame_v2(
+            MSP2_SEND_DSHOT_COMMAND,
+            bytes([0, motor, repeats]) + bytes([command]) * repeats))
 
     def get_reply(self, cmd):
         '''(seq, payload) of the latest reply for cmd, or (0, None)'''

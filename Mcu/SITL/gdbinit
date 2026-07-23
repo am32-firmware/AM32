@@ -1,0 +1,30 @@
+# gdb setup for debugging the AM32 SITL:
+#
+#   gdb -x Mcu/SITL/gdbinit --args obj/AM32_AM32_SITL_CAN_*.elf --can-uri none --input-type 1
+#
+# or attach to a running simulator with
+#
+#   gdb -x Mcu/SITL/gdbinit -p <pid>
+#
+# The simulator delivers emulated interrupts by parking the firmware
+# thread with SIGUSR1, so gdb must pass it through silently or every
+# interrupt stops the debugger.
+handle SIGUSR1 noprint nostop pass
+
+# While the process is stopped (breakpoint, single stepping, ^C) both
+# the firmware and the simulation freeze together: simulated time, the
+# emulated watchdog and the ESC's own timeouts all stop with it, and
+# the pacer rebases on resume instead of sprinting to catch up, so
+# stopping never breaks the physics.
+#
+# Breakpoints go in the firmware sources as usual, e.g.:
+#   break tenKhzRoutine
+#   break Src/main.c:1137
+#
+# Deterministic single stepping of firmware code with simulated time
+# frozen between steps:
+#   set scheduler-locking step
+# Caveat: with locking on, code that needs the other thread hangs -
+# waits on simulated time (delayMicros/delayMillis), waits for an
+# emulated interrupt, or the park/resume machinery itself. Step over
+# those with locking off, or just continue to the next breakpoint.

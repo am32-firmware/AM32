@@ -2122,7 +2122,41 @@ if(zero_crosses < 5){
 #else
             battery_voltage = ((7 * battery_voltage) + ((ADC_raw_volts * 3300 / 4095 * VOLTAGE_DIVIDER) / 100)) >> 3;
             smoothed_raw_current = getSmoothedCurrent();
-            actual_current = ((smoothed_raw_current * 3300 / 41) - (CURRENT_OFFSET * 100)) / (MILLIVOLT_PER_AMP);
+            {
+                const int32_t sense_mv100 = (int32_t)smoothed_raw_current * 3300 / 41; // millivolts * 100
+                int32_t offset_mv100 = CURRENT_OFFSET * 100;
+#ifdef CURRENT_AUTO_OFFSET
+                // boot-time zero of the current sense amp, for amps
+                // biased off ground (e.g. bidirectional amps near
+                // mid-rail)
+                static int32_t current_zero_mv100;
+                static uint8_t current_zero_samples;
+                static uint8_t current_zero_warmup;
+                static int32_t current_zero_offset;
+                // zero the sense amp bias while the motor has never
+                // run; skip the first samples while the 50-deep
+                // smoothing buffer fills
+                if (current_zero_warmup < 100) {
+                    current_zero_warmup++;
+                    current_zero_offset = sense_mv100;
+                } else if (current_zero_samples < 32 && !running) {
+                    current_zero_mv100 += sense_mv100;
+                    current_zero_samples++;
+                    current_zero_offset = current_zero_mv100 / current_zero_samples;
+                }
+                offset_mv100 = current_zero_offset;
+#endif
+                // int32 up to here: the old int16 arithmetic wrapped
+                // negative on high sense bias and clamped to zero
+                int32_t current_10ma = (sense_mv100 - offset_mv100) / MILLIVOLT_PER_AMP;
+                if (current_10ma < 0) {
+                    current_10ma = 0;
+                }
+                if (current_10ma > 32767) {
+                    current_10ma = 32767;
+                }
+                actual_current = (int16_t)current_10ma;
+            }
 #endif
             if (actual_current < 0) {
                 actual_current = 0;

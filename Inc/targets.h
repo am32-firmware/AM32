@@ -93,6 +93,7 @@
 #define HARDWARE_GROUP_L4_B
 #define TARGET_VOLTAGE_DIVIDER 94
 #define MILLIVOLT_PER_AMP 30
+#define CURRENT_AUTO_OFFSET // dev board sense amp reads ~+98mV at zero current
 #define USE_SERIAL_TELEMETRY
 #define EEPROM_START_ADD (uint32_t)0x0800F800
 #endif
@@ -106,6 +107,7 @@
 #define HARDWARE_GROUP_L4_B
 #define TARGET_VOLTAGE_DIVIDER 94
 #define MILLIVOLT_PER_AMP 30
+#define CURRENT_AUTO_OFFSET // dev board sense amp reads ~+98mV at zero current
 #define USE_SERIAL_TELEMETRY
 #endif
 
@@ -394,6 +396,7 @@
 #ifdef SEQURE_G431
 #define FIRMWARE_NAME "SEQURE_G431 "
 #define FILE_NAME "SEQURE_G431"
+#define CURRENT_AUTO_OFFSET
 #define DEAD_TIME 80
 #define HARDWARE_GROUP_G4_D
 #define TARGET_STALL_PROTECTION_INTERVAL 20000
@@ -405,7 +408,7 @@
 #define NTC_ADC_PIN LL_GPIO_PIN_1
 #define NTC_ADC_CHANNEL LL_ADC_CHANNEL_12
 #define USE_ADC_1_2
-#define MILLIVOLT_PER_AMP 5
+#define MILLIVOLT_PER_AMP 2 // measured 2.0mV/A against a bench supply (GT2215 finger-load test)
 #define TARGET_VOLTAGE_DIVIDER 480
 #define NO_POLLING_START
 #define USE_PULSE_OUT
@@ -423,6 +426,7 @@
 #ifdef SEQURE_G431_CAN
 #define FIRMWARE_NAME "SEQUREG4_CAN"
 #define FILE_NAME "SEQURE_G431_CAN"
+#define CURRENT_AUTO_OFFSET
 #define DRONECAN_SUPPORT 1
 #define DRONECAN_NODE_NAME "com.sequre.esc"
 #define DEAD_TIME 80
@@ -437,7 +441,7 @@
 #define NTC_ADC_PIN LL_GPIO_PIN_1
 #define NTC_ADC_CHANNEL LL_ADC_CHANNEL_12
 #define USE_ADC_1_2
-#define MILLIVOLT_PER_AMP 5
+#define MILLIVOLT_PER_AMP 2 // measured 2.0mV/A against a bench supply (GT2215 finger-load test)
 #define TARGET_VOLTAGE_DIVIDER 480
 #define NO_POLLING_START
 #define USE_PULSE_OUT

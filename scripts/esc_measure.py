@@ -16,7 +16,12 @@ import struct
 import sys
 import time
 
-import dronecan
+try:
+    import dronecan
+except ImportError:
+    # the Recorder and the profile functions are transport agnostic and
+    # are reused by esc_capture_fc.py, which needs no DroneCAN stack
+    dronecan = None
 
 import sim_clock
 from am32_debug import FLEXDEBUG_AM32_DEBUG1, decode_debug1
@@ -34,6 +39,7 @@ class Recorder(object):
         self.t0 = self.clock.now()
         self.rows = []
         self.q = None
+        self.closed = False
         self.write_error = None
         if path:
             import queue
@@ -57,15 +63,25 @@ class Recorder(object):
                     self.write_error = ex
                     print('log write failed: %s' % ex)
 
-    def add(self, rtype, **fields):
-        row = {'t': round(self.clock.now() - self.t0, 4), 'type': rtype}
+    def add(self, rtype, _at=None, **fields):
+        '''_at overrides the timestamp with a clock reading taken when
+        the sample actually arrived, for backends that receive on a
+        separate thread'''
+        now = self.clock.now() if _at is None else _at
+        row = {'t': round(now - self.t0, 4), 'type': rtype}
         row.update(fields)
         self.rows.append(row)
         if self.q:
+            if self.closed:
+                # the writer has already drained and exited: say so
+                # rather than silently dropping the row
+                print('log closed, not written: %s' % row)
+                return
             self.q.put(row)
 
     def close(self):
-        if self.q:
+        if self.q and not self.closed:
+            self.closed = True
             self.q.put(None)
             self.thread.join(timeout=10)
             if self.thread.is_alive():
@@ -76,6 +92,8 @@ class Recorder(object):
 
 class EscMeasure(object):
     def __init__(self, args):
+        if dronecan is None:
+            raise SystemExit('this tool needs pydronecan: pip install dronecan')
         self.args = args
         self.node = dronecan.make_node(args.uri, node_id=args.client_node_id)
         self.target = args.node_id

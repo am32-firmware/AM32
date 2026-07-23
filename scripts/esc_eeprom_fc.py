@@ -23,11 +23,25 @@ this tool probes in a loop rather than trying once:
     seen 4-way traffic, so a client that probes once, or slowly, will
     miss the window every time
 
-So: reset the ESC (power cycle it, or reset it over SWD) while this is
-running. It probes continuously and only needs one to land inside that
-250ms window - the bootloader then stays put for the session. If it
-still will not connect, dump the settings with the AM32 configurator
-instead and include that with the capture.
+So: reset the ESC while this is running. It probes continuously and
+only needs one probe to land inside that 250ms window - the bootloader
+then stays put for the session.
+
+A *software* reset is what works reliably: the bootloader only skips
+its "signal line is low, jump to the application" check when
+RCC_CSR_SFTRSTF is set (checkForSignal in bootloader/main.c). An
+st-link does that with
+  openocd -f interface/stlink.cfg -c "transport select hla_swd" \
+          -f target/stm32g4x.cfg -c "init; reset run; exit"
+
+A power cycle is a power-on reset, so it takes that jump whenever the
+signal line reads low - and Betaflight only holds the line up weakly
+in 4-way (esc4wayInit does setEscInput + setEscHi), against the
+bootloader's own pull-down. Whether the pull-up wins is board
+specific: on a SEQURE G431 here it never did, over a full 180s window.
+Power cycling may still work elsewhere, and is worth a few tries, but
+if it does not, use SWD or dump the settings with the AM32
+configurator and include that with the capture.
 
 usage:
   esc_eeprom_fc.py --port /dev/ttyACM0 --out sitl_eeprom.bin

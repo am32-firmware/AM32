@@ -599,7 +599,7 @@ int32_t doPidCalculations(struct fastPID* pidnow, int actual, int target)
 void loadEEpromSettings()
 {
     read_flash_bin(eepromBuffer.buffer, eeprom_address, sizeof(eepromBuffer.buffer));
-    if(eepromBuffer.eeprom_version < EEPROM_VERSION){
+    if(eepromBuffer.eeprom_version < 3){ // eeprom versions less than 3 had a firmware name string in these bytes 
       eepromBuffer.max_ramp = 160;    // 0.1% per ms to 25% per ms 
       eepromBuffer.minimum_duty_cycle = 1; // 0.2% to 51 percent
       eepromBuffer.disable_stick_calibration = 0; // 
@@ -608,6 +608,7 @@ void loadEEpromSettings()
       eepromBuffer.current_I = 0; // 0-255
       eepromBuffer.current_D = 100; // 0-255
       eepromBuffer.active_brake_power = 0; // 1-5 percent duty cycle
+      eepromBuffer.brake_on_zero_throttle = 0;
       eepromBuffer.reserved_eeprom_3[0] = 0; //14-16  for crsf input
       eepromBuffer.reserved_eeprom_3[1] = 0;
       eepromBuffer.reserved_eeprom_3[2] = 0;
@@ -1472,7 +1473,8 @@ void tenKhzRoutine()
 
         if ((armed && running) && input > 47) {
           if(zero_throttle_brake_active){
-            adjusted_duty_cycle = 0;
+            zero_throttle_brake_active = 0;
+            temp_comp_pwm = eepromBuffer.comp_pwm;
           }else{
             adjusted_duty_cycle = ((duty_cycle * tim1_arr) / 2000) + 1;
         }

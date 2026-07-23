@@ -254,7 +254,7 @@ void make_dshot_package(uint16_t com_time)
             telem_scheduler.temp_count++;
 
             if (telem_scheduler.current_count >= CURRENT_EDT_RATE_DIVISOR) {
-                extended_frame_to_send = 0b0110 << 8 | (uint8_t)(actual_current / 50);
+                extended_frame_to_send = 0b0110 << 8 | (uint8_t)(actual_current / 100);
                 telem_scheduler.current_count = 0;
             }
             else if (telem_scheduler.voltage_count >= VOLTAGE_EDT_RATE_DIVISOR) {

@@ -86,6 +86,12 @@ def cmd_run(args):
         print('TELEM_RATE ->', m.set_param('TELEM_RATE', args.telem_rate))
     if args.debug_rate is not None:
         print('DEBUG_RATE ->', m.set_param('DEBUG_RATE', args.debug_rate))
+    run_chirp(m, args)
+
+
+def run_chirp(m, args):
+    '''drive the chirp profile on any measurement backend implementing
+    the EscMeasure interface (set_throttle/spin_for/rec/clock)'''
     # spin up gently to the mid throttle
     m.set_throttle(0.1)
     m.spin_for(1.5)

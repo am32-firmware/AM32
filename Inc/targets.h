@@ -1,5 +1,16 @@
 
 
+/*
+  ELF section placement for the flash layout tooling (app signature,
+  file name). Not meaningful for the SITL build and mach-o (macOS) has
+  a different section syntax, so it becomes a no-op there
+ */
+#ifdef __APPLE__
+#define AM32_FLASH_SECTION(name)
+#else
+#define AM32_FLASH_SECTION(name) __attribute__((section(name)))
+#endif
+
 #ifndef USE_MAKE
 // #define F031_DEV
 // #define FD6288_F051
@@ -93,6 +104,7 @@
 #define HARDWARE_GROUP_L4_B
 #define TARGET_VOLTAGE_DIVIDER 94
 #define MILLIVOLT_PER_AMP 30
+#define CURRENT_AUTO_OFFSET // dev board sense amp reads ~+98mV at zero current
 #define USE_SERIAL_TELEMETRY
 #define EEPROM_START_ADD (uint32_t)0x0800F800
 #endif
@@ -106,6 +118,7 @@
 #define HARDWARE_GROUP_L4_B
 #define TARGET_VOLTAGE_DIVIDER 94
 #define MILLIVOLT_PER_AMP 30
+#define CURRENT_AUTO_OFFSET // dev board sense amp reads ~+98mV at zero current
 #define USE_SERIAL_TELEMETRY
 #endif
 
@@ -353,6 +366,20 @@
 #define MILLIVOLT_PER_AMP 9
 #endif
 ///
+#ifdef AM32_SITL_CAN
+#define FIRMWARE_NAME "AM32 SITL"
+#define FILE_NAME "AM32_SITL_CAN"
+#define DRONECAN_SUPPORT 1
+#define DRONECAN_NODE_NAME "org.am32.sitl"
+#define DEAD_TIME 80
+#define HARDWARE_GROUP_SITL_A
+#define TARGET_STALL_PROTECTION_INTERVAL 20000
+#define TARGET_VOLTAGE_DIVIDER 110
+#define MILLIVOLT_PER_AMP 20
+#define CURRENT_OFFSET 0
+#define CURRENT_AUTO_OFFSET
+#endif
+
 #ifdef REF_G431
 #define FIRMWARE_NAME "Ref G431"
 #define FILE_NAME "REF_G431"
@@ -394,6 +421,7 @@
 #ifdef SEQURE_G431
 #define FIRMWARE_NAME "SEQURE_G431 "
 #define FILE_NAME "SEQURE_G431"
+#define CURRENT_AUTO_OFFSET
 #define DEAD_TIME 80
 #define HARDWARE_GROUP_G4_D
 #define TARGET_STALL_PROTECTION_INTERVAL 20000
@@ -405,7 +433,7 @@
 #define NTC_ADC_PIN LL_GPIO_PIN_1
 #define NTC_ADC_CHANNEL LL_ADC_CHANNEL_12
 #define USE_ADC_1_2
-#define MILLIVOLT_PER_AMP 5
+#define MILLIVOLT_PER_AMP 2 // measured 2.0mV/A against a bench supply (GT2215 finger-load test)
 #define TARGET_VOLTAGE_DIVIDER 480
 #define NO_POLLING_START
 #define USE_PULSE_OUT
@@ -423,6 +451,7 @@
 #ifdef SEQURE_G431_CAN
 #define FIRMWARE_NAME "SEQUREG4_CAN"
 #define FILE_NAME "SEQURE_G431_CAN"
+#define CURRENT_AUTO_OFFSET
 #define DRONECAN_SUPPORT 1
 #define DRONECAN_NODE_NAME "com.sequre.esc"
 #define DEAD_TIME 80
@@ -437,7 +466,7 @@
 #define NTC_ADC_PIN LL_GPIO_PIN_1
 #define NTC_ADC_CHANNEL LL_ADC_CHANNEL_12
 #define USE_ADC_1_2
-#define MILLIVOLT_PER_AMP 5
+#define MILLIVOLT_PER_AMP 2 // measured 2.0mV/A against a bench supply (GT2215 finger-load test)
 #define TARGET_VOLTAGE_DIVIDER 480
 #define NO_POLLING_START
 #define USE_PULSE_OUT
@@ -4092,6 +4121,12 @@
 
 #endif
 
+#ifdef HARDWARE_GROUP_SITL_A
+
+#define MCU_SITL
+
+#endif
+
 #ifdef HARDWARE_GROUP_G4_A
 
 #define MCU_G431
@@ -5588,6 +5623,30 @@
   #define COMPARATOR_IRQ   EXTI2_IRQn
 #endif
 
+#endif
+
+#ifdef MCU_SITL
+// software in the loop simulation, emulating a G431 class MCU with the
+// hardware replaced by a motor/battery simulation. See Mcu/SITL
+#define STMICRO
+#define CPU_FREQUENCY_MHZ 160
+#ifndef EEPROM_START_ADD
+#define EEPROM_START_ADD (uint32_t)0x0800F800
+#endif
+#define INTERVAL_TIMER TIM2
+#define TEN_KHZ_TIMER TIM6
+#define UTILITY_TIMER TIM17
+#define COM_TIMER TIM16
+#define APPLICATION_ADDRESS 0x08001000
+#define TARGET_MIN_BEMF_COUNTS 3
+#define COMPARATOR_IRQ SITL_IRQ_COMP
+#define COM_TIMER_IRQ SITL_IRQ_COM
+#define IC_DMA_IRQ_NAME SITL_IRQ_DMA
+#define USE_ADC
+#define DSHOT_PRIORITY_THRESHOLD 60
+// the SITL harness provides the real main(), the firmware main() is
+// started by the harness under this name
+#define main am32_main
 #endif
 
 #ifndef LOOP_FREQUENCY_HZ

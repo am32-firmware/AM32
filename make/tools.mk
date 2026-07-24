@@ -6,6 +6,16 @@
 
 
 ifeq ($(OS),Windows_NT)
+UNAME_O := $(shell uname -o 2>/dev/null)
+# only Cygwin gets the unix tools flow. cmd.exe and git-bash/MSYS keep
+# the cmd.exe flow: git-bash may put uname on PATH but its MinGW tools
+# cannot build the SITL, and the cmd.exe flow is proven there
+ifneq ($(UNAME_O),Cygwin)
+WIN_CMD_FLOW := 1
+endif
+endif
+
+ifeq ($(WIN_CMD_FLOW),1)
 ARM_SDK_PREFIX:=tools/windows/xpack-arm-none-eabi-gcc-10.3.1-2.3/bin/arm-none-eabi-
 SHELL:=cmd.exe
 CP:=tools\\windows\\make\\bin\\cp
@@ -15,6 +25,18 @@ MKDIR:=tools\\windows\\make\\bin\\mkdir
 RM:=tools\\windows\\make\\bin\\rm
 CUT:=tools\\windows\\make\\bin\\cut
 FGREP:=tools\\windows\\make\\bin\\fgrep
+OSDIR:=windows
+
+else ifeq ($(OS),Windows_NT)
+# Cygwin
+ARM_SDK_PREFIX:=tools/windows/xpack-arm-none-eabi-gcc-10.3.1-2.3/bin/arm-none-eabi-
+CP:=cp
+DSEP:=/
+NUL:=/dev/null
+MKDIR:=mkdir
+RM:=rm
+CUT:=cut
+FGREP:=fgrep
 OSDIR:=windows
 
 else

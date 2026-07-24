@@ -1,0 +1,13 @@
+{
+  "motor": {
+    "kv": 900,
+    "poles": 14,
+    "resistance": 0.045,
+    "inductance": 2.1e-5,
+    "inertia": 2.0e-5,
+    "damping": 1.0e-6,
+    "static_friction": 0.003,
+    "load_k_omega2": 2.0e-9
+  },
+  "battery": { "voltage": 16.8, "resistance": 0.012 }
+}

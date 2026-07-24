@@ -1,0 +1,70 @@
+name: SITL Calibration Tests
+
+# Compares the SITL physics against the real-hardware bench captures:
+# steady sweep, square amplitude sweep and 120s chirp per calibrated
+# model, checked against Mcu/SITL/data/*/expected.json. Heavier than
+# the functional SITL tests (~25 min), so it runs only when the
+# physics, models or measurement tools change, plus nightly.
+#
+# All measurements are paced against SITL simulation time, so a slow
+# runner simply takes longer in wall time and measures the same
+# experiment. The three datasets run as parallel matrix jobs.
+# Comparison graphs are uploaded as artifacts on every run.
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "Mcu/SITL/**"
+      - "scripts/esc_*.py"
+      - "Src/main.c"
+      - "Src/DroneCAN/**"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "Mcu/SITL/**"
+      - "scripts/esc_*.py"
+      - "Src/main.c"
+      - "Src/DroneCAN/**"
+  schedule:
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  calibration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        dataset: [gt2215, vim1404, nano2216]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build SITL
+        run: make AM32_SITL_CAN
+
+      - name: Install python dependencies
+        run: python3 -m pip install dronecan plotly numpy matplotlib
+
+      - name: Run calibration tests
+        run: |
+          mkdir calibration_run && cd calibration_run
+          python3 ../Mcu/SITL/run_calibration_tests.py \
+            --sitl ../obj/AM32_AM32_SITL_CAN_*.elf \
+            --dataset ${{ matrix.dataset }} \
+            --artifacts ../calibration_artifacts
+
+      - name: Upload comparison graphs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: calibration-graphs-${{ matrix.dataset }}
+          path: calibration_artifacts/
+
+      - name: Upload run logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: calibration-logs-${{ matrix.dataset }}
+          path: calibration_run/calrun_*/

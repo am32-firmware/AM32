@@ -1,0 +1,202 @@
+name: SITL Tests
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  sitl-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build SITL
+        run: make AM32_SITL_CAN
+
+      - name: Install pydronecan
+        run: python3 -m pip install dronecan pyserial
+
+      - name: Run SITL tests
+        run: |
+          mkdir sitl_test_run && cd sitl_test_run
+          python3 ../Mcu/SITL/run_ci_tests.py --sitl ../obj/AM32_AM32_SITL_CAN_*.elf
+
+      - name: Upload SITL log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sitl-test-log
+          path: sitl_test_run/sitl_ci.log
+
+  asan-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build SITL with AddressSanitizer
+        run: make AM32_SITL_CAN SITL_SANITIZE=address
+
+      - name: Install pydronecan
+        run: python3 -m pip install dronecan pyserial
+
+      - name: Run SITL tests under ASan
+        env:
+          ASAN_OPTIONS: detect_leaks=1:halt_on_error=0:abort_on_error=0
+        run: |
+          mkdir sitl_test_run && cd sitl_test_run
+          python3 ../Mcu/SITL/run_ci_tests.py --sitl ../obj/AM32_AM32_SITL_CAN_*.elf
+
+      - name: Upload SITL log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: asan-test-log
+          path: sitl_test_run/sitl_ci.log
+
+  ubsan-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build SITL with UndefinedBehaviorSanitizer
+        run: make AM32_SITL_CAN SITL_SANITIZE=undefined
+
+      - name: Install pydronecan
+        run: python3 -m pip install dronecan pyserial
+
+      - name: Run SITL tests under UBSan
+        env:
+          UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+        run: |
+          mkdir sitl_test_run && cd sitl_test_run
+          python3 ../Mcu/SITL/run_ci_tests.py --sitl ../obj/AM32_AM32_SITL_CAN_*.elf
+
+      - name: Upload SITL log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ubsan-test-log
+          path: sitl_test_run/sitl_ci.log
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install python and gcovr
+        run: python3 -m pip install dronecan pyserial gcovr
+
+      - name: Build and run with coverage
+        run: |
+          mkdir sitl_test_run && cd sitl_test_run
+          bash ../Mcu/SITL/run_coverage.sh
+
+      - name: Coverage summary
+        run: cat coverage/coverage.txt || true
+
+      - name: Upload HTML coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+
+  gui-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Qt system libraries
+        run: sudo apt-get update && sudo apt-get install -y libgl1 libegl1 libfontconfig1 libxkbcommon0
+
+      - name: Build SITL
+        run: make AM32_SITL_CAN
+
+      - name: Create GUI environment
+        run: python3 Mcu/SITL/make_gui_env.py
+
+      - name: Run GUI test (offscreen)
+        run: |
+          mkdir gui_test_run && cd gui_test_run
+          python3 ../Mcu/SITL/gui_ci_test.py \
+            --gui-python ../Mcu/SITL/venv/bin/python3 \
+            --sitl ../obj/AM32_AM32_SITL_CAN_*.elf
+
+      - name: Upload SITL log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gui-test-log
+          path: gui_test_run/sitl_ci.log
+
+  macos-tests:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build SITL
+        run: make AM32_SITL_CAN
+
+      - name: Install pydronecan
+        run: python3 -m pip install --break-system-packages dronecan pyserial
+
+      - name: Run SITL tests
+        run: |
+          mkdir sitl_test_run && cd sitl_test_run
+          python3 ../Mcu/SITL/run_ci_tests.py --sitl ../obj/AM32_AM32_SITL_CAN_*.elf
+
+      - name: Upload SITL log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sitl-test-log-macos
+          path: sitl_test_run/sitl_ci.log
+
+  windows-build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Cygwin
+        uses: cygwin/cygwin-install-action@v4
+        with:
+          packages: gcc-core make
+
+      - name: Build SITL
+        shell: C:\cygwin\bin\bash.exe --noprofile --norc -o igncr -eo pipefail '{0}'
+        run: |
+          cd $(cygpath -u "$GITHUB_WORKSPACE")
+          make AM32_SITL_CAN
+          ls -la obj/
+
+      - name: Boot smoke test
+        shell: C:\cygwin\bin\bash.exe --noprofile --norc -o igncr -eo pipefail '{0}'
+        run: |
+          cd $(cygpath -u "$GITHUB_WORKSPACE")
+          # explicit ports: Windows reserves chunks of the ephemeral
+          # range and the defaults can land in an excluded block
+          # (state bind fails with Permission denied)
+          ./obj/AM32_AM32_SITL_CAN_*.elf --can-uri none --input-type 1 \
+            --input-port 18470 --state-port 18471 >boot.log 2>&1 &
+          sleep 3
+          kill %1 || true
+          cat boot.log
+          grep -q "PWM/DShot input on udp port" boot.log
+          grep -q "state/model port udp" boot.log
+
+      - name: Package binary with cygwin runtime
+        shell: C:\cygwin\bin\bash.exe --noprofile --norc -o igncr -eo pipefail '{0}'
+        run: |
+          cd $(cygpath -u "$GITHUB_WORKSPACE")
+          mkdir -p sitl-windows
+          cp obj/AM32_AM32_SITL_CAN_*.elf sitl-windows/AM32_SITL_CAN.exe
+          cp /bin/cygwin1.dll sitl-windows/
+
+      - name: Upload Windows SITL binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: sitl-windows
+          path: sitl-windows/

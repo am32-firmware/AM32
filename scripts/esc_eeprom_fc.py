@@ -48,12 +48,14 @@ usage:
 '''
 
 import argparse
+import os
 import struct
 import sys
 import time
 
 import serial
 
+import esc_settings
 import msp
 
 # 4-way interface (serial_4way.h)
@@ -161,7 +163,7 @@ def main():
     ap = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('--port', required=True, help='FC serial port')
+    ap.add_argument('--port', default=None, help='FC serial port (auto-detected if omitted)')
     ap.add_argument('--motor', type=int, default=1,
                     help='motor number the ESC is on (1-based)')
     ap.add_argument('--out', default='sitl_eeprom.bin',
@@ -170,6 +172,7 @@ def main():
                     help='how long to keep probing for the ESC bootloader')
     args = ap.parse_args()
 
+    args.port = msp.find_fc_port(args.port)
     ser, count = enter_passthrough(args.port)
     print('4-way passthrough: %u ESC(s) detected' % count)
     if count == 0:
@@ -235,6 +238,14 @@ def main():
         with open(args.out, 'wb') as f:
             f.write(eeprom)
         print('wrote %s (%u bytes)' % (args.out, len(eeprom)))
+        # store the computed values alongside the raw image: only the
+        # computed ones are visible over DroneCAN, and they are what a
+        # contributor reads off the configurator
+        import json
+        jpath = os.path.splitext(args.out)[0] + '.json'
+        with open(jpath, 'w') as f:
+            json.dump(esc_settings.as_record(eeprom), f, indent=2, sort_keys=True)
+        print('wrote %s (raw image + computed values)' % jpath)
         describe(eeprom)
     finally:
         try:
@@ -249,42 +260,13 @@ def main():
           'before capturing again')
 
 
-# EEprom_t (Inc/eeprom.h): the settings a calibration data set must mirror
-SETTINGS = (
-    ('version', 3, 4), ('max_ramp', 5), ('minimum_duty_cycle', 6),
-    ('absolute_voltage_cutoff', 8), ('current_P', 9), ('current_I', 10),
-    ('current_D', 11), ('active_brake_power', 12), ('dir_reversed', 17),
-    ('bi_direction', 18), ('use_sine_start', 19), ('comp_pwm', 20),
-    ('variable_pwm', 21), ('stuck_rotor_protection', 22), ('advance_level', 23),
-    ('pwm_frequency', 24), ('startup_power', 25), ('motor_kv', 26),
-    ('motor_poles', 27), ('brake_on_stop', 28), ('stall_protection', 29),
-    ('beep_volume', 30), ('telemetry_on_interval', 31), ('low_voltage_cut_off', 36),
-    ('low_cell_volt_cutoff', 37), ('rc_car_reverse', 38), ('use_hall_sensors', 39),
-    ('sine_mode_changeover', 40), ('drag_brake_strength', 41),
-    ('driving_brake_strength', 42), ('temperature_limit', 43),
-    ('current_limit', 44), ('sine_mode_power', 45), ('input_type', 46),
-    ('auto_advance', 47), ('can_node', 176), ('can_esc_index', 177),
-    ('can_require_arming', 178), ('can_telem_rate', 179),
-    ('can_require_zero_throttle', 180), ('can_filter_hz', 181),
-    ('can_debug_rate', 182),
-)
-
-
 def describe(e):
-    '''print the settings a calibration data set needs to mirror'''
-    if len(e) < EEPROM_SIZE:
+    """print the settings as the config tools display them"""
+    if len(e) < esc_settings.EEPROM_SIZE:
         print('(short eeprom, not decoding)')
         return
-    print('\nsettings (eeprom layout version %u, firmware %u.%02u):'
-          % (e[1], e[3], e[4]))
-    for entry in SETTINGS:
-        name, off = entry[0], entry[1]
-        if len(entry) > 2:
-            print('  %-26s: %u.%02u' % (name, e[off], e[entry[2]]))
-        else:
-            print('  %-26s: %u' % (name, e[off]))
-    # the stored byte is (kv - 20) / 40
-    print('  %-26s: %u rpm/V' % ('motor_kv (decoded)', e[26] * 40 + 20))
+    print('\nsettings (as shown by the configurator / DroneCAN GUI):')
+    print(esc_settings.format_text(e))
 
 
 if __name__ == '__main__':

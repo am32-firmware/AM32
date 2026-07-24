@@ -15,8 +15,6 @@
 #include "DroneCAN/DroneCAN.h"
 #endif
 
-int dpulse[16] = { 0 };
-
 const char gcr_encode_table[16] = {
     0b11001, 0b11011, 0b10010, 0b10011, 0b11101, 0b10101, 0b10110, 0b10111,
     0b11010, 0b01001, 0b01010, 0b01011, 0b11110, 0b01101, 0b01110, 0b01111
@@ -48,7 +46,6 @@ char EDT_ARM_ENABLE = 0;
 char EDT_ARMED = 0;
 int shift_amount = 0;
 volatile uint32_t gcrnumber;
-extern int zero_crosses;
 extern volatile char send_telemetry;
 extern uint8_t max_duty_cycle_change;
 int dshot_full_number;
@@ -75,14 +72,16 @@ void computeDshotDMA()
     halfpulsetime = dshot_frametime >> 5;
     if ((dshot_frametime > dshot_frametime_low) && (dshot_frametime < dshot_frametime_high)) {
 			signaltimeout = 0;
+        // pack the 16 pulses into one word msb first, bit (15 - i) is pulse i
+        uint16_t frame = 0;
         for (int i = 0; i < 16; i++) {
             // note that dma_buffer[] is uint32_t, we cast the difference to uint16_t to handle
             // timer wrap correctly
             const uint16_t pdiff = dma_buffer[(i << 1) + 1] - dma_buffer[(i << 1)];
-            dpulse[i] = (pdiff > halfpulsetime);
+            frame = (frame << 1) | (pdiff > halfpulsetime);
         }
-        uint8_t calcCRC = ((dpulse[0] ^ dpulse[4] ^ dpulse[8]) << 3 | (dpulse[1] ^ dpulse[5] ^ dpulse[9]) << 2 | (dpulse[2] ^ dpulse[6] ^ dpulse[10]) << 1 | (dpulse[3] ^ dpulse[7] ^ dpulse[11]));
-        uint8_t checkCRC = (dpulse[12] << 3 | dpulse[13] << 2 | dpulse[14] << 1 | dpulse[15]);
+        uint8_t calcCRC = ((frame >> 4) ^ (frame >> 8) ^ (frame >> 12)) & 0xF;
+        uint8_t checkCRC = frame & 0xF;
 
         if (!armed) {
             if (dshot_telemetry == 0) {
@@ -96,15 +95,15 @@ void computeDshotDMA()
             }
         }
         if (dshot_telemetry) {
-            checkCRC = ~checkCRC + 16;
+            checkCRC = (~checkCRC) & 0xF;
         }
 
-        int tocheck = (dpulse[0] << 10 | dpulse[1] << 9 | dpulse[2] << 8 | dpulse[3] << 7 | dpulse[4] << 6 | dpulse[5] << 5 | dpulse[6] << 4 | dpulse[7] << 3 | dpulse[8] << 2 | dpulse[9] << 1 | dpulse[10]);
+        int tocheck = frame >> 5; // upper 11 bits are the throttle / command value
 
         if (calcCRC == checkCRC) {
             signaltimeout = 0;
             dshot_goodcounts++;
-            if (dpulse[11] == 1) {
+            if (frame & 0x10) { // telemetry request bit
                 send_telemetry = 1;
             }
             if(programming_mode > 0){  

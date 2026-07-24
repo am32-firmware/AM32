@@ -136,16 +136,18 @@ SECTIONS
   _sidata = LOADADDR(.data);
 
   /* Initialized data sections into "RAM" Ram type memory */
-  .data : 
+  .data :
   {
     . = ALIGN(4);
     _sdata = .;        /* create a global symbol at data start */
+    *(.ramfunc)        /* functions executed from RAM, copied by startup data init */
+    *(.ramfunc*)
     *(.data)           /* .data sections */
     *(.data*)          /* .data* sections */
 
     . = ALIGN(4);
     _edata = .;        /* define a global symbol at data end */
-    
+
   } >RAM AT> FLASH
 
   /* Uninitialized data section into "RAM" Ram type memory */

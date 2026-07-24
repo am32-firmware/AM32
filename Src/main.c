@@ -344,7 +344,7 @@ uint16_t low_cell_volt_cutoff = 330; // 3.3volts per cell
 
 //=========================== END EEPROM Defaults ===========================
 
-const char filename[30] __attribute__((section(".file_name"))) = FILE_NAME;
+const char filename[30] __attribute__((used, section(".file_name"))) = FILE_NAME; // used: keep under LTO
 _Static_assert(sizeof(FIRMWARE_NAME) <=13,"Firmware name too long");   // max 12 character firmware name plus NULL 
 
 // move these to targets folder or peripherals for each mcu
@@ -370,6 +370,7 @@ uint32_t desync_happened = 0;
 uint8_t desync_happened = 0;
 #endif
 char maximum_throttle_change_ramp = 1;
+uint8_t input_priority_is_high = 0xFF; // unknown at boot, first main loop pass sets it
 
 char crawler_mode = 0; // no longer used //
 uint16_t velocity_count = 0;
@@ -419,6 +420,12 @@ char desync_check = 0;
 char low_kv_filter_level = 20;
 
 uint16_t tim1_arr = TIM1_AUTORELOAD; // current auto reset value
+// Q16 fixed point scale factor equal to tim1_arr / 2000, recomputed in the main
+// loop when tim1_arr changes so the 20khz routine multiplies instead of divides
+uint32_t pwm_to_arr_scale_q16 = ((uint32_t)TIM1_AUTORELOAD << 16) / 2000;
+// Q16 input to duty cycle slopes, computed once at startup for setInput
+uint32_t throttle_duty_slope_q16 = ((uint32_t)(2000 - DEAD_TIME) << 16) / (2047 - 47);
+uint32_t sine_throttle_duty_slope_q16 = ((uint32_t)(2000 - (DEAD_TIME + 40)) << 16) / (2047 - 137);
 uint16_t TIMER1_MAX_ARR = TIM1_AUTORELOAD; // maximum auto reset register value
 uint16_t duty_cycle_maximum = 2000; // restricted by temperature or low rpm throttle protect
 uint16_t low_rpm_level = 20; // thousand erpm used to set range for throttle resrictions
@@ -459,10 +466,10 @@ uint16_t adjusted_input = 0;
 #define TEMP110_CAL_VALUE ((uint16_t*)((uint32_t)0x1FFFF7C2))
 
 uint16_t smoothedcurrent = 0;
-const uint8_t numReadings = 50; // the readings from the analog input
+#define NUM_CURRENT_READINGS 50 // compile time constant so the divide becomes a multiply
 uint8_t readIndex = 0; // the index of the current reading
 uint32_t total = 0;
-uint16_t readings[50];
+uint16_t readings[NUM_CURRENT_READINGS];
 
 uint8_t bemf_timeout_happened = 0;
 uint8_t changeover_step = 5;
@@ -805,14 +812,14 @@ uint16_t getSmoothedCurrent()
     readings[readIndex] = ADC_raw_current;
     total = total + readings[readIndex];
     readIndex = readIndex + 1;
-    if (readIndex >= numReadings) {
+    if (readIndex >= NUM_CURRENT_READINGS) {
         readIndex = 0;
     }
-    smoothedcurrent = total / numReadings;
+    smoothedcurrent = total / NUM_CURRENT_READINGS;
     return smoothedcurrent;
 }
 
-void getBemfState()
+RAM_FUNC void getBemfState()
 {
     uint8_t current_state = 0;
 #if defined(MCU_F031) || defined(MCU_G031)
@@ -850,7 +857,7 @@ void getBemfState()
     }
 }
 
-void commutate()
+RAM_FUNC void commutate()
 {
     if (forward == 1) {
         step++;
@@ -898,7 +905,7 @@ void commutate()
  * 			This disables the COM_TIMER interrupt.
  * 			Then it enables the comparator to generate its interrupt.
  */
-void PeriodElapsedCallback()
+RAM_FUNC void PeriodElapsedCallback()
 {
     DISABLE_COM_TIMER_INT(); // disable interrupt
     commutate();
@@ -922,7 +929,7 @@ void PeriodElapsedCallback()
  * 			Disables the comparator interrupt.
  * 			Enables the COM_TIMER and sets it to generate an interrupt after the wait time.
  */
-void interruptRoutine()
+RAM_FUNC void interruptRoutine()
 {
 //   if (average_interval > 125) {
 //        if ((INTERVAL_TIMER_COUNT < 125) && (duty_cycle < 600) && (zero_crosses < 500)) { // should be impossible, desync?exit anyway
@@ -1194,10 +1201,16 @@ if (!stepper_sine && armed) {
                 last_duty_cycle = min_startup_duty;
             }
 
+            // straight line from (in_min, out_min) to (2047, 2000) using a
+            // startup computed Q16 slope, avoids calling map() at input rate
             if (eepromBuffer.use_sine_start) {
-                duty_cycle_setpoint = map(input, 137, 2047, minimum_duty_cycle+40, 2000);
+                duty_cycle_setpoint = input >= 2047 ? 2000
+                    : input <= 137 ? minimum_duty_cycle + 40
+                    : minimum_duty_cycle + 40 + (uint16_t)(((uint32_t)(input - 137) * sine_throttle_duty_slope_q16) >> 16);
             } else {
-                duty_cycle_setpoint = map(input, 47, 2047, minimum_duty_cycle, 2000);
+                duty_cycle_setpoint = input >= 2047 ? 2000
+                    : input <= 47 ? minimum_duty_cycle
+                    : minimum_duty_cycle + (uint16_t)(((uint32_t)(input - 47) * throttle_duty_slope_q16) >> 16);
             }
 
             if (!eepromBuffer.rc_car_reverse) {
@@ -1332,7 +1345,7 @@ if (!stepper_sine && armed) {
 #endif
 }
 
-void tenKhzRoutine()
+RAM_FUNC void tenKhzRoutine()
 { // 20khz as of 2.00 to be renamed
     duty_cycle = duty_cycle_setpoint;
     tenkhzcounter++;
@@ -1494,18 +1507,18 @@ void tenKhzRoutine()
         if ((armed && running) && input > 47) {
             if (eepromBuffer.variable_pwm) {
             }
-            adjusted_duty_cycle = ((duty_cycle * tim1_arr) / 2000) + 1;
+            adjusted_duty_cycle = (((uint32_t)duty_cycle * pwm_to_arr_scale_q16) >> 16) + 1;
 
         } else {
 
             if (prop_brake_active) {
-              adjusted_duty_cycle =  tim1_arr - ((prop_brake_duty_cycle * tim1_arr) / 2000);
+              adjusted_duty_cycle =  tim1_arr - (((uint32_t)prop_brake_duty_cycle * pwm_to_arr_scale_q16) >> 16);
             } else {
               if((eepromBuffer.brake_on_stop == 2) && armed){  // require arming for active brake
                 comStep(2);
-                adjusted_duty_cycle = DEAD_TIME + ((eepromBuffer.active_brake_power * tim1_arr) / 2000)* 10;
+                adjusted_duty_cycle = DEAD_TIME + (((uint32_t)eepromBuffer.active_brake_power * pwm_to_arr_scale_q16) >> 16)* 10;
             }else{
-                adjusted_duty_cycle = ((duty_cycle * tim1_arr) / 2000);
+                adjusted_duty_cycle = (((uint32_t)duty_cycle * pwm_to_arr_scale_q16) >> 16);
             }
             }
         }
@@ -1892,6 +1905,13 @@ int main(void)
   startup_max_duty_cycle = startup_max_duty_cycle + 400;
 #endif
 
+    // minimum_duty_cycle is final at this point, precompute the input to duty
+    // cycle slopes so setInput multiplies instead of calling map()
+    throttle_duty_slope_q16 = (((uint32_t)(2000 - minimum_duty_cycle)) << 16) / (2047 - 47);
+    sine_throttle_duty_slope_q16 = (((uint32_t)(2000 - (minimum_duty_cycle + 40))) << 16) / (2047 - 137);
+
+    uint16_t last_tim1_arr = 0; // force scale factor computation on first pass
+
     while (1) {
 e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation_intervals[2] + commutation_intervals[3] + commutation_intervals[4] + commutation_intervals[5]) + 4) >> 1; // COMMUTATION INTERVAL IS 0.5US INCREMENTS 
 
@@ -1931,7 +1951,7 @@ if(zero_crosses < 5){
             tim1_arr = map(commutation_interval, 96, 200, TIMER1_MAX_ARR / 2,
                 TIMER1_MAX_ARR);
         }
-        if (eepromBuffer.variable_pwm == 2) {      // uses automatic range   
+        if (eepromBuffer.variable_pwm == 2) {      // uses automatic range
           if(average_interval < 250 && average_interval > 100){
             tim1_arr = average_interval * (CPU_FREQUENCY_MHZ/9);
           }
@@ -1940,7 +1960,11 @@ if(zero_crosses < 5){
          }
           if((average_interval >= 250) || (average_interval == 0)){
               tim1_arr = 250 * (CPU_FREQUENCY_MHZ/9);
-          } 
+          }
+        }
+        if (tim1_arr != last_tim1_arr) { // keep the 20khz routine scale factor in sync, division
+            last_tim1_arr = tim1_arr;    // happens here at idle priority instead of in the interrupt
+            pwm_to_arr_scale_q16 = ((uint32_t)tim1_arr << 16) / 2000;
         }
         if (signaltimeout > (LOOP_FREQUENCY_HZ >> 1)) { // half second timeout when armed;
             if (armed) {
@@ -2038,8 +2062,12 @@ if(zero_crosses < 5){
         }
 
 #if !defined(MCU_G031) && !defined(NEED_INPUT_READY)
+        // only touch the NVIC when the priority scheme actually changes
+        uint8_t want_input_priority = dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD);
+        if (want_input_priority != input_priority_is_high) {
+            input_priority_is_high = want_input_priority;
 #ifdef NXP
-	if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD)) {
+	if (want_input_priority) {
 		NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
 		NVIC_SetPriority(COM_TIMER_IRQ, 1);
 		NVIC_SetPriority(COMP0_IRQ, 1);
@@ -2051,7 +2079,7 @@ if(zero_crosses < 5){
 		NVIC_SetPriority(COMP1_IRQ, 0);
 	}
 #else
-        if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD)) {
+        if (want_input_priority) {
              NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
              NVIC_SetPriority(COM_TIMER_IRQ, 1);
              NVIC_SetPriority(COMPARATOR_IRQ, 1);
@@ -2061,6 +2089,7 @@ if(zero_crosses < 5){
              NVIC_SetPriority(COMPARATOR_IRQ, 0);
          }
 #endif
+        }
 #endif
         if (send_telemetry) {
 #ifdef USE_SERIAL_TELEMETRY

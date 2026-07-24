@@ -18,6 +18,41 @@ import threading
 import time
 
 import serial
+import serial.tools.list_ports
+
+# Betaflight's USB VCP. 0x5740 is the normal (MSP) mode, 0x572a is the
+# mass storage mode it reboots into for blackbox downloads
+BF_VID = 0x0483
+BF_PID_MSP = 0x5740
+BF_PID_MSC = 0x572a
+
+
+def find_fc_port(preferred=None):
+    '''locate the flight controller's serial port on any platform.
+    Returns a device name ("COM4", "/dev/ttyACM0", ...). Matching is by
+    USB VID/PID and product string rather than by path, so the same code
+    works on Windows, Linux and macOS'''
+    if preferred:
+        return preferred
+    hits = []
+    for p in serial.tools.list_ports.comports():
+        product = (p.product or '') + ' ' + (p.description or '')
+        if (p.vid == BF_VID and p.pid == BF_PID_MSP) or 'Betaflight' in product:
+            hits.append(p)
+    if len(hits) == 1:
+        return hits[0].device
+    if not hits:
+        # a helpful error beats a bare "port not found"
+        others = ', '.join('%s (%s)' % (p.device, p.product or '?')
+                           for p in serial.tools.list_ports.comports()
+                           if p.vid) or 'none'
+        raise SystemExit(
+            'no Betaflight flight controller found on USB.\n'
+            '  ports seen: %s\n'
+            '  if the FC is in mass storage mode, power cycle it first;\n'
+            '  otherwise pass the port explicitly with --port' % others)
+    raise SystemExit('several flight controllers found (%s) - pick one '
+                     'with --port' % ', '.join(p.device for p in hits))
 
 MSP_API_VERSION = 1
 MSP_FC_VARIANT = 2

@@ -387,7 +387,7 @@ def main():
     sub = parser.add_subparsers(dest='cmd', required=True)
 
     def common(p, rate, max_current):
-        p.add_argument('--port', required=True, help='FC serial port, e.g. /dev/ttyACM0')
+        p.add_argument('--port', default=None, help='FC serial port (auto-detected if omitted)')
         p.add_argument('--motor', type=int, default=1, help='motor number (1-based, as in the BF configurator)')
         p.add_argument('--log', required=True, help='JSONL output file')
         p.add_argument('--rate', type=float, default=rate, help='command rate Hz')
@@ -456,6 +456,7 @@ def main():
         if sig is not None:
             signal.signal(sig, on_signal)
 
+    args.port = msp.find_fc_port(args.port)
     try:
         m = BetaflightBackend(args)
     except serial.SerialException as ex:

@@ -1,0 +1,608 @@
+AM32 SITL: eeprom=/tmp/claude-1000/-home-tridge-project-UAV-AM32-AM32-4/196b27cd-430d-4142-a2d8-7acd45205596/scratchpad/sitl_eeprom.bin can=mcast:2:lo speedup=1.0
+SITL: PWM/DShot input on udp port 57933
+SITL: state/model port udp 57934
+SITL: dead time 500ns (BDTR 0x50)
+SITL: CAN init mcast:2:lo
+SITL: CAN on mcast:2:lo (239.65.82.2:57732)
+SITL: desync 1 at t=4.3020s avg=1998 last_avg=1998 zc=0 e_com_time=5994, recent events:
+  t=4.282114 MAINLOOP  thetae=171.4 rpm=   916 ci=6727 a=8330 b=0 c=157
+  t=4.282354 EDGE      thetae=180.7 rpm=   931 ci=6727 a=1 b=0 c=0
+  t=4.283253 COMMUTATE thetae=216.9 rpm=   983 ci=5861 a=3 b=232 c=400
+  t=4.283253 MAINLOOP  thetae=216.9 rpm=   983 ci=5861 a=8330 b=0 c=993
+  t=4.283388 MAINLOOP  thetae=222.5 rpm=   991 ci=5861 a=8100 b=0 c=134
+  t=4.283554 MAINLOOP  thetae=229.4 rpm=  1001 ci=5861 a=8100 b=0 c=166
+  t=4.283811 EDGE      thetae=240.3 rpm=  1015 ci=5861 a=0 b=0 c=0
+  t=4.284642 COMMUTATE thetae=276.5 rpm=  1060 ci=5135 a=4 b=232 c=400
+  t=4.285176 EDGE      thetae=300.6 rpm=  1088 ci=5135 a=1 b=0 c=0
+  t=4.285224 MAINLOOP  thetae=302.8 rpm=  1090 ci=5135 a=8100 b=0 c=1570
+  t=4.285944 COMMUTATE thetae=336.3 rpm=  1125 ci=4539 a=5 b=232 c=400
+  t=4.285944 MAINLOOP  thetae=336.3 rpm=  1125 ci=4539 a=7129 b=0 c=720
+  t=4.286295 MAINLOOP  thetae=353.0 rpm=  1142 ci=4539 a=6468 b=0 c=306
+  t=4.286448 EDGE      thetae=  0.4 rpm=  1149 ci=4539 a=0 b=0 c=0
+  t=4.287157 COMMUTATE thetae= 35.1 rpm=  1181 ci=4041 a=6 b=232 c=400
+  t=4.287174 MAINLOOP  thetae= 35.9 rpm=  1182 ci=4041 a=6468 b=6468 c=777
+  t=4.287661 EDGE      thetae= 60.3 rpm=  1203 ci=4041 a=1 b=0 c=0
+  t=4.288277 COMMUTATE thetae= 91.7 rpm=  1229 ci=3617 a=1 b=232 c=400
+  t=4.288277 MAINLOOP  thetae= 91.7 rpm=  1229 ci=3617 a=5675 b=5675 c=1064
+  t=4.288826 EDGE      thetae=120.4 rpm=  1250 ci=3617 a=0 b=0 c=0
+  t=4.289411 COMMUTATE thetae=151.3 rpm=  1273 ci=3299 a=2 b=232 c=400
+  t=4.289763 MAINLOOP  thetae=170.3 rpm=  1286 ci=3299 a=4987 b=5675 c=1428
+  t=4.289947 EDGE      thetae=180.3 rpm=  1293 ci=3299 a=1 b=0 c=0
+  t=4.289967 MAINLOOP  thetae=181.3 rpm=  1294 ci=3299 a=4416 b=5675 c=107
+  t=4.290500 COMMUTATE thetae=210.4 rpm=  1312 ci=3035 a=3 b=232 c=400
+  t=4.290732 MAINLOOP  thetae=223.3 rpm=  1320 ci=3035 a=4416 b=5675 c=663
+  t=4.291040 EDGE      thetae=240.5 rpm=  1331 ci=3035 a=0 b=0 c=0
+  t=4.291596 COMMUTATE thetae=271.8 rpm=  1350 ci=2837 a=4 b=232 c=400
+  t=4.292097 EDGE      thetae=300.3 rpm=  1366 ci=2837 a=1 b=0 c=0
+  t=4.292592 COMMUTATE thetae=328.8 rpm=  1381 ci=2637 a=5 b=232 c=400
+  t=4.292592 MAINLOOP  thetae=328.8 rpm=  1381 ci=2637 a=3945 b=5675 c=1859
+  t=4.293130 EDGE      thetae=  0.3 rpm=  1397 ci=2637 a=0 b=0 c=0
+  t=4.293647 COMMUTATE thetae= 30.8 rpm=  1412 ci=2513 a=6 b=232 c=450
+  t=4.294143 EDGE      thetae= 60.3 rpm=  1426 ci=2513 a=1 b=0 c=0
+  t=4.294598 COMMUTATE thetae= 87.7 rpm=  1438 ci=2369 a=1 b=232 c=450
+  t=4.294616 EDGE      thetae= 88.8 rpm=  1438 ci=2369 a=0 b=0 c=0
+  t=4.294617 EDGE      thetae= 88.8 rpm=  1438 ci=2369 a=0 b=0 c=0
+  t=4.294618 EDGE      thetae= 88.9 rpm=  1438 ci=2369 a=0 b=0 c=0
+  t=4.294619 EDGE      thetae= 88.9 rpm=  1438 ci=2369 a=0 b=0 c=0
+  t=4.294620 EDGE      thetae= 89.0 rpm=  1438 ci=2369 a=0 b=0 c=0
+  t=4.294658 EDGE      thetae= 91.3 rpm=  1439 ci=2369 a=0 b=0 c=0
+  t=4.294659 EDGE      thetae= 91.4 rpm=  1439 ci=2369 a=0 b=0 c=0
+  t=4.294660 EDGE      thetae= 91.4 rpm=  1439 ci=2369 a=0 b=0 c=0
+  t=4.295067 MAINLOOP  thetae=116.1 rpm=  1450 ci=2369 a=3245 b=3245 c=2448
+  t=4.295136 EDGE      thetae=120.3 rpm=  1452 ci=2369 a=0 b=0 c=0
+  t=4.295608 COMMUTATE thetae=149.2 rpm=  1463 ci=2286 a=2 b=232 c=500
+  t=4.295608 MAINLOOP  thetae=149.2 rpm=  1463 ci=2286 a=2782 b=3245 c=286
+  t=4.296117 EDGE      thetae=180.6 rpm=  1475 ci=2286 a=1 b=0 c=0
+  t=4.296240 MAINLOOP  thetae=188.3 rpm=  1478 ci=2286 a=2613 b=3245 c=562
+  t=4.296566 COMMUTATE thetae=208.5 rpm=  1486 ci=2199 a=3 b=232 c=500
+  t=4.296566 MAINLOOP  thetae=208.5 rpm=  1486 ci=2199 a=2613 b=3245 c=275
+  t=4.296574 EDGE      thetae=209.1 rpm=  1486 ci=2199 a=0 b=0 c=0
+  t=4.296576 EDGE      thetae=209.1 rpm=  1486 ci=2199 a=0 b=0 c=0
+  t=4.296576 EDGE      thetae=209.2 rpm=  1486 ci=2199 a=0 b=0 c=0
+  t=4.296577 EDGE      thetae=209.3 rpm=  1486 ci=2199 a=0 b=0 c=0
+  t=4.296903 MAINLOOP  thetae=229.6 rpm=  1494 ci=2199 a=2474 b=3245 c=153
+  t=4.297072 EDGE      thetae=240.3 rpm=  1499 ci=2199 a=0 b=0 c=0
+  t=4.297158 MAINLOOP  thetae=245.7 rpm=  1501 ci=2199 a=2474 b=3245 c=248
+  t=4.297526 COMMUTATE thetae=269.0 rpm=  1510 ci=2133 a=4 b=232 c=500
+  t=4.298018 EDGE      thetae=300.3 rpm=  1522 ci=2133 a=1 b=0 c=0
+  t=4.298436 COMMUTATE thetae=327.0 rpm=  1532 ci=2059 a=5 b=232 c=500
+  t=4.298490 EDGE      thetae=330.6 rpm=  1533 ci=2059 a=0 b=0 c=0
+  t=4.298491 EDGE      thetae=330.6 rpm=  1533 ci=2059 a=0 b=0 c=0
+  t=4.298492 EDGE      thetae=330.7 rpm=  1533 ci=2059 a=0 b=0 c=0
+  t=4.298493 EDGE      thetae=330.8 rpm=  1533 ci=2059 a=0 b=0 c=0
+  t=4.298494 EDGE      thetae=330.8 rpm=  1533 ci=2059 a=0 b=0 c=0
+  t=4.298532 EDGE      thetae=333.3 rpm=  1534 ci=2059 a=0 b=0 c=0
+  t=4.298533 EDGE      thetae=333.4 rpm=  1534 ci=2059 a=0 b=0 c=0
+  t=4.298534 EDGE      thetae=333.4 rpm=  1534 ci=2059 a=0 b=0 c=0
+  t=4.298536 EDGE      thetae=333.5 rpm=  1534 ci=2059 a=0 b=0 c=0
+  t=4.298953 EDGE      thetae=  0.5 rpm=  1545 ci=2059 a=0 b=0 c=0
+  t=4.299401 COMMUTATE thetae= 29.6 rpm=  1556 ci=2028 a=6 b=232 c=500
+  t=4.299869 EDGE      thetae= 60.3 rpm=  1566 ci=2028 a=1 b=0 c=0
+  t=4.300313 COMMUTATE thetae= 89.6 rpm=  1576 ci=1980 a=1 b=232 c=500
+  t=4.300323 EDGE      thetae= 90.4 rpm=  1577 ci=1980 a=0 b=1 c=0
+  t=4.300324 BLANKED   thetae= 90.4 rpm=  1577 ci=1980 a=519 b=990 c=0
+  t=4.300325 EDGE      thetae= 90.4 rpm=  1577 ci=1980 a=0 b=1 c=0
+  t=4.300325 BLANKED   thetae= 90.4 rpm=  1577 ci=1980 a=521 b=990 c=0
+  t=4.300326 EDGE      thetae= 90.5 rpm=  1577 ci=1980 a=0 b=1 c=0
+  t=4.300326 BLANKED   thetae= 90.5 rpm=  1577 ci=1980 a=523 b=990 c=0
+  t=4.300327 EDGE      thetae= 90.6 rpm=  1577 ci=1980 a=0 b=1 c=0
+  t=4.300328 BLANKED   thetae= 90.6 rpm=  1577 ci=1980 a=526 b=990 c=0
+  t=4.300776 EDGE      thetae=120.4 rpm=  1586 ci=1980 a=0 b=1 c=0
+  t=4.300777 COMP_RUN  thetae=120.4 rpm=  1586 ci=1980 a=1424 b=0 c=0
+  t=4.300778 ZC_ACCEPT thetae=120.5 rpm=  1586 ci=1980 a=496 b=0 c=0
+  t=4.301026 COMMUTATE thetae=137.0 rpm=  1592 ci=1980 a=2 b=232 c=500
+  t=4.301671 EDGE      thetae=180.4 rpm=  1607 ci=1805 a=1 b=1 c=0
+  t=4.301672 COMP_RUN  thetae=180.4 rpm=  1607 ci=1805 a=1788 b=0 c=0
+  t=4.301673 ZC_ACCEPT thetae=180.5 rpm=  1607 ci=1805 a=452 b=0 c=0
+  t=4.301898 COMMUTATE thetae=195.8 rpm=  1612 ci=1805 a=3 b=232 c=500
+  t=4.301949 EDGE      thetae=199.2 rpm=  1613 ci=1706 a=0 b=1 c=0
+  t=4.301950 BLANKED   thetae=199.2 rpm=  1613 ci=1706 a=553 b=853 c=0
+  t=4.301950 MAINLOOP  thetae=199.2 rpm=  1613 ci=1706 a=2474 b=3245 c=4729
+  t=4.301950 EDGE      thetae=199.3 rpm=  1613 ci=1706 a=0 b=1 c=0
+  t=4.301951 BLANKED   thetae=199.3 rpm=  1613 ci=1706 a=556 b=853 c=0
+  t=4.301951 EDGE      thetae=199.3 rpm=  1613 ci=1706 a=0 b=1 c=0
+SITL: irq 0 blocked 143.0us at t=4.3400: primask=245 dis=0 free=1 act=[0,0,0,0,0,0]
+SITL: reset (software) at t=32.758s
+AM32 SITL: eeprom=/tmp/claude-1000/-home-tridge-project-UAV-AM32-AM32-4/196b27cd-430d-4142-a2d8-7acd45205596/scratchpad/sitl_eeprom.bin can=mcast:2:lo speedup=1.0
+SITL: PWM/DShot input on udp port 57933
+SITL: state/model port udp 57934
+SITL: dead time 500ns (BDTR 0x50)
+SITL: CAN init mcast:2:lo
+SITL: CAN on mcast:2:lo (239.65.82.2:57732)
+SITL: irq 0 blocked 178.5us at t=23.0226: primask=316 dis=0 free=1 act=[0,0,0,0,0,0]
+SITL: irq 0 blocked 8013.5us at t=23.1750: primask=15987 dis=0 free=0 act=[0,0,0,0,0,0]
+SITL: desync 1 at t=23.1932s avg=1614 last_avg=1980 zc=0 e_com_time=4844, recent events:
+  t=23.191879 COMP_RUN  thetae=335.6 rpm=  2931 ci=1105 a=3994 b=0 c=0
+  t=23.191881 EDGE      thetae=335.7 rpm=  2931 ci=1105 a=0 b=1 c=0
+  t=23.191881 COMP_RUN  thetae=335.7 rpm=  2931 ci=1105 a=3996 b=0 c=0
+  t=23.191881 EDGE      thetae=335.8 rpm=  2931 ci=1105 a=0 b=1 c=0
+  t=23.191881 COMP_RUN  thetae=335.8 rpm=  2931 ci=1105 a=3998 b=0 c=0
+  t=23.191883 EDGE      thetae=336.0 rpm=  2932 ci=1105 a=0 b=1 c=0
+  t=23.191883 COMP_RUN  thetae=336.0 rpm=  2932 ci=1105 a=4001 b=0 c=0
+  t=23.191883 EDGE      thetae=336.1 rpm=  2932 ci=1105 a=0 b=1 c=0
+  t=23.191885 COMP_RUN  thetae=336.1 rpm=  2932 ci=1105 a=4003 b=0 c=0
+  t=23.191957 EDGE      thetae=345.1 rpm=  2943 ci=1105 a=0 b=1 c=0
+  t=23.191957 COMP_RUN  thetae=345.1 rpm=  2943 ci=1105 a=4148 b=0 c=0
+  t=23.191957 EDGE      thetae=345.2 rpm=  2943 ci=1105 a=0 b=1 c=0
+  t=23.191957 COMP_RUN  thetae=345.2 rpm=  2943 ci=1105 a=4150 b=0 c=0
+  t=23.191959 EDGE      thetae=345.3 rpm=  2943 ci=1105 a=0 b=1 c=0
+  t=23.191959 COMP_RUN  thetae=345.3 rpm=  2943 ci=1105 a=4152 b=0 c=0
+  t=23.191959 EDGE      thetae=345.4 rpm=  2943 ci=1105 a=0 b=1 c=0
+  t=23.191959 COMP_RUN  thetae=345.4 rpm=  2943 ci=1105 a=4154 b=0 c=0
+  t=23.191961 EDGE      thetae=345.6 rpm=  2944 ci=1105 a=0 b=1 c=0
+  t=23.191961 COMP_RUN  thetae=345.6 rpm=  2944 ci=1105 a=4156 b=0 c=0
+  t=23.191961 EDGE      thetae=345.7 rpm=  2944 ci=1105 a=0 b=1 c=0
+  t=23.191961 COMP_RUN  thetae=345.7 rpm=  2944 ci=1105 a=4158 b=0 c=0
+  t=23.191963 EDGE      thetae=345.9 rpm=  2944 ci=1105 a=0 b=1 c=0
+  t=23.191963 COMP_RUN  thetae=345.9 rpm=  2944 ci=1105 a=4161 b=0 c=0
+  t=23.191963 EDGE      thetae=346.0 rpm=  2944 ci=1105 a=0 b=1 c=0
+  t=23.191965 COMP_RUN  thetae=346.0 rpm=  2944 ci=1105 a=4163 b=0 c=0
+  t=23.191965 EDGE      thetae=346.1 rpm=  2944 ci=1105 a=0 b=1 c=0
+  t=23.191965 COMP_RUN  thetae=346.1 rpm=  2944 ci=1105 a=4165 b=0 c=0
+  t=23.191965 EDGE      thetae=346.2 rpm=  2945 ci=1105 a=0 b=1 c=0
+  t=23.191967 COMP_RUN  thetae=346.2 rpm=  2945 ci=1105 a=4167 b=0 c=0
+  t=23.191967 EDGE      thetae=346.4 rpm=  2945 ci=1105 a=0 b=1 c=0
+  t=23.191967 COMP_RUN  thetae=346.4 rpm=  2945 ci=1105 a=4169 b=0 c=0
+  t=23.191967 EDGE      thetae=346.5 rpm=  2945 ci=1105 a=0 b=1 c=0
+  t=23.191969 COMP_RUN  thetae=346.5 rpm=  2945 ci=1105 a=4171 b=0 c=0
+  t=23.191998 EDGE      thetae=350.2 rpm=  2949 ci=1105 a=0 b=1 c=0
+  t=23.191998 COMP_RUN  thetae=350.2 rpm=  2949 ci=1105 a=4231 b=0 c=0
+  t=23.191999 EDGE      thetae=350.3 rpm=  2949 ci=1105 a=0 b=1 c=0
+  t=23.191999 COMP_RUN  thetae=350.3 rpm=  2949 ci=1105 a=4233 b=0 c=0
+  t=23.191999 EDGE      thetae=350.5 rpm=  2949 ci=1105 a=0 b=1 c=0
+  t=23.191999 COMP_RUN  thetae=350.5 rpm=  2949 ci=1105 a=4235 b=0 c=0
+  t=23.191999 EDGE      thetae=350.6 rpm=  2950 ci=1105 a=0 b=1 c=0
+  t=23.192001 COMP_RUN  thetae=350.6 rpm=  2950 ci=1105 a=4237 b=0 c=0
+  t=23.192001 EDGE      thetae=350.7 rpm=  2950 ci=1105 a=0 b=1 c=0
+  t=23.192001 COMP_RUN  thetae=350.7 rpm=  2950 ci=1105 a=4239 b=0 c=0
+  t=23.192001 EDGE      thetae=350.8 rpm=  2950 ci=1105 a=0 b=1 c=0
+  t=23.192003 COMP_RUN  thetae=350.8 rpm=  2950 ci=1105 a=4241 b=0 c=0
+  t=23.192003 EDGE      thetae=351.0 rpm=  2950 ci=1105 a=0 b=1 c=0
+  t=23.192003 COMP_RUN  thetae=351.0 rpm=  2950 ci=1105 a=4243 b=0 c=0
+  t=23.192003 EDGE      thetae=351.1 rpm=  2950 ci=1105 a=0 b=1 c=0
+  t=23.192005 COMP_RUN  thetae=351.1 rpm=  2950 ci=1105 a=4245 b=0 c=0
+  t=23.192005 EDGE      thetae=351.2 rpm=  2950 ci=1105 a=0 b=1 c=0
+  t=23.192005 COMP_RUN  thetae=351.2 rpm=  2950 ci=1105 a=4247 b=0 c=0
+  t=23.192009 EDGE      thetae=351.4 rpm=  2951 ci=1105 a=0 b=1 c=0
+  t=23.192009 COMP_RUN  thetae=351.4 rpm=  2951 ci=1105 a=4250 b=0 c=0
+  t=23.192009 EDGE      thetae=351.5 rpm=  2951 ci=1105 a=0 b=1 c=0
+  t=23.192009 COMP_RUN  thetae=351.5 rpm=  2951 ci=1105 a=4252 b=0 c=0
+  t=23.192011 EDGE      thetae=351.6 rpm=  2951 ci=1105 a=0 b=1 c=0
+  t=23.192011 COMP_RUN  thetae=351.6 rpm=  2951 ci=1105 a=4254 b=0 c=0
+  t=23.192080 EDGE      thetae=  0.3 rpm=  2961 ci=1105 a=0 b=1 c=0
+  t=23.192080 COMP_RUN  thetae=  0.3 rpm=  2961 ci=1105 a=4393 b=0 c=0
+  t=23.192080 ZC_ACCEPT thetae=  0.4 rpm=  2961 ci=1105 a=277 b=0 c=0
+  t=23.192219 COMMUTATE thetae= 17.7 rpm=  2981 ci=1105 a=6 b=600 c=600
+  t=23.192556 EDGE      thetae= 60.4 rpm=  3030 ci=1844 a=1 b=1 c=0
+  t=23.192556 COMP_RUN  thetae= 60.5 rpm=  3030 ci=1844 a=955 b=0 c=0
+  t=23.192558 ZC_ACCEPT thetae= 60.6 rpm=  3030 ci=1844 a=462 b=0 c=0
+  t=23.192707 EDGE      thetae= 79.6 rpm=  3050 ci=1844 a=1 b=0 c=0
+  t=23.192709 EDGE      thetae= 79.7 rpm=  3050 ci=1844 a=1 b=0 c=0
+  t=23.192709 EDGE      thetae= 79.8 rpm=  3050 ci=1844 a=1 b=0 c=0
+  t=23.192711 EDGE      thetae= 79.9 rpm=  3051 ci=1844 a=1 b=0 c=0
+  t=23.192749 EDGE      thetae= 85.0 rpm=  3056 ci=1844 a=1 b=0 c=0
+  t=23.192749 EDGE      thetae= 85.1 rpm=  3056 ci=1844 a=1 b=0 c=0
+  t=23.192751 EDGE      thetae= 85.3 rpm=  3056 ci=1844 a=1 b=0 c=0
+  t=23.192791 COMMUTATE thetae= 90.1 rpm=  3062 ci=1844 a=1 b=600 c=600
+  t=23.192791 BLANKED   thetae= 90.1 rpm=  3062 ci=2260 a=462 b=1130 c=0
+  t=23.192831 EDGE      thetae= 95.7 rpm=  3067 ci=2260 a=0 b=1 c=0
+  t=23.192833 BLANKED   thetae= 95.7 rpm=  3067 ci=2260 a=549 b=1130 c=0
+  t=23.192833 EDGE      thetae= 95.8 rpm=  3067 ci=2260 a=0 b=1 c=0
+  t=23.192833 BLANKED   thetae= 95.8 rpm=  3067 ci=2260 a=550 b=1130 c=0
+  t=23.192833 EDGE      thetae= 95.9 rpm=  3067 ci=2260 a=0 b=1 c=0
+  t=23.192835 BLANKED   thetae= 95.9 rpm=  3067 ci=2260 a=552 b=1130 c=0
+  t=23.192835 EDGE      thetae= 96.1 rpm=  3068 ci=2260 a=0 b=1 c=0
+  t=23.192835 BLANKED   thetae= 96.1 rpm=  3068 ci=2260 a=555 b=1130 c=0
+  t=23.192837 EDGE      thetae= 96.3 rpm=  3068 ci=2260 a=0 b=1 c=0
+  t=23.192837 BLANKED   thetae= 96.3 rpm=  3068 ci=2260 a=557 b=1130 c=0
+  t=23.192837 EDGE      thetae= 96.4 rpm=  3068 ci=2260 a=0 b=1 c=0
+  t=23.192839 BLANKED   thetae= 96.5 rpm=  3068 ci=2260 a=560 b=1130 c=0
+  t=23.192839 EDGE      thetae= 96.5 rpm=  3068 ci=2260 a=0 b=1 c=0
+  t=23.192839 BLANKED   thetae= 96.5 rpm=  3068 ci=2260 a=561 b=1130 c=0
+  t=23.192839 EDGE      thetae= 96.7 rpm=  3068 ci=2260 a=0 b=1 c=0
+  t=23.192842 BLANKED   thetae= 96.7 rpm=  3068 ci=2260 a=564 b=1130 c=0
+  t=23.192842 EDGE      thetae= 96.8 rpm=  3069 ci=2260 a=0 b=1 c=0
+  t=23.192842 BLANKED   thetae= 96.8 rpm=  3069 ci=2260 a=566 b=1130 c=0
+  t=23.192842 EDGE      thetae= 97.0 rpm=  3069 ci=2260 a=0 b=1 c=0
+  t=23.192844 BLANKED   thetae= 97.0 rpm=  3069 ci=2260 a=568 b=1130 c=0
+  t=23.193022 EDGE      thetae=120.2 rpm=  3094 ci=2260 a=0 b=1 c=0
+  t=23.193024 BLANKED   thetae=120.3 rpm=  3094 ci=2260 a=928 b=1130 c=0
+  t=23.193167 MAINLOOP  thetae=139.1 rpm=  3113 ci=2260 a=1980 b=1980 c=2346
+SITL: desync 2 at t=23.2548s avg=1454 last_avg=1454 zc=0 e_com_time=3260, recent events:
+  t=23.253534 EDGE      thetae=346.9 rpm=  2807 ci=1080 a=0 b=1 c=0
+  t=23.253536 COMP_RUN  thetae=346.9 rpm=  2807 ci=1080 a=790 b=0 c=0
+  t=23.253536 EDGE      thetae=347.1 rpm=  2808 ci=1080 a=0 b=1 c=0
+  t=23.253536 COMP_RUN  thetae=347.1 rpm=  2808 ci=1080 a=793 b=0 c=0
+  t=23.253538 EDGE      thetae=347.2 rpm=  2808 ci=1080 a=0 b=1 c=0
+  t=23.253538 COMP_RUN  thetae=347.2 rpm=  2808 ci=1080 a=795 b=0 c=0
+  t=23.253538 EDGE      thetae=347.3 rpm=  2808 ci=1080 a=0 b=1 c=0
+  t=23.253538 COMP_RUN  thetae=347.3 rpm=  2808 ci=1080 a=797 b=0 c=0
+  t=23.253540 EDGE      thetae=347.4 rpm=  2808 ci=1080 a=0 b=1 c=0
+  t=23.253540 COMP_RUN  thetae=347.4 rpm=  2808 ci=1080 a=799 b=0 c=0
+  t=23.253540 EDGE      thetae=347.5 rpm=  2808 ci=1080 a=0 b=1 c=0
+  t=23.253540 COMP_RUN  thetae=347.5 rpm=  2808 ci=1080 a=801 b=0 c=0
+  t=23.253542 EDGE      thetae=347.7 rpm=  2808 ci=1080 a=0 b=1 c=0
+  t=23.253542 COMP_RUN  thetae=347.7 rpm=  2808 ci=1080 a=803 b=0 c=0
+  t=23.253542 EDGE      thetae=347.8 rpm=  2809 ci=1080 a=0 b=1 c=0
+  t=23.253542 COMP_RUN  thetae=347.8 rpm=  2809 ci=1080 a=805 b=0 c=0
+  t=23.253647 EDGE      thetae=  0.2 rpm=  2822 ci=1080 a=0 b=1 c=0
+  t=23.253649 COMP_RUN  thetae=  0.2 rpm=  2822 ci=1080 a=1015 b=0 c=0
+  t=23.253649 ZC_ACCEPT thetae=  0.3 rpm=  2822 ci=1080 a=271 b=0 c=0
+  t=23.253784 COMMUTATE thetae= 16.4 rpm=  2839 ci=1080 a=6 b=560 c=600
+  t=23.254150 EDGE      thetae= 60.5 rpm=  2889 ci=1057 a=1 b=1 c=0
+  t=23.254150 COMP_RUN  thetae= 60.6 rpm=  2889 ci=1057 a=1005 b=0 c=0
+  t=23.254152 ZC_ACCEPT thetae= 60.7 rpm=  2889 ci=1057 a=265 b=0 c=0
+  t=23.254284 EDGE      thetae= 76.6 rpm=  2907 ci=1057 a=1 b=0 c=0
+  t=23.254284 EDGE      thetae= 76.7 rpm=  2907 ci=1057 a=1 b=0 c=0
+  t=23.254286 COMMUTATE thetae= 76.8 rpm=  2907 ci=1057 a=1 b=580 c=600
+  t=23.254286 BLANKED   thetae= 76.8 rpm=  2907 ci=1034 a=265 b=517 c=0
+  t=23.254326 EDGE      thetae= 82.0 rpm=  2912 ci=1034 a=0 b=1 c=0
+  t=23.254328 BLANKED   thetae= 82.1 rpm=  2912 ci=1034 a=351 b=517 c=0
+  t=23.254328 EDGE      thetae= 82.1 rpm=  2912 ci=1034 a=0 b=1 c=0
+  t=23.254328 BLANKED   thetae= 82.1 rpm=  2912 ci=1034 a=352 b=517 c=0
+  t=23.254328 EDGE      thetae= 82.3 rpm=  2912 ci=1034 a=0 b=1 c=0
+  t=23.254332 BLANKED   thetae= 82.3 rpm=  2912 ci=1034 a=355 b=517 c=0
+  t=23.254332 EDGE      thetae= 82.4 rpm=  2912 ci=1034 a=0 b=1 c=0
+  t=23.254332 BLANKED   thetae= 82.4 rpm=  2912 ci=1034 a=357 b=517 c=0
+  t=23.254333 EDGE      thetae= 82.6 rpm=  2913 ci=1034 a=0 b=1 c=0
+  t=23.254333 BLANKED   thetae= 82.6 rpm=  2913 ci=1034 a=360 b=517 c=0
+  t=23.254333 EDGE      thetae= 82.7 rpm=  2913 ci=1034 a=0 b=1 c=0
+  t=23.254335 BLANKED   thetae= 82.8 rpm=  2913 ci=1034 a=363 b=517 c=0
+  t=23.254335 EDGE      thetae= 82.9 rpm=  2913 ci=1034 a=0 b=1 c=0
+  t=23.254335 BLANKED   thetae= 82.9 rpm=  2913 ci=1034 a=364 b=517 c=0
+  t=23.254335 EDGE      thetae= 83.0 rpm=  2913 ci=1034 a=0 b=1 c=0
+  t=23.254335 BLANKED   thetae= 83.0 rpm=  2913 ci=1034 a=367 b=517 c=0
+  t=23.254368 EDGE      thetae= 87.1 rpm=  2917 ci=1034 a=0 b=1 c=0
+  t=23.254370 BLANKED   thetae= 87.1 rpm=  2917 ci=1034 a=433 b=517 c=0
+  t=23.254370 EDGE      thetae= 87.3 rpm=  2918 ci=1034 a=0 b=1 c=0
+  t=23.254370 BLANKED   thetae= 87.3 rpm=  2918 ci=1034 a=436 b=517 c=0
+  t=23.254372 EDGE      thetae= 87.4 rpm=  2918 ci=1034 a=0 b=1 c=0
+  t=23.254372 BLANKED   thetae= 87.4 rpm=  2918 ci=1034 a=439 b=517 c=0
+  t=23.254372 EDGE      thetae= 87.5 rpm=  2918 ci=1034 a=0 b=1 c=0
+  t=23.254372 BLANKED   thetae= 87.5 rpm=  2918 ci=1034 a=440 b=517 c=0
+  t=23.254374 EDGE      thetae= 87.7 rpm=  2918 ci=1034 a=0 b=1 c=0
+  t=23.254374 BLANKED   thetae= 87.7 rpm=  2918 ci=1034 a=443 b=517 c=0
+  t=23.254374 EDGE      thetae= 87.8 rpm=  2918 ci=1034 a=0 b=1 c=0
+  t=23.254375 BLANKED   thetae= 87.8 rpm=  2918 ci=1034 a=445 b=517 c=0
+  t=23.254408 EDGE      thetae= 92.0 rpm=  2923 ci=1034 a=0 b=1 c=0
+  t=23.254408 BLANKED   thetae= 92.0 rpm=  2923 ci=1034 a=514 b=517 c=0
+  t=23.254410 EDGE      thetae= 92.2 rpm=  2923 ci=1034 a=0 b=1 c=0
+  t=23.254410 COMP_RUN  thetae= 92.3 rpm=  2923 ci=1034 a=518 b=0 c=0
+  t=23.254410 EDGE      thetae= 92.4 rpm=  2924 ci=1034 a=0 b=1 c=0
+  t=23.254414 COMP_RUN  thetae= 92.4 rpm=  2924 ci=1034 a=519 b=0 c=0
+  t=23.254414 EDGE      thetae= 92.5 rpm=  2924 ci=1034 a=0 b=1 c=0
+  t=23.254414 COMP_RUN  thetae= 92.5 rpm=  2924 ci=1034 a=521 b=0 c=0
+  t=23.254416 EDGE      thetae= 92.7 rpm=  2924 ci=1034 a=0 b=1 c=0
+  t=23.254416 COMP_RUN  thetae= 92.7 rpm=  2924 ci=1034 a=524 b=0 c=0
+  t=23.254416 EDGE      thetae= 92.8 rpm=  2924 ci=1034 a=0 b=1 c=0
+  t=23.254416 COMP_RUN  thetae= 92.8 rpm=  2924 ci=1034 a=526 b=0 c=0
+  t=23.254417 EDGE      thetae= 92.9 rpm=  2924 ci=1034 a=0 b=1 c=0
+  t=23.254417 COMP_RUN  thetae= 92.9 rpm=  2924 ci=1034 a=528 b=0 c=0
+  t=23.254417 EDGE      thetae= 93.1 rpm=  2925 ci=1034 a=0 b=1 c=0
+  t=23.254419 COMP_RUN  thetae= 93.1 rpm=  2925 ci=1034 a=531 b=0 c=0
+  t=23.254419 EDGE      thetae= 93.2 rpm=  2925 ci=1034 a=0 b=1 c=0
+  t=23.254419 COMP_RUN  thetae= 93.2 rpm=  2925 ci=1034 a=533 b=0 c=0
+  t=23.254450 EDGE      thetae= 97.1 rpm=  2929 ci=1034 a=0 b=1 c=0
+  t=23.254452 COMP_RUN  thetae= 97.1 rpm=  2929 ci=1034 a=597 b=0 c=0
+  t=23.254452 EDGE      thetae= 97.3 rpm=  2929 ci=1034 a=0 b=1 c=0
+  t=23.254452 COMP_RUN  thetae= 97.3 rpm=  2929 ci=1034 a=600 b=0 c=0
+  t=23.254454 EDGE      thetae= 97.5 rpm=  2930 ci=1034 a=0 b=1 c=0
+  t=23.254454 COMP_RUN  thetae= 97.5 rpm=  2930 ci=1034 a=602 b=0 c=0
+  t=23.254454 EDGE      thetae= 97.6 rpm=  2930 ci=1034 a=0 b=1 c=0
+  t=23.254454 COMP_RUN  thetae= 97.6 rpm=  2930 ci=1034 a=604 b=0 c=0
+  t=23.254456 EDGE      thetae= 97.7 rpm=  2930 ci=1034 a=0 b=1 c=0
+  t=23.254456 COMP_RUN  thetae= 97.7 rpm=  2930 ci=1034 a=606 b=0 c=0
+  t=23.254456 EDGE      thetae= 97.9 rpm=  2930 ci=1034 a=0 b=1 c=0
+  t=23.254457 COMP_RUN  thetae= 97.9 rpm=  2930 ci=1034 a=609 b=0 c=0
+  t=23.254457 EDGE      thetae= 98.0 rpm=  2930 ci=1034 a=0 b=1 c=0
+  t=23.254457 COMP_RUN  thetae= 98.0 rpm=  2930 ci=1034 a=611 b=0 c=0
+  t=23.254457 EDGE      thetae= 98.1 rpm=  2931 ci=1034 a=0 b=1 c=0
+  t=23.254459 COMP_RUN  thetae= 98.1 rpm=  2931 ci=1034 a=613 b=0 c=0
+  t=23.254459 EDGE      thetae= 98.3 rpm=  2931 ci=1034 a=0 b=1 c=0
+  t=23.254459 COMP_RUN  thetae= 98.3 rpm=  2931 ci=1034 a=615 b=0 c=0
+  t=23.254639 EDGE      thetae=120.4 rpm=  2957 ci=1034 a=0 b=1 c=0
+  t=23.254639 COMP_RUN  thetae=120.4 rpm=  2957 ci=1034 a=973 b=0 c=0
+  t=23.254641 ZC_ACCEPT thetae=120.5 rpm=  2957 ci=1034 a=260 b=0 c=0
+  t=23.254768 COMMUTATE thetae=136.7 rpm=  2975 ci=1034 a=2 b=598 c=600
+  t=23.254776 MAINLOOP  thetae=137.4 rpm=  2976 ci=1012 a=1454 b=1454 c=4080
+SITL: reset (software) at t=29.281s
+AM32 SITL: eeprom=/tmp/claude-1000/-home-tridge-project-UAV-AM32-AM32-4/196b27cd-430d-4142-a2d8-7acd45205596/scratchpad/sitl_eeprom.bin can=mcast:2:lo speedup=1.0
+SITL: PWM/DShot input on udp port 57933
+SITL: state/model port udp 57934
+SITL: dead time 500ns (BDTR 0x50)
+SITL: CAN init mcast:2:lo
+SITL: CAN on mcast:2:lo (239.65.82.2:57732)
+SITL: irq 0 blocked 472.5us at t=3.5628: primask=905 dis=0 free=0 act=[0,0,0,0,0,0]
+SITL: desync 1 at t=3.5693s avg=1510 last_avg=1280 zc=0 e_com_time=4530, recent events:
+  t=3.568455 EDGE      thetae=348.1 rpm=  5007 ci=1931 a=0 b=1 c=0
+  t=3.568455 COMP_RUN  thetae=348.1 rpm=  5007 ci=1931 a=3406 b=0 c=0
+  t=3.568456 EDGE      thetae=348.5 rpm=  5008 ci=1931 a=0 b=1 c=0
+  t=3.568457 COMP_RUN  thetae=348.5 rpm=  5008 ci=1931 a=3409 b=0 c=0
+  t=3.568457 EDGE      thetae=348.7 rpm=  5008 ci=1931 a=0 b=1 c=0
+  t=3.568458 COMP_RUN  thetae=348.7 rpm=  5008 ci=1931 a=3411 b=0 c=0
+  t=3.568458 EDGE      thetae=348.9 rpm=  5008 ci=1931 a=0 b=1 c=0
+  t=3.568459 COMP_RUN  thetae=348.9 rpm=  5008 ci=1931 a=3413 b=0 c=0
+  t=3.568460 EDGE      thetae=349.1 rpm=  5008 ci=1931 a=0 b=1 c=0
+  t=3.568460 COMP_RUN  thetae=349.1 rpm=  5008 ci=1931 a=3415 b=0 c=0
+  t=3.568510 MAINLOOP  thetae=359.7 rpm=  5011 ci=1931 a=1036 b=463 c=63
+  t=3.568512 EDGE      thetae=  0.2 rpm=  5012 ci=1931 a=0 b=1 c=0
+  t=3.568513 COMP_RUN  thetae=  0.2 rpm=  5012 ci=1931 a=3521 b=0 c=0
+  t=3.568514 ZC_ACCEPT thetae=  0.5 rpm=  5012 ci=1931 a=484 b=0 c=0
+  t=3.568597 MAINLOOP  thetae= 17.9 rpm=  5016 ci=1931 a=1036 b=463 c=86
+  t=3.568674 MAINLOOP  thetae= 34.2 rpm=  5020 ci=1931 a=1036 b=463 c=77
+  t=3.568756 COMMUTATE thetae= 51.5 rpm=  5025 ci=1931 a=6 b=665 c=900
+  t=3.568797 EDGE      thetae= 60.3 rpm=  5028 ci=2063 a=1 b=1 c=0
+  t=3.568798 BLANKED   thetae= 60.4 rpm=  5029 ci=2063 a=569 b=1031 c=0
+  t=3.568798 MAINLOOP  thetae= 60.4 rpm=  5029 ci=2063 a=1036 b=463 c=56
+  t=3.568863 EDGE      thetae= 74.3 rpm=  5032 ci=2063 a=1 b=1 c=0
+  t=3.568864 BLANKED   thetae= 74.3 rpm=  5032 ci=2063 a=700 b=1031 c=0
+  t=3.568864 EDGE      thetae= 74.5 rpm=  5032 ci=2063 a=1 b=1 c=0
+  t=3.568865 BLANKED   thetae= 74.5 rpm=  5032 ci=2063 a=702 b=1031 c=0
+  t=3.568866 EDGE      thetae= 74.7 rpm=  5032 ci=2063 a=1 b=1 c=0
+  t=3.568866 BLANKED   thetae= 74.7 rpm=  5032 ci=2063 a=704 b=1031 c=0
+  t=3.568866 EDGE      thetae= 74.9 rpm=  5032 ci=2063 a=1 b=1 c=0
+  t=3.568867 BLANKED   thetae= 74.9 rpm=  5032 ci=2063 a=706 b=1031 c=0
+  t=3.568868 EDGE      thetae= 75.2 rpm=  5032 ci=2063 a=1 b=1 c=0
+  t=3.568869 BLANKED   thetae= 75.3 rpm=  5032 ci=2063 a=710 b=1031 c=0
+  t=3.568869 EDGE      thetae= 75.4 rpm=  5032 ci=2063 a=1 b=1 c=0
+  t=3.568869 BLANKED   thetae= 75.4 rpm=  5032 ci=2063 a=711 b=1031 c=0
+  t=3.568870 EDGE      thetae= 75.6 rpm=  5033 ci=2063 a=1 b=1 c=0
+  t=3.568870 BLANKED   thetae= 75.6 rpm=  5033 ci=2063 a=713 b=1031 c=0
+  t=3.568871 EDGE      thetae= 76.0 rpm=  5033 ci=2063 a=1 b=1 c=0
+  t=3.568872 BLANKED   thetae= 76.0 rpm=  5033 ci=2063 a=716 b=1031 c=0
+  t=3.568872 EDGE      thetae= 76.2 rpm=  5033 ci=2063 a=1 b=1 c=0
+  t=3.568873 BLANKED   thetae= 76.2 rpm=  5033 ci=2063 a=718 b=1031 c=0
+  t=3.568873 EDGE      thetae= 76.4 rpm=  5033 ci=2063 a=1 b=1 c=0
+  t=3.568874 BLANKED   thetae= 76.5 rpm=  5033 ci=2063 a=721 b=1031 c=0
+  t=3.568875 EDGE      thetae= 76.7 rpm=  5033 ci=2063 a=1 b=1 c=0
+  t=3.568875 BLANKED   thetae= 76.7 rpm=  5033 ci=2063 a=723 b=1031 c=0
+  t=3.568876 EDGE      thetae= 76.9 rpm=  5033 ci=2063 a=1 b=1 c=0
+  t=3.568877 BLANKED   thetae= 76.9 rpm=  5033 ci=2063 a=725 b=1031 c=0
+  t=3.568877 EDGE      thetae= 77.1 rpm=  5033 ci=2063 a=1 b=1 c=0
+  t=3.568877 BLANKED   thetae= 77.1 rpm=  5033 ci=2063 a=727 b=1031 c=0
+  t=3.568908 EDGE      thetae= 83.7 rpm=  5035 ci=2063 a=1 b=1 c=0
+  t=3.568908 BLANKED   thetae= 83.7 rpm=  5035 ci=2063 a=789 b=1031 c=0
+  t=3.568909 EDGE      thetae= 84.0 rpm=  5035 ci=2063 a=1 b=1 c=0
+  t=3.568911 BLANKED   thetae= 84.1 rpm=  5035 ci=2063 a=793 b=1031 c=0
+  t=3.568911 EDGE      thetae= 84.2 rpm=  5035 ci=2063 a=1 b=1 c=0
+  t=3.568911 BLANKED   thetae= 84.2 rpm=  5035 ci=2063 a=794 b=1031 c=0
+  t=3.568912 EDGE      thetae= 84.5 rpm=  5035 ci=2063 a=1 b=1 c=0
+  t=3.568912 BLANKED   thetae= 84.5 rpm=  5035 ci=2063 a=797 b=1031 c=0
+  t=3.568913 EDGE      thetae= 84.7 rpm=  5035 ci=2063 a=1 b=1 c=0
+  t=3.568913 BLANKED   thetae= 84.7 rpm=  5035 ci=2063 a=799 b=1031 c=0
+  t=3.568914 EDGE      thetae= 85.1 rpm=  5035 ci=2063 a=1 b=1 c=0
+  t=3.568915 BLANKED   thetae= 85.1 rpm=  5035 ci=2063 a=802 b=1031 c=0
+  t=3.568915 EDGE      thetae= 85.3 rpm=  5035 ci=2063 a=1 b=1 c=0
+  t=3.568916 BLANKED   thetae= 85.4 rpm=  5035 ci=2063 a=805 b=1031 c=0
+  t=3.568917 EDGE      thetae= 85.6 rpm=  5035 ci=2063 a=1 b=1 c=0
+  t=3.568918 BLANKED   thetae= 85.6 rpm=  5035 ci=2063 a=807 b=1031 c=0
+  t=3.568918 EDGE      thetae= 85.8 rpm=  5035 ci=2063 a=1 b=1 c=0
+  t=3.568918 BLANKED   thetae= 85.8 rpm=  5035 ci=2063 a=809 b=1031 c=0
+  t=3.568953 EDGE      thetae= 93.1 rpm=  5037 ci=2063 a=1 b=1 c=0
+  t=3.568953 BLANKED   thetae= 93.1 rpm=  5037 ci=2063 a=878 b=1031 c=0
+  t=3.568954 EDGE      thetae= 93.4 rpm=  5037 ci=2063 a=1 b=1 c=0
+  t=3.568954 BLANKED   thetae= 93.4 rpm=  5037 ci=2063 a=881 b=1031 c=0
+  t=3.568955 EDGE      thetae= 93.6 rpm=  5037 ci=2063 a=1 b=1 c=0
+  t=3.568956 BLANKED   thetae= 93.7 rpm=  5037 ci=2063 a=884 b=1031 c=0
+  t=3.568956 EDGE      thetae= 93.9 rpm=  5037 ci=2063 a=1 b=1 c=0
+  t=3.568957 BLANKED   thetae= 93.9 rpm=  5037 ci=2063 a=886 b=1031 c=0
+  t=3.568958 EDGE      thetae= 94.3 rpm=  5037 ci=2063 a=1 b=1 c=0
+  t=3.568958 BLANKED   thetae= 94.3 rpm=  5037 ci=2063 a=889 b=1031 c=0
+  t=3.568959 EDGE      thetae= 94.6 rpm=  5037 ci=2063 a=1 b=1 c=0
+  t=3.568960 BLANKED   thetae= 94.6 rpm=  5037 ci=2063 a=892 b=1031 c=0
+  t=3.568995 EDGE      thetae=102.2 rpm=  5039 ci=2063 a=1 b=1 c=0
+  t=3.568996 BLANKED   thetae=102.2 rpm=  5039 ci=2063 a=964 b=1031 c=0
+  t=3.568997 EDGE      thetae=102.5 rpm=  5039 ci=2063 a=1 b=1 c=0
+  t=3.568998 BLANKED   thetae=102.6 rpm=  5039 ci=2063 a=968 b=1031 c=0
+  t=3.568998 EDGE      thetae=102.8 rpm=  5039 ci=2063 a=1 b=1 c=0
+  t=3.568999 BLANKED   thetae=102.8 rpm=  5039 ci=2063 a=970 b=1031 c=0
+  t=3.569000 EDGE      thetae=103.1 rpm=  5039 ci=2063 a=1 b=1 c=0
+  t=3.569000 BLANKED   thetae=103.1 rpm=  5039 ci=2063 a=973 b=1031 c=0
+  t=3.569001 EDGE      thetae=103.5 rpm=  5039 ci=2063 a=1 b=1 c=0
+  t=3.569002 BLANKED   thetae=103.5 rpm=  5039 ci=2063 a=976 b=1031 c=0
+  t=3.569039 EDGE      thetae=111.4 rpm=  5041 ci=2063 a=1 b=1 c=0
+  t=3.569040 COMP_RUN  thetae=111.4 rpm=  5041 ci=2063 a=1051 b=0 c=0
+  t=3.569041 ZC_ACCEPT thetae=111.7 rpm=  5041 ci=2063 a=517 b=0 c=0
+  t=3.569083 EDGE      thetae=120.7 rpm=  5042 ci=2063 a=1 b=0 c=0
+  t=3.569084 EDGE      thetae=121.0 rpm=  5043 ci=2063 a=1 b=0 c=0
+  t=3.569127 EDGE      thetae=130.0 rpm=  5044 ci=2063 a=1 b=0 c=0
+  t=3.569133 MAINLOOP  thetae=131.2 rpm=  5044 ci=2063 a=1280 b=463 c=51
+  t=3.569299 COMMUTATE thetae=166.4 rpm=  5031 ci=2063 a=1 b=665 c=800
+  t=3.569299 BLANKED   thetae=166.4 rpm=  5031 ci=2175 a=517 b=1087 c=0
+  t=3.569299 EDGE      thetae=166.5 rpm=  5031 ci=2175 a=0 b=1 c=0
+SITL: desync 2 at t=3.5909s avg=1910 last_avg=1668 zc=0 e_com_time=5730, recent events:
+  t=3.590236 EDGE      thetae= 77.1 rpm=  2660 ci=3301 a=1 b=1 c=0
+  t=3.590237 BLANKED   thetae= 77.1 rpm=  2660 ci=3301 a=1382 b=1650 c=0
+  t=3.590237 EDGE      thetae= 77.2 rpm=  2660 ci=3301 a=1 b=1 c=0
+  t=3.590238 BLANKED   thetae= 77.2 rpm=  2660 ci=3301 a=1384 b=1650 c=0
+  t=3.590238 EDGE      thetae= 77.3 rpm=  2660 ci=3301 a=1 b=1 c=0
+  t=3.590239 BLANKED   thetae= 77.3 rpm=  2660 ci=3301 a=1386 b=1650 c=0
+  t=3.590239 EDGE      thetae= 77.4 rpm=  2660 ci=3301 a=1 b=1 c=0
+  t=3.590240 BLANKED   thetae= 77.5 rpm=  2660 ci=3301 a=1389 b=1650 c=0
+  t=3.590240 EDGE      thetae= 77.5 rpm=  2660 ci=3301 a=1 b=1 c=0
+  t=3.590241 BLANKED   thetae= 77.5 rpm=  2660 ci=3301 a=1390 b=1650 c=0
+  t=3.590241 EDGE      thetae= 77.7 rpm=  2660 ci=3301 a=1 b=1 c=0
+  t=3.590242 BLANKED   thetae= 77.7 rpm=  2660 ci=3301 a=1392 b=1650 c=0
+  t=3.590243 EDGE      thetae= 77.8 rpm=  2660 ci=3301 a=1 b=1 c=0
+  t=3.590244 BLANKED   thetae= 77.8 rpm=  2660 ci=3301 a=1395 b=1650 c=0
+  t=3.590244 EDGE      thetae= 77.9 rpm=  2660 ci=3301 a=1 b=1 c=0
+  t=3.590245 BLANKED   thetae= 77.9 rpm=  2660 ci=3301 a=1397 b=1650 c=0
+  t=3.590245 EDGE      thetae= 78.0 rpm=  2660 ci=3301 a=1 b=1 c=0
+  t=3.590246 BLANKED   thetae= 78.1 rpm=  2661 ci=3301 a=1400 b=1650 c=0
+  t=3.590246 MAINLOOP  thetae= 78.1 rpm=  2661 ci=3301 a=1556 b=2523 c=407
+  t=3.590279 EDGE      thetae= 81.8 rpm=  2663 ci=3301 a=1 b=1 c=0
+  t=3.590279 BLANKED   thetae= 81.8 rpm=  2663 ci=3301 a=1467 b=1650 c=0
+  t=3.590280 EDGE      thetae= 82.0 rpm=  2663 ci=3301 a=1 b=1 c=0
+  t=3.590280 BLANKED   thetae= 82.0 rpm=  2663 ci=3301 a=1469 b=1650 c=0
+  t=3.590320 EDGE      thetae= 86.5 rpm=  2666 ci=3301 a=1 b=1 c=0
+  t=3.590321 BLANKED   thetae= 86.5 rpm=  2666 ci=3301 a=1550 b=1650 c=0
+  t=3.590322 EDGE      thetae= 86.7 rpm=  2666 ci=3301 a=1 b=1 c=0
+  t=3.590322 BLANKED   thetae= 86.7 rpm=  2666 ci=3301 a=1553 b=1650 c=0
+  t=3.590323 EDGE      thetae= 86.8 rpm=  2666 ci=3301 a=1 b=1 c=0
+  t=3.590324 BLANKED   thetae= 86.8 rpm=  2666 ci=3301 a=1556 b=1650 c=0
+  t=3.590324 EDGE      thetae= 86.9 rpm=  2666 ci=3301 a=1 b=1 c=0
+  t=3.590324 BLANKED   thetae= 86.9 rpm=  2666 ci=3301 a=1557 b=1650 c=0
+  t=3.590325 EDGE      thetae= 87.0 rpm=  2666 ci=3301 a=1 b=1 c=0
+  t=3.590325 BLANKED   thetae= 87.0 rpm=  2666 ci=3301 a=1559 b=1650 c=0
+  t=3.590326 EDGE      thetae= 87.2 rpm=  2666 ci=3301 a=1 b=1 c=0
+  t=3.590327 BLANKED   thetae= 87.2 rpm=  2666 ci=3301 a=1562 b=1650 c=0
+  t=3.590328 EDGE      thetae= 87.3 rpm=  2666 ci=3301 a=1 b=1 c=0
+  t=3.590328 BLANKED   thetae= 87.3 rpm=  2666 ci=3301 a=1564 b=1650 c=0
+  t=3.590363 EDGE      thetae= 91.3 rpm=  2668 ci=3301 a=1 b=1 c=0
+  t=3.590364 BLANKED   thetae= 91.3 rpm=  2668 ci=3301 a=1636 b=1650 c=0
+  t=3.590364 EDGE      thetae= 91.4 rpm=  2668 ci=3301 a=1 b=1 c=0
+  t=3.590364 BLANKED   thetae= 91.4 rpm=  2668 ci=3301 a=1637 b=1650 c=0
+  t=3.590365 EDGE      thetae= 91.5 rpm=  2668 ci=3301 a=1 b=1 c=0
+  t=3.590366 BLANKED   thetae= 91.5 rpm=  2668 ci=3301 a=1640 b=1650 c=0
+  t=3.590366 EDGE      thetae= 91.6 rpm=  2669 ci=3301 a=1 b=1 c=0
+  t=3.590367 BLANKED   thetae= 91.6 rpm=  2669 ci=3301 a=1642 b=1650 c=0
+  t=3.590367 EDGE      thetae= 91.8 rpm=  2669 ci=3301 a=1 b=1 c=0
+  t=3.590368 BLANKED   thetae= 91.8 rpm=  2669 ci=3301 a=1644 b=1650 c=0
+  t=3.590369 EDGE      thetae= 91.9 rpm=  2669 ci=3301 a=1 b=1 c=0
+  t=3.590370 BLANKED   thetae= 92.0 rpm=  2669 ci=3301 a=1648 b=1650 c=0
+  t=3.590370 EDGE      thetae= 92.0 rpm=  2669 ci=3301 a=1 b=1 c=0
+  t=3.590370 BLANKED   thetae= 92.0 rpm=  2669 ci=3301 a=1649 b=1650 c=0
+  t=3.590406 EDGE      thetae= 96.1 rpm=  2671 ci=3301 a=1 b=1 c=0
+  t=3.590406 COMP_RUN  thetae= 96.1 rpm=  2671 ci=3301 a=1721 b=0 c=0
+  t=3.590407 EDGE      thetae= 96.2 rpm=  2671 ci=3301 a=1 b=1 c=0
+  t=3.590407 COMP_RUN  thetae= 96.2 rpm=  2671 ci=3301 a=1723 b=0 c=0
+  t=3.590408 EDGE      thetae= 96.3 rpm=  2671 ci=3301 a=1 b=1 c=0
+  t=3.590408 COMP_RUN  thetae= 96.3 rpm=  2671 ci=3301 a=1725 b=0 c=0
+  t=3.590409 EDGE      thetae= 96.5 rpm=  2671 ci=3301 a=1 b=1 c=0
+  t=3.590410 COMP_RUN  thetae= 96.5 rpm=  2671 ci=3301 a=1728 b=0 c=0
+  t=3.590410 EDGE      thetae= 96.6 rpm=  2671 ci=3301 a=1 b=1 c=0
+  t=3.590411 COMP_RUN  thetae= 96.6 rpm=  2671 ci=3301 a=1730 b=0 c=0
+  t=3.590412 ZC_ACCEPT thetae= 96.7 rpm=  2671 ci=3301 a=826 b=0 c=0
+  t=3.590447 EDGE      thetae=100.7 rpm=  2673 ci=3301 a=1 b=0 c=0
+  t=3.590448 EDGE      thetae=100.8 rpm=  2674 ci=3301 a=1 b=0 c=0
+  t=3.590449 EDGE      thetae=101.0 rpm=  2674 ci=3301 a=1 b=0 c=0
+  t=3.590450 EDGE      thetae=101.1 rpm=  2674 ci=3301 a=1 b=0 c=0
+  t=3.590452 EDGE      thetae=101.2 rpm=  2674 ci=3301 a=1 b=0 c=0
+  t=3.590453 EDGE      thetae=101.3 rpm=  2674 ci=3301 a=1 b=0 c=0
+  t=3.590489 EDGE      thetae=105.5 rpm=  2676 ci=3301 a=1 b=0 c=0
+  t=3.590491 EDGE      thetae=105.6 rpm=  2676 ci=3301 a=1 b=0 c=0
+  t=3.590492 EDGE      thetae=105.7 rpm=  2676 ci=3301 a=1 b=0 c=0
+  t=3.590532 EDGE      thetae=110.2 rpm=  2678 ci=3301 a=1 b=0 c=0
+  t=3.590533 EDGE      thetae=110.3 rpm=  2679 ci=3301 a=1 b=0 c=0
+  t=3.590534 EDGE      thetae=110.5 rpm=  2679 ci=3301 a=1 b=0 c=0
+  t=3.590535 EDGE      thetae=110.6 rpm=  2679 ci=3301 a=1 b=0 c=0
+  t=3.590615 EDGE      thetae=119.6 rpm=  2683 ci=3301 a=1 b=0 c=0
+  t=3.590616 EDGE      thetae=119.7 rpm=  2683 ci=3301 a=1 b=0 c=0
+  t=3.590617 EDGE      thetae=119.9 rpm=  2683 ci=3301 a=1 b=0 c=0
+  t=3.590619 EDGE      thetae=120.0 rpm=  2683 ci=3301 a=1 b=0 c=0
+  t=3.590620 EDGE      thetae=120.1 rpm=  2684 ci=3301 a=1 b=0 c=0
+  t=3.590658 EDGE      thetae=124.5 rpm=  2685 ci=3301 a=1 b=0 c=0
+  t=3.590659 EDGE      thetae=124.6 rpm=  2685 ci=3301 a=1 b=0 c=0
+  t=3.590661 EDGE      thetae=124.8 rpm=  2685 ci=3301 a=1 b=0 c=0
+  t=3.590700 EDGE      thetae=129.2 rpm=  2687 ci=3301 a=1 b=0 c=0
+  t=3.590701 EDGE      thetae=129.3 rpm=  2687 ci=3301 a=1 b=0 c=0
+  t=3.590703 EDGE      thetae=129.4 rpm=  2687 ci=3301 a=1 b=0 c=0
+  t=3.590741 EDGE      thetae=133.8 rpm=  2688 ci=3301 a=1 b=0 c=0
+  t=3.590743 EDGE      thetae=134.0 rpm=  2688 ci=3301 a=1 b=0 c=0
+  t=3.590744 EDGE      thetae=134.2 rpm=  2688 ci=3301 a=1 b=0 c=0
+  t=3.590784 EDGE      thetae=138.6 rpm=  2689 ci=3301 a=1 b=0 c=0
+  t=3.590786 EDGE      thetae=138.8 rpm=  2689 ci=3301 a=1 b=0 c=0
+  t=3.590825 COMMUTATE thetae=143.2 rpm=  2689 ci=3301 a=1 b=440 c=600
+  t=3.590825 EDGE      thetae=143.3 rpm=  2689 ci=3795 a=0 b=1 c=0
+  t=3.590825 BLANKED   thetae=143.3 rpm=  2689 ci=3795 a=827 b=1897 c=0
+  t=3.590825 BLANKED   thetae=143.3 rpm=  2689 ci=3795 a=827 b=1897 c=0
+  t=3.590859 MAINLOOP  thetae=147.1 rpm=  2695 ci=3795 a=1668 b=1668 c=613
+SITL: desync 3 at t=3.6038s avg=1121 last_avg=1121 zc=0 e_com_time=3363, recent events:
+  t=3.601784 BLANKED   thetae=206.7 rpm=  2666 ci=1101 a=469 b=550 c=0
+  t=3.601784 EDGE      thetae=206.8 rpm=  2666 ci=1101 a=0 b=1 c=0
+  t=3.601785 BLANKED   thetae=206.8 rpm=  2666 ci=1101 a=472 b=550 c=0
+  t=3.601820 EDGE      thetae=210.8 rpm=  2669 ci=1101 a=0 b=1 c=0
+  t=3.601820 BLANKED   thetae=210.8 rpm=  2669 ci=1101 a=543 b=550 c=0
+  t=3.601821 EDGE      thetae=210.9 rpm=  2669 ci=1101 a=0 b=1 c=0
+  t=3.601821 BLANKED   thetae=210.9 rpm=  2669 ci=1101 a=545 b=550 c=0
+  t=3.601822 EDGE      thetae=211.0 rpm=  2669 ci=1101 a=0 b=1 c=0
+  t=3.601822 BLANKED   thetae=211.0 rpm=  2669 ci=1101 a=547 b=550 c=0
+  t=3.601823 EDGE      thetae=211.2 rpm=  2669 ci=1101 a=0 b=1 c=0
+  t=3.601824 BLANKED   thetae=211.2 rpm=  2669 ci=1101 a=550 b=550 c=0
+  t=3.601825 EDGE      thetae=211.3 rpm=  2669 ci=1101 a=0 b=1 c=0
+  t=3.601825 COMP_RUN  thetae=211.4 rpm=  2669 ci=1101 a=553 b=0 c=0
+  t=3.601825 EDGE      thetae=211.4 rpm=  2669 ci=1101 a=0 b=1 c=0
+  t=3.601826 COMP_RUN  thetae=211.4 rpm=  2669 ci=1101 a=554 b=0 c=0
+  t=3.601861 EDGE      thetae=215.4 rpm=  2672 ci=1101 a=0 b=1 c=0
+  t=3.601861 COMP_RUN  thetae=215.4 rpm=  2672 ci=1101 a=625 b=0 c=0
+  t=3.601862 EDGE      thetae=215.5 rpm=  2672 ci=1101 a=0 b=1 c=0
+  t=3.601862 COMP_RUN  thetae=215.5 rpm=  2672 ci=1101 a=627 b=0 c=0
+  t=3.601863 EDGE      thetae=215.6 rpm=  2672 ci=1101 a=0 b=1 c=0
+  t=3.601863 COMP_RUN  thetae=215.6 rpm=  2672 ci=1101 a=629 b=0 c=0
+  t=3.601864 EDGE      thetae=215.8 rpm=  2672 ci=1101 a=0 b=1 c=0
+  t=3.601865 COMP_RUN  thetae=215.8 rpm=  2672 ci=1101 a=632 b=0 c=0
+  t=3.601865 EDGE      thetae=215.9 rpm=  2672 ci=1101 a=0 b=1 c=0
+  t=3.601866 COMP_RUN  thetae=215.9 rpm=  2672 ci=1101 a=634 b=0 c=0
+  t=3.601866 EDGE      thetae=216.0 rpm=  2673 ci=1101 a=0 b=1 c=0
+  t=3.601867 COMP_RUN  thetae=216.0 rpm=  2673 ci=1101 a=636 b=0 c=0
+  t=3.601867 EDGE      thetae=216.1 rpm=  2673 ci=1101 a=0 b=1 c=0
+  t=3.601868 COMP_RUN  thetae=216.1 rpm=  2673 ci=1101 a=638 b=0 c=0
+  t=3.601902 EDGE      thetae=220.0 rpm=  2675 ci=1101 a=0 b=1 c=0
+  t=3.601902 COMP_RUN  thetae=220.0 rpm=  2675 ci=1101 a=707 b=0 c=0
+  t=3.602083 EDGE      thetae=240.4 rpm=  2688 ci=1101 a=0 b=1 c=0
+  t=3.602083 COMP_RUN  thetae=240.4 rpm=  2688 ci=1101 a=1069 b=0 c=0
+  t=3.602084 ZC_ACCEPT thetae=240.5 rpm=  2688 ci=1101 a=276 b=0 c=0
+  t=3.602222 COMMUTATE thetae=256.1 rpm=  2698 ci=1101 a=4 b=440 c=700
+  t=3.602538 MAINLOOP  thetae=292.0 rpm=  2721 ci=1090 a=1320 b=2049 c=59
+  t=3.602610 EDGE      thetae=300.4 rpm=  2725 ci=1090 a=1 b=1 c=0
+  t=3.602611 COMP_RUN  thetae=300.4 rpm=  2725 ci=1090 a=1054 b=0 c=0
+  t=3.602612 ZC_ACCEPT thetae=300.5 rpm=  2726 ci=1090 a=274 b=0 c=0
+  t=3.602640 MAINLOOP  thetae=303.7 rpm=  2728 ci=1090 a=1320 b=2049 c=51
+  t=3.602749 COMMUTATE thetae=316.2 rpm=  2735 ci=1090 a=5 b=440 c=800
+  t=3.602778 EDGE      thetae=319.6 rpm=  2736 ci=1076 a=0 b=1 c=0
+  t=3.602779 BLANKED   thetae=319.6 rpm=  2736 ci=1076 a=333 b=538 c=0
+  t=3.602779 EDGE      thetae=319.8 rpm=  2736 ci=1076 a=0 b=1 c=0
+  t=3.602780 BLANKED   thetae=319.8 rpm=  2736 ci=1076 a=336 b=538 c=0
+  t=3.602781 EDGE      thetae=319.9 rpm=  2736 ci=1076 a=0 b=1 c=0
+  t=3.602781 BLANKED   thetae=319.9 rpm=  2736 ci=1076 a=338 b=538 c=0
+  t=3.602782 EDGE      thetae=320.0 rpm=  2736 ci=1076 a=0 b=1 c=0
+  t=3.602782 BLANKED   thetae=320.0 rpm=  2736 ci=1076 a=340 b=538 c=0
+  t=3.602783 EDGE      thetae=320.2 rpm=  2737 ci=1076 a=0 b=1 c=0
+  t=3.602784 BLANKED   thetae=320.2 rpm=  2737 ci=1076 a=343 b=538 c=0
+  t=3.602784 EDGE      thetae=320.3 rpm=  2737 ci=1076 a=0 b=1 c=0
+  t=3.602785 BLANKED   thetae=320.3 rpm=  2737 ci=1076 a=345 b=538 c=0
+  t=3.602861 EDGE      thetae=329.2 rpm=  2742 ci=1076 a=0 b=1 c=0
+  t=3.602862 BLANKED   thetae=329.2 rpm=  2742 ci=1076 a=499 b=538 c=0
+  t=3.602863 EDGE      thetae=329.3 rpm=  2742 ci=1076 a=0 b=1 c=0
+  t=3.602863 BLANKED   thetae=329.3 rpm=  2742 ci=1076 a=501 b=538 c=0
+  t=3.602864 EDGE      thetae=329.4 rpm=  2742 ci=1076 a=0 b=1 c=0
+  t=3.602864 BLANKED   thetae=329.4 rpm=  2742 ci=1076 a=503 b=538 c=0
+  t=3.602943 EDGE      thetae=338.6 rpm=  2747 ci=1076 a=0 b=1 c=0
+  t=3.602944 COMP_RUN  thetae=338.6 rpm=  2747 ci=1076 a=663 b=0 c=0
+  t=3.602944 EDGE      thetae=338.8 rpm=  2748 ci=1076 a=0 b=1 c=0
+  t=3.602945 COMP_RUN  thetae=338.8 rpm=  2748 ci=1076 a=665 b=0 c=0
+  t=3.602946 EDGE      thetae=338.9 rpm=  2748 ci=1076 a=0 b=1 c=0
+  t=3.602947 COMP_RUN  thetae=338.9 rpm=  2748 ci=1076 a=668 b=0 c=0
+  t=3.602947 EDGE      thetae=339.0 rpm=  2748 ci=1076 a=0 b=1 c=0
+  t=3.602947 COMP_RUN  thetae=339.0 rpm=  2748 ci=1076 a=670 b=0 c=0
+  t=3.602948 EDGE      thetae=339.2 rpm=  2748 ci=1076 a=0 b=1 c=0
+  t=3.602948 COMP_RUN  thetae=339.2 rpm=  2748 ci=1076 a=672 b=0 c=0
+  t=3.602949 EDGE      thetae=339.3 rpm=  2748 ci=1076 a=0 b=1 c=0
+  t=3.602949 COMP_RUN  thetae=339.3 rpm=  2748 ci=1076 a=674 b=0 c=0
+  t=3.602950 EDGE      thetae=339.4 rpm=  2748 ci=1076 a=0 b=1 c=0
+  t=3.602950 COMP_RUN  thetae=339.4 rpm=  2748 ci=1076 a=676 b=0 c=0
+  t=3.602984 EDGE      thetae=343.4 rpm=  2750 ci=1076 a=0 b=1 c=0
+  t=3.602985 COMP_RUN  thetae=343.4 rpm=  2750 ci=1076 a=745 b=0 c=0
+  t=3.602985 EDGE      thetae=343.5 rpm=  2750 ci=1076 a=0 b=1 c=0
+  t=3.602986 COMP_RUN  thetae=343.5 rpm=  2750 ci=1076 a=747 b=0 c=0
+  t=3.602986 EDGE      thetae=343.6 rpm=  2750 ci=1076 a=0 b=1 c=0
+  t=3.602987 COMP_RUN  thetae=343.6 rpm=  2750 ci=1076 a=749 b=0 c=0
+  t=3.602988 EDGE      thetae=343.7 rpm=  2750 ci=1076 a=0 b=1 c=0
+  t=3.602988 COMP_RUN  thetae=343.7 rpm=  2750 ci=1076 a=751 b=0 c=0
+  t=3.603099 MAINLOOP  thetae=356.6 rpm=  2758 ci=1076 a=1194 b=2049 c=55
+  t=3.603132 EDGE      thetae=  0.4 rpm=  2761 ci=1076 a=0 b=1 c=0
+  t=3.603132 COMP_RUN  thetae=  0.4 rpm=  2761 ci=1076 a=1040 b=0 c=0
+  t=3.603133 ZC_ACCEPT thetae=  0.6 rpm=  2761 ci=1076 a=270 b=0 c=0
+  t=3.603214 MAINLOOP  thetae=  9.8 rpm=  2766 ci=1076 a=1194 b=2049 c=51
+  t=3.603269 COMMUTATE thetae= 16.2 rpm=  2769 ci=1076 a=6 b=440 c=800
+  t=3.603525 MAINLOOP  thetae= 46.2 rpm=  2786 ci=1062 a=1121 b=2049 c=69
+  t=3.603644 EDGE      thetae= 60.2 rpm=  2794 ci=1062 a=1 b=1 c=0
+  t=3.603645 COMP_RUN  thetae= 60.3 rpm=  2794 ci=1062 a=1024 b=0 c=0
+  t=3.603646 ZC_ACCEPT thetae= 60.4 rpm=  2794 ci=1062 a=267 b=0 c=0
+  t=3.603777 EDGE      thetae= 75.8 rpm=  2802 ci=1062 a=1 b=0 c=0
+  t=3.603778 EDGE      thetae= 75.9 rpm=  2802 ci=1062 a=1 b=0 c=0
+  t=3.603779 EDGE      thetae= 76.0 rpm=  2802 ci=1062 a=1 b=0 c=0
+  t=3.603780 COMMUTATE thetae= 76.1 rpm=  2802 ci=1062 a=1 b=440 c=850
+  t=3.603780 BLANKED   thetae= 76.1 rpm=  2802 ci=1048 a=267 b=524 c=0
+SITL: irq 0 blocked 149.5us at t=11.9470: primask=258 dis=0 free=1 act=[0,0,0,0,0,0]
+SITL: irq 0 blocked 1561.0us at t=12.1180: primask=3082 dis=0 free=0 act=[0,0,0,0,0,0]

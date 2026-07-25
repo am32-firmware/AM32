@@ -1,0 +1,20 @@
+{
+    "comment": "real-hardware reference values for the calibration CI: VimDrones L431 + 1404 4300KV. Values from the bench captures in this directory; tolerances cover the documented model residuals plus CI run-to-run scatter. This combination genuinely desyncs on the bench, so the desync budget is generous and chirp starts retry.",
+    "steady": {
+        "levels": {"0.10": 4373, "0.20": 8577, "0.30": 12965, "0.40": 17106, "0.50": 21004},
+        "tolerance_pct": 5.0
+    },
+    "square": {
+        "down_ms": {"0.060": 70, "0.090": 100, "0.120": 120, "0.150": 142, "0.180": 155, "0.210": 160, "0.240": 133},
+        "down_tolerance_ms": 30,
+        "down_tolerance_pct": 25,
+        "up_flat_ms": [30, 80]
+    },
+    "chirp": {
+        "accel_3db_hz": 8.4,
+        "brake_3db_hz": 3.45,
+        "tolerance_pct": 25
+    },
+    "desync_budget": 25,
+    "chirp_start_retries": 3
+}

@@ -1,0 +1,21 @@
+{
+    "comment": "real-hardware reference values for the calibration CI: VimDrones Nano + AIR 2216 II 920KV with a 10x4.5 prop (Edu450, 3S). The 0.85+ levels sit on the firmware 8A current limiter. Model v2 matches the down-curve within ~21ms; the up_flat floor allows the model's faster up-steps - the bench PSU's CC foldback that stretched the real up-steps to 122ms+ is not modelled.",
+    "steady": {
+        "levels": {"0.10": 1079, "0.30": 3099, "0.50": 4770, "0.70": 6347, "0.80": 7001, "0.90": 7069},
+        "tolerance_pct": 6.0
+    },
+    "square": {
+        "down_ms": {"0.060": 118, "0.090": 129, "0.120": 135, "0.150": 146, "0.180": 164, "0.210": 181, "0.240": 189},
+        "down_tolerance_ms": 50,
+        "down_tolerance_pct": 40,
+        "up_flat_ms": [84, 190]
+    },
+    "chirp": {
+        "accel_3db_hz": 3.41,
+        "brake_3db_hz": 2.77,
+        "tolerance_pct": 30
+    },
+    "desync_budget": 8,
+    "chirp_start_retries": 4,
+    "square_start_retries": 3
+}

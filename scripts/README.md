@@ -17,9 +17,10 @@ into a SITL model is in `CALIBRATION.md`; the existing data sets under
 `Mcu/SITL/data/` show the result.
 
 Record with the data: ESC model and AM32 build target, motor
-(size/model, nameplate KV, pole count), propeller if fitted, supply
-voltage and any current limit (bench supply rating and the eeprom
-CURRENT_LIMIT if you set one), and anything unusual about the rig.
+(size/model, nameplate KV, pole count), propeller if fitted, power
+source and voltage (battery chemistry and cell count, or supply
+rating) plus the eeprom CURRENT_LIMIT if you set one, and anything
+unusual about the rig.
 
 Setup, once the ESC is reachable over DroneCAN (`dronecan_bridge.py`
 for a serial CAN adapter):
@@ -69,6 +70,81 @@ check the sweep's current at 0.6 fits your supply before running them.
 A quick look at the results: `esc_analyze.py sweep1.jsonl`,
 `esc_chirp.py fit chirp_120s.jsonl --plot`, `esc_square.py analyze
 square1.jsonl`, and `esc_plot.py <log>` for time series.
+
+## capturing via a Betaflight flight controller (no CAN needed)
+
+`esc_capture_fc.py` runs the same capture battery with the ESC wired
+to a Betaflight FC instead of a CAN adapter: it drives the motor
+through the FC's motor-test path over MSP (USB) and logs the FC's
+bidirectional-DShot telemetry — eRPM plus the EDT
+voltage/current/temperature frames — to the same JSONL files. Needs
+only `pip install pyserial`.
+
+**REMOVE ALL PROPELLERS before using it.** Betaflight keeps the last
+motor-test value it was given, and applies no failsafe of its own to
+it. The tool aborts on over-current, over-temperature, telemetry loss
+or arming, and commands motor stop when it exits — including on
+Ctrl-C, an abort, or SIGTERM — but it cannot do so if the USB link
+dies or the process is killed outright. **Keep a way to cut power
+within reach** - the battery connector or an inline switch - and do
+not rely on software as the only way to stop the motor.
+
+Betaflight setup (CLI, then `save`):
+
+```
+set motor_pwm_protocol = DSHOT600   # or DSHOT300
+set dshot_bidir = ON
+set motor_poles = 14                # your motor's pole count
+set serial_update_rate_hz = 1000    # see below - the default caps telemetry at ~50Hz
+set dshot_edt = ON                  # BF 4.4+: EDT volt/current/temp
+feature -3D                         # 3D mode makes 1000 full reverse
+save
+```
+
+`serial_update_rate_hz` matters: Betaflight answers one MSP request per
+serial task tick, so the default of 100 yields about 50 telemetry
+samples per second whatever the tool asks for — enough for steady
+levels, but too slow for the chirp. Raising it to 1000 gives the full
+200 Hz the capture tools request, matching the DroneCAN captures.
+Measured on an H743: 49 Hz at the default, 200 Hz at 1000.
+
+The capture battery, ESC on motor output 1 (`--poles` must match the
+motor and the FC setting: it scales every logged rpm):
+
+```
+esc_capture_fc.py hold  --port /dev/ttyACM0 --poles 14 --throttle 0.1 --hold 6 --max-current A --log first_spin_010.jsonl
+esc_capture_fc.py sweep --port /dev/ttyACM0 --poles 14 --levels 0.05,0.1,...,0.5 --hold 4 \
+    --max-current A --max-throttle 1.0 --log sweep1.jsonl
+esc_capture_fc.py chirp --port /dev/ttyACM0 --poles 14 --duration 120 --f-start 0.5 --f-stop 40 \
+    --max-current A --log chirp_120s.jsonl
+esc_capture_fc.py square --port /dev/ttyACM0 --poles 14 --max-current A --log square1.jsonl
+```
+
+Differences from the DroneCAN path:
+
+- telemetry arrives at the MSP poll rate (~100 Hz, enough for the
+  chirp fit) instead of `TELEM_RATE`
+- EDT values are coarse: Betaflight passes the DShot telemetry through
+  nearly raw, so voltage lands in whole volts and current in 0.5 A
+  steps. Note a measured pack or supply voltage alongside the capture
+- Betaflight only sends the EDT enable command when it arms, which
+  never happens during a motor test, so the tool sends it itself over
+  MSP once the ESC is armed and stopped. If no EDT frames appear it
+  says so: `--max-current`/`--max-temp` cannot protect anything
+  without them. EDT resolution is coarse — voltage in whole volts and
+  current in 0.5 A steps — so low currents read as zero
+- Betaflight never marks its DShot telemetry stale: if the ESC's
+  replies stop arriving it keeps serving the last values it decoded.
+  The tool notices when telemetry fails to respond to a throttle
+  change, but during a constant-throttle hold cached values are
+  indistinguishable from live ones, so the current and temperature
+  limits can be acting on stale readings — one more reason for the
+  switchable supply
+- `err` is the BDShot invalid-frame percentage, not the desync counter
+- ESC eeprom settings cannot be changed over the FC link: set
+  `motor_poles` on the FC and everything else with the AM32
+  configurator first, and include the ESC's settings dump with a
+  submission so the SITL model can mirror them
 
 ## simulation-time pacing (SITL only)
 

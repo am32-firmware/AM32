@@ -1,0 +1,8 @@
+# dependencies for the calibration capture GUI (esc_capture_gui.py)
+PySide6
+pyqtgraph
+numpy
+matplotlib
+pyserial          # Betaflight MSP transport
+dronecan          # DroneCAN transport
+pymavlink        # mavcan: URIs (ArduPilot board as the CAN adapter)

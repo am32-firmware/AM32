@@ -86,6 +86,12 @@ def cmd_run(args):
         print('TELEM_RATE ->', m.set_param('TELEM_RATE', args.telem_rate))
     if args.debug_rate is not None:
         print('DEBUG_RATE ->', m.set_param('DEBUG_RATE', args.debug_rate))
+    run_chirp(m, args)
+
+
+def run_chirp(m, args):
+    '''drive the chirp profile on any measurement backend implementing
+    the EscMeasure interface (set_throttle/spin_for/rec/clock)'''
     # spin up gently to the mid throttle
     m.set_throttle(0.1)
     m.spin_for(1.5)
@@ -537,6 +543,39 @@ def draw_model(ax, res, log):
     ax.set_title('%s: best %s, %s, envelope-rms %.0frpm' %
                  (log, res['best'], desc, b['rms']), fontsize=10)
     ax.legend(fontsize=8)
+
+
+def fit_numbers(log, max_freq=None, raw=None, progress=None):
+    """the numeric part of `fit`, without matplotlib.
+
+    Returns the empirical 3dB pair and the best-fitting model, so tools
+    can use the result directly instead of scraping the printed output.
+    """
+    import numpy as np
+    say = progress or (lambda *a: None)
+    rows, cfg, toff = load_rows(log)
+    status = [(r['t'] - toff, r['rpm']) for r in rows if r['type'] == 'status'
+              if 0 <= r['t'] - toff <= cfg['duration']]
+    if raw:
+        status, _off = align_raw(np, status, load_raw(raw))
+        status = [(t, v) for t, v in status if 0 <= t <= cfg['duration']]
+    env = cycle_envelope(status, cfg)
+    if max_freq:
+        env = [e for e in env if e['freq'] <= max_freq]
+    centre, amp0, _pts, f3_up, f3_dn = envelope_numbers(env)
+    res = compute_fit(np, status, cfg, centre, amp0, progress=say,
+                      max_freq=max_freq)
+    best = res['models'][res['best']]
+    return {
+        'model': res['best'],
+        'accel_3db_hz': best['mf3_up'],
+        'brake_3db_hz': best['mf3_dn'],
+        'tau_up_ms': round(best['tau_up'] * 1000.0, 2),
+        'tau_dn_ms': round(best['tau_dn'] * 1000.0, 2),
+        'rms_rpm': round(best['rms']),
+        'empirical': {'accel_3db_hz': f3_up, 'brake_3db_hz': f3_dn,
+                      'centre_rpm': round(centre), 'amplitude_rpm': round(amp0)},
+    }
 
 
 def cmd_fit(args):

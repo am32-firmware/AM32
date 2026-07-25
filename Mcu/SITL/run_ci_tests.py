@@ -575,6 +575,65 @@ def test_dronecan_params(sitl_path):
             node.close()
 
 
+def test_fc_capture(sitl_path):
+    '''scripts/esc_capture_fc.py against the fake-Betaflight MSP stub:
+    the FC capture path must produce the calibration JSONL with sane
+    values at full telemetry rate'''
+    try:
+        import pty  # noqa: F401  (POSIX only)
+        import serial  # noqa: F401
+    except ImportError as ex:
+        print('SKIP: fc capture, %s' % ex)
+        sys.stdout.flush()
+        return
+    import json
+    import msp_stub_fc
+    tool = os.path.join(HERE, '..', '..', 'scripts', 'esc_capture_fc.py')
+    with Sitl(sitl_path, ['--can-uri', 'none', '--input-type', '1']):
+        stub = msp_stub_fc.MspStubFC()
+        try:
+            r = subprocess.run(
+                [sys.executable, tool, 'sweep', '--port', stub.slave_path,
+                 '--log', 'fc_capture_sweep.jsonl',
+                 '--levels', '0.25,0.35', '--hold', '4.0',
+                 '--arm-time', '3.0', '--countdown', '0', '--poles', '14',
+                 # this backend runs on the wall clock (a real FC has no
+                 # sim time), so a sanitizer or coverage build that lags
+                 # wall time needs slack in the stall guards
+                 '--stall-timeout', '3.0', '--status-timeout', '10.0'],
+                timeout=180, capture_output=True, text=True)
+            check('fc capture exits cleanly', r.returncode == 0,
+                  'exit=%s stderr=%s' % (r.returncode, r.stderr[-300:].strip()))
+            if r.returncode != 0:
+                return
+            rows = [json.loads(line) for line in open('fc_capture_sweep.jsonl')]
+            st = [row for row in rows if row['type'] == 'status']
+            span = st[-1]['t'] - st[0]['t'] if len(st) > 1 else 0
+            rate = len(st) / span if span else 0
+            check('fc capture telemetry rate', rate > 40,
+                  'rate=%.0fHz rows=%d' % (rate, len(st)))
+            # steady rpm at the end of the 0.35 hold: the sim can lag
+            # wall time here, so measure the last second of the segment
+            marks = [row for row in rows if row['type'] == 'cmd'
+                     and row.get('throttle') == 0.35]
+            t35 = marks[0]['t']
+            tend = min([row['t'] for row in rows
+                        if row['type'] == 'cmd' and row['t'] > t35]
+                       + [st[-1]['t']])
+            seg = [row['rpm'] for row in st if tend - 1.0 < row['t'] <= tend]
+            rpm = sum(seg) / len(seg) if seg else 0
+            check('fc capture rpm', 2500 < rpm < 4500, 'rpm=%.0f' % rpm)
+            # EDT voltage arrives as whole volts through Betaflight
+            volts = [row['volt'] for row in st if row['t'] > t35]
+            check('fc capture edt voltage', volts and 10 <= max(volts) <= 14,
+                  'volt=%s' % (max(volts) if volts else None))
+            currs = [row['curr'] for row in st if row['t'] > t35]
+            check('fc capture edt current', currs and 0 < max(currs) < 20,
+                  'curr=%s' % (max(currs) if currs else None))
+        finally:
+            stub.close()
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     # don't hardcode the firmware version in the default binary path
@@ -605,6 +664,7 @@ def main():
     test_stuck_rotor(args.sitl, protection=False)
     test_debugger_pause(args.sitl)
     test_dronecan_params(args.sitl)
+    test_fc_capture(args.sitl)
 
     if failures:
         print('\n%d FAILED: %s' % (len(failures), ', '.join(failures)))

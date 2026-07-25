@@ -5,6 +5,12 @@ written down so further ESC/motor combinations follow the same steps.
 Data lives in `Mcu/SITL/data/<TARGET>/` with a README describing each
 capture; the model json goes in `Mcu/SITL/models/`.
 
+For a DShot ESC wired to a Betaflight flight controller instead of a
+CAN adapter, the same capture battery runs over MSP with
+`esc_capture_fc.py` — see "capturing via a Betaflight flight
+controller" in `README.md`. The fitting steps below are identical
+whichever way the data was captured.
+
 ## 0. recon
 
 - Bridge the ESC onto a multicast bus (dronecan_bridge.py, or direct
@@ -30,8 +36,8 @@ capture; the model json goes in `Mcu/SITL/models/`.
   volt + debug1 adc_volts): a supply that cannot absorb regen pumps
   the bus up and dominates spin-down behaviour.
 - current calibration if the sense scale is unknown: steady
-  finger-load at ~0.25 throttle while reading the bench supply
-  display; solve mV/A from the debug1 adc_current delta. Check
+  finger-load at ~0.25 throttle while reading a meter on the pack or
+  supply; solve mV/A from the debug1 adc_current delta. Check
   MILLIVOLT_PER_AMP and the auto-offset behaviour (CURRENT_AUTO_OFFSET).
 
 ## 2. chirp (esc_chirp.py) — the primary dynamics metric

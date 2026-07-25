@@ -10,10 +10,10 @@
 
 #include "peripherals.h"
 #include "serial_telemetry.h"
-#include <common.h>
-#include <signal.h>
-#include <version.h>
-#include <eeprom.h>
+#include "common.h"
+#include "signal.h"
+#include "version.h"
+#include "eeprom.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
@@ -60,7 +60,7 @@ const struct {
     uint32_t crc2; // crc32 from end of app_signature to end of fw
     char mcu[16];
     uint32_t unused[2];
-} app_signature __attribute__((section(".app_signature"))) = {
+} app_signature AM32_FLASH_SECTION(".app_signature") = {
         .magic1 = APP_SIGNATURE_MAGIC1,
         .magic2 = APP_SIGNATURE_MAGIC2,
         .fwlen = 0,
@@ -90,6 +90,13 @@ static struct PACKED {
     uint16_t rxframe_error;
     int32_t  rx_ecode;
     uint8_t auto_advance_level;
+    // version 2 fields
+    uint16_t duty_cycle;         // demanded duty, 0..2000
+    uint16_t duty_cycle_maximum; // low-rpm/temperature duty clamp
+    uint16_t adjusted_input;     // input after mode mapping, 0..2047
+    uint16_t adc_raw_current;    // current sense ADC counts
+    uint16_t adc_raw_volts;      // voltage sense ADC counts
+    uint8_t flags;               // bit0 armed, bit1 running, bit2 stepper_sine
 } debug1;
 
 static void can_printf(const char *fmt, ...);
@@ -108,6 +115,12 @@ extern volatile uint32_t commutation_interval;
 extern uint8_t auto_advance_level;
 extern uint16_t low_cell_volt_cutoff;
 extern uint32_t desync_happened;
+extern volatile uint16_t duty_cycle;
+extern uint16_t duty_cycle_maximum;
+extern uint16_t adjusted_input;
+extern uint16_t ADC_raw_current;
+extern uint16_t ADC_raw_volts;
+extern char stepper_sine;
 
 static uint16_t last_can_input;
 static uint64_t last_heartbeat_us;
@@ -257,6 +270,11 @@ static uint64_t micros64(void)
 {
     static uint64_t base_us;
     static uint16_t last_cnt;
+    // the static state must be updated atomically, this is called from
+    // both interrupt handlers and the main loop. Save and restore
+    // PRIMASK so a caller's critical section is not ended early
+    const uint32_t primask = __get_PRIMASK();
+    __disable_irq();
 #ifdef ARTERY
     uint16_t cnt = UTILITY_TIMER->cval;
 #else
@@ -266,7 +284,11 @@ static uint64_t micros64(void)
 	base_us += 0x10000;
     }
     last_cnt = cnt;
-    return base_us + cnt;
+    const uint64_t ret = base_us + cnt;
+    if (!primask) {
+        __enable_irq();
+    }
+    return ret;
 }
 
 /*
@@ -286,6 +308,16 @@ static const uint8_t default_settings[] = {
     0x20, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x1a, 0x18, 0x64, 0x37, 0x0e, 0x00, 0x00, 0x05, 0x00,
     0x80, 0x80, 0x80, 0x32, 0x00, 0x32, 0x00, 0x00, 0x0f, 0x0a, 0x0a, 0x8d, 0x66, 0x06, 0x01, 0x00
 };
+
+#ifdef MCU_SITL
+// let the SITL eeprom emulation seed a missing eeprom file with defaults
+const uint8_t* DroneCAN_default_settings(unsigned* len);
+const uint8_t* DroneCAN_default_settings(unsigned* len)
+{
+    *len = sizeof(default_settings);
+    return default_settings;
+}
+#endif
 
 static const uint8_t advance_level_v3_remap[] = {
   0x00, 0x08, 0x10, 0x16 // old values 0-3 map to new values 0,8,16,22 
@@ -428,7 +460,7 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
             }
             if ((uint8_t *)p->ptr == &eepromBuffer.advance_level) {
               // automatically remap old values
-              if (pkt.value.integer_value < sizeof(advance_level_v3_remap)) {
+              if ((uint64_t)pkt.value.integer_value < sizeof(advance_level_v3_remap)) {
                 pkt.value.integer_value = advance_level_v3_remap[pkt.value.integer_value];
               }
               // adjust for advance level offset for eeprom v3
@@ -1081,7 +1113,7 @@ static void send_FlexDebug(void)
     /*
       popupate debug1
      */
-    debug1.version = 1;
+    debug1.version = 2;
     debug1.commutation_interval = commutation_interval;
     debug1.auto_advance_level = auto_advance_level;
     debug1.num_commands = canstats.total_commands - last.total_commands;
@@ -1089,6 +1121,12 @@ static void send_FlexDebug(void)
     debug1.rx_errors = canstats.rx_errors;
     debug1.rxframe_error = canstats.rxframe_error;
     debug1.rx_ecode = canstats.rx_ecode;
+    debug1.duty_cycle = duty_cycle;
+    debug1.duty_cycle_maximum = duty_cycle_maximum;
+    debug1.adjusted_input = adjusted_input;
+    debug1.adc_raw_current = ADC_raw_current;
+    debug1.adc_raw_volts = ADC_raw_volts;
+    debug1.flags = (armed ? 1 : 0) | (running ? 2 : 0) | (stepper_sine ? 4 : 0);
 
     last.num_input = canstats.num_input;
     last.total_commands = canstats.total_commands;
@@ -1188,6 +1226,9 @@ static void DroneCAN_Startup(void)
         NVIC_DisableIRQ(DMA1_Channel6_IRQn);
         NVIC_DisableIRQ(EXINT15_10_IRQn);
         EXINT->inten &= ~EXINT_LINE_15;
+#elif defined(MCU_SITL)
+        NVIC_DisableIRQ(SITL_IRQ_DMA);
+        NVIC_DisableIRQ(SITL_IRQ_EXTI15);
 #else
         #error "unsupported MCU"
 #endif

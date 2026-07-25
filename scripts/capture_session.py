@@ -142,8 +142,6 @@ def can_uri_candidates():
     for label, dev in serial_candidates():
         out.append(('mavcan: %s' % label, 'mavcan:' + dev))
     out.append(('mcast:0 (local multicast / SITL)', 'mcast:0'))
-    for label, dev in serial_candidates():
-        out.append(('slcan: %s' % label, 'slcan:' + dev))
     return out
 
 

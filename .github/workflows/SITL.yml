@@ -143,6 +143,14 @@ jobs:
       - name: Install pydronecan
         run: python3 -m pip install --break-system-packages dronecan pyserial
 
+      # GitHub macOS runners do not loop the DroneCAN multicast group back
+      # on the default interface (the SITL logs "multicast loopback
+      # failed" and the DroneCAN tests get no traffic), so route it to
+      # loopback - the macOS equivalent of the Linux "ip route add
+      # 239.65.82.0/24 dev lo" the SITL's self test expects.
+      - name: Route the DroneCAN multicast group to loopback
+        run: sudo route -n add -net 239.65.82.0/24 -interface lo0 || true
+
       - name: Run SITL tests
         run: |
           mkdir sitl_test_run && cd sitl_test_run

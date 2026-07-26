@@ -11,6 +11,7 @@ import argparse
 import glob
 import json
 import os
+import random
 import re
 import shutil
 import socket
@@ -27,14 +28,25 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 
 
 def free_control_port():
-    '''ask the OS for an unused localhost port.
+    '''pick an unused localhost port for the GUI control socket.
 
-    A fixed port makes an immediate second run fail on macOS while the
-    previous control connection is still in TIME_WAIT.
+    It has to vary between runs - a fixed port fails on macOS while the
+    previous control connection is still in TIME_WAIT - but must stay
+    below the ephemeral range (macOS: 32768+). An ephemeral port would be
+    handed straight back to one of the GUI's own bind(0) sockets, which
+    open before its control server, so the control bind then fails with
+    "address already in use" (seen consistently on macOS).
     '''
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-        sock.bind(('127.0.0.1', 0))
-        return sock.getsockname()[1]
+    for _ in range(50):
+        port = random.randint(20000, 32000)
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            try:
+                sock.bind(('127.0.0.1', port))
+            except OSError:
+                continue
+        return port
+    return random.randint(20000, 32000)
 
 
 def test_launcher(args, env):

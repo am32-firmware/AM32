@@ -421,5 +421,11 @@ void sitl_config_init(int argc, char** argv)
             sitl_cfg.stuck = s;
         }
     }
+    // a runtime model load survives resets too: the physical motor is
+    // unchanged by a firmware reboot, so reapply it over any --config
+    const char* env_model = getenv("AM32_SITL_MODEL");
+    if (env_model != NULL && env_model[0] != 0) {
+        load_json_ex(env_model, true);
+    }
     config_sanitise();
 }

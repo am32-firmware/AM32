@@ -8,8 +8,14 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/file.h>
 #include <unistd.h>
+#ifdef _WIN32
+#include <windows.h>
+// Windows deletes an environment variable by assigning it an empty value
+#define unsetenv(name) _putenv(name "=")
+#else
+#include <sys/file.h>
+#endif
 
 #include "sitl.h"
 #include "sitl_config.h"
@@ -58,6 +64,20 @@ static void lock_instance(void)
     // the firmware writing it (a missing eeprom triggers default seeding)
     char lockpath[512];
     snprintf(lockpath, sizeof(lockpath), "%s.lock", sitl_cfg.eeprom_path);
+#ifdef _WIN32
+    // exclusive-share open; a second instance's open fails. FILE_FLAG_
+    // DELETE_ON_CLOSE and non-inheritable so a reset (re-exec) drops it.
+    // Contention only warns: the input socket bind is the real guard, and
+    // enforcing here would race the brief parent/child overlap on re-exec
+    HANDLE h = CreateFileA(lockpath, GENERIC_READ | GENERIC_WRITE, 0, NULL,
+                           OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (h == INVALID_HANDLE_VALUE) {
+        fprintf(stderr,
+            "SITL: %s may be in use by another SITL instance\n",
+            sitl_cfg.eeprom_path);
+    }
+    // handle deliberately left open to hold the lock
+#else
     const int fd = open(lockpath, O_RDWR | O_CREAT | O_CLOEXEC, 0644);
     if (fd < 0) {
         perror("SITL: lock file open");
@@ -71,6 +91,7 @@ static void lock_instance(void)
         exit(1);
     }
     // fd deliberately left open to hold the lock
+#endif
 }
 
 #ifdef SITL_COVERAGE
@@ -105,6 +126,13 @@ void sitl_coverage_flush(void) { }
 int main(int argc, char** argv)
 {
     sitl_saved_argv = argv;
+#ifdef _WIN32
+    // the GUI reads our diagnostics over a pipe, and msvcrt block-buffers
+    // a piped stderr/stdout - force unbuffered so verbose output streams
+    // live as it does on POSIX (where stderr is unbuffered by default)
+    setvbuf(stderr, NULL, _IONBF, 0);
+    setvbuf(stdout, NULL, _IONBF, 0);
+#endif
 #ifdef SITL_COVERAGE
     install_coverage_handlers();
 #endif

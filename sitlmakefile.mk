@@ -16,9 +16,17 @@ endif
 
 HAL_FOLDER_$(MCU) := $(HAL_FOLDER)/$(MCU)
 
-# native build using the host compiler
+# native build using the host compiler. SITL_CROSS=win cross-builds a
+# dependency-free native Windows exe with the MinGW-w64 toolchain, for
+# distributing the SITL GUI to users without a POSIX environment
+ifeq ($(SITL_CROSS),win)
+SITL_CC := x86_64-w64-mingw32-gcc
+SITL_OBJCOPY := x86_64-w64-mingw32-objcopy
+SITL_IS_WIN := 1
+else
 SITL_CC := gcc
 SITL_OBJCOPY := objcopy
+endif
 NATIVE_$(MCU) := 1
 
 MCU_$(MCU) :=
@@ -79,6 +87,12 @@ CFLAGS_COMMON_$(MCU) := $(SITL_GCC_FLAGS) -funsigned-char -iquote $(MAIN_INC_DIR
 LDFLAGS_COMMON_$(MCU) := -pthread $(SITL_SAN_FLAGS) $(SITL_COV_FLAGS)
 
 LDLIBS_$(MCU) := -lm
+ifdef SITL_IS_WIN
+# Winsock for the UDP/mcast sockets; static libgcc/libstdc++/winpthread so
+# the exe carries no runtime DLL dependencies for end users
+LDLIBS_$(MCU) += -lws2_32
+LDFLAGS_COMMON_$(MCU) += -static -static-libgcc
+endif
 
 SRC_$(MCU) := $(foreach dir,$(SRC_DIR_$(MCU)),$(wildcard $(dir)/*.c))
 

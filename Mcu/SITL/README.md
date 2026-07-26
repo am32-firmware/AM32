@@ -138,7 +138,18 @@ Tools in `Mcu/SITL/`:
   `INPUT_SIGNAL_TYPE` parameter panel. The simulation panel selects the
   motor model (the JSON files in `Mcu/SITL/models/`, applied to the
   running simulation over the state port; switch at zero throttle for
-  clean results) and has optional high rate views, both default off:
+  clean results). **Create...** next to the model list opens a builder
+  that turns a motor spec sheet — size code (`2216` = 22mm x 16mm
+  stator), poles, Kv, and optionally winding resistance, no-load idle
+  current, weight, propeller and power source — into a new model.json,
+  so a new setup can be simulated without knowing torque constants and
+  inductances (`model_builder.py` is the same logic on the command
+  line). The **SITL process** panel runs the simulator binary itself,
+  on the ports this GUI drives, instead of starting it separately: pick
+  the binary (one is bundled with the packaged build, or Browse), an
+  eeprom and an optional bootloader, and Start; leave it stopped to
+  drive a simulator you ran yourself. The simulation panel also has
+  optional high rate views, both default off:
   pyqtgraph scopes of the phase currents and the phase terminal
   voltages, each in its own window (sample period down to the 500ns
   physics step and adjustable window; the sample rate is automatically
@@ -167,7 +178,10 @@ python3 Mcu/SITL/make_gui_env.py
 
   which creates `Mcu/SITL/venv` and prints the interpreter to run the
   GUI with. A system python with the packages from
-  `Mcu/SITL/requirements-gui.txt` installed works too. The UI backends
+  `Mcu/SITL/requirements.txt` installed works too.
+  `python3 Mcu/SITL/build_sitl_gui.py` packages the GUI into a single
+  executable with the SITL bundled (so it runs the simulator out of the
+  box); CI builds one for Linux and Windows. The UI backends
   live in `sitl_gui_backend.py`, UI-independent for headless tests
 - `dshot_test.py` — headless scripted test (arming, throttle, EDT,
   bad-CRC injection), e.g.:

@@ -16,19 +16,19 @@
 #include "sys_can.h"
 #include "sitl.h"
 #include "sitl_config.h"
+#include "sitl_net.h"
 
-#include <arpa/inet.h>
 #include <errno.h>
-#include <fcntl.h>
-#include <net/if.h>
-#include <netinet/in.h>
-#include <poll.h>
-#include <sys/ioctl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/socket.h>
 #include <unistd.h>
+#ifndef _WIN32
+#include <fcntl.h>
+#include <net/if.h>
+#include <poll.h>
+#include <sys/ioctl.h>
+#endif
 
 #define MCAST_ADDRESS_BASE "239.65.82.0"
 #define MCAST_PORT 57732
@@ -97,6 +97,7 @@ void sys_can_init(void)
     if (ifname != NULL) {
         if (inet_pton(AF_INET, ifname, &if_addr) == 1) {
             have_if = true;
+#ifndef _WIN32
         } else {
             struct ifreq ifr;
             memset(&ifr, 0, sizeof(ifr));
@@ -109,6 +110,12 @@ void sys_can_init(void)
             if_addr = ((struct sockaddr_in*)&ifr.ifr_addr)->sin_addr;
             close(s);
             have_if = true;
+#else
+        } else {
+            // no interface-by-name lookup on Windows; pass an IPv4 address
+            fprintf(stderr, "SITL: interface must be an IPv4 address: %s\n", ifname);
+            exit(1);
+#endif
         }
     }
     char address[32];
@@ -128,7 +135,7 @@ void sys_can_init(void)
         exit(1);
     }
     const int one = 1;
-    setsockopt(fd_in, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
+    setsockopt(fd_in, SOL_SOCKET, SO_REUSEADDR, (const char*)&one, sizeof(one));
     struct sockaddr_in bind_addr = addr;
 #if defined(__CYGWIN__) || defined(_WIN32)
     // Windows cannot bind to a multicast group address; bind the port
@@ -144,7 +151,7 @@ void sys_can_init(void)
     memset(&mreq, 0, sizeof(mreq));
     mreq.imr_multiaddr = addr.sin_addr;
     mreq.imr_interface.s_addr = have_if ? if_addr.s_addr : htonl(INADDR_ANY);
-    if (setsockopt(fd_in, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) != 0) {
+    if (setsockopt(fd_in, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char*)&mreq, sizeof(mreq)) != 0) {
         perror("SITL: can multicast join");
         exit(1);
     }
@@ -160,7 +167,7 @@ void sys_can_init(void)
         src.sin_family = AF_INET;
         src.sin_addr = if_addr;
         if (bind(fd_out, (struct sockaddr*)&src, sizeof(src)) != 0 ||
-            setsockopt(fd_out, IPPROTO_IP, IP_MULTICAST_IF, &if_addr, sizeof(if_addr)) != 0) {
+            setsockopt(fd_out, IPPROTO_IP, IP_MULTICAST_IF, (const char*)&if_addr, sizeof(if_addr)) != 0) {
             perror("SITL: can tx interface");
             exit(1);
         }

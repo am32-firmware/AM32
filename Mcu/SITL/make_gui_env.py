@@ -15,7 +15,7 @@ import venv
 
 here = os.path.dirname(os.path.abspath(__file__))
 env_dir = os.path.join(here, 'venv')
-requirements = os.path.join(here, 'requirements-gui.txt')
+requirements = os.path.join(here, 'requirements.txt')
 
 if sys.platform == 'win32':
     python = os.path.join(env_dir, 'Scripts', 'python.exe')

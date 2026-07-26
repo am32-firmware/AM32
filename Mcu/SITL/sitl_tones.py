@@ -25,6 +25,7 @@ Pitch scales with --speedup (slow motion sounds lower).
 '''
 
 import argparse
+import contextlib
 import math
 import os
 import struct
@@ -100,6 +101,30 @@ def render_wav(events, path, volume=0.5):
     return len(frames) // 2
 
 
+@contextlib.contextmanager
+def _muffle_stderr():
+    '''hide the one-time audio backend chatter during device setup. The
+    distro Qt multimedia stack (FFmpeg + libva + PipeWire) writes probe
+    messages straight to fd 2; a self-contained pip PySide6 stays quiet,
+    so this only matters for a system-python install. A no-op if fd 2
+    cannot be duplicated.'''
+    try:
+        saved = os.dup(2)
+    except OSError:
+        yield
+        return
+    devnull = os.open(os.devnull, os.O_WRONLY)
+    try:
+        sys.stderr.flush()
+        os.dup2(devnull, 2)
+        yield
+    finally:
+        sys.stderr.flush()
+        os.dup2(saved, 2)
+        os.close(saved)
+        os.close(devnull)
+
+
 def _run_sink_on_thread(build):
     '''run a QAudioSink on its own thread with its own Qt event loop.
 
@@ -119,7 +144,8 @@ def _run_sink_on_thread(build):
     class SinkThread(QThread):
         def run(self):
             try:
-                built = build()
+                with _muffle_stderr():
+                    built = build()
             except Exception as ex:
                 res['err'] = str(ex)
                 ready.set()

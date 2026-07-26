@@ -14,6 +14,7 @@ hand to --port. Linux/macOS only (pty).
 
 import os
 import pty
+import select
 import struct
 import threading
 import time
@@ -57,11 +58,20 @@ class MspStubFC(object):
         import tty
         tty.setraw(self.slave)
         self.slave_path = os.ttyname(self.slave)
-        threading.Thread(target=self._dshot_loop, daemon=True).start()
-        threading.Thread(target=self._msp_loop, daemon=True).start()
+        self.dshot_thread = threading.Thread(target=self._dshot_loop,
+                                             daemon=True)
+        self.msp_thread = threading.Thread(target=self._msp_loop, daemon=True)
+        self.dshot_thread.start()
+        self.msp_thread.start()
 
     def close(self):
         self.running = False
+        # Do not close a pty descriptor under a blocking read in another
+        # thread: close() itself can wait for that read forever on macOS.
+        # _msp_loop polls with a short timeout, so both workers can leave
+        # before their descriptors are closed.
+        self.msp_thread.join(0.5)
+        self.dshot_thread.join(0.5)
         try:
             os.close(self.master)
             os.close(self.slave)
@@ -179,6 +189,12 @@ class MspStubFC(object):
     def _msp_loop(self):
         buf = b''
         while self.running:
+            try:
+                ready, _, _ = select.select([self.master], [], [], 0.1)
+            except (OSError, ValueError):
+                return
+            if not ready:
+                continue
             try:
                 chunk = os.read(self.master, 256)
             except OSError:

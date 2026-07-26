@@ -6,6 +6,7 @@ front end or by headless tests without a display.
 '''
 
 import collections
+import os
 import queue
 import socket
 import struct
@@ -14,6 +15,21 @@ import threading
 import time
 
 import sitl_dshot as sd
+
+
+def _udp_ignore_connreset(sock):
+    '''On Windows, a UDP datagram sent to a port with no listener makes
+    the next recv() on that socket fail with WSAECONNRESET (10054) via
+    an ICMP port-unreachable. The GUI subscribes to the SITL before it
+    has launched, so without this every subscriber socket would take one
+    reset and its reader thread would exit for good. Disabling
+    SIO_UDP_CONNRESET restores the POSIX behaviour of ignoring it.'''
+    if sys.platform.startswith('win'):
+        try:
+            sock.ioctl(socket.SIO_UDP_CONNRESET, False)
+        except (OSError, AttributeError):
+            pass
+
 
 try:
     import dronecan
@@ -395,6 +411,7 @@ class EepromClient(object):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.bind(('127.0.0.1', 0))
         s.settimeout(0.4)      # short recv slices; _transact resends
+        _udp_ignore_connreset(s)
         return s
 
     def _transact(self, s, pkt):
@@ -479,6 +496,7 @@ class SimStream(object):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(('127.0.0.1', 0))
         self.sock.settimeout(0.2)
+        _udp_ignore_connreset(self.sock)
         threading.Thread(target=self._reader, daemon=True).start()
         threading.Thread(target=self._subscriber, daemon=True).start()
 
@@ -502,6 +520,9 @@ class SimStream(object):
             try:
                 d = self.sock.recv(4096)
             except socket.timeout:
+                continue
+            except ConnectionResetError:
+                # a UDP send to a not-yet-listening SITL; keep waiting
                 continue
             except OSError:
                 return
@@ -567,7 +588,7 @@ class SimStream(object):
             pass
 
     def load_model(self, path):
-        self.model_status = 'loading %s ...' % path
+        self.model_status = 'loading %s ...' % os.path.basename(path)
         pkt = struct.pack('<HBB', self.MAGIC_CMD, 1, 0) + path.encode()
         try:
             self.sock.sendto(pkt, self.addr)
@@ -600,6 +621,7 @@ class AudioStream(object):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(('127.0.0.1', 0))
         self.sock.settimeout(0.2)
+        _udp_ignore_connreset(self.sock)
         threading.Thread(target=self._reader, daemon=True).start()
         threading.Thread(target=self._subscriber, daemon=True).start()
 
@@ -620,6 +642,8 @@ class AudioStream(object):
             try:
                 d = self.sock.recv(4096)
             except socket.timeout:
+                continue
+            except ConnectionResetError:
                 continue
             except OSError:
                 return
@@ -687,6 +711,7 @@ class CanFrameCounter(object):
             self.error = str(ex)
             return
         sock.settimeout(0.2)
+        _udp_ignore_connreset(sock)
         self.sock = sock
         self.available = True
         threading.Thread(target=self._reader, daemon=True).start()
@@ -696,6 +721,8 @@ class CanFrameCounter(object):
             try:
                 d = self.sock.recv(128)
             except socket.timeout:
+                continue
+            except ConnectionResetError:
                 continue
             except OSError:
                 return
@@ -739,6 +766,7 @@ class ToneStream(object):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(('127.0.0.1', 0))
         self.sock.settimeout(0.2)
+        _udp_ignore_connreset(self.sock)
         threading.Thread(target=self._reader, daemon=True).start()
         threading.Thread(target=self._subscriber, daemon=True).start()
 
@@ -760,6 +788,8 @@ class ToneStream(object):
             try:
                 d = self.sock.recv(64)
             except socket.timeout:
+                continue
+            except ConnectionResetError:
                 continue
             except OSError:
                 return

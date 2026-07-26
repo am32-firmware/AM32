@@ -1,0 +1,18 @@
+# Python dependencies for the AM32 SITL tools and control GUI.
+#
+# The pip PySide6 wheel is complete (it includes QtOpenGLWidgets, which a
+# distro-split PySide6 may omit and pyqtgraph needs), so installing these
+# into a virtualenv is the reliable way to get the live scopes working.
+#
+#   python3 -m venv Mcu/SITL/venv
+#   Mcu/SITL/venv/bin/pip install -r Mcu/SITL/requirements.txt
+#   Mcu/SITL/venv/bin/python3 Mcu/SITL/sitl_gui.py
+#
+# Mcu/SITL/make_gui_env.py does the venv creation and install for you.
+
+PySide6         # Qt bindings for the GUI
+pyqtgraph       # live scope / plot widgets
+numpy           # pyqtgraph and the model fitting
+dronecan        # DroneCAN comms to the simulated ESC
+pymavlink       # mavcan transport and FC telemetry
+pyserial        # serial port discovery and slcan / mavcan links

@@ -15,8 +15,6 @@
 #include <errno.h>
 #include <pthread.h>
 #include <sched.h>
-#include <semaphore.h>
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -25,6 +23,16 @@
 #endif
 #include <time.h>
 #include <unistd.h>
+#ifdef _WIN32
+// native Windows (MinGW): the firmware thread is suspended with the
+// Windows scheduler rather than a POSIX signal, and there is no
+// re-exec, so signals and POSIX semaphores are not used
+#include <windows.h>
+#include <process.h>
+#else
+#include <semaphore.h>
+#include <signal.h>
+#endif
 
 #include "motor.h"
 
@@ -70,7 +78,27 @@ static volatile uint8_t irq_prio[SITL_IRQ_MAX];
   park/resume semaphores. macOS has no unnamed POSIX semaphores or
   sem_timedwait, so it uses GCD semaphores instead
  */
-#ifdef __APPLE__
+#if defined(_WIN32)
+typedef HANDLE sitl_sem_t;
+static void sitl_sem_init(sitl_sem_t* s)
+{
+    *s = CreateSemaphore(NULL, 0, 0x7fffffff, NULL);
+}
+static void sitl_sem_post(sitl_sem_t* s) { ReleaseSemaphore(*s, 1, NULL); }
+// wait / wait_2s only back the POSIX signal-park path; Windows suspends
+// the firmware thread directly, so they are unused there
+__attribute__((unused))
+static void sitl_sem_wait(sitl_sem_t* s) { WaitForSingleObject(*s, INFINITE); }
+__attribute__((unused))
+static bool sitl_sem_wait_2s(sitl_sem_t* s)
+{
+    return WaitForSingleObject(*s, 2000) == WAIT_OBJECT_0;
+}
+static bool sitl_sem_wait_10ms(sitl_sem_t* s)
+{
+    return WaitForSingleObject(*s, 10) == WAIT_OBJECT_0;
+}
+#elif defined(__APPLE__)
 #include <dispatch/dispatch.h>
 typedef dispatch_semaphore_t sitl_sem_t;
 static void sitl_sem_init(sitl_sem_t* s) { *s = dispatch_semaphore_create(0); }
@@ -285,11 +313,41 @@ void sitl_primask_clear(void)
 }
 
 /*
-  firmware thread suspension. SIGUSR1 parks the firmware thread on
-  resume_sem. Blocking in a handler is not formally async-signal-safe,
-  but these are bare syscall wrappers taking no library locks; the one
-  real hazard is parking this thread inside a locked stdio call while
-  the sim thread also prints, so diagnostics prints are kept rare
+  firmware thread suspension. The firmware thread runs to completion
+  frozen: the dispatcher stops it wherever it is, runs an ISR, then lets
+  it continue. The one real hazard is freezing the firmware thread inside
+  a locked stdio/heap call while the sim thread also takes that lock, so
+  diagnostics prints are kept rare.
+ */
+#ifdef _WIN32
+// native Windows: freeze the firmware thread with the OS scheduler.
+// SuspendThread is asynchronous, so GetThreadContext is used to block
+// until the thread is genuinely stopped before an ISR runs.
+static HANDLE fw_win_handle;
+
+static bool suspend_firmware(void)
+{
+    if (SuspendThread(fw_win_handle) == (DWORD)-1) {
+        return false;
+    }
+    CONTEXT ctx;
+    ctx.ContextFlags = CONTEXT_CONTROL;
+    if (!GetThreadContext(fw_win_handle, &ctx)) {
+        ResumeThread(fw_win_handle);
+        return false;
+    }
+    return true;
+}
+
+static void resume_firmware(void)
+{
+    ResumeThread(fw_win_handle);
+}
+#else
+/*
+  POSIX: SIGUSR1 parks the firmware thread on resume_sem. Blocking in a
+  handler is not formally async-signal-safe, but these are bare syscall
+  wrappers taking no library locks.
  */
 static void sigusr1_handler(int sig)
 {
@@ -312,6 +370,7 @@ static void resume_firmware(void)
 {
     sitl_sem_post(&resume_sem);
 }
+#endif
 
 // priority of the currently executing handler, NVIC style (lower value
 // is higher priority). 1000 = thread level, nothing active
@@ -509,25 +568,34 @@ void sitl_exec_bootloader(const char* cause)
 
 void sitl_reset_with_cause(const char* cause)
 {
+#ifndef _WIN32
     // block the suspension signal so a concurrent interrupt delivery
     // cannot park this thread on the way into exec
     sigset_t set;
     sigemptyset(&set);
     sigaddset(&set, SIGUSR1);
     pthread_sigmask(SIG_BLOCK, &set, NULL);
+#endif
     fprintf(stderr, "SITL: reset (%s) at t=%.3fs\n", cause, sim_time_ns_v * 1.0e-9);
     if (sitl_cfg.bootloader_path != NULL) {
         // a reset lands in the bootloader, as on hardware
         sitl_exec_bootloader(cause);
     }
-#ifdef __APPLE__
     sitl_coverage_flush();
+#if defined(_WIN32)
+    // no true exec on Windows: re-launch this image by its full path.
+    // _execv replaces the current process from the caller's point of
+    // view (the CRT terminates it once the child starts)
+    char exe[MAX_PATH];
+    if (GetModuleFileNameA(NULL, exe, sizeof(exe)) > 0) {
+        _execv(exe, (const char* const*)sitl_saved_argv);
+    }
+#elif defined(__APPLE__)
     execv(sitl_saved_argv[0], sitl_saved_argv);
 #else
-    sitl_coverage_flush();
     execv("/proc/self/exe", sitl_saved_argv);
 #endif
-    fprintf(stderr, "SITL: execv failed: %s\n", strerror(errno));
+    fprintf(stderr, "SITL: exec failed: %s\n", strerror(errno));
     _exit(1);
 }
 
@@ -610,6 +678,14 @@ static void set_realtime(const char* what)
     if (!sitl_cfg.realtime) {
         return;
     }
+#ifdef _WIN32
+    // Windows has no SCHED_FIFO; raise the OS thread priority instead
+    if (!SetThreadPriority(GetCurrentThread(),
+                           THREAD_PRIORITY_TIME_CRITICAL)) {
+        fprintf(stderr, "SITL: raising %s thread priority failed\n", what);
+    }
+    return;
+#else
     struct sched_param sp = { .sched_priority = 50 };
     if (pthread_setschedparam(pthread_self(), SCHED_FIFO, &sp) != 0) {
         fprintf(stderr, "SITL: SCHED_FIFO failed for %s thread: %s\n",
@@ -632,6 +708,7 @@ static void set_realtime(const char* what)
         }
     }
     fprintf(stderr, "SITL: %s thread using SCHED_FIFO\n", what);
+#endif
 }
 
 static void* sim_thread_main(void* arg)
@@ -819,9 +896,9 @@ static void* sim_thread_main(void* arg)
                     sched_yield();
                 }
             } else if (target_wall > wall + 100000) {
-#ifdef __APPLE__
-                // no clock_nanosleep on macOS: relative sleep. Drift free
-                // because the absolute target is recomputed each pass
+#if defined(__APPLE__) || defined(_WIN32)
+                // no clock_nanosleep on macOS/Windows: relative sleep. Drift
+                // free because the absolute target is recomputed each pass
                 const uint64_t delta = target_wall - wall;
                 struct timespec ts = { delta / 1000000000ULL, delta % 1000000000ULL };
                 nanosleep(&ts, NULL);
@@ -860,6 +937,14 @@ void sitl_start_sim_thread(void)
     sitl_sem_init(&resume_sem);
     sitl_sem_init(&gate_sem);
 
+#ifdef _WIN32
+    // capture a real, suspendable handle to this (the firmware) thread.
+    // GetCurrentThread is a pseudo-handle only valid in this thread, so
+    // duplicate it into one the sim thread can use to suspend us.
+    DuplicateHandle(GetCurrentProcess(), GetCurrentThread(),
+                    GetCurrentProcess(), &fw_win_handle,
+                    0, FALSE, DUPLICATE_SAME_ACCESS);
+#else
     // sitl_system_reset blocks SIGUSR1 on the way into execv; both the
     // mask and a possibly pending SIGUSR1 survive exec. Discard any
     // pending instance and unblock before installing the real handler
@@ -874,6 +959,7 @@ void sitl_start_sim_thread(void)
     sa.sa_handler = sigusr1_handler;
     sa.sa_flags = SA_RESTART;
     sigaction(SIGUSR1, &sa, NULL);
+#endif
 
     pthread_create(&sim_thread_id, NULL, sim_thread_main, NULL);
 }

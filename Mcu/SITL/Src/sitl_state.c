@@ -57,16 +57,18 @@
 #include "sitl.h"
 #include "sitl_config.h"
 #include "motor.h"
+#include "sitl_net.h"
 
-#include <arpa/inet.h>
-#include <netinet/in.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/socket.h>
 #include <time.h>
 #include <unistd.h>
+#ifdef _WIN32
+#define setenv(name, val, overwrite) _putenv_s((name), (val))
+#define unsetenv(name) _putenv(name "=")
+#endif
 
 #define STATE_MAGIC_CMD 0x5353
 #define STATE_MAGIC_DATA 0x5354
@@ -291,7 +293,7 @@ void sitl_state_init(void)
     addr.sin_addr.s_addr = htonl(sitl_cfg.bind_any ? INADDR_ANY : INADDR_LOOPBACK);
     if (bind(fd, (struct sockaddr*)&addr, sizeof(addr)) != 0) {
         perror("SITL: state bind");
-        close(fd);
+        closesocket(fd);
         fd = -1;
         return;
     }
@@ -309,13 +311,24 @@ void sitl_state_init(void)
 static void load_model(const char* path, struct sockaddr_in* src)
 {
     char msg[256];
+    // report just the file name, not the full path the GUI sent
+    const char* base = path;
+    for (const char* p = path; *p; p++) {
+        if (*p == '/' || *p == '\\') {
+            base = p + 1;
+        }
+    }
     const bool ok = sitl_config_reload(path);
     if (ok) {
         motor_config_changed();
-        snprintf(msg, sizeof(msg), "loaded %.200s", path);
+        // a firmware reboot does not swap the physical motor, so the
+        // runtime model must survive the emulated reset (which re-execs
+        // with the original argv and would otherwise reload --config)
+        setenv("AM32_SITL_MODEL", path, 1);
+        snprintf(msg, sizeof(msg), "loaded %.200s", base);
         fprintf(stderr, "SITL: %s\n", msg);
     } else {
-        snprintf(msg, sizeof(msg), "failed to load %.200s", path);
+        snprintf(msg, sizeof(msg), "failed to load %.200s", base);
         fprintf(stderr, "SITL: %s\n", msg);
     }
     struct __attribute__((packed)) {

@@ -51,6 +51,15 @@
 #include "sitl_config.h"
 #include "eeprom.h"
 
+#ifdef _WIN32
+// MinGW has no rand_r; the standard reentrant LCG (returns 0..RAND_MAX)
+static int rand_r(unsigned* seed)
+{
+    *seed = *seed * 1103515245u + 12345u;
+    return (int)((*seed >> 16) & 0x7fff);
+}
+#endif
+
 #define TWO_PI 6.283185307179586
 
 // which EXTI line the active comparator drives, owned by comparator.c

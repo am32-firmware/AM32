@@ -1,4 +1,0 @@
-# python dependencies for the SITL control GUI (sitl_gui.py)
-PySide6
-pyqtgraph
-dronecan

@@ -28,13 +28,11 @@
 #include "IO.h"
 #include "sitl.h"
 #include "sitl_config.h"
+#include "sitl_net.h"
 
-#include <arpa/inet.h>
 #include <errno.h>
-#include <netinet/in.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/socket.h>
 #include <unistd.h>
 
 #define SITL_INPUT_MAGIC 0x4453
@@ -110,7 +108,7 @@ void sitl_input_init(void)
     addr.sin_addr.s_addr = htonl(sitl_cfg.bind_any ? INADDR_ANY : INADDR_LOOPBACK);
     if (bind(fd, (struct sockaddr*)&addr, sizeof(addr)) != 0) {
         perror("SITL: input bind");
-        close(fd);
+        closesocket(fd);
         fd = -1;
         return;
     }

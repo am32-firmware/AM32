@@ -148,12 +148,24 @@ jobs:
           mkdir sitl_test_run && cd sitl_test_run
           python3 ../Mcu/SITL/run_ci_tests.py --sitl ../obj/AM32_AM32_SITL_CAN_*.elf
 
+      - name: Create GUI environment
+        run: python3 Mcu/SITL/make_gui_env.py
+
+      - name: Run GUI test (offscreen)
+        run: |
+          mkdir gui_test_run && cd gui_test_run
+          python3 ../Mcu/SITL/gui_ci_test.py \
+            --gui-python ../Mcu/SITL/venv/bin/python3 \
+            --sitl ../obj/AM32_AM32_SITL_CAN_*.elf
+
       - name: Upload SITL log on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: sitl-test-log-macos
-          path: sitl_test_run/sitl_ci.log
+          path: |
+            sitl_test_run/sitl_ci.log
+            gui_test_run/sitl_ci.log
 
   windows-build:
     runs-on: windows-latest

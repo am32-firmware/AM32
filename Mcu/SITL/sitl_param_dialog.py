@@ -13,7 +13,7 @@ set: testing a misconfigured ESC is a legitimate thing to simulate.
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QBrush, QColor
 from PySide6.QtWidgets import (QDialog, QHBoxLayout, QHeaderView, QLabel,
-                               QPushButton, QSpinBox, QTableWidget,
+                               QPushButton, QSizePolicy, QSpinBox, QTableWidget,
                                QTableWidgetItem, QVBoxLayout)
 
 import sitl_params
@@ -49,6 +49,10 @@ class ParamDialog(QDialog):
 
         btns = QHBoxLayout()
         self.status = QLabel('')
+        # wrap long status text (e.g. the apply summary) instead of forcing
+        # the whole dialog wider
+        self.status.setWordWrap(True)
+        self.status.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
         btns.addWidget(self.status, 1)
         for text, slot, tip in (
                 ('Refresh', self.refresh, 'Re-read the eeprom from the simulator.'),

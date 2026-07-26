@@ -21,6 +21,7 @@ bootloader SITL replies with type 4 packets carrying its serial output
 
 import socket
 import struct
+import sys
 import time
 import threading
 
@@ -144,6 +145,14 @@ class InputPort(object):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(('127.0.0.1', 0))
         self.sock.settimeout(0.2)
+        # on Windows a send to a not-yet-listening (or resetting) SITL
+        # makes the next recv() fail with WSAECONNRESET; ignore it so the
+        # reader survives startup and the firmware's no-signal reboots
+        if sys.platform.startswith('win'):
+            try:
+                self.sock.ioctl(socket.SIO_UDP_CONNRESET, False)
+            except (OSError, AttributeError):
+                pass
         self.lock = threading.Lock()
         self.replies = []          # (time, type, flags, data)
         self.serial_rx = b''       # reassembled type 4 serial bytes
@@ -158,6 +167,8 @@ class InputPort(object):
             try:
                 buf = self.sock.recv(512)
             except socket.timeout:
+                continue
+            except ConnectionResetError:
                 continue
             except OSError:
                 return

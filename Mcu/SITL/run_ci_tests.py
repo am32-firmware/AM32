@@ -42,9 +42,16 @@ def check(name, cond, detail):
 
 
 class Sitl(object):
-    def __init__(self, sitl_path, extra_args=()):
+    def __init__(self, sitl_path, extra_args=(), nosleep=True):
+        # --nosleep busy-waits to hold the ratio steady, but that pins a
+        # core. With a heavy client (pydronecan runs its IO in a separate
+        # process) on a CPU-starved CI runner it can starve the client so
+        # commands never reach the firmware, which then no-signal resets.
+        # Such tests pass nosleep=False to let the SITL yield the core.
         args = [sitl_path, '--input-port', str(INPUT_PORT),
-                '--state-port', str(STATE_PORT), '--nosleep'] + list(extra_args)
+                '--state-port', str(STATE_PORT)] + list(extra_args)
+        if nosleep:
+            args.append('--nosleep')
         self.log = open('sitl_ci.log', 'ab')
         self.proc = subprocess.Popen(args, stdout=self.log, stderr=self.log)
         time.sleep(0.5)
@@ -135,6 +142,12 @@ def rpm_from_state(sim, window=1.0):
     if not w:
         return -1
     return sum(s[1] for s in w) / len(w) * 60.0 / 6.28318
+
+
+def sim_time(sim):
+    '''latest simulation timestamp on the state stream, or None'''
+    w = sim.window(0.05)
+    return w[-1][0] if w else None
 
 
 def test_dshot(sitl_path, name, ptype, bidir, edt, value, rpm_lo, rpm_hi, input_type=1):
@@ -302,7 +315,8 @@ def test_dronecan(sitl_path):
     except ImportError:
         print('SKIP: dronecan not installed, DroneCAN test skipped')
         return
-    with Sitl(sitl_path, ['--can-uri', CAN_URI, '--node-id', '10']):
+    with Sitl(sitl_path, ['--can-uri', CAN_URI, '--node-id', '10'],
+              nosleep=False):
         sim = can_state_stream('dronecan')
         if sim is None:
             return
@@ -314,24 +328,41 @@ def test_dronecan(sitl_path):
             status['voltage'] = e.message.voltage
 
         node.add_handler(dronecan.uavcan.equipment.esc.Status, on_esc)
+        # the phases are timed on SIMULATION time, not wall clock: the
+        # firmware arms only after a full second of zero throttle in its
+        # own time (main.c armed_timeout_count), and this SITL is paced,
+        # so a loaded runner that holds well under 1x used to end the
+        # wall-clock zero phase before arming completed - the ESC then
+        # ignored the throttle for the rest of the run and read rpm=0
+        ZERO_S, RUN_S = 2.5, 5.5
         t0 = time.time()
-        nxt = t0
-        while time.time() - t0 < 10:
+        nxt, sim0, elapsed = t0, None, 0.0
+        while time.time() - t0 < 120:
             node.spin(0)
             now = time.time()
             if now >= nxt:
                 nxt += 0.02
-                thr = 0.35 if now - t0 > 2.5 else 0.0
+                t = sim_time(sim)
+                if t is not None:
+                    if sim0 is None:
+                        sim0 = t
+                    elapsed = t - sim0
+                thr = 0.35 if elapsed > ZERO_S else 0.0
                 node.broadcast(dronecan.uavcan.equipment.safety.ArmingStatus(status=255))
                 node.broadcast(dronecan.uavcan.equipment.esc.RawCommand(cmd=[int(8191 * thr)]))
+                if elapsed >= ZERO_S + RUN_S:
+                    break
             time.sleep(0.001)
         # read rpm from the state stream while the motor is still driven;
         # commands have stopped, so a wait here would let it coast down
         rpm = rpm_from_state(sim)
-        check('dronecan rpm', 2500 <= rpm <= 5000, 'rpm=%.0f' % rpm)
+        # the pacing ratio is in the detail so a future failure here says
+        # whether the runner simply ran out of wall clock
+        paced = '%.1fs sim in %.1fs wall' % (elapsed, time.time() - t0)
+        check('dronecan rpm', 2500 <= rpm <= 5000, 'rpm=%.0f (%s)' % (rpm, paced))
         check('dronecan telemetry', 2500 <= status.get('rpm', -1) <= 5000
               and 11 < status.get('voltage', 0) < 13,
-              'esc.Status=%s' % status)
+              'esc.Status=%s (%s)' % (status, paced))
         node.close()
         sim.close()
 
@@ -537,7 +568,8 @@ def test_dronecan_params(sitl_path):
     except ImportError:
         print('SKIP: dronecan not installed, DroneCAN param test skipped')
         return
-    with Sitl(sitl_path, ['--can-uri', 'mcast:4', '--node-id', '40']):
+    with Sitl(sitl_path, ['--can-uri', 'mcast:4', '--node-id', '40'],
+              nosleep=False):
         sim = can_state_stream('dronecan param set')
         if sim is None:
             return

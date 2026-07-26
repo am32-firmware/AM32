@@ -29,7 +29,10 @@ import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-PORT = 58123
+# below the macOS ephemeral range (32768+): an ephemeral control port
+# gets handed to one of the GUI's own bind(0) sockets before its control
+# server binds it, so the bind then fails there
+PORT = 28123
 SITL_URI = 'mcast:9'
 SITL_NODE = 14
 

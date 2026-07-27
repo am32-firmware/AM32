@@ -5,6 +5,16 @@ written down so further ESC/motor combinations follow the same steps.
 Data lives in `Mcu/SITL/data/<TARGET>/` with a README describing each
 capture; the model json goes in `Mcu/SITL/models/`.
 
+The bench ESC's settings are committed as a text `sitl.param` beside
+the captures, never as an eeprom binary: an image pins one snapshot of
+the layout and silently means something else after an eeprom.h change.
+Convert a capture's raw dump with
+
+    Mcu/SITL/sitl_params.py dump sitl_eeprom.bin > sitl.param
+
+which lists only what differs from the firmware defaults. The tests
+generate the image from it (`sitl_params.py build`).
+
 For a DShot ESC wired to a Betaflight flight controller instead of a
 CAN adapter, the same capture battery runs over MSP with
 `esc_capture_fc.py` — see "capturing via a Betaflight flight
@@ -53,8 +63,8 @@ whichever way the data was captured.
 ## 3. SITL model fit (order matters)
 
 Run the same profiles against the SITL build (`--can-uri mcast:N:lo`,
-mirror the ESC's eeprom params, `--physics-log` for raw truth,
-dedicated raw file per run):
+mirror the ESC's eeprom params from `sitl.param`, `--physics-log` for
+raw truth, dedicated raw file per run):
 
 1. `battery.voltage` — match the reported idle voltage.
 2. `motor.kv` — scale until the steady rpm curve matches (±2%);

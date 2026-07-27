@@ -299,10 +299,10 @@ Calibration regression tests (used by the SITL-calibration CI
 workflow): runs the bench measurement battery (steady sweep, square
 amplitude sweep, 120s chirp) against each calibrated model and
 compares to the REAL hardware reference values in
-`Mcu/SITL/data/<TARGET>/expected.json`, using each dataset's
-committed `sitl_eeprom.bin` so the SITL runs the same ESC settings
-as the bench. Tolerances cover the documented model residuals plus
-run-to-run scatter; the whole suite self-skips (exit 0) on runners
+`Mcu/SITL/data/<TARGET>/expected.json`, using the eeprom generated
+from each dataset's `sitl.param` so the SITL runs the same ESC
+settings as the bench. Tolerances cover the documented model residuals
+plus run-to-run scatter; the whole suite self-skips (exit 0) on runners
 that cannot hold the sim/wall ratio near 1, since every test is
 wall-clock paced; desyncs check against a per-model budget (the 1404
 reproduces the real hardware's marginality by design). Real-vs-run

@@ -13,7 +13,6 @@ import json
 import os
 import random
 import re
-import shutil
 import socket
 import tempfile
 import subprocess
@@ -22,6 +21,7 @@ import threading
 import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import sitl_params
 from run_ci_tests import Sitl, check, failures, INPUT_PORT, STATE_PORT
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -56,12 +56,11 @@ def test_launcher(args, env):
     control_port = free_control_port()
     input_port = 29833
     state_port = 29834
-    source_eeprom = os.path.join(
-        HERE, 'data', 'VIMDRONES_NANO_2216', 'sitl_eeprom.bin')
+    params = os.path.join(HERE, 'data', 'VIMDRONES_NANO_2216', 'sitl.param')
 
     with tempfile.TemporaryDirectory(prefix='am32_gui_launcher_') as tmp:
-        eeprom = os.path.join(tmp, 'sitl_eeprom.bin')
-        shutil.copyfile(source_eeprom, eeprom)
+        eeprom = sitl_params.write_eeprom(params,
+                                          os.path.join(tmp, 'eeprom.bin'))
         gui = subprocess.Popen(
             [args.gui_python, os.path.join(HERE, 'sitl_gui.py'),
              '--control-port', str(control_port),

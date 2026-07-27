@@ -19,6 +19,9 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))       # Mcu/SITL
 ROOT = os.path.dirname(os.path.dirname(HERE))
 
+sys.path.insert(0, HERE)
+import sitl_params
+
 # pulled in dynamically or lazily, so PyInstaller cannot see them
 HIDDEN = [
     'dronecan', 'dronecan.app.node_monitor', 'dronecan.app.dynamic_node_id',
@@ -89,15 +92,16 @@ def main():
         os.makedirs(stage)
         name = 'AM32_SITL_CAN.exe' if sys.platform.startswith('win') \
             else 'AM32_SITL_CAN'
-        payload = [(sitl_bin, name, '--add-binary')]
-        ee = os.path.join(ROOT,
-                          'Mcu/SITL/data/VIMDRONES_NANO_2216/sitl_eeprom.bin')
-        if os.path.isfile(ee):
-            payload.append((ee, 'default_eeprom.bin', '--add-data'))
-        for src, dest, flag in payload:
-            staged = os.path.join(stage, dest)
-            shutil.copy(src, staged)
-            cmd += [flag, '%s%s%s' % (staged, sep, 'sitl')]
+        staged = os.path.join(stage, name)
+        shutil.copy(sitl_bin, staged)
+        cmd += ['--add-binary', '%s%s%s' % (staged, sep, 'sitl')]
+        # the default eeprom is generated from the parameter file, not
+        # copied: no eeprom binary is committed
+        params = os.path.join(HERE, 'data/VIMDRONES_NANO_2216/sitl.param')
+        if os.path.isfile(params):
+            ee = sitl_params.write_eeprom(
+                params, os.path.join(stage, 'default_eeprom.bin'))
+            cmd += ['--add-data', '%s%s%s' % (ee, sep, 'sitl')]
         print('bundling simulator: %s' % sitl_bin)
     else:
         print('no SITL binary found - the SITL panel will need one chosen '

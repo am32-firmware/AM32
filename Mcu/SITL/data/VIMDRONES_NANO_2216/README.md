@@ -59,7 +59,7 @@ kv 944 effective, R 0.09, L 15u, J 3.35e-5 (prop dominated),
 load_k_omega2 1.9e-7 (the prop constant: the naive fit from input
 power over-estimates it ~20% by absorbing motor losses), battery
 12.40V/0.09 ohm, sink Rsink 4 / imax 0.8 (fit to the braking bus
-pump), CURRENT_LIMIT=8 mirrored in `sitl_eeprom.bin`.
+pump), CURRENT_LIMIT=8 mirrored in `sitl.param`.
 
 SITL files: `sitl_sweep_v1.jsonl`, `sitl_chirp_120s_v1.jsonl`,
 `sitl_square_v1.jsonl`.

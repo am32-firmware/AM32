@@ -8,6 +8,8 @@ Keil_Projects/Objects
 Keil_Projects/RTE/*
 Keil_Projects/Listings
 *.bin
+*.bin.bkup
+*.bin.lock
 *.elf
 *.d
 *.hex

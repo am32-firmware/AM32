@@ -19,7 +19,6 @@ motor - notably that Abort stops a run in flight.
 import argparse
 import json
 import os
-import shutil
 import threading
 import socket
 import subprocess
@@ -29,6 +28,10 @@ import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
+
+sys.path.insert(0, os.path.join(ROOT, 'Mcu', 'SITL'))
+import sitl_params
+
 # below the macOS ephemeral range (32768+): an ephemeral control port
 # gets handed to one of the GUI's own bind(0) sockets before its control
 # server binds it, so the bind then fails there
@@ -253,9 +256,9 @@ def wait_idle(c, timeout):
 def sitl_checks(c, sitl_bin):
     '''the parts that need a live ESC, against the simulated one'''
     outdir = tempfile.mkdtemp(prefix='am32-capture-sitl-')
-    eeprom = os.path.join(outdir, 'sitl_eeprom.bin')
-    shutil.copy(os.path.join(ROOT, 'Mcu/SITL/data/SEQURE_G431/sitl_eeprom.bin'),
-                eeprom)
+    eeprom = sitl_params.write_eeprom(
+        os.path.join(ROOT, 'Mcu/SITL/data/SEQURE_G431/sitl.param'),
+        os.path.join(outdir, 'sitl_eeprom.bin'))
     proc = subprocess.Popen(
         [os.path.abspath(sitl_bin), '--node-id', str(SITL_NODE),
          '--can-uri', SITL_URI, '--eeprom', eeprom,

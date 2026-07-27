@@ -41,6 +41,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(os.path.dirname(HERE))
 SCRIPTS = os.path.join(REPO, 'scripts')
 
+sys.path.insert(0, HERE)
+import sitl_params
+
 DATASETS = [
     {
         'name': 'gt2215',
@@ -380,7 +383,7 @@ def main():
         shutil.rmtree(run_dir, ignore_errors=True)
         os.makedirs(run_dir)
         eeprom = os.path.join(run_dir, 'eeprom.bin')
-        shutil.copy(os.path.join(ds['data'], 'sitl_eeprom.bin'), eeprom)
+        sitl_params.write_eeprom(os.path.join(ds['data'], 'sitl.param'), eeprom)
         raw = os.path.join(run_dir, 'chirp_raw.jsonl')
         sitl = Sitl(sitl_bin, ds['model'], eeprom,
                     os.path.join(run_dir, 'sitl.log'))

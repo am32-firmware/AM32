@@ -46,14 +46,28 @@ def bundled_sitl():
 
 
 def bundled_eeprom():
-    '''a default eeprom image to seed the simulated ESC'''
+    '''a default eeprom image to seed the simulated ESC.
+
+    The packaged build ships one generated at build time. From a
+    checkout there is none to ship, so generate it from the parameter
+    file into build/ - the simulator opens its eeprom read/write, and
+    handing it a file in the source tree corrupts the tree.
+    '''
     base = _resource_dir()
-    for cand in (os.path.join(base, 'sitl', 'default_eeprom.bin'),
-                 os.path.join(base,
-                              'Mcu/SITL/data/VIMDRONES_NANO_2216/sitl_eeprom.bin')):
-        if os.path.isfile(cand):
-            return cand
-    return None
+    packaged = os.path.join(base, 'sitl', 'default_eeprom.bin')
+    if os.path.isfile(packaged):
+        return packaged
+    here = os.path.dirname(os.path.abspath(__file__))
+    params = os.path.join(here, 'data', 'VIMDRONES_NANO_2216', 'sitl.param')
+    if not os.path.isfile(params):
+        return None
+    out = os.path.join(base, 'build', 'sitl_gui', 'default_eeprom.bin')
+    if (not os.path.isfile(out) or
+            os.path.getmtime(out) < os.path.getmtime(params)):
+        import sitl_params
+        os.makedirs(os.path.dirname(out), exist_ok=True)
+        sitl_params.write_eeprom(params, out)
+    return out
 
 
 # On Windows the SITL emulates an MCU reset by re-exec (execv has no true

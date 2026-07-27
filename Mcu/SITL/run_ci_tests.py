@@ -607,6 +607,41 @@ def test_dronecan_params(sitl_path):
             node.close()
 
 
+def test_dataset_params():
+    '''every calibration dataset's sitl.param must still build an eeprom
+    image, and must describe the motor its model simulates. This is what
+    keeps the parameter files from ageing: a renamed or dropped setting
+    fails to parse here instead of silently meaning something else'''
+    import json
+    from run_calibration_tests import DATASETS
+    for ds in DATASETS:
+        param = os.path.join(ds['data'], 'sitl.param')
+        try:
+            image = sitl_params.image_from_param_file(param)
+        except (OSError, ValueError, KeyError) as ex:
+            check('dataset params %s' % ds['name'], False, str(ex))
+            continue
+        model = json.load(open(ds['model'])).get('motor', {})
+        # the stored Kv is the real ESC's setting and the model's is the
+        # fitted effective value, so they differ a little by design; the
+        # band is the one Mcu/SITL/Src/eeprom.c warns outside of, where
+        # low rpm power protection starts clamping duty
+        ee_kv = sitl_params.byte_to_kv(image[
+            sitl_params.PARAMS_BY_NAME['MOTOR_KV'][0]])
+        poles = image[sitl_params.PARAMS_BY_NAME['MOTOR_POLES'][0]]
+        bad = []
+        if not model['kv'] * 0.8 <= ee_kv <= model['kv'] * 1.25:
+            bad.append('MOTOR_KV %d vs model %.0f' % (ee_kv, model['kv']))
+        if poles != model['poles']:
+            bad.append('MOTOR_POLES %d vs model %d' % (poles, model['poles']))
+        if len(image) != sitl_params.EEPROM_SIZE:
+            bad.append('image is %d bytes' % len(image))
+        check('dataset params %s' % ds['name'], not bad,
+              '; '.join(bad) if bad else
+              '%d settings, %d Kv, %d poles'
+              % (len(sitl_params.parse_param_file(param)), ee_kv, poles))
+
+
 def test_fc_capture(sitl_path):
     '''scripts/esc_capture_fc.py against the fake-Betaflight MSP stub:
     the FC capture path must produce the calibration JSONL with sane
@@ -696,6 +731,7 @@ def main():
     test_stuck_rotor(args.sitl, protection=False)
     test_debugger_pause(args.sitl)
     test_dronecan_params(args.sitl)
+    test_dataset_params()
     test_fc_capture(args.sitl)
 
     if failures:

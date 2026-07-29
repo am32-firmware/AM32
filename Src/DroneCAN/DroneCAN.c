@@ -1245,9 +1245,20 @@ void DroneCAN_update()
 
     if (canstats.last_raw_command_us != 0 && ts - canstats.last_raw_command_us > 250000ULL) {
         /*
-          we have stopped getting CAN RawCommand, zero input
+          we have stopped getting CAN RawCommand, zero input.
+
+          The input filter has to be forced to zero as well, not just
+          fed a zero sample: this is the only zero the failsafe gets
+          (the 1kHz re-injection below is disabled once
+          last_raw_command_us is cleared), and one sample through a
+          slow filter leaves nearly all of the previous throttle
+          applied - with INPUT_FILTER_HZ=10 over 99% of it. The motor
+          would keep running at the last commanded throttle for as
+          long as any other accepted DroneCAN transfer kept the main
+          loop's signal watchdog fed.
          */
         canstats.last_raw_command_us = 0;
+        Filter2P_reset(0);
         set_input(0);
     }
     if (canstats.last_raw_command_us != 0 && ts - last_heartbeat_us > TARGET_PERIOD_US) {

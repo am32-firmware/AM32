@@ -16,6 +16,9 @@ import time
 
 import sitl_dshot as sd
 
+# how many EDT command frames to keep queued while waiting for the latch
+EDT_CMD_QUEUE = 16
+
 
 def _udp_ignore_connreset(sock):
     '''On Windows, a UDP datagram sent to a port with no listener makes
@@ -136,7 +139,6 @@ class DshotPanel(object):
         self.edt = {}           # kind -> (value, time received)
         self.edt_want = False
         self.last_edt_seen = 0.0
-        self.last_edt_cmd = 0.0
         self.poles = 14
         self.status = ''
         self.running = True
@@ -228,14 +230,24 @@ class DshotPanel(object):
             if self.edt_want:
                 self.status = 'EDT pending: needs the motor stopped at zero throttle'
             return
-        if now - self.last_edt_cmd > 1.5:
-            self.last_edt_cmd = now
-            if self.edt_want:
-                self.send_command(sd.DSHOT_CMD_EDT_ENABLE)
-                self.status = 'EDT enable sent, waiting for EDT frames (arms after >1.5s at zero)'
-            else:
-                self.send_command(sd.DSHOT_CMD_EDT_DISABLE)
-                self.status = 'EDT disable sent'
+        # the firmware latches a command only after six CONSECUTIVE command
+        # frames while armed and stopped, counting the ones it actually
+        # processes, and any zero throttle frame in between resets that
+        # count. A short fixed burst is fragile: an ESC (or a SITL on a
+        # loaded machine) that cannot keep up with the frame rate drops most
+        # of the burst and the count never reaches six. Keep the queue
+        # topped up so the command stream is unbroken until the replies show
+        # the state we asked for. Command frames read as zero throttle, so
+        # this does not disturb arming.
+        if self.cmd_queue.qsize() < EDT_CMD_QUEUE:
+            want_enable = self.edt_want
+            self.send_command(sd.DSHOT_CMD_EDT_ENABLE if want_enable
+                              else sd.DSHOT_CMD_EDT_DISABLE,
+                              count=EDT_CMD_QUEUE)
+            status = ('EDT enable sent, waiting for EDT frames (arms after >1.5s at zero)'
+                      if want_enable else 'EDT disable sent')
+            if self.status != status:
+                self.status = status
 
 
 class CanPanel(object):

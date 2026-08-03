@@ -71,6 +71,22 @@
 #define USE_LMT87
 #endif
 
+#ifdef EPROPELLED_6S_G431_SINGLE_CAN
+#define FIRMWARE_NAME "EPROPG4_40A"
+#define FILE_NAME "EPROPELLED_6S_G431_SINGLE_CAN"
+#define DRONECAN_SUPPORT 1
+#define DRONECAN_NODE_NAME "com.epropelled.esc"
+#define DEAD_TIME 120
+#define HARDWARE_GROUP_G4_E
+#define TARGET_STALL_PROTECTION_INTERVAL 20000
+#define USE_SERIAL_TELEMETRY
+#define USE_RGB_LED						// USE RGB instead
+#define CURRENT_OFFSET            1650
+#define MILLIVOLT_PER_AMP         -9      // Really it is 8.8; negative because current polarity is inverted on Single ESC
+#define TARGET_VOLTAGE_DIVIDER    107
+#define USE_LMT87
+#endif
+
 #ifdef EPROPELLED_6S_G431_4in1
 #define FIRMWARE_NAME "EPROPG4_40A"
 #define FILE_NAME "EPROPELLED_6S_G431_4in1"

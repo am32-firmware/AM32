@@ -1,0 +1,45 @@
+name: Publish EEPROM Schema
+
+# On a release tag, publish Inc/eeprom.json to am32.ca so configurators (the
+# AM32 Configurator and QGroundControl) can fetch a version-aware schema.
+#
+# The upload transport is not wired yet (pending the am32.ca deploy mechanism).
+# Until the deploy secret is set the upload step skips with a notice, so this
+# workflow is safe to keep enabled. To finish it, add the deploy secret in the
+# repo settings and replace the TODO in the "Publish to am32.ca" step.
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+'
+  workflow_dispatch:
+
+jobs:
+  publish-schema:
+    name: Publish schema to am32.ca
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Gate: never publish a schema that disagrees with the released header.
+      - name: Check eeprom.h and eeprom.json are in sync
+        run: python generate_eeprom.py --check
+
+      - name: Publish to am32.ca
+        env:
+          # TODO(freasy): the secret name/shape depends on the transport
+          # (static-site repo token, object-store creds, API token, or SSH key).
+          DEPLOY_TOKEN: ${{ secrets.AM32CA_DEPLOY_TOKEN }}
+        run: |
+          if [ -z "$DEPLOY_TOKEN" ]; then
+            echo "::notice title=Schema publish not configured::am32.ca deploy mechanism is not wired yet. Inc/eeprom.json for ${GITHUB_REF_NAME} was validated but not uploaded."
+            exit 0
+          fi
+          # TODO(freasy): upload Inc/eeprom.json to the rolling am32.ca/eeprom URL using $DEPLOY_TOKEN.
+          echo "Publishing Inc/eeprom.json to am32.ca/eeprom for ${GITHUB_REF_NAME}..."

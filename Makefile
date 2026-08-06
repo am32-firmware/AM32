@@ -5,6 +5,7 @@ QUIET = @
 CC = $(ARM_SDK_PREFIX)gcc
 OBJCOPY = $(ARM_SDK_PREFIX)objcopy
 ECHO = echo
+PYTHON ?= python3
 
 # common variables
 IDENTIFIER := AM32
@@ -80,6 +81,14 @@ $(foreach MCU,$(MCU_TYPES),$(eval $(call CREATE_TARGET,$(MCU))))
 clean :
 	@echo Removing $(OBJ) directory
 	@$(RM) -rf $(OBJ)
+
+# eeprom.h is the hand-edited source of truth for the EEPROM layout; Inc/eeprom.json
+# mirrors it (plus configurator metadata). 'make eeprom-check' (and the eeprom-schema
+# CI job) flag any divergence. The firmware build never regenerates the header, so it
+# can't clobber hand edits and needs no network access.
+.PHONY: eeprom-check
+eeprom-check:
+	$(QUIET)$(PYTHON) generate_eeprom.py --check
 
 #####################
 # main firmware build

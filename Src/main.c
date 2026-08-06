@@ -2206,6 +2206,7 @@ if(zero_crosses < 5){
         if (newinput > 2000) {
             newinput = 2000;
         }
+        input_ready = 1;       
 #endif
         stuckcounter = 0;
         if (stepper_sine == 0) {
@@ -2304,7 +2305,7 @@ if(zero_crosses < 5){
 #else
 
             if (input > 48 && armed) {
-
+                PROCESS_ADC_FLAG = 1;
                 if (input > 48 && input < 137) { // sine wave stepper
 
                     if (do_once_sinemode) {

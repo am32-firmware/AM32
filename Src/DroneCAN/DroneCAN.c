@@ -110,6 +110,7 @@ extern uint16_t low_cell_volt_cutoff;
 extern uint32_t desync_happened;
 
 static uint16_t last_can_input;
+static uint64_t last_heartbeat_us;
 static struct {
     uint32_t sum;
     uint32_t count;
@@ -1248,10 +1249,13 @@ void DroneCAN_update()
         canstats.last_raw_command_us = 0;
         set_input(0);
     }
-    if (ts - canstats.last_raw_command_us > TARGET_PERIOD_US) {
-        // ensure at least 1kHz signal is seen by main code
+    if (canstats.last_raw_command_us != 0 && ts - last_heartbeat_us > TARGET_PERIOD_US) {
+        /*
+          ensure at least 1kHz signal is seen by main code, but only
+          once we have received a RawCommand
+         */
         set_input(last_can_input);
-        canstats.last_raw_command_us = ts;
+        last_heartbeat_us = ts;
     }
 
     sys_can_enable_IRQ();

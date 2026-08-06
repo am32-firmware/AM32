@@ -19,5 +19,5 @@ void maskPhaseInterrupts();
 void changeCompInput();
 void enableCompInterrupts();
 
-extern char rising;
+extern volatile char rising;
 extern char step;

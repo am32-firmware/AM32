@@ -19,18 +19,18 @@ extern uint8_t running;
 extern uint16_t zero_input_count;
 extern uint16_t signaltimeout;
 extern uint16_t input;
-extern uint16_t newinput;
+extern volatile uint16_t newinput;
 extern char play_tone_flag;
 extern uint32_t current_GPIO_PIN;
 extern char ic_timer_prescaler;
 extern uint8_t buffersize;
 extern char output_timer_prescaler;
-extern uint8_t compute_dshot_flag;
+extern volatile uint8_t compute_dshot_flag;
 extern uint16_t battery_voltage;
 extern int16_t actual_current;
 extern uint16_t e_rpm;
-extern uint32_t average_interval;
-
+extern volatile uint32_t average_interval;
+extern volatile int16_t degrees_celsius;
 
 #ifdef STMICRO
 extern GPIO_TypeDef* current_GPIO_PORT;
@@ -49,7 +49,7 @@ extern int e_com_time;
 extern char EDT_ARM_ENABLE;
 extern char EDT_ARMED;
 extern uint16_t send_extended_dshot;
-#ifdef NEED_INPUT_READY
+#if defined(NEED_INPUT_READY) || defined(NXP)
 extern volatile char input_ready;
 #endif
 // typedef struct PID{

@@ -2,6 +2,9 @@
 
 #pragma once
 
+#ifndef EEPROM_H_
+#define EEPROM_H_
+
 typedef union EEprom_u {
     struct {
         uint8_t reserved_0; //0
@@ -78,3 +81,5 @@ extern EEprom_t eepromBuffer;
 // void save_to_flash_bin(uint8_t *data, int length, uint32_t add);
 void read_flash_bin(uint8_t* data, uint32_t add, int out_buff_len);
 void save_flash_nolib(uint8_t* data, int length, uint32_t add);
+
+#endif /* EEPROM_H_ */

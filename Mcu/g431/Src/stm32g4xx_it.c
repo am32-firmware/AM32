@@ -12,14 +12,14 @@ extern void interruptRoutine();
 extern void tenKhzRoutine();
 extern void processDshot();
 
-extern char send_telemetry;
+extern volatile char send_telemetry;
 uint16_t interrupt_time = 0;
-extern char servoPwm;
-extern char dshot_telemetry;
-extern char armed;
-extern char out_put;
-extern uint8_t compute_dshot_flag;
-extern uint16_t commutation_interval;
+extern volatile char servoPwm;
+extern volatile char dshot_telemetry;
+extern volatile char armed;
+extern volatile char out_put;
+extern volatile uint8_t compute_dshot_flag;
+extern volatile uint16_t commutation_interval;
 
 int interrupt = 0;
 

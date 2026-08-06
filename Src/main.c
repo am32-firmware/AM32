@@ -1814,8 +1814,9 @@ int main(void)
         eepromBuffer.use_sine_start = 0;
         low_rpm_throttle_limit = 1;
         eepromBuffer.variable_pwm = 0;
-        // eepromBuffer.stall_protection = 1;
+        eepromBuffer.brake_on_zero_throttle = 0;
         eepromBuffer.comp_pwm = 0;
+        temp_comp_pwm = 0;
         eepromBuffer.stuck_rotor_protection = 0;
         minimum_duty_cycle = minimum_duty_cycle + 50;
         stall_protect_minimum_duty = stall_protect_minimum_duty + 50;

@@ -46,7 +46,11 @@ void telem_UART_Init(void)
     USART_InitStruct.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
     USART_Init(USART2, &USART_InitStruct);
     USART_Cmd(USART2, ENABLE);
-
+    
+    /* Clear any pending TC and enable USART2 IRQ so TC interrupt can fire */
+    USART_ClearFlag(USART2, USART_FLAG_TC);
+    NVIC_SetPriority(USART2_IRQn, 0xE0);
+    NVIC_EnableIRQ(USART2_IRQn);
 
     /* USART2 DMA Init */
     DMA_DeInit(DMA1_Channel7);

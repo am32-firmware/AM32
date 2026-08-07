@@ -157,20 +157,36 @@ static const struct parameter {
         { "PWM_FREQUENCY",          T_UINT8, 8, 144, 24, &eepromBuffer.pwm_frequency},
         { "MAX_RAMP",               T_UINT8, 1, 200, 160, &eepromBuffer.max_ramp},
         { "MIN_DUTY_CYCLE",         T_UINT8, 0, 50,  4, &eepromBuffer.minimum_duty_cycle},
-        { "USE_SIN_START",          T_BOOL,  0, 1,   0, &eepromBuffer.use_sine_start},
         { "COMP_PWM",               T_BOOL,  0, 1,   1, &eepromBuffer.comp_pwm},
-        { "STUCK_ROTOR_PROTECTION", T_BOOL,  0, 1,   1, &eepromBuffer.stuck_rotor_protection},
         { "ADVANCE_LEVEL",          T_UINT8, 0, 30,  26, &eepromBuffer.advance_level},
         { "AUTO_ADVANCE",           T_BOOL,  0, 1,   0, &eepromBuffer.auto_advance},
-        { "STARTUP_POWER",          T_UINT8, 50,150, 10, &eepromBuffer.startup_power},
-        { "CURRENT_LIMIT",          T_UINT8, 0, 200, 0, &eepromBuffer.limits.current},
-        { "TEMPERATURE_LIMIT",      T_UINT8, 70,255, 255,&eepromBuffer.limits.temperature},
-        { "LOW_VOLTAGE_CUTOFF",     T_BOOL,  0, 1,   0,  &eepromBuffer.low_voltage_cut_off},
+        { "STARTUP_POWER",          T_UINT8, 50,150, 100, &eepromBuffer.startup_power},
+        { "STALL_PROTECTION",       T_UINT8, 0, 3,   0, &eepromBuffer.stall_protection},
+        { "STUCK_ROTOR_PROTECTION", T_BOOL,  0, 1,   1, &eepromBuffer.stuck_rotor_protection},
+        { "DISABLE_STICK_CALIBRATION", T_BOOL,  0, 1,   0, &eepromBuffer.disable_stick_calibration},
+        { "SERVO_LOW_THRESHOLD",    T_UINT8, 0, 250, 128, &eepromBuffer.servo.low_threshold},
+        { "SERVO_HIGH_THRESHOLD",   T_UINT8, 0, 250, 128, &eepromBuffer.servo.high_threshold},
+        { "SERVO_NEUTRAL",          T_UINT8, 0, 250, 128, &eepromBuffer.servo.neutral},
+        { "SERVO_DEAD_BAND",        T_UINT8, 0, 250, 50, &eepromBuffer.servo.dead_band},
+        { "LOW_VOLTAGE_CUTOFF",     T_UINT8, 0, 2,   0,  &eepromBuffer.low_voltage_cut_off},
         { "CELL_VOLTAGE_THRESHOLD", T_UINT16, 250, 350, 300, &low_cell_volt_cutoff},
-        { "BRAKE_ON_STOP",          T_BOOL,  0, 1,   1, &eepromBuffer.brake_on_stop},
+        { "ABSOLUTE_VOLTAGE_CUTOFF",   T_UINT8, 1, 100, 10, &eepromBuffer.absolute_voltage_cutoff},
+        { "CURRENT_LIMIT",          T_UINT8, 0, 200, 0, &eepromBuffer.limits.current},
+        { "CURRENT_P",              T_UINT8, 0, 510, 200, &eepromBuffer.current_P},
+        { "CURRENT_I",              T_UINT8, 0, 255, 0, &eepromBuffer.current_I},
+        { "CURRENT_D",              T_UINT8, 0, 510, 100, &eepromBuffer.current_D},
+        { "TEMPERATURE_LIMIT",      T_UINT8, 70,255, 255,&eepromBuffer.limits.temperature},
+        { "BRAKE_ON_STOP",          T_UINT8, 0, 2,   0, &eepromBuffer.brake_on_stop},
         { "BRAKE_ON_ZERO_THROTTLE", T_UINT8, 0, 9,   0, &eepromBuffer.brake_on_zero_throttle},
         { "DRIVING_BRAKE_STRENGTH", T_UINT8, 1, 10,  10, &eepromBuffer.driving_brake_strength},
         { "DRAG_BRAKE_STRENGTH",    T_UINT8, 1, 10,  10, &eepromBuffer.drag_brake_strength},
+        { "ACTIVE_BRAKE_POWER",     T_UINT8, 0, 5,   2, &eepromBuffer.active_brake_power},
+        { "RC_CAR_REVERSE",         T_BOOL,  0, 1,   0, &eepromBuffer.rc_car_reverse},
+        { "USE_SIN_START",          T_BOOL,  0, 1,   0, &eepromBuffer.use_sine_start},
+        { "SINE_MODE_CHANGEOVER_THROTTLE", T_UINT8, 5, 25, 15, &eepromBuffer.sine_mode_changeover_thottle_level},
+        { "SINE_MODE_POWER",        T_UINT8, 1, 10,  6, &eepromBuffer.sine_mode_power},
+        { "USE_HALL_SENSORS",       T_BOOL,  0, 1,   0, &eepromBuffer.use_hall_sensors},
+        { "SERIAL_TELEM_INTERVAL",  T_UINT8, 0, 255, 0, &eepromBuffer.telemetry_on_interval},
         { "INPUT_SIGNAL_TYPE",      T_UINT8, 0, 5,   5, &eepromBuffer.input_type},
         { "INPUT_FILTER_HZ",        T_UINT8, 0, 100, 0, &eepromBuffer.can.filter_hz},
 #ifdef CAN_TERM_PIN
@@ -199,7 +215,7 @@ static void load_settings(void)
             case T_BOOL:
             case T_UINT8: {
                 uint8_t *pvalue = (uint8_t *)p->ptr;
-                uint8_t max_value = p->max_value;
+                uint16_t max_value = p->max_value;
                 if (pvalue == &eepromBuffer.limits.current) {
                     max_value = max_value / 2;
                 }
@@ -366,7 +382,9 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
 	switch (p->vtype) {
             case T_UINT8: {
                 uint8_t *ptr8 = (uint8_t *)p->ptr;
-                if (ptr8 == &eepromBuffer.limits.current) {
+                if (ptr8 == &eepromBuffer.limits.current ||
+                    ptr8 == &eepromBuffer.current_P ||
+                    ptr8 == &eepromBuffer.current_D) {
                     *ptr8 = req.value.integer_value / 2;
                 } else {
                     *ptr8 = req.value.integer_value;
@@ -446,7 +464,9 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
             pkt.min_value.integer_value = p->min_value;
 
             // special case scaling
-            if ((uint8_t *)p->ptr == &eepromBuffer.limits.current) {
+            if ((uint8_t *)p->ptr == &eepromBuffer.limits.current ||
+                (uint8_t *)p->ptr == &eepromBuffer.current_P ||
+                (uint8_t *)p->ptr == &eepromBuffer.current_D) {
                 pkt.default_value.integer_value *= 2;
                 pkt.value.integer_value *= 2;
             }
@@ -1277,9 +1297,20 @@ void DroneCAN_update()
 
     if (canstats.last_raw_command_us != 0 && ts - canstats.last_raw_command_us > 250000ULL) {
         /*
-          we have stopped getting CAN RawCommand, zero input
+          we have stopped getting CAN RawCommand, zero input.
+
+          The input filter has to be forced to zero as well, not just
+          fed a zero sample: this is the only zero the failsafe gets
+          (the 1kHz re-injection below is disabled once
+          last_raw_command_us is cleared), and one sample through a
+          slow filter leaves nearly all of the previous throttle
+          applied - with INPUT_FILTER_HZ=10 over 99% of it. The motor
+          would keep running at the last commanded throttle for as
+          long as any other accepted DroneCAN transfer kept the main
+          loop's signal watchdog fed.
          */
         canstats.last_raw_command_us = 0;
+        Filter2P_reset(0);
         set_input(0);
     }
     if (canstats.last_raw_command_us != 0 && ts - last_heartbeat_us > TARGET_PERIOD_US) {

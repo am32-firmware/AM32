@@ -1,0 +1,31 @@
+{
+    "motor": {
+        "kv": 1165.0,
+        "poles": 14,
+        "resistance": 0.1,
+        "inductance": 9e-06,
+        "inertia": 4.22e-06,
+        "damping": 1e-06,
+        "static_friction": 0.002,
+        "load_k_omega2": 2e-09
+    },
+    "battery": {
+        "voltage": 15.75,
+        "resistance": 0.085,
+        "capacitance": 0.002,
+        "sink_resistance": 8.0,
+        "sink_current_max": 0.26
+    },
+    "esc": {
+        "rds_on": 0.004,
+        "diode_vf": 0.7,
+        "temperature_c": 33.0,
+        "commutation_transfer": 1.0
+    },
+    "sim": {
+        "comparator_hysteresis_mv": 0.0,
+        "comparator_noise_mv": 3.0,
+        "comparator_phase_rc_ns": 800,
+        "comparator_neutral_rc_ns": 800
+    }
+}

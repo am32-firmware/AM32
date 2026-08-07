@@ -75,6 +75,7 @@ float Filter2P_apply(const float sample, float cutoff_freq, float sample_freq)
     return output;
 }
 
+#ifndef MCU_SITL
 /*
   unfortunately the maths libraries have an abort() linkage
  */
@@ -82,3 +83,4 @@ void abort(void)
 {
     __builtin_unreachable();
 }
+#endif

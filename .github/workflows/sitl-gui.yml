@@ -1,0 +1,114 @@
+name: SITL GUI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  # drive the GUI headlessly over its control socket against a real
+  # SITL: exercises the panels, the model builder and the launcher
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgl1 libegl1 libxkbcommon0 libfontconfig1 \
+                                  libdbus-1-3 libxcb-cursor0
+          python3 -m pip install -r Mcu/SITL/requirements.txt
+
+      - name: Build SITL
+        run: make AM32_SITL_CAN
+
+      - name: Headless GUI test
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python3 Mcu/SITL/gui_ci_test.py --gui-python python3
+
+  # cross-compile the native Windows SITL exe on Linux with MinGW-w64,
+  # so the Windows packaging job bundles a dependency-free binary (no
+  # cygwin1.dll) that runs the real-time simulator reliably
+  sitl-windows-exe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install MinGW-w64
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-mingw-w64-x86-64
+
+      - name: Cross-build native Windows SITL
+        run: |
+          make AM32_SITL_CAN SITL_CROSS=win
+          mkdir -p sitl-windows
+          cp obj/AM32_AM32_SITL_CAN_*.elf sitl-windows/AM32_SITL_CAN.exe
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sitl-windows-exe
+          path: sitl-windows/AM32_SITL_CAN.exe
+
+  build:
+    needs: [sitl-windows-exe]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: am32-sitl-gui-linux
+            binary: dist/am32-sitl-gui
+          - os: windows-latest
+            artifact: am32-sitl-gui-windows
+            binary: dist/am32-sitl-gui.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Qt runtime libraries (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgl1 libegl1 libxkbcommon0 libfontconfig1 \
+                                  libdbus-1-3 libxcb-cursor0
+
+      # the SITL is bundled so the GUI runs the simulator out of the box
+      - name: Build SITL (Linux)
+        if: runner.os == 'Linux'
+        run: make AM32_SITL_CAN
+
+      - name: Download native Windows SITL
+        if: runner.os == 'Windows'
+        uses: actions/download-artifact@v4
+        with:
+          name: sitl-windows-exe
+          path: sitl-windows
+
+      - name: Install build dependencies
+        # a clean environment on purpose: a system python with other Qt
+        # bindings or unrelated packages inflates the bundle
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r Mcu/SITL/requirements.txt pyinstaller
+
+      - name: Build executable
+        run: python3 Mcu/SITL/build_sitl_gui.py
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.binary }}

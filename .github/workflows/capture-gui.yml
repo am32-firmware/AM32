@@ -1,0 +1,92 @@
+name: Capture GUI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  # the GUI logic is exercised headlessly through the same control
+  # socket the packaged build exposes, so this catches breakage without
+  # any hardware attached
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgl1 libegl1 libxkbcommon0 libfontconfig1 \
+                                  libdbus-1-3 libxcb-cursor0
+          python3 -m pip install -r scripts/requirements-capture-gui.txt
+
+      # a simulated ESC to capture from, so the test covers the paths
+      # that need a live motor - notably that Abort stops a run
+      - name: Build SITL
+        run: make AM32_SITL_CAN
+
+      - name: Headless GUI test
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          python3 scripts/capture_gui_test.py \
+            --sitl obj/AM32_AM32_SITL_CAN_*.elf
+
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: am32-capture-linux
+            binary: dist/am32-capture
+          - os: windows-latest
+            artifact: am32-capture-windows
+            binary: dist/am32-capture.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Qt runtime libraries (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgl1 libegl1 libxkbcommon0 libfontconfig1 \
+                                  libdbus-1-3 libxcb-cursor0
+
+      - name: Install build dependencies
+        # a clean environment on purpose: building against a system
+        # python that has other Qt bindings or unrelated packages
+        # installed inflates the bundle several times over
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r scripts/requirements-capture-gui.txt pyinstaller
+          python3 -m pip uninstall -y matplotlib || true
+
+      - name: Build executable
+        run: python3 scripts/build_capture_gui.py
+
+      # runs on both: the Windows binary is the one end users get, and
+      # the frozen multiprocessing path that mavcan needs behaves
+      # differently there
+      - name: Smoke test the executable
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python3 scripts/capture_gui_test.py --binary ${{ matrix.binary }}
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.binary }}

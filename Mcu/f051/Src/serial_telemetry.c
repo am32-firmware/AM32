@@ -8,7 +8,7 @@
 #include "serial_telemetry.h"
 #include "common.h"
 #include "targets.h"
-#include "kiss_telemetry.h"
+#include "telemetry_protocol.h"
 
 #ifdef USE_PA14_TELEMETRY
 void telem_UART_Init(void)
@@ -50,7 +50,7 @@ void telem_UART_Init(void)
     NVIC_SetPriority(USART2_IRQn, 3);
     NVIC_EnableIRQ(USART2_IRQn);
 
-    USART_InitStruct.BaudRate = 115200;
+    USART_InitStruct.BaudRate = SERIAL_TELEMETRY_BAUDRATE_SELECTED;
     USART_InitStruct.DataWidth = LL_USART_DATAWIDTH_8B;
     USART_InitStruct.StopBits = LL_USART_STOPBITS_1;
     USART_InitStruct.Parity = LL_USART_PARITY_NONE;
@@ -58,6 +58,10 @@ void telem_UART_Init(void)
     USART_InitStruct.HardwareFlowControl = LL_USART_HWCONTROL_NONE;
     USART_InitStruct.OverSampling = LL_USART_OVERSAMPLING_16;
     LL_USART_Init(USART2, &USART_InitStruct);
+#ifdef USE_SPORT_TELEMETRY
+    LL_USART_SetTXPinLevel(USART2, LL_USART_TXPIN_LEVEL_INVERTED);
+    LL_USART_SetRXPinLevel(USART2, LL_USART_RXPIN_LEVEL_INVERTED);
+#endif
     LL_USART_DisableIT_CTS(USART2);
     LL_USART_ConfigAsyncMode(USART2);
     LL_USART_Enable(USART2);
@@ -121,7 +125,7 @@ void telem_UART_Init(void)
     LL_DMA_SetPeriphSize(DMA1, LL_DMA_CHANNEL_2, LL_DMA_PDATAALIGN_BYTE);
     LL_DMA_SetMemorySize(DMA1, LL_DMA_CHANNEL_2, LL_DMA_MDATAALIGN_BYTE);
 
-    USART_InitStruct.BaudRate = 115200;
+    USART_InitStruct.BaudRate = SERIAL_TELEMETRY_BAUDRATE_SELECTED;
     USART_InitStruct.DataWidth = LL_USART_DATAWIDTH_8B;
     USART_InitStruct.StopBits = LL_USART_STOPBITS_1;
     USART_InitStruct.Parity = LL_USART_PARITY_NONE;
@@ -129,6 +133,10 @@ void telem_UART_Init(void)
     USART_InitStruct.HardwareFlowControl = LL_USART_HWCONTROL_NONE;
     USART_InitStruct.OverSampling = LL_USART_OVERSAMPLING_16;
     LL_USART_Init(USART1, &USART_InitStruct);
+#ifdef USE_SPORT_TELEMETRY
+    LL_USART_SetTXPinLevel(USART1, LL_USART_TXPIN_LEVEL_INVERTED);
+    LL_USART_SetRXPinLevel(USART1, LL_USART_RXPIN_LEVEL_INVERTED);
+#endif
     LL_USART_DisableIT_CTS(USART1);
     LL_USART_ConfigAsyncMode(USART1);
     LL_USART_Enable(USART1);

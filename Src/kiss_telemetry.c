@@ -1,6 +1,8 @@
 #include "kiss_telemetry.h"
 #include "eeprom.h"
 
+#ifndef USE_SPORT_TELEMETRY
+
 extern uint8_t get_crc8(uint8_t* Buf, uint8_t BufLen);
 
 uint8_t aTxBuffer[49] __attribute__((aligned(4)));
@@ -38,3 +40,5 @@ void makeInfoPacket()
     }
     aTxBuffer[48] = get_crc8(aTxBuffer, 48);
 }
+
+#endif

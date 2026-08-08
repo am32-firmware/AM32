@@ -425,6 +425,9 @@
 #define FILE_NAME "SEQURE_G431_CAN"
 #define DRONECAN_SUPPORT 1
 #define DRONECAN_NODE_NAME "com.sequre.esc"
+// CAN termination pin on PB7, active high
+#define CAN_TERM_PIN GPIO_PORT_PIN(1, 7) // PB7
+#define CAN_TERM_POLARITY 1
 #define DEAD_TIME 80
 
 #define HARDWARE_GROUP_G4_D

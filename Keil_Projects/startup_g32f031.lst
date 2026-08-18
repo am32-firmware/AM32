@@ -1,0 +1,831 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000         ;/*!
+    2 00000000         ; * @file       startup_g32f031xx.s
+    3 00000000         ; *
+    4 00000000         ; * @brief      CMSIS Cortex-M0 PLUS based Core Device S
+                       tartup File
+    5 00000000         ; *
+    6 00000000         ; * @version    V1.0.0
+    7 00000000         ; *
+    8 00000000         ; * @date       2026-01-15
+    9 00000000         ; *
+   10 00000000         ; * @attention
+   11 00000000         ; *
+   12 00000000         ; *  Copyright (C) 2026 Geehy Semiconductor
+   13 00000000         ; *
+   14 00000000         ; *  You may not use this file except in compliance with
+                        the
+   15 00000000         ; *  GEEHY COPYRIGHT NOTICE (GEEHY SOFTWARE PACKAGE LICE
+                       NSE).
+   16 00000000         ; *
+   17 00000000         ; *  The program is only for reference, which is distrib
+                       uted in the hope
+   18 00000000         ; *  that it will be useful and instructional for custom
+                       ers to develop
+   19 00000000         ; *  their software. Unless required by applicable law o
+                       r agreed to in
+   20 00000000         ; *  writing, the program is distributed on an "AS IS" B
+                       ASIS, WITHOUT
+   21 00000000         ; *  ANY WARRANTY OR CONDITIONS OF ANY KIND, either expr
+                       ess or implied.
+   22 00000000         ; *  See the GEEHY SOFTWARE PACKAGE LICENSE for the gove
+                       rning permissions
+   23 00000000         ; *  and limitations under the License.
+   24 00000000         ; */
+   25 00000000         
+   26 00000000         ; <h> Stack Configuration
+   27 00000000         ;  <o> Stack Size (in Bytes) <0x0-0xFFFFFFFF:8>
+   28 00000000         ; </h>
+   29 00000000         
+   30 00000000 00000400 
+                       Stack_Size
+                               EQU              0x00000400
+   31 00000000         
+   32 00000000                 AREA             STACK, NOINIT, READWRITE, ALIGN
+=3
+   33 00000000         Stack_Mem
+                               SPACE            Stack_Size
+   34 00000400         __initial_sp
+   35 00000400         
+   36 00000400         
+   37 00000400         ; <h> Heap Configuration
+   38 00000400         ;   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
+   39 00000400         ; </h>
+   40 00000400         
+   41 00000400 00000200 
+                       Heap_Size
+                               EQU              0x00000200
+   42 00000400         
+   43 00000400                 AREA             HEAP, NOINIT, READWRITE, ALIGN=
+3
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+   44 00000000         __heap_base
+   45 00000000         Heap_Mem
+                               SPACE            Heap_Size
+   46 00000200         __heap_limit
+   47 00000200         
+   48 00000200                 PRESERVE8
+   49 00000200                 THUMB
+   50 00000200         
+   51 00000200         
+   52 00000200         ; Vector Table Mapped to Address 0 at Reset
+   53 00000200                 AREA             RESET, DATA, READONLY
+   54 00000000                 EXPORT           __Vectors
+   55 00000000                 EXPORT           __Vectors_End
+   56 00000000                 EXPORT           __Vectors_Size
+   57 00000000         
+   58 00000000 00000000 
+                       __Vectors
+                               DCD              __initial_sp ; Top of Stack
+   59 00000004 00000000        DCD              Reset_Handler ; Reset Handler
+   60 00000008 00000000        DCD              NMI_Handler ; NMI Handler
+   61 0000000C 00000000        DCD              HardFault_Handler ; Hard Fault 
+                                                            Handler
+   62 00000010 00000000        DCD              0           ; Reserved
+   63 00000014 00000000        DCD              0           ; Reserved
+   64 00000018 00000000        DCD              0           ; Reserved
+   65 0000001C 00000000        DCD              0           ; Reserved
+   66 00000020 00000000        DCD              0           ; Reserved
+   67 00000024 00000000        DCD              0           ; Reserved
+   68 00000028 00000000        DCD              0           ; Reserved
+   69 0000002C 00000000        DCD              SVC_Handler ; SVCall Handler
+   70 00000030 00000000        DCD              0           ; Reserved
+   71 00000034 00000000        DCD              0           ; Reserved
+   72 00000038 00000000        DCD              PendSV_Handler ; PendSV Handler
+                                                            
+   73 0000003C 00000000        DCD              SysTick_Handler 
+                                                            ; SysTick Handler
+   74 00000040         
+   75 00000040         ; External Interrupts
+   76 00000040 00000000        DCD              WWDT_IRQHandler 
+                                                            ; Window Watchdog
+   77 00000044 00000000        DCD              PVD_IRQHandler ; PVD through EI
+                                                            NT Line detect
+   78 00000048 00000000        DCD              0           ; Reserved
+   79 0000004C 00000000        DCD              FLASH_IRQHandler ; FLASH
+   80 00000050 00000000        DCD              RCC_IRQHandler ; RCM
+   81 00000054 00000000        DCD              EINT0_1_IRQHandler 
+                                                            ; EINT Line 0 and 1
+                                                            
+   82 00000058 00000000        DCD              EINT2_3_IRQHandler 
+                                                            ; EINT Line 2 and 3
+                                                            
+   83 0000005C 00000000        DCD              EINT4_15_IRQHandler 
+                                                            ; EINT Line 4 to 15
+                                                            
+   84 00000060 00000000        DCD              0           ; Reserved
+   85 00000064 00000000        DCD              DMA_CH0_IRQHandler 
+                                                            ; DMA Channel 0
+   86 00000068 00000000        DCD              DMA_CH1_IRQHandler 
+                                                            ; DMA Channel 1
+
+
+
+ARM Macro Assembler    Page 3 
+
+
+   87 0000006C 00000000        DCD              0           ; Reserved
+   88 00000070 00000000        DCD              ADC_IRQHandler ; ADC
+   89 00000074 00000000        DCD              ATMR_BRK_UP_TRG_COM_IRQHandler 
+                                                            ; Advanced Timer Br
+                                                            eak, Update, Trigge
+                                                            r and Commutation
+   90 00000078 00000000        DCD              ATMR_CC_IRQHandler ; Advanced T
+                                                            imer Capture Compar
+                                                            e
+   91 0000007C 00000000        DCD              GTMR_IRQHandler ; General Timer
+                                                            
+   92 00000080 00000000        DCD              0           ; 0
+   93 00000084 00000000        DCD              BTMR0_IRQHandler 
+                                                            ; Basic timer 0
+   94 00000088 00000000        DCD              BTMR1_IRQHandler 
+                                                            ; Basic timer 1
+   95 0000008C 00000000        DCD              LPTMR_IRQHandler 
+                                                            ; Low power timer 1
+                                                            
+   96 00000090 00000000        DCD              0           ; Reserved
+   97 00000094 00000000        DCD              COMP0_IRQHandler ; COMP0
+   98 00000098 00000000        DCD              COMP1_2_3_IRQHandler 
+                                                            ; COMP1/2/3
+   99 0000009C 00000000        DCD              I2C_IRQHandler ; I2C
+  100 000000A0 00000000        DCD              0           ; Reserved
+  101 000000A4 00000000        DCD              SPI_IRQHandler ; SPI
+  102 000000A8 00000000        DCD              0           ; Reserved
+  103 000000AC 00000000        DCD              USART_IRQHandler ; USART0
+  104 000000B0 00000000        DCD              UART_IRQHandler ; UART0
+  105 000000B4 00000000        DCD              0           ; Reserved
+  106 000000B8 00000000        DCD              0           ; Reserved
+  107 000000BC 00000000        DCD              0           ; Reserved
+  108 000000C0         
+  109 000000C0         __Vectors_End
+  110 000000C0         
+  111 000000C0 000000C0 
+                       __Vectors_Size
+                               EQU              __Vectors_End - __Vectors
+  112 000000C0         
+  113 000000C0                 AREA             |.text|, CODE, READONLY
+  114 00000000         
+  115 00000000         ; Reset handler routine
+  116 00000000         Reset_Handler
+                               PROC
+  117 00000000                 EXPORT           Reset_Handler                 [
+WEAK]
+  118 00000000                 IMPORT           __main
+  119 00000000                 IMPORT           SystemInit
+  120 00000000 4807            LDR              R0, =SystemInit
+  121 00000002 4780            BLX              R0
+  122 00000004 4807            LDR              R0, =__main
+  123 00000006 4700            BX               R0
+  124 00000008                 ENDP
+  125 00000008         
+  126 00000008         ; Dummy Exception Handlers (infinite loops which can be 
+                       modified)
+  127 00000008         
+  128 00000008         NMI_Handler
+                               PROC
+
+
+
+ARM Macro Assembler    Page 4 
+
+
+  129 00000008                 EXPORT           NMI_Handler                    
+[WEAK]
+  130 00000008 E7FE            B                .
+  131 0000000A                 ENDP
+  133 0000000A         HardFault_Handler
+                               PROC
+  134 0000000A                 EXPORT           HardFault_Handler              
+[WEAK]
+  135 0000000A E7FE            B                .
+  136 0000000C                 ENDP
+  137 0000000C         SVC_Handler
+                               PROC
+  138 0000000C                 EXPORT           SVC_Handler                    
+[WEAK]
+  139 0000000C E7FE            B                .
+  140 0000000E                 ENDP
+  141 0000000E         PendSV_Handler
+                               PROC
+  142 0000000E                 EXPORT           PendSV_Handler                 
+[WEAK]
+  143 0000000E E7FE            B                .
+  144 00000010                 ENDP
+  145 00000010         SysTick_Handler
+                               PROC
+  146 00000010                 EXPORT           SysTick_Handler                
+[WEAK]
+  147 00000010 E7FE            B                .
+  148 00000012                 ENDP
+  149 00000012         
+  150 00000012         Default_Handler
+                               PROC
+  151 00000012         
+  152 00000012                 EXPORT           WWDT_IRQHandler                
+ [WEAK]
+  153 00000012                 EXPORT           PVD_IRQHandler                 
+ [WEAK]
+  154 00000012                 EXPORT           FLASH_IRQHandler               
+ [WEAK]
+  155 00000012                 EXPORT           RCC_IRQHandler                 
+ [WEAK]
+  156 00000012                 EXPORT           EINT0_1_IRQHandler             
+ [WEAK]
+  157 00000012                 EXPORT           EINT2_3_IRQHandler             
+ [WEAK]
+  158 00000012                 EXPORT           EINT4_15_IRQHandler            
+ [WEAK]
+  159 00000012                 EXPORT           DMA_CH0_IRQHandler             
+ [WEAK]
+  160 00000012                 EXPORT           DMA_CH1_IRQHandler             
+ [WEAK]
+  161 00000012                 EXPORT           ADC_IRQHandler                 
+ [WEAK]
+  162 00000012                 EXPORT           ATMR_BRK_UP_TRG_COM_IRQHandler 
+ [WEAK]
+  163 00000012                 EXPORT           ATMR_CC_IRQHandler             
+ [WEAK]
+  164 00000012                 EXPORT           GTMR_IRQHandler                
+ [WEAK]
+  165 00000012                 EXPORT           BTMR0_IRQHandler               
+
+
+
+ARM Macro Assembler    Page 5 
+
+
+ [WEAK]
+  166 00000012                 EXPORT           BTMR1_IRQHandler               
+ [WEAK]
+  167 00000012                 EXPORT           LPTMR_IRQHandler               
+ [WEAK]
+  168 00000012                 EXPORT           COMP0_IRQHandler               
+ [WEAK]
+  169 00000012                 EXPORT           COMP1_2_3_IRQHandler           
+ [WEAK]
+  170 00000012                 EXPORT           I2C_IRQHandler                 
+ [WEAK]
+  171 00000012                 EXPORT           SPI_IRQHandler                 
+ [WEAK]
+  172 00000012                 EXPORT           USART_IRQHandler               
+ [WEAK]
+  173 00000012                 EXPORT           UART_IRQHandler                
+ [WEAK]
+  174 00000012         
+  175 00000012         
+  176 00000012         WWDT_IRQHandler
+  177 00000012         PVD_IRQHandler
+  178 00000012         FLASH_IRQHandler
+  179 00000012         RCC_IRQHandler
+  180 00000012         EINT0_1_IRQHandler
+  181 00000012         EINT2_3_IRQHandler
+  182 00000012         EINT4_15_IRQHandler
+  183 00000012         DMA_CH0_IRQHandler
+  184 00000012         DMA_CH1_IRQHandler
+  185 00000012         ADC_IRQHandler
+  186 00000012         ATMR_BRK_UP_TRG_COM_IRQHandler
+  187 00000012         ATMR_CC_IRQHandler
+  188 00000012         GTMR_IRQHandler
+  189 00000012         BTMR0_IRQHandler
+  190 00000012         BTMR1_IRQHandler
+  191 00000012         LPTMR_IRQHandler
+  192 00000012         COMP0_IRQHandler
+  193 00000012         COMP1_2_3_IRQHandler
+  194 00000012         I2C_IRQHandler
+  195 00000012         SPI_IRQHandler
+  196 00000012         USART_IRQHandler
+  197 00000012         UART_IRQHandler
+  198 00000012         
+  199 00000012 E7FE            B                .
+  200 00000014         
+  201 00000014                 ENDP
+  202 00000014         
+  203 00000014                 ALIGN
+  204 00000014         
+  205 00000014         ;*******************************************************
+                       ************************
+  206 00000014         ; User Stack and Heap initialization
+  207 00000014         ;*******************************************************
+                       ************************
+  208 00000014                 IF               :DEF:__MICROLIB
+  215 00000014         
+  216 00000014                 IMPORT           __use_two_region_memory
+  217 00000014                 EXPORT           __user_initial_stackheap
+  218 00000014         
+  219 00000014         __user_initial_stackheap
+
+
+
+ARM Macro Assembler    Page 6 
+
+
+  220 00000014         
+  221 00000014 4804            LDR              R0, =  Heap_Mem
+  222 00000016 4905            LDR              R1, =(Stack_Mem + Stack_Size)
+  223 00000018 4A05            LDR              R2, = (Heap_Mem +  Heap_Size)
+  224 0000001A 4B06            LDR              R3, = Stack_Mem
+  225 0000001C 4770            BX               LR
+  226 0000001E         
+  227 0000001E 00 00           ALIGN
+  228 00000020         
+  229 00000020                 ENDIF
+  230 00000020         
+  231 00000020                 END
+              00000000 
+              00000000 
+              00000000 
+              00000400 
+              00000200 
+              00000000 
+Command Line: --debug --xref --diag_suppress=9931,A1950W --cpu=Cortex-M0+ --dep
+end=.\objects\startup_g32f031.d -o.\objects\startup_g32f031.o -I"D:\Program Fil
+es\MDK5.40\PACK\Geehy\G32F031_DFP\0.3.3\Device\Device\Geehy\G32F031\Include" --
+predefine="__UVISION_VERSION SETA 540" --predefine="G32F031 SETA 1" --list=star
+tup_g32f031.lst ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+STACK 00000000
+
+Symbol: STACK
+   Definitions
+      At line 32 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      None
+Comment: STACK unused
+Stack_Mem 00000000
+
+Symbol: Stack_Mem
+   Definitions
+      At line 33 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 222 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 224 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+__initial_sp 00000400
+
+Symbol: __initial_sp
+   Definitions
+      At line 34 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 58 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+Comment: __initial_sp used once
+3 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+HEAP 00000000
+
+Symbol: HEAP
+   Definitions
+      At line 43 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      None
+Comment: HEAP unused
+Heap_Mem 00000000
+
+Symbol: Heap_Mem
+   Definitions
+      At line 45 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 221 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 223 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+__heap_base 00000000
+
+Symbol: __heap_base
+   Definitions
+      At line 44 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      None
+Comment: __heap_base unused
+__heap_limit 00000200
+
+Symbol: __heap_limit
+   Definitions
+      At line 46 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      None
+Comment: __heap_limit unused
+4 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+RESET 00000000
+
+Symbol: RESET
+   Definitions
+      At line 53 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      None
+Comment: RESET unused
+__Vectors 00000000
+
+Symbol: __Vectors
+   Definitions
+      At line 58 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 54 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 111 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+__Vectors_End 000000C0
+
+Symbol: __Vectors_End
+   Definitions
+      At line 109 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 55 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 111 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+3 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+.text 00000000
+
+Symbol: .text
+   Definitions
+      At line 113 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      None
+Comment: .text unused
+ADC_IRQHandler 00000012
+
+Symbol: ADC_IRQHandler
+   Definitions
+      At line 185 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 88 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 161 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+ATMR_BRK_UP_TRG_COM_IRQHandler 00000012
+
+Symbol: ATMR_BRK_UP_TRG_COM_IRQHandler
+   Definitions
+      At line 186 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 89 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 162 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+ATMR_CC_IRQHandler 00000012
+
+Symbol: ATMR_CC_IRQHandler
+   Definitions
+      At line 187 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 90 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 163 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+BTMR0_IRQHandler 00000012
+
+Symbol: BTMR0_IRQHandler
+   Definitions
+      At line 189 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 93 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 165 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+BTMR1_IRQHandler 00000012
+
+Symbol: BTMR1_IRQHandler
+   Definitions
+      At line 190 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 94 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 166 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+COMP0_IRQHandler 00000012
+
+Symbol: COMP0_IRQHandler
+   Definitions
+      At line 192 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+
+
+
+ARM Macro Assembler    Page 2 Alphabetic symbol ordering
+Relocatable symbols
+
+      At line 97 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 168 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+COMP1_2_3_IRQHandler 00000012
+
+Symbol: COMP1_2_3_IRQHandler
+   Definitions
+      At line 193 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 98 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 169 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+DMA_CH0_IRQHandler 00000012
+
+Symbol: DMA_CH0_IRQHandler
+   Definitions
+      At line 183 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 85 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 159 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+DMA_CH1_IRQHandler 00000012
+
+Symbol: DMA_CH1_IRQHandler
+   Definitions
+      At line 184 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 86 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 160 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+Default_Handler 00000012
+
+Symbol: Default_Handler
+   Definitions
+      At line 150 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      None
+Comment: Default_Handler unused
+EINT0_1_IRQHandler 00000012
+
+Symbol: EINT0_1_IRQHandler
+   Definitions
+      At line 180 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 81 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 156 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+EINT2_3_IRQHandler 00000012
+
+Symbol: EINT2_3_IRQHandler
+   Definitions
+      At line 181 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 82 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 157 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+EINT4_15_IRQHandler 00000012
+
+Symbol: EINT4_15_IRQHandler
+
+
+
+ARM Macro Assembler    Page 3 Alphabetic symbol ordering
+Relocatable symbols
+
+   Definitions
+      At line 182 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 83 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 158 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+FLASH_IRQHandler 00000012
+
+Symbol: FLASH_IRQHandler
+   Definitions
+      At line 178 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 79 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 154 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+GTMR_IRQHandler 00000012
+
+Symbol: GTMR_IRQHandler
+   Definitions
+      At line 188 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 91 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 164 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+HardFault_Handler 0000000A
+
+Symbol: HardFault_Handler
+   Definitions
+      At line 133 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 61 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 134 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+I2C_IRQHandler 00000012
+
+Symbol: I2C_IRQHandler
+   Definitions
+      At line 194 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 99 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 170 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+LPTMR_IRQHandler 00000012
+
+Symbol: LPTMR_IRQHandler
+   Definitions
+      At line 191 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 95 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 167 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+NMI_Handler 00000008
+
+Symbol: NMI_Handler
+   Definitions
+      At line 128 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 60 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 129 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+
+
+ARM Macro Assembler    Page 4 Alphabetic symbol ordering
+Relocatable symbols
+
+
+PVD_IRQHandler 00000012
+
+Symbol: PVD_IRQHandler
+   Definitions
+      At line 177 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 77 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 153 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+PendSV_Handler 0000000E
+
+Symbol: PendSV_Handler
+   Definitions
+      At line 141 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 72 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 142 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+RCC_IRQHandler 00000012
+
+Symbol: RCC_IRQHandler
+   Definitions
+      At line 179 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 80 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 155 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+Reset_Handler 00000000
+
+Symbol: Reset_Handler
+   Definitions
+      At line 116 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 59 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 117 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+SPI_IRQHandler 00000012
+
+Symbol: SPI_IRQHandler
+   Definitions
+      At line 195 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 101 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 171 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+SVC_Handler 0000000C
+
+Symbol: SVC_Handler
+   Definitions
+      At line 137 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 69 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 138 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+SysTick_Handler 00000010
+
+Symbol: SysTick_Handler
+   Definitions
+
+
+
+ARM Macro Assembler    Page 5 Alphabetic symbol ordering
+Relocatable symbols
+
+      At line 145 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 73 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 146 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+UART_IRQHandler 00000012
+
+Symbol: UART_IRQHandler
+   Definitions
+      At line 197 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 104 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 173 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+USART_IRQHandler 00000012
+
+Symbol: USART_IRQHandler
+   Definitions
+      At line 196 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 103 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 172 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+WWDT_IRQHandler 00000012
+
+Symbol: WWDT_IRQHandler
+   Definitions
+      At line 176 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 76 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 152 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+__user_initial_stackheap 00000014
+
+Symbol: __user_initial_stackheap
+   Definitions
+      At line 219 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 217 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+Comment: __user_initial_stackheap used once
+31 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Absolute symbols
+
+Heap_Size 00000200
+
+Symbol: Heap_Size
+   Definitions
+      At line 41 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 45 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 223 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+Stack_Size 00000400
+
+Symbol: Stack_Size
+   Definitions
+      At line 30 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 33 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+      At line 222 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+
+__Vectors_Size 000000C0
+
+Symbol: __Vectors_Size
+   Definitions
+      At line 111 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 56 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+Comment: __Vectors_Size used once
+3 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+External symbols
+
+SystemInit 00000000
+
+Symbol: SystemInit
+   Definitions
+      At line 119 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 120 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+Comment: SystemInit used once
+__main 00000000
+
+Symbol: __main
+   Definitions
+      At line 118 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      At line 122 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+Comment: __main used once
+__use_two_region_memory 00000000
+
+Symbol: __use_two_region_memory
+   Definitions
+      At line 216 in file ..\Mcu\g32f031\Startup\mdk\startup_g32f031.s
+   Uses
+      None
+Comment: __use_two_region_memory unused
+3 symbols
+383 symbols in table

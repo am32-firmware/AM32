@@ -63,6 +63,8 @@ static inline uint16_t get_timer_us16(void) {
     return 0;
 #elif defined(WCH)
     return UTILITY_TIMER->CNT>>1;
+#elif defined(GEEHY)
+    return UTILITY_TIMER->CNT;
 #else
 #error unsupported MCU
 #endif

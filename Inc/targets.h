@@ -3256,6 +3256,37 @@
 #define HARDWARE_GROUP_CH_A
 #endif
 
+/******************** Geehy F031 TARGETS ******************************************/
+
+#ifdef  GEEHY_G32F031
+#define FILE_NAME                           "GEEHY_G32F031"
+#define FIRMWARE_NAME                       "G32F031"
+
+#define DEAD_TIME                           0
+#define MILLIVOLT_PER_AMP                   28
+#define TARGET_STALL_PROTECTION_INTERVAL    8000
+
+#define USE_SERIAL_TELEMETRY
+#define NO_POLLING_START
+#define HARDWARE_GROUP_F031_GEEHY_A
+
+#define INPUT_PIN                           DDL_GPIO_PIN_1
+#define INPUT_PIN_AF                        GPIO_AF_1
+#define INPUT_PIN_PORT                      GPIOB
+
+#define CURRENT_SENSE_ADC_PIN               DDL_GPIO_PIN_5
+#define CURRENT_SENSE_ADC_PORT              GPIOA
+#define VOLTAGE_SENSE_ADC_PIN               DDL_GPIO_PIN_12
+#define VOLTAGE_SENSE_ADC_PORT              GPIOB
+#define INPUT_SENSE_ADC_PIN                 DDL_GPIO_PIN_1
+#define INPUT_SENSE_ADC_PORT                GPIOB
+
+#define CURRENT_ADC_CHANNEL                 DDL_ADC_CHANNEL_12
+#define VOLTAGE_ADC_CHANNEL                 DDL_ADC_CHANNEL_5
+#define TSENSOR_ADC_CHANNEL                 DDL_ADC_CHANNEL_8
+#define INPUT_ADC_CHANNEL                   DDL_ADC_CHANNEL_4
+#endif
+
 #ifndef FIRMWARE_NAME
 /* if you get this then you have forgotten to add the section for your target above */
 #error "Missing defines for target"
@@ -5227,6 +5258,54 @@
 
 #endif
 
+/************************************ F031 Hardware Groups
+ * ************************************************/
+#ifdef HARDWARE_GROUP_F031_GEEHY_A
+
+#define MCU_G32F031
+#define INPUT_PIN               DDL_GPIO_PIN_1
+#define INPUT_PIN_AF            GPIO_AF_1
+#define INPUT_PIN_PORT          GPIOB
+#define IC_TIMER_CHANNEL        TIMER_CH_0
+#define IC_TIMER_REGISTER       GTMR
+#define INPUT_DMA_CHANNEL       DMA_CH3
+
+#define PHASE_A_GPIO_LOW        DDL_GPIO_PIN_12
+#define PHASE_A_GPIO_PORT_LOW   GPIOA
+#define PHASE_A_GPIO_HIGH       DDL_GPIO_PIN_15
+#define PHASE_A_GPIO_PORT_HIGH  GPIOA
+
+#define PHASE_B_GPIO_LOW        DDL_GPIO_PIN_11
+#define PHASE_B_GPIO_PORT_LOW   GPIOA
+#define PHASE_B_GPIO_HIGH       DDL_GPIO_PIN_14
+#define PHASE_B_GPIO_PORT_HIGH  GPIOA
+
+#define PHASE_C_GPIO_LOW        DDL_GPIO_PIN_10
+#define PHASE_C_GPIO_PORT_LOW   GPIOA
+#define PHASE_C_GPIO_HIGH       DDL_GPIO_PIN_13
+#define PHASE_C_GPIO_PORT_HIGH  GPIOA
+
+#define GPIO_TEST               GPIOB
+#define GPIO_PIN_TEST           DDL_GPIO_PIN_2
+#define GPIO_LED                GPIOB
+#define GPIO_PIN_LED            DDL_GPIO_PIN_10
+
+#define COMP0_INN_IBUS_PORT     GPIOA
+#define COMP0_INN_IBUS_PIN      DDL_GPIO_PIN_8
+
+#define COMP0_INP_VREF_PORT     GPIOA
+#define COMP0_INP_VREF_PIN      DDL_GPIO_PIN_7
+
+#define COMP1_BEMFA_PROT        GPIOA
+#define COMP1_BEMFA_PIN         DDL_GPIO_PIN_1
+
+#define COMP2_BEMFC_PROT        GPIOA
+#define COMP2_BEMFC_PIN         DDL_GPIO_PIN_2
+
+#define COMP3_BEMFB_PROT        GPIOA
+#define COMP3_BEMFB_PIN         DDL_GPIO_PIN_0
+
+#endif
 
 #ifdef HARDWARE_GROUP_CH_A
 
@@ -5589,6 +5668,24 @@
 #endif
 
 #endif
+
+#ifdef  MCU_G32F031
+#define GEEHY
+#define NEED_INPUT_READY
+#define CPU_FREQUENCY_MHZ       64
+#define EEPROM_START_ADD        0x0000f800
+#define APPLICATION_ADDRESS     0x00001000
+
+#define TEN_KHZ_TIMER           SysTick
+#define UTILITY_TIMER           BTMR0
+#define COM_TIMER               BTMR1
+#define TARGET_MIN_BEMF_COUNTS  3
+#define USE_SERIAL_TELEMETRY
+#define USE_ADC
+#define LOOP_FREQUENCY_HZ       20000
+#define POLLING_MODE_THRESHOLD  500
+#endif
+
 
 #ifndef LOOP_FREQUENCY_HZ
 #define LOOP_FREQUENCY_HZ 20000

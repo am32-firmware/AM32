@@ -11,7 +11,11 @@ extern uint16_t dshot_frametime_low;
 extern uint32_t gcr[37];
 extern uint8_t buffer_padding;
 extern uint16_t adjusted_input;
+#if defined(GEEHY_G32F031)
+extern uint32_t dma_buffer[32];
+#else
 extern uint32_t dma_buffer[64];
+#endif
 extern uint8_t dshotcommand;
 extern uint16_t armed_count_threshold;
 extern char forward;

@@ -1765,7 +1765,11 @@ static void checkDeviceInfo(void)
             eeprom_address = 0x08007c00;
             break;
         case 0x35:
+#ifdef GEEHY
+            eeprom_address = 0x0000f800;
+#else
             eeprom_address = 0x0800f800;
+#endif
             break;
         case 0x2b:
             eeprom_address = 0x0801f800;
@@ -1983,7 +1987,11 @@ if(zero_crosses < 5){
                 zero_input_count = 0;
                 SET_DUTY_CYCLE_ALL(0);
                 resetInputCaptureTimer();
+#ifdef GEEHY
+                for (int i = 0; i < (int)(sizeof(dma_buffer)/sizeof(dma_buffer[0])); i++) {
+#else
                 for (int i = 0; i < 64; i++) {
+#endif
                     dma_buffer[i] = 0;
                 }
                 NVIC_SystemReset();
@@ -1996,7 +2004,11 @@ if(zero_crosses < 5){
                 zero_input_count = 0;
                 SET_DUTY_CYCLE_ALL(0);
                 resetInputCaptureTimer();
+#ifdef GEEHY
+                for (int i = 0; i < (int)(sizeof(dma_buffer)/sizeof(dma_buffer[0])); i++) {
+#else
                 for (int i = 0; i < 64; i++) {
+#endif
                     dma_buffer[i] = 0;
                 }
                 NVIC_SystemReset();

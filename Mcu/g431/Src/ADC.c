@@ -227,9 +227,9 @@ void ADC_Init(void){
   LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_ADC12);
 
   LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
-#ifdef EPROPELLED_6S_G431_4in1
+
   LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOF);
-#endif
+
   /**ADC2 GPIO Configuration
   PA6   ------> ADC2_IN3
   PA7   ------> ADC2_IN4
@@ -239,24 +239,17 @@ void ADC_Init(void){
   GPIO_InitStruct.Pin = NTC_ADC_PIN;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-  LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-#ifdef EPROPELLED_6S_G431_4in1
-  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-#endif
+  LL_GPIO_Init(NTC_ADC_PORT, &GPIO_InitStruct);
   
   GPIO_InitStruct.Pin = VOLTAGE_ADC_PIN;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  LL_GPIO_Init(VOLTAGE_ADC_PORT, &GPIO_InitStruct);
 
   GPIO_InitStruct.Pin = CURRENT_ADC_PIN;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-#ifdef EPROPELLED_6S_G431_4in1
-  LL_GPIO_Init(GPIOF, &GPIO_InitStruct);
-#endif
-
+  LL_GPIO_Init(CURRENT_ADC_PORT, &GPIO_InitStruct);
 
   /*BEGIN ADC1 SETUP */
 
@@ -313,13 +306,8 @@ void ADC_Init(void){
   LL_ADC_SetCommonPathInternalCh(__LL_ADC_COMMON_INSTANCE(ADC1), LL_ADC_PATH_INTERNAL_TEMPSENSOR);
 
   LL_ADC_REG_SetSequencerRanks(ADC1, LL_ADC_REG_RANK_2, NTC_ADC_CHANNEL);
-#if defined(EPROPELLED_6S_G431_SINGLE) || defined(EPROPELLED_6S_G431_4in1)
   LL_ADC_SetChannelSamplingTime(ADC1, NTC_ADC_CHANNEL, LL_ADC_SAMPLINGTIME_47CYCLES_5);
   LL_ADC_SetChannelSingleDiff(ADC1, NTC_ADC_CHANNEL, LL_ADC_SINGLE_ENDED);
-#else
-  LL_ADC_SetChannelSamplingTime(ADC1, VOLTAGE_ADC_CHANNEL, LL_ADC_SAMPLINGTIME_47CYCLES_5);
-  LL_ADC_SetChannelSingleDiff(ADC1, VOLTAGE_ADC_CHANNEL, LL_ADC_SINGLE_ENDED);
-#endif
 
  
 
@@ -357,8 +345,6 @@ void ADC_Init(void){
     wait_loop_index--;
   }
 
-  #if defined(EPROPELLED_6S_G431_SINGLE) || defined(EPROPELLED_6S_G431_4in1)
-
   LL_ADC_REG_SetSequencerRanks(ADC2, LL_ADC_REG_RANK_1, VOLTAGE_ADC_CHANNEL);
   LL_ADC_SetChannelSamplingTime(ADC2, VOLTAGE_ADC_CHANNEL, LL_ADC_SAMPLINGTIME_2CYCLES_5);
   LL_ADC_SetChannelSingleDiff(ADC2, VOLTAGE_ADC_CHANNEL, LL_ADC_SINGLE_ENDED);
@@ -366,17 +352,6 @@ void ADC_Init(void){
   LL_ADC_REG_SetSequencerRanks(ADC2, LL_ADC_REG_RANK_2, CURRENT_ADC_CHANNEL);
   LL_ADC_SetChannelSamplingTime(ADC2, CURRENT_ADC_CHANNEL, LL_ADC_SAMPLINGTIME_47CYCLES_5);
   LL_ADC_SetChannelSingleDiff(ADC2, CURRENT_ADC_CHANNEL, LL_ADC_SINGLE_ENDED);
-
-  #else
-  LL_ADC_REG_SetSequencerRanks(ADC2, LL_ADC_REG_RANK_1, LL_ADC_CHANNEL_3);
-  LL_ADC_SetChannelSamplingTime(ADC2, LL_ADC_CHANNEL_3, LL_ADC_SAMPLINGTIME_2CYCLES_5);
-  LL_ADC_SetChannelSingleDiff(ADC2, LL_ADC_CHANNEL_3, LL_ADC_SINGLE_ENDED);
-
-  LL_ADC_REG_SetSequencerRanks(ADC2, LL_ADC_REG_RANK_2, LL_ADC_CHANNEL_4);
-  LL_ADC_SetChannelSamplingTime(ADC2, LL_ADC_CHANNEL_4, LL_ADC_SAMPLINGTIME_47CYCLES_5);
-  LL_ADC_SetChannelSingleDiff(ADC2, LL_ADC_CHANNEL_4, LL_ADC_SINGLE_ENDED);
-  #endif
-
 }
 #else
 

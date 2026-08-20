@@ -267,9 +267,7 @@ void MX_TIM1_Init(void)
     LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOF);
     LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
     LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOB);
-#ifdef EPROPELLED_6S_G431_SINGLE
     LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOC);
-#endif
 
     /**TIM1 GPIO Configuration   */
     GPIO_InitStruct.Pin = PHASE_A_GPIO_LOW;
@@ -354,29 +352,16 @@ void MX_TIM2_Init(void)
     /**TIM3 GPIO Configuration
     PB4   ------> TIM3_CH1
     */
-	#ifdef EPROPELLED_6S_G431_4in1
-	    GPIO_InitStruct.Pin = INPUT_PIN;
-	#else
-	    GPIO_InitStruct.Pin = LL_GPIO_PIN_4;
-	#endif 
-    GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
+	GPIO_InitStruct.Pin = INPUT_PIN;
+	GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
     GPIO_InitStruct.Alternate = LL_GPIO_AF_2;
-    #ifdef EPROPELLED_6S_G431_4in1
 	LL_GPIO_Init(INPUT_PIN_PORT, &GPIO_InitStruct);
-	#else
-	LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-	#endif
 
-    #ifdef EPROPELLED_6S_G431_4in1
-    	LL_DMA_SetPeriphRequest(DMA1, INPUT_DMA_CHANNEL, LL_DMAMUX_REQ_TIM3_CH1);
-    	LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_1, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
-	#else
-    	LL_DMA_SetPeriphRequest(DMA1, LL_DMA_CHANNEL_1, LL_DMAMUX_REQ_TIM3_CH1);
-    	LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_1, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
-	#endif
+    LL_DMA_SetPeriphRequest(DMA1, INPUT_DMA_CHANNEL, LL_DMAMUX_REQ_TIM3_CH1);
+    LL_DMA_SetDataTransferDirection(DMA1, INPUT_DMA_CHANNEL, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
     LL_DMA_SetChannelPriorityLevel(DMA1, LL_DMA_CHANNEL_1, LL_DMA_PRIORITY_LOW);
     LL_DMA_SetMode(DMA1, LL_DMA_CHANNEL_1, LL_DMA_MODE_NORMAL);
     LL_DMA_SetPeriphIncMode(DMA1, LL_DMA_CHANNEL_1, LL_DMA_PERIPH_NOINCREMENT);
@@ -629,14 +614,9 @@ void enableCorePeripherals()
 
 #ifdef USE_RGB_LED
     LED_GPIO_init();
-    GPIOB->BRR = LL_GPIO_PIN_8; // turn on red
-    GPIOB->BSRR = LL_GPIO_PIN_5;
-    GPIOB->BSRR = LL_GPIO_PIN_3; //
-    #if defined(EPROPELLED_6S_G431_SINGLE) || defined(EPROPELLED_6S_G431_4in1)
-        GPIOB->BRR = RED_PIN; // turn on red
-        GPIOB->BSRR = GREEN_PIN;
-        GPIOB->BSRR = BLUE_PIN; 
-    #endif
+    RED_PORT->BRR = RED_PIN;      /* turn on red */
+    GREEN_PORT->BSRR = GREEN_PIN;
+    BLUE_PORT->BSRR = BLUE_PIN;    
 #endif
 
 #ifndef BRUSHED_MODE

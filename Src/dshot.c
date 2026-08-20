@@ -254,7 +254,7 @@ void make_dshot_package(uint16_t com_time)
             telem_scheduler.temp_count++;
 
             if (telem_scheduler.current_count >= CURRENT_EDT_RATE_DIVISOR) {
-#if defined(EPROPELLED_6S_G431_SINGLE) || defined(EPROPELLED_6S_G431_4in1)
+#if defined(EPROPELLED_G431_CAN) || defined(EPROPELLED_4in1_G431_CAN)
                 extended_frame_to_send = 0b0110 << 8 | (uint8_t)(actual_current / 100);
 #else
                 extended_frame_to_send = 0b0110 << 8 | (uint8_t)(actual_current / 50);

@@ -47,7 +47,7 @@ int NTC_table[65] = {
 };
 #endif
 
-#if defined(EPROPELLED_6S_G431_4in1)
+#if defined(EPROPELLED_4in1_G431_CAN) 
 int NTC_table[65] ={
   154,	133,	119,	108,	100,	93,		87,
 	82,		78,		73,		70,		66,		63,		60,		57,		55,

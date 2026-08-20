@@ -2131,7 +2131,13 @@ if(zero_crosses < 5){
 #ifdef USE_ADC_1_2
           LL_ADC_REG_StartConversion(ADC2);
 #endif          
+        #ifdef USE_LMT87
+            converted_degrees = getLMT87Degrees(ADC_raw_ntc);
+        #elif defined(USE_NTC)
+            converted_degrees = getNTCDegrees(ADC_raw_ntc);
+        #else
             converted_degrees = __LL_ADC_CALC_TEMPERATURE(3300, ADC_raw_temp, LL_ADC_RESOLUTION_12B);
+        #endif
 #endif
 #ifdef MCU_GDE23
             ADC_DMA_Callback();
@@ -2163,16 +2169,7 @@ if(zero_crosses < 5){
             converted_degrees = getConvertedDegrees(ADC_raw_temp);
 #endif
 
-	#ifdef USE_LMT87
-				converted_degrees = getLMT87Degrees(ADC_raw_ntc);
-    #endif            
-#ifdef EPROPELLED_6S_G431_4in1
-	#ifdef USE_NTC
-				converted_degrees =  getNTCDegrees(ADC_raw_ntc);
-	#endif
-#endif
-
-            degrees_celsius = converted_degrees;
+	        degrees_celsius = converted_degrees;
 #ifdef NXP
             //MCXA has 16-bit ADC data
             battery_voltage = ((7 * battery_voltage) + ((ADC_raw_volts * 3300 / 65535 * VOLTAGE_DIVIDER) / 100)) / 8;

@@ -1705,7 +1705,7 @@ void runBrushedLoop()
 
     if (use_current_limit) {
         use_current_limit_adjust -= (int16_t)(doPidCalculations(&currentPid, actual_current,
-                                                  CURRENT_LIMIT * 100)
+                                                  eepromBuffer.limits.current * 100)
             / 10000);
         if (use_current_limit_adjust < minimum_duty_cycle) {
             use_current_limit_adjust = minimum_duty_cycle;

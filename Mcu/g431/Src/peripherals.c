@@ -38,7 +38,9 @@ void initCorePeripherals(void)
     MX_COMP1_Init();
     MX_TIM17_Init();
     MX_TIM6_Init();
+#ifdef USE_TIMER_15_CHANNEL_1
     MX_TIM15_Init();
+#endif
     #ifdef USE_TIMER_3_CHANNEL_1
     MX_TIM3_Init();
     #endif

@@ -786,7 +786,7 @@ void loadEEpromSettings()
           }
         }
         
-        if (motor_kv < 300) {
+        if (motor_kv <= 20) {
             low_rpm_throttle_limit = 0;
         }
         // guard divisions for an erased eeprom (motor_poles 0 or 0xff),

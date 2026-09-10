@@ -983,6 +983,45 @@ void startMotor()
     enableCompInterrupts();
 }
 
+#ifdef USE_ENHANCED_LOW_VOLTAGE_PROTECTION
+static uint8_t startVoltageIsBelowCutoff(void)
+{
+    if (eepromBuffer.low_voltage_cut_off == 1) {
+        return cell_count > 0 && battery_voltage < (cell_count * low_cell_volt_cutoff);
+    }
+    if (eepromBuffer.low_voltage_cut_off == 2) {
+        return battery_voltage < (eepromBuffer.absolute_voltage_cutoff * 50);
+    }
+    return 0;
+}
+
+static void playLowVoltageCutoffTone(void)
+{
+    for (uint8_t i = 0; i < 5; i++) {
+        playBeaconTune3();
+        delayMillis(150);
+        RELOAD_WATCHDOG_COUNTER();
+    }
+}
+
+static void abortMotorStartForLowVoltage(void)
+{
+    uint8_t play_cutoff_tone = !LOW_VOLTAGE_CUTOFF;
+    LOW_VOLTAGE_CUTOFF = 1;
+    input = 0;
+    allOff();
+    maskPhaseInterrupts();
+    running = 0;
+    stepper_sine = 0;
+    do_once_sinemode = 1;
+    zero_input_count = 0;
+    armed = 0;
+    if (play_cutoff_tone) {
+        playLowVoltageCutoffTone();
+    }
+}
+#endif
+
 void setInput()
 {
     if (eepromBuffer.bi_direction) {
@@ -1198,6 +1237,16 @@ void setInput()
             }
         }
 #endif
+    }
+#endif
+#if defined(USE_ENHANCED_LOW_VOLTAGE_PROTECTION) && !defined(BRUSHED_MODE)
+    // Do not energize the motor when a start is requested below the configured cutoff.
+    // Once running, the original AM32 undervoltage delay remains in control.
+    uint8_t motor_start_requested = eepromBuffer.use_sine_start ? (input > 48) : (input >= 47);
+    if (!running && armed && motor_start_requested &&
+        (LOW_VOLTAGE_CUTOFF || startVoltageIsBelowCutoff())) {
+        abortMotorStartForLowVoltage();
+        return;
     }
 #endif
 #ifndef BRUSHED_MODE
@@ -2171,8 +2220,15 @@ if(zero_crosses < 5){
             actual_current = (((smoothed_raw_current * 3300 / 65535) - CURRENT_OFFSET) * 100) / (MILLIVOLT_PER_AMP);
 #else
             battery_voltage = ((7 * battery_voltage) + ((ADC_raw_volts * 3300 / 4095 * VOLTAGE_DIVIDER) / 100)) >> 3;
+#ifdef USE_RAW_CURRENT_IIR
+            // This target uses a 19 mV/A current sensor with zero offset. Multiplying the
+            // ADC voltage by five closely approximates the conversion to 10 mA units.
+            actual_current = (int16_t)((((((uint32_t)ADC_raw_current * 3300 / 4095) * 5) +
+                (7 * (uint32_t)actual_current)) >> 3));
+#else
             smoothed_raw_current = getSmoothedCurrent();
             actual_current = ((smoothed_raw_current * 3300 / 41) - (CURRENT_OFFSET * 100)) / (MILLIVOLT_PER_AMP);
+#endif
 #endif
             if (actual_current < 0) {
                 actual_current = 0;
@@ -2196,6 +2252,9 @@ if(zero_crosses < 5){
                 }
             }
             if (low_voltage_count > (10000 - (stepper_sine * 9900))) {      // 10 second wait before cut-off for low voltage
+#ifdef USE_ENHANCED_LOW_VOLTAGE_PROTECTION
+              uint8_t play_cutoff_tone = !LOW_VOLTAGE_CUTOFF;
+#endif
               LOW_VOLTAGE_CUTOFF = 1;
               input = 0;
               allOff();
@@ -2203,6 +2262,11 @@ if(zero_crosses < 5){
               running = 0;
               zero_input_count = 0;
               armed = 0;
+#ifdef USE_ENHANCED_LOW_VOLTAGE_PROTECTION
+              if (play_cutoff_tone) {
+                  playLowVoltageCutoffTone();
+              }
+#endif
              }
            
             PROCESS_ADC_FLAG = 0;

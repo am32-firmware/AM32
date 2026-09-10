@@ -552,7 +552,10 @@ void sitl_exec_bootloader(const char* cause)
         argv[n++] = sitl_cfg.uid;
     }
     argv[n++] = "--reset-cause";
-    argv[n++] = cause;
+    // The state-port reset used by configurators is a software reset.
+    // Passing its diagnostic label would make the bootloader interpret it
+    // as power-on and jump back to the application before the probe arrives.
+    argv[n++] = strcmp(cause, "state port") == 0 ? "software" : cause;
     argv[n++] = "--";
     for (int i = 0; sitl_saved_argv[i] != NULL && n < (int)(sizeof(argv) / sizeof(argv[0])) - 1; i++) {
         argv[n++] = sitl_saved_argv[i];
@@ -609,6 +612,8 @@ void sitl_system_reset(void)
   loop and re-entrantly from interrupt handlers that busy wait on time
   (delayMicros, comparator filter reads)
  */
+static uint64_t next_udp_poll_ns;
+
 static void sim_step_once(void)
 {
     const uint32_t dt = sitl_cfg.sim.physics_dt_ns;
@@ -616,6 +621,20 @@ static void sim_step_once(void)
     sim_time_ns_v += dt;
     sitl_timers_step(sim_time_ns_v);
     sitl_state_step(sim_time_ns_v);
+
+    // UDP polling belongs to time itself, not to the main loop: a tune
+    // played from an interrupt handler advances whole tenths of a
+    // second re-entrantly through sitl_isr_read_tick, and input frames
+    // sent meanwhile used to queue in the socket and replay compressed
+    // afterwards instead of being seen (or missed) at their real time.
+    // The deadline is bumped before polling so a poll that lands back
+    // here through a register read cannot recurse
+    if (sim_time_ns_v >= next_udp_poll_ns) {
+        next_udp_poll_ns = sim_time_ns_v + 100000; // 100us
+        sitl_can_poll();
+        sitl_input_poll();
+        sitl_state_poll();
+    }
 
     // dispatch block tracer: classify this step if a priority 0 interrupt
     // has been pending for a while
@@ -720,7 +739,6 @@ static void* sim_thread_main(void* arg)
     prctl(PR_SET_TIMERSLACK, 1UL);
 #endif
     const uint64_t wall0 = wallclock_ns();
-    uint64_t next_can_poll_ns = 0;
     uint64_t next_pace_check_ns = 0;
     uint64_t verbose_last_ns = 0;
     uint64_t verbose_last_wall = wall0;
@@ -837,6 +855,9 @@ static void* sim_thread_main(void* arg)
                         sitl_can_poll();
                         sitl_input_poll();
                         sitl_state_poll();
+                        if (sitl_state_reset_requested()) {
+                            sitl_reset_with_cause("state port");
+                        }
                     }
                 }
                 // rebase the wall pacer only after a genuine stall:
@@ -850,15 +871,11 @@ static void* sim_thread_main(void* arg)
                 }
             }
         }
-        sim_step_once();
-        const uint64_t now = sim_time_ns_v;
-
-        if (now >= next_can_poll_ns) {
-            next_can_poll_ns = now + 100000; // 100us
-            sitl_can_poll();
-            sitl_input_poll();
-            sitl_state_poll();
+        sim_step_once(); // also runs the 100us UDP polls
+        if (sitl_state_reset_requested()) {
+            sitl_reset_with_cause("state port");
         }
+        const uint64_t now = sim_time_ns_v;
         watchdog_check();
         sitl_dispatch();
 

@@ -92,6 +92,11 @@ ifdef SITL_IS_WIN
 # the exe carries no runtime DLL dependencies for end users
 LDLIBS_$(MCU) += -lws2_32
 LDFLAGS_COMMON_$(MCU) += -static -static-libgcc
+else
+# export the executable's symbols so the state-port variable watch
+# (sitl_state.c cmd 8) can resolve firmware globals with dlsym
+LDFLAGS_COMMON_$(MCU) += -rdynamic
+LDLIBS_$(MCU) += -ldl
 endif
 
 SRC_$(MCU) := $(foreach dir,$(SRC_DIR_$(MCU)),$(wildcard $(dir)/*.c))

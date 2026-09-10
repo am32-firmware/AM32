@@ -2,9 +2,10 @@ name: SITL Calibration Tests
 
 # Compares the SITL physics against the real-hardware bench captures:
 # steady sweep, square amplitude sweep and 120s chirp per calibrated
-# model, checked against Mcu/SITL/data/*/expected.json. Heavier than
-# the functional SITL tests (~25 min), so it runs only when the
-# physics, models or measurement tools change, plus nightly.
+# model. The captures, models and expected values live in the ESCSim
+# repository, which is cloned to run them against this firmware.
+# Heavier than the functional SITL tests (~25 min), so it runs only when
+# the physics or the firmware it drives change, plus nightly.
 #
 # All measurements are paced against SITL simulation time, so a slow
 # runner simply takes longer in wall time and measures the same
@@ -16,19 +17,23 @@ on:
     branches: ["main"]
     paths:
       - "Mcu/SITL/**"
-      - "scripts/esc_*.py"
       - "Src/main.c"
       - "Src/DroneCAN/**"
   pull_request:
     branches: ["main"]
     paths:
       - "Mcu/SITL/**"
-      - "scripts/esc_*.py"
       - "Src/main.c"
       - "Src/DroneCAN/**"
   schedule:
     - cron: "17 2 * * *"
   workflow_dispatch:
+    inputs:
+      escsim_ref:
+        description: 'ESCSim ref to test against'
+        required: false
+        default: 'main'
+        type: string
 
 jobs:
   calibration:
@@ -41,6 +46,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check out ESCSim
+        uses: actions/checkout@v4
+        with:
+          repository: am32-firmware/ESCSim
+          ref: ${{ inputs.escsim_ref || 'main' }}
+          path: ESCSim
+
       - name: Build SITL
         run: make AM32_SITL_CAN
 
@@ -48,10 +60,11 @@ jobs:
         run: python3 -m pip install dronecan plotly numpy matplotlib
 
       - name: Run calibration tests
+        env:
+          AM32_ROOT: ${{ github.workspace }}
         run: |
           mkdir calibration_run && cd calibration_run
-          python3 ../Mcu/SITL/run_calibration_tests.py \
-            --sitl ../obj/AM32_AM32_SITL_CAN_*.elf \
+          python3 "$GITHUB_WORKSPACE/ESCSim/SITL/run_calibration_tests.py" \
             --dataset ${{ matrix.dataset }} \
             --artifacts ../calibration_artifacts
 

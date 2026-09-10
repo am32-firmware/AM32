@@ -5,7 +5,7 @@
  *      Author: Alka
  */
  #include "ADC.h"
-#include "ntc_tables.h"
+ #include "ntc_tables.h"
 
 
  #ifdef USE_ADC_1_2
@@ -19,7 +19,12 @@
  uint16_t ADCDataDMA[3];
  #endif
  #endif
- 
+ #ifdef USE_LMT87
+static int16_t getLMT87Degrees(uint16_t adc_raw);
+#endif
+#ifdef USE_NTC
+static int16_t getNTCDegrees(uint16_t ntcrawtemp);
+#endif
  extern uint16_t ADC_raw_temp;
  extern uint16_t ADC_raw_volts;
  extern uint16_t ADC_raw_current;
@@ -470,6 +475,16 @@ void ADC_Init(void)
 }
 #endif
 
+int16_t convertTemperature(uint16_t adcrawtemp)
+{
+  #ifdef USE_LMT87
+    return getLMT87Degrees(adcrawtemp);
+  #elif defined(USE_NTC)
+    return getNTCDegrees(adcrawtemp);
+  #else
+    return 0;
+  #endif
+}
 #ifdef USE_LMT87
 typedef struct {
     int16_t temp_c;
@@ -511,7 +526,7 @@ static const lmt87_entry_t lmt87_table[] = {
 #define ADC_VREF_MV        3300
 #define ADC_MAX_COUNT      4095
 
-int16_t getLMT87Degrees(uint16_t adc_raw)
+static int16_t getLMT87Degrees(uint16_t adc_raw)
 {
     uint32_t vtemp_mv;
     uint32_t i;
@@ -574,7 +589,7 @@ int16_t getLMT87Degrees(uint16_t adc_raw)
 #endif
 
 #ifdef USE_NTC
-int16_t getNTCDegrees(uint16_t ntcrawtemp){
+static int16_t getNTCDegrees(uint16_t ntcrawtemp){
   int p1,p2;
   p1 = NTC_table[ (ntcrawtemp >> 6)  ];
   p2 = NTC_table[ (ntcrawtemp >> 6)+1];

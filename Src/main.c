@@ -2130,11 +2130,9 @@ if(zero_crosses < 5){
             LL_ADC_REG_StartConversion(ADC1);
 #ifdef USE_ADC_1_2
           LL_ADC_REG_StartConversion(ADC2);
-#endif          
-        #ifdef USE_LMT87
-            converted_degrees = getLMT87Degrees(ADC_raw_ntc);
-        #elif defined(USE_NTC)
-            converted_degrees = getNTCDegrees(ADC_raw_ntc);
+#endif  
+        #ifdef HAVE_CONVERT_TEMPERATURE
+            converted_degrees = convertTemperature(ADC_raw_ntc);        
         #else
             converted_degrees = __LL_ADC_CALC_TEMPERATURE(3300, ADC_raw_temp, LL_ADC_RESOLUTION_12B);
         #endif
@@ -2168,7 +2166,6 @@ if(zero_crosses < 5){
             startADCConversion( );
             converted_degrees = getConvertedDegrees(ADC_raw_temp);
 #endif
-
 	        degrees_celsius = converted_degrees;
 #ifdef NXP
             //MCXA has 16-bit ADC data

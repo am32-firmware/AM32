@@ -72,6 +72,7 @@
 #define MILLIVOLT_PER_AMP         -9      // Really it is 8.8; negative because current polarity is inverted on Single ESC
 #define TARGET_VOLTAGE_DIVIDER    107
 #define USE_LMT87
+#define HAVE_CONVERT_TEMPERATURE
 #endif
 
 #ifdef EPROPELLED_4in1_G431_CAN
@@ -88,6 +89,7 @@
 #define MILLIVOLT_PER_AMP         13      // Really it is 13.2
 #define TARGET_VOLTAGE_DIVIDER    105
 #define USE_NTC
+#define HAVE_CONVERT_TEMPERATURE
 #endif
 
 #ifdef LUMENIER_12S_F421
@@ -4483,11 +4485,6 @@
 #define NFAULT_PORT           GPIOB
 #define ENABLE_PIN            LL_GPIO_PIN_5          
 #define ENABLE_PORT           GPIOB
-
-//#define USE_HSE
-#undef HSE_VALUE
-#define HSE_VALUE 						16000000
-//#define USE_HSE_BYPASS 0
 #endif
 
 #ifdef HARDWARE_GROUP_G4_F
@@ -4566,11 +4563,6 @@
 #define NFAULT_PORT           GPIOB
 #define ENABLE_PIN            LL_GPIO_PIN_5          
 #define ENABLE_PORT           GPIOB
-
-//#define USE_HSE
-#undef HSE_VALUE
-#define HSE_VALUE 						16000000
-//#define USE_HSE_BYPASS 0
 #endif
 
 /************************************ G031 Hardware Groups

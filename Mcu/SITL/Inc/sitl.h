@@ -85,6 +85,9 @@ void sitl_primask_set(void); // __disable_irq
 void sitl_primask_clear(void); // __enable_irq
 uint32_t sitl_primask_get(void); // __get_PRIMASK
 void sitl_system_reset(void) __attribute__((noreturn));
+// a state-port cmd 9 reset is latched in the poll and executed from
+// the sim main loop, where no firmware locks can be held
+bool sitl_state_reset_requested(void);
 
 // watchdog
 void sitl_watchdog_reload(void);
@@ -162,6 +165,11 @@ enum sitl_phase_mode {
 };
 
 extern volatile uint8_t sitl_phase_mode[3];
+
+// 1 while sounds.c is playing a beep (TIM1 PSC > 0 with a driven
+// phase); a test waits for armed == 1 then sitl_tone_active == 0 to
+// know the arming beeps are over and throttle input is live
+extern volatile uint8_t sitl_tone_active;
 
 // comparator state: which phase is floating and the latched output
 extern volatile uint8_t sitl_comp_phase; // 0=A 1=B 2=C

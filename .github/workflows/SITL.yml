@@ -1,17 +1,39 @@
 name: SITL Tests
 
+# The SITL simulator is built here; the models, datasets, GUI and test
+# suites live in the ESCSim repository, which is cloned to test this
+# firmware. AM32_ROOT points ESCSim's tools at this checkout instead of
+# its own pinned am32-firmware submodule, so every job tests the branch
+# under CI.
+
 on:
   push:
     branches: ["main"]
   pull_request:
     branches: ["main"]
   workflow_dispatch:
+    inputs:
+      escsim_ref:
+        description: 'ESCSim ref to test against'
+        required: false
+        default: 'main'
+        type: string
+
+env:
+  ESCSIM_REF: ${{ inputs.escsim_ref || 'main' }}
 
 jobs:
   sitl-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Check out ESCSim
+        uses: actions/checkout@v4
+        with:
+          repository: am32-firmware/ESCSim
+          ref: ${{ env.ESCSIM_REF }}
+          path: ESCSim
 
       - name: Build SITL
         run: make AM32_SITL_CAN
@@ -20,9 +42,11 @@ jobs:
         run: python3 -m pip install dronecan pyserial
 
       - name: Run SITL tests
+        env:
+          AM32_ROOT: ${{ github.workspace }}
         run: |
           mkdir sitl_test_run && cd sitl_test_run
-          python3 ../Mcu/SITL/run_ci_tests.py --sitl ../obj/AM32_AM32_SITL_CAN_*.elf
+          python3 "$GITHUB_WORKSPACE/ESCSim/SITL/run_ci_tests.py"
 
       - name: Upload SITL log on failure
         if: failure()
@@ -36,6 +60,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check out ESCSim
+        uses: actions/checkout@v4
+        with:
+          repository: am32-firmware/ESCSim
+          ref: ${{ env.ESCSIM_REF }}
+          path: ESCSim
+
       - name: Build SITL with AddressSanitizer
         run: make AM32_SITL_CAN SITL_SANITIZE=address
 
@@ -44,10 +75,11 @@ jobs:
 
       - name: Run SITL tests under ASan
         env:
+          AM32_ROOT: ${{ github.workspace }}
           ASAN_OPTIONS: detect_leaks=1:halt_on_error=0:abort_on_error=0
         run: |
           mkdir sitl_test_run && cd sitl_test_run
-          python3 ../Mcu/SITL/run_ci_tests.py --sitl ../obj/AM32_AM32_SITL_CAN_*.elf
+          python3 "$GITHUB_WORKSPACE/ESCSim/SITL/run_ci_tests.py"
 
       - name: Upload SITL log on failure
         if: failure()
@@ -61,6 +93,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check out ESCSim
+        uses: actions/checkout@v4
+        with:
+          repository: am32-firmware/ESCSim
+          ref: ${{ env.ESCSIM_REF }}
+          path: ESCSim
+
       - name: Build SITL with UndefinedBehaviorSanitizer
         run: make AM32_SITL_CAN SITL_SANITIZE=undefined
 
@@ -69,10 +108,11 @@ jobs:
 
       - name: Run SITL tests under UBSan
         env:
+          AM32_ROOT: ${{ github.workspace }}
           UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
         run: |
           mkdir sitl_test_run && cd sitl_test_run
-          python3 ../Mcu/SITL/run_ci_tests.py --sitl ../obj/AM32_AM32_SITL_CAN_*.elf
+          python3 "$GITHUB_WORKSPACE/ESCSim/SITL/run_ci_tests.py"
 
       - name: Upload SITL log on failure
         if: failure()
@@ -86,28 +126,44 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check out ESCSim
+        uses: actions/checkout@v4
+        with:
+          repository: am32-firmware/ESCSim
+          ref: ${{ env.ESCSIM_REF }}
+          path: ESCSim
+
       - name: Install python and gcovr
         run: python3 -m pip install dronecan pyserial gcovr
 
       - name: Build and run with coverage
+        env:
+          AM32_ROOT: ${{ github.workspace }}
         run: |
           mkdir sitl_test_run && cd sitl_test_run
-          bash ../Mcu/SITL/run_coverage.sh
+          bash "$GITHUB_WORKSPACE/ESCSim/SITL/run_coverage.sh"
 
       - name: Coverage summary
-        run: cat coverage/coverage.txt || true
+        run: cat sitl_test_run/coverage/coverage.txt || true
 
       - name: Upload HTML coverage report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: coverage/
+          path: sitl_test_run/coverage/
 
   gui-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Check out ESCSim
+        uses: actions/checkout@v4
+        with:
+          repository: am32-firmware/ESCSim
+          ref: ${{ env.ESCSIM_REF }}
+          path: ESCSim
 
       - name: Install Qt system libraries
         run: sudo apt-get update && sudo apt-get install -y libgl1 libegl1 libfontconfig1 libxkbcommon0
@@ -116,14 +172,15 @@ jobs:
         run: make AM32_SITL_CAN
 
       - name: Create GUI environment
-        run: python3 Mcu/SITL/make_gui_env.py
+        run: python3 ESCSim/SITL/make_gui_env.py
 
       - name: Run GUI test (offscreen)
+        env:
+          AM32_ROOT: ${{ github.workspace }}
         run: |
           mkdir gui_test_run && cd gui_test_run
-          python3 ../Mcu/SITL/gui_ci_test.py \
-            --gui-python ../Mcu/SITL/venv/bin/python3 \
-            --sitl ../obj/AM32_AM32_SITL_CAN_*.elf
+          python3 "$GITHUB_WORKSPACE/ESCSim/SITL/gui_ci_test.py" \
+            --gui-python "$GITHUB_WORKSPACE/ESCSim/SITL/venv/bin/python3"
 
       - name: Upload SITL log on failure
         if: failure()
@@ -136,6 +193,13 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Check out ESCSim
+        uses: actions/checkout@v4
+        with:
+          repository: am32-firmware/ESCSim
+          ref: ${{ env.ESCSIM_REF }}
+          path: ESCSim
 
       - name: Build SITL
         run: make AM32_SITL_CAN
@@ -152,19 +216,22 @@ jobs:
         run: sudo route -n add -net 239.65.82.0/24 -interface lo0 || true
 
       - name: Run SITL tests
+        env:
+          AM32_ROOT: ${{ github.workspace }}
         run: |
           mkdir sitl_test_run && cd sitl_test_run
-          python3 ../Mcu/SITL/run_ci_tests.py --sitl ../obj/AM32_AM32_SITL_CAN_*.elf
+          python3 "$GITHUB_WORKSPACE/ESCSim/SITL/run_ci_tests.py"
 
       - name: Create GUI environment
-        run: python3 Mcu/SITL/make_gui_env.py
+        run: python3 ESCSim/SITL/make_gui_env.py
 
       - name: Run GUI test (offscreen)
+        env:
+          AM32_ROOT: ${{ github.workspace }}
         run: |
           mkdir gui_test_run && cd gui_test_run
-          python3 ../Mcu/SITL/gui_ci_test.py \
-            --gui-python ../Mcu/SITL/venv/bin/python3 \
-            --sitl ../obj/AM32_AM32_SITL_CAN_*.elf
+          python3 "$GITHUB_WORKSPACE/ESCSim/SITL/gui_ci_test.py" \
+            --gui-python "$GITHUB_WORKSPACE/ESCSim/SITL/venv/bin/python3"
 
       - name: Upload SITL log on failure
         if: failure()
@@ -174,6 +241,29 @@ jobs:
           path: |
             sitl_test_run/sitl_ci.log
             gui_test_run/sitl_ci.log
+
+  # the cross-built exe is what the ESCSim GUI packaging bundles for
+  # Windows users, so a break here must fail the firmware build too
+  windows-cross-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install MinGW-w64
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-mingw-w64-x86-64
+
+      - name: Cross-build native Windows SITL
+        run: |
+          make AM32_SITL_CAN SITL_CROSS=win
+          mkdir -p sitl-windows
+          cp obj/AM32_AM32_SITL_CAN_*.elf sitl-windows/AM32_SITL_CAN.exe
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sitl-windows-exe
+          path: sitl-windows/AM32_SITL_CAN.exe
 
   windows-build:
     runs-on: windows-latest

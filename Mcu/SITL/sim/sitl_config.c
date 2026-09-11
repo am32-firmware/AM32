@@ -16,8 +16,8 @@ sitl_config_t sitl_cfg = {
     /*
       defaults are the calibrated VimDrones Nano + T-Motor AIR 2216 II
       920Kv with a 10x4.5 prop on 3S (an Edu450 drivetrain), fitted
-      against the bench captures in data/VIMDRONES_NANO_2216 - see
-      models/vimdrones_nano_2216.json. A prop-loaded model is the right
+      against the bench captures in ESCSim's SITL/data/VIMDRONES_NANO_2216
+      - see its models/vimdrones_nano_2216.json. A prop-loaded model is right
       default: it matches how ESCs are actually flown, and the real
       combination never desyncs, which the model reproduces
      */

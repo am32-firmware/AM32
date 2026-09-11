@@ -7,6 +7,7 @@
 
 #include "comparator.h"
 
+#include "common.h"
 #include "targets.h"
 
 uint8_t getCompOutputLevel() { return CMP->ctrlsts1_bit.cmp1value; }
@@ -55,7 +56,15 @@ void changeCompInput()
         //	COMP->CTRLSTS1 |= PHASE_B_COMP;
         CMP->ctrlsts1 = PHASE_B_COMP;
     }
-    if (rising) {
+    if (auto_blanking) { // look for reverse edge first
+        if (rising) {
+            EXINT->polcfg1 |= (uint32_t)EXTI_LINE;
+            EXINT->polcfg2 &= ~(uint32_t)EXTI_LINE;
+        } else {
+            EXINT->polcfg1 &= ~(uint32_t)EXTI_LINE;
+            EXINT->polcfg2 |= (uint32_t)EXTI_LINE;
+        }
+    } else if (rising) {
         //	EXTI->RTSR = 0x0;
         //	EXTI->FTSR = 0x200000;
         EXINT->polcfg1 &= ~(uint32_t)EXTI_LINE;

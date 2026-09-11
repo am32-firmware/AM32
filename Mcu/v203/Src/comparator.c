@@ -8,6 +8,7 @@
 
 #include "comparator.h"
 
+#include "common.h"
 #include "targets.h"
 
 #ifndef USE_PA2_AS_COMP
@@ -74,24 +75,25 @@ void changeCompInput()
         current_Gpio_Pin = GPIO_Pin_4;
 #endif
     }
-    if (rising)
+    char catch_reverse = auto_blanking ? !rising : rising;
+    if (catch_reverse)
     {
 #ifdef  USE_PA2_AS_COMP
         EXTI->RTENR = 0;
-        EXTI->FTENR = (1<<2);  //·´Ïò
+        EXTI->FTENR = (1<<2);  //ï¿½ï¿½ï¿½ï¿½
 #else
         EXTI->RTENR = 0;
-        EXTI->FTENR = (1<<current_exti_line);  //·´Ïò
+        EXTI->FTENR = (1<<current_exti_line);  //ï¿½ï¿½ï¿½ï¿½
 #endif
     }
     else
     {
 #ifdef USE_PA2_AS_COMP
         EXTI->FTENR = 0;
-        EXTI->RTENR = (1<<2);  //·´Ïò
+        EXTI->RTENR = (1<<2);  //ï¿½ï¿½ï¿½ï¿½
 #else
         EXTI->FTENR = 0;
-        EXTI->RTENR = (1<<current_exti_line);  //·´Ïò
+        EXTI->RTENR = (1<<current_exti_line);  //ï¿½ï¿½ï¿½ï¿½
 #endif
     }
 }

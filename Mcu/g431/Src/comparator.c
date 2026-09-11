@@ -10,7 +10,7 @@
 //
 //
 // void maskPhaseInterrupts(){
-//	EXTI->IMR1 &= ~(1 << 18);
+//	EXTI->IMR1 &= ~(1 << 22);
 //	EXTI->RPR1 = EXTI_LINE;
 //	EXTI->FPR1 = EXTI_LINE;
 ////	LL_EXTI_ClearRisingFlag_0_31(EXTI_LINE);
@@ -18,7 +18,7 @@
 //}
 //
 // void enableCompInterrupts(){
-//    EXTI->IMR1 |= (1 << 18);
+//    EXTI->IMR1 |= (1 << 22);
 //}
 //
 
@@ -78,15 +78,22 @@ void changeCompInput()
 
         LL_COMP_ConfigInputs(active_COMP, PHASE_B_COMP, PHASE_B_INPUT_PLUS);
     }
-    if (rising) {
-        LL_EXTI_DisableRisingTrig_0_31(LL_EXTI_LINE_22);
-        LL_EXTI_DisableRisingTrig_0_31(LL_EXTI_LINE_21);
-        LL_EXTI_EnableFallingTrig_0_31(current_EXTI_LINE);
-    } else { // falling bemf
-        LL_EXTI_EnableRisingTrig_0_31(current_EXTI_LINE);
-        LL_EXTI_DisableFallingTrig_0_31(LL_EXTI_LINE_21);
-        LL_EXTI_DisableFallingTrig_0_31(LL_EXTI_LINE_22);
-    }
+//    if (rising) {
+//        LL_EXTI_DisableRisingTrig_0_31(LL_EXTI_LINE_22);
+//        LL_EXTI_DisableRisingTrig_0_31(LL_EXTI_LINE_21);
+//        LL_EXTI_EnableFallingTrig_0_31(current_EXTI_LINE);
+//    } else { // falling bemf
+//        LL_EXTI_EnableRisingTrig_0_31(current_EXTI_LINE);
+//        LL_EXTI_DisableFallingTrig_0_31(LL_EXTI_LINE_21);
+//        LL_EXTI_DisableFallingTrig_0_31(LL_EXTI_LINE_22);
+//    }
+if (auto_blanking) {
+    EXTI->RTSR1 = (EXTI->RTSR1 & ~((1UL << 22) | (1UL << 21))) | ( rising << 22) | ( rising << 21);
+    EXTI->FTSR1 = (EXTI->FTSR1 & ~((1UL << 22) | (1UL << 21))) | (!rising << 22) | (!rising << 21);
+} else {
+    EXTI->RTSR1 = (EXTI->RTSR1 & ~((1UL << 22) | (1UL << 21))) | (!rising << 22) | (!rising << 21);
+    EXTI->FTSR1 = (EXTI->FTSR1 & ~((1UL << 22) | (1UL << 21))) | ( rising << 22) | ( rising << 21);
+}
 }
 
 // void changeCompInput() {
@@ -102,11 +109,11 @@ void changeCompInput()
 //		COMP2->CSR = 0x000271;
 //	}
 //	if (rising){
-//		  EXTI->RTSR1 &= ~(LL_EXTI_LINE_18);
-//		  EXTI->FTSR1 |= LL_EXTI_LINE_18;
+//		  EXTI->RTSR1 &= ~(LL_EXTI_LINE_22);
+//		  EXTI->FTSR1 |= LL_EXTI_LINE_22;
 //	}else{                          // falling bemf
-//		  EXTI->RTSR1 |= LL_EXTI_LINE_18;
-//		  EXTI->FTSR1 &= ~(LL_EXTI_LINE_18);
+//		  EXTI->RTSR1 |= LL_EXTI_LINE_22;
+//		  EXTI->FTSR1 &= ~(LL_EXTI_LINE_22);
 //	}
 //}
 // void changeCompInput() {
@@ -139,11 +146,11 @@ void changeCompInput()
 //	}
 
 //	if (rising){
-//		  EXTI->RTSR1 &= ~(LL_EXTI_LINE_18);
-//		  EXTI->FTSR1 |= LL_EXTI_LINE_18;
+//		  EXTI->RTSR1 &= ~(LL_EXTI_LINE_22);
+//		  EXTI->FTSR1 |= LL_EXTI_LINE_22;
 //	}else{                          // falling bemf
-//		  EXTI->RTSR1 |= LL_EXTI_LINE_18;
-//		  EXTI->FTSR1 &= ~(LL_EXTI_LINE_18);
+//		  EXTI->RTSR1 |= LL_EXTI_LINE_22;
+//		  EXTI->FTSR1 &= ~(LL_EXTI_LINE_22);
 
 //	}
 //}

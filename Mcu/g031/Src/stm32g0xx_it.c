@@ -377,13 +377,69 @@ void TIM14_IRQHandler(void)
 
 void EXTI0_1_IRQHandler(){
     if (LL_EXTI_IsActiveRisingFlag_0_31(LL_EXTI_LINE_1) != RESET) {
-        LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_1);
-        interruptRoutine();
+        if (auto_blanking) {
+            LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_1);
+            uint16_t cnt = INTERVAL_TIMER->CNT;
+            blanking_length = (cnt > last_commutation_wait) ? (cnt - last_commutation_wait) : 0;
+            blanking_lengths[step - 1] = blanking_length;
+            auto_blanking = 0;
+            if (rising) {
+                EXTI->RTSR1 |= (1 << current_EXTI_LINE);
+                EXTI->FTSR1 &= ~(1 << current_EXTI_LINE);
+            } else {
+                EXTI->FTSR1 |= (1 << current_EXTI_LINE);
+                EXTI->RTSR1 &= ~(1 << current_EXTI_LINE);
+            }
+            if ((blanking_length) > ((average_interval >> 2) + (average_interval >> 3))) {
+                last_duty_cycle = duty_cycle - (duty_cycle >> 6);
+                duty_cycle = last_duty_cycle;
+            }
+            if ((blanking_length) > (average_interval >> 1)) {
+                interruptRoutine();
+            }
+        } else {
+            if (INTERVAL_TIMER->CNT > (last_commutation_wait + (average_interval >> 2))) {
+                LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_1);
+                interruptRoutine();
+            } else {
+                if (((current_GPIO_PORT->IDR & current_GPIO_PIN) == !(rising))) {
+                    LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_1);
+                }
+            }
+        }
         return;
     }
     if (LL_EXTI_IsActiveFallingFlag_0_31(LL_EXTI_LINE_1) != RESET) {
-        LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_1);
-        interruptRoutine();
+        if (auto_blanking) {
+            LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_1);
+            uint16_t cnt = INTERVAL_TIMER->CNT;
+            blanking_length = (cnt > last_commutation_wait) ? (cnt - last_commutation_wait) : 0;
+            blanking_lengths[step - 1] = blanking_length;
+            auto_blanking = 0;
+            if (rising) {
+                EXTI->RTSR1 |= (1 << current_EXTI_LINE);
+                EXTI->FTSR1 &= ~(1 << current_EXTI_LINE);
+            } else {
+                EXTI->FTSR1 |= (1 << current_EXTI_LINE);
+                EXTI->RTSR1 &= ~(1 << current_EXTI_LINE);
+            }
+            if ((blanking_length) > ((average_interval >> 2) + (average_interval >> 3))) {
+                last_duty_cycle = duty_cycle - (duty_cycle >> 6);
+                duty_cycle = last_duty_cycle;
+            }
+            if ((blanking_length) > (average_interval >> 1)) {
+                interruptRoutine();
+            }
+        } else {
+            if (INTERVAL_TIMER->CNT > (last_commutation_wait + (average_interval >> 2))) {
+                LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_1);
+                interruptRoutine();
+            } else {
+                if (((current_GPIO_PORT->IDR & current_GPIO_PIN) == !(rising))) {
+                    LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_1);
+                }
+            }
+        }
         return;
     }
 
@@ -401,23 +457,135 @@ void EXTI4_15_IRQHandler(void)
 {
 
     if (LL_EXTI_IsActiveRisingFlag_0_31(LL_EXTI_LINE_7) != RESET) {
-        LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_7);
-        interruptRoutine();
+        if (auto_blanking) {
+            LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_7);
+            uint16_t cnt = INTERVAL_TIMER->CNT;
+            blanking_length = (cnt > last_commutation_wait) ? (cnt - last_commutation_wait) : 0;
+            blanking_lengths[step - 1] = blanking_length;
+            auto_blanking = 0;
+            if (rising) {
+                EXTI->RTSR1 |= (1 << current_EXTI_LINE);
+                EXTI->FTSR1 &= ~(1 << current_EXTI_LINE);
+            } else {
+                EXTI->FTSR1 |= (1 << current_EXTI_LINE);
+                EXTI->RTSR1 &= ~(1 << current_EXTI_LINE);
+            }
+            if ((blanking_length) > ((average_interval >> 2) + (average_interval >> 3))) {
+                last_duty_cycle = duty_cycle - (duty_cycle >> 6);
+                duty_cycle = last_duty_cycle;
+            }
+            if ((blanking_length) > (average_interval >> 1)) {
+                interruptRoutine();
+            }
+        } else {
+            if (INTERVAL_TIMER->CNT > (last_commutation_wait + (average_interval >> 2))) {
+                LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_7);
+                interruptRoutine();
+            } else {
+                if (((current_GPIO_PORT->IDR & current_GPIO_PIN) == !(rising))) {
+                    LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_7);
+                }
+            }
+        }
         return;
     }
     if (LL_EXTI_IsActiveFallingFlag_0_31(LL_EXTI_LINE_7) != RESET) {
-        LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_7);
-        interruptRoutine();
+        if (auto_blanking) {
+            LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_7);
+            uint16_t cnt = INTERVAL_TIMER->CNT;
+            blanking_length = (cnt > last_commutation_wait) ? (cnt - last_commutation_wait) : 0;
+            blanking_lengths[step - 1] = blanking_length;
+            auto_blanking = 0;
+            if (rising) {
+                EXTI->RTSR1 |= (1 << current_EXTI_LINE);
+                EXTI->FTSR1 &= ~(1 << current_EXTI_LINE);
+            } else {
+                EXTI->FTSR1 |= (1 << current_EXTI_LINE);
+                EXTI->RTSR1 &= ~(1 << current_EXTI_LINE);
+            }
+            if ((blanking_length) > ((average_interval >> 2) + (average_interval >> 3))) {
+                last_duty_cycle = duty_cycle - (duty_cycle >> 6);
+                duty_cycle = last_duty_cycle;
+            }
+            if ((blanking_length) > (average_interval >> 1)) {
+                interruptRoutine();
+            }
+        } else {
+            if (INTERVAL_TIMER->CNT > (last_commutation_wait + (average_interval >> 2))) {
+                LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_7);
+                interruptRoutine();
+            } else {
+                if (((current_GPIO_PORT->IDR & current_GPIO_PIN) == !(rising))) {
+                    LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_7);
+                }
+            }
+        }
         return;
     }
     if (LL_EXTI_IsActiveRisingFlag_0_31(LL_EXTI_LINE_14) != RESET) {
-        LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_14);
-        interruptRoutine();
+        if (auto_blanking) {
+            LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_14);
+            uint16_t cnt = INTERVAL_TIMER->CNT;
+            blanking_length = (cnt > last_commutation_wait) ? (cnt - last_commutation_wait) : 0;
+            blanking_lengths[step - 1] = blanking_length;
+            auto_blanking = 0;
+            if (rising) {
+                EXTI->RTSR1 |= (1 << current_EXTI_LINE);
+                EXTI->FTSR1 &= ~(1 << current_EXTI_LINE);
+            } else {
+                EXTI->FTSR1 |= (1 << current_EXTI_LINE);
+                EXTI->RTSR1 &= ~(1 << current_EXTI_LINE);
+            }
+            if ((blanking_length) > ((average_interval >> 2) + (average_interval >> 3))) {
+                last_duty_cycle = duty_cycle - (duty_cycle >> 6);
+                duty_cycle = last_duty_cycle;
+            }
+            if ((blanking_length) > (average_interval >> 1)) {
+                interruptRoutine();
+            }
+        } else {
+            if (INTERVAL_TIMER->CNT > (last_commutation_wait + (average_interval >> 2))) {
+                LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_14);
+                interruptRoutine();
+            } else {
+                if (((current_GPIO_PORT->IDR & current_GPIO_PIN) == !(rising))) {
+                    LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_14);
+                }
+            }
+        }
         return;
     }
     if (LL_EXTI_IsActiveFallingFlag_0_31(LL_EXTI_LINE_14) != RESET) {
-        LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_14);
-        interruptRoutine();
+        if (auto_blanking) {
+            LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_14);
+            uint16_t cnt = INTERVAL_TIMER->CNT;
+            blanking_length = (cnt > last_commutation_wait) ? (cnt - last_commutation_wait) : 0;
+            blanking_lengths[step - 1] = blanking_length;
+            auto_blanking = 0;
+            if (rising) {
+                EXTI->RTSR1 |= (1 << current_EXTI_LINE);
+                EXTI->FTSR1 &= ~(1 << current_EXTI_LINE);
+            } else {
+                EXTI->FTSR1 |= (1 << current_EXTI_LINE);
+                EXTI->RTSR1 &= ~(1 << current_EXTI_LINE);
+            }
+            if ((blanking_length) > ((average_interval >> 2) + (average_interval >> 3))) {
+                last_duty_cycle = duty_cycle - (duty_cycle >> 6);
+                duty_cycle = last_duty_cycle;
+            }
+            if ((blanking_length) > (average_interval >> 1)) {
+                interruptRoutine();
+            }
+        } else {
+            if (INTERVAL_TIMER->CNT > (last_commutation_wait + (average_interval >> 2))) {
+                LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_14);
+                interruptRoutine();
+            } else {
+                if (((current_GPIO_PORT->IDR & current_GPIO_PIN) == !(rising))) {
+                    LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_14);
+                }
+            }
+        }
         return;
     }
 }

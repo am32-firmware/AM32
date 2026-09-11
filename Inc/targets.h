@@ -1,16 +1,5 @@
 
 
-/*
-  ELF section placement for the flash layout tooling (app signature,
-  file name). Not meaningful for the SITL build and mach-o (macOS) has
-  a different section syntax, so it becomes a no-op there
- */
-#ifdef __APPLE__
-#define AM32_FLASH_SECTION(name)
-#else
-#define AM32_FLASH_SECTION(name) __attribute__((section(name)))
-#endif
-
 #ifndef USE_MAKE
 // #define F031_DEV
 // #define FD6288_F051
@@ -221,7 +210,6 @@
 #define LOOP_FREQUENCY_HZ 20000
 #define USE_LSE
 #define USE_LSE_BYPASS 0
-#define USE_SERIAL_TELEMETRY
 #endif
 
 #ifdef TBS_16S_L431_CAN
@@ -240,7 +228,6 @@
 #define LOOP_FREQUENCY_HZ 20000
 #define USE_LSE
 #define USE_LSE_BYPASS 1
-#define USE_SERIAL_TELEMETRY
 #endif
 
 #ifdef TBS_16S_L431
@@ -256,7 +243,6 @@
 #define LOOP_FREQUENCY_HZ 20000
 #define USE_LSE
 #define USE_LSE_BYPASS 1
-#define USE_SERIAL_TELEMETRY
 #endif
 
 #ifdef  REF_L431
@@ -364,19 +350,6 @@
 #define MILLIVOLT_PER_AMP 9
 #endif
 ///
-#ifdef AM32_SITL_CAN
-#define FIRMWARE_NAME "AM32 SITL"
-#define FILE_NAME "AM32_SITL_CAN"
-#define DRONECAN_SUPPORT 1
-#define DRONECAN_NODE_NAME "org.am32.sitl"
-#define DEAD_TIME 80
-#define HARDWARE_GROUP_SITL_A
-#define TARGET_STALL_PROTECTION_INTERVAL 20000
-#define TARGET_VOLTAGE_DIVIDER 110
-#define MILLIVOLT_PER_AMP 20
-#define CURRENT_OFFSET 0
-#endif
-
 #ifdef REF_G431
 #define FIRMWARE_NAME "Ref G431"
 #define FILE_NAME "REF_G431"
@@ -393,6 +366,7 @@
 #define HARDWARE_GROUP_G4_C
 #define TARGET_STALL_PROTECTION_INTERVAL 20000
 #define USE_SERIAL_TELEMETRY
+#define NO_POLLING_START
 #endif
 
 #ifdef SCAR_G431
@@ -657,19 +631,6 @@
 #define CURRENT_ADC_PIN GPIO_PINS_3
 #define VOLTAGE_ADC_CHANNEL ADC_CHANNEL_6
 #define VOLTAGE_ADC_PIN GPIO_PINS_6
-#endif
-
-#ifdef  DEEPSPACE_TALOS_F421
-#define FIRMWARE_NAME "DEEPSPACE_F4"
-#define FILE_NAME "DEEPSPACE_TALOS_F421"
-#define DEAD_TIME 75
-#define HARDWARE_GROUP_AT_540
-#define HARDWARE_GROUP_AT_E
-#define USE_SERIAL_TELEMETRY
-#define VOLTAGE_ADC_CHANNEL ADC_CHANNEL_3
-#define VOLTAGE_ADC_PIN GPIO_PINS_3
-#define USE_LED_STRIP
-#define WS2812_PIN GPIO_PINS_4
 #endif
 
 #ifdef  FLYWOO_GOKU_F421
@@ -1081,17 +1042,53 @@
 #define USE_SERIAL_TELEMETRY
 #endif
 
-/***************************************End Generic
- * *****************************************/
+#ifdef AT32PA2_054_F421
+#define FIRMWARE_NAME "AT32PA2_054 "
+#define FILE_NAME "AT32PA2_054_F421"
+#define DEAD_TIME 80
+#define HARDWARE_GROUP_AT_C
+#define HARDWARE_GROUP_AT_054
+#define USE_SERIAL_TELEMETRY
+#endif
 
-#ifdef  FLYCOLOR_F421
-#define FIRMWARE_NAME "FLYCOLOR_F4 "
-#define FILE_NAME "FLYCOLOR_F421"
-#define DEAD_TIME 60
-#define HARDWARE_GROUP_AT_B
+#ifdef AT32PA2_405_F421
+#define FIRMWARE_NAME "AT32PA2_405 "
+#define FILE_NAME "AT32PA2_405_F421"
+#define DEAD_TIME 80
+#define HARDWARE_GROUP_AT_C
+#define HARDWARE_GROUP_AT_405
+#define USE_SERIAL_TELEMETRY
+#endif
+
+#ifdef AT32PA2_540_F421
+#define FIRMWARE_NAME "AT32PA2_540 "
+#define FILE_NAME "AT32PA2_540_F421"
+#define DEAD_TIME 80
+#define HARDWARE_GROUP_AT_C
 #define HARDWARE_GROUP_AT_540
 #define USE_SERIAL_TELEMETRY
 #endif
+
+#ifdef AT32PA2_504_F421
+#define FIRMWARE_NAME "AT32PA2_04 "
+#define FILE_NAME "AT32PA2_504_F421"
+#define DEAD_TIME 80
+#define HARDWARE_GROUP_AT_C
+#define HARDWARE_GROUP_AT_504
+#define USE_SERIAL_TELEMETRY
+#endif
+
+#ifdef AT32PA2_450_F421
+#define FIRMWARE_NAME "AT32PA2_450 "
+#define FILE_NAME "AT32PA2_450_F421"
+#define DEAD_TIME 80
+#define HARDWARE_GROUP_AT_C
+#define HARDWARE_GROUP_AT_450
+#define USE_SERIAL_TELEMETRY
+#endif
+
+/***************************************End Generic
+ * *****************************************/
 
 #ifdef  MAXKGO_F421
 #define FIRMWARE_NAME "MAXKGO_F4 "
@@ -1329,6 +1326,7 @@
 #define HARDWARE_GROUP_AT_540
 #define HARDWARE_GROUP_AT_C
 #define USE_SERIAL_TELEMETRY
+#define TARGET_MIN_BEMF_COUNTS 2
 #endif
 
 #ifdef AIKON_55A_F421
@@ -1927,15 +1925,6 @@
 #define HARDWARE_GROUP_F0_405
 #endif
 
-#ifdef BOTDRIVE_F051
-#define FILE_NAME "BOTDRIVE_F051"
-#define FIRMWARE_NAME "BOTDRIVE_F0 "
-#define DEAD_TIME 30
-#define HARDWARE_GROUP_F0_U
-#define USE_SERIAL_TELEMETRY
-#define HARDWARE_GROUP_F0_405
-#endif
-
 #ifdef  ASCENT_TEST_F051
 #define FIRMWARE_NAME "Sequre F0 "
 #define FILE_NAME "ASCENT_TEST_F051"
@@ -2244,6 +2233,7 @@
 #define NFAULT_PORT GPIOB
 #define NFAULT_PIN LL_GPIO_PIN_5
 #define TARGET_MIN_BEMF_COUNTS 3
+#define NO_POLLING_START
 #endif
 
 #ifdef ARK_4IN1_RAMP_F051
@@ -2417,22 +2407,6 @@
 #define USE_SERIAL_TELEMETRY
 #endif
 
-#ifdef XRC_F051
-#define FILE_NAME "XRC_F051"
-#define FIRMWARE_NAME "XRC TECH F0 "
-#define DEAD_TIME 45 
-#define HARDWARE_GROUP_F0_B
-#define MILLIVOLT_PER_AMP 50
-#define CURRENT_OFFSET 0
-#define TARGET_VOLTAGE_DIVIDER 110
-#define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_6
-#define VOLTAGE_ADC_PIN LL_GPIO_PIN_6
-#define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_3
-#define CURRENT_ADC_PIN LL_GPIO_PIN_3
-#define USE_SERIAL_TELEMETRY
-#define TARGET_STALL_PROTECTION_INTERVAL 9000
-#endif
-
 /*******************************   G071 Targets
  * *********************************/
 
@@ -2500,23 +2474,6 @@
 #define SIXTY_FOUR_KB_MEMORY
 #endif
 
-#ifdef  SKYSTARS_12S_G071
-#define FILE_NAME "SKYSTARS_12S_G071"
-#define FIRMWARE_NAME "SKYSTARS_G0 "
-#define DEAD_TIME 60
-#define HARDWARE_GROUP_G0_L
-#define USE_SERIAL_TELEMETRY
-#define SIXTY_FOUR_KB_MEMORY
-#define TARGET_VOLTAGE_DIVIDER 285
-#define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_4
-#define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_5
-#define CURRENT_ADC_PIN LL_GPIO_PIN_4
-#define VOLTAGE_ADC_PIN LL_GPIO_PIN_5
-#define RAMP_SPEED_LOW_RPM 2
-#define RAMP_SPEED_HIGH_RPM 4
-#define USE_INVERTED_LOW
-#endif
-
 #ifdef GEN_64K_G071
 #define FILE_NAME "GEN_64K_G071"
 #define FIRMWARE_NAME "G071 64kESC "
@@ -2526,36 +2483,40 @@
 #define HARDWARE_GROUP_G0_A
 #define USE_SERIAL_TELEMETRY
 #define SIXTY_FOUR_KB_MEMORY
+//#define NO_POLLING_START
+#define MIN_BEMF_COUNTS 3
+#define POLLING_MODE_THRESHOLD 3000
+#define RAMP_SPEED_LOW_RPM 1
 #endif
 
-#ifdef  ZTW_A_HV_G071
-#define FILE_NAME "ZTW_A_HV_G071"
-#define FIRMWARE_NAME "ZTW_A_HV_G0 "
+#ifdef SEQURE_TEST_G071
+#define FILE_NAME "SEQURE_TEST_G071"
+#define FIRMWARE_NAME "TEST_SQ_G0 "
 #define DEAD_TIME 60
 #define MILLIVOLT_PER_AMP 20
 #define CURRENT_OFFSET 0
 #define HARDWARE_GROUP_G0_A
 #define USE_SERIAL_TELEMETRY
 #define SIXTY_FOUR_KB_MEMORY
-#define RAMP_SPEED_LOW_RPM 2
-#define RAMP_SPEED_HIGH_RPM 4
+//#define NO_POLLING_START
+#define MIN_BEMF_COUNTS 3
+#define POLLING_MODE_THRESHOLD 3000
+#define RAMP_SPEED_LOW_RPM 1
 #endif
 
-#ifdef  ZTW_A_LV_G071
-#define FILE_NAME "ZTW_A_LV_G071"
-#define FIRMWARE_NAME "ZTW_A_LV_G0 "
-#define DEAD_TIME 60
-#define MILLIVOLT_PER_AMP 33
-#define TARGET_VOLTAGE_DIVIDER 210
-#define CURRENT_OFFSET 0
-#define HARDWARE_GROUP_G0_A
+
+#ifdef  ST_G0_07_N_G071
+#define FILE_NAME "ST_G0_07_N_G071"
+#define FIRMWARE_NAME "ST_G_07_G071"
+#define DEAD_TIME 50
+#define MILLIVOLT_PER_AMP 7
+#define CURRENT_OFFSET 572
+#define HARDWARE_GROUP_G0_G
 #define USE_SERIAL_TELEMETRY
 #define SIXTY_FOUR_KB_MEMORY
-#define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_0
-#define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_1
-#define CURRENT_ADC_PIN LL_GPIO_PIN_0
-#define VOLTAGE_ADC_PIN LL_GPIO_PIN_1
-#define USE_LED_STRIP
+#define TARGET_VOLTAGE_DIVIDER 210
+#define TARGET_MIN_BEMF_COUNTS 4
+#define RAMP_SPEED_LOW_RPM 1
 #endif
 
 #ifdef  TBS_4IN1_G071
@@ -2588,7 +2549,9 @@
 #define CURRENT_ADC_PIN LL_GPIO_PIN_5
 #define VOLTAGE_ADC_PIN LL_GPIO_PIN_6
 #define RAMP_SPEED_LOW_RPM 1
-#define RAMP_SPEED_HIGH_RPM 1
+#define RAMP_SPEED_HIGH_RPM 2
+#define MIN_BEMF_COUNTS 4
+#define POLLING_MODE_THRESHOLD 4000
 #endif
 
 #ifdef  SP_CRUSTCORE_G071
@@ -2850,33 +2813,13 @@
 #define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_4
 #define CURRENT_ADC_PIN LL_GPIO_PIN_4
 #define RAMP_SPEED_LOW_RPM 1
-#define RAMP_SPEED_HIGH_RPM 1
-#define TARGET_MIN_BEMF_COUNTS 3
-#define USE_LED_STRIP
-#define USE_PULSE_OUT
-#define RPM_PULSE_PORT GPIOB
-#define RPM_PULSE_PIN LL_GPIO_PIN_5
-#endif
-
-#ifdef  FT_12S_100A 
-#define FILE_NAME "FT_12S_100A "
-#define FIRMWARE_NAME "FT_12S_100A "
-#define DEAD_TIME 60
-#define MILLIVOLT_PER_AMP 11
-#define TARGET_STALL_PROTECTION_INTERVAL 9000
-#define TARGET_VOLTAGE_DIVIDER 210
-#define HARDWARE_GROUP_G0_A
-#define USE_SERIAL_TELEMETRY
-#define SIXTY_FOUR_KB_MEMORY
-#define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_4
-#define CURRENT_ADC_PIN LL_GPIO_PIN_4
-#define RAMP_SPEED_LOW_RPM 2
 #define RAMP_SPEED_HIGH_RPM 2
 #define TARGET_MIN_BEMF_COUNTS 3
 #define USE_LED_STRIP
 #define USE_PULSE_OUT
 #define RPM_PULSE_PORT GPIOB
 #define RPM_PULSE_PIN LL_GPIO_PIN_5
+#define POLLING_MODE_THRESHOLD 3500
 #endif
 
 #ifdef  SEQURE_TOP_G071
@@ -3205,23 +3148,6 @@
 
 #define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_5
 #define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_7
-#endif
-
-//FRDM_MCXA153
-#ifdef FRDM_A153
-#define FILE_NAME				"FRDM_A153"
-#define FIRMWARE_NAME           "FRDM_MCXA153"
-#define NEED_INPUT_READY
-#define DEAD_TIME               70
-#define HARDWARE_GROUP_NXP_MCXA153
-#define TARGET_VOLTAGE_DIVIDER  100	//10k and 100k, but end voltage is in centivolts
-#define CURRENT_OFFSET          0 	//millivolts
-#define MILLIVOLT_PER_AMP       20
-#define USE_SERIAL_TELEMETRY
-#define USE_LED_STRIP
-#define NUM_LEDS 1		//Amount of APA102 RGB LEDS
-#define BRIGHTNESS 3	//Can be from 0 to 31
-#define RESET 0			//Not used for anything but needed to build correctly
 #endif
 
 #ifdef  CRAWLMASTER_F031
@@ -4113,12 +4039,6 @@
 
 #define PHASE_C_EXTI_LINE LL_EXTI_LINE_18
 #define PHASE_C_COMP_NUMBER COMP2
-
-#endif
-
-#ifdef HARDWARE_GROUP_SITL_A
-
-#define MCU_SITL
 
 #endif
 
@@ -5101,75 +5021,6 @@
 
 #endif
 
-//NXP hardware group of the MCXA153
-#ifdef     HARDWARE_GROUP_NXP_MCXA153
-
-#define    MCU_A153
-
-//This is the Dshot/PWM input pin
-#define    INPUT_PIN            	2		//P1.2
-#define    INPUT_PIN_PORT        	PORT1
-#define    INPUT_PIN_GPIO			GPIO1
-#define    INPUT_PIN_CAPTURE_INP	1		//CT_INP0, check datasheet for correct value
-#define    INPUT_PIN_ALT_FUNC		5		//CTIMER Capture input
-
-//This is the Dshot/PWM timer
-#define    IC_TIMER_REGISTER    	CTIMER0
-
-//This is the DMA used for the Dshot/PWM data transfer
-#define    INPUT_DMA_CHANNEL       	0 				//DMA channel 0
-#define    IC_DMA_IRQ_NAME         	DMA_CH0_IRQn
-
-//Assign the pins/PORTs/GPIOs for each gate signal
-#define PHASE_A_PIN_LOW       		0		//Pin number
-#define PHASE_A_PORT_LOW   			PORT3	//PORT number
-#define PHASE_A_GPIO_LOW   			GPIO3	//GPIO number
-#define PHASE_A_PIN_HIGH       		1
-#define PHASE_A_PORT_HIGH    		PORT3
-#define PHASE_A_GPIO_HIGH			GPIO3
-
-#define PHASE_B_PIN_LOW         	8
-#define PHASE_B_PORT_LOW     		PORT3
-#define PHASE_B_GPIO_LOW			GPIO3
-#define PHASE_B_PIN_HIGH      		9
-#define PHASE_B_PORT_HIGH   		PORT3
-#define PHASE_B_GPIO_HIGH			GPIO3
-
-#define PHASE_C_PIN_LOW       		10
-#define PHASE_C_PORT_LOW   			PORT3
-#define PHASE_C_GPIO_LOW			GPIO3
-#define PHASE_C_PIN_HIGH   			11
-#define PHASE_C_PORT_HIGH			PORT3
-#define PHASE_C_GPIO_HIGH			GPIO3
-
-#define PHASE_A_COMP_INP  	3  		//P1.0 COMP0_IN3
-#define PHASE_A_COMP_UNIT 	CMP0
-#define PHASE_B_COMP_INP  	3  		//P1.1 COMP1_IN3
-#define PHASE_B_COMP_UNIT 	CMP1
-#define PHASE_C_COMP_INP  	1  		//P1.3 COMP0_IN1
-#define PHASE_C_COMP_UNIT 	CMP0
-
-#define COMMON_COMP0_INP	0		//P2.2 COMP0_IN0
-#define COMMON_COMP1_INP	0		//P2.3 COMP1_IN0
-
-//Assign UART pins and module
-#define SERIAL_TELEMETRY				LPUART1
-#define SERIAL_TELEMETRY_MODULE 		1
-#define SERIAL_TELEMETRY_TX_PORT 		PORT1	//P1.9
-#define SERIAL_TELEMETRY_TX_PIN 		9
-#define SERIAL_TELEMETRY_TX_ALT_FUNC 	2
-
-//Assign ADC pins and channels
-#define CURRENT_SENSE_ADC_PIN     	7		//P2.7
-#define VOLTAGE_SENSE_ADC_PIN      	16		//P2.16
-#define SENSE_ADC_PORT 				PORT2
-
-#define CURRENT_ADC_CHANNEL         7
-#define VOLTAGE_ADC_CHANNEL         6
-#define TEMP_ADC_CHANNEL 			26
-
-//#define LOOP_FREQUENCY_HZ 10000
-#endif
 /************************************ G031 Hardware Groups
  * ************************************************/
 
@@ -5557,41 +5408,6 @@
 #define USE_ADC
 #endif
 
-//NXP MCXA153/133
-#ifdef MCU_A153
-//#define STMICRO
-#define NXP
-#define CPU_FREQUENCY_MHZ   96		//Is the CPU/System clock, main_clk is 192MHz
-#ifndef EEPROM_START_ADD
-#define EEPROM_START_ADD  (uint32_t)0xE000		//Flash is 128kB, sector is 8kB, we use 64kB flash
-#endif
-
-//Assign correct timer functions to timers
-#define INTERVAL_TIMER     CTIMER2
-#define TEN_KHZ_TIMER      LPTMR0
-#define UTILITY_TIMER      SysTick
-#define COM_TIMER          CTIMER1
-#define TIM1_AUTORELOAD    8000		//Reloads the PWM at 24kHz. 192MHz clock for FlexPWM
-
-//Define the DMA channels used
-#define DMA_CH_DshotPWM			0
-#define DMA_CH_DshotPWM_IRQ		DMA_CH0_IRQn
-#define DMA_CH_ADC				1
-#define DMA_CH_ADC_IRQ			DMA_CH1_IRQn
-#define DMA_CH_UART				2
-#define DMA_CH_UART_IRQ			DMA_CH2_IRQn
-
-#ifndef TARGET_MIN_BEMF_COUNTS
-#define TARGET_MIN_BEMF_COUNTS 3
-#endif
-
-//Assign interrupt routines
-#define COM_TIMER_IRQ 				CTIMER1_IRQn
-#define DSHOT_PRIORITY_THRESHOLD 	60
-#define COMP0_IRQ 					CMP0_IRQn
-#define COMP1_IRQ 					CMP1_IRQn
-#define USE_ADC
-#endif
 
 #ifdef MCU_CH32V203
 #define WCH
@@ -5618,30 +5434,6 @@
   #define COMPARATOR_IRQ   EXTI2_IRQn
 #endif
 
-#endif
-
-#ifdef MCU_SITL
-// software in the loop simulation, emulating a G431 class MCU with the
-// hardware replaced by a motor/battery simulation. See Mcu/SITL
-#define STMICRO
-#define CPU_FREQUENCY_MHZ 160
-#ifndef EEPROM_START_ADD
-#define EEPROM_START_ADD (uint32_t)0x0800F800
-#endif
-#define INTERVAL_TIMER TIM2
-#define TEN_KHZ_TIMER TIM6
-#define UTILITY_TIMER TIM17
-#define COM_TIMER TIM16
-#define APPLICATION_ADDRESS 0x08001000
-#define TARGET_MIN_BEMF_COUNTS 3
-#define COMPARATOR_IRQ SITL_IRQ_COMP
-#define COM_TIMER_IRQ SITL_IRQ_COM
-#define IC_DMA_IRQ_NAME SITL_IRQ_DMA
-#define USE_ADC
-#define DSHOT_PRIORITY_THRESHOLD 60
-// the SITL harness provides the real main(), the firmware main() is
-// started by the harness under this name
-#define main am32_main
 #endif
 
 #ifndef LOOP_FREQUENCY_HZ

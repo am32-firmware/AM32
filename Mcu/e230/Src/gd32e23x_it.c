@@ -25,6 +25,8 @@ uint16_t interrupt_time = 0;
 #include "systick.h"
 #include "targets.h"
 #include "WS2812.h"
+#include "comparator.h"
+#include "peripherals.h"
 
 /*!
     \brief      this function handles NMI exception
@@ -126,8 +128,36 @@ void DMA_Channel3_4_IRQHandler(void)
 void ADC_CMP_IRQHandler(void)
 {
     if (exti_interrupt_flag_get(EXTI_21)) {
-        exti_flag_clear(EXTI_21);
-        interruptRoutine();
+        if (auto_blanking) {
+            exti_flag_clear(EXTI_21);
+            uint16_t cnt = INTERVAL_TIMER_COUNT;
+            blanking_length = (cnt > last_commutation_wait) ? (cnt - last_commutation_wait) : 0;
+            blanking_lengths[step - 1] = blanking_length;
+            auto_blanking = 0;
+            if (rising) {
+                EXTI_RTEN &= ~(uint32_t)EXTI_LINE;
+                EXTI_FTEN |= (uint32_t)EXTI_LINE;
+            } else {
+                EXTI_RTEN |= (uint32_t)EXTI_LINE;
+                EXTI_FTEN &= ~(uint32_t)EXTI_LINE;
+            }
+            if ((blanking_length) > ((average_interval >> 2) + (average_interval >> 3))) {
+                last_duty_cycle = duty_cycle - (duty_cycle >> 6);
+                duty_cycle = last_duty_cycle;
+            }
+            if ((blanking_length) > (average_interval >> 1)) {
+                interruptRoutine();
+            }
+        } else {
+            if (INTERVAL_TIMER_COUNT > (last_commutation_wait + (average_interval >> 2))) {
+                exti_flag_clear(EXTI_21);
+                interruptRoutine();
+            } else {
+                if (getCompOutputLevel() == rising) {
+                    exti_flag_clear(EXTI_21);
+                }
+            }
+        }
     }
 }
 

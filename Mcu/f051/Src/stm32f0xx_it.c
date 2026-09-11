@@ -21,7 +21,7 @@
 /* Includes
  * ------------------------------------------------------------------*/
 #include "stm32f0xx_it.h"
-
+#include "phaseouts.h"
 #include "main.h"
 #include "comparator.h"
 #include "ADC.h"
@@ -192,15 +192,33 @@ void DMA1_Channel4_5_IRQHandler(void)
 void ADC1_COMP_IRQHandler(void)
 {
   if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_21) != RESET) {
-      if((INTERVAL_TIMER->CNT) > ((average_interval>>1))){
-       EXTI->PR = EXTI_LINE;
+      if(auto_blanking){
+        EXTI->PR = EXTI_LINE;
+        uint16_t cnt = INTERVAL_TIMER->CNT;
+        blanking_length = (cnt > last_commutation_wait) ? (cnt - last_commutation_wait) : 0;
+        blanking_lengths[step - 1] = blanking_length;
+        auto_blanking = 0;
+        EXTI->RTSR = !rising << 21;
+        EXTI->FTSR = rising << 21;
+        if((blanking_length)>((average_interval>>2)+(average_interval>>3))){
+          last_duty_cycle = duty_cycle - (duty_cycle>>6);
+          duty_cycle = last_duty_cycle;
+        }
+        if((blanking_length)>(average_interval>>1)){
+          interruptRoutine();
+        }
+      }else{
+      if ((INTERVAL_TIMER->CNT) > (last_commutation_wait + (average_interval>>2))) {
+      EXTI->PR = EXTI_LINE;
       interruptRoutine();
-  }else{ 
+  }else{
       if (getCompOutputLevel() == rising){
       EXTI->PR = EXTI_LINE;
   }
 }
-}
+      }
+    }
+
 }
 
 /**

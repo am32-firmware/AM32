@@ -63,15 +63,22 @@ medium_speed_set = 1;
 #endif
         LL_COMP_ConfigInputs(active_COMP, PHASE_B_COMP, LL_COMP_INPUT_PLUS_IO3);
     }
-    if (rising) {
-        LL_EXTI_DisableRisingTrig_0_31(LL_EXTI_LINE_18);
-        LL_EXTI_DisableRisingTrig_0_31(LL_EXTI_LINE_17);
-        LL_EXTI_EnableFallingTrig_0_31(current_EXTI_LINE);
-    } else { // falling bemf
-        LL_EXTI_EnableRisingTrig_0_31(current_EXTI_LINE);
-        LL_EXTI_DisableFallingTrig_0_31(LL_EXTI_LINE_17);
-        LL_EXTI_DisableFallingTrig_0_31(LL_EXTI_LINE_18);
-    }
+//    if (rising) {
+//        LL_EXTI_DisableRisingTrig_0_31(LL_EXTI_LINE_18);
+//        LL_EXTI_DisableRisingTrig_0_31(LL_EXTI_LINE_17);
+//        LL_EXTI_EnableFallingTrig_0_31(current_EXTI_LINE);
+//    } else { // falling bemf
+//        LL_EXTI_EnableRisingTrig_0_31(current_EXTI_LINE);
+//        LL_EXTI_DisableFallingTrig_0_31(LL_EXTI_LINE_17);
+//        LL_EXTI_DisableFallingTrig_0_31(LL_EXTI_LINE_18);
+//    }
+    if (auto_blanking) {
+    EXTI->RTSR1 = (EXTI->RTSR1 & ~((1UL << 18) | (1UL << 17))) | ( rising << 18) | ( rising << 17);
+    EXTI->FTSR1 = (EXTI->FTSR1 & ~((1UL << 18) | (1UL << 17))) | (!rising << 18) | (!rising << 17);
+} else {
+    EXTI->RTSR1 = (EXTI->RTSR1 & ~((1UL << 18) | (1UL << 17))) | (!rising << 18) | (!rising << 17);
+    EXTI->FTSR1 = (EXTI->FTSR1 & ~((1UL << 18) | (1UL << 17))) | ( rising << 18) | ( rising << 17);
+}
 }
 
 // void changeCompInput() {

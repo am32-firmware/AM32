@@ -7,6 +7,8 @@
 #include "targets.h"
 #include "common.h"
 #include "comparator.h"
+#include "phaseouts.h"
+#include "peripherals.h"
 
 
 extern void transfercomplete();
@@ -180,14 +182,34 @@ void DMA1_Channel5_4_IRQHandler(void)
  */
 void ADC1_CMP_IRQHandler(void)
 {
-  if((INTERVAL_TIMER->cval) > ((average_interval>>1))){
+
+      if ((EXINT->intsts >> 21 & 0xF) == 1) {
+      EXINT->intsts = EXTI_LINE;
+      if(auto_blanking){
+        uint16_t cnt = INTERVAL_TIMER->cval;
+        blanking_length = (cnt > last_commutation_wait) ? (cnt - last_commutation_wait) : 0;
+        blanking_lengths[step - 1] = blanking_length;
+        auto_blanking = 0;
+        EXINT->polcfg1 = !rising << 21;  // reverse polarity back to normal
+        EXINT->polcfg2 = rising << 21;
+        if((blanking_length)>((average_interval>>2)+ (average_interval>>3))){
+          last_duty_cycle = duty_cycle - (duty_cycle>>6);
+          duty_cycle = last_duty_cycle;
+        }
+        if((blanking_length)>(average_interval>>1)){
+          interruptRoutine();
+        }
+      }else{
+      if(INTERVAL_TIMER->cval > (last_commutation_wait + (average_interval >> 2))){
        EXINT->intsts = EXTI_LINE;
        interruptRoutine();
-    }else{ 
+    }else{
       if (getCompOutputLevel() == rising){
         EXINT->intsts = EXTI_LINE;
+       }
+     }
+      }
     }
-  }
 }
 
 /**
@@ -203,9 +225,17 @@ void TMR14_GLOBAL_IRQHandler(void)
  * @brief This function handles TIM14 global interrupt.
  */
 void TMR16_GLOBAL_IRQHandler(void)
-{ 
+{
     TMR16->ists = 0x00;
-    PeriodElapsedCallback();
+//    if(auto_blanking){  // auto blanking has been set but the interrupt has not happened yet, 
+//          allOff(); // turns everything off until next step change.
+//          last_duty_cycle = duty_cycle - (duty_cycle>>2);
+//          duty_cycle = last_duty_cycle;
+//          DISABLE_COM_TIMER_INT();
+//          interruptRoutine();
+//    }else{
+     PeriodElapsedCallback();
+ //   }
 }
 
 void TMR15_GLOBAL_IRQHandler(void)

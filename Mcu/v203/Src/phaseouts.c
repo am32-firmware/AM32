@@ -26,8 +26,10 @@ extern char prop_brake_active;
 
 #ifdef USE_INVERTED_HIGH
 #pragma message("using inverted high side output")
+#define HIGH_BITREG_ON BCR
 #define HIGH_BITREG_OFF BSHR
 #else
+#define HIGH_BITREG_ON BSHR
 #define HIGH_BITREG_OFF BCR
 #endif
 
@@ -64,7 +66,7 @@ void proportionalBrake()
 
 void phaseBPWM()
 {
-    if(!temp_comp_pwm)
+    if(!eepromBuffer.comp_pwm)
     {  // for future
         PHASE_B_GPIO_PORT_LOW->CFGLR  &= ~(0xf<<0); PHASE_B_GPIO_PORT_LOW->CFGLR|= (0x3<<0);
         PHASE_B_GPIO_PORT_LOW->LOW_BITREG_OFF = PHASE_B_GPIO_LOW; //low close
@@ -101,7 +103,7 @@ void phaseBLOW()
 
 void phaseCPWM()
 {
-    if (!temp_comp_pwm)
+    if (!eepromBuffer.comp_pwm)
     {
         PHASE_C_GPIO_PORT_LOW->CFGLR  &= ~(0xf<<28); PHASE_C_GPIO_PORT_LOW->CFGLR |= (0x3<<28);
         PHASE_C_GPIO_PORT_LOW->LOW_BITREG_OFF = PHASE_C_GPIO_LOW;
@@ -137,7 +139,7 @@ void phaseCLOW()
 
 void phaseAPWM()
 {
-    if (!temp_comp_pwm)
+    if (!eepromBuffer.comp_pwm)
     {
         PHASE_A_GPIO_PORT_LOW->CFGLR  &= ~(0xf<<4); PHASE_A_GPIO_PORT_LOW->CFGLR|= (0x3<<4);
         PHASE_A_GPIO_PORT_LOW->LOW_BITREG_OFF = PHASE_A_GPIO_LOW; //low close
@@ -167,12 +169,41 @@ void phaseALOW()
     PHASE_A_GPIO_PORT_HIGH->HIGH_BITREG_OFF = PHASE_A_GPIO_HIGH; //high close
 }
 
+// Solid-on high side. Caller must guarantee the low switch of the same
+// leg has been off for at least the dead time.
+void phaseAHIGH(void)
+{
+    PHASE_A_GPIO_PORT_LOW->CFGLR  &= ~(0xf<<4); PHASE_A_GPIO_PORT_LOW->CFGLR|= (0x3<<4);
+    PHASE_A_GPIO_PORT_LOW->LOW_BITREG_OFF = PHASE_A_GPIO_LOW;
+
+    PHASE_A_GPIO_PORT_HIGH->CFGHR &= ~(0xf<<8); PHASE_A_GPIO_PORT_HIGH->CFGHR |= (0x3<<8);
+    PHASE_A_GPIO_PORT_HIGH->HIGH_BITREG_ON = PHASE_A_GPIO_HIGH;
+}
+
+void phaseBHIGH(void)
+{
+    PHASE_B_GPIO_PORT_LOW->CFGLR  &= ~(0xf<<0); PHASE_B_GPIO_PORT_LOW->CFGLR|= (0x3<<0);
+    PHASE_B_GPIO_PORT_LOW->LOW_BITREG_OFF = PHASE_B_GPIO_LOW;
+
+    PHASE_B_GPIO_PORT_HIGH->CFGHR &= ~(0xf<<4); PHASE_B_GPIO_PORT_HIGH->CFGHR |= (0x3<<4);
+    PHASE_B_GPIO_PORT_HIGH->HIGH_BITREG_ON = PHASE_B_GPIO_HIGH;
+}
+
+void phaseCHIGH(void)
+{
+    PHASE_C_GPIO_PORT_LOW->CFGLR  &= ~(0xf<<28); PHASE_C_GPIO_PORT_LOW->CFGLR |= (0x3<<28);
+    PHASE_C_GPIO_PORT_LOW->LOW_BITREG_OFF = PHASE_C_GPIO_LOW;
+
+    PHASE_C_GPIO_PORT_HIGH->CFGHR &= ~(0xf<<0); PHASE_C_GPIO_PORT_HIGH->CFGHR |= (0x3<<0);
+    PHASE_C_GPIO_PORT_HIGH->HIGH_BITREG_ON = PHASE_C_GPIO_HIGH;
+}
+
 #else
 
 //////////////////////////////////PHASE 1//////////////////////
 void phaseBPWM()
 {
-    if (!temp_comp_pwm)
+    if (!eepromBuffer.comp_pwm)
     {
         // for future
         // gpio_mode_QUICK(PHASE_B_GPIO_PORT_LOW, GPIO_MODE_OUTPUT,
@@ -212,7 +243,7 @@ void phaseBLOW()
 
 void phaseCPWM()
 {
-    if (!temp_comp_pwm)
+    if (!eepromBuffer.comp_pwm)
     {
         //	gpio_mode_QUICK(PHASE_C_GPIO_PORT_LOW, GPIO_MODE_OUTPUT,
         // GPIO_PULL_NONE,
@@ -251,7 +282,7 @@ void phaseCLOW()
 
 void phaseAPWM()
 {
-    if (!temp_comp_pwm)
+    if (!eepromBuffer.comp_pwm)
     {
         //	gpio_mode_QUICK(PHASE_A_GPIO_PORT_LOW, GPIO_MODE_OUTPUT,
         // GPIO_PULL_NONE,
@@ -284,6 +315,35 @@ void phaseALOW()
     PHASE_A_GPIO_PORT_HIGH->HIGH_BITREG_OFF = PHASE_A_GPIO_HIGH; //high close
 }
 
+// Solid-on high side. Caller must guarantee the low switch of the same
+// leg has been off for at least the dead time.
+void phaseAHIGH(void)
+{
+    PHASE_A_GPIO_PORT_LOW->CFGLR  &= ~(0xf<<4); PHASE_A_GPIO_PORT_LOW->CFGLR|= (0x3<<4);
+    PHASE_A_GPIO_PORT_LOW->LOW_BITREG_OFF = PHASE_A_GPIO_LOW;
+
+    PHASE_A_GPIO_PORT_HIGH->CFGHR &= ~(0xf<<8); PHASE_A_GPIO_PORT_HIGH->CFGHR |= (0x3<<8);
+    PHASE_A_GPIO_PORT_HIGH->HIGH_BITREG_ON = PHASE_A_GPIO_HIGH;
+}
+
+void phaseBHIGH(void)
+{
+    PHASE_B_GPIO_PORT_LOW->CFGLR  &= ~(0xf<<0); PHASE_B_GPIO_PORT_LOW->CFGLR|= (0x3<<0);
+    PHASE_B_GPIO_PORT_LOW->LOW_BITREG_OFF = PHASE_B_GPIO_LOW;
+
+    PHASE_B_GPIO_PORT_HIGH->CFGHR &= ~(0xf<<4); PHASE_B_GPIO_PORT_HIGH->CFGHR |= (0x3<<4);
+    PHASE_B_GPIO_PORT_HIGH->HIGH_BITREG_ON = PHASE_B_GPIO_HIGH;
+}
+
+void phaseCHIGH(void)
+{
+    PHASE_C_GPIO_PORT_LOW->CFGLR  &= ~(0xf<<28); PHASE_C_GPIO_PORT_LOW->CFGLR |= (0x3<<28);
+    PHASE_C_GPIO_PORT_LOW->LOW_BITREG_OFF = PHASE_C_GPIO_LOW;
+
+    PHASE_C_GPIO_PORT_HIGH->CFGHR &= ~(0xf<<0); PHASE_C_GPIO_PORT_HIGH->CFGHR |= (0x3<<0);
+    PHASE_C_GPIO_PORT_HIGH->HIGH_BITREG_ON = PHASE_C_GPIO_HIGH;
+}
+
 #endif
 
 
@@ -292,6 +352,41 @@ void allOff()
     phaseAFLOAT();
     phaseBFLOAT();
     phaseCFLOAT();
+}
+
+// Turn on the synchronous FET on the floating leg for active demag: the
+// FET in parallel with the body diode that would otherwise carry the
+// freewheeling current for this step.
+void syncFetOn(int newStep, char forward)
+{
+    if (forward) { // 1->2->3->4->5->6
+        switch (newStep) {
+        case 1: phaseCHIGH(); break; // C floated, was LOW  in step 6
+        case 2: phaseALOW();  break; // A floated, was PWM  in step 1
+        case 3: phaseBHIGH(); break; // B floated, was LOW  in step 2
+        case 4: phaseCLOW();  break; // C floated, was PWM  in step 3
+        case 5: phaseAHIGH(); break; // A floated, was LOW  in step 4
+        case 6: phaseBLOW();  break; // B floated, was PWM  in step 5
+        }
+    } else { // 6->5->4->3->2->1, previous role mirrored
+        switch (newStep) {
+        case 1: phaseCLOW();  break; // C floated, was PWM  in step 2
+        case 2: phaseAHIGH(); break; // A floated, was LOW  in step 3
+        case 3: phaseBLOW();  break; // B floated, was PWM  in step 4
+        case 4: phaseCHIGH(); break; // C floated, was LOW  in step 5
+        case 5: phaseALOW();  break; // A floated, was PWM  in step 6
+        case 6: phaseBHIGH(); break; // B floated, was LOW  in step 1
+        }
+    }
+}
+
+void floatLeg(int newStep)
+{
+    switch (newStep) {
+    case 1: case 4: phaseCFLOAT(); break;
+    case 2: case 5: phaseAFLOAT(); break;
+    case 3: case 6: phaseBFLOAT(); break;
+    }
 }
 
 void comStep(int newStep)

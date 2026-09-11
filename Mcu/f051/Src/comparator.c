@@ -29,6 +29,11 @@ COMP->CSR = COMP->CSR & ~(1<<2);
 }else{
 COMP->CSR  = COMP->CSR | 1<<2;
 }
+    if(auto_blanking){
+      EXTI->RTSR = rising << 21;
+      EXTI->FTSR = !rising << 21;
+    }else{
   EXTI->RTSR = !rising << 21;
   EXTI->FTSR = rising << 21;
+  }
 }

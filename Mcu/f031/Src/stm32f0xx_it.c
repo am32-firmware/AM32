@@ -260,22 +260,91 @@ void TIM16_IRQHandler(void)
 
 void EXTI4_15_IRQHandler(void)
 {
+    if (auto_blanking) {
         EXTI->PR = current_EXTI_LINE;
-        interruptRoutine();
+        uint16_t cnt = INTERVAL_TIMER->CNT;
+        blanking_length = (cnt > last_commutation_wait) ? (cnt - last_commutation_wait) : 0;
+        blanking_lengths[step - 1] = blanking_length;
+        auto_blanking = 0;
+        EXTI->RTSR = rising << current_EXTI_LINE;
+        EXTI->FTSR = !rising << current_EXTI_LINE;
+        if ((blanking_length) > ((average_interval >> 2) + (average_interval >> 3))) {
+            last_duty_cycle = duty_cycle - (duty_cycle >> 6);
+            duty_cycle = last_duty_cycle;
+        }
+        if ((blanking_length) > (average_interval >> 1)) {
+            interruptRoutine();
+        }
+    } else {
+        if ((INTERVAL_TIMER->CNT) > (last_commutation_wait + (average_interval >> 2))) {
+            EXTI->PR = current_EXTI_LINE;
+            interruptRoutine();
+        } else {
+            if (((current_GPIO_PORT->IDR & current_GPIO_PIN) == !(rising))) {
+                EXTI->PR = current_EXTI_LINE;
+            }
+        }
+    }
 }
 
 // #ifdef BLUE_BOARD
 void EXTI0_1_IRQHandler(void)
-{ 
+{
+    if (auto_blanking) {
         EXTI->PR = current_EXTI_LINE;
-        interruptRoutine();
+        uint16_t cnt = INTERVAL_TIMER->CNT;
+        blanking_length = (cnt > last_commutation_wait) ? (cnt - last_commutation_wait) : 0;
+        blanking_lengths[step - 1] = blanking_length;
+        auto_blanking = 0;
+        EXTI->RTSR = rising << current_EXTI_LINE;
+        EXTI->FTSR = !rising << current_EXTI_LINE;
+        if ((blanking_length) > ((average_interval >> 2) + (average_interval >> 3))) {
+            last_duty_cycle = duty_cycle - (duty_cycle >> 6);
+            duty_cycle = last_duty_cycle;
+        }
+        if ((blanking_length) > (average_interval >> 1)) {
+            interruptRoutine();
+        }
+    } else {
+        if ((INTERVAL_TIMER->CNT) > (last_commutation_wait + (average_interval >> 2))) {
+            EXTI->PR = current_EXTI_LINE;
+            interruptRoutine();
+        } else {
+            if (((current_GPIO_PORT->IDR & current_GPIO_PIN) == !(rising))) {
+                EXTI->PR = current_EXTI_LINE;
+            }
+        }
+    }
 }
 
 void EXTI2_3_IRQHandler(void)
 {
     if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_2) != RESET) {
-        LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_2);
-        interruptRoutine();
+        if (auto_blanking) {
+            LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_2);
+            uint16_t cnt = INTERVAL_TIMER->CNT;
+            blanking_length = (cnt > last_commutation_wait) ? (cnt - last_commutation_wait) : 0;
+            blanking_lengths[step - 1] = blanking_length;
+            auto_blanking = 0;
+            EXTI->RTSR = rising << current_EXTI_LINE;
+            EXTI->FTSR = !rising << current_EXTI_LINE;
+            if ((blanking_length) > ((average_interval >> 2) + (average_interval >> 3))) {
+                last_duty_cycle = duty_cycle - (duty_cycle >> 6);
+                duty_cycle = last_duty_cycle;
+            }
+            if ((blanking_length) > (average_interval >> 1)) {
+                interruptRoutine();
+            }
+        } else {
+            if ((INTERVAL_TIMER->CNT) > (last_commutation_wait + (average_interval >> 2))) {
+                LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_2);
+                interruptRoutine();
+            } else {
+                if (((current_GPIO_PORT->IDR & current_GPIO_PIN) == !(rising))) {
+                    LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_2);
+                }
+            }
+        }
     }
 }
 

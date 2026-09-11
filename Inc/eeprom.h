@@ -2,9 +2,6 @@
 
 #pragma once
 
-#ifndef EEPROM_H_
-#define EEPROM_H_
-
 typedef union EEprom_u {
     struct {
         uint8_t reserved_0; //0
@@ -22,8 +19,7 @@ typedef union EEprom_u {
         uint8_t current_I; //10 0-255
         uint8_t current_D; //11 0-255
         uint8_t active_brake_power; //12  1-5 percent duty cycle
-        uint8_t brake_on_zero_throttle; // brake behavior when throttle is 0 but motor is still rotating
-        char reserved_eeprom_3[3]; //13-16  
+        char reserved_eeprom_3[4]; //13-16  
         uint8_t dir_reversed; // 17
         uint8_t bi_direction; // 18
         uint8_t use_sine_start; // 19
@@ -35,7 +31,7 @@ typedef union EEprom_u {
         uint8_t startup_power; // 25
         uint8_t motor_kv; // 26
         uint8_t motor_poles; // 27
-        uint8_t brake_on_stop; // 28  // brake behavior after rotation has stopped
+        uint8_t brake_on_stop; // 28 
         uint8_t stall_protection; // 29
         uint8_t beep_volume; // 30
         uint8_t telemetry_on_interval; // 31
@@ -82,5 +78,3 @@ extern EEprom_t eepromBuffer;
 // void save_to_flash_bin(uint8_t *data, int length, uint32_t add);
 void read_flash_bin(uint8_t* data, uint32_t add, int out_buff_len);
 void save_flash_nolib(uint8_t* data, int length, uint32_t add);
-
-#endif /* EEPROM_H_ */

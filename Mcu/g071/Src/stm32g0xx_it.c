@@ -237,32 +237,120 @@ void DMA1_Channel2_3_IRQHandler(void)
 void ADC1_COMP_IRQHandler(void)
 {
   if (LL_EXTI_IsActiveFallingFlag_0_31(LL_EXTI_LINE_18)) {
-    if((INTERVAL_TIMER->CNT) > (average_interval >> 1)){
+            if(auto_blanking){
+        LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_18);
+        uint16_t cnt = INTERVAL_TIMER->CNT;
+        blanking_length = (cnt > last_commutation_wait) ? (cnt - last_commutation_wait) : 0;
+        auto_blanking = 0;
+           EXTI->RTSR1 = (EXTI->RTSR1 & ~((1UL << 18) | (1UL << 17))) | (!rising << 18) | (!rising << 17);
+           EXTI->FTSR1 = (EXTI->FTSR1 & ~((1UL << 18) | (1UL << 17))) | ( rising << 18) | ( rising << 17);
+        if((blanking_length)>((average_interval>>2)+ (average_interval>>3))){
+          last_duty_cycle = duty_cycle - (duty_cycle>>6);
+          duty_cycle = last_duty_cycle;
+        }
+        if((blanking_length)>(average_interval>>1)){
+   //       allOff(); // turns everything off until next step change.
+   //       last_duty_cycle = duty_cycle - (duty_cycle>>2);
+   //       duty_cycle = last_duty_cycle;
+          interruptRoutine();
+        }
+      }else{
+   if (INTERVAL_TIMER->CNT > (last_commutation_wait + (average_interval >> 2))) {
       LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_18);
       interruptRoutine();
-    }else{
-      if(getCompOutputLevel() == rising){
-          LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_18);
-          return;
+  }else{ 
+      if (getCompOutputLevel() == rising){
+      LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_18);
+  }
+}
       }
-    }
+//    if((INTERVAL_TIMER->CNT) > (average_interval >> 1)){
+//      LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_18);
+//      interruptRoutine();
+//    }else{
+//      if(getCompOutputLevel() == rising){
+//          LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_18);
+//          return;
+//      }
+//    }
     return;
   }
 
   if (LL_EXTI_IsActiveRisingFlag_0_31(LL_EXTI_LINE_18)) {
-    if((INTERVAL_TIMER->CNT) > (average_interval >> 1)){
+        if(auto_blanking){
+        LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_18);
+        uint16_t cnt = INTERVAL_TIMER->CNT;
+        blanking_length = (cnt > last_commutation_wait) ? (cnt - last_commutation_wait) : 0;
+        auto_blanking = 0;
+           EXTI->RTSR1 = (EXTI->RTSR1 & ~((1UL << 18) | (1UL << 17))) | (!rising << 18) | (!rising << 17);
+           EXTI->FTSR1 = (EXTI->FTSR1 & ~((1UL << 18) | (1UL << 17))) | ( rising << 18) | ( rising << 17);
+        if((blanking_length)>((average_interval>>2)+ (average_interval>>3))){
+          last_duty_cycle = duty_cycle - (duty_cycle>>6);
+          duty_cycle = last_duty_cycle;
+        }
+        if((blanking_length)>(average_interval>>1)){
+   //       allOff(); // turns everything off until next step change.
+   //       last_duty_cycle = duty_cycle - (duty_cycle>>2);
+   //       duty_cycle = last_duty_cycle;
+          interruptRoutine();
+        }
+      }else{
+  if (INTERVAL_TIMER->CNT > (last_commutation_wait + (average_interval >> 2))) {
       LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_18);
       interruptRoutine();
-    }else{
-      if(getCompOutputLevel() == rising){
-          LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_18);
-          return;
+  }else{ 
+      if (getCompOutputLevel() == rising){
+      LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_18);
+  }
+}
       }
-    }
+
+
+
+//    if((INTERVAL_TIMER->CNT) > (average_interval >> 1)){
+//      LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_18);
+//      interruptRoutine();
+//    }else{
+//      if(getCompOutputLevel() == rising){
+//          LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_18);
+//          return;
+//      }
+//    }
     return;
   }
+ 
+
+
+
+
+
+
+
+
   if (LL_EXTI_IsActiveFallingFlag_0_31(LL_EXTI_LINE_17)) {
-    if((INTERVAL_TIMER->CNT) > (average_interval >> 1)){
+    
+    
+        if(auto_blanking){
+        LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_17);
+        uint16_t cnt = INTERVAL_TIMER->CNT;
+        blanking_length = (cnt > last_commutation_wait) ? (cnt - last_commutation_wait) : 0;
+        auto_blanking = 0;
+           EXTI->RTSR1 = (EXTI->RTSR1 & ~((1UL << 18) | (1UL << 17))) | (!rising << 18) | (!rising << 17);
+           EXTI->FTSR1 = (EXTI->FTSR1 & ~((1UL << 18) | (1UL << 17))) | ( rising << 18) | ( rising << 17);
+        if((blanking_length)>((average_interval>>2)+ (average_interval>>3))){
+          last_duty_cycle = duty_cycle - (duty_cycle>>6);
+          duty_cycle = last_duty_cycle;
+        }
+        if((blanking_length)>((average_interval>>2)+ (average_interval>>3))){
+   //       allOff(); // turns everything off until next step change.
+   //       last_duty_cycle = duty_cycle - (duty_cycle>>2);
+   //       duty_cycle = last_duty_cycle;
+          interruptRoutine();
+        }
+      }else{
+    
+    
+    if (INTERVAL_TIMER->CNT > (last_commutation_wait + (average_interval >> 2))) {
       LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_17);
       interruptRoutine();
     }else{
@@ -271,11 +359,30 @@ void ADC1_COMP_IRQHandler(void)
           return;
       }
     }
+  }
     return;
   }
 
   if (LL_EXTI_IsActiveRisingFlag_0_31(LL_EXTI_LINE_17)) {
-    if((INTERVAL_TIMER->CNT) > (average_interval >> 1)){
+        if(auto_blanking){
+        LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_17);
+        uint16_t cnt = INTERVAL_TIMER->CNT;
+        blanking_length = (cnt > last_commutation_wait) ? (cnt - last_commutation_wait) : 0;
+        auto_blanking = 0;
+           EXTI->RTSR1 = (EXTI->RTSR1 & ~((1UL << 18) | (1UL << 17))) | (!rising << 18) | (!rising << 17);
+           EXTI->FTSR1 = (EXTI->FTSR1 & ~((1UL << 18) | (1UL << 17))) | ( rising << 18) | ( rising << 17);
+        if((blanking_length)>((average_interval>>2)+ (average_interval>>3))){
+          last_duty_cycle = duty_cycle - (duty_cycle>>6);
+          duty_cycle = last_duty_cycle;
+        }
+        if((blanking_length)>(average_interval>>1)){
+   //       allOff(); // turns everything off until next step change.
+   //       last_duty_cycle = duty_cycle - (duty_cycle>>2);
+   //       duty_cycle = last_duty_cycle;
+          interruptRoutine();
+        }
+      }else{
+    if (INTERVAL_TIMER->CNT > (last_commutation_wait + (average_interval >> 2))) {
       LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_17);
       interruptRoutine();
     }else{
@@ -284,8 +391,9 @@ void ADC1_COMP_IRQHandler(void)
           return;
       }
     }
-    return;
   }
+    return;
+}
 }
 
 /**

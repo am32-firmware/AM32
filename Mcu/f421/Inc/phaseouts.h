@@ -19,4 +19,10 @@ void proportionalBrake();
 void twoChannelForward();
 void twoChannelReverse();
 
+#ifndef DEMAG_DEADTIME_US
+#define DEMAG_DEADTIME_US 1
+#endif
+void syncFetOn(int newStep, char forward);
+void floatLeg(int newStep);
+
 #endif /* INC_PHASEOUTS_H_ */

@@ -166,13 +166,35 @@ void DMA1_Channel6_IRQHandler(void)
  */
 void CMP1_IRQHandler(void)
 {
-  if((INTERVAL_TIMER->cval) > ((average_interval>>1))){
+  if (auto_blanking) {
+    EXINT->intsts = EXTI_LINE;
+    uint16_t cnt = INTERVAL_TIMER->cval;
+    blanking_length = (cnt > last_commutation_wait) ? (cnt - last_commutation_wait) : 0;
+    blanking_lengths[step - 1] = blanking_length;
+    auto_blanking = 0;
+    if (rising) {
+      EXINT->polcfg1 |= (uint32_t)EXTI_LINE;
+      EXINT->polcfg2 &= ~(uint32_t)EXTI_LINE;
+    } else {
+      EXINT->polcfg1 &= ~(uint32_t)EXTI_LINE;
+      EXINT->polcfg2 |= (uint32_t)EXTI_LINE;
+    }
+    if ((blanking_length) > ((average_interval>>2)+(average_interval>>3))) {
+      last_duty_cycle = duty_cycle - (duty_cycle>>6);
+      duty_cycle = last_duty_cycle;
+    }
+    if ((blanking_length) > (average_interval>>1)) {
+      interruptRoutine();
+    }
+  } else {
+  if((INTERVAL_TIMER->cval) > (last_commutation_wait + (average_interval>>2))){
        EXINT->intsts = EXTI_LINE;
        interruptRoutine();
-    }else{ 
+    }else{
       if (getCompOutputLevel() == rising){
         EXINT->intsts = EXTI_LINE;
     }
+  }
   }
 }
 

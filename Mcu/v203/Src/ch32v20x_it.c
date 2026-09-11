@@ -160,32 +160,104 @@ void SysTick_Handler(void)
 #ifdef USE_PA2_AS_COMP
 void EXTI2_IRQHandler(void)
 {
-    EXTI->INTFR = EXTI_Line2;
-    interruptRoutine( );
+    if (auto_blanking) {
+        EXTI->INTFR = EXTI_Line2;
+        uint16_t cnt = INTERVAL_TIMER->CNT;
+        blanking_length = (cnt > last_commutation_wait) ? (cnt - last_commutation_wait) : 0;
+        blanking_lengths[step - 1] = blanking_length;
+        auto_blanking = 0;
+        if (rising) {
+            EXTI->RTENR = 0;
+            EXTI->FTENR = (1<<2);
+        } else {
+            EXTI->FTENR = 0;
+            EXTI->RTENR = (1<<2);
+        }
+        if ((blanking_length) > ((average_interval>>2)+(average_interval>>3))) {
+            last_duty_cycle = duty_cycle - (duty_cycle>>6);
+            duty_cycle = last_duty_cycle;
+        }
+        if ((blanking_length) > (average_interval>>1)) {
+            interruptRoutine();
+        }
+    } else {
+        if (INTERVAL_TIMER->CNT > (last_commutation_wait + (average_interval>>2))) {
+            EXTI->INTFR = EXTI_Line2;
+            interruptRoutine();
+        } else {
+            if (getCompOutputLevel() == rising) {
+                EXTI->INTFR = EXTI_Line2;
+            }
+        }
+    }
 }
 #else
 void EXTI3_IRQHandler(void)
 {
-    if((INTERVAL_TIMER->CNT) > ((average_interval>>1))){
+    if (auto_blanking) {
+        EXTI->INTFR = EXTI_Line3;
+        uint16_t cnt = INTERVAL_TIMER->CNT;
+        blanking_length = (cnt > last_commutation_wait) ? (cnt - last_commutation_wait) : 0;
+        blanking_lengths[step - 1] = blanking_length;
+        auto_blanking = 0;
+        if (rising) {
+            EXTI->RTENR = 0;
+            EXTI->FTENR = (1<<current_exti_line);
+        } else {
+            EXTI->FTENR = 0;
+            EXTI->RTENR = (1<<current_exti_line);
+        }
+        if ((blanking_length) > ((average_interval>>2)+(average_interval>>3))) {
+            last_duty_cycle = duty_cycle - (duty_cycle>>6);
+            duty_cycle = last_duty_cycle;
+        }
+        if ((blanking_length) > (average_interval>>1)) {
+            interruptRoutine();
+        }
+    } else {
+    if((INTERVAL_TIMER->CNT) > (last_commutation_wait + (average_interval>>2))){
         EXTI->INTFR = EXTI_Line3;
         interruptRoutine();
-     }else{ 
+     }else{
        if (getCompOutputLevel() == rising){
         EXTI->INTFR = EXTI_Line3;
      }
    }
+    }
 }
 
 void EXTI4_IRQHandler(void)
 {
-    if((INTERVAL_TIMER->CNT) > ((average_interval>>1))){
+    if (auto_blanking) {
+        EXTI->INTFR = EXTI_Line4;
+        uint16_t cnt = INTERVAL_TIMER->CNT;
+        blanking_length = (cnt > last_commutation_wait) ? (cnt - last_commutation_wait) : 0;
+        blanking_lengths[step - 1] = blanking_length;
+        auto_blanking = 0;
+        if (rising) {
+            EXTI->RTENR = 0;
+            EXTI->FTENR = (1<<current_exti_line);
+        } else {
+            EXTI->FTENR = 0;
+            EXTI->RTENR = (1<<current_exti_line);
+        }
+        if ((blanking_length) > ((average_interval>>2)+(average_interval>>3))) {
+            last_duty_cycle = duty_cycle - (duty_cycle>>6);
+            duty_cycle = last_duty_cycle;
+        }
+        if ((blanking_length) > (average_interval>>1)) {
+            interruptRoutine();
+        }
+    } else {
+    if((INTERVAL_TIMER->CNT) > (last_commutation_wait + (average_interval>>2))){
         EXTI->INTFR = EXTI_Line4;
         interruptRoutine();
-     }else{ 
+     }else{
        if (getCompOutputLevel() == rising){
            EXTI->INTFR = EXTI_Line4;
      }
    }
+    }
 }
 #endif
 

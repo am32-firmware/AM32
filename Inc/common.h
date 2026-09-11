@@ -31,8 +31,15 @@ extern int16_t actual_current;
 extern uint16_t e_rpm;
 extern volatile uint32_t average_interval;
 extern volatile int16_t degrees_celsius;
-extern volatile uint8_t temp_comp_pwm;
-
+extern volatile uint8_t auto_blanking;
+extern volatile uint16_t blanking_length;
+extern volatile uint16_t blanking_lengths[6];
+extern volatile uint16_t duty_cycle; 
+extern volatile uint16_t last_duty_cycle;
+extern volatile uint16_t waitTime;
+extern int16_t correction_factor;
+extern volatile uint16_t last_commutation_wait;
+extern volatile char demag_active;
 #ifdef STMICRO
 extern GPIO_TypeDef* current_GPIO_PORT;
 #if !defined(MCU_F031) && !defined(MCU_G031)
@@ -50,7 +57,7 @@ extern int e_com_time;
 extern char EDT_ARM_ENABLE;
 extern char EDT_ARMED;
 extern uint16_t send_extended_dshot;
-#if defined(NEED_INPUT_READY) || defined(NXP)
+#ifdef NEED_INPUT_READY
 extern volatile char input_ready;
 #endif
 // typedef struct PID{

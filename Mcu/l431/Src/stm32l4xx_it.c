@@ -277,16 +277,38 @@ void COMP_IRQHandler(void)
 {
 
     if (LL_EXTI_IsActiveFlag_0_31(EXTI_LINE) != RESET) {
-      if((INTERVAL_TIMER->CNT) > ((average_interval>>1))){
+      if (auto_blanking) {
+        LL_EXTI_ClearFlag_0_31(EXTI_LINE);
+        uint16_t cnt = INTERVAL_TIMER->CNT;
+        blanking_length = (cnt > last_commutation_wait) ? (cnt - last_commutation_wait) : 0;
+        blanking_lengths[step - 1] = blanking_length;
+        auto_blanking = 0;
+        if (rising) {
+          LL_EXTI_DisableRisingTrig_0_31(EXTI_LINE);
+          LL_EXTI_EnableFallingTrig_0_31(EXTI_LINE);
+        } else {
+          LL_EXTI_EnableRisingTrig_0_31(EXTI_LINE);
+          LL_EXTI_DisableFallingTrig_0_31(EXTI_LINE);
+        }
+        if ((blanking_length) > ((average_interval>>2)+(average_interval>>3))) {
+          last_duty_cycle = duty_cycle - (duty_cycle>>6);
+          duty_cycle = last_duty_cycle;
+        }
+        if ((blanking_length) > (average_interval>>1)) {
+          interruptRoutine();
+        }
+      }else{
+      if ((INTERVAL_TIMER->CNT) > (last_commutation_wait + (average_interval>>2))){
        LL_EXTI_ClearFlag_0_31(EXTI_LINE);
       interruptRoutine();
-  }else{ 
+  }else{
       if (getCompOutputLevel() == rising){
       LL_EXTI_ClearFlag_0_31(EXTI_LINE);
   }
 }
+      }
 }
-  
+
 }
 
 void EXTI15_10_IRQHandler(void)

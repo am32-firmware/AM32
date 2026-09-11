@@ -51,7 +51,15 @@ void changeCompInput()
         current_EXTI_LINE = PHASE_B_EXTI_LINE;
     //    LL_EXTI_SetEXTISource(SYSCFG_EXTI_PORTB, SYSCFG_EXTI_LINEB);
     }
-    if (rising) {
+    if (auto_blanking) { // look for reverse edge first
+        if (rising) {
+            EXTI->FTSR1 |= (1 << current_EXTI_LINE);
+            EXTI->RTSR1 &= ~(1 << current_EXTI_LINE);
+        } else {
+            EXTI->RTSR1 |= (1 << current_EXTI_LINE);
+            EXTI->FTSR1 &= ~(1 << current_EXTI_LINE);
+        }
+    } else if (rising) {
         EXTI->RTSR1 |= (1 << current_EXTI_LINE);
         EXTI->FTSR1 &= ~(1 << current_EXTI_LINE);
     } else {

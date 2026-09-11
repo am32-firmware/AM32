@@ -7,6 +7,7 @@
 
 #include "comparator.h"
 
+#include "common.h"
 #include "targets.h"
 
 uint8_t getCompOutputLevel() { return cmp_output_level_get(); }
@@ -45,7 +46,15 @@ void changeCompInput()
         //		cmp_mode_init(CMP_HIGHSPEED, PHASE_B_COMP,
         // CMP_HYSTERESIS_NO);
     }
-    if (rising) {
+    if (auto_blanking) { // look for reverse edge first
+        if (rising) {
+            EXTI_RTEN |= (uint32_t)EXTI_LINE;
+            EXTI_FTEN &= ~(uint32_t)EXTI_LINE;
+        } else {
+            EXTI_RTEN &= ~(uint32_t)EXTI_LINE;
+            EXTI_FTEN |= (uint32_t)EXTI_LINE;
+        }
+    } else if (rising) {
         //	EXTI->RTSR = 0x0;
         //	EXTI->FTSR = 0x200000;
         EXTI_RTEN &= ~(uint32_t)EXTI_LINE;

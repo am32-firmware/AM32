@@ -22,6 +22,11 @@ void enableCompInterrupts() { EXTI->IMR |= (1 << current_EXTI_LINE); }
 
 void changeCompInput()
 {
-  EXTI->RTSR = rising << current_EXTI_LINE;
-  EXTI->FTSR = !rising << current_EXTI_LINE;
+  if (auto_blanking) {
+    EXTI->RTSR = !rising << current_EXTI_LINE;
+    EXTI->FTSR = rising << current_EXTI_LINE;
+  } else {
+    EXTI->RTSR = rising << current_EXTI_LINE;
+    EXTI->FTSR = !rising << current_EXTI_LINE;
+  }
 }

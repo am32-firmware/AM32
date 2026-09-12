@@ -22,6 +22,7 @@ void Configure_ADC();
 
 void Activate_ADC();
 
+int16_t convertTemperature(uint16_t adcrawtemp);
 #ifndef USE_TIMEOUT
 #define USE_TIMEOUT 0
 #endif

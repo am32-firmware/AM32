@@ -5,8 +5,9 @@
  *      Author: Alka
  */
 #include "ADC.h"
+#include "ntc_tables.h"
 
-#ifdef USE_ADC_INPUT
+#if defined(USE_ADC_INPUT) || defined(USE_NTC)
 uint16_t ADCDataDMA[4];
 #else
 uint16_t ADCDataDMA[3];
@@ -16,6 +17,7 @@ extern uint16_t ADC_raw_temp;
 extern uint16_t ADC_raw_volts;
 extern uint16_t ADC_raw_current;
 extern uint16_t ADC_raw_input;
+extern uint16_t ADC_raw_ntc;
 
 void ADC_DMA_Callback()
 { // read dma buffer and set extern variables
@@ -26,6 +28,19 @@ void ADC_DMA_Callback()
     ADC_raw_current = ADCDataDMA[2];
     ADC_raw_input = ADCDataDMA[0];
 
+#elif defined(USE_NTC)
+    /* F051 scans enabled ADC channels in ascending channel order. */
+    const uint8_t currentIndex =
+        (VOLTAGE_ADC_PIN < CURRENT_ADC_PIN) + (NTC_ADC_PIN < CURRENT_ADC_PIN);
+    const uint8_t voltageIndex =
+        (CURRENT_ADC_PIN < VOLTAGE_ADC_PIN) + (NTC_ADC_PIN < VOLTAGE_ADC_PIN);
+    const uint8_t ntcIndex =
+        (CURRENT_ADC_PIN < NTC_ADC_PIN) + (VOLTAGE_ADC_PIN < NTC_ADC_PIN);
+
+    ADC_raw_current = ADCDataDMA[currentIndex];
+    ADC_raw_volts = ADCDataDMA[voltageIndex];
+    ADC_raw_ntc = ADCDataDMA[ntcIndex];
+    ADC_raw_temp = ADCDataDMA[3];
 #else
     ADC_raw_temp = ADCDataDMA[2];
     if (VOLTAGE_ADC_PIN > CURRENT_ADC_PIN) {
@@ -50,7 +65,7 @@ void enableADC_DMA()
         (uint32_t)&ADCDataDMA, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
 
     /* Set DMA transfer size */
-#ifdef USE_ADC_INPUT
+#if defined(USE_ADC_INPUT) || defined(USE_NTC)
     LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_1, 4);
 #else
     LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_1, 3);
@@ -110,6 +125,13 @@ void ADC_Init(void)
     LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 #endif
 
+#ifdef USE_NTC
+    GPIO_InitStruct.Pin = NTC_ADC_PIN;
+    GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+#endif
+
     GPIO_InitStruct.Pin = CURRENT_ADC_PIN;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
@@ -137,6 +159,10 @@ void ADC_Init(void)
 
 #ifdef USE_ADC_INPUT
     LL_ADC_REG_SetSequencerChAdd(ADC1, LL_ADC_CHANNEL_2);
+#endif
+
+#ifdef USE_NTC
+    LL_ADC_REG_SetSequencerChAdd(ADC1, NTC_ADC_CHANNEL);
 #endif
 
     LL_ADC_REG_SetSequencerChAdd(ADC1, VOLTAGE_ADC_CHANNEL);
@@ -170,3 +196,12 @@ void ADC_Init(void)
     LL_ADC_DisableIT_EOC(ADC1);
     LL_ADC_DisableIT_EOS(ADC1);
 }
+
+#ifdef USE_NTC
+int16_t getNTCDegrees(uint16_t ntcrawtemp)
+{
+    const int p1 = NTC_table[ntcrawtemp >> 6];
+    const int p2 = NTC_table[(ntcrawtemp >> 6) + 1];
+    return p1 - ((p1 - p2) * (ntcrawtemp & 0x003F)) / 64;
+}
+#endif

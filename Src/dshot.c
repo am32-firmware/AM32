@@ -254,11 +254,7 @@ void make_dshot_package(uint16_t com_time)
             telem_scheduler.temp_count++;
 
             if (telem_scheduler.current_count >= CURRENT_EDT_RATE_DIVISOR) {
-                // Do not report the last sampled motor current after the motor has stopped.
-                // Keep actual_current intact for protection and serial telemetry; only the
-                // EDT value is clamped to zero while the motor is not running.
-                const uint8_t edt_current_amps = running ? (uint8_t)(actual_current / 100) : 0;
-                extended_frame_to_send = 0b0110 << 8 | edt_current_amps;
+                extended_frame_to_send = 0b0110 << 8 | (uint8_t)(actual_current / 100);
                 telem_scheduler.current_count = 0;
             }
             else if (telem_scheduler.voltage_count >= VOLTAGE_EDT_RATE_DIVISOR) {

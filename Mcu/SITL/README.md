@@ -18,6 +18,11 @@ or `=undefined` builds it under a sanitizer, `SITL_COVERAGE=1` under
 gcov, and `SITL_CROSS=win` cross-builds a native Windows exe with
 MinGW-w64.
 
+For the Windows developer setup and the Linux/Windows VS Code build task,
+see [Building SITL in VS Code](../../env_setup_scripts/README-SITL.md).
+This builds replacement firmware for the packaged GUI without rebuilding
+the GUI or installing its Python dependencies.
+
 Everything around the simulator - the motor models, the calibration
 datasets captured from real hardware, the Qt control GUI, the DroneCAN
 measurement tools and the test suites - lives in the

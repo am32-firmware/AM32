@@ -8,7 +8,7 @@
 
 #include "serial_telemetry.h"
 #include "common.h"
-#include "kiss_telemetry.h"
+#include "telemetry_protocol.h"
 
 //USART2_TX
 void send_telem_DMA(uint8_t bytes)
@@ -38,7 +38,7 @@ void telem_UART_Init(void)
     GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_PP;
     GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    USART_InitStruct.USART_BaudRate            = 115200;
+    USART_InitStruct.USART_BaudRate            = SERIAL_TELEMETRY_BAUDRATE_SELECTED;
     USART_InitStruct.USART_WordLength          = USART_WordLength_8b;
     USART_InitStruct.USART_StopBits            = USART_StopBits_1;
     USART_InitStruct.USART_Parity              = USART_Parity_No;

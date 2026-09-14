@@ -36,7 +36,9 @@ try {
     $bash = Join-Path $CygwinRoot 'bin\bash.exe'
     $cygpath = Join-Path $CygwinRoot 'bin\cygpath.exe'
     # awk is a Cygwin symlink; native Test-Path can only check its gawk target.
-    $missing = @('bash', 'cygpath', 'gcc', 'make', 'gawk', 'cp') | Where-Object {
+    $requiredTools = @('bash', 'cygpath', 'gcc', 'make', 'gawk', 'cp')
+    if ($Action -eq 'Setup') { $requiredTools += 'gdb' }
+    $missing = $requiredTools | Where-Object {
         !(Test-Path -LiteralPath (Join-Path $CygwinRoot "bin\$_.exe"))
     }
     if ($Action -eq 'Setup' -and $missing) {
@@ -51,7 +53,7 @@ try {
         # unrelated packages or changing the machine-wide PATH.
         $setupArgs = @('--quiet-mode', '--no-admin', '--no-shortcuts', '--no-write-registry', '--only-site',
             '--site', $Mirror, '--root', $CygwinRoot, '--local-package-dir', $cache,
-            '--packages', 'gcc-core,make')
+            '--packages', 'gcc-core,make,gdb')
         # Start-Process joins ArgumentList into a Windows command line.
         $quotedArgs = $setupArgs | ForEach-Object { '"' + $_ + '"' }
         $process = Start-Process -FilePath $installer -ArgumentList $quotedArgs -Wait -PassThru
@@ -74,7 +76,40 @@ try {
     if ($Action -eq 'Setup') {
         New-Item -ItemType Directory -Force -Path (Split-Path -Parent $rootFile) | Out-Null
         Set-Content -LiteralPath $rootFile -Value $CygwinRoot -Encoding UTF8
-        Write-Host 'Open AM32-SITL.code-workspace in VS Code and press Ctrl+Shift+B.'
+        $boardMake = Join-Path $repo 'tools\windows\make\bin\make.exe'
+        # The debugger must match the Cygwin compiler, including custom roots.
+        $settingsFile = Join-Path $repo '.vscode\settings.json'
+        try {
+            if (Test-Path -LiteralPath $settingsFile) {
+                $settings = Get-Content -LiteralPath $settingsFile -Raw | ConvertFrom-Json
+                $backup = "$settingsFile.sitl-backup"
+                if (!(Test-Path -LiteralPath $backup)) {
+                    Copy-Item -LiteralPath $settingsFile -Destination $backup
+                }
+            } elseif (Test-Path -LiteralPath $boardMake) {
+                $settings = Get-Content (Join-Path $repo '.vscode\settings.json.windows') -Raw | ConvertFrom-Json
+            } else {
+                $settings = [PSCustomObject]@{}
+            }
+            $settings | Add-Member -Force NoteProperty 'am32.sitl.gdbPath' (Join-Path $CygwinRoot 'bin\gdb.exe')
+            if (Test-Path -LiteralPath $boardMake) {
+                $settings | Add-Member -Force NoteProperty 'makefile.makePath' '${workspaceFolder}/tools/windows/make/bin/make.exe'
+                $settings | Add-Member -Force NoteProperty 'makefile.configureOnOpen' $true
+                $settings | Add-Member -Force NoteProperty 'makefile.phonyOnlyTargets' $true
+            }
+            New-Item -ItemType Directory -Force -Path (Split-Path -Parent $settingsFile) | Out-Null
+            $settings | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $settingsFile -Encoding UTF8
+        } catch {
+            # PowerShell 5 cannot parse JSON with comments. Preserve custom
+            # settings in that case and let the VS Code settings editor do it.
+            Write-Warning 'Could not update VS Code settings. See README-SITL.md for the target-picker and GDB settings.'
+        }
+        if (Test-Path -LiteralPath $boardMake) {
+            Write-Host 'In VS Code, run Makefile: Clean configure, then select AM32_SITL_CAN in the board target picker.'
+        } else {
+            Write-Host 'Open AM32-SITL.code-workspace in VS Code and press Ctrl+Shift+B.'
+        }
+        Write-Host 'For Run/Debug, install the Microsoft C/C++ extension and select AM32 SITL (ESCSim GUI).'
     }
 } catch {
     Write-Error $_ -ErrorAction Continue

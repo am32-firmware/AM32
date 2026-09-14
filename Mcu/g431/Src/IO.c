@@ -53,12 +53,13 @@ void sendDshotDma()
     RCC->APB1RSTR1 &= ~LL_APB1_GRP1_PERIPH_TIM3;
     IC_TIMER_REGISTER->CCMR1 = 0x60;
     IC_TIMER_REGISTER->CCER = 0x3;
-#endif
+#else
 
     LL_APB2_GRP1_ForceReset(LL_APB2_GRP1_PERIPH_TIM15); // de-init timer 2
     LL_APB2_GRP1_ReleaseReset(LL_APB2_GRP1_PERIPH_TIM15);
     IC_TIMER_REGISTER->CCMR1 = 0x60;
     IC_TIMER_REGISTER->CCER = 0x3;
+#endif
 
     IC_TIMER_REGISTER->PSC = output_timer_prescaler;
     IC_TIMER_REGISTER->ARR = 108;

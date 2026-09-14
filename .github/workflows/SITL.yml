@@ -38,6 +38,9 @@ jobs:
       - name: Build SITL
         run: bash env_setup_scripts/sitl_build.sh
 
+      - name: Test debugger startup, reset and diagnostic logging
+        run: python3 Mcu/SITL/tests/test_debug_lifecycle.py build/sitl/AM32_SITL_CAN
+
       - name: Install pydronecan
         run: python3 -m pip install dronecan pyserial
 
@@ -278,6 +281,10 @@ jobs:
       - name: Build SITL
         shell: pwsh
         run: ./env_setup_scripts/sitl_windows.ps1 -Action Build -CygwinRoot C:\cygwin
+
+      - name: Test debugger startup, reset and diagnostic logging
+        shell: pwsh
+        run: python Mcu/SITL/tests/test_debug_lifecycle.py build/sitl/AM32_SITL_CAN.exe
 
       - name: Boot smoke test
         shell: C:\cygwin\bin\bash.exe --noprofile --norc -o igncr -eo pipefail '{0}'

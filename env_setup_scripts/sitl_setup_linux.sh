@@ -7,6 +7,6 @@ if ! command -v apt-get >/dev/null; then
     exit 1
 fi
 sudo apt-get update
-sudo apt-get install -y build-essential git
+sudo apt-get install -y build-essential git gdb
 bash "$(dirname -- "${BASH_SOURCE[0]}")/sitl_build.sh" --check
 echo 'Open AM32-SITL.code-workspace in VS Code and press Ctrl+Shift+B.'

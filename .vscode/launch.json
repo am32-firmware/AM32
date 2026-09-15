@@ -4,6 +4,31 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+      {
+        "name": "AM32 SITL (ESCSim GUI)",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/build/sitl/AM32_SITL_CAN",
+        "cwd": "${workspaceFolder}/build/sitl",
+        "args": ["--eeprom", "vscode_eeprom.bin", "--input-type", "1",
+                 "--input-port", "57733", "--state-port", "57734",
+                 "--can-uri", "mcast:0", "--nosleep", "--verbose",
+                 "--wait-for-input", "--exit-on-reset",
+                 "--log-file", "vscode-sitl.log"],
+        "preLaunchTask": "AM32 SITL: Build for Run",
+        "MIMode": "gdb",
+        "miDebuggerPath": "/usr/bin/gdb",
+        "setupCommands": [
+          {"text": "handle SIGUSR1 nostop noprint pass", "description": "Allow SITL interrupt delivery"}
+        ],
+        "stopAtEntry": false,
+        "externalConsole": false,
+        "windows": {
+          "program": "${workspaceFolder}/build/sitl/AM32_SITL_CAN.exe",
+          "miDebuggerPath": "${config:am32.sitl.gdbPath}",
+          "avoidWindowsConsoleRedirection": true
+        }
+      },
       // STLink configuration
       {
         "name": "AM32 STLink",

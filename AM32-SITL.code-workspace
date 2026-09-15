@@ -1,0 +1,34 @@
+{
+    "folders": [{ "name": "AM32", "path": "." }],
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "AM32 SITL: Build",
+                "type": "process",
+                "command": "bash",
+                "args": ["${workspaceFolder:AM32}/env_setup_scripts/sitl_build.sh"],
+                "windows": {
+                    "command": "powershell.exe",
+                    "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder:AM32}/env_setup_scripts/sitl_windows.ps1", "-Action", "Build"]
+                },
+                "options": { "cwd": "${workspaceFolder:AM32}" },
+                "group": { "kind": "build", "isDefault": true },
+                "problemMatcher": [{ "base": "$gcc", "fileLocation": ["relative", "${workspaceFolder:AM32}"] }],
+                "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+            },
+            {
+                "label": "AM32 SITL: Check tools",
+                "type": "process",
+                "command": "bash",
+                "args": ["${workspaceFolder:AM32}/env_setup_scripts/sitl_build.sh", "--check"],
+                "windows": {
+                    "command": "powershell.exe",
+                    "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder:AM32}/env_setup_scripts/sitl_windows.ps1", "-Action", "Check"]
+                },
+                "options": { "cwd": "${workspaceFolder:AM32}" },
+                "problemMatcher": []
+            }
+        ]
+    }
+}

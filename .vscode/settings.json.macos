@@ -2,6 +2,8 @@
     "OS": "macos",
     "makefile.makePath": "/usr/bin/make",
 
+    "makefile.configureOnOpen": true,
+    "makefile.phonyOnlyTargets": true,
     "makefile.configurations": [
         {
             "name": "MakeSingle",

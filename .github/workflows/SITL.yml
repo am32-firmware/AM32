@@ -287,19 +287,28 @@ jobs:
         run: python Mcu/SITL/tests/test_debug_lifecycle.py build/sitl/AM32_SITL_CAN.exe
 
       - name: Boot smoke test
-        shell: C:\cygwin\bin\bash.exe --noprofile --norc -o igncr -eo pipefail '{0}'
+        shell: pwsh
         run: |
-          cd $(cygpath -u "$GITHUB_WORKSPACE")
-          # explicit ports: Windows reserves chunks of the ephemeral
-          # range and the defaults can land in an excluded block
-          # (state bind fails with Permission denied)
-          ./build/sitl/AM32_SITL_CAN.exe --can-uri none --input-type 1 \
-            --input-port 18470 --state-port 18471 >boot.log 2>&1 &
-          sleep 3
-          kill %1 || true
-          cat boot.log
-          grep -q "PWM/DShot input on udp port" boot.log
-          grep -q "state/model port udp" boot.log
+          # Launch natively: a Cygwin parent cannot start this executable
+          # with its separate, bundled cygwin1.dll beside it.
+          # Explicit ports avoid Windows' excluded ephemeral port ranges.
+          $sim = Start-Process -FilePath ./build/sitl/AM32_SITL_CAN.exe `
+            -ArgumentList '--can-uri none --input-type 1 --input-port 18470 --state-port 18471 --exit-on-reset' `
+            -RedirectStandardOutput boot-stdout.log -RedirectStandardError boot.log `
+            -NoNewWindow -PassThru
+          try {
+            $deadline = (Get-Date).AddSeconds(15)
+            do {
+              if ($sim.HasExited) { throw 'SITL exited before both UDP ports opened' }
+              $log = Get-Content boot.log -Raw
+              if ($log -match 'PWM/DShot input on udp port' -and $log -match 'state/model port udp') { break }
+              if ((Get-Date) -ge $deadline) { throw 'SITL did not open its input and state ports' }
+              Start-Sleep -Milliseconds 100
+            } while ($true)
+          } finally {
+            if (!$sim.HasExited) { Stop-Process -Id $sim.Id -Force }
+            Get-Content boot.log, boot-stdout.log
+          }
 
       - name: Package binary with cygwin runtime
         shell: C:\cygwin\bin\bash.exe --noprofile --norc -o igncr -eo pipefail '{0}'

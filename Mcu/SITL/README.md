@@ -38,3 +38,16 @@ which is what the SITL CI jobs do. See `ESCSim/SITL/README.md` for the
 runtime options, the UDP PWM/DShot input protocol, the GUI, gdb use and
 the simulator architecture, and `ESCSim/SITL/TIMING-DESIGN.md` for the
 design of the host-timing-immune scheduler in `Src/sitl_sched.c`.
+
+ESCSim's `SITL/DEMAG.md` describes the demagnetisation bench and DHO804-style
+virtual scope. Select a recipe from the GUI's Benchmark dropdown (default
+None), then use Start benchmark / Stop benchmark. Recipes include full
+duty at approximately 50 A, light load, partial-duty PWM and a full-duty
+load increase into desync. The scope observes instantaneous phase currents, terminal
+voltages, back EMF, filtered comparator inputs and body-diode conduction.
+State subscriptions with flag bit 1 request this extended version 3
+layout; ordinary subscribers retain version 2. At 0.1x simulation speed,
+the default 500 ns physics steps can be streamed without the wall-clock
+sample-rate cap coarsening them. Demag studies must use a model with
+`esc.commutation_transfer = 0` so outgoing winding current decays through
+the bridge instead of being transferred instantaneously.

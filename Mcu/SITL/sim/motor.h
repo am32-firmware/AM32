@@ -31,6 +31,11 @@ void motor_add_signals(double acc[8]);
 // accumulate audio signals (torque, summed |i|) for the audio stream
 void motor_add_audio(double acc[2]);
 
+// Instantaneous analog nodes and diode states for the virtual scope.
+// Diode polarity: -1 low rail, +1 high rail, 0 not conducting.
+void motor_get_scope(float bemf[3], float filtered[3], float* neutral,
+                     int8_t diodes[3]);
+
 // called from the firmware main loop for debug tracing
 void motor_log_mainloop(void);
 

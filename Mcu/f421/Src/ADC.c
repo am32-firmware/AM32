@@ -45,11 +45,7 @@ void ADC_Init(void)
 {
     crm_periph_clock_enable(CURRENT_ADC_PORT_CLOCK, TRUE);
     crm_periph_clock_enable(VOLTAGE_ADC_PORT_CLOCK, TRUE);
-#ifdef PA2_VOLTAGE
-    gpio_mode_QUICK(VOLTAGE_ADC_PORT, GPIO_MODE_ANALOG, GPIO_PULL_NONE, GPIO_PINS_2);
-#else
     gpio_mode_QUICK(CURRENT_ADC_PORT, GPIO_MODE_ANALOG, GPIO_PULL_NONE, CURRENT_ADC_PIN);
-#endif
     gpio_mode_QUICK(VOLTAGE_ADC_PORT, GPIO_MODE_ANALOG, GPIO_PULL_NONE, VOLTAGE_ADC_PIN);
 #ifdef USE_NTC
     crm_periph_clock_enable(NTC_ADC_PORT_CLOCK, TRUE);

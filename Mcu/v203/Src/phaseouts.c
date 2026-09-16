@@ -64,7 +64,7 @@ void proportionalBrake()
 
 void phaseBPWM()
 {
-    if(!eepromBuffer.comp_pwm)
+    if(!temp_comp_pwm)
     {  // for future
         PHASE_B_GPIO_PORT_LOW->CFGLR  &= ~(0xf<<0); PHASE_B_GPIO_PORT_LOW->CFGLR|= (0x3<<0);
         PHASE_B_GPIO_PORT_LOW->LOW_BITREG_OFF = PHASE_B_GPIO_LOW; //low close
@@ -101,7 +101,7 @@ void phaseBLOW()
 
 void phaseCPWM()
 {
-    if (!eepromBuffer.comp_pwm)
+    if (!temp_comp_pwm)
     {
         PHASE_C_GPIO_PORT_LOW->CFGLR  &= ~(0xf<<28); PHASE_C_GPIO_PORT_LOW->CFGLR |= (0x3<<28);
         PHASE_C_GPIO_PORT_LOW->LOW_BITREG_OFF = PHASE_C_GPIO_LOW;
@@ -137,7 +137,7 @@ void phaseCLOW()
 
 void phaseAPWM()
 {
-    if (!eepromBuffer.comp_pwm)
+    if (!temp_comp_pwm)
     {
         PHASE_A_GPIO_PORT_LOW->CFGLR  &= ~(0xf<<4); PHASE_A_GPIO_PORT_LOW->CFGLR|= (0x3<<4);
         PHASE_A_GPIO_PORT_LOW->LOW_BITREG_OFF = PHASE_A_GPIO_LOW; //low close
@@ -172,7 +172,7 @@ void phaseALOW()
 //////////////////////////////////PHASE 1//////////////////////
 void phaseBPWM()
 {
-    if (!eepromBuffer.comp_pwm)
+    if (!temp_comp_pwm)
     {
         // for future
         // gpio_mode_QUICK(PHASE_B_GPIO_PORT_LOW, GPIO_MODE_OUTPUT,
@@ -212,7 +212,7 @@ void phaseBLOW()
 
 void phaseCPWM()
 {
-    if (!eepromBuffer.comp_pwm)
+    if (!temp_comp_pwm)
     {
         //	gpio_mode_QUICK(PHASE_C_GPIO_PORT_LOW, GPIO_MODE_OUTPUT,
         // GPIO_PULL_NONE,
@@ -251,7 +251,7 @@ void phaseCLOW()
 
 void phaseAPWM()
 {
-    if (!eepromBuffer.comp_pwm)
+    if (!temp_comp_pwm)
     {
         //	gpio_mode_QUICK(PHASE_A_GPIO_PORT_LOW, GPIO_MODE_OUTPUT,
         // GPIO_PULL_NONE,

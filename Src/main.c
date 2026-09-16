@@ -248,7 +248,7 @@ an settings option)
 #include "DroneCAN/DroneCAN.h"
 #endif
 
-#include <version.h>
+#include "version.h"
 
 void zcfoundroutine(void);
 
@@ -331,6 +331,9 @@ uint16_t stall_protect_target_interval = TARGET_STALL_PROTECTION_INTERVAL;
 uint16_t enter_sine_angle = 180;
 char do_once_sinemode = 0;
 uint8_t auto_advance_level;
+volatile uint8_t zero_throttle_brake_active;
+volatile uint8_t temp_comp_pwm;
+uint8_t brake_countdown;
 
 //============================= Servo Settings ==============================
 uint16_t servo_low_threshold = 1100; // anything below this point considered 0
@@ -344,7 +347,7 @@ uint16_t low_cell_volt_cutoff = 330; // 3.3volts per cell
 
 //=========================== END EEPROM Defaults ===========================
 
-const char filename[30] __attribute__((section(".file_name"))) = FILE_NAME;
+const char filename[30] AM32_FLASH_SECTION(".file_name") = FILE_NAME;
 _Static_assert(sizeof(FIRMWARE_NAME) <=13,"Firmware name too long");   // max 12 character firmware name plus NULL 
 
 // move these to targets folder or peripherals for each mcu
@@ -602,7 +605,7 @@ int32_t doPidCalculations(struct fastPID* pidnow, int actual, int target)
 void loadEEpromSettings()
 {
     read_flash_bin(eepromBuffer.buffer, eeprom_address, sizeof(eepromBuffer.buffer));
-    if(eepromBuffer.eeprom_version < EEPROM_VERSION){
+    if(eepromBuffer.eeprom_version < 3){ // eeprom versions less than 3 had a firmware name string in these bytes 
       eepromBuffer.max_ramp = 160;    // 0.1% per ms to 25% per ms 
       eepromBuffer.minimum_duty_cycle = 1; // 0.2% to 51 percent
       eepromBuffer.disable_stick_calibration = 0; // 
@@ -611,10 +614,13 @@ void loadEEpromSettings()
       eepromBuffer.current_I = 0; // 0-255
       eepromBuffer.current_D = 100; // 0-255
       eepromBuffer.active_brake_power = 0; // 1-5 percent duty cycle
+      eepromBuffer.brake_on_zero_throttle = 0;
       eepromBuffer.reserved_eeprom_3[0] = 0; //14-16  for crsf input
       eepromBuffer.reserved_eeprom_3[1] = 0;
       eepromBuffer.reserved_eeprom_3[2] = 0;
-      eepromBuffer.reserved_eeprom_3[3] = 0;
+    }
+    if(eepromBuffer.brake_on_zero_throttle > 9){ // byte 13 held a firmware name character (0x30 or similar) before eeprom version 4
+      eepromBuffer.brake_on_zero_throttle = 0;
     }
     // eepromBuffer.advance_level can either be set to 0-3 with config tools less than 1.90 or 10-42 with 1.90 or above 
     if (eepromBuffer.advance_level > 42 || (eepromBuffer.advance_level < 10 && eepromBuffer.advance_level > 3)){
@@ -721,7 +727,7 @@ void loadEEpromSettings()
             eepromBuffer.limits.temperature = 255;
         }
 
-        if (eepromBuffer.limits.current > 0 && eepromBuffer.limits.current < 100) {
+        if (eepromBuffer.limits.current > 0 && eepromBuffer.limits.current <= 100) {
             use_current_limit = 1;
         }
         
@@ -783,8 +789,19 @@ void loadEEpromSettings()
         if (motor_kv < 300) {
             low_rpm_throttle_limit = 0;
         }
-        low_rpm_level = motor_kv / 100 / (32 / eepromBuffer.motor_poles);
-        high_rpm_level = motor_kv / 12 / (32 / eepromBuffer.motor_poles);				
+        // guard divisions for an erased eeprom (motor_poles 0 or 0xff),
+        // ARM hardware division returns 0 but it is UB in C
+        uint8_t rpm_level_div = 0;
+        if (eepromBuffer.motor_poles != 0) {
+            rpm_level_div = 32 / eepromBuffer.motor_poles;
+        }
+        if (rpm_level_div != 0) {
+            low_rpm_level = motor_kv / 100 / rpm_level_div;
+            high_rpm_level = motor_kv / 12 / rpm_level_div;
+        } else {
+            low_rpm_level = 0;
+            high_rpm_level = 0;
+        }
     }
     reverse_speed_threshold = map(motor_kv, 300, 3000, 1000, 500);
     if (eepromBuffer.bi_direction){
@@ -792,6 +809,7 @@ void loadEEpromSettings()
     }else{
       polling_mode_changeover = POLLING_MODE_THRESHOLD;
     }
+    temp_comp_pwm = eepromBuffer.comp_pwm;
 }
 
 void saveEEpromSettings()
@@ -1492,12 +1510,35 @@ void tenKhzRoutine()
             }
 
         if ((armed && running) && input > 47) {
-            if (eepromBuffer.variable_pwm) {
-            }
+          if(zero_throttle_brake_active){
+            zero_throttle_brake_active = 0;
+            temp_comp_pwm = eepromBuffer.comp_pwm;
+          }else{
             adjusted_duty_cycle = ((duty_cycle * tim1_arr) / 2000) + 1;
-
+        }
         } else {
-
+          if(running && input < 47){ // brake on zero throttle behavior while motor is still rotating
+            if(eepromBuffer.brake_on_zero_throttle == 1){   // coast on 0 throttle
+              temp_comp_pwm = 0;                            // tracks rpm until stopped 
+              zero_throttle_brake_active = 1;
+            }
+              if(eepromBuffer.brake_on_zero_throttle == 2){   // motor brake on 0 throttle    
+              temp_comp_pwm = 1;                             // tracks rpm until stopped
+              zero_throttle_brake_active = 1;
+            }
+              if((eepromBuffer.brake_on_zero_throttle > 2) && (eepromBuffer.brake_on_zero_throttle < 10)){   // brake on 0 throttle after 2 + x seconds
+              if(zero_throttle_brake_active == 0){
+                brake_countdown = eepromBuffer.brake_on_zero_throttle - 2;  // brake countdown decremented in 10khz routine
+                tenkhzcounter = 10000; 
+              }
+              if((brake_countdown == 0) && (zero_throttle_brake_active == 1)){
+                zero_crosses = 0;                          // after countdown forces the brake on stop behavior 
+                running = 0;                               // stops tracking rpm
+              }
+              zero_throttle_brake_active = 1;
+              }
+              adjusted_duty_cycle = ((duty_cycle * tim1_arr) / 2000);
+          } else{  // input less than 47 and not running, normal brake on stop behavior
             if (prop_brake_active) {
               adjusted_duty_cycle =  tim1_arr - ((prop_brake_duty_cycle * tim1_arr) / 2000);
             } else {
@@ -1508,6 +1549,7 @@ void tenKhzRoutine()
                 adjusted_duty_cycle = ((duty_cycle * tim1_arr) / 2000);
             }
             }
+          }
         }
         last_duty_cycle = duty_cycle;
         SET_AUTO_RELOAD_PWM(tim1_arr);
@@ -1705,6 +1747,10 @@ void runBrushedLoop()
  */
 static void checkDeviceInfo(void)
 {
+#ifdef MCU_SITL
+    // no bootloader device info page in SITL
+    return;
+#endif
 #ifdef NXP
     uint32_t pflashBlockBase  = 0U;
     uint32_t pflashTotalSize  = 0U;
@@ -1786,8 +1832,9 @@ int main(void)
         eepromBuffer.use_sine_start = 0;
         low_rpm_throttle_limit = 1;
         eepromBuffer.variable_pwm = 0;
-        // eepromBuffer.stall_protection = 1;
+        eepromBuffer.brake_on_zero_throttle = 0;
         eepromBuffer.comp_pwm = 0;
+        temp_comp_pwm = 0;
         eepromBuffer.stuck_rotor_protection = 0;
         minimum_duty_cycle = minimum_duty_cycle + 50;
         stall_protect_minimum_duty = stall_protect_minimum_duty + 50;
@@ -1893,12 +1940,7 @@ int main(void)
 #endif
 
     while (1) {
-if(zero_crosses < 24){
-   e_com_time = 65408; // report a low value during startup to avoid false rpm spikes.
-}else{
-   e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation_intervals[2] + commutation_intervals[3] + commutation_intervals[4] + commutation_intervals[5]) + 4) >> 1; // COMMUTATION INTERVAL IS 0.5US INCREMENTS 
-}
-
+e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation_intervals[2] + commutation_intervals[3] + commutation_intervals[4] + commutation_intervals[5]) + 4) >> 1; // COMMUTATION INTERVAL IS 0.5US INCREMENTS 
 
 #if defined(FIXED_DUTY_MODE) || defined(FIXED_SPEED_MODE)
         setInput();
@@ -1997,6 +2039,9 @@ if(zero_crosses < 5){
         if (tenkhzcounter > LOOP_FREQUENCY_HZ) { // 1s sample interval 10000
             consumed_current += (actual_current << 16) / 360;
             tenkhzcounter = 0;
+            if(brake_countdown > 0){
+              brake_countdown--;
+            }
         }
 
 #ifndef BRUSHED_MODE
@@ -2131,7 +2176,7 @@ if(zero_crosses < 5){
 #endif
             if (actual_current < 0) {
                 actual_current = 0;
-            }             
+            }
             if (eepromBuffer.low_voltage_cut_off == 1) {  
                 if (battery_voltage < (cell_count * low_cell_volt_cutoff)) {
                   low_voltage_count++;
@@ -2142,7 +2187,7 @@ if(zero_crosses < 5){
                 }
             }
             if (eepromBuffer.low_voltage_cut_off == 2 ){   // absolute cut off
-              if (battery_voltage <  eepromBuffer.absolute_voltage_cutoff) {
+              if (battery_voltage <  (eepromBuffer.absolute_voltage_cutoff * 50)) {
                 low_voltage_count++;    
                 } else {
                   if(!LOW_VOLTAGE_CUTOFF){
@@ -2176,6 +2221,7 @@ if(zero_crosses < 5){
         if (newinput > 2000) {
             newinput = 2000;
         }
+        input_ready = 1;       
 #endif
         stuckcounter = 0;
         if (stepper_sine == 0) {
@@ -2232,9 +2278,12 @@ if(zero_crosses < 5){
                 }
             }
 #endif
-            if (INTERVAL_TIMER_COUNT > 45000 && running == 1) {
+            if (INTERVAL_TIMER_COUNT > 45000) {
+              zero_throttle_brake_active = 0;   // reset zero throttle brake on back emf timeout (rotation stop)
+              if(running){
                 bemf_timeout_happened++;
-
+                
+                temp_comp_pwm = eepromBuffer.comp_pwm;
                 maskPhaseInterrupts();
                 old_routine = 1;
                 if (input < 48) {
@@ -2243,6 +2292,7 @@ if(zero_crosses < 5){
                 }
                 zero_crosses = 0;
                 zcfoundroutine();
+              }
             }
         } else { // stepper sine
 
@@ -2270,7 +2320,7 @@ if(zero_crosses < 5){
 #else
 
             if (input > 48 && armed) {
-
+                PROCESS_ADC_FLAG = 1;
                 if (input > 48 && input < 137) { // sine wave stepper
 
                     if (do_once_sinemode) {
@@ -2285,6 +2335,7 @@ if(zero_crosses < 5){
                     step_delay = map(input, 48, 120, 7000 / eepromBuffer.motor_poles, 810 / eepromBuffer.motor_poles);
                     delayMicros(step_delay);
                     e_rpm = 600 / step_delay; // in hundreds so 33 e_rpm is 3300 actual erpm
+                    e_com_time = step_delay * 360; 
 
                 } else {
                     do_once_sinemode = 1;
@@ -2316,6 +2367,7 @@ if(zero_crosses < 5){
                 }
 
             } else {
+                running = 0;
                 do_once_sinemode = 1;
                 if (eepromBuffer.brake_on_stop == 1) {
 #ifndef PWM_ENABLE_BRIDGE

@@ -42,6 +42,18 @@ static void Filter2P_setup(float sample_freq, float cutoff_freq)
     filter.a2 = (1.0f-2.0f*cosf(M_PI/4.0f)*ohm+ohm*ohm)/c;
 }
 
+/*
+  force the filter state to a value, so that the next
+  apply(value, ...) returns it rather than easing towards it. Used by the RawCommand failsafe: a
+  single zero sample pushed through a slow filter leaves almost all of
+  the previous throttle applied
+ */
+void Filter2P_reset(const float value)
+{
+    filter._delay_element_1 = filter._delay_element_2 =
+        value * (1.0f / (1 + filter.a1 + filter.a2));
+}
+
 float Filter2P_apply(const float sample, float cutoff_freq, float sample_freq)
 {
     if (cutoff_freq <= 0 || sample_freq <= 0) {
@@ -63,6 +75,7 @@ float Filter2P_apply(const float sample, float cutoff_freq, float sample_freq)
     return output;
 }
 
+#ifndef MCU_SITL
 /*
   unfortunately the maths libraries have an abort() linkage
  */
@@ -70,3 +83,4 @@ void abort(void)
 {
     __builtin_unreachable();
 }
+#endif

@@ -1,5 +1,16 @@
 
 
+/*
+  ELF section placement for the flash layout tooling (app signature,
+  file name). Not meaningful for the SITL build and mach-o (macOS) has
+  a different section syntax, so it becomes a no-op there
+ */
+#ifdef __APPLE__
+#define AM32_FLASH_SECTION(name)
+#else
+#define AM32_FLASH_SECTION(name) __attribute__((section(name)))
+#endif
+
 #ifndef USE_MAKE
 // #define F031_DEV
 // #define FD6288_F051
@@ -210,6 +221,7 @@
 #define LOOP_FREQUENCY_HZ 20000
 #define USE_LSE
 #define USE_LSE_BYPASS 0
+#define USE_SERIAL_TELEMETRY
 #endif
 
 #ifdef TBS_16S_L431_CAN
@@ -228,6 +240,7 @@
 #define LOOP_FREQUENCY_HZ 20000
 #define USE_LSE
 #define USE_LSE_BYPASS 1
+#define USE_SERIAL_TELEMETRY
 #endif
 
 #ifdef TBS_16S_L431
@@ -243,6 +256,7 @@
 #define LOOP_FREQUENCY_HZ 20000
 #define USE_LSE
 #define USE_LSE_BYPASS 1
+#define USE_SERIAL_TELEMETRY
 #endif
 
 #ifdef  REF_L431
@@ -350,6 +364,19 @@
 #define MILLIVOLT_PER_AMP 9
 #endif
 ///
+#ifdef AM32_SITL_CAN
+#define FIRMWARE_NAME "AM32 SITL"
+#define FILE_NAME "AM32_SITL_CAN"
+#define DRONECAN_SUPPORT 1
+#define DRONECAN_NODE_NAME "org.am32.sitl"
+#define DEAD_TIME 80
+#define HARDWARE_GROUP_SITL_A
+#define TARGET_STALL_PROTECTION_INTERVAL 20000
+#define TARGET_VOLTAGE_DIVIDER 110
+#define MILLIVOLT_PER_AMP 20
+#define CURRENT_OFFSET 0
+#endif
+
 #ifdef REF_G431
 #define FIRMWARE_NAME "Ref G431"
 #define FILE_NAME "REF_G431"
@@ -632,6 +659,19 @@
 #define VOLTAGE_ADC_PIN GPIO_PINS_6
 #endif
 
+#ifdef  DEEPSPACE_TALOS_F421
+#define FIRMWARE_NAME "DEEPSPACE_F4"
+#define FILE_NAME "DEEPSPACE_TALOS_F421"
+#define DEAD_TIME 75
+#define HARDWARE_GROUP_AT_540
+#define HARDWARE_GROUP_AT_E
+#define USE_SERIAL_TELEMETRY
+#define VOLTAGE_ADC_CHANNEL ADC_CHANNEL_3
+#define VOLTAGE_ADC_PIN GPIO_PINS_3
+#define USE_LED_STRIP
+#define WS2812_PIN GPIO_PINS_4
+#endif
+
 #ifdef  FLYWOO_GOKU_F421
 #define FIRMWARE_NAME "FLYWOO_GOKU "
 #define FILE_NAME "FLYWOO_GOKU_F421"
@@ -691,6 +731,22 @@
 #define CURRENT_ADC_PIN GPIO_PINS_3
 #define VOLTAGE_ADC_CHANNEL ADC_CHANNEL_6
 #define VOLTAGE_ADC_PIN GPIO_PINS_6
+#endif
+
+#ifdef SOE_A_F421
+#define FIRMWARE_NAME "SOE_A_F421"
+#define FILE_NAME "SOE_A_F421"
+#define DEAD_TIME 45
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_045
+#define USE_SERIAL_TELEMETRY
+#define MILLIVOLT_PER_AMP 19
+#define CURRENT_OFFSET 0
+#define TARGET_VOLTAGE_DIVIDER 110
+#define CURRENT_ADC_CHANNEL ADC_CHANNEL_6
+#define CURRENT_ADC_PIN GPIO_PINS_6
+#define VOLTAGE_ADC_CHANNEL ADC_CHANNEL_3
+#define VOLTAGE_ADC_PIN GPIO_PINS_3
 #endif
 
 #ifdef ZTW_A_F421
@@ -1043,6 +1099,15 @@
 
 /***************************************End Generic
  * *****************************************/
+
+#ifdef  FLYCOLOR_F421
+#define FIRMWARE_NAME "FLYCOLOR_F4 "
+#define FILE_NAME "FLYCOLOR_F421"
+#define DEAD_TIME 60
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_540
+#define USE_SERIAL_TELEMETRY
+#endif
 
 #ifdef  MAXKGO_F421
 #define FIRMWARE_NAME "MAXKGO_F4 "
@@ -1878,6 +1943,15 @@
 #define HARDWARE_GROUP_F0_405
 #endif
 
+#ifdef BOTDRIVE_F051
+#define FILE_NAME "BOTDRIVE_F051"
+#define FIRMWARE_NAME "BOTDRIVE_F0 "
+#define DEAD_TIME 30
+#define HARDWARE_GROUP_F0_U
+#define USE_SERIAL_TELEMETRY
+#define HARDWARE_GROUP_F0_405
+#endif
+
 #ifdef  ASCENT_TEST_F051
 #define FIRMWARE_NAME "Sequre F0 "
 #define FILE_NAME "ASCENT_TEST_F051"
@@ -2359,6 +2433,22 @@
 #define USE_SERIAL_TELEMETRY
 #endif
 
+#ifdef XRC_F051
+#define FILE_NAME "XRC_F051"
+#define FIRMWARE_NAME "XRC TECH F0 "
+#define DEAD_TIME 45 
+#define HARDWARE_GROUP_F0_B
+#define MILLIVOLT_PER_AMP 50
+#define CURRENT_OFFSET 0
+#define TARGET_VOLTAGE_DIVIDER 110
+#define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_6
+#define VOLTAGE_ADC_PIN LL_GPIO_PIN_6
+#define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_3
+#define CURRENT_ADC_PIN LL_GPIO_PIN_3
+#define USE_SERIAL_TELEMETRY
+#define TARGET_STALL_PROTECTION_INTERVAL 9000
+#endif
+
 /*******************************   G071 Targets
  * *********************************/
 
@@ -2426,6 +2516,23 @@
 #define SIXTY_FOUR_KB_MEMORY
 #endif
 
+#ifdef  SKYSTARS_12S_G071
+#define FILE_NAME "SKYSTARS_12S_G071"
+#define FIRMWARE_NAME "SKYSTARS_G0 "
+#define DEAD_TIME 60
+#define HARDWARE_GROUP_G0_L
+#define USE_SERIAL_TELEMETRY
+#define SIXTY_FOUR_KB_MEMORY
+#define TARGET_VOLTAGE_DIVIDER 285
+#define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_4
+#define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_5
+#define CURRENT_ADC_PIN LL_GPIO_PIN_4
+#define VOLTAGE_ADC_PIN LL_GPIO_PIN_5
+#define RAMP_SPEED_LOW_RPM 2
+#define RAMP_SPEED_HIGH_RPM 4
+#define USE_INVERTED_LOW
+#endif
+
 #ifdef GEN_64K_G071
 #define FILE_NAME "GEN_64K_G071"
 #define FIRMWARE_NAME "G071 64kESC "
@@ -2435,6 +2542,36 @@
 #define HARDWARE_GROUP_G0_A
 #define USE_SERIAL_TELEMETRY
 #define SIXTY_FOUR_KB_MEMORY
+#endif
+
+#ifdef  ZTW_A_HV_G071
+#define FILE_NAME "ZTW_A_HV_G071"
+#define FIRMWARE_NAME "ZTW_A_HV_G0 "
+#define DEAD_TIME 60
+#define MILLIVOLT_PER_AMP 20
+#define CURRENT_OFFSET 0
+#define HARDWARE_GROUP_G0_A
+#define USE_SERIAL_TELEMETRY
+#define SIXTY_FOUR_KB_MEMORY
+#define RAMP_SPEED_LOW_RPM 2
+#define RAMP_SPEED_HIGH_RPM 4
+#endif
+
+#ifdef  ZTW_A_LV_G071
+#define FILE_NAME "ZTW_A_LV_G071"
+#define FIRMWARE_NAME "ZTW_A_LV_G0 "
+#define DEAD_TIME 60
+#define MILLIVOLT_PER_AMP 33
+#define TARGET_VOLTAGE_DIVIDER 210
+#define CURRENT_OFFSET 0
+#define HARDWARE_GROUP_G0_A
+#define USE_SERIAL_TELEMETRY
+#define SIXTY_FOUR_KB_MEMORY
+#define CURRENT_ADC_CHANNEL LL_ADC_CHANNEL_0
+#define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_1
+#define CURRENT_ADC_PIN LL_GPIO_PIN_0
+#define VOLTAGE_ADC_PIN LL_GPIO_PIN_1
+#define USE_LED_STRIP
 #endif
 
 #ifdef  TBS_4IN1_G071
@@ -3995,6 +4132,12 @@
 
 #endif
 
+#ifdef HARDWARE_GROUP_SITL_A
+
+#define MCU_SITL
+
+#endif
+
 #ifdef HARDWARE_GROUP_G4_A
 
 #define MCU_G431
@@ -5491,6 +5634,30 @@
   #define COMPARATOR_IRQ   EXTI2_IRQn
 #endif
 
+#endif
+
+#ifdef MCU_SITL
+// software in the loop simulation, emulating a G431 class MCU with the
+// hardware replaced by a motor/battery simulation. See Mcu/SITL
+#define STMICRO
+#define CPU_FREQUENCY_MHZ 160
+#ifndef EEPROM_START_ADD
+#define EEPROM_START_ADD (uint32_t)0x0800F800
+#endif
+#define INTERVAL_TIMER TIM2
+#define TEN_KHZ_TIMER TIM6
+#define UTILITY_TIMER TIM17
+#define COM_TIMER TIM16
+#define APPLICATION_ADDRESS 0x08001000
+#define TARGET_MIN_BEMF_COUNTS 3
+#define COMPARATOR_IRQ SITL_IRQ_COMP
+#define COM_TIMER_IRQ SITL_IRQ_COM
+#define IC_DMA_IRQ_NAME SITL_IRQ_DMA
+#define USE_ADC
+#define DSHOT_PRIORITY_THRESHOLD 60
+// the SITL harness provides the real main(), the firmware main() is
+// started by the harness under this name
+#define main am32_main
 #endif
 
 #ifndef LOOP_FREQUENCY_HZ

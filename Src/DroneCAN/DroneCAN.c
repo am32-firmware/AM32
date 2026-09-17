@@ -38,12 +38,22 @@
 // use set input at 1kHz
 #define TARGET_PERIOD_US 1000U
 
+/* A live backup input allows substantially faster CAN-loss detection. */
+#define RAWCOMMAND_TIMEOUT_US 250000ULL
+#define RAWCOMMAND_BACKUP_TIMEOUT_US 50000ULL
+#define DSHOT_BACKUP_FRESH_US 100000ULL
+#define DSHOT_BACKUP_MIN_FRAMES 8U
+
+extern volatile uint16_t dshot_goodcounts;
+
 static CanardInstance canard;
 static uint8_t canard_memory_pool[CANARD_POOL_SIZE];
 
 struct CANStats canstats;
 
 static bool dronecan_armed;
+/* True only while RawCommand is fresh, not merely after one was seen. */
+static volatile bool rawcommand_active;
 static bool done_startup;
 
 #define APP_SIGNATURE_MAGIC1 0x68f058e6
@@ -673,8 +683,7 @@ static void handle_GetNodeInfo(CanardInstance *ins, CanardRxTransfer *transfer)
                            total_size);
 }
 
-extern void transfercomplete();
-extern void setInput();
+extern void setInputDroneCAN();
 
 
 /*
@@ -693,13 +702,20 @@ static void set_input(uint16_t input)
 
     newinput = filtered_input;
     last_can_input = unfiltered_input;
-    inputSet = 1;
+    setInputDroneCAN();
 
-    // we must set dshot for bi_direction to work
-    dshot = eepromBuffer.bi_direction;
-
-    transfercomplete();
-    setInput();
+    /*
+      inputSet and dshot describe the timer-capture input, not CAN. Leaving
+      them alone lets a connected DShot/PWM backup continue to be decoded.
+      CAN still contributes zero-throttle samples to the normal arming gate.
+     */
+    if (!armed) {
+        if (adjusted_input == 0) {
+            zero_input_count++;
+        } else {
+            zero_input_count = 0;
+        }
+    }
 
     canstats.num_input++;
 }
@@ -747,6 +763,7 @@ static void handle_RawCommand(CanardInstance *ins, CanardRxTransfer *transfer)
     canstats.num_commands++;
     canstats.total_commands++;
     canstats.last_raw_command_us = ts;
+    rawcommand_active = true;
 
     set_input(this_input);
 }
@@ -1311,6 +1328,23 @@ void DroneCAN_update()
     }
 
     const uint64_t ts = micros64();
+    static uint16_t last_dshot_goodcounts;
+    static uint64_t last_dshot_input_us;
+    static uint8_t dshot_backup_frames;
+
+    if (dshot_goodcounts != last_dshot_goodcounts) {
+        const uint16_t frame_delta = dshot_goodcounts - last_dshot_goodcounts;
+        last_dshot_goodcounts = dshot_goodcounts;
+        last_dshot_input_us = ts;
+        if (frame_delta >= DSHOT_BACKUP_MIN_FRAMES - dshot_backup_frames) {
+            dshot_backup_frames = DSHOT_BACKUP_MIN_FRAMES;
+        } else {
+            dshot_backup_frames += frame_delta;
+        }
+    } else if (last_dshot_input_us != 0 &&
+               ts - last_dshot_input_us >= DSHOT_BACKUP_FRESH_US) {
+        dshot_backup_frames = 0;
+    }
 
     if (ts >= next_1hz_service_at) {
 	next_1hz_service_at += 1000000ULL;
@@ -1336,7 +1370,14 @@ void DroneCAN_update()
         save_settings();
     }
 
-    if (canstats.last_raw_command_us != 0 && ts - canstats.last_raw_command_us > 250000ULL) {
+    const bool dshot_backup_active =
+        dshot_backup_frames >= DSHOT_BACKUP_MIN_FRAMES &&
+        ts - last_dshot_input_us < DSHOT_BACKUP_FRESH_US;
+    const uint64_t rawcommand_timeout_us = dshot_backup_active ?
+        RAWCOMMAND_BACKUP_TIMEOUT_US : RAWCOMMAND_TIMEOUT_US;
+
+    if (canstats.last_raw_command_us != 0 &&
+        ts - canstats.last_raw_command_us > rawcommand_timeout_us) {
         /*
           we have stopped getting CAN RawCommand, zero input.
 
@@ -1351,6 +1392,7 @@ void DroneCAN_update()
           loop's signal watchdog fed.
          */
         canstats.last_raw_command_us = 0;
+        rawcommand_active = false;
         Filter2P_reset(0);
         set_input(0);
     }
@@ -1372,7 +1414,7 @@ void DroneCAN_update()
 
 bool DroneCAN_active(void)
 {
-    return canstats.total_commands != 0;
+    return rawcommand_active;
 }
 
 #endif // DRONECAN_SUPPORT

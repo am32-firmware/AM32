@@ -51,6 +51,10 @@ CFLAGS_BASE += -Wall -Wundef -Wextra -Werror -Wno-unused-parameter -Wno-stringop
 
 CFLAGS_COMMON := $(CFLAGS_BASE)
 
+ifeq ($(USE_SPORT_TELEMETRY),1)
+CFLAGS_COMMON += -DUSE_SPORT_TELEMETRY
+endif
+
 # Linker options
 LDFLAGS_COMMON := -specs=nano.specs $(LIBS) -Wl,--gc-sections -Wl,--print-memory-usage
 

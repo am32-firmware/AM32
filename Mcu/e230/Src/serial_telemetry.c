@@ -6,7 +6,7 @@
  */
 
 #include "serial_telemetry.h"
-#include "kiss_telemetry.h"
+#include "telemetry_protocol.h"
 
 #include "main.h"
 #include "common.h"
@@ -48,7 +48,11 @@ void telem_UART_Init(void)
     usart_halfduplex_enable(USART0);
     /* USART configure */
     //  usart_deinit(USART0);
-    usart_baudrate_set(USART0, 115200U);
+    usart_baudrate_set(USART0, SERIAL_TELEMETRY_BAUDRATE_SELECTED);
+#ifdef USE_SPORT_TELEMETRY
+    usart_invert_config(USART0, USART_TXPIN_ENABLE);
+    usart_invert_config(USART0, USART_RXPIN_ENABLE);
+#endif
     usart_receive_config(USART0, USART_RECEIVE_ENABLE);
     usart_transmit_config(USART0, USART_TRANSMIT_ENABLE);
 

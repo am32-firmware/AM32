@@ -31,6 +31,10 @@
 #include "targets.h"
 #include "comparator.h"
 #include "common.h"
+#ifdef USE_SPORT_TELEMETRY
+#include "serial_telemetry.h"
+#include "sport_telemetry.h"
+#endif
 
 /* USER CODE END Includes */
 
@@ -87,6 +91,9 @@ extern volatile char dshot_telemetry;
 extern volatile char armed;
 extern volatile char out_put;
 extern volatile uint8_t compute_dshot_flag;
+#ifdef USE_SPORT_TELEMETRY
+static uint8_t sport_poll_pending;
+#endif
 
 /* USER CODE END EV */
 
@@ -221,12 +228,25 @@ void DMA1_Channel2_3_IRQHandler(void)
         send_telemetry = 0;
         LL_DMA_ClearFlag_GI3(DMA1);
         LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_3);
+#ifdef USE_SPORT_TELEMETRY
+        LL_USART_DisableDMAReq_TX(USART1);
+        LL_USART_EnableIT_TC(USART1);
+#else
         /* Call function Transmission complete Callback */
+#endif
     } else if (LL_DMA_IsActiveFlag_TE3(DMA1)) {
         LL_DMA_ClearFlag_GI3(DMA1);
         LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_3);
+#ifdef USE_SPORT_TELEMETRY
+        LL_USART_DisableDMAReq_TX(USART1);
+        LL_USART_SetTransferDirection(USART1, LL_USART_DIRECTION_RX);
+        LL_USART_ClearFlag_RTO(USART1);
+        LL_USART_EnableIT_RXNE(USART1);
+        LL_USART_EnableIT_RTO(USART1);
+#else
         /* Call Error function */
         // USART_TransferError_Callback();
+#endif
     }
 }
 
@@ -349,6 +369,45 @@ void TIM14_IRQHandler(void)
     LL_TIM_ClearFlag_UPDATE(TIM14);
     interrupt_time = ((uint16_t)UTILITY_TIMER->CNT) - interrupt_time;
 }
+
+#ifdef USE_SPORT_TELEMETRY
+void USART1_IRQHandler(void)
+{
+    if (LL_USART_IsActiveFlag_ORE(USART1)) {
+        LL_USART_ClearFlag_ORE(USART1);
+    }
+    if (LL_USART_IsActiveFlag_FE(USART1)) {
+        LL_USART_ClearFlag_FE(USART1);
+    }
+    if (LL_USART_IsActiveFlag_NE(USART1)) {
+        LL_USART_ClearFlag_NE(USART1);
+    }
+
+    if (LL_USART_IsEnabledIT_TC(USART1) && LL_USART_IsActiveFlag_TC(USART1)) {
+        LL_USART_ClearFlag_TC(USART1);
+        LL_USART_DisableIT_TC(USART1);
+        LL_USART_SetTransferDirection(USART1, LL_USART_DIRECTION_RX);
+        LL_USART_ClearFlag_RTO(USART1);
+        LL_USART_EnableIT_RXNE(USART1);
+        LL_USART_EnableIT_RTO(USART1);
+    }
+
+    if (LL_USART_IsActiveFlag_RXNE_RXFNE(USART1)) {
+        uint8_t byte = LL_USART_ReceiveData8(USART1);
+        if (sport_rx_byte(byte)) {
+            sport_poll_pending = 1;
+        }
+    }
+
+    if (LL_USART_IsActiveFlag_RTO(USART1)) {
+        LL_USART_ClearFlag_RTO(USART1);
+        if (sport_poll_pending) {
+            sport_poll_pending = 0;
+            send_telem_DMA(sport_prepare_response(aTxBuffer));
+        }
+    }
+}
+#endif
 
 /* USER CODE BEGIN 1 */
 void DMA1_Ch4_7_DMAMUX1_OVR_IRQHandler(void)

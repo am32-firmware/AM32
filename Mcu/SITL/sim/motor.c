@@ -84,6 +84,7 @@ static struct {
     bool driven_last[3];
     // last terminal voltages for the state stream
     double v_term[3];
+    double bemf[3]; // BEMF used for the most recent electrical step
     // comparator analog front end: RC-filtered phase divider nodes and
     // the filtered virtual-neutral node, plus band-limited input noise
     double v_cmp[3];
@@ -172,6 +173,17 @@ void motor_get_live_state(float* omega, float* theta, float* theta_e,
     }
     *vbus = (float)m.vbus;
     *ibus = (float)m.ibus;
+}
+
+void motor_get_scope(float bemf[3], float filtered[3], float* neutral,
+                     int8_t diodes[3])
+{
+    for (int p = 0; p < 3; p++) {
+        bemf[p] = (float)m.bemf[p];
+        filtered[p] = (float)m.v_cmp[p];
+        diodes[p] = m.diode_state[p];
+    }
+    *neutral = (float)m.vn_cmp;
 }
 
 void motor_init(void)
@@ -371,6 +383,7 @@ void motor_step(uint64_t now_ns, uint32_t dt_ns)
     for (int p = 0; p < 3; p++) {
         shape[p] = trap_shape(thetae + p * (TWO_PI / 3.0));
         e[p] = m.ke * m.omega * shape[p];
+        m.bemf[p] = e[p];
     }
 
     // gate states from the phase mode and the emulated PWM timer. On a

@@ -2,17 +2,9 @@ MCU := SITL
 
 MCU_LC := $(call lc,$(MCU))
 
-ifeq ($(OS),Windows_NT)
-ifeq ($(UNAME_O),Cygwin)
+# Expose SITL to the normal board selector on every host. Native Windows
+# Make delegates this target to Cygwin in the top-level Makefile.
 TARGETS_$(MCU) := $(call get_targets,$(MCU))
-else
-# plain Windows (cmd.exe or git-bash/MinGW): no POSIX environment, the
-# SITL only builds under Cygwin there
-TARGETS_$(MCU) :=
-endif
-else
-TARGETS_$(MCU) := $(call get_targets,$(MCU))
-endif
 
 HAL_FOLDER_$(MCU) := $(HAL_FOLDER)/$(MCU)
 

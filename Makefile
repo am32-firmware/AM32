@@ -69,6 +69,7 @@ $(foreach MCU,$(MCU_TYPES),$(eval SVD_$(MCU) := $(wildcard $(HAL_FOLDER_$(MCU))/
 
 .PHONY : clean all binary $(foreach MCU,$(MCU_TYPES),$(call lc,$(MCU)))
 ALL_TARGETS := $(foreach MCU,$(MCU_TYPES),$(TARGETS_$(MCU)))
+.PHONY: $(ALL_TARGETS) targets arm_sdk_install
 all : $(ALL_TARGETS)
 
 # create targets for compiling one mcu type, eg "make f421"
@@ -128,7 +129,15 @@ $$($(2)_BASENAME).elf: $(SRC_COMMON) $$(SRC_$(1)) $(xSRC)
 # in vscode
 	$(if $(NATIVE_$(1)),,$(QUIET)$(CP) -f Mcu$(DSEP)$(call lc,$(1))$(DSEP)openocd.cfg $(OBJ)$(DSEP)openocd.cfg > $(NUL))
 endef
-$(foreach MCU,$(MCU_TYPES),$(foreach TARGET,$(TARGETS_$(MCU)), $(eval $(call CREATE_BUILD_TARGET,$(MCU),$(TARGET)))))
+
+# The Windows board workflow uses native Make and the ARM SDK. Keep SITL
+# selectable there too, with its host compiler supplied by the Cygwin setup.
+# A database query or dry run only lists the command; it never starts a build.
+define CREATE_WINDOWS_SITL_TARGET
+$(2):
+	@powershell.exe -NoProfile -ExecutionPolicy Bypass -File env_setup_scripts/sitl_windows.ps1 -Action Build
+endef
+$(foreach MCU,$(MCU_TYPES),$(foreach TARGET,$(TARGETS_$(MCU)), $(eval $(call $(if $(and $(WIN_CMD_FLOW),$(NATIVE_$(MCU))),CREATE_WINDOWS_SITL_TARGET,CREATE_BUILD_TARGET),$(MCU),$(TARGET)))))
 
 # include the targets for installing tools
 include $(ROOT)/make/tools_install.mk
@@ -138,4 +147,3 @@ include $(ROOT)/make/tools_install.mk
 targets:
 	$(QUIET)echo List of targets. To build a target use 'make TARGETNAME'
 	$(QUIET)echo $(ALL_TARGETS)
-

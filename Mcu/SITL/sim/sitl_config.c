@@ -318,6 +318,9 @@ static void usage(const char* prog)
            "                   repo): boot starts in the bootloader and resets\n"
            "                   return to it, as on hardware. Default off\n"
            "  --verbose        1Hz state output on stderr\n"
+           "  --log-file FILE  append diagnostics to FILE instead of stderr\n"
+           "  --wait-for-input wait for PWM/DShot packets before booting\n"
+           "  --exit-on-reset  exit instead of re-exec on firmware reset\n"
            "  --nosleep        busy wait instead of sleeping (uses two full\n"
            "                   CPU cores but gives the most accurate timing)\n"
            "  --realtime       SCHED_FIFO scheduling for both threads (needs\n"
@@ -342,6 +345,9 @@ void sitl_config_init(int argc, char** argv)
         { "bootloader", required_argument, NULL, 'B' },
         { "physics-log", required_argument, NULL, 'L' },
         { "verbose", no_argument, NULL, 'v' },
+        { "log-file", required_argument, NULL, 'l' },
+        { "wait-for-input", no_argument, NULL, 'w' },
+        { "exit-on-reset", no_argument, NULL, 'x' },
         { "nosleep", no_argument, NULL, 'N' },
         { "realtime", no_argument, NULL, 'R' },
         { "help", no_argument, NULL, 'h' },
@@ -388,6 +394,15 @@ void sitl_config_init(int argc, char** argv)
             break;
         case 'v':
             sitl_cfg.verbose = true;
+            break;
+        case 'l':
+            sitl_cfg.log_file = optarg;
+            break;
+        case 'w':
+            sitl_cfg.wait_for_input = true;
+            break;
+        case 'x':
+            sitl_cfg.exit_on_reset = true;
             break;
         case 'N':
             sitl_cfg.nosleep = true;

@@ -983,10 +983,10 @@ void startMotor()
     enableCompInterrupts();
 }
 
-void setInput()
+static void setInputProtocol(char dshot_input)
 {
     if (eepromBuffer.bi_direction) {
-        if (dshot == 0) {
+        if (!dshot_input) {
             if (eepromBuffer.rc_car_reverse) {
                 if (newinput > (1000 + (servo_dead_band << 1))) {
                     if (forward == eepromBuffer.dir_reversed) {
@@ -1062,7 +1062,7 @@ void setInput()
                 }
             }
         }
-        if (dshot) {
+        if (dshot_input) {
                      if (eepromBuffer.rc_car_reverse) {
                          if (newinput > 1047) {
                          if (forward == eepromBuffer.dir_reversed) {
@@ -1262,8 +1262,8 @@ if (!stepper_sine && armed) {
                 if (eepromBuffer.rc_car_reverse && prop_brake_active) {
 #ifndef PWM_ENABLE_BRIDGE
 
-                  if (dshot == 0) prop_brake_duty_cycle = (getAbsDif(1000, newinput) + 1000);
-                    if (dshot)  {
+                  if (!dshot_input) prop_brake_duty_cycle = (getAbsDif(1000, newinput) + 1000);
+                    if (dshot_input)  {
                         if (newinput <= 1047 && newinput > 47) prop_brake_duty_cycle = ((newinput - 48) * 2 + 47) - reversing_dead_band;
                         if (newinput > 1047) prop_brake_duty_cycle = ((newinput - 1048) * 2 + 47) - reversing_dead_band;
                     }
@@ -1350,6 +1350,24 @@ if (!stepper_sine && armed) {
 #endif
 }
 
+void setInput()
+{
+    setInputProtocol(dshot != 0);
+}
+
+#if DRONECAN_SUPPORT
+/*
+  DroneCAN RawCommand uses the same 48..2047 encoding as DShot. Keep that
+  interpretation separate from the physical input detector: changing the
+  global dshot flag prevents a connected backup DShot input being decoded
+  after CAN has been in control.
+ */
+void setInputDroneCAN()
+{
+    setInputProtocol(true);
+}
+#endif
+
 void tenKhzRoutine()
 { // 20khz as of 2.00 to be renamed
     duty_cycle = duty_cycle_setpoint;
@@ -1359,7 +1377,11 @@ void tenKhzRoutine()
     one_khz_loop_counter++;
     if (!armed) {
         if (cell_count == 0) {
-            if (inputSet) {
+            if (inputSet
+#if DRONECAN_SUPPORT
+                || DroneCAN_active()
+#endif
+            ) {
                 if (adjusted_input == 0) {
                     armed_timeout_count++;
                     if (armed_timeout_count > LOOP_FREQUENCY_HZ) { // one second
@@ -1387,7 +1409,11 @@ void tenKhzRoutine()
 															playInputTune();
 #endif
                             }
-                            if (!servoPwm && !dshot) {
+                            if (!servoPwm && !dshot
+#if DRONECAN_SUPPORT
+                                && !DroneCAN_active()
+#endif
+                            ) {
                                 eepromBuffer.rc_car_reverse = 0;
                             }
                         } else {

@@ -92,13 +92,8 @@ void dshot_note_status_event(uint8_t event_mask)
 static uint8_t dshot_take_status_events(void)
 {
     const uint8_t events = pending_status_events;
-    pending_status_events &= (uint8_t)~events;
-    return events;
-}
-
-static void dshot_clear_status_events(void)
-{
     pending_status_events = 0;
+    return events;
 }
 
 void computeDshotDMA()
@@ -240,7 +235,7 @@ void computeDshotDMA()
                         break;
                     case 13:
                         dshot_extended_telemetry = 1;
-                        dshot_clear_status_events();
+                        pending_status_events = 0;
                         send_EDT_init = 1;
                         if (EDT_ARM_ENABLE == 1) {
                             EDT_ARMED = 1;

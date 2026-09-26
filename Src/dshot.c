@@ -33,6 +33,9 @@ typedef struct {
 } dshot_telem_scheduler_t;
 
 static dshot_telem_scheduler_t telem_scheduler = {0};
+// Event producers run in the main control path. Telemetry runs there or may
+// preempt it from an ISR; byte accesses are atomic, so an interrupted OR can
+// only re-latch an old event, not lose the new one.
 static volatile uint8_t pending_status_events;
 static uint8_t max_commutation_stress;
 
@@ -80,50 +83,22 @@ uint8_t programming_mode;
 uint16_t position;
 uint8_t  new_byte;
 
-static uint32_t dshot_irq_save(void)
-{
-#ifdef MCU_CH32V203
-    const uint32_t irq_state = __get_MSTATUS();
-#else
-    const uint32_t irq_state = __get_PRIMASK();
-#endif
-    __disable_irq();
-    return irq_state;
-}
-
-static void dshot_irq_restore(uint32_t irq_state)
-{
-#ifdef MCU_CH32V203
-    __set_MSTATUS(irq_state);
-#else
-    if (!irq_state) {
-        __enable_irq();
-    }
-#endif
-}
-
 void dshot_note_status_event(uint8_t event_mask)
 {
-    const uint32_t irq_state = dshot_irq_save();
     pending_status_events |= event_mask & (DSHOT_EDT_STATUS_ALERT
         | DSHOT_EDT_STATUS_WARNING | DSHOT_EDT_STATUS_ERROR);
-    dshot_irq_restore(irq_state);
 }
 
 static uint8_t dshot_take_status_events(void)
 {
-    const uint32_t irq_state = dshot_irq_save();
     const uint8_t events = pending_status_events;
     pending_status_events &= (uint8_t)~events;
-    dshot_irq_restore(irq_state);
     return events;
 }
 
 static void dshot_clear_status_events(void)
 {
-    const uint32_t irq_state = dshot_irq_save();
     pending_status_events = 0;
-    dshot_irq_restore(irq_state);
 }
 
 void computeDshotDMA()

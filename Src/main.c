@@ -398,7 +398,7 @@ char lowkv = 0;
 
 uint16_t min_startup_duty = 120;
 uint16_t sin_mode_min_s_d = 120;
-char bemf_timeout = 10;
+volatile char bemf_timeout = 10;
 
 char startup_boost = 50;
 char reversing_dead_band = 1;
@@ -467,7 +467,7 @@ uint8_t readIndex = 0; // the index of the current reading
 uint32_t total = 0;
 uint16_t readings[50];
 
-uint8_t bemf_timeout_happened = 0;
+volatile uint8_t bemf_timeout_happened = 0;
 uint8_t changeover_step = 5;
 uint8_t filter_level = 5;
 uint8_t running = 0;
@@ -1142,6 +1142,9 @@ void setInput()
     }
 #ifndef BRUSHED_MODE
     if ((bemf_timeout_happened > bemf_timeout) && eepromBuffer.stuck_rotor_protection) {
+        if (bemf_timeout_happened != 102) {
+            dshot_note_status_event(DSHOT_EDT_STATUS_ERROR);
+        }
         allOff();
         maskPhaseInterrupts();
         input = 0;
@@ -2073,6 +2076,7 @@ if(zero_crosses < 5){
             if ((getAbsDif(last_average_interval, average_interval) > average_interval >> 1) && (average_interval < 2000)) { // throttle resitricted before zc 20.
                 zero_crosses = 0;
                 desync_happened++;
+                dshot_note_status_event(DSHOT_EDT_STATUS_WARNING);
                 if ((!eepromBuffer.bi_direction && (input > 47)) || commutation_interval > 1000) {
                     running = 0;
                 }
@@ -2282,6 +2286,7 @@ if(zero_crosses < 5){
               zero_throttle_brake_active = 0;   // reset zero throttle brake on back emf timeout (rotation stop)
               if(running){
                 bemf_timeout_happened++;
+                dshot_note_status_event(DSHOT_EDT_STATUS_ALERT);
                 
                 temp_comp_pwm = eepromBuffer.comp_pwm;
                 maskPhaseInterrupts();

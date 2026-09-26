@@ -10,8 +10,16 @@
 #ifndef INC_DSHOT_H_
 #define INC_DSHOT_H_
 
+#define DSHOT_EDT_FRAME_STRESS 0x0C00U
+#define DSHOT_EDT_FRAME_STATUS 0x0E00U
+
+#define DSHOT_EDT_STATUS_ALERT   (1U << 7)
+#define DSHOT_EDT_STATUS_WARNING (1U << 6)
+#define DSHOT_EDT_STATUS_ERROR   (1U << 5)
+
 void computeDshotDMA(void);
 void make_dshot_package(uint16_t com_time);
+void dshot_note_status_event(uint8_t event_mask);
 
 extern void playInputTune(void);
 extern void playInputTune2(void);

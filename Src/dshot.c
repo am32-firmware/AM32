@@ -26,20 +26,29 @@ typedef struct {
     uint16_t temp_count;
     uint16_t voltage_count;
     uint16_t current_count;
+    uint16_t stress_count;
+    uint16_t status_count;
     uint8_t last_sent_extended;
+    uint8_t last_armed;
 } dshot_telem_scheduler_t;
 
 static dshot_telem_scheduler_t telem_scheduler = {0};
+static volatile uint8_t pending_status_events;
+static uint8_t max_commutation_stress;
 
 // These divisors create ratios regardless of input rate:
 // - Temperature: every 200 calls (4Hz at 800Hz input)
 // - Voltage: every 200 calls (4Hz at 800Hz input)
 // - Current: every 40 calls (20Hz at 800Hz input)
+// - Commutation stress: every 200 calls (4Hz at 800Hz input)
+// - Status: every 800 calls (1Hz at 800Hz input)
 // - eRPM: fills all other slots
 
 #define TEMP_EDT_RATE_DIVISOR    200
 #define VOLTAGE_EDT_RATE_DIVISOR 200
 #define CURRENT_EDT_RATE_DIVISOR 40
+#define STRESS_EDT_RATE_DIVISOR  200
+#define STATUS_EDT_RATE_DIVISOR  800
 
 
 char send_EDT_init;
@@ -51,6 +60,8 @@ volatile uint32_t gcrnumber;
 extern int zero_crosses;
 extern volatile char send_telemetry;
 extern uint8_t max_duty_cycle_change;
+extern volatile char bemf_timeout;
+extern volatile uint8_t bemf_timeout_happened;
 int dshot_full_number;
 extern char play_tone_flag;
 extern char send_esc_info_flag;
@@ -68,6 +79,52 @@ uint16_t halfpulsetime = 0;
 uint8_t programming_mode;
 uint16_t position;
 uint8_t  new_byte;
+
+static uint32_t dshot_irq_save(void)
+{
+#ifdef MCU_CH32V203
+    const uint32_t irq_state = __get_MSTATUS();
+#else
+    const uint32_t irq_state = __get_PRIMASK();
+#endif
+    __disable_irq();
+    return irq_state;
+}
+
+static void dshot_irq_restore(uint32_t irq_state)
+{
+#ifdef MCU_CH32V203
+    __set_MSTATUS(irq_state);
+#else
+    if (!irq_state) {
+        __enable_irq();
+    }
+#endif
+}
+
+void dshot_note_status_event(uint8_t event_mask)
+{
+    const uint32_t irq_state = dshot_irq_save();
+    pending_status_events |= event_mask & (DSHOT_EDT_STATUS_ALERT
+        | DSHOT_EDT_STATUS_WARNING | DSHOT_EDT_STATUS_ERROR);
+    dshot_irq_restore(irq_state);
+}
+
+static uint8_t dshot_take_status_events(void)
+{
+    const uint32_t irq_state = dshot_irq_save();
+    const uint8_t events = pending_status_events;
+    pending_status_events &= (uint8_t)~events;
+    dshot_irq_restore(irq_state);
+    return events;
+}
+
+static void dshot_clear_status_events(void)
+{
+    const uint32_t irq_state = dshot_irq_save();
+    pending_status_events = 0;
+    dshot_irq_restore(irq_state);
+}
 
 void computeDshotDMA()
 {
@@ -208,6 +265,7 @@ void computeDshotDMA()
                         break;
                     case 13:
                         dshot_extended_telemetry = 1;
+                        dshot_clear_status_events();
                         send_EDT_init = 1;
                         if (EDT_ARM_ENABLE == 1) {
                             EDT_ARMED = 1;
@@ -242,8 +300,30 @@ void computeDshotDMA()
 void make_dshot_package(uint16_t com_time)
 {
     uint16_t extended_frame_to_send = 0;
+    uint8_t commutation_stress = 0;
 
-    if (dshot_extended_telemetry) {
+    if (running) {
+        const uint8_t timeout_count = bemf_timeout_happened;
+        const uint8_t timeout_limit = (uint8_t)bemf_timeout;
+        const uint16_t stress = (uint16_t)timeout_count * 255U / ((uint16_t)timeout_limit + 1U);
+        commutation_stress = stress > 255U ? 255U : (uint8_t)stress;
+    }
+
+    if (armed && !telem_scheduler.last_armed) {
+        max_commutation_stress = 0;
+    }
+    telem_scheduler.last_armed = armed;
+    if (armed && commutation_stress > max_commutation_stress) {
+        max_commutation_stress = commutation_stress;
+    }
+
+    if (send_EDT_init) {
+        extended_frame_to_send = DSHOT_EDT_FRAME_STATUS;
+        send_EDT_init = 0;
+    } else if (send_EDT_deinit) {
+        extended_frame_to_send = DSHOT_EDT_FRAME_STATUS | 0x00FFU;
+        send_EDT_deinit = 0;
+    } else if (dshot_extended_telemetry) {
         // Only send extended telemetry if last frame wasn't extended. This ensures eRPM interleaving.
         if (telem_scheduler.last_sent_extended) {
             telem_scheduler.last_sent_extended = 0;
@@ -252,10 +332,22 @@ void make_dshot_package(uint16_t com_time)
             telem_scheduler.current_count++;
             telem_scheduler.voltage_count++;
             telem_scheduler.temp_count++;
+            telem_scheduler.stress_count++;
+            telem_scheduler.status_count++;
 
-            if (telem_scheduler.current_count >= CURRENT_EDT_RATE_DIVISOR) {
+            if (pending_status_events || telem_scheduler.status_count >= STATUS_EDT_RATE_DIVISOR) {
+                const uint8_t status = dshot_take_status_events()
+                    | (max_commutation_stress >> 4);
+                extended_frame_to_send = DSHOT_EDT_FRAME_STATUS | status;
+                telem_scheduler.status_count = 0;
+            }
+            else if (telem_scheduler.current_count >= CURRENT_EDT_RATE_DIVISOR) {
                 extended_frame_to_send = 0b0110 << 8 | (uint8_t)(actual_current / 100);
                 telem_scheduler.current_count = 0;
+            }
+            else if (telem_scheduler.stress_count >= STRESS_EDT_RATE_DIVISOR) {
+                extended_frame_to_send = DSHOT_EDT_FRAME_STRESS | commutation_stress;
+                telem_scheduler.stress_count = 0;
             }
             else if (telem_scheduler.voltage_count >= VOLTAGE_EDT_RATE_DIVISOR) {
                 extended_frame_to_send = 0b0100 << 8 | (uint8_t)(battery_voltage / 25);
@@ -267,15 +359,7 @@ void make_dshot_package(uint16_t com_time)
             }
         }
     }
-      if(send_EDT_init){
-        extended_frame_to_send = 0b111000000000;
-        send_EDT_init = 0;
-      }
-      if(send_EDT_deinit){
-        extended_frame_to_send = 0b111011111111;
-        send_EDT_deinit = 0;
-      }
-    
+
     if (extended_frame_to_send > 0) {
         dshot_full_number = extended_frame_to_send;
         telem_scheduler.last_sent_extended = 1;

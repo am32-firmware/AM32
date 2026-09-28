@@ -13,6 +13,7 @@
 #include "serial_telemetry.h"
 #include "sounds.h"
 #include "targets.h"
+#include "ultra.h"
 int max_servo_deviation = 250;
 int servorawinput;
 uint16_t smallestnumber = 20000;
@@ -31,6 +32,7 @@ uint32_t average_packet_length;
 uint16_t dshot_frametime_high = 50000;
 uint16_t dshot_frametime_low = 0;
 
+#ifndef ULTRA_DEDICATED
 void computeMSInput()
 {
 
@@ -115,9 +117,19 @@ void computeServoInput()
     }
 }
 
+#endif // !ULTRA_DEDICATED
+
 void transfercomplete()
 {
-#ifndef MCU_F031   // f031 does not use software EXTI event to process dshot
+#ifdef ULTRA_DEDICATED
+    if (armed && dshot) {
+        // polled one-way dshot: runDshotCheck() invoked this and re-arms
+        // the DMA itself; just flag the packet for processDshot
+        compute_dshot_flag = 1;
+        return;
+    }
+#endif
+#if !defined(MCU_F031) && !defined(ULTRA_DEDICATED)   // f031 does not use software EXTI event to process dshot
     if (armed && dshot_telemetry) {
         if (out_put) {
             receiveDshotDma();
@@ -137,6 +149,15 @@ void transfercomplete()
     }
     if (inputSet == 1) {
 
+#ifdef ULTRA_DEDICATED
+        // dedicated ultra build: dshot input only. 100.20 reference does
+        // NOT re-init the DMA here - runDshotCheck() resets the channel
+        // itself after this returns (a receiveDshotDma() call here would
+        // reconfigure the DMA while the channel is still enabled)
+        if (dshot == 1) {
+            computeDshotDMA();
+        }
+#else
         if (dshot_telemetry) {
             if (out_put) {
                 make_dshot_package(e_com_time);
@@ -163,6 +184,7 @@ void transfercomplete()
                 receiveDshotDma();
             }
         }
+#endif // !ULTRA_DEDICATED
         if (!armed) {
             if (dshot && (average_count < 8) && (zero_input_count > 5)) {
                 average_count++;

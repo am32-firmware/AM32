@@ -227,6 +227,7 @@ an settings option)
 #include "phaseouts.h"
 #include "serial_telemetry.h"
 #include "kiss_telemetry.h"
+#include "ultra.h"
 #include "signal.h"
 #include "sounds.h"
 #include "targets.h"
@@ -411,6 +412,12 @@ char fast_deccel = 0;
 uint16_t last_duty_cycle = 0;
 uint16_t duty_cycle_setpoint = 0;
 char play_tone_flag = 0;
+
+#ifdef ULTRA_DEDICATED
+uint16_t DMA_start_bit = 0;
+uint16_t valid_packet_high = 0;
+uint16_t packet_length_badcounts = 0;
+#endif
 
 typedef enum { GPIO_PIN_RESET = 0U,
     GPIO_PIN_SET } GPIO_PinState;
@@ -985,6 +992,14 @@ void startMotor()
 
 void setInput()
 {
+#ifdef ULTRA_DEDICATED
+    // while a tone plays, input must not start the motor mid-beep; the
+    // tone engine aborts on incoming throttle (newinput) and processing
+    // resumes the next cycle
+    if (beeping) {
+        return;
+    }
+#endif
     if (eepromBuffer.bi_direction) {
         if (dshot == 0) {
             if (eepromBuffer.rc_car_reverse) {
@@ -1224,6 +1239,7 @@ if (!stepper_sine && armed) {
         }
 
         if (input < 47 + (80 * eepromBuffer.use_sine_start)) {
+#ifndef ULTRA_DEDICATED // ultra plays tones via the 1kHz engine
             if (play_tone_flag != 0) {
                 switch (play_tone_flag) {
 									
@@ -1245,6 +1261,7 @@ if (!stepper_sine && armed) {
                 }
                 play_tone_flag = 0;
             }
+#endif // !ULTRA_DEDICATED
 
             if (!eepromBuffer.comp_pwm) {
                 duty_cycle_setpoint = 0;
@@ -1350,8 +1367,135 @@ if (!stepper_sine && armed) {
 #endif
 }
 
+#ifdef ULTRA_DEDICATED
+// ---------------------------------------------------------------------------
+// non-blocking tone engine: tones advance as a 1kHz state machine instead of
+// blocking the 20kHz ISR with delayMillis. DShot input, motor commands and
+// telemetry keep flowing while a tone plays; incoming throttle aborts the
+// tone instantly. Replaces the blocking sounds.c players for ultra builds.
+extern uint8_t beep_volume;
+typedef struct {
+    uint8_t psc; // TIM1 prescaler = tone pitch
+    uint8_t com; // comStep phase (0 = keep previous)
+    uint16_t ms; // step duration, 0 = end of sequence
+} ultra_tone_step_t;
+// DShot standard beacons: one single-pitch beep per beacon index,
+// frequency ascending 1 -> 5 (lower TIM1 prescaler = higher pitch)
+static const ultra_tone_step_t ultra_tone_beacon1[] = { { 100, 2, 100 }, { 0, 0, 0 } };
+static const ultra_tone_step_t ultra_tone_beacon2[] = { { 80, 2, 100 }, { 0, 0, 0 } };
+static const ultra_tone_step_t ultra_tone_beacon3[] = { { 60, 2, 100 }, { 0, 0, 0 } };
+static const ultra_tone_step_t ultra_tone_beacon4[] = { { 45, 2, 100 }, { 0, 0, 0 } };
+static const ultra_tone_step_t ultra_tone_beacon5[] = { { 30, 2, 100 }, { 0, 0, 0 } };
+static const ultra_tone_step_t ultra_tone_input[] = { { 80, 3, 100 }, { 70, 3, 100 }, { 40, 3, 100 }, { 0, 0, 0 } };
+static const ultra_tone_step_t* ultra_tone_seq = 0;
+static uint8_t ultra_tone_step_idx = 0;
+static uint16_t ultra_tone_ms = 0;
+
+static void ultraToneStop(void)
+{
+    allOff();
+    SET_PRESCALER_PWM(0);
+    SET_AUTO_RELOAD_PWM(TIMER1_MAX_ARR);
+    ultra_tone_seq = 0;
+    signaltimeout = 0;
+    beeping = 0;
+}
+
+static void ultraToneApply(uint8_t psc, uint8_t com)
+{
+    if (psc == 0) { // silence step (morse gap)
+        SET_DUTY_CYCLE_ALL(0);
+        return;
+    }
+    SET_PRESCALER_PWM(psc);
+    if (com > 0 && com < 7) {
+        comStep(com);
+    }
+    SET_DUTY_CYCLE_ALL(beep_volume);
+}
+
+static void ultraToneStart(uint8_t tone)
+{
+    beeping = 1;
+    SET_AUTO_RELOAD_PWM(TIM1_AUTORELOAD);
+    switch (tone) {
+    case 1:
+        ultra_tone_seq = ultra_tone_beacon1;
+        break;
+    case 2:
+        ultra_tone_seq = ultra_tone_beacon2;
+        break;
+    case 3:
+        ultra_tone_seq = ultra_tone_beacon3;
+        break;
+    case 4:
+        ultra_tone_seq = ultra_tone_beacon4;
+        break;
+    case 5:
+        ultra_tone_seq = ultra_tone_beacon5;
+        break;
+    case 6: // arming / input tune
+        ultra_tone_seq = ultra_tone_input;
+        break;
+    default:
+        ultraToneStop();
+        return;
+    }
+    ultra_tone_step_idx = 0;
+    ultraToneApply(ultra_tone_seq[0].psc, ultra_tone_seq[0].com);
+    ultra_tone_ms = ultra_tone_seq[0].ms;
+}
+
+static void ultraToneTick(void) // 1kHz, only while beeping
+{
+    if (newinput > 90) { // throttle arrived - abort instantly
+        ultraToneStop();
+        return;
+    }
+    if (ultra_tone_ms > 0 && --ultra_tone_ms > 0) {
+        return;
+    }
+    ultra_tone_step_idx++;
+    if (ultra_tone_seq && ultra_tone_seq[ultra_tone_step_idx].ms > 0) {
+        ultraToneApply(ultra_tone_seq[ultra_tone_step_idx].psc, ultra_tone_seq[ultra_tone_step_idx].com);
+        ultra_tone_ms = ultra_tone_seq[ultra_tone_step_idx].ms;
+    } else {
+        ultraToneStop();
+    }
+}
+#endif // ULTRA_DEDICATED
+
 void tenKhzRoutine()
 { // 20khz as of 2.00 to be renamed
+#ifdef ULTRA_DEDICATED
+    // dshot input DMA runs without interrupts and is drained here; edges
+    // closer than valid_packet_high*2 to the last capture are still part
+    // of a packet or noise burst
+    valid_packet_high = (dshot_frametime_high >> 4);
+    runDshotCheck();
+    { // tone engine at 1kHz - outside the beeping guard on purpose, the
+      // active tone must keep advancing while beeping == 1
+        static uint8_t ultra_tone_div = 0;
+        if (++ultra_tone_div >= 20) {
+            ultra_tone_div = 0;
+            if (beeping) {
+                if (play_tone_flag != 0) {
+                    // the FC shapes patterns (SOS etc.) by streaming beacon
+                    // commands: a repeated beacon extends the active beep
+                    ultra_tone_ms = 100;
+                    play_tone_flag = 0;
+                }
+                ultraToneTick();
+            } else if (play_tone_flag != 0 && running == 0) {
+                // start here, ahead of the motor PWM block below: that block
+                // is skipped once beeping is set, so nothing in this pass
+                // overwrites the tone's TIM1 period and duty
+                ultraToneStart((uint8_t)play_tone_flag);
+                play_tone_flag = 0;
+            }
+        }
+    }
+#endif
     duty_cycle = duty_cycle_setpoint;
     tenkhzcounter++;
     ledcounter++;
@@ -1375,13 +1519,19 @@ void tenKhzRoutine()
 #endif
                             if ((cell_count == 0) && eepromBuffer.low_voltage_cut_off == 1) {
                                 cell_count = battery_voltage / 370;
+#ifdef ULTRA_DEDICATED
+                                play_tone_flag = 6; // single non-blocking arm tune
+#else
                                 for (int i = 0; i < cell_count; i++) {
                                     playInputTune();
                                     delayMillis(100);
                                     RELOAD_WATCHDOG_COUNTER();
                                 }
+#endif
                             } else {
-#ifdef MCU_AT415
+#ifdef ULTRA_DEDICATED
+                                play_tone_flag = 6; // non-blocking arm tune
+#elif defined(MCU_AT415)
 															play_tone_flag = 4;
 #else
 															playInputTune();
@@ -1415,6 +1565,11 @@ void tenKhzRoutine()
 
 #ifndef BRUSHED_MODE
 
+#ifdef ULTRA_DEDICATED
+    // no motor PWM register writes while a tone plays - the tone engine
+    // owns TIM1 ARR/prescaler/duty
+    if (!beeping)
+#endif
     if (!stepper_sine) {
 #ifndef CUSTOM_RAMP
         if (old_routine && running) {
@@ -1577,6 +1732,7 @@ void processDshot()
         computeDshotDMA();
         compute_dshot_flag = 0;
     }
+#ifndef ULTRA_DEDICATED // ultra: one-way dshot only, no GCR response
     if (compute_dshot_flag == 2) {
       if(e_com_time > 65535){    // beyond dshot range
         make_dshot_package(65535);
@@ -1586,7 +1742,33 @@ void processDshot()
         compute_dshot_flag = 0;
         return;
     }
+#endif
+#if defined(ULTRA_DEDICATED) && defined(USE_SERIAL_TELEMETRY)
+    // fast telemetry: answer the telemetry request of the packet that
+    // was just parsed instead of waiting for the 20kHz loop
+    // keep answering while a buzzer beacon plays: the Ultra FC treats a
+    // telemetry gap as an ESC reboot and drops its link back to 115200
+    if (send_telemetry) {
+        makeTelemPackage((int8_t)degrees_celsius, battery_voltage, actual_current,
+            (uint16_t)(consumed_current >> 16), e_rpm);
+        send_telem_DMA(10);
+        send_telemetry = 0;
+    } else if (send_esc_info_flag) {
+        makeInfoPacket();
+        send_telem_DMA(49);
+        send_esc_info_flag = 0;
+    }
+#endif
     setInput();
+#ifdef ULTRA_DEDICATED
+    // 100.20 reference: kick a fresh ADC conversion per parsed packet so
+    // the fast telemetry always reports current voltage/temperature
+#ifdef ARTERY
+    ADC_DMA_Callback();
+    adc_ordinary_software_trigger_enable(ADC1, TRUE);
+    converted_degrees = getConvertedDegrees(ADC_raw_temp);
+#endif
+#endif
 }
 
 void advanceincrement()
@@ -2112,6 +2294,7 @@ if(zero_crosses < 5){
          }
 #endif
 #endif
+#ifndef ULTRA_DEDICATED // ultra answers telemetry per packet in processDshot
         if (send_telemetry) {
 #ifdef USE_SERIAL_TELEMETRY
             makeTelemPackage((int8_t)degrees_celsius, battery_voltage, actual_current,
@@ -2124,6 +2307,7 @@ if(zero_crosses < 5){
            send_telem_DMA(49);
            send_esc_info_flag = 0;
         }
+#endif // !ULTRA_DEDICATED
         if (PROCESS_ADC_FLAG == 1) { // for adc and telemetry set adc counter at 1khz loop rate
           ADC_DMA_Callback(); // common to all, Call ADC_DMA callback to get raw data
 #ifdef NO_CURRENT_SENSE

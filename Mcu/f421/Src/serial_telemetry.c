@@ -14,6 +14,14 @@
 
 void send_telem_DMA(uint8_t bytes)
 { // set data length and enable channel to start transfer
+#ifdef ULTRA_DEDICATED
+    // never abort an in-flight transfer: disabling the channel mid-frame
+    // puts a partial frame on the wire and desyncs the FC parser.
+    // Skip instead - the FC re-requests with the next packet.
+    if (DMA1_CHANNEL4->ctrl_bit.chen && (DMA1_CHANNEL4->dtcnt != 0)) {
+        return;
+    }
+#endif
     DMA1_CHANNEL4->ctrl_bit.chen = FALSE;
     DMA1_CHANNEL4->dtcnt = bytes;
     DMA1_CHANNEL4->ctrl_bit.chen = TRUE;
@@ -61,10 +69,28 @@ void telem_UART_Init(void)
     usart_enable(USART2, TRUE);
 }
 
+#ifdef ULTRA_DEDICATED
+void setBaudRate(uint32_t baud)
+{
+    DMA1_CHANNEL4->ctrl_bit.chen = FALSE;
+    usart_enable(USART2, FALSE);
+    usart_init(USART2, baud, USART_DATA_8BITS, USART_STOP_1_BIT);
+    usart_enable(USART2, TRUE);
+}
+#endif
+
 #else
 
 void send_telem_DMA(uint8_t bytes)
 { // set data length and enable channel to start transfer
+#ifdef ULTRA_DEDICATED
+    // never abort an in-flight transfer: disabling the channel mid-frame
+    // puts a partial frame on the wire and desyncs the FC parser.
+    // Skip instead - the FC re-requests with the next packet.
+    if (DMA1_CHANNEL2->ctrl_bit.chen && (DMA1_CHANNEL2->dtcnt != 0)) {
+        return;
+    }
+#endif
     DMA1_CHANNEL2->ctrl_bit.chen = FALSE;
     DMA1_CHANNEL2->dtcnt = bytes;
     DMA1_CHANNEL2->ctrl_bit.chen = TRUE;
@@ -117,4 +143,13 @@ void telem_UART_Init(void)
     nvic_irq_enable(DMA1_Channel3_2_IRQn, 3, 0);
 }
 
+#ifdef ULTRA_DEDICATED
+void setBaudRate(uint32_t baud)
+{
+    DMA1_CHANNEL2->ctrl_bit.chen = FALSE;
+    usart_enable(USART1, FALSE);
+    usart_init(USART1, baud, USART_DATA_8BITS, USART_STOP_1_BIT);
+    usart_enable(USART1, TRUE);
+}
+#endif
 #endif

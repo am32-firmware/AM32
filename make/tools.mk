@@ -50,7 +50,7 @@ NUL:=/dev/null
 MKDIR:=mkdir
 RM:=rm
 CUT:=cut
-FGREP:=fgrep
+FGREP:=grep -F
 OSDIR:=macos
 else
 # assume Linux
@@ -61,7 +61,7 @@ NUL:=/dev/null
 MKDIR:=mkdir
 RM:=rm
 CUT:=cut
-FGREP:=fgrep
+FGREP:=grep -F
 OSDIR:=linux
 endif
 endif

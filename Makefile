@@ -113,7 +113,9 @@ $(eval xSRC := $$(if $$(call has_can_suffix,$$(2)),$(SRC_CAN_$(1))))
 $(eval xCFLAGS_COMMON := $(if $(CFLAGS_COMMON_$(1)),$(CFLAGS_COMMON_$(1)),$(CFLAGS_COMMON)))
 $(eval xLDFLAGS_COMMON := $(if $(LDFLAGS_COMMON_$(1)),$(LDFLAGS_COMMON_$(1)),$(LDFLAGS_COMMON)))
 
-CFLAGS_$(2) = -DAM32_MCU=\"$(MCU)\" $(MCU_$(1)) -D$(2) $(CFLAGS_$(1)) $(xCFLAGS_COMMON) $(xCFLAGS)
+# a FOO_ULTRA target builds the FOO hardware target as a dedicated KISS
+# Ultra artifact (see Inc/ultra.h)
+CFLAGS_$(2) = -DAM32_MCU=\"$(MCU)\" $(MCU_$(1)) $(if $(filter %_ULTRA,$(2)),-D$(patsubst %_ULTRA,%,$(2)) -DULTRA_DEDICATED,-D$(2)) $(CFLAGS_$(1)) $(xCFLAGS_COMMON) $(xCFLAGS)
 LDFLAGS_$(2) = $(xLDFLAGS_COMMON) $(LDFLAGS_$(1)) $(if $(xLDSCRIPT),-T$(xLDSCRIPT))
 
 -include $$($(2)_BASENAME).d

@@ -32,9 +32,19 @@ void runDshotCheck()
         if (armed) {
             if ((IC_TIMER_REGISTER->cval - dma_buffer[63 - INPUT_DMA_CHANNEL->dtcnt]) > (uint32_t)(valid_packet_high << 1)) {
                 if (INPUT_DMA_CHANNEL->dtcnt <= 32) {
-                    DMA_start_bit = 32 - INPUT_DMA_CHANNEL->dtcnt;
-                    transfercomplete();
-                    EXINT->swtrg = EXINT_LINE_15;
+                    uint16_t start = 32 - INPUT_DMA_CHANNEL->dtcnt;
+                    // edges beyond 32 are only skipped as noise ahead of the
+                    // packet when an idle gap separates them from it: a noise
+                    // edge after the packet would shift the decode by one
+                    // edge and invert every bit, and an inverted zero-throttle
+                    // frame is full throttle with a valid CRC
+                    if (start == 0 || (uint16_t)(dma_buffer[start] - dma_buffer[start - 1]) > valid_packet_high) {
+                        DMA_start_bit = start;
+                        transfercomplete();
+                        EXINT->swtrg = EXINT_LINE_15;
+                    } else {
+                        packet_length_badcounts++;
+                    }
                 } else {
                     packet_length_badcounts++;
                 }

@@ -17,7 +17,8 @@
       cmd 0 SUBSCRIBE: u32 period_ns; flags byte bit0 = averaged
         sampling (currents/voltages are the mean over each sample
         period instead of instantaneous, avoiding PWM aliasing at
-        coarse periods)
+        coarse periods); bit1 requests version 3 scope samples (always
+        instantaneous). Without bit1 the version 2 layout is unchanged.
       cmd 1 LOAD_MODEL: JSON file path (rest of packet)
       cmd 2 SET_SPEEDUP: float speedup (0 = free run)
       cmd 3 SUBSCRIBE_TONES: no payload. Streams tone events: the
@@ -46,7 +47,10 @@
         sample stream the subscription expires two seconds after the
         last refresh; an identical refresh only extends it
   SITL -> client:
-    u16 magic 0x5354, u8 version=1, u8 count, count * sample
+    u16 magic 0x5354, u8 version=2 or 3, u8 count, count * sample
+        v3 appends: float bemf[3], filtered_phase[3], filtered_neutral;
+        i8 diodes[3] (-1 low, 0 off, +1 high), u8 pad;
+        float active_duty (0..1), u32 firmware_desync_count
     u16 magic 0x5355, u8 ok, u8 pad, message   (LOAD_MODEL reply)
     u16 magic 0x5359, u8 version=1, u8 count, count * u8 resolved
         (WATCH_VARS reply, one flag per requested name)
@@ -75,6 +79,7 @@
 #include "motor.h"
 #include "sitl_net.h"
 
+#include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -108,7 +113,20 @@ struct __attribute__((packed)) state_sample {
     uint8_t pad[3];
 };
 
-#define STATE_BATCH 16
+struct __attribute__((packed)) scope_sample {
+    struct state_sample state;
+    float bemf[3], filtered[3], neutral;
+    int8_t diodes[3];
+    uint8_t pad;
+    float duty;
+    uint32_t desync_count;
+};
+
+_Static_assert(sizeof(struct state_sample) == 60, "state protocol v2 layout");
+_Static_assert(sizeof(struct scope_sample) == 100, "state protocol v3 layout");
+
+// Keep extended packets below the usual Ethernet MTU, including UDP/IP.
+#define STATE_BATCH 12
 
 static int fd = -1;
 static struct sockaddr_in sub_addr;
@@ -117,6 +135,7 @@ static time_t sub_expire;
 static uint32_t period_req_ns = 50000; // requested by the subscriber
 static uint32_t period_ns = 50000; // effective, wall rate limited
 static bool averaged; // mean over the period instead of point samples
+static bool scope_samples;
 static double sig_acc[8];
 static uint32_t sig_n;
 static uint64_t next_sample_ns;
@@ -126,7 +145,7 @@ static struct __attribute__((packed)) {
     uint16_t magic;
     uint8_t version;
     uint8_t count;
-    struct state_sample s[STATE_BATCH];
+    struct scope_sample s[STATE_BATCH];
 } batch = { .magic = STATE_MAGIC_DATA, .version = 2 };
 
 // tone event stream (cmd 3)
@@ -670,12 +689,16 @@ void sitl_state_poll(void)
     }
     const uint8_t cmd = pkt[2];
     if (cmd == 0 && ret >= 8) {
+        const bool want_scope = (pkt[3] & 2) != 0;
+        const bool want_averaged = (pkt[3] & 1) != 0 && !want_scope;
+        const bool format_changed = want_scope != scope_samples || want_averaged != averaged;
         memcpy(&period_req_ns, pkt + 4, 4);
-        averaged = (pkt[3] & 1) != 0;
+        scope_samples = want_scope;
+        averaged = want_averaged;
         apply_period();
         // a new subscriber must not receive samples batched for the
         // previous one
-        if (!have_sub || src.sin_addr.s_addr != sub_addr.sin_addr.s_addr
+        if (format_changed || !have_sub || src.sin_addr.s_addr != sub_addr.sin_addr.s_addr
             || src.sin_port != sub_addr.sin_port) {
             batch.count = 0;
             memset(sig_acc, 0, sizeof(sig_acc));
@@ -780,7 +803,8 @@ void sitl_state_step(uint64_t now_ns)
     }
     next_sample_ns = now_ns + period_ns;
 
-    struct state_sample* s = &batch.s[batch.count];
+    struct scope_sample* scope = &batch.s[batch.count];
+    struct state_sample* s = &scope->state;
     memset(s, 0, sizeof(*s));
     s->t_ns = now_ns;
     float omega, theta, theta_e, i[3], v[3], vbus, ibus;
@@ -814,11 +838,39 @@ void sitl_state_step(uint64_t now_ns)
     }
     s->comp_phase = sitl_comp_phase;
     s->comp_out = sitl_comp_out;
+    if (scope_samples) {
+        float bemf[3], filtered[3], neutral;
+        int8_t diodes[3];
+        motor_get_scope(bemf, filtered, &neutral, diodes);
+        memcpy(scope->bemf, bemf, sizeof(bemf));
+        memcpy(scope->filtered, filtered, sizeof(filtered));
+        memcpy(scope->diodes, diodes, sizeof(diodes));
+        scope->neutral = neutral;
+        scope->pad = 0;
+        uint32_t psc, arr, ccr[3];
+        sitl_tim1_get_active(&psc, &arr, ccr);
+        scope->duty = fminf(1.0f, (float)ccr[0] / ((double)arr + 1));
+        extern uint32_t desync_happened;
+        scope->desync_count = desync_happened;
+    }
     batch.count++;
 
     if (batch.count >= STATE_BATCH || now_ns - last_flush_ns > 5000000ULL) {
-        sendto(fd, &batch, 4 + batch.count * sizeof(struct state_sample), 0,
-               (struct sockaddr*)&sub_addr, sizeof(sub_addr));
+        if (scope_samples) {
+            batch.version = 3;
+            sendto(fd, &batch, 4 + batch.count * sizeof(struct scope_sample), 0,
+                   (struct sockaddr*)&sub_addr, sizeof(sub_addr));
+        } else {
+            uint8_t legacy[4 + STATE_BATCH * sizeof(struct state_sample)];
+            batch.version = 2;
+            memcpy(legacy, &batch, 4);
+            for (unsigned k = 0; k < batch.count; k++) {
+                memcpy(legacy + 4 + k * sizeof(struct state_sample),
+                       &batch.s[k].state, sizeof(struct state_sample));
+            }
+            sendto(fd, legacy, 4 + batch.count * sizeof(struct state_sample), 0,
+                   (struct sockaddr*)&sub_addr, sizeof(sub_addr));
+        }
         batch.count = 0;
         last_flush_ns = now_ns;
     }

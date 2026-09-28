@@ -786,7 +786,7 @@ void loadEEpromSettings()
           }
         }
         
-        if (motor_kv < 300) {
+        if (motor_kv <= 20) {
             low_rpm_throttle_limit = 0;
         }
         // guard divisions for an erased eeprom (motor_poles 0 or 0xff),
@@ -2125,8 +2125,14 @@ if(zero_crosses < 5){
            send_esc_info_flag = 0;
         }
         if (PROCESS_ADC_FLAG == 1) { // for adc and telemetry set adc counter at 1khz loop rate
+          ADC_DMA_Callback(); // common to all, Call ADC_DMA callback to get raw data
+#ifdef NO_CURRENT_SENSE
+          ADC_raw_current = 0;
+#endif
+#ifdef NO_VOLTAGE_SENSE
+          ADC_raw_volts = 0;
+#endif          
 #if defined(STMICRO)
-            ADC_DMA_Callback();
             LL_ADC_REG_StartConversion(ADC1);
 #ifdef USE_ADC_1_2
           LL_ADC_REG_StartConversion(ADC2);
@@ -2134,13 +2140,11 @@ if(zero_crosses < 5){
             converted_degrees = __LL_ADC_CALC_TEMPERATURE(3300, ADC_raw_temp, LL_ADC_RESOLUTION_12B);
 #endif
 #ifdef MCU_GDE23
-            ADC_DMA_Callback();
             // converted_degrees = (1.43 - ADC_raw_temp * 3.3 / 4096) * 1000 / 4.3 + 25;
             converted_degrees = ((int32_t)(357.5581395348837f * (1 << 16)) - ADC_raw_temp * (int32_t)(0.18736373546511628f * (1 << 16))) >> 16;
             adc_software_trigger_enable(ADC_REGULAR_CHANNEL);
 #endif
-#ifdef ARTERY
-            ADC_DMA_Callback();
+#ifdef ARTERY            
             adc_ordinary_software_trigger_enable(ADC1, TRUE);
     #ifdef USE_NTC
             converted_degrees = getNTCDegrees(ADC_raw_ntc);
@@ -2149,12 +2153,8 @@ if(zero_crosses < 5){
     #endif
 #endif
 #ifdef NXP
-            //Call ADC_DMA callback to get raw data
-            ADC_DMA_Callback();
-
             //Convert temperature data to actual temperature in degrees Celsius
             converted_degrees = computeTemperature(ADC_raw_temp[0], ADC_raw_temp[1]);
-
             //Start ADC conversion
             startADCConversion();
 #endif

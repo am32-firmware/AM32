@@ -137,6 +137,24 @@ int main(int argc, char** argv)
     install_coverage_handlers();
 #endif
     sitl_config_init(argc, argv);
+    if (sitl_cfg.log_file != NULL) {
+        // Cygwin GDB in VS Code can leave the inferior's stderr pipe
+        // unread. Once it fills, even an ordinary verbose print blocks
+        // physics and UDP polling. A file also preserves reset messages.
+        const int fd = open(sitl_cfg.log_file, O_WRONLY | O_CREAT | O_APPEND, 0644);
+        if (fd < 0) {
+            perror("SITL: open diagnostic log");
+            return 1;
+        }
+        if (dup2(fd, STDERR_FILENO) < 0) {
+            perror("SITL: redirect diagnostic log");
+            close(fd);
+            return 1;
+        }
+        if (fd != STDERR_FILENO) {
+            close(fd);
+        }
+    }
     if (sitl_cfg.bootloader_path != NULL) {
         if (getenv("AM32_SITL_FROM_BL") == NULL) {
             // hardware boots into the bootloader first; it execs us
@@ -156,6 +174,9 @@ int main(int argc, char** argv)
 
     sitl_input_init();
     sitl_state_init();
+    if (sitl_cfg.wait_for_input) {
+        sitl_input_wait();
+    }
     sitl_start_sim_thread();
     return am32_main();
 }

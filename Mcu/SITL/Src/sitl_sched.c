@@ -2,8 +2,9 @@
   sitl_sched.c - simulated time, interrupt delivery and pacing for AM32 SITL
 
   The sim thread advances simulated time in fixed physics steps. Emulated
-  interrupts are delivered by suspending the firmware thread with SIGUSR1
-  (parking it on a semaphore) and running the handler in the sim thread,
+  interrupts are delivered by suspending the firmware thread (with OS
+  thread suspension on Windows, or SIGUSR1 and a semaphore on POSIX)
+  and running the handler in the sim thread,
   which reproduces the run-to-completion, mainline-frozen semantics of real
   interrupts. __disable_irq()/__enable_irq() map onto an atomic PRIMASK
   flag; while set, events stay pending exactly as on hardware.
@@ -23,13 +24,15 @@
 #endif
 #include <time.h>
 #include <unistd.h>
-#ifdef _WIN32
-// native Windows (MinGW): the firmware thread is suspended with the
-// Windows scheduler rather than a POSIX signal, and there is no
-// re-exec, so signals and POSIX semaphores are not used
+#if defined(_WIN32) || defined(__CYGWIN__)
+// Use OS thread suspension on both Windows toolchains. Cygwin's SIGUSR1
+// delivery can produce spurious SIGTRAP stops under GDB, even without
+// user breakpoints. Keep the POSIX exec path for Cygwin below.
+#define SITL_WINDOWS_THREADS
 #include <windows.h>
 #include <process.h>
-#else
+#endif
+#ifndef _WIN32
 #include <semaphore.h>
 #include <signal.h>
 #endif
@@ -78,7 +81,7 @@ static volatile uint8_t irq_prio[SITL_IRQ_MAX];
   park/resume semaphores. macOS has no unnamed POSIX semaphores or
   sem_timedwait, so it uses GCD semaphores instead
  */
-#if defined(_WIN32)
+#ifdef SITL_WINDOWS_THREADS
 typedef HANDLE sitl_sem_t;
 static void sitl_sem_init(sitl_sem_t* s)
 {
@@ -319,8 +322,8 @@ void sitl_primask_clear(void)
   a locked stdio/heap call while the sim thread also takes that lock, so
   diagnostics prints are kept rare.
  */
-#ifdef _WIN32
-// native Windows: freeze the firmware thread with the OS scheduler.
+#ifdef SITL_WINDOWS_THREADS
+// Windows: freeze the firmware thread with the OS scheduler.
 // SuspendThread is asynchronous, so GetThreadContext is used to block
 // until the thread is genuinely stopped before an ISR runs.
 static HANDLE fw_win_handle;
@@ -580,6 +583,13 @@ void sitl_reset_with_cause(const char* cause)
     pthread_sigmask(SIG_BLOCK, &set, NULL);
 #endif
     fprintf(stderr, "SITL: reset (%s) at t=%.3fs\n", cause, sim_time_ns_v * 1.0e-9);
+    if (sitl_cfg.exit_on_reset) {
+        // Cygwin GDB cannot follow the replacement process made by execv.
+        // End this debugging run explicitly, retaining real firmware resets.
+        fprintf(stderr, "SITL: --exit-on-reset: run ended; restart the simulator to boot again\n");
+        sitl_coverage_flush();
+        _exit(0);
+    }
     if (sitl_cfg.bootloader_path != NULL) {
         // a reset lands in the bootloader, as on hardware
         sitl_exec_bootloader(cause);
@@ -954,7 +964,7 @@ void sitl_start_sim_thread(void)
     sitl_sem_init(&resume_sem);
     sitl_sem_init(&gate_sem);
 
-#ifdef _WIN32
+#ifdef SITL_WINDOWS_THREADS
     // capture a real, suspendable handle to this (the firmware) thread.
     // GetCurrentThread is a pseudo-handle only valid in this thread, so
     // duplicate it into one the sim thread can use to suspend us.

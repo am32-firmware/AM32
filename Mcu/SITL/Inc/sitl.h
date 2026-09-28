@@ -31,6 +31,7 @@ enum sitl_irq {
 
 // PWM/DShot input over UDP (sitl_input.c)
 void sitl_input_init(void);
+void sitl_input_wait(void); // startup only; no firmware or physics threads yet
 void sitl_input_poll(void); // sim thread, every 100us
 void sitl_input_arm(void); // receiveDshotDma()
 void sitl_input_timer_reset(void); // resetInputCaptureTimer()

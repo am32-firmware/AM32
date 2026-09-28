@@ -84,6 +84,9 @@ typedef struct {
     int node_id; // -1 = leave to eeprom/DNA
     int input_type; // eeprom INPUT_SIGNAL_TYPE override, -1 = leave
     bool verbose;
+    const char* log_file; // redirect diagnostics to a file instead of stderr
+    bool wait_for_input; // hold startup until the PWM/DShot sender is ready
+    bool exit_on_reset; // end the run instead of re-exec (for host debuggers)
     bool nosleep; // busy wait instead of sleeping, for timing accuracy
     bool realtime; // SCHED_FIFO for both threads
 } sitl_config_t;

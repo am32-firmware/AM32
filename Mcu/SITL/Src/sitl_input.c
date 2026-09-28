@@ -32,6 +32,7 @@
 
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -88,6 +89,33 @@ static struct {
     uint32_t bad_gcr;
     uint32_t serial_ignored;
 } stats;
+
+void sitl_input_wait(void)
+{
+    if (fd < 0) {
+        fprintf(stderr, "SITL: --wait-for-input requires an available input port\n");
+        exit(1);
+    }
+    fprintf(stderr, "SITL: waiting for PWM/DShot on UDP %d; enable GUI input at zero throttle\n",
+            sitl_cfg.input_port);
+    for (;;) {
+        struct input_pkt pkt;
+        const ssize_t n = recv(fd, &pkt, sizeof(pkt), MSG_PEEK | MSG_DONTWAIT);
+        if (n == sizeof(pkt) && pkt.magic == SITL_INPUT_MAGIC && pkt.len == 4
+            && pkt.type <= SITL_INPUT_DSHOT600) {
+            // Leave the first packet queued for the normal input decoder.
+            fprintf(stderr, "SITL: input sender ready; booting firmware\n");
+            return;
+        }
+        if (n >= 0) {
+            // A line-level or bootloader packet must not release startup.
+            recv(fd, &pkt, sizeof(pkt), MSG_DONTWAIT);
+        }
+        // Keep GUI state-port requests available while simulated time is held.
+        sitl_state_poll();
+        usleep(10000);
+    }
+}
 
 void sitl_input_init(void)
 {

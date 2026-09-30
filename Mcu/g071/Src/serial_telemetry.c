@@ -35,8 +35,10 @@ void telem_UART_Init()
     GPIO_InitStruct.Alternate = LL_GPIO_AF_0;
     LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
+#ifndef ULTRA_DEDICATED // no USART interrupt is used, and there is no handler for one (off in 100.20 too)
     NVIC_SetPriority(USART1_IRQn, 3);
     NVIC_EnableIRQ(USART1_IRQn);
+#endif
 
     LL_DMA_SetPeriphRequest(DMA1, LL_DMA_CHANNEL_3, LL_DMAMUX_REQ_USART1_TX);
 

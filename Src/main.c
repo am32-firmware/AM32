@@ -1767,11 +1767,19 @@ void processDshot()
     setInput();
 #ifdef ULTRA_DEDICATED
     // 100.20 reference: kick a fresh ADC conversion per parsed packet so
-    // the fast telemetry always reports current voltage/temperature
+    // the fast telemetry always reports current voltage/temperature. Only
+    // the raw values are refreshed here; the 1kHz block in main() turns
+    // them into the telemetry fields (and picks NTC or internal sensor)
 #ifdef ARTERY
     ADC_DMA_Callback();
     adc_ordinary_software_trigger_enable(ADC1, TRUE);
-    converted_degrees = getConvertedDegrees(ADC_raw_temp);
+#endif
+#ifdef STMICRO
+    ADC_DMA_Callback();
+    LL_ADC_REG_StartConversion(ADC1);
+#ifdef USE_ADC_1_2
+    LL_ADC_REG_StartConversion(ADC2);
+#endif
 #endif
 #endif
 }

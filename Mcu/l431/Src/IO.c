@@ -38,8 +38,8 @@ extern void processDshot(void);
 void runDshotCheck()
 {
     // one snapshot of the DMA counter per pass, and the timer is read
-    // after the last captured edge: an edge arriving in between must not
-    // make the line look idle or change the packet being judged
+    // after that snapshot: an edge arriving in between must not make the
+    // line look idle or change the packet being judged
     const uint16_t remaining = ULTRA_INPUT_DMA->CNDTR;
     if (remaining < 63) {
         if (armed) {

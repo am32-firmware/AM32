@@ -46,6 +46,14 @@ struct CANStats canstats;
 static bool dronecan_armed;
 static bool done_startup;
 
+/* uavcan.equipment.indication.BeepCommand: float16 frequency (Hz), float16
+ * duration (s). A note the flight controller wants the motor to make; played
+ * from the main loop while the motor is stopped (see dronecan_beep_* in main.c). */
+#define UAVCAN_EQUIPMENT_INDICATION_BEEPCOMMAND_ID 1080
+#define UAVCAN_EQUIPMENT_INDICATION_BEEPCOMMAND_SIGNATURE (0xBE9EA9FEC2B15D52ULL)
+volatile uint16_t dronecan_beep_hz;
+volatile uint16_t dronecan_beep_ms;
+
 #define APP_SIGNATURE_MAGIC1 0x68f058e6
 #define APP_SIGNATURE_MAGIC2 0xafcee5a0
 
@@ -754,6 +762,28 @@ static void handle_RawCommand(CanardInstance *ins, CanardRxTransfer *transfer)
 /*
   handle ArmingStatus messages
 */
+static void handle_BeepCommand(CanardInstance* ins, CanardRxTransfer* transfer)
+{
+    (void)ins;
+    uint16_t f16, d16;
+    uint32_t bit_ofs = 0;
+    if (transfer->payload_len < 4) {
+        return;
+    }
+    canardDecodeScalar(transfer, bit_ofs, 16, true, &f16); bit_ofs += 16;
+    canardDecodeScalar(transfer, bit_ofs, 16, true, &d16);
+    float hz = canardConvertFloat16ToNativeFloat(f16);
+    float sec = canardConvertFloat16ToNativeFloat(d16);
+    if (!(hz >= 100.0f && hz <= 5000.0f) || !(sec > 0.0f)) {
+        return;
+    }
+    if (sec > 0.4f) {
+        sec = 0.4f;                 /* the signal watchdog is half a second when armed */
+    }
+    dronecan_beep_hz = (uint16_t)hz;
+    dronecan_beep_ms = (uint16_t)(sec * 1000.0f);
+}
+
 static void handle_ArmingStatus(CanardInstance *ins, CanardRxTransfer *transfer)
 {
     struct uavcan_equipment_safety_ArmingStatus cmd;
@@ -987,6 +1017,10 @@ static void onTransferReceived(CanardInstance *ins, CanardRxTransfer *transfer)
 	    handle_ArmingStatus(ins, transfer);
             break;
         }
+        case UAVCAN_EQUIPMENT_INDICATION_BEEPCOMMAND_ID: {
+            handle_BeepCommand(ins, transfer);
+            break;
+        }
         }
     }
 }
@@ -1046,6 +1080,10 @@ static bool shouldAcceptTransfer(const CanardInstance *ins,
         }
 	case UAVCAN_EQUIPMENT_SAFETY_ARMINGSTATUS_ID: {
 	    *out_data_type_signature = UAVCAN_EQUIPMENT_SAFETY_ARMINGSTATUS_SIGNATURE;
+            return true;
+        }
+        case UAVCAN_EQUIPMENT_INDICATION_BEEPCOMMAND_ID: {
+            *out_data_type_signature = UAVCAN_EQUIPMENT_INDICATION_BEEPCOMMAND_SIGNATURE;
             return true;
         }
         }

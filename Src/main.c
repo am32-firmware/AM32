@@ -1245,6 +1245,20 @@ if (!stepper_sine && armed) {
                 }
                 play_tone_flag = 0;
             }
+#if DRONECAN_SUPPORT
+            if (dronecan_beep_ms && !running) {
+                /* a note from the flight controller: same footing as the
+                 * beacon tones above, energise a phase pair and sing */
+                comStep(3);
+                playBJNote(dronecan_beep_hz, dronecan_beep_ms);
+                allOff();
+                SET_PRESCALER_PWM(0);
+                SET_AUTO_RELOAD_PWM(TIMER1_MAX_ARR);
+                dronecan_beep_ms = 0;
+                signaltimeout = 0;
+                RELOAD_WATCHDOG_COUNTER();
+            }
+#endif
 
             if (!eepromBuffer.comp_pwm) {
                 duty_cycle_setpoint = 0;

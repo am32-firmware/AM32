@@ -682,8 +682,13 @@ void MX_DMA_Init(void)
 
     /* DMA interrupt init */
     /* DMA1_Channel1_IRQn interrupt configuration */
+#ifndef ULTRA_DEDICATED
+    // ultra polled mode: the input DMA IRQ stays disabled - runDshotCheck()
+    // owns the channel; a stray flag would stop it behind its back via the
+    // DMA handler
     NVIC_SetPriority(DMA1_Channel1_IRQn, 1);
     NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+#endif
     /* DMA1_Channel2_3_IRQn interrupt configuration */
     NVIC_SetPriority(DMA1_Channel2_3_IRQn, 1);
     NVIC_EnableIRQ(DMA1_Channel2_3_IRQn);

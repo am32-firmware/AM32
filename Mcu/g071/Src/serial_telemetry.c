@@ -79,6 +79,20 @@ void telem_UART_Init()
 
 void send_telem_DMA(uint8_t bytes)
 { // set data length and enable channel to start transfer
+#ifdef ULTRA_DEDICATED
+    // never abort an in-flight transfer: disabling the channel mid-frame
+    // puts a partial frame on the wire and desyncs the FC parser.
+    // Skip instead - the FC re-requests with the next packet.
+    if (LL_DMA_IsEnabledChannel(DMA1, LL_DMA_CHANNEL_3) && (LL_DMA_GetDataLength(DMA1, LL_DMA_CHANNEL_3) != 0)) {
+        return;
+    }
+    // the previous frame is out, but its transfer complete interrupt
+    // cannot preempt the dshot EXTI this runs in: stop the channel and
+    // drop the stale flag here, or that interrupt cuts the frame started
+    // below
+    LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_3);
+    LL_DMA_ClearFlag_GI3(DMA1);
+#endif
     LL_USART_SetTransferDirection(USART1, LL_USART_DIRECTION_TX);
     //  GPIOB->OTYPER &= 0 << 6;
     LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_3, bytes);
@@ -87,3 +101,12 @@ void send_telem_DMA(uint8_t bytes)
     LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_3);
     LL_USART_SetTransferDirection(USART1, LL_USART_DIRECTION_RX);
 }
+
+#ifdef ULTRA_DEDICATED
+void setBaudRate(uint32_t baud)
+{
+    LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_3);
+    // usart kernel clock is PCLK = CPU frequency
+    USART1->BRR = (CPU_FREQUENCY_MHZ * 1000000U + (baud / 2)) / baud;
+}
+#endif

@@ -5,10 +5,12 @@
  * ("AM32 Ultra", successor of the 100.x release line from
  * AlkaMotors/AM32).
  *
- * Ultra support is strictly compile-time: every non-CAN F421 hardware
- * target is additionally built as a <TARGET>_ULTRA artifact with
- * ULTRA_DEDICATED defined (see f421makefile.mk and the CFLAGS mapping in
- * the main Makefile). Stock firmware contains no ultra code at all.
+ * Ultra support is strictly compile-time: every non-CAN hardware target
+ * of the capable MCUs (F421, F415, G071, G431, L431, E230) is additionally
+ * built as a <TARGET>_ULTRA artifact with ULTRA_DEDICATED defined (see the
+ * <mcu>makefile.mk files and the CFLAGS mapping in the main Makefile).
+ * Stock firmware contains no ultra code at all. Ultra artifacts are
+ * versioned n00.x (see Inc/version.h).
  *
  * Feature set, ported from the AM32 Ultra 100.20 fork with fixes from
  * bench sessions on a KISS Ultra FC:

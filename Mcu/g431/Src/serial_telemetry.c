@@ -7,6 +7,7 @@
 
 #include "serial_telemetry.h"
 #include "common.h"
+#include "targets.h"
 #include "kiss_telemetry.h"
 
 void telem_UART_Init()
@@ -79,6 +80,14 @@ void telem_UART_Init()
 
 void send_telem_DMA(uint8_t bytes)
 { // set data length and enable channel to start transfer
+#ifdef ULTRA_DEDICATED
+    // never abort an in-flight transfer: disabling the channel mid-frame
+    // puts a partial frame on the wire and desyncs the FC parser.
+    // Skip instead - the FC re-requests with the next packet.
+    if (LL_DMA_IsEnabledChannel(DMA1, LL_DMA_CHANNEL_3) && (LL_DMA_GetDataLength(DMA1, LL_DMA_CHANNEL_3) != 0)) {
+        return;
+    }
+#endif
      LL_USART_SetTransferDirection(USART1, LL_USART_DIRECTION_TX);
      LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_3);
      LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_3, bytes);
@@ -87,3 +96,12 @@ void send_telem_DMA(uint8_t bytes)
     LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_3);
     LL_USART_SetTransferDirection(USART1, LL_USART_DIRECTION_RX);
 }
+
+#ifdef ULTRA_DEDICATED
+void setBaudRate(uint32_t baud)
+{
+    LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_3);
+    // usart kernel clock is PCLK2 = CPU frequency
+    USART1->BRR = (CPU_FREQUENCY_MHZ * 1000000U + (baud / 2)) / baud;
+}
+#endif

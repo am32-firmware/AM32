@@ -1379,13 +1379,20 @@ typedef struct {
     uint8_t com; // comStep phase (0 = keep previous)
     uint16_t ms; // step duration, 0 = end of sequence
 } ultra_tone_step_t;
-// DShot standard beacons: one single-pitch beep per beacon index,
-// frequency ascending 1 -> 5 (lower TIM1 prescaler = higher pitch)
-static const ultra_tone_step_t ultra_tone_beacon1[] = { { 100, 2, 100 }, { 0, 0, 0 } };
-static const ultra_tone_step_t ultra_tone_beacon2[] = { { 80, 2, 100 }, { 0, 0, 0 } };
-static const ultra_tone_step_t ultra_tone_beacon3[] = { { 60, 2, 100 }, { 0, 0, 0 } };
-static const ultra_tone_step_t ultra_tone_beacon4[] = { { 45, 2, 100 }, { 0, 0, 0 } };
-static const ultra_tone_step_t ultra_tone_beacon5[] = { { 30, 2, 100 }, { 0, 0, 0 } };
+// beacons 1-5, each with its own pattern so they can be told apart; pitch
+// is 24000 / (psc + 1) Hz on F421, psc 0 is a silent gap. 1, 2 and 4 are the
+// stock / 100.20 players, 3 replaces the stock siren sweep and 5 (a copy of
+// 1 in stock) gets a pattern of its own
+static const ultra_tone_step_t ultra_tone_beacon1[] = { // rising 471 -> 774 Hz
+    { 50, 2, 150 }, { 30, 0, 150 }, { 0, 0, 0 } };
+static const ultra_tone_step_t ultra_tone_beacon2[] = { // falling 585 -> 296 Hz
+    { 40, 2, 150 }, { 80, 0, 150 }, { 0, 0, 0 } };
+static const ultra_tone_step_t ultra_tone_beacon3[] = { // double beep 923 Hz
+    { 25, 2, 100 }, { 0, 0, 50 }, { 25, 0, 100 }, { 0, 0, 0 } };
+static const ultra_tone_step_t ultra_tone_beacon4[] = { // falling 393 / 296 / 264 Hz
+    { 60, 1, 75 }, { 80, 0, 75 }, { 90, 0, 75 }, { 0, 0, 0 } };
+static const ultra_tone_step_t ultra_tone_beacon5[] = { // triple staccato 774 Hz
+    { 30, 2, 60 }, { 0, 0, 40 }, { 30, 0, 60 }, { 0, 0, 40 }, { 30, 0, 60 }, { 0, 0, 0 } };
 static const ultra_tone_step_t ultra_tone_input[] = { { 80, 3, 100 }, { 70, 3, 100 }, { 40, 3, 100 }, { 0, 0, 0 } };
 static const ultra_tone_step_t* ultra_tone_seq = 0;
 static uint8_t ultra_tone_step_idx = 0;
@@ -1479,12 +1486,9 @@ void tenKhzRoutine()
         if (++ultra_tone_div >= 20) {
             ultra_tone_div = 0;
             if (beeping) {
-                if (play_tone_flag != 0) {
-                    // the FC shapes patterns (SOS etc.) by streaming beacon
-                    // commands: a repeated beacon extends the active beep
-                    ultra_tone_ms = 100;
-                    play_tone_flag = 0;
-                }
+                // a beacon arriving while a pattern plays stays pending in
+                // play_tone_flag and starts once this one ends, so a streamed
+                // beacon repeats its pattern back to back (as in 100.20)
                 ultraToneTick();
             } else if (play_tone_flag != 0 && running == 0) {
                 // start here, ahead of the motor PWM block below: that block

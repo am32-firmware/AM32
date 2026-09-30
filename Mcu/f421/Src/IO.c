@@ -30,10 +30,15 @@ extern void processDshot(void);
 // EXTI that decodes it only preempts this routine on some MCUs
 void runDshotCheck()
 {
-    if (INPUT_DMA_CHANNEL->dtcnt < 63) {
+    // one snapshot of the DMA counter per pass, and the timer is read
+    // after the last captured edge: an edge arriving in between must not
+    // make the line look idle or change the packet being judged
+    const uint16_t remaining = INPUT_DMA_CHANNEL->dtcnt;
+    if (remaining < 63) {
         if (armed) {
-            if ((IC_TIMER_REGISTER->cval - dma_buffer[63 - INPUT_DMA_CHANNEL->dtcnt]) > (uint32_t)(valid_packet_high << 1)) {
-                if (ultraPacketStart(dma_buffer, INPUT_DMA_CHANNEL->dtcnt, valid_packet_high, &DMA_start_bit)) {
+            const uint32_t last_edge = dma_buffer[63 - remaining];
+            if ((IC_TIMER_REGISTER->cval - last_edge) > (uint32_t)(valid_packet_high << 1)) {
+                if (ultraPacketStart(dma_buffer, remaining, valid_packet_high, &DMA_start_bit)) {
                     transfercomplete();
                     EXINT->swtrg = EXINT_LINE_15;
                 } else {
@@ -45,7 +50,7 @@ void runDshotCheck()
                 IC_TIMER_REGISTER->cval = 0;
             }
         } else {
-            if (INPUT_DMA_CHANNEL->dtcnt <= 32) {
+            if (remaining <= 32) {
                 DMA_start_bit = 0;
                 transfercomplete();
                 processDshot();

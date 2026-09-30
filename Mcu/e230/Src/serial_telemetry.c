@@ -79,6 +79,9 @@ void send_telem_DMA(uint8_t bytes)
 #ifdef ULTRA_DEDICATED
 void setBaudRate(uint32_t baud)
 {
+    // stop a frame in flight first: its remaining bytes must not go out
+    // at the new rate
+    dma_channel_disable(DMA_CH1);
     usart_disable(USART0);
     usart_baudrate_set(USART0, baud);
     usart_enable(USART0);

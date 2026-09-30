@@ -350,6 +350,7 @@ uint16_t low_cell_volt_cutoff = 330; // 3.3volts per cell
 
 const char filename[30] AM32_FLASH_SECTION(".file_name") = FILE_NAME;
 _Static_assert(sizeof(FIRMWARE_NAME) <=13,"Firmware name too long");   // max 12 character firmware name plus NULL 
+_Static_assert(REPORTED_VERSION_MAJOR <= 255, "version major must fit eepromBuffer.version.major (uint8_t)");
 
 // move these to targets folder or peripherals for each mcu
 uint16_t ADC_CCR = 30;
@@ -1995,8 +1996,8 @@ int main(void)
     loadEEpromSettings();
 #endif
 
-    if (VERSION_MAJOR != eepromBuffer.version.major || VERSION_MINOR != eepromBuffer.version.minor || EEPROM_VERSION > eepromBuffer.eeprom_version) {
-        eepromBuffer.version.major = VERSION_MAJOR;
+    if (REPORTED_VERSION_MAJOR != eepromBuffer.version.major || VERSION_MINOR != eepromBuffer.version.minor || EEPROM_VERSION > eepromBuffer.eeprom_version) {
+        eepromBuffer.version.major = REPORTED_VERSION_MAJOR;
         eepromBuffer.version.minor = VERSION_MINOR;
         eepromBuffer.eeprom_version = EEPROM_VERSION;
         saveEEpromSettings();

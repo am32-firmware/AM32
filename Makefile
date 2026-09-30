@@ -42,6 +42,8 @@ VERSION_MAJOR := $(shell $(FGREP) "define VERSION_MAJOR" $(MAIN_INC_DIR)/version
 VERSION_MINOR := $(shell $(FGREP) "define VERSION_MINOR" $(MAIN_INC_DIR)/version.h | $(CUT) -d" " -f3 )
 
 FIRMWARE_VERSION := $(VERSION_MAJOR).$(VERSION_MINOR)
+# dedicated KISS Ultra artifacts are versioned n00.x (see Inc/version.h)
+ULTRA_FIRMWARE_VERSION := $(VERSION_MAJOR)00.$(VERSION_MINOR)
 
 # Compiler options
 
@@ -85,7 +87,7 @@ clean :
 #####################
 # main firmware build
 define CREATE_BUILD_TARGET
-$(2)_BASENAME = $(BIN_DIR)/$(IDENTIFIER)_$(2)_$(FIRMWARE_VERSION)
+$(2)_BASENAME = $(BIN_DIR)/$(IDENTIFIER)_$(2)_$(if $(filter %_ULTRA,$(2)),$(ULTRA_FIRMWARE_VERSION),$(FIRMWARE_VERSION))
 
 # native (SITL) targets build to an executable elf, no bin/hex conversion
 $(2) : $$($(2)_BASENAME).$(if $(NATIVE_$(1)),elf,bin)

@@ -1753,7 +1753,13 @@ void processDshot()
     // was just parsed instead of waiting for the 20kHz loop
     // keep answering while a buzzer beacon plays: the Ultra FC treats a
     // telemetry gap as an ESC reboot and drops its link back to 115200
-    if (send_telemetry) {
+    if (telem_tx_busy()) {
+        // a frame is still going out and the DMA reads it from the buffer
+        // the next packet would be built in: leave the buffer alone. The
+        // FC repeats a telemetry request with its next packet; an esc info
+        // request stays pending until the line is free
+        send_telemetry = 0;
+    } else if (send_telemetry) {
         makeTelemPackage((int8_t)degrees_celsius, battery_voltage, actual_current,
             (uint16_t)(consumed_current >> 16), e_rpm);
         send_telem_DMA(10);

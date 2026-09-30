@@ -55,6 +55,14 @@ void telem_UART_Init(void)
     usart_enable(USART0);
 }
 
+#ifdef ULTRA_DEDICATED
+// a telemetry frame is still going out
+uint8_t telem_tx_busy(void)
+{
+    return (DMA_CHCTL(DMA_CH1) & DMA_CHXCTL_CHEN) && (DMA_CHCNT(DMA_CH1) != 0);
+}
+#endif
+
 void send_telem_DMA(uint8_t bytes)
 {
     // set data length and enable channel to start transfer
@@ -62,7 +70,7 @@ void send_telem_DMA(uint8_t bytes)
     // never abort an in-flight transfer: disabling the channel mid-frame
     // puts a partial frame on the wire and desyncs the FC parser.
     // Skip instead - the FC re-requests with the next packet.
-    if ((DMA_CHCTL(DMA_CH1) & DMA_CHXCTL_CHEN) && (DMA_CHCNT(DMA_CH1) != 0)) {
+    if (telem_tx_busy()) {
         return;
     }
 #endif

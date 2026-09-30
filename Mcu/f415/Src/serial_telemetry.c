@@ -9,13 +9,21 @@
 #include "common.h"
 #include "kiss_telemetry.h"
 
+#ifdef ULTRA_DEDICATED
+// a telemetry frame is still going out
+uint8_t telem_tx_busy(void)
+{
+    return DMA1_CHANNEL4->ctrl_bit.chen && (DMA1_CHANNEL4->dtcnt != 0);
+}
+#endif
+
 void send_telem_DMA(uint8_t bytes)
 { // set data length and enable channel to start transfer
 #ifdef ULTRA_DEDICATED
     // never abort an in-flight transfer: disabling the channel mid-frame
     // puts a partial frame on the wire and desyncs the FC parser.
     // Skip instead - the FC re-requests with the next packet.
-    if (DMA1_CHANNEL4->ctrl_bit.chen && (DMA1_CHANNEL4->dtcnt != 0)) {
+    if (telem_tx_busy()) {
         return;
     }
     // the previous frame is out, but its transfer complete interrupt

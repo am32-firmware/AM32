@@ -19,6 +19,7 @@ void makeInfoPacket(void);
 #include "ultra.h"
 #ifdef ULTRA_DEDICATED
 void setBaudRate(uint32_t baud);
+uint8_t telem_tx_busy(void);
 #endif
 
 #endif /* SERIAL_TELEMETRY_H_ */

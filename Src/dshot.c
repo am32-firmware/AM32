@@ -96,6 +96,10 @@ void computeDshotDMA()
         uint8_t calcCRC = ((dpulse[0] ^ dpulse[4] ^ dpulse[8]) << 3 | (dpulse[1] ^ dpulse[5] ^ dpulse[9]) << 2 | (dpulse[2] ^ dpulse[6] ^ dpulse[10]) << 1 | (dpulse[3] ^ dpulse[7] ^ dpulse[11]));
         uint8_t checkCRC = (dpulse[12] << 3 | dpulse[13] << 2 | dpulse[14] << 1 | dpulse[15]);
 
+#ifndef ULTRA_DEDICATED // ultra: one-way dshot only. The polled decode can
+                        // run while the next packet is already on the line,
+                        // and a latched detection would fail every CRC
+                        // until the next power cycle
         if (!armed) {
             if (dshot_telemetry == 0) {
                 if (getInputPinState()) { // if the pin is high for 100 checks between
@@ -107,6 +111,7 @@ void computeDshotDMA()
                 }
             }
         }
+#endif
         if (dshot_telemetry) {
             checkCRC = ~checkCRC + 16;
         }

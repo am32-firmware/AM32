@@ -39,8 +39,8 @@ extern uint16_t DMA_start_bit;
 // shortest edge-to-edge gap treated as packet separation (frametime / 16)
 extern uint16_t valid_packet_high;
 
-// counts DMA captures discarded because the edge count never reached a
-// full packet
+// counts DMA captures runDshotCheck() discarded: too few edges for a full
+// packet, or extra edges not separated from it by an idle gap
 extern uint16_t packet_length_badcounts;
 
 // Packet boundary check shared by every MCU's runDshotCheck(). The input
@@ -48,6 +48,9 @@ extern uint16_t packet_length_badcounts;
 // line has gone idle: 64 - remaining edges were captured and a DShot frame
 // is the last 32 of them. Returns 1 and the index of the frame's first
 // edge in *start when the capture may be decoded, 0 when it must be dropped.
+// *start is only written when the capture is accepted. Edge times are
+// captures of the 16 bit input timer (0xFFFF reload on every MCU), hence
+// the uint16_t difference.
 //
 // Edges ahead of the frame are only skipped as noise when an idle gap
 // (more than `gap` timer ticks) separates them from it: a noise edge after

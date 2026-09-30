@@ -31,7 +31,10 @@ static void check(const char* name, uint16_t captured, uint8_t want_ok, uint16_t
 {
     uint16_t start = 0xFFFF;
     uint8_t ok = ultraPacketStart(edges, 64 - captured, GAP, &start);
-    if (ok != want_ok || (want_ok && start != want_start)) {
+    // a rejected capture must leave *start alone: runDshotCheck() passes
+    // DMA_start_bit in directly, and that has to stay at the last accepted
+    // packet's value
+    if (ok != want_ok || (want_ok && start != want_start) || (!want_ok && start != 0xFFFF)) {
         printf("FAIL %s: ok=%u start=%u, want ok=%u start=%u\n", name, ok, start, want_ok, want_start);
         failures++;
     } else {

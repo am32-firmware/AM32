@@ -74,9 +74,15 @@ void telem_UART_Init()
                          LL_DMA_GetDataTransferDirection(DMA1, LL_DMA_CHANNEL_4));
   LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_4, sizeof(aTxBuffer));
 
+#ifndef ULTRA_DEDICATED
+    // ultra builds run the TX channel without interrupts (as 100.20):
+    // send_telem_DMA() checks and restarts it itself, and a transfer
+    // complete handler running below the dshot EXTI could stop a frame
+    // that was just started
   /* (5) Enable DMA transfer complete/error interrupts  */
   LL_DMA_EnableIT_TC(DMA1, LL_DMA_CHANNEL_4);
   LL_DMA_EnableIT_TE(DMA1, LL_DMA_CHANNEL_4);
+#endif
 }
 
 void send_telem_DMA(uint8_t bytes){   // set data length and enable channel to start transfer
@@ -87,10 +93,8 @@ void send_telem_DMA(uint8_t bytes){   // set data length and enable channel to s
     if (LL_DMA_IsEnabledChannel(DMA1, LL_DMA_CHANNEL_4) && (LL_DMA_GetDataLength(DMA1, LL_DMA_CHANNEL_4) != 0)) {
         return;
     }
-    // the previous frame is out, but its transfer complete interrupt
-    // cannot preempt the dshot EXTI this runs in: stop the channel and
-    // drop the stale flag here, or that interrupt cuts the frame started
-    // below
+    // the previous frame is out: nothing else stops the channel in ultra
+    // builds, and the new length is only taken while it is stopped
     LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_4);
     LL_DMA_ClearFlag_GI4(DMA1);
 #endif

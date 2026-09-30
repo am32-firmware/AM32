@@ -24,7 +24,13 @@ void telem_UART_Init()
     GPIO_InitStruct.Pin = LL_GPIO_PIN_6;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+#ifdef ULTRA_DEDICATED
+    // 2 Mbaud telemetry: the pull-up of an open drain output is far too
+    // slow for 500 ns bits (100.20 drives this pin push-pull as well)
+    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+#else
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_OPENDRAIN;
+#endif
     GPIO_InitStruct.Pull = LL_GPIO_PULL_UP;
     GPIO_InitStruct.Alternate = LL_GPIO_AF_0;
     LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
@@ -72,9 +78,15 @@ void telem_UART_Init()
         LL_DMA_GetDataTransferDirection(DMA1, LL_DMA_CHANNEL_3));
     LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_3, sizeof(aTxBuffer));
 
+#ifndef ULTRA_DEDICATED
+    // ultra builds run the TX channel without interrupts (as 100.20):
+    // send_telem_DMA() checks and restarts it itself, and a transfer
+    // complete handler running below the dshot EXTI could stop a frame
+    // that was just started
     /* (5) Enable DMA transfer complete/error interrupts  */
     LL_DMA_EnableIT_TC(DMA1, LL_DMA_CHANNEL_3);
     LL_DMA_EnableIT_TE(DMA1, LL_DMA_CHANNEL_3);
+#endif
 }
 
 void send_telem_DMA(uint8_t bytes)
@@ -86,10 +98,8 @@ void send_telem_DMA(uint8_t bytes)
     if (LL_DMA_IsEnabledChannel(DMA1, LL_DMA_CHANNEL_3) && (LL_DMA_GetDataLength(DMA1, LL_DMA_CHANNEL_3) != 0)) {
         return;
     }
-    // the previous frame is out, but its transfer complete interrupt
-    // cannot preempt the dshot EXTI this runs in: stop the channel and
-    // drop the stale flag here, or that interrupt cuts the frame started
-    // below
+    // the previous frame is out: nothing else stops the channel in ultra
+    // builds, and the new length is only taken while it is stopped
     LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_3);
     LL_DMA_ClearFlag_GI3(DMA1);
 #endif

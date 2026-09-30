@@ -89,6 +89,11 @@ void DMA_Channel3_4_IRQHandler(void)
         }
     #endif
 
+#ifdef ULTRA_DEDICATED
+    // polled dshot input: never stop the channel from here, just
+    // acknowledge whatever flag the input channel raised
+    DMA_INTC |= DMA_FLAG_ADD(DMA_INT_FLAG_G, INPUT_DMA_CHANNEL);
+#else
     if (dshot_telemetry && armed) {
         DMA_INTC |= DMA_FLAG_ADD(DMA_INT_FLAG_G, INPUT_DMA_CHANNEL);
         DMA_CHCTL(INPUT_DMA_CHANNEL) &= ~DMA_CHXCTL_CHEN;
@@ -117,6 +122,7 @@ void DMA_Channel3_4_IRQHandler(void)
     } else if (dma_interrupt_flag_get(INPUT_DMA_CHANNEL, DMA_INT_FLAG_ERR) == 1) {
         dma_interrupt_flag_clear(INPUT_DMA_CHANNEL, DMA_INT_FLAG_G);
     }
+#endif
 }
 
 /**

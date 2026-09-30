@@ -273,8 +273,13 @@ void UN_TIM_Init(void)
 
     DMA_CHCTL(INPUT_DMA_CHANNEL) = 0x0000098a;
 
+#ifndef ULTRA_DEDICATED
+    // ultra polled mode: runDshotCheck() owns the input channel. The
+    // vector is shared with the LED strip, which enables it on its own
+    // (WS2812.c); the handler then only acknowledges input flags
     NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
     NVIC_EnableIRQ(IC_DMA_IRQ_NAME);
+#endif
     #ifdef LED_USES_PA2
     rcu_periph_clock_enable(RCU_TIMER2);
     TIMER_CAR(TIMER2) = 0xFFFF;

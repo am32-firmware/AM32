@@ -58,6 +58,14 @@ void telem_UART_Init(void)
 void send_telem_DMA(uint8_t bytes)
 {
     // set data length and enable channel to start transfer
+#ifdef ULTRA_DEDICATED
+    // never abort an in-flight transfer: disabling the channel mid-frame
+    // puts a partial frame on the wire and desyncs the FC parser.
+    // Skip instead - the FC re-requests with the next packet.
+    if ((DMA_CHCTL(DMA_CH1) & DMA_CHXCTL_CHEN) && (DMA_CHCNT(DMA_CH1) != 0)) {
+        return;
+    }
+#endif
     usart_receive_config(USART0, USART_TRANSMIT_DISABLE);
     usart_transmit_config(USART0, USART_TRANSMIT_ENABLE);
     dma_channel_disable(DMA_CH1);
@@ -67,3 +75,12 @@ void send_telem_DMA(uint8_t bytes)
     usart_receive_config(USART0, USART_RECEIVE_ENABLE);
     //  usart_transmit_config(USART0, USART_TRANSMIT_DISABLE);
 }
+
+#ifdef ULTRA_DEDICATED
+void setBaudRate(uint32_t baud)
+{
+    usart_disable(USART0);
+    usart_baudrate_set(USART0, baud);
+    usart_enable(USART0);
+}
+#endif

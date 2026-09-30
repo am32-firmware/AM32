@@ -14,4 +14,9 @@ void telem_UART_Init(void);
 void send_telem_DMA(uint8_t bytes);
 void telem_UART_Init_CH4(void);
 
+#include "ultra.h"
+#ifdef ULTRA_DEDICATED
+void setBaudRate(uint32_t baud);
+#endif
+
 #endif /* SERIAL_TELEMETRY_H_ */

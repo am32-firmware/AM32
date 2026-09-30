@@ -4,6 +4,10 @@ PART := AT32F415K8U7_4
 MCU_LC := $(call lc,$(MCU))
 
 TARGETS_$(MCU) := $(call get_targets,$(MCU))
+# dedicated KISS Ultra artifacts: every non-CAN hardware target gets a
+# _ULTRA variant built with ULTRA_DEDICATED (see Inc/ultra.h)
+TARGETS_$(MCU) += $(addsuffix _ULTRA,$(filter-out %_CAN,$(call get_targets,$(MCU))))
+
 
 HAL_FOLDER_$(MCU) := $(HAL_FOLDER)/$(MCU_LC)
 

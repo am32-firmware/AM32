@@ -41,6 +41,29 @@ extern uint16_t valid_packet_high;
 // full packet
 extern uint16_t packet_length_badcounts;
 
+// Packet boundary check shared by every MCU's runDshotCheck(). The input
+// capture DMA is 64 deep and `remaining` is its transfer counter once the
+// line has gone idle: 64 - remaining edges were captured and a DShot frame
+// is the last 32 of them. Returns 1 and the index of the frame's first
+// edge in *start when the capture may be decoded, 0 when it must be dropped.
+//
+// Edges ahead of the frame are only skipped as noise when an idle gap
+// (more than `gap` timer ticks) separates them from it: a noise edge after
+// the frame would shift the decode by one edge and invert every bit, and
+// an inverted zero-throttle frame is full throttle with a valid CRC.
+static inline uint8_t ultraPacketStart(const uint32_t* edges, uint16_t remaining, uint16_t gap, uint16_t* start)
+{
+    if (remaining > 32) {
+        return 0; // fewer than 32 edges: not a full frame
+    }
+    const uint16_t first = 32 - remaining;
+    if (first != 0 && (uint16_t)(edges[first] - edges[first - 1]) <= gap) {
+        return 0;
+    }
+    *start = first;
+    return 1;
+}
+
 #endif // ULTRA_DEDICATED
 
 #endif // ULTRA_H_

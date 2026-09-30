@@ -25,26 +25,17 @@ extern void processDshot(void);
 
 // ultra mode: the input capture DMA runs without a transfer complete
 // interrupt and is drained here from the 20kHz loop; a packet is complete
-// once the line has been idle for more than 2x the expected bit time
+// once the line has been idle for more than 2x the expected bit time.
+// DMA_start_bit stays valid until the next accepted packet: the software
+// EXTI that decodes it only preempts this routine on some MCUs
 void runDshotCheck()
 {
     if (INPUT_DMA_CHANNEL->dtcnt < 63) {
         if (armed) {
             if ((IC_TIMER_REGISTER->cval - dma_buffer[63 - INPUT_DMA_CHANNEL->dtcnt]) > (uint32_t)(valid_packet_high << 1)) {
-                if (INPUT_DMA_CHANNEL->dtcnt <= 32) {
-                    uint16_t start = 32 - INPUT_DMA_CHANNEL->dtcnt;
-                    // edges beyond 32 are only skipped as noise ahead of the
-                    // packet when an idle gap separates them from it: a noise
-                    // edge after the packet would shift the decode by one
-                    // edge and invert every bit, and an inverted zero-throttle
-                    // frame is full throttle with a valid CRC
-                    if (start == 0 || (uint16_t)(dma_buffer[start] - dma_buffer[start - 1]) > valid_packet_high) {
-                        DMA_start_bit = start;
-                        transfercomplete();
-                        EXINT->swtrg = EXINT_LINE_15;
-                    } else {
-                        packet_length_badcounts++;
-                    }
+                if (ultraPacketStart(dma_buffer, INPUT_DMA_CHANNEL->dtcnt, valid_packet_high, &DMA_start_bit)) {
+                    transfercomplete();
+                    EXINT->swtrg = EXINT_LINE_15;
                 } else {
                     packet_length_badcounts++;
                 }
@@ -52,10 +43,10 @@ void runDshotCheck()
                 INPUT_DMA_CHANNEL->dtcnt = 64;
                 INPUT_DMA_CHANNEL->ctrl_bit.chen = TRUE;
                 IC_TIMER_REGISTER->cval = 0;
-                DMA_start_bit = 0;
             }
         } else {
             if (INPUT_DMA_CHANNEL->dtcnt <= 32) {
+                DMA_start_bit = 0;
                 transfercomplete();
                 processDshot();
                 INPUT_DMA_CHANNEL->ctrl_bit.chen = FALSE;

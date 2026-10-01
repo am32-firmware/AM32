@@ -145,7 +145,13 @@ void enableADC_DMA(void)
                         LL_DMA_MEMORY_INCREMENT           |
                         LL_DMA_PDATAALIGN_HALFWORD        |
                         LL_DMA_MDATAALIGN_HALFWORD        |
+#ifdef ULTRA_DEDICATED
+                        // the dshot capture DMA must win the arbitration
+                        // against the ADC DMA
+                        LL_DMA_PRIORITY_LOW                );
+#else
                         LL_DMA_PRIORITY_HIGH               );
+#endif
 
 
   LL_DMA_SetPeriphRequest(DMA1,

@@ -1772,10 +1772,13 @@ void processDshot()
 #endif
     setInput();
 #ifdef ULTRA_DEDICATED
-    // 100.20 reference: kick a fresh ADC conversion per parsed packet so
-    // the fast telemetry always reports current voltage/temperature. Only
-    // the raw values are refreshed here; the 1kHz block in main() turns
-    // them into the telemetry fields (and picks NTC or internal sensor)
+    // start the ADC right after the dshot packet, and only here (the 1kHz
+    // block in main() does not start conversions in ultra builds): the
+    // conversions and their DMA transfers then run in the idle gap behind
+    // the frame. An ADC DMA transfer during a capture can corrupt the dshot
+    // capture DMA - seen on F421 (Alka); done the same way on every MCU
+    // for consistency. The 1kHz block only reads the results and turns
+    // them into the telemetry fields (and picks NTC or internal sensor).
 #ifdef ARTERY
     ADC_DMA_Callback();
     adc_ordinary_software_trigger_enable(ADC1, TRUE);
@@ -1786,6 +1789,10 @@ void processDshot()
 #ifdef USE_ADC_1_2
     LL_ADC_REG_StartConversion(ADC2);
 #endif
+#endif
+#ifdef MCU_GDE23
+    ADC_DMA_Callback();
+    adc_software_trigger_enable(ADC_REGULAR_CHANNEL);
 #endif
 #endif
 }
@@ -2336,19 +2343,25 @@ if(zero_crosses < 5){
           ADC_raw_volts = 0;
 #endif          
 #if defined(STMICRO)
+#ifndef ULTRA_DEDICATED // ultra: conversions start in processDshot() only, see there
             LL_ADC_REG_StartConversion(ADC1);
 #ifdef USE_ADC_1_2
           LL_ADC_REG_StartConversion(ADC2);
 #endif          
+#endif
             converted_degrees = __LL_ADC_CALC_TEMPERATURE(3300, ADC_raw_temp, LL_ADC_RESOLUTION_12B);
 #endif
 #ifdef MCU_GDE23
             // converted_degrees = (1.43 - ADC_raw_temp * 3.3 / 4096) * 1000 / 4.3 + 25;
             converted_degrees = ((int32_t)(357.5581395348837f * (1 << 16)) - ADC_raw_temp * (int32_t)(0.18736373546511628f * (1 << 16))) >> 16;
+#ifndef ULTRA_DEDICATED // ultra: conversions start in processDshot() only
             adc_software_trigger_enable(ADC_REGULAR_CHANNEL);
 #endif
+#endif
 #ifdef ARTERY            
+#ifndef ULTRA_DEDICATED // ultra: conversions start in processDshot() only
             adc_ordinary_software_trigger_enable(ADC1, TRUE);
+#endif
     #ifdef USE_NTC
             converted_degrees = getNTCDegrees(ADC_raw_ntc);
     #else     

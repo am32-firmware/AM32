@@ -56,7 +56,13 @@ void ADC_Init(void)
     dma_init_struct.peripheral_base_addr = (uint32_t) & (ADC1->odt);
     dma_init_struct.peripheral_data_width = DMA_PERIPHERAL_DATA_WIDTH_HALFWORD;
     dma_init_struct.peripheral_inc_enable = FALSE;
+#ifdef ULTRA_DEDICATED
+    // the dshot capture DMA must win the arbitration against the ADC DMA
+    // (100.20 lowers the ADC channel on F421 as well)
+    dma_init_struct.priority = DMA_PRIORITY_LOW;
+#else
     dma_init_struct.priority = DMA_PRIORITY_HIGH;
+#endif
     dma_init_struct.loop_mode_enable = TRUE;
     dma_init(DMA1_CHANNEL1, &dma_init_struct);
 

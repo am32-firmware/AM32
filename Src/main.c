@@ -2137,6 +2137,10 @@ int main(void)
 #endif
 #ifdef NEUTRONRC_G071
     setInputPullDown();
+#elif defined(ULTRA_DEDICATED)
+    // ultra builds use the pull-down on every target, as 100.20 does
+    // (Alka; the stock targets will follow in a separate change)
+    setInputPullDown();
 #else
     setInputPullUp();
 #endif

@@ -199,8 +199,10 @@ void TIM17_Init(void)
 void MX_DMA_Init(void)
 {
     crm_periph_clock_enable(CRM_DMA1_PERIPH_CLOCK, TRUE);
+#ifndef ULTRA_DEDICATED // see UN_TIM_Init(): runDshotCheck() owns the input channel
     NVIC_SetPriority(DMA1_Channel5_4_IRQn, 1);
     NVIC_EnableIRQ(DMA1_Channel5_4_IRQn);
+#endif
 }
 
 void MX_GPIO_Init(void) { }

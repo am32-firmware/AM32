@@ -57,8 +57,10 @@ void ADC_Init(void)
     dma_init_struct.peripheral_data_width = DMA_PERIPHERAL_DATA_WIDTH_HALFWORD;
     dma_init_struct.peripheral_inc_enable = FALSE;
 #ifdef ULTRA_DEDICATED
-    // the dshot capture DMA must win the arbitration against the ADC DMA
-    // (100.20 lowers the ADC channel on F421 as well)
+    // as in 100.20 on F421. Note this alone does not make the capture DMA
+    // win: that channel is low too and at equal level the lower channel
+    // number (the ADC's) goes first; ultra builds avoid the contest instead
+    // by starting conversions only after a dshot packet (processDshot)
     dma_init_struct.priority = DMA_PRIORITY_LOW;
 #else
     dma_init_struct.priority = DMA_PRIORITY_HIGH;
@@ -75,7 +77,14 @@ void ADC_Init(void)
 
     adc_base_default_para_init(&adc_base_struct);
     adc_base_struct.sequence_mode = TRUE;
+#ifdef ULTRA_DEDICATED
+    // one sequence per software start: ultra builds start the ADC right
+    // after each dshot packet (processDshot) so its DMA never runs during
+    // a capture; in repeat mode it would convert back to back
+    adc_base_struct.repeat_mode = FALSE;
+#else
     adc_base_struct.repeat_mode = TRUE;
+#endif
     adc_base_struct.data_align = ADC_RIGHT_ALIGNMENT;
     adc_base_struct.ordinary_channel_length = 3;
     adc_base_config(ADC1, &adc_base_struct);

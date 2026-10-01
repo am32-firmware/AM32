@@ -41,7 +41,11 @@ void changeToOutput()
 
 void changeToInput()
 {
+#ifdef ULTRA_DEDICATED // keep the pull-down of setInputPullDown()
+    gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_INPUT, GPIO_PULL_DOWN, INPUT_PIN);
+#else
     gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_INPUT, GPIO_PULL_NONE, INPUT_PIN);
+#endif
     INPUT_DMA_CHANNEL->ctrl |= DMA_DIR_PERIPHERAL_TO_MEMORY;
     GPIOB->scr = INPUT_PIN;
     IC_TIMER_REGISTER->cval = 0;

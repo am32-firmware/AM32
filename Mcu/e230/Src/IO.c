@@ -28,8 +28,10 @@ extern void processDshot(void);
 // ultra mode: the input capture DMA runs without a transfer complete
 // interrupt and is drained here from the 20kHz loop; a packet is complete
 // once the line has been idle for more than 2x the expected bit time.
-// DMA_start_bit stays valid until the next accepted packet: the software
-// EXTI that decodes it only preempts this routine on some MCUs
+// The packet is decoded right here, before the DMA is re-armed, by
+// calling processDshot() directly: no software EXTI, so the interrupt
+// priorities of the 20kHz timer and the EXTI play no part (agreed with
+// Alka; the EXTI path is not used by ultra builds)
 void runDshotCheck()
 {
     // one snapshot of the DMA counter per pass, and the timer is read
@@ -42,7 +44,7 @@ void runDshotCheck()
             if ((TIMER_CNT(IC_TIMER_REGISTER) - last_edge) > (uint32_t)(valid_packet_high << 1)) {
                 if (ultraPacketStart(dma_buffer, remaining, valid_packet_high, &DMA_start_bit)) {
                     transfercomplete();
-                    EXTI_SWIEV |= (uint32_t)EXTI_15;
+                    processDshot();
                 } else {
                     packet_length_badcounts++;
                 }

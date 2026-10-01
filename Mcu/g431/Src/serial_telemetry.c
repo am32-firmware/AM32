@@ -109,7 +109,10 @@ void send_telem_DMA(uint8_t bytes)
 void setBaudRate(uint32_t baud)
 {
     LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_3);
-    // usart kernel clock is PCLK2 = CPU frequency
+    // usart kernel clock is PCLK2 = CPU frequency. BRR is written with the
+    // USART enabled, as 100.20 does on this MCU: the reference manual asks
+    // for UE = 0, the direct write is what flies in the field and was kept
+    // on purpose (agreed with Alka)
     USART1->BRR = (CPU_FREQUENCY_MHZ * 1000000U + (baud / 2)) / baud;
 }
 #endif

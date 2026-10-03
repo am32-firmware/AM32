@@ -145,7 +145,15 @@ void enableADC_DMA(void)
                         LL_DMA_MEMORY_INCREMENT           |
                         LL_DMA_PDATAALIGN_HALFWORD        |
                         LL_DMA_MDATAALIGN_HALFWORD        |
+#ifdef ULTRA_DEDICATED
+                        // low, like the capture channel; at equal level the
+                        // ADC (channel 1) still goes first. Ultra builds
+                        // avoid the contest by starting conversions only
+                        // after a dshot packet (processDshot)
+                        LL_DMA_PRIORITY_LOW                );
+#else
                         LL_DMA_PRIORITY_HIGH               );
+#endif
 
 
   LL_DMA_SetPeriphRequest(DMA1,

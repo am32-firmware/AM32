@@ -238,8 +238,13 @@ void TIM10_Init(void)
 void MX_DMA_Init(void)
 {
     crm_periph_clock_enable(CRM_DMA1_PERIPH_CLOCK, TRUE);
+#ifndef ULTRA_DEDICATED
+    // ultra polled mode: the input DMA IRQ stays disabled - runDshotCheck()
+    // owns the channel; a stray flag would stop it behind its back via the
+    // DMA handler
     NVIC_SetPriority(DMA1_Channel6_IRQn, 1);
     NVIC_EnableIRQ(DMA1_Channel6_IRQn);
+#endif
 }
 
 void MX_GPIO_Init(void)
@@ -286,8 +291,10 @@ void UN_TIM_Init(void)
     INPUT_DMA_CHANNEL->ctrl = 0X98a; //  PERIPHERAL HALF WORD, MEMORY WORD ,
                                      //  MEMORY INC ENABLE , TC AND ERROR INTS
 
+#ifndef ULTRA_DEDICATED // see MX_DMA_Init()
     NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
     NVIC_EnableIRQ(IC_DMA_IRQ_NAME);
+#endif
 
     IC_TIMER_REGISTER->pr = 0xFFFF;
     IC_TIMER_REGISTER->div = 16;

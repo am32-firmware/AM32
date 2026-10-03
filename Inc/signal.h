@@ -26,3 +26,4 @@ extern char dshot;
 extern volatile char servoPwm;
 
 void detectInput();
+void transfercomplete();

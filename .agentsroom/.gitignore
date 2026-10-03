@@ -1,0 +1,9 @@
+# AgentsRoom: local cache and personal files (not committed)
+*-cache.json
+*-personal.json
+agents-local.json
+*.migrated.json
+sessions/
+team-runs/
+memory/
+agent-mail/

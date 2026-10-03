@@ -11,12 +11,60 @@
 #include "dshot.h"
 #include "functions.h"
 #include "serial_telemetry.h"
+#include "signal.h"
 #include "targets.h"
+#include "ultra.h"
 
 uint8_t buffer_padding = 7;
 char ic_timer_prescaler = CPU_FREQUENCY_MHZ / 6;
 uint32_t dma_buffer[64] = { 0 };
 volatile char out_put = 0;
+
+#ifdef ULTRA_DEDICATED
+extern void processDshot(void);
+
+// ultra mode: the input capture DMA runs without a transfer complete
+// interrupt and is drained here from the 20kHz loop; a packet is complete
+// once the line has been idle for more than 2x the expected bit time.
+// The packet is decoded right here, before the DMA is re-armed, by
+// calling processDshot() directly: no software EXTI, so the interrupt
+// priorities of the 20kHz timer and the EXTI play no part (agreed with
+// Alka; the EXTI path is not used by ultra builds)
+void runDshotCheck()
+{
+    // one snapshot of the DMA counter per pass, and the timer is read
+    // after that snapshot: an edge arriving in between must not make the
+    // line look idle or change the packet being judged
+    const uint16_t remaining = DMA1_Channel1->CNDTR;
+    if (remaining < 63) {
+        if (armed) {
+            const uint32_t last_edge = dma_buffer[63 - remaining];
+            if ((IC_TIMER_REGISTER->CNT - last_edge) > (uint32_t)(valid_packet_high << 1)) {
+                if (ultraPacketStart(dma_buffer, remaining, valid_packet_high, &DMA_start_bit)) {
+                    transfercomplete();
+                    processDshot();
+                } else {
+                    packet_length_badcounts++;
+                }
+                LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_1);
+                DMA1_Channel1->CNDTR = 64;
+                LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_1);
+                IC_TIMER_REGISTER->CNT = 0;
+            }
+        } else {
+            if (remaining <= 32) {
+                DMA_start_bit = 0;
+                transfercomplete();
+                processDshot();
+                LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_1);
+                DMA1_Channel1->CNDTR = 64;
+                LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_1);
+                IC_TIMER_REGISTER->CNT = 0;
+            }
+        }
+    }
+}
+#endif // ULTRA_DEDICATED
 
 void receiveDshotDma()
 {
@@ -39,8 +87,16 @@ void receiveDshotDma()
     IC_TIMER_REGISTER->CNT = 0;
     DMA1_Channel1->CMAR = (uint32_t)&dma_buffer;
     DMA1_Channel1->CPAR = (uint32_t)&IC_TIMER_REGISTER->CCR1;
+#ifdef ULTRA_DEDICATED
+    // polled mode: 64 deep capture, no transfer complete interrupt,
+    // lighter input filter - noise is handled in runDshotCheck()
+    IC_TIMER_REGISTER->CCMR1 = 0x21;
+    DMA1_Channel1->CNDTR = 64;
+    DMA1_Channel1->CCR = 0x989;
+#else
     DMA1_Channel1->CNDTR = buffersize;
     DMA1_Channel1->CCR = 0x98b;
+#endif
     IC_TIMER_REGISTER->DIER |= TIM_DIER_CC1DE;
     IC_TIMER_REGISTER->CCER |= IC_TIMER_CHANNEL;
     IC_TIMER_REGISTER->CR1 |= TIM_CR1_CEN;

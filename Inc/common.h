@@ -21,6 +21,7 @@ extern uint16_t signaltimeout;
 extern uint16_t input;
 extern volatile uint16_t newinput;
 extern char play_tone_flag;
+extern uint8_t beeping;
 extern uint32_t current_GPIO_PIN;
 extern char ic_timer_prescaler;
 extern uint8_t buffersize;

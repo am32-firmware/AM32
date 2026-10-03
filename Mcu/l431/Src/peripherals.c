@@ -507,8 +507,13 @@ void MX_DMA_Init(void)
   LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1);
   NVIC_SetPriority(DMA1_Channel4_IRQn, 2);
   NVIC_EnableIRQ(DMA1_Channel4_IRQn);
+#ifndef ULTRA_DEDICATED
+    // ultra polled mode: the input DMA IRQ stays disabled - runDshotCheck()
+    // owns the channel; a stray flag would stop it behind its back via the
+    // DMA handler
   NVIC_SetPriority(DMA1_Channel5_IRQn, 1);
   NVIC_EnableIRQ(DMA1_Channel5_IRQn);
+#endif
 
 }
 
@@ -588,6 +593,7 @@ void UN_TIM_Init(void)
 
   LL_DMA_SetMemorySize(DMA1, LL_DMA_CHANNEL_5, LL_DMA_MDATAALIGN_WORD);
 
+#ifndef ULTRA_DEDICATED // see MX_DMA_Init()
 #ifdef USE_TIMER_15_CHANNEL_1
     NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
     NVIC_EnableIRQ(IC_DMA_IRQ_NAME);
@@ -595,6 +601,7 @@ void UN_TIM_Init(void)
 #ifdef USE_TIMER_3_CHANNEL_1
     NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
     NVIC_EnableIRQ(IC_DMA_IRQ_NAME);
+#endif
 #endif
 
     // TIM_InitStruct.Prescaler = 0;

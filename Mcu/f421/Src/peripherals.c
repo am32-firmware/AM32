@@ -17,6 +17,7 @@
 #include "functions.h"
 #include "serial_telemetry.h"
 #include "targets.h"
+#include "ultra.h"
 #ifdef USE_LED_STRIP
 #include "WS2812.h"
 #endif
@@ -198,8 +199,10 @@ void TIM17_Init(void)
 void MX_DMA_Init(void)
 {
     crm_periph_clock_enable(CRM_DMA1_PERIPH_CLOCK, TRUE);
+#ifndef ULTRA_DEDICATED // see UN_TIM_Init(): runDshotCheck() owns the input channel
     NVIC_SetPriority(DMA1_Channel5_4_IRQn, 1);
     NVIC_EnableIRQ(DMA1_Channel5_4_IRQn);
+#endif
 }
 
 void MX_GPIO_Init(void) { }
@@ -223,8 +226,14 @@ void UN_TIM_Init(void)
     crm_periph_clock_enable(CRM_DMA1_PERIPH_CLOCK, TRUE);
     INPUT_DMA_CHANNEL->ctrl = 0X98a; //  PERIPHERAL HALF WORD, MEMROY WORD ,
                                      //  MEMORY INC ENABLE , TC AND ERROR INTS
+#ifndef ULTRA_DEDICATED
+    // ultra polled mode: the input DMA IRQ stays disabled (100.20
+    // reference) - runDshotCheck() owns the channel; a spurious
+    // DTERR/flag would disable the channel behind its back via the
+    // DMA handler
     NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
     NVIC_EnableIRQ(IC_DMA_IRQ_NAME);
+#endif
     IC_TIMER_REGISTER->pr = 0xFFFF;
     IC_TIMER_REGISTER->div = 16;
     IC_TIMER_REGISTER->ctrl1_bit.prben = TRUE;

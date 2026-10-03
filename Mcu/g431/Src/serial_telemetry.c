@@ -7,6 +7,7 @@
 
 #include "serial_telemetry.h"
 #include "common.h"
+#include "targets.h"
 #include "kiss_telemetry.h"
 
 void telem_UART_Init()
@@ -77,8 +78,24 @@ void telem_UART_Init()
   //  LL_DMA_EnableIT_TE(DMA1, LL_DMA_CHANNEL_3);
 }
 
+#ifdef ULTRA_DEDICATED
+// a telemetry frame is still going out
+uint8_t telem_tx_busy(void)
+{
+    return LL_DMA_IsEnabledChannel(DMA1, LL_DMA_CHANNEL_3) && (LL_DMA_GetDataLength(DMA1, LL_DMA_CHANNEL_3) != 0);
+}
+#endif
+
 void send_telem_DMA(uint8_t bytes)
 { // set data length and enable channel to start transfer
+#ifdef ULTRA_DEDICATED
+    // never abort an in-flight transfer: disabling the channel mid-frame
+    // puts a partial frame on the wire and desyncs the FC parser.
+    // Skip instead - the FC re-requests with the next packet.
+    if (telem_tx_busy()) {
+        return;
+    }
+#endif
      LL_USART_SetTransferDirection(USART1, LL_USART_DIRECTION_TX);
      LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_3);
      LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_3, bytes);
@@ -87,3 +104,15 @@ void send_telem_DMA(uint8_t bytes)
     LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_3);
     LL_USART_SetTransferDirection(USART1, LL_USART_DIRECTION_RX);
 }
+
+#ifdef ULTRA_DEDICATED
+void setBaudRate(uint32_t baud)
+{
+    LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_3);
+    // usart kernel clock is PCLK2 = CPU frequency. BRR is written with the
+    // USART enabled, as 100.20 does on this MCU: the reference manual asks
+    // for UE = 0, the direct write is what flies in the field and was kept
+    // on purpose (agreed with Alka)
+    USART1->BRR = (CPU_FREQUENCY_MHZ * 1000000U + (baud / 2)) / baud;
+}
+#endif

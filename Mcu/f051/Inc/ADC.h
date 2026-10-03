@@ -15,5 +15,6 @@ void ADC_DMA_Callback();
 void enableADC_DMA();
 void activateADC();
 void ADC_Init(void);
+int16_t getNTCDegrees(uint16_t ntcrawtemp);
 
 #endif /* ADC_H_ */

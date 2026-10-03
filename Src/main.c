@@ -2137,7 +2137,11 @@ if(zero_crosses < 5){
 #ifdef USE_ADC_1_2
           LL_ADC_REG_StartConversion(ADC2);
 #endif          
+#if defined(MCU_F051) && defined(USE_NTC)
+            converted_degrees = getNTCDegrees(ADC_raw_ntc);
+#else
             converted_degrees = __LL_ADC_CALC_TEMPERATURE(3300, ADC_raw_temp, LL_ADC_RESOLUTION_12B);
+#endif
 #endif
 #ifdef MCU_GDE23
             // converted_degrees = (1.43 - ADC_raw_temp * 3.3 / 4096) * 1000 / 4.3 + 25;

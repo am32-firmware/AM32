@@ -6,7 +6,11 @@
  */
 #include "ADC.h"
 
-#ifdef USE_ADC_INPUT
+#if defined(USE_ADC_INPUT) && defined(USE_ADC_PA2)
+#error "USE_ADC_INPUT and USE_ADC_PA2 cannot be enabled at the same time"
+#endif
+
+#if defined(USE_ADC_INPUT) || defined(USE_ADC_PA2)
 uint16_t ADCDataDMA[4];
 #else
 uint16_t ADCDataDMA[3];
@@ -16,6 +20,7 @@ extern uint16_t ADC_raw_temp;
 extern uint16_t ADC_raw_volts;
 extern uint16_t ADC_raw_current;
 extern uint16_t ADC_raw_input;
+extern uint16_t ADC_raw_pa2;
 
 void ADC_DMA_Callback()
 { // read dma buffer and set extern variables
@@ -25,6 +30,17 @@ void ADC_DMA_Callback()
     ADC_raw_volts = ADCDataDMA[1] / 2;
     ADC_raw_current = ADCDataDMA[2];
     ADC_raw_input = ADCDataDMA[0];
+
+#elif defined(USE_ADC_PA2)
+    ADC_raw_pa2 = ADCDataDMA[0];
+    ADC_raw_temp = ADCDataDMA[3];
+    if (VOLTAGE_ADC_PIN > CURRENT_ADC_PIN) {
+        ADC_raw_current = ADCDataDMA[1];
+        ADC_raw_volts = ADCDataDMA[2];
+    } else {
+        ADC_raw_volts = ADCDataDMA[1];
+        ADC_raw_current = ADCDataDMA[2];
+    }
 
 #else
     ADC_raw_temp = ADCDataDMA[2];
@@ -50,7 +66,7 @@ void enableADC_DMA()
         (uint32_t)&ADCDataDMA, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
 
     /* Set DMA transfer size */
-#ifdef USE_ADC_INPUT
+#if defined(USE_ADC_INPUT) || defined(USE_ADC_PA2)
     LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_1, 4);
 #else
     LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_1, 3);
@@ -103,7 +119,7 @@ void ADC_Init(void)
     PA3   ------> ADC_IN3
     PA6   ------> ADC_IN6
     */
-#ifdef USE_ADC_INPUT
+#if defined(USE_ADC_INPUT) || defined(USE_ADC_PA2)
     GPIO_InitStruct.Pin = LL_GPIO_PIN_2;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
@@ -135,7 +151,7 @@ void ADC_Init(void)
 
     LL_DMA_SetMemorySize(DMA1, LL_DMA_CHANNEL_1, LL_DMA_MDATAALIGN_HALFWORD);
 
-#ifdef USE_ADC_INPUT
+#if defined(USE_ADC_INPUT) || defined(USE_ADC_PA2)
     LL_ADC_REG_SetSequencerChAdd(ADC1, LL_ADC_CHANNEL_2);
 #endif
 

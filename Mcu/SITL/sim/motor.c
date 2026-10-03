@@ -1068,7 +1068,7 @@ void motor_print_state(uint64_t now_ns, float time_ratio)
     extern volatile uint32_t zero_crosses;
     extern volatile uint32_t commutation_interval;
     extern volatile uint16_t duty_cycle;
-    extern uint8_t bemf_timeout_happened;
+    extern volatile uint8_t bemf_timeout_happened;
     extern uint8_t running;
     extern char old_routine;
     extern volatile uint16_t newinput;

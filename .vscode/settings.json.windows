@@ -1,7 +1,10 @@
 {
     "OS": "windows",
-    "makefile.makePath": "tools/windows/make/bin/make.exe",
+    "am32.sitl.gdbPath": "C:/cygwin64/bin/gdb.exe",
+    "makefile.makePath": "${workspaceFolder}/tools/windows/make/bin/make.exe",
 
+    "makefile.configureOnOpen": true,
+    "makefile.phonyOnlyTargets": true,
     "makefile.configurations": [
         {
             "name": "MakeSingle",

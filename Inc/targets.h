@@ -1,5 +1,16 @@
 
 
+/*
+  ELF section placement for the flash layout tooling (app signature,
+  file name). Not meaningful for the SITL build and mach-o (macOS) has
+  a different section syntax, so it becomes a no-op there
+ */
+#ifdef __APPLE__
+#define AM32_FLASH_SECTION(name)
+#else
+#define AM32_FLASH_SECTION(name) __attribute__((section(name)))
+#endif
+
 #ifndef USE_MAKE
 // #define F031_DEV
 // #define FD6288_F051
@@ -353,6 +364,19 @@
 #define MILLIVOLT_PER_AMP 9
 #endif
 ///
+#ifdef AM32_SITL_CAN
+#define FIRMWARE_NAME "AM32 SITL"
+#define FILE_NAME "AM32_SITL_CAN"
+#define DRONECAN_SUPPORT 1
+#define DRONECAN_NODE_NAME "org.am32.sitl"
+#define DEAD_TIME 80
+#define HARDWARE_GROUP_SITL_A
+#define TARGET_STALL_PROTECTION_INTERVAL 20000
+#define TARGET_VOLTAGE_DIVIDER 110
+#define MILLIVOLT_PER_AMP 20
+#define CURRENT_OFFSET 0
+#endif
+
 #ifdef REF_G431
 #define FIRMWARE_NAME "Ref G431"
 #define FILE_NAME "REF_G431"
@@ -593,6 +617,35 @@
 /*********************************************************************AT32F421
  * targets*********************************************/
 
+#ifdef  UAVOD_F421
+#define FIRMWARE_NAME "UAVOD_F421 "
+#define FILE_NAME "UAVOD_F421"
+#define DEAD_TIME 60
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_045
+#define USE_SERIAL_TELEMETRY
+#define CURRENT_ADC_CHANNEL ADC_CHANNEL_3
+#define CURRENT_ADC_PIN GPIO_PINS_3
+#define VOLTAGE_ADC_CHANNEL ADC_CHANNEL_6
+#define VOLTAGE_ADC_PIN GPIO_PINS_6
+#endif
+
+
+#ifdef  GEPRC_12S_F421
+#define FIRMWARE_NAME "GEPRC_12S_F4"
+#define FILE_NAME "GEPRC_12S_F421"
+#define DEAD_TIME 80
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_045
+#define USE_SERIAL_TELEMETRY
+#define NO_CURRENT_SENSE
+#define VOLTAGE_ADC_CHANNEL ADC_CHANNEL_3
+#define VOLTAGE_ADC_PIN GPIO_PINS_3
+#define USE_NTC
+#define NTC_ADC_CHANNEL ADC_CHANNEL_2
+#define NTC_ADC_PIN GPIO_PINS_2
+#endif
+
 #ifdef ORQA_F421
 #define FIRMWARE_NAME "ORQA       "
 #define FILE_NAME "ORQA_F421"
@@ -707,6 +760,18 @@
 #define WS2812_PIN GPIO_PINS_4
 #endif
 
+#ifdef  SDMODEL_4IN1_F421
+#define FIRMWARE_NAME "SDMODEL_F4"
+#define FILE_NAME "SDMODEL_4IN1_F421"
+#define DEAD_TIME 60
+#define HARDWARE_GROUP_AT_540
+#define HARDWARE_GROUP_AT_E
+#define USE_SERIAL_TELEMETRY
+#define VOLTAGE_ADC_CHANNEL ADC_CHANNEL_3
+#define VOLTAGE_ADC_PIN GPIO_PINS_3
+#define USE_SERIAL_TELEMETRY
+#endif
+
 #ifdef  FLYWOO_GOKU_F421
 #define FIRMWARE_NAME "FLYWOO_GOKU "
 #define FILE_NAME "FLYWOO_GOKU_F421"
@@ -766,6 +831,22 @@
 #define CURRENT_ADC_PIN GPIO_PINS_3
 #define VOLTAGE_ADC_CHANNEL ADC_CHANNEL_6
 #define VOLTAGE_ADC_PIN GPIO_PINS_6
+#endif
+
+#ifdef SOE_A_F421
+#define FIRMWARE_NAME "SOE_A_F421"
+#define FILE_NAME "SOE_A_F421"
+#define DEAD_TIME 45
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_045
+#define USE_SERIAL_TELEMETRY
+#define MILLIVOLT_PER_AMP 19
+#define CURRENT_OFFSET 0
+#define TARGET_VOLTAGE_DIVIDER 110
+#define CURRENT_ADC_CHANNEL ADC_CHANNEL_6
+#define CURRENT_ADC_PIN GPIO_PINS_6
+#define VOLTAGE_ADC_CHANNEL ADC_CHANNEL_3
+#define VOLTAGE_ADC_PIN GPIO_PINS_3
 #endif
 
 #ifdef ZTW_A_F421
@@ -1148,6 +1229,38 @@
 #define FIRMWARE_NAME "FLIPSKY_F4 "
 #define FILE_NAME "FLIPSKY_F421"
 #define DEAD_TIME 80
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_540
+#define USE_SERIAL_TELEMETRY
+#define TARGET_VOLTAGE_DIVIDER 210
+#define MILLIVOLT_PER_AMP 10
+#define RAMP_SPEED_LOW_RPM 2
+#define CURRENT_ADC_CHANNEL ADC_CHANNEL_3
+#define CURRENT_ADC_PIN GPIO_PINS_3
+#define VOLTAGE_ADC_CHANNEL ADC_CHANNEL_6
+#define VOLTAGE_ADC_PIN GPIO_PINS_6
+#endif
+
+#ifdef  MAXKGO_V1_F421
+#define FIRMWARE_NAME "MAXKGO_F4 "
+#define FILE_NAME "MAXKGO_F421"
+#define DEAD_TIME 130
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_540
+#define USE_SERIAL_TELEMETRY
+#define TARGET_VOLTAGE_DIVIDER 210
+#define MILLIVOLT_PER_AMP 10
+#define RAMP_SPEED_LOW_RPM 2
+#define CURRENT_ADC_CHANNEL ADC_CHANNEL_3
+#define CURRENT_ADC_PIN GPIO_PINS_3
+#define VOLTAGE_ADC_CHANNEL ADC_CHANNEL_6
+#define VOLTAGE_ADC_PIN GPIO_PINS_6
+#endif
+
+#ifdef  FLIPSKY_V1_F421
+#define FIRMWARE_NAME "FLIPSKY_F4 "
+#define FILE_NAME "FLIPSKY_F421"
+#define DEAD_TIME 130
 #define HARDWARE_GROUP_AT_B
 #define HARDWARE_GROUP_AT_540
 #define USE_SERIAL_TELEMETRY
@@ -2599,7 +2712,7 @@
 #ifdef  ZTW_A_LV_G071
 #define FILE_NAME "ZTW_A_LV_G071"
 #define FIRMWARE_NAME "ZTW_A_LV_G0 "
-#define DEAD_TIME 60
+#define DEAD_TIME 30
 #define MILLIVOLT_PER_AMP 33
 #define TARGET_VOLTAGE_DIVIDER 210
 #define CURRENT_OFFSET 0
@@ -3320,6 +3433,18 @@
 #define DEAD_TIME 60
 #define MILLIVOLT_PER_AMP 20
 #define CURRENT_OFFSET 0
+#define HARDWARE_GROUP_G031_A
+#define USE_SERIAL_TELEMETRY
+#define NO_POLLING_START
+#endif
+
+#ifdef AIRHEART_SINGLE_G031
+#define FILE_NAME "AIRHEART_SINGLE_G031"
+#define FIRMWARE_NAME "AirHeart Sgl"
+#define DEAD_TIME 60
+#define MILLIVOLT_PER_AMP 39
+#define CURRENT_OFFSET 0
+#define TARGET_VOLTAGE_DIVIDER 230
 #define HARDWARE_GROUP_G031_A
 #define USE_SERIAL_TELEMETRY
 #define NO_POLLING_START
@@ -4168,6 +4293,12 @@
 
 #define PHASE_C_EXTI_LINE LL_EXTI_LINE_18
 #define PHASE_C_COMP_NUMBER COMP2
+
+#endif
+
+#ifdef HARDWARE_GROUP_SITL_A
+
+#define MCU_SITL
 
 #endif
 
@@ -5717,6 +5848,30 @@
   #define COMPARATOR_IRQ   EXTI2_IRQn
 #endif
 
+#endif
+
+#ifdef MCU_SITL
+// software in the loop simulation, emulating a G431 class MCU with the
+// hardware replaced by a motor/battery simulation. See Mcu/SITL
+#define STMICRO
+#define CPU_FREQUENCY_MHZ 160
+#ifndef EEPROM_START_ADD
+#define EEPROM_START_ADD (uint32_t)0x0800F800
+#endif
+#define INTERVAL_TIMER TIM2
+#define TEN_KHZ_TIMER TIM6
+#define UTILITY_TIMER TIM17
+#define COM_TIMER TIM16
+#define APPLICATION_ADDRESS 0x08001000
+#define TARGET_MIN_BEMF_COUNTS 3
+#define COMPARATOR_IRQ SITL_IRQ_COMP
+#define COM_TIMER_IRQ SITL_IRQ_COM
+#define IC_DMA_IRQ_NAME SITL_IRQ_DMA
+#define USE_ADC
+#define DSHOT_PRIORITY_THRESHOLD 60
+// the SITL harness provides the real main(), the firmware main() is
+// started by the harness under this name
+#define main am32_main
 #endif
 
 #ifndef LOOP_FREQUENCY_HZ

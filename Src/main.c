@@ -248,7 +248,7 @@ an settings option)
 #include "DroneCAN/DroneCAN.h"
 #endif
 
-#include <version.h>
+#include "version.h"
 
 void zcfoundroutine(void);
 
@@ -347,7 +347,7 @@ uint16_t low_cell_volt_cutoff = 330; // 3.3volts per cell
 
 //=========================== END EEPROM Defaults ===========================
 
-const char filename[30] __attribute__((section(".file_name"))) = FILE_NAME;
+const char filename[30] AM32_FLASH_SECTION(".file_name") = FILE_NAME;
 _Static_assert(sizeof(FIRMWARE_NAME) <=13,"Firmware name too long");   // max 12 character firmware name plus NULL 
 
 // move these to targets folder or peripherals for each mcu
@@ -786,11 +786,22 @@ void loadEEpromSettings()
           }
         }
         
-        if (motor_kv < 300) {
+        if (motor_kv <= 20) {
             low_rpm_throttle_limit = 0;
         }
-        low_rpm_level = motor_kv / 100 / (32 / eepromBuffer.motor_poles);
-        high_rpm_level = motor_kv / 12 / (32 / eepromBuffer.motor_poles);				
+        // guard divisions for an erased eeprom (motor_poles 0 or 0xff),
+        // ARM hardware division returns 0 but it is UB in C
+        uint8_t rpm_level_div = 0;
+        if (eepromBuffer.motor_poles != 0) {
+            rpm_level_div = 32 / eepromBuffer.motor_poles;
+        }
+        if (rpm_level_div != 0) {
+            low_rpm_level = motor_kv / 100 / rpm_level_div;
+            high_rpm_level = motor_kv / 12 / rpm_level_div;
+        } else {
+            low_rpm_level = 0;
+            high_rpm_level = 0;
+        }
     }
     reverse_speed_threshold = map(motor_kv, 300, 3000, 1000, 500);
     if (eepromBuffer.bi_direction){
@@ -1705,7 +1716,7 @@ void runBrushedLoop()
 
     if (use_current_limit) {
         use_current_limit_adjust -= (int16_t)(doPidCalculations(&currentPid, actual_current,
-                                                  CURRENT_LIMIT * 100)
+                                                  eepromBuffer.limits.current * 100)
             / 10000);
         if (use_current_limit_adjust < minimum_duty_cycle) {
             use_current_limit_adjust = minimum_duty_cycle;
@@ -1736,6 +1747,10 @@ void runBrushedLoop()
  */
 static void checkDeviceInfo(void)
 {
+#ifdef MCU_SITL
+    // no bootloader device info page in SITL
+    return;
+#endif
 #ifdef NXP
     uint32_t pflashBlockBase  = 0U;
     uint32_t pflashTotalSize  = 0U;
@@ -2110,8 +2125,14 @@ if(zero_crosses < 5){
            send_esc_info_flag = 0;
         }
         if (PROCESS_ADC_FLAG == 1) { // for adc and telemetry set adc counter at 1khz loop rate
+          ADC_DMA_Callback(); // common to all, Call ADC_DMA callback to get raw data
+#ifdef NO_CURRENT_SENSE
+          ADC_raw_current = 0;
+#endif
+#ifdef NO_VOLTAGE_SENSE
+          ADC_raw_volts = 0;
+#endif          
 #if defined(STMICRO)
-            ADC_DMA_Callback();
             LL_ADC_REG_StartConversion(ADC1);
 #ifdef USE_ADC_1_2
           LL_ADC_REG_StartConversion(ADC2);
@@ -2119,13 +2140,11 @@ if(zero_crosses < 5){
             converted_degrees = __LL_ADC_CALC_TEMPERATURE(3300, ADC_raw_temp, LL_ADC_RESOLUTION_12B);
 #endif
 #ifdef MCU_GDE23
-            ADC_DMA_Callback();
             // converted_degrees = (1.43 - ADC_raw_temp * 3.3 / 4096) * 1000 / 4.3 + 25;
             converted_degrees = ((int32_t)(357.5581395348837f * (1 << 16)) - ADC_raw_temp * (int32_t)(0.18736373546511628f * (1 << 16))) >> 16;
             adc_software_trigger_enable(ADC_REGULAR_CHANNEL);
 #endif
-#ifdef ARTERY
-            ADC_DMA_Callback();
+#ifdef ARTERY            
             adc_ordinary_software_trigger_enable(ADC1, TRUE);
     #ifdef USE_NTC
             converted_degrees = getNTCDegrees(ADC_raw_ntc);
@@ -2134,12 +2153,8 @@ if(zero_crosses < 5){
     #endif
 #endif
 #ifdef NXP
-            //Call ADC_DMA callback to get raw data
-            ADC_DMA_Callback();
-
             //Convert temperature data to actual temperature in degrees Celsius
             converted_degrees = computeTemperature(ADC_raw_temp[0], ADC_raw_temp[1]);
-
             //Start ADC conversion
             startADCConversion();
 #endif
@@ -2161,7 +2176,7 @@ if(zero_crosses < 5){
 #endif
             if (actual_current < 0) {
                 actual_current = 0;
-            }             
+            }
             if (eepromBuffer.low_voltage_cut_off == 1) {  
                 if (battery_voltage < (cell_count * low_cell_volt_cutoff)) {
                   low_voltage_count++;

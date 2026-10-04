@@ -30,6 +30,15 @@ jobs:
         with:
           submodules: 'recursive'
 
+      - name: Install Windows SITL toolchain
+        if: runner.os == 'Windows'
+        uses: cygwin/cygwin-install-action@v4
+        with:
+          packages: gcc-core make
+          # Keep the board build on Git Bash/native Make. The SITL build
+          # script selects Cygwin explicitly when make reaches that target.
+          add-to-path: false
+
       - name: Build CI
         shell: bash
         run: |

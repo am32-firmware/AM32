@@ -13,7 +13,7 @@
 #include "serial_telemetry.h"
 #include "targets.h"
 
-extern volatile char bemf_timeout;
+extern char bemf_timeout;
 
 void initCorePeripherals(void)
 {

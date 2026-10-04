@@ -38,6 +38,8 @@ static dshot_telem_scheduler_t telem_scheduler = {0};
 // only re-latch an old event, not lose the new one.
 static volatile uint8_t pending_status_events;
 static uint8_t max_commutation_stress;
+static volatile uint16_t stress_window_peak_delta;
+static volatile uint8_t stress_window_reset_requested = 1;
 
 // These divisors create ratios regardless of input rate:
 // - Temperature: every 200 calls (4Hz at 800Hz input)
@@ -60,11 +62,10 @@ char EDT_ARM_ENABLE = 0;
 char EDT_ARMED = 0;
 int shift_amount = 0;
 volatile uint32_t gcrnumber;
-extern int zero_crosses;
+extern volatile uint32_t zero_crosses;
 extern volatile char send_telemetry;
 extern uint8_t max_duty_cycle_change;
-extern volatile char bemf_timeout;
-extern volatile uint8_t bemf_timeout_happened;
+extern volatile uint16_t thiszctime;
 int dshot_full_number;
 extern char play_tone_flag;
 extern char send_esc_info_flag;
@@ -94,6 +95,44 @@ static uint8_t dshot_take_status_events(void)
     const uint8_t events = pending_status_events;
     pending_status_events = 0;
     return events;
+}
+
+void dshot_note_zero_cross_interval(uint16_t current_interval,
+    uint16_t previous_interval)
+{
+    if (stress_window_reset_requested) {
+        stress_window_peak_delta = 0;
+        stress_window_reset_requested = 0;
+    }
+
+    if (!running || zero_crosses <= 10 || current_interval == 0) {
+        return;
+    }
+
+    const uint16_t interval_delta = current_interval > previous_interval
+        ? current_interval - previous_interval
+        : previous_interval - current_interval;
+    if (interval_delta > stress_window_peak_delta) {
+        stress_window_peak_delta = interval_delta;
+    }
+}
+
+static uint8_t dshot_take_commutation_stress(void)
+{
+    if (!running || stress_window_reset_requested) {
+        return 0;
+    }
+    stress_window_reset_requested = 1;
+    const uint16_t interval_delta = stress_window_peak_delta;
+    const uint16_t current_interval = thiszctime;
+
+    if (current_interval == 0) {
+        return 0;
+    }
+
+    const uint32_t stress = (uint32_t)interval_delta * 255U
+        / current_interval;
+    return stress > 255U ? 255U : (uint8_t)stress;
 }
 
 void computeDshotDMA()
@@ -270,22 +309,12 @@ void computeDshotDMA()
 void make_dshot_package(uint16_t com_time)
 {
     uint16_t extended_frame_to_send = 0;
-    uint8_t commutation_stress = 0;
-
-    if (running) {
-        const uint8_t timeout_count = bemf_timeout_happened;
-        const uint8_t timeout_limit = (uint8_t)bemf_timeout;
-        const uint16_t stress = (uint16_t)timeout_count * 255U / ((uint16_t)timeout_limit + 1U);
-        commutation_stress = stress > 255U ? 255U : (uint8_t)stress;
-    }
 
     if (armed && !telem_scheduler.last_armed) {
         max_commutation_stress = 0;
+        stress_window_reset_requested = 1;
     }
     telem_scheduler.last_armed = armed;
-    if (armed && commutation_stress > max_commutation_stress) {
-        max_commutation_stress = commutation_stress;
-    }
 
     if (send_EDT_init) {
         extended_frame_to_send = DSHOT_EDT_FRAME_STATUS;
@@ -316,7 +345,12 @@ void make_dshot_package(uint16_t com_time)
                 telem_scheduler.current_count = 0;
             }
             else if (telem_scheduler.stress_count >= STRESS_EDT_RATE_DIVISOR) {
-                extended_frame_to_send = DSHOT_EDT_FRAME_STRESS | commutation_stress;
+                const uint8_t commutation_stress = dshot_take_commutation_stress();
+                if (armed && commutation_stress > max_commutation_stress) {
+                    max_commutation_stress = commutation_stress;
+                }
+                extended_frame_to_send = DSHOT_EDT_FRAME_STRESS
+                    | commutation_stress;
                 telem_scheduler.stress_count = 0;
             }
             else if (telem_scheduler.voltage_count >= VOLTAGE_EDT_RATE_DIVISOR) {

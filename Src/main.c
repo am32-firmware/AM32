@@ -398,7 +398,7 @@ char lowkv = 0;
 
 uint16_t min_startup_duty = 120;
 uint16_t sin_mode_min_s_d = 120;
-volatile char bemf_timeout = 10;
+char bemf_timeout = 10;
 
 char startup_boost = 50;
 char reversing_dead_band = 1;
@@ -467,7 +467,7 @@ uint8_t readIndex = 0; // the index of the current reading
 uint32_t total = 0;
 uint16_t readings[50];
 
-volatile uint8_t bemf_timeout_happened = 0;
+uint8_t bemf_timeout_happened = 0;
 uint8_t changeover_step = 5;
 uint8_t filter_level = 5;
 uint8_t running = 0;
@@ -967,6 +967,7 @@ void interruptRoutine()
     maskPhaseInterrupts();
     lastzctime = thiszctime;
     thiszctime = INTERVAL_TIMER_COUNT;  
+    dshot_note_zero_cross_interval(thiszctime, lastzctime);
     SET_INTERVAL_TIMER_COUNT(0);
     SET_AND_ENABLE_COM_INT(waitTime+1); // enable COM_TIMER interrupt
     __enable_irq();
@@ -1637,7 +1638,11 @@ void advanceincrement()
 
 void zcfoundroutine()
 { // only used in polling mode, blocking routine.
+    __disable_irq();
+    lastzctime = thiszctime;
     thiszctime = INTERVAL_TIMER_COUNT;
+    dshot_note_zero_cross_interval(thiszctime, lastzctime);
+    __enable_irq();
     SET_INTERVAL_TIMER_COUNT(0);
     commutation_interval = (thiszctime + (3 * commutation_interval)) / 4;
     advance = (temp_advance * commutation_interval) >> 6; //   7.5 degree increments

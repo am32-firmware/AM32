@@ -20,6 +20,8 @@
 void computeDshotDMA(void);
 void make_dshot_package(uint16_t com_time);
 void dshot_note_status_event(uint8_t event_mask);
+void dshot_note_zero_cross_interval(uint16_t current_interval,
+    uint16_t previous_interval);
 
 extern void playInputTune(void);
 extern void playInputTune2(void);

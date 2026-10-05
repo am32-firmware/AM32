@@ -25,3 +25,6 @@ windows-tools.zip
 .settings/
 /dist/
 /build/
+.mcp.json
+.agentsroom/handoff-transcript-*.txt
+.agentsroom/handoff-summary-*.md

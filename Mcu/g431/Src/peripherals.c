@@ -472,8 +472,13 @@ void MX_DMA_Init(void)
     LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMAMUX1);
     LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1);
 
+#ifndef ULTRA_DEDICATED
+    // ultra polled mode: the input DMA IRQ stays disabled - runDshotCheck()
+    // owns the channel; a stray flag would stop it behind its back via the
+    // DMA handler
     NVIC_SetPriority(DMA1_Channel1_IRQn, 1);
     NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+#endif
 }
 
 void MX_TIM6_Init(void)

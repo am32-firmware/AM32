@@ -6,9 +6,11 @@
  */
 
 #include "dshot.h"
+#include "ultra.h"
 #include "IO.h"
 #include "common.h"
 #include "functions.h"
+#include "serial_telemetry.h"
 #include "sounds.h"
 #include "targets.h"
 #if DRONECAN_SUPPORT
@@ -71,19 +73,33 @@ uint8_t  new_byte;
 
 void computeDshotDMA()
 {
+#ifdef ULTRA_DEDICATED
+    // the packet may sit behind noise edges; DMA_start_bit is the offset
+    // of the first real edge (0 otherwise)
+    dshot_frametime = dma_buffer[31 + DMA_start_bit] - dma_buffer[0 + DMA_start_bit];
+#else
     dshot_frametime = dma_buffer[31] - dma_buffer[0];
+#endif
     halfpulsetime = dshot_frametime >> 5;
     if ((dshot_frametime > dshot_frametime_low) && (dshot_frametime < dshot_frametime_high)) {
 			signaltimeout = 0;
         for (int i = 0; i < 16; i++) {
             // note that dma_buffer[] is uint32_t, we cast the difference to uint16_t to handle
             // timer wrap correctly
+#ifdef ULTRA_DEDICATED
+            const uint16_t pdiff = dma_buffer[(i << 1) + DMA_start_bit + 1] - dma_buffer[(i << 1) + DMA_start_bit];
+#else
             const uint16_t pdiff = dma_buffer[(i << 1) + 1] - dma_buffer[(i << 1)];
+#endif
             dpulse[i] = (pdiff > halfpulsetime);
         }
         uint8_t calcCRC = ((dpulse[0] ^ dpulse[4] ^ dpulse[8]) << 3 | (dpulse[1] ^ dpulse[5] ^ dpulse[9]) << 2 | (dpulse[2] ^ dpulse[6] ^ dpulse[10]) << 1 | (dpulse[3] ^ dpulse[7] ^ dpulse[11]));
         uint8_t checkCRC = (dpulse[12] << 3 | dpulse[13] << 2 | dpulse[14] << 1 | dpulse[15]);
 
+#ifndef ULTRA_DEDICATED // ultra: one-way dshot only. The polled decode can
+                        // run while the next packet is already on the line,
+                        // and a latched detection would fail every CRC
+                        // until the next power cycle
         if (!armed) {
             if (dshot_telemetry == 0) {
                 if (getInputPinState()) { // if the pin is high for 100 checks between
@@ -95,6 +111,7 @@ void computeDshotDMA()
                 }
             }
         }
+#endif
         if (dshot_telemetry) {
             checkCRC = ~checkCRC + 16;
         }
@@ -154,12 +171,22 @@ void computeDshotDMA()
                 command_count = 0;
             }
 
+#ifdef ULTRA_DEDICATED
+            // 100.20 reference: commands are not gated on armed at all -
+            // the Ultra FC probes (30/31) and beeps (1-5) while disarmed
+            if ((dshotcommand > 0) && (running == 0)) {
+#else
             if ((dshotcommand > 0) && (running == 0) && armed) {
+#endif
                 if (dshotcommand != last_command) {
                     last_command = dshotcommand;
                     command_count = 0;
                 }
+#ifdef ULTRA_DEDICATED
+                if (dshotcommand < 5) { // beacons (100.20: 1-4 immediate)
+#else
                 if (dshotcommand <= 5) { // beacons
+#endif
                     command_count = 6; // go on right away
                 }
                 command_count++;
@@ -168,19 +195,11 @@ void computeDshotDMA()
                     switch (dshotcommand) { // todo
 
                     case 1:
-                        play_tone_flag = 1;
-                        break;
                     case 2:
-                        play_tone_flag = 2;
-                        break;
                     case 3:
-                        play_tone_flag = 3;
-                        break;
                     case 4:
-                        play_tone_flag = 4;
-                        break;
                     case 5:
-                        play_tone_flag = 5;
+                        play_tone_flag = (char)dshotcommand;
                         break;
                     case 6:
                         send_esc_info_flag = 1;
@@ -223,6 +242,14 @@ void computeDshotDMA()
                     case 21:
                         forward = eepromBuffer.dir_reversed;
                         break;
+#ifdef ULTRA_DEDICATED
+                    case 30: // KISS Ultra: telemetry link at 115200 baud
+                        setBaudRate(115200);
+                        break;
+                    case 31: // KISS Ultra: fast telemetry link at 2 Mbaud
+                        setBaudRate(2000000);
+                        break;
+#endif
                     case 36:
                         programming_mode = 1;
               //          armed = 0;           // disarm when entering programming mode

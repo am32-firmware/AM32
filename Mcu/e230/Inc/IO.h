@@ -15,6 +15,10 @@
 void changeToOutput();
 void changeToInput();
 void receiveDshotDma();
+#include "ultra.h"
+#ifdef ULTRA_DEDICATED
+void runDshotCheck();
+#endif
 void sendDshotDma();
 
 uint8_t getInputPinState();

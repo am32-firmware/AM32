@@ -138,7 +138,14 @@ void ADC_Init(void)
     LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_2,
         LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
 
+#ifdef ULTRA_DEDICATED
+    // the dshot capture DMA (channel 1, low) must win against the ADC when
+    // both request at once: at equal level the lower channel goes first
+    // (100.20 lowers the ADC channel as well)
+    LL_DMA_SetChannelPriorityLevel(DMA1, LL_DMA_CHANNEL_2, LL_DMA_PRIORITY_LOW);
+#else
     LL_DMA_SetChannelPriorityLevel(DMA1, LL_DMA_CHANNEL_2, LL_DMA_PRIORITY_HIGH);
+#endif
 
     LL_DMA_SetMode(DMA1, LL_DMA_CHANNEL_2, LL_DMA_MODE_CIRCULAR);
 

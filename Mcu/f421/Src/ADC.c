@@ -71,7 +71,15 @@ void ADC_Init(void)
     dma_init_struct.peripheral_base_addr = (uint32_t)&ADC1->odt;
     dma_init_struct.peripheral_data_width = DMA_PERIPHERAL_DATA_WIDTH_HALFWORD;
     dma_init_struct.peripheral_inc_enable = FALSE;
+#ifdef ULTRA_DEDICATED
+    // as in 100.20 on F421. Note this alone does not make the capture DMA
+    // win: that channel is low too and at equal level the lower channel
+    // number (the ADC's) goes first; ultra builds avoid the contest instead
+    // by starting conversions only after a dshot packet (processDshot)
+    dma_init_struct.priority = DMA_PRIORITY_LOW;
+#else
     dma_init_struct.priority = DMA_PRIORITY_HIGH;
+#endif
     dma_init_struct.loop_mode_enable = TRUE;
     dma_init(DMA1_CHANNEL1, &dma_init_struct);
 

@@ -11,12 +11,60 @@
 #include "dshot.h"
 #include "functions.h"
 #include "serial_telemetry.h"
+#include "signal.h"
 #include "targets.h"
+#include "ultra.h"
 
 char ic_timer_prescaler = CPU_FREQUENCY_MHZ / 6;
 uint32_t dma_buffer[64] = { 0 };
 volatile char out_put = 0;
 uint8_t buffer_padding = 7;
+
+#ifdef ULTRA_DEDICATED
+extern void processDshot(void);
+
+// ultra mode: the input capture DMA runs without a transfer complete
+// interrupt and is drained here from the 20kHz loop; a packet is complete
+// once the line has been idle for more than 2x the expected bit time.
+// The packet is decoded right here, before the DMA is re-armed, by
+// calling processDshot() directly: no software EXTI, so the interrupt
+// priorities of the 20kHz timer and the EXTI play no part (agreed with
+// Alka; the EXTI path is not used by ultra builds)
+void runDshotCheck()
+{
+    // one snapshot of the DMA counter per pass, and the timer is read
+    // after that snapshot: an edge arriving in between must not make the
+    // line look idle or change the packet being judged
+    const uint16_t remaining = INPUT_DMA_CHANNEL->dtcnt;
+    if (remaining < 63) {
+        if (armed) {
+            const uint32_t last_edge = dma_buffer[63 - remaining];
+            if ((IC_TIMER_REGISTER->cval - last_edge) > (uint32_t)(valid_packet_high << 1)) {
+                if (ultraPacketStart(dma_buffer, remaining, valid_packet_high, &DMA_start_bit)) {
+                    transfercomplete();
+                    processDshot();
+                } else {
+                    packet_length_badcounts++;
+                }
+                INPUT_DMA_CHANNEL->ctrl_bit.chen = FALSE;
+                INPUT_DMA_CHANNEL->dtcnt = 64;
+                INPUT_DMA_CHANNEL->ctrl_bit.chen = TRUE;
+                IC_TIMER_REGISTER->cval = 0;
+            }
+        } else {
+            if (remaining <= 32) {
+                DMA_start_bit = 0;
+                transfercomplete();
+                processDshot();
+                INPUT_DMA_CHANNEL->ctrl_bit.chen = FALSE;
+                INPUT_DMA_CHANNEL->dtcnt = 64;
+                INPUT_DMA_CHANNEL->ctrl_bit.chen = TRUE;
+                IC_TIMER_REGISTER->cval = 0;
+            }
+        }
+    }
+}
+#endif // ULTRA_DEDICATED
 
 void changeToOutput()
 {
@@ -45,6 +93,19 @@ void changeToInput()
 void receiveDshotDma()
 {
     changeToInput();
+#ifdef ULTRA_DEDICATED
+    // polled mode: 64 deep capture, no transfer complete interrupt,
+    // timer counter free-runs for the idle gap detection in
+    // runDshotCheck(); lighter input filter, noise is handled in
+    // software instead
+    IC_TIMER_REGISTER->cm1 = 0x21;
+    INPUT_DMA_CHANNEL->paddr = (uint32_t)&IC_TIMER_REGISTER->c1dt;
+    INPUT_DMA_CHANNEL->maddr = (uint32_t)&dma_buffer;
+    INPUT_DMA_CHANNEL->dtcnt = 64;
+    IC_TIMER_REGISTER->iden |= TMR_C1_DMA_REQUEST;
+    IC_TIMER_REGISTER->ctrl1_bit.tmren = TRUE;
+    INPUT_DMA_CHANNEL->ctrl = 0x00000989;
+#else
     IC_TIMER_REGISTER->cval = 0;
     INPUT_DMA_CHANNEL->paddr = (uint32_t)&IC_TIMER_REGISTER->c1dt;
     INPUT_DMA_CHANNEL->maddr = (uint32_t)&dma_buffer;
@@ -52,6 +113,7 @@ void receiveDshotDma()
     IC_TIMER_REGISTER->iden |= TMR_C1_DMA_REQUEST;
     IC_TIMER_REGISTER->ctrl1_bit.tmren = TRUE;
     INPUT_DMA_CHANNEL->ctrl = 0x0000098b;
+#endif
 }
 
 void sendDshotDma()

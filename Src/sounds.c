@@ -19,6 +19,11 @@
 
 uint8_t beep_volume;
 
+// set while the ultra non-blocking tone engine plays a tone (see main.c);
+// ULTRA_DEDICATED builds gate setInput() and the motor PWM writes on it.
+// Stock builds never read it.
+uint8_t beeping = 0;
+
 
 void pause(uint16_t ms)
 {
@@ -119,9 +124,13 @@ void playStartupTune()
 {
     __disable_irq();
 comStep(3);
+#ifndef ULTRA_DEDICATED
   if (eepromBuffer.tune[0] != ERASED_FLASH_BYTE) {
     playBlueJayTune();
     } else {
+#else
+    {
+#endif
         SET_AUTO_RELOAD_PWM(TIM1_AUTORELOAD);
         setCaptureCompare();
         comStep(3); // activate a pwm channel

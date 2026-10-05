@@ -42,6 +42,8 @@ VERSION_MAJOR := $(shell $(FGREP) "define VERSION_MAJOR" $(MAIN_INC_DIR)/version
 VERSION_MINOR := $(shell $(FGREP) "define VERSION_MINOR" $(MAIN_INC_DIR)/version.h | $(CUT) -d" " -f3 )
 
 FIRMWARE_VERSION := $(VERSION_MAJOR).$(VERSION_MINOR)
+# dedicated KISS Ultra artifacts are versioned n00.x (see Inc/version.h)
+ULTRA_FIRMWARE_VERSION := $(VERSION_MAJOR)00.$(VERSION_MINOR)
 
 # Compiler options
 
@@ -85,7 +87,7 @@ clean :
 #####################
 # main firmware build
 define CREATE_BUILD_TARGET
-$(2)_BASENAME = $(BIN_DIR)/$(IDENTIFIER)_$(2)_$(FIRMWARE_VERSION)
+$(2)_BASENAME = $(BIN_DIR)/$(IDENTIFIER)_$(2)_$(if $(filter %_ULTRA,$(2)),$(ULTRA_FIRMWARE_VERSION),$(FIRMWARE_VERSION))
 
 # native (SITL) targets build to an executable elf, no bin/hex conversion
 $(2) : $$($(2)_BASENAME).$(if $(NATIVE_$(1)),elf,bin)
@@ -113,7 +115,9 @@ $(eval xSRC := $$(if $$(call has_can_suffix,$$(2)),$(SRC_CAN_$(1))))
 $(eval xCFLAGS_COMMON := $(if $(CFLAGS_COMMON_$(1)),$(CFLAGS_COMMON_$(1)),$(CFLAGS_COMMON)))
 $(eval xLDFLAGS_COMMON := $(if $(LDFLAGS_COMMON_$(1)),$(LDFLAGS_COMMON_$(1)),$(LDFLAGS_COMMON)))
 
-CFLAGS_$(2) = -DAM32_MCU=\"$(MCU)\" $(MCU_$(1)) -D$(2) $(CFLAGS_$(1)) $(xCFLAGS_COMMON) $(xCFLAGS)
+# a FOO_ULTRA target builds the FOO hardware target as a dedicated KISS
+# Ultra artifact (see Inc/ultra.h)
+CFLAGS_$(2) = -DAM32_MCU=\"$(MCU)\" $(MCU_$(1)) $(if $(filter %_ULTRA,$(2)),-D$(patsubst %_ULTRA,%,$(2)) -DULTRA_DEDICATED,-D$(2)) $(CFLAGS_$(1)) $(xCFLAGS_COMMON) $(xCFLAGS)
 LDFLAGS_$(2) = $(xLDFLAGS_COMMON) $(LDFLAGS_$(1)) $(if $(xLDSCRIPT),-T$(xLDSCRIPT))
 
 -include $$($(2)_BASENAME).d

@@ -13,6 +13,10 @@
 #include "main.h"
 
 void changeToOutput();
+#include "ultra.h"
+#ifdef ULTRA_DEDICATED
+void runDshotCheck();
+#endif
 void changeToInput();
 void receiveDshotDma();
 void sendDshotDma();

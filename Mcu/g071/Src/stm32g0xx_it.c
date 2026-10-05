@@ -217,6 +217,11 @@ void DMA1_Channel2_3_IRQHandler(void)
         LL_DMA_ClearFlag_TE2(DMA1);
     }
 
+#ifndef ULTRA_DEDICATED
+    // ultra builds: send_telem_DMA() owns the telemetry channel. This
+    // vector still fires for the ADC on channel 2, and the channel 3 flags
+    // are set whether or not their interrupts are enabled: stopping the
+    // channel from here could cut a frame the dshot EXTI has just started
     if (LL_DMA_IsActiveFlag_TC3(DMA1)) {
         send_telemetry = 0;
         LL_DMA_ClearFlag_GI3(DMA1);
@@ -228,6 +233,7 @@ void DMA1_Channel2_3_IRQHandler(void)
         /* Call Error function */
         // USART_TransferError_Callback();
     }
+#endif
 }
 
 /**

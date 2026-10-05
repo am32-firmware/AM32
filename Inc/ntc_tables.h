@@ -1,6 +1,6 @@
 #ifdef USE_NTC
 
-#ifdef SEQURE_4IN1_F421
+#if defined(SEQURE_4IN1_F421) || defined(AM32REF_F051_NTC)
 int NTC_table[65] = {
   400, 332, 264, 230, 208, 192, 180, 170, 161, 
   154, 147, 141, 136, 131, 127, 122, 119, 115, 

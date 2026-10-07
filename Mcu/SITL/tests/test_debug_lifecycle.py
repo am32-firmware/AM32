@@ -105,6 +105,7 @@ def test_diagnostic_log(binary):
     with tempfile.TemporaryDirectory(prefix='am32-log-test-') as tmp:
         log = Path(tmp) / 'debug log.txt'
         log.write_text('Previous run\n')
+        initial_log_size = log.stat().st_size
         proc = subprocess.Popen(
             [str(binary), '--eeprom', str(Path(tmp) / 'eeprom.bin'),
              '--input-type', '1', '--can-uri', 'none',
@@ -115,19 +116,35 @@ def test_diagnostic_log(binary):
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
                 sock.setblocking(False)
-                deadline = time.monotonic() + 90
+                started = time.monotonic()
+                deadline = started + 300
                 next_subscribe = 0
                 last_sample_ns = 0
-                last_update = time.monotonic()
-                while last_sample_ns < 25_000_000_000:
+                last_update = started
+                next_log_check = 0
+                log_bytes = 0
+                capacity_sample_ns = None
+
+                def failure(message):
+                    return (f'{message}: wall={time.monotonic() - started:.1f}s, '
+                            f'sim={last_sample_ns / 1e9:.3f}s, '
+                            f'new log bytes={log.stat().st_size - initial_log_size}, '
+                            f'telemetry idle={time.monotonic() - last_update:.1f}s\n'
+                            + log.read_text(errors='replace')[-4096:])
+
+                # Exercise the unread pipe's capacity without requiring a
+                # minimum sim/wall-clock ratio from a shared Windows runner.
+                # Require advancing telemetry after crossing the byte limit.
+                while True:
                     now = time.monotonic()
-                    assert proc.poll() is None, log.read_text()
-                    assert now < deadline, 'Physics did not reach 25 seconds'
-                    assert now - last_update < 10, 'Telemetry stopped: ' + log.read_text()
+                    assert proc.poll() is None, failure('Simulator exited')
+                    assert now < deadline, failure('Diagnostic logging timed out')
+                    assert now - last_update < 30, failure('Telemetry stopped')
                     sock.sendto(struct.pack('<HBBHH', 0x4453, 2, 4, 0, 0),
                                 ('127.0.0.1', input_port))
                     if now >= next_subscribe:
-                        sock.sendto(struct.pack('<HBBI', 0x5353, 0, 1, 1_000_000),
+                        # Fine enough to observe liveness even far below 1x.
+                        sock.sendto(struct.pack('<HBBI', 0x5353, 0, 1, 10_000),
                                     ('127.0.0.1', state_port))
                         next_subscribe = now + 0.5
                     while True:
@@ -142,15 +159,26 @@ def test_diagnostic_log(binary):
                             if stamp > last_sample_ns:
                                 last_sample_ns = stamp
                                 last_update = now
+                    if now >= next_log_check:
+                        log_bytes = log.stat().st_size - initial_log_size
+                        next_log_check = now + 0.5
+                        if log_bytes > 4096 and capacity_sample_ns is None:
+                            capacity_sample_ns = last_sample_ns
+                    if (capacity_sample_ns is not None
+                            and last_sample_ns > capacity_sample_ns):
+                        break
                     time.sleep(0.002)
                 sock.sendto(struct.pack('<HBB', 0x5353, 9, 0), ('127.0.0.1', state_port))
                 assert proc.wait(timeout=10) == 0
             diagnostics = log.read_text()
             assert diagnostics.startswith('Previous run\n'), 'Existing diagnostics were truncated'
-            assert len(diagnostics) > 4096, 'Did not exercise the Windows pipe capacity'
+            assert log_bytes > 4096, 'Did not exercise the Windows pipe capacity'
             assert '--exit-on-reset: run ended' in diagnostics, diagnostics
             assert not proc.stdout.read(), 'Diagnostics leaked to the debugger pipe'
-            print('PASS: 25 seconds of live telemetry with unread stderr, appended diagnostics and reset logging')
+            print(f'PASS: {log_bytes} diagnostic bytes with unread stderr, '
+                  f'continued telemetry, appended diagnostics and reset logging '
+                  f'(sim={last_sample_ns / 1e9:.3f}s, '
+                  f'wall={time.monotonic() - started:.1f}s)')
         finally:
             if proc.poll() is None:
                 proc.kill()

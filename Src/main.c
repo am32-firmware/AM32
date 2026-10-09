@@ -1253,7 +1253,11 @@ if (!stepper_sine && armed) {
                 __disable_irq();
                 RELOAD_WATCHDOG_COUNTER();
                 comStep(3);
-                playBJNote(dronecan_beep_hz, dronecan_beep_ms);
+                /* playBJNote() runs TIM1 at prescaler 10 (clock / 11) but
+                 * sizes the period for clock / 10, so it sounds 10/11 of
+                 * what it is asked for; the BlueJay melody path hides the
+                 * same 1.1 in its 11 MHz constant.  Ask for 11/10. */
+                playBJNote((uint16_t)(((uint32_t)dronecan_beep_hz * 11u + 5u) / 10u), dronecan_beep_ms);
                 allOff();
                 SET_PRESCALER_PWM(0);
                 SET_AUTO_RELOAD_PWM(TIMER1_MAX_ARR);

@@ -967,6 +967,7 @@ void interruptRoutine()
     maskPhaseInterrupts();
     lastzctime = thiszctime;
     thiszctime = INTERVAL_TIMER_COUNT;  
+    dshot_note_zero_cross_interval(thiszctime, lastzctime);
     SET_INTERVAL_TIMER_COUNT(0);
     SET_AND_ENABLE_COM_INT(waitTime+1); // enable COM_TIMER interrupt
     __enable_irq();
@@ -1142,6 +1143,9 @@ void setInput()
     }
 #ifndef BRUSHED_MODE
     if ((bemf_timeout_happened > bemf_timeout) && eepromBuffer.stuck_rotor_protection) {
+        if (bemf_timeout_happened != 102) {
+            dshot_note_status_event(DSHOT_EDT_STATUS_ERROR);
+        }
         allOff();
         maskPhaseInterrupts();
         input = 0;
@@ -1634,7 +1638,11 @@ void advanceincrement()
 
 void zcfoundroutine()
 { // only used in polling mode, blocking routine.
+    __disable_irq();
+    lastzctime = thiszctime;
     thiszctime = INTERVAL_TIMER_COUNT;
+    dshot_note_zero_cross_interval(thiszctime, lastzctime);
+    __enable_irq();
     SET_INTERVAL_TIMER_COUNT(0);
     commutation_interval = (thiszctime + (3 * commutation_interval)) / 4;
     advance = (temp_advance * commutation_interval) >> 6; //   7.5 degree increments
@@ -2073,6 +2081,7 @@ if(zero_crosses < 5){
             if ((getAbsDif(last_average_interval, average_interval) > average_interval >> 1) && (average_interval < 2000)) { // throttle resitricted before zc 20.
                 zero_crosses = 0;
                 desync_happened++;
+                dshot_note_status_event(DSHOT_EDT_STATUS_WARNING);
                 if ((!eepromBuffer.bi_direction && (input > 47)) || commutation_interval > 1000) {
                     running = 0;
                 }
@@ -2286,6 +2295,7 @@ if(zero_crosses < 5){
               zero_throttle_brake_active = 0;   // reset zero throttle brake on back emf timeout (rotation stop)
               if(running){
                 bemf_timeout_happened++;
+                dshot_note_status_event(DSHOT_EDT_STATUS_ALERT);
                 
                 temp_comp_pwm = eepromBuffer.comp_pwm;
                 maskPhaseInterrupts();

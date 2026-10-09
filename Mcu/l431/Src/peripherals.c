@@ -498,7 +498,9 @@ void MX_TIM16_Init(void)
   TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
   TIM_InitStruct.RepetitionCounter = 0;
   LL_TIM_Init(TIM16, &TIM_InitStruct);
-  LL_TIM_EnableARRPreload(TIM16);
+  // no reload buffering: a re-armed delay must take effect at once, not at
+  // the next overflow (the demag guard re-arms this timer within a sector)
+  LL_TIM_DisableARRPreload(TIM16);
 
 }
 

@@ -4299,6 +4299,7 @@
 #ifdef HARDWARE_GROUP_SITL_A
 
 #define MCU_SITL
+#define COMP_DELAY_TICKS 8 // modelled comparator RC and response lag, 0.5 us ticks
 
 #endif
 
@@ -5902,3 +5903,18 @@
 #ifndef POLLING_MODE_THRESHOLD
 #define POLLING_MODE_THRESHOLD 2000
 #endif
+
+/* demag guard (Src/demag_guard.c): built on the MCUs that have a port; a
+ * target may set these to override the defaults */
+#ifndef DEMAG_GUARD_ENABLED
+#if (defined(MCU_L431) || defined(MCU_G431) || defined(MCU_G071) || defined(MCU_SITL)) && !defined(BRUSHED_MODE)
+#define DEMAG_GUARD_ENABLED 1
+#else
+#define DEMAG_GUARD_ENABLED 0
+#endif // MCUs with a demag guard port
+#endif // DEMAG_GUARD_ENABLED
+/* let a validated current sensor widen the guard's duty gate; off until a
+ * board has been tested with it */
+#ifndef DEMAG_GUARD_CURRENT
+#define DEMAG_GUARD_CURRENT 0
+#endif // DEMAG_GUARD_CURRENT

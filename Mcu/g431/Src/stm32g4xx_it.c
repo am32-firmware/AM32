@@ -4,6 +4,7 @@
 #include "IO.h"
 #include "WS2812.h"
 #include "main.h"
+#include "demag_guard.h"
 #include "targets.h"
 
 extern uint32_t current_EXTI_LINE;
@@ -114,6 +115,9 @@ void COMP1_2_3_IRQHandler(void)
         interrupt++;
         interruptRoutine();
     }
+    // the guard observes after the handler's own blanking and crossing
+    // filter: code ahead of the filter changes which short glitches it accepts
+    demag_guard_edge();
 }
 
 void TIM6_DAC_IRQHandler(void)

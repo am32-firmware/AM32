@@ -21,6 +21,7 @@
 #include <canard.h>
 #include "phaseouts.h"
 #include "comparator.h"
+#include "demag_guard.h"
 
 extern void setInput(void);
 extern char prop_brake_active;
@@ -307,6 +308,7 @@ static bool flash_write_begin(void)
     COM_TIMER_CLEAR_PENDING();
 #endif // COM_TIMER_CLEAR_PENDING
     maskPhaseInterrupts();
+    demag_guard_off();
     allOff();
     return true;
 }

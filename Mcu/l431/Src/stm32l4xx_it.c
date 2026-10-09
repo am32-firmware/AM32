@@ -26,6 +26,7 @@
 #include "IO.h"
 #include "common.h"
 #include "comparator.h"
+#include "demag_guard.h"
 
 extern void transfercomplete();
 extern void PeriodElapsedCallback();
@@ -293,6 +294,9 @@ void COMP_IRQHandler(void)
         LL_EXTI_ClearFlag_0_31(EXTI_LINE);
     }
     // otherwise the edge stays pending until the window ends, as before
+    // the guard observes after the handler's own blanking and crossing
+    // filter: code ahead of the filter changes which short glitches it accepts
+    demag_guard_edge();
 }
 
 void EXTI15_10_IRQHandler(void)

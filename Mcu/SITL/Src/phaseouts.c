@@ -9,7 +9,9 @@
 #include "common.h"
 #include "sitl.h"
 #include "targets.h"
+#include "demag_guard.h"
 
+extern volatile char rising;
 
 volatile uint8_t sitl_phase_mode[3];
 
@@ -113,3 +115,11 @@ void twoChannelReverse(void)
     phasePWM(1);
     phaseLOW(2);
 }
+
+#if DEMAG_GUARD_ENABLED
+bool demag_comparator_pending(void)
+{
+    return (sitl_exti.PR & current_EXTI_LINE) != 0;
+}
+
+#endif // DEMAG_GUARD_ENABLED

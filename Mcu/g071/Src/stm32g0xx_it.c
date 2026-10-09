@@ -30,6 +30,7 @@
 #include "WS2812.h"
 #include "targets.h"
 #include "comparator.h"
+#include "demag_guard.h"
 #include "common.h"
 
 /* USER CODE END Includes */
@@ -261,6 +262,9 @@ void ADC1_COMP_IRQHandler(void)
         LL_EXTI_ClearFallingFlag_0_31(line);
     }
     // otherwise the edge stays pending until the window ends, as before
+    // the guard observes after the handler's own blanking and crossing
+    // filter: code ahead of the filter changes which short glitches it accepts
+    demag_guard_edge();
 }
 
 /**

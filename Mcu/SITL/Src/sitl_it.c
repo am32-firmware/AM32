@@ -6,6 +6,7 @@
 #include "sitl.h"
 #include "targets.h"
 #include "../sim/sitl_config.h"
+#include "demag_guard.h"
 
 extern void PeriodElapsedCallback(void);
 extern void interruptRoutine(void);
@@ -55,6 +56,8 @@ static void comp_irq(void)
             sitl_exti.PR &= ~lines;
             motor_log_event(3 /*MEV_COMP_RUN*/, cnt, 0, 0);
             interruptRoutine();
+            // as the ports: observe only after the handler's own crossing filter
+            demag_guard_edge();
         } else {
             // pend delivered with no pending line: the edge was consumed
             // by an earlier handler
@@ -71,6 +74,7 @@ static void comp_irq(void)
             } else {
                 sitl_exti.PR &= ~lines;
             }
+            demag_guard_edge();
         } else {
             sitl_exti.PR &= ~lines;
         }

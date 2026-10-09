@@ -397,6 +397,9 @@ int16_t actual_current = 0;
 char lowkv = 0;
 
 uint16_t min_startup_duty = 120;
+#if !defined(MCU_G031) && !defined(NEED_INPUT_READY)
+static uint8_t dshot_priority = 2; // neither, so the first pass sets them
+#endif
 uint16_t sin_mode_min_s_d = 120;
 char bemf_timeout = 10;
 
@@ -2090,29 +2093,24 @@ if(zero_crosses < 5){
         }
 
 #if !defined(MCU_G031) && !defined(NEED_INPUT_READY)
+        // the comparator and COM timer interrupts must never preempt each
+        // other: change their priorities together, and only on a change
+        const uint8_t dshot_first = dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD);
+        if (dshot_first != dshot_priority) {
+            dshot_priority = dshot_first;
+            __disable_irq();
 #ifdef NXP
-	if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD)) {
-		NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
-		NVIC_SetPriority(COM_TIMER_IRQ, 1);
-		NVIC_SetPriority(COMP0_IRQ, 1);
-		NVIC_SetPriority(COMP1_IRQ, 1);
-	} else {
-		NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
-		NVIC_SetPriority(COM_TIMER_IRQ, 0);
-		NVIC_SetPriority(COMP0_IRQ, 0);
-		NVIC_SetPriority(COMP1_IRQ, 0);
-	}
+            NVIC_SetPriority(IC_DMA_IRQ_NAME, !dshot_first);
+            NVIC_SetPriority(COM_TIMER_IRQ, dshot_first);
+            NVIC_SetPriority(COMP0_IRQ, dshot_first);
+            NVIC_SetPriority(COMP1_IRQ, dshot_first);
 #else
-        if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD)) {
-             NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
-             NVIC_SetPriority(COM_TIMER_IRQ, 1);
-             NVIC_SetPriority(COMPARATOR_IRQ, 1);
-         } else {
-             NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
-             NVIC_SetPriority(COM_TIMER_IRQ, 0);
-             NVIC_SetPriority(COMPARATOR_IRQ, 0);
-         }
+            NVIC_SetPriority(IC_DMA_IRQ_NAME, !dshot_first);
+            NVIC_SetPriority(COM_TIMER_IRQ, dshot_first);
+            NVIC_SetPriority(COMPARATOR_IRQ, dshot_first);
 #endif
+            __enable_irq();
+        }
 #endif
         if (send_telemetry) {
 #ifdef USE_SERIAL_TELEMETRY

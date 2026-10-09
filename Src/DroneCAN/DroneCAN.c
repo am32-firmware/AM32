@@ -285,8 +285,9 @@ static struct uavcan_protocol_NodeStatus node_status;
 static bool safe_to_write_settings(void)
 {
     // a flash erase stalls the core for tens of milliseconds: only with the
-    // motor stopped and the command zero
-    return !running && newinput == 0;
+    // motor stopped and the decoded throttle below the start threshold, which
+    // a bidirectional servo input reaches at its 1000 neutral
+    return !running && input < 47;
 }
 
 // drive inhibit held through a flash write: a stopped motor can still be

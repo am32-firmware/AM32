@@ -1246,6 +1246,10 @@ if (!stepper_sine && armed) {
                 play_tone_flag = 0;
             }
 #if DRONECAN_SUPPORT
+            if (dronecan_beep_ms && running) {
+                /* never defer a note into a running motor: drop it */
+                dronecan_beep_ms = 0;
+            }
             if (dronecan_beep_ms && !running) {
                 /* a note from the flight controller, played like the beacon
                  * tunes: interrupts masked, because tenKhzRoutine() rewrites

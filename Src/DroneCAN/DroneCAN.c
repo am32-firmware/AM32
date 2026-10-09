@@ -55,14 +55,15 @@ volatile uint16_t dronecan_beep_hz;
 volatile uint16_t dronecan_beep_ms;
 volatile uint8_t  dronecan_beep_volume = 255;   /* 0..11 for this note, 255 = the ESC's own */
 
-/* com.ninjapilot.esc.Note (vendor data type 20400): one note for the ESCs
- * named in a mask, so four motors can hold four different pitches.
+/* uavcan.equipment.indication.NoteCommand: one note for the ESCs named in
+ * a mask, so four motors can hold four different pitches. Data type id
+ * 20400 (vendor range) until the DSDL is registered upstream.
  *   uint8 mask      bit i = ESC index i
  *   uint8 volume    0..11 like BEEP_VOLUME, 255 = leave it
  *   float16 frequency_hz
  *   float16 duration_s  */
-#define NINJAPILOT_ESC_NOTE_ID 20400
-#define NINJAPILOT_ESC_NOTE_SIGNATURE (0x4E494E4A41504931ULL)
+#define UAVCAN_EQUIPMENT_INDICATION_NOTECOMMAND_ID 20400
+#define UAVCAN_EQUIPMENT_INDICATION_NOTECOMMAND_SIGNATURE (0x4E494E4A41504931ULL)
 
 #define APP_SIGNATURE_MAGIC1 0x68f058e6
 #define APP_SIGNATURE_MAGIC2 0xafcee5a0
@@ -772,7 +773,7 @@ static void handle_RawCommand(CanardInstance *ins, CanardRxTransfer *transfer)
 /*
   handle ArmingStatus messages
 */
-static void handle_Note(CanardInstance* ins, CanardRxTransfer* transfer)
+static void handle_NoteCommand(CanardInstance* ins, CanardRxTransfer* transfer)
 {
     (void)ins;
     uint8_t mask, volume;
@@ -1061,8 +1062,8 @@ static void onTransferReceived(CanardInstance *ins, CanardRxTransfer *transfer)
             handle_BeepCommand(ins, transfer);
             break;
         }
-        case NINJAPILOT_ESC_NOTE_ID: {
-            handle_Note(ins, transfer);
+        case UAVCAN_EQUIPMENT_INDICATION_NOTECOMMAND_ID: {
+            handle_NoteCommand(ins, transfer);
             break;
         }
         }
@@ -1130,8 +1131,8 @@ static bool shouldAcceptTransfer(const CanardInstance *ins,
             *out_data_type_signature = UAVCAN_EQUIPMENT_INDICATION_BEEPCOMMAND_SIGNATURE;
             return true;
         }
-        case NINJAPILOT_ESC_NOTE_ID: {
-            *out_data_type_signature = NINJAPILOT_ESC_NOTE_SIGNATURE;
+        case UAVCAN_EQUIPMENT_INDICATION_NOTECOMMAND_ID: {
+            *out_data_type_signature = UAVCAN_EQUIPMENT_INDICATION_NOTECOMMAND_SIGNATURE;
             return true;
         }
         }

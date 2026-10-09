@@ -1205,6 +1205,8 @@ if (!stepper_sine && armed) {
         if (input >= 47 + (80 * eepromBuffer.use_sine_start)) {
             if (running == 0) {
                 allOff();
+                SET_DUTY_CYCLE_ALL(0); // not the last brake compare for the first commutation:
+                generatePwmTimerEvent(); // the compares are preloaded, so make the zeros active now, outputs still off
                 if (!old_routine) {
                     startMotor();
                 }

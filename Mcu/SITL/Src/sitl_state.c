@@ -485,7 +485,7 @@ static void eeprom_set(uint16_t off, uint16_t len, const uint8_t* data,
  */
 #define STATE_MAGIC_WATCH_REPLY 0x5359
 #define STATE_MAGIC_WATCH_DATA 0x535a
-#define WATCH_MAX 16
+#define WATCH_MAX 32
 #define WATCH_NAME_MAX 64
 #define WATCH_BATCH 32
 

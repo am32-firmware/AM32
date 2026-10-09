@@ -10,11 +10,12 @@
 #include "sitl.h"
 #include "targets.h"
 
+
 volatile uint8_t sitl_phase_mode[3];
 
 static void phasePWM(int p)
 {
-    if (!eepromBuffer.comp_pwm) {
+    if (!temp_comp_pwm) {
         sitl_phase_mode[p] = SITL_PHASE_PWM_NOCOMP;
     } else {
         sitl_phase_mode[p] = SITL_PHASE_PWM;

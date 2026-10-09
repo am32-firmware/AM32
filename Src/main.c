@@ -1252,6 +1252,9 @@ if (!stepper_sine && armed) {
                  * the duty cycle every 100 us and would cut the note to a click */
                 __disable_irq();
                 RELOAD_WATCHDOG_COUNTER();
+                if (dronecan_beep_volume <= 11) {
+                    setVolume(dronecan_beep_volume);      /* this note's loudness */
+                }
                 comStep(3);
                 /* playBJNote() runs TIM1 at prescaler 10 (clock / 11) but
                  * sizes the period for clock / 10, so it sounds 10/11 of
@@ -1262,6 +1265,7 @@ if (!stepper_sine && armed) {
                 SET_PRESCALER_PWM(0);
                 SET_AUTO_RELOAD_PWM(TIMER1_MAX_ARR);
                 dronecan_beep_ms = 0;
+                setVolume(eepromBuffer.beep_volume);      /* back to the ESC's own */
                 signaltimeout = 0;
                 RELOAD_WATCHDOG_COUNTER();
                 __enable_irq();

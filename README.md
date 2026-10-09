@@ -4,8 +4,10 @@ Firmware for ARM based speed controllers
   <a href="/LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-brightgreen" alt="GitHub license" /></a>
 </p>
 
+[Wiki] (https://wiki.am32.ca/)
+
 The AM32 firmware is designed for STM32 ARM processors to control a brushless motor (BLDC).
-The firmware is intended to be safe and fast with smooth fast startups and linear throttle. It is meant for use with multiple vehicle types and a flight controller. The firmware can also be built with support for crawlers. For crawler usage please read this wiki page [Crawler Hardware](https://github.com/AlkaMotors/AM32-MultiRotor-ESC-firmware/wiki/Crawler-Hardware-and-AM32)
+The firmware is intended to be safe and fast with smooth fast startups and linear throttle. It is meant for use with multiple vehicle types and a flight controller. The firmware can also be built with support for crawlers. For crawler usage please read this wiki page [Crawler Hardware](https://wiki.am32.ca/general/Crawler-Hardware-and-AM32.html)
 
 ## Features
 
@@ -35,7 +37,7 @@ You can also use a desktop configurator which you can download from here:
 
 Alternately you can use the [Online-ESC Configurator](https://esc-configurator.com/) to flash or change settings with any web browser that supports web serial.
 
-
+A full explanation of the available settings is available on the [wiki] (https://wiki.am32.ca/guides/ESC-Settings-Explained.html).
 
 ## Hardware
 AM32 currently has support for STSPIN32F0, STM32F051, STM32G071, GD32E230, AT32F415 and AT32F421.
@@ -54,10 +56,7 @@ After the bootloader has been installed the main firmware from can be installed 
 To update an existing AM32 bootloader an update tool can be found [here](https://github.com/am32-firmware/AM32-unlocker).
 
 ## Support and Developers Channel
-There are two ways you can get support or participate in improving am32.
-We have a discord server here:
-
-https://discord.gg/h7ddYMmEVV
+You can get support or participate in improving am32 on the [discord server](https://discord.gg/h7ddYMmEVV).
 
 Etiquette: Please wait around long enough for a reply - sometimes people are out flying, asleep or at work and can't answer immediately. 
 

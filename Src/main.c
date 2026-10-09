@@ -1247,8 +1247,11 @@ if (!stepper_sine && armed) {
             }
 #if DRONECAN_SUPPORT
             if (dronecan_beep_ms && !running) {
-                /* a note from the flight controller: same footing as the
-                 * beacon tones above, energise a phase pair and sing */
+                /* a note from the flight controller, played like the beacon
+                 * tunes: interrupts masked, because tenKhzRoutine() rewrites
+                 * the duty cycle every 100 us and would cut the note to a click */
+                __disable_irq();
+                RELOAD_WATCHDOG_COUNTER();
                 comStep(3);
                 playBJNote(dronecan_beep_hz, dronecan_beep_ms);
                 allOff();
@@ -1257,6 +1260,7 @@ if (!stepper_sine && armed) {
                 dronecan_beep_ms = 0;
                 signaltimeout = 0;
                 RELOAD_WATCHDOG_COUNTER();
+                __enable_irq();
             }
 #endif
 

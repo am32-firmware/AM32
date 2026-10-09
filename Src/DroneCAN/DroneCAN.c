@@ -1232,6 +1232,46 @@ static void send_FlexDebug(void)
                     CANARD_TRANSFER_PRIORITY_LOW,
                     buffer,
                     len);
+#if DEMAG_GUARD_ENABLED
+    // demag guard counters as a second message, same rate
+    static struct PACKED {
+        uint8_t version;
+        uint32_t valid, predicted, warnings, faults;
+        uint32_t late, late_max, commutation_late, commutation_late_max, switch_delay_max;
+        uint16_t cap;
+        uint8_t level, adv_offset, advance_level, flags;
+        int16_t current;
+        uint32_t desync;
+    } demag;
+    demag.version = 1;
+    demag.valid = demag_valid;
+    demag.predicted = demag_predicted;
+    demag.warnings = demag_warnings;
+    demag.faults = demag_faults;
+    demag.late = demag_late;
+    demag.late_max = demag_late_max;
+    demag.commutation_late = demag_commutation_late;
+    demag.commutation_late_max = demag_commutation_late_max;
+    demag.switch_delay_max = demag_switch_delay_max;
+    demag.cap = demag_cap;
+    demag.level = demag_level;
+    demag.adv_offset = demag_adv_offset;
+    demag.advance_level = demag_advance_level;
+    demag.flags = (demag_guard_loaded() ? 1 : 0) | (demag_active ? 2 : 0) | (demag_guard_compensate() ? 4 : 0) | (demag_latched ? 8 : 0);
+    demag.current = actual_current;
+    demag.desync = desync_happened;
+    pkt.id = DRONECAN_PROTOCOL_FLEXDEBUG_AM32_RESERVE_START+1;
+    pkt.u8.len = sizeof(demag);
+    memcpy(pkt.u8.data, (const uint8_t *)&demag, sizeof(demag));
+    len = dronecan_protocol_FlexDebug_encode(&pkt, buffer);
+    canardBroadcast(&canard,
+                    DRONECAN_PROTOCOL_FLEXDEBUG_SIGNATURE,
+                    DRONECAN_PROTOCOL_FLEXDEBUG_ID,
+                    &transfer_id,
+                    CANARD_TRANSFER_PRIORITY_LOW,
+                    buffer,
+                    len);
+#endif // DEMAG_GUARD_ENABLED
 }
 
 

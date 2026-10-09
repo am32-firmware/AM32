@@ -236,56 +236,31 @@ void DMA1_Channel2_3_IRQHandler(void)
  */
 void ADC1_COMP_IRQHandler(void)
 {
-  if (LL_EXTI_IsActiveFallingFlag_0_31(LL_EXTI_LINE_18)) {
-    if((INTERVAL_TIMER->CNT) > (average_interval >> 1)){
-      LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_18);
-      interruptRoutine();
-    }else{
-      if(getCompOutputLevel() == rising){
-          LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_18);
-          return;
-      }
+    // flags on the line the firmware is not listening to carry no information
+    const uint32_t other = current_EXTI_LINE == LL_EXTI_LINE_18 ? LL_EXTI_LINE_17 : LL_EXTI_LINE_18;
+    LL_EXTI_ClearRisingFlag_0_31(other);
+    LL_EXTI_ClearFallingFlag_0_31(other);
+    const uint32_t line = current_EXTI_LINE;
+    if (!LL_EXTI_IsActiveRisingFlag_0_31(line) && !LL_EXTI_IsActiveFallingFlag_0_31(line)) {
+        return;
     }
-    return;
-  }
-
-  if (LL_EXTI_IsActiveRisingFlag_0_31(LL_EXTI_LINE_18)) {
-    if((INTERVAL_TIMER->CNT) > (average_interval >> 1)){
-      LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_18);
-      interruptRoutine();
-    }else{
-      if(getCompOutputLevel() == rising){
-          LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_18);
-          return;
-      }
+    if (!(EXTI->IMR1 & line)) {
+        // a flag latched while the line was masked, serviced by an NVIC
+        // invocation that was already pending: not an observation
+        LL_EXTI_ClearRisingFlag_0_31(line);
+        LL_EXTI_ClearFallingFlag_0_31(line);
+        return;
     }
-    return;
-  }
-  if (LL_EXTI_IsActiveFallingFlag_0_31(LL_EXTI_LINE_17)) {
-    if((INTERVAL_TIMER->CNT) > (average_interval >> 1)){
-      LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_17);
-      interruptRoutine();
-    }else{
-      if(getCompOutputLevel() == rising){
-          LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_17);
-          return;
-      }
+    if ((INTERVAL_TIMER->CNT) > (average_interval >> 1)) {
+        LL_EXTI_ClearRisingFlag_0_31(line);
+        LL_EXTI_ClearFallingFlag_0_31(line);
+        interruptRoutine();
+    } else if (getCompOutputLevel() == rising) {
+        // in the blanking window with the pre-crossing level: a glitch
+        LL_EXTI_ClearRisingFlag_0_31(line);
+        LL_EXTI_ClearFallingFlag_0_31(line);
     }
-    return;
-  }
-
-  if (LL_EXTI_IsActiveRisingFlag_0_31(LL_EXTI_LINE_17)) {
-    if((INTERVAL_TIMER->CNT) > (average_interval >> 1)){
-      LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_17);
-      interruptRoutine();
-    }else{
-      if(getCompOutputLevel() == rising){
-          LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_17);
-          return;
-      }
-    }
-    return;
-  }
+    // otherwise the edge stays pending until the window ends, as before
 }
 
 /**
@@ -345,8 +320,10 @@ void TIM6_DAC_LPTIM1_IRQHandler(void)
 void TIM14_IRQHandler(void)
 {
     interrupt_time = UTILITY_TIMER->CNT;
-    PeriodElapsedCallback();
+    // acknowledge first: the callback may re-arm a short delay whose update
+    // would otherwise be erased by a clear after it
     LL_TIM_ClearFlag_UPDATE(TIM14);
+    PeriodElapsedCallback();
     interrupt_time = ((uint16_t)UTILITY_TIMER->CNT) - interrupt_time;
 }
 

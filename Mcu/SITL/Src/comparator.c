@@ -10,6 +10,7 @@
 #include "common.h"
 #include "sitl.h"
 #include "targets.h"
+#include "demag_comp.h"
 
 sitl_exti_t sitl_exti;
 
@@ -73,3 +74,18 @@ void changeCompInput(void)
         sitl_exti.FTSR &= ~(SITL_EXTI_LINE_21 | SITL_EXTI_LINE_22);
     }
 }
+
+#if DEMAG_COMP_ENABLED
+// the edge changeCompInput() selects for rising == r, inputs unchanged
+void setCompEdge(char r)
+{
+    if (r) {
+        sitl_exti.RTSR &= ~(SITL_EXTI_LINE_21 | SITL_EXTI_LINE_22);
+        sitl_exti.FTSR |= current_EXTI_LINE;
+    } else { // falling bemf
+        sitl_exti.RTSR |= current_EXTI_LINE;
+        sitl_exti.FTSR &= ~(SITL_EXTI_LINE_21 | SITL_EXTI_LINE_22);
+    }
+}
+#endif // DEMAG_COMP_ENABLED
+

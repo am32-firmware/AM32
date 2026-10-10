@@ -6,6 +6,7 @@
 #include "sitl.h"
 #include "targets.h"
 #include "../sim/sitl_config.h"
+#include "demag_comp.h"
 
 extern void PeriodElapsedCallback(void);
 extern void interruptRoutine(void);
@@ -50,7 +51,7 @@ static void comp_irq(void)
     const uint32_t cnt = sitl_interval_timer_count();
     // G431 gates on commutation_interval, the F051/G071 handlers on average_interval
     const uint32_t gate = sitl_cfg.sim.comparator_hold_pending ? (average_interval >> 1) : (commutation_interval >> 1);
-    if (cnt > gate) {
+    if (cnt > gate || demag_comp_scanned()) {
         if (sitl_exti.PR & line) {
             sitl_exti.PR &= ~lines;
             motor_log_event(3 /*MEV_COMP_RUN*/, cnt, 0, 0);

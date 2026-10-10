@@ -9,6 +9,7 @@
 #include "common.h"
 #include "sitl.h"
 #include "targets.h"
+#include "demag_comp.h"
 
 
 volatile uint8_t sitl_phase_mode[3];
@@ -113,3 +114,11 @@ void twoChannelReverse(void)
     phasePWM(1);
     phaseLOW(2);
 }
+
+#if DEMAG_COMP_ENABLED
+// the demag power cut: the PWM phase of step s off until the next comStep()
+void floatPwmPhase(char s)
+{
+    phaseFLOAT((s == 1 || s == 6) ? 0 : ((s == 2 || s == 3) ? 2 : 1));
+}
+#endif // DEMAG_COMP_ENABLED

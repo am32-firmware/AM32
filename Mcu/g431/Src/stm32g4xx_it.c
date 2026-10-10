@@ -5,6 +5,7 @@
 #include "WS2812.h"
 #include "main.h"
 #include "targets.h"
+#include "demag_comp.h"
 
 extern uint32_t current_EXTI_LINE;
 extern void transfercomplete();
@@ -110,7 +111,7 @@ void COMP1_2_3_IRQHandler(void)
     if (!(EXTI->IMR1 & line)) {
         return;
     }
-    if (INTERVAL_TIMER->CNT > (commutation_interval >> 1)) {
+    if (INTERVAL_TIMER->CNT > (commutation_interval >> 1) || demag_comp_scanned()) {
         interrupt++;
         interruptRoutine();
     }

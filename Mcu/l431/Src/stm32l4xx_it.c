@@ -23,6 +23,7 @@
 #include "stm32l4xx_it.h"
 #include "ADC.h"
 #include "targets.h"
+#include "demag_comp.h"
 #include "IO.h"
 #include "common.h"
 #include "comparator.h"
@@ -285,7 +286,7 @@ void COMP_IRQHandler(void)
         LL_EXTI_ClearFlag_0_31(EXTI_LINE);
         return;
     }
-    if ((INTERVAL_TIMER->CNT) > (average_interval >> 1)) {
+    if ((INTERVAL_TIMER->CNT) > (average_interval >> 1) || demag_comp_scanned()) {
         LL_EXTI_ClearFlag_0_31(EXTI_LINE);
         interruptRoutine();
     } else if (getCompOutputLevel() == rising) {

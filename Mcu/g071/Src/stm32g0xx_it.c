@@ -29,6 +29,7 @@
 #include "IO.h"
 #include "WS2812.h"
 #include "targets.h"
+#include "demag_comp.h"
 #include "comparator.h"
 #include "common.h"
 
@@ -251,7 +252,7 @@ void ADC1_COMP_IRQHandler(void)
         LL_EXTI_ClearFallingFlag_0_31(line);
         return;
     }
-    if ((INTERVAL_TIMER->CNT) > (average_interval >> 1)) {
+    if ((INTERVAL_TIMER->CNT) > (average_interval >> 1) || demag_comp_scanned()) {
         LL_EXTI_ClearRisingFlag_0_31(line);
         LL_EXTI_ClearFallingFlag_0_31(line);
         interruptRoutine();

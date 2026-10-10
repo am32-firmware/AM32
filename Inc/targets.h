@@ -5902,3 +5902,8 @@
 #ifndef POLLING_MODE_THRESHOLD
 #define POLLING_MODE_THRESHOLD 2000
 #endif
+
+/* Bluejay-style demag compensation (Src/demag_comp.c); a target may override it */
+#ifndef DEMAG_COMP_ENABLED
+#define DEMAG_COMP_ENABLED 0
+#endif // DEMAG_COMP_ENABLED

@@ -1,5 +1,6 @@
 #include "comparator.h"
 #include "targets.h"
+#include "demag_comp.h"
 #include "common.h"
 
 
@@ -33,4 +34,19 @@ void changeCompInput() {
 		  LL_EXTI_DisableFallingTrig_0_31(EXTI_LINE);
 	}
 }
+
+#if DEMAG_COMP_ENABLED
+// the edge changeCompInput() selects for rising == r, inputs unchanged
+void setCompEdge(char r)
+{
+	if (r){
+		  LL_EXTI_DisableRisingTrig_0_31(EXTI_LINE);
+		  LL_EXTI_EnableFallingTrig_0_31(EXTI_LINE);
+	}else{                          // falling bemf
+		  LL_EXTI_EnableRisingTrig_0_31(EXTI_LINE);
+		  LL_EXTI_DisableFallingTrig_0_31(EXTI_LINE);
+	}
+}
+#endif // DEMAG_COMP_ENABLED
+
 

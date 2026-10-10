@@ -59,6 +59,43 @@ typedef struct {
         // threshold this long before the output commits (inertial
         // propagation - constant delay, absorbs shorter pulses)
         uint32_t comparator_min_toggle_ns;
+        // pulse injected into the comparator difference at every switching
+        // edge of a driven leg, decaying with this time constant (0 = off)
+        float comparator_pwm_glitch_mv;
+        uint32_t comparator_pwm_glitch_ns;
+        // damped ringing of the comparator input after every driven-leg PWM
+        // edge: bursts of toggles around each edge near the crossing, a single
+        // short dip per edge away from it (bench capture, TBS 12S L431 at 15 %)
+        float comparator_ring_mv;
+        uint32_t comparator_ring_hz;
+        uint32_t comparator_ring_tau_ns;
+        // comparator input offset: pins the output at rest, shifts the crossing slightly
+        float comparator_offset_mv;
+        // bench-measured unipolar excursions (TBS 12S L431, unloaded): the
+        // comparator reads the floating phase below the neutral in a ramp
+        // through the high-side on-time and in a lobe some microseconds
+        // after the turn-off; the lobe shrinks with speed as (ref/rpm)^exp
+        float comparator_on_ramp_mv_per_us;
+        uint32_t comparator_on_ramp_delay_ns;
+        float comparator_on_ramp_max_mv;
+        float comparator_off_lobe_mv;
+        uint32_t comparator_off_lobe_delay_ns;
+        uint32_t comparator_off_lobe_width_ns;
+        uint32_t comparator_off_lobe_ref_rpm;
+        float comparator_off_lobe_rpm_exp;
+        float comparator_off_notch_mv; // brief opposite swing just ahead of the lobe
+        // board dead time when nonzero (the SITL target's BDTR otherwise)
+        uint32_t dead_time_ns;
+        // MCU profile knobs: interrupt entry latency, the F051/G071-style
+        // comparator handler that keeps an in-window edge pending until the
+        // blanking gate opens, and a 16-bit interval timer
+        uint32_t irq_latency_ns;
+        bool comparator_hold_pending;
+        uint32_t interval_timer_bits;
+        // in the demag runner's MCU profiles for the demag guard: accepted, unused here
+        uint32_t demag_max_advance_level;
+        uint32_t demag_min_wait_ticks;
+        uint32_t demag_deadline_margin_ticks;
         // mainline progress lease: simulated time may not run further
         // than this ahead of the last firmware-thread interception
         // while the mainline is runnable. Bounds sim-visible mainline

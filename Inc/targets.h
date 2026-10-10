@@ -6107,3 +6107,13 @@
 #ifndef POLLING_MODE_THRESHOLD
 #define POLLING_MODE_THRESHOLD 2000
 #endif
+
+/* Bluejay-style demag compensation (Src/demag_comp.c): built on the MCUs
+ * whose phaseouts provide floatPwmPhase(); a target may override it */
+#ifndef DEMAG_COMP_ENABLED
+#if (defined(MCU_L431) || defined(MCU_G431) || defined(MCU_G071) || defined(MCU_SITL)) && !defined(BRUSHED_MODE)
+#define DEMAG_COMP_ENABLED 1
+#else
+#define DEMAG_COMP_ENABLED 0
+#endif // MCUs with a demag compensation port
+#endif // DEMAG_COMP_ENABLED

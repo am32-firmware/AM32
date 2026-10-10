@@ -230,6 +230,7 @@ an settings option)
 #include "signal.h"
 #include "sounds.h"
 #include "targets.h"
+#include "demag_comp.h"
 #include <stdint.h>
 #include <string.h>
 #include <assert.h>
@@ -397,6 +398,9 @@ int16_t actual_current = 0;
 char lowkv = 0;
 
 uint16_t min_startup_duty = 120;
+#if !defined(MCU_G031) && !defined(NEED_INPUT_READY)
+static uint8_t dshot_priority = 2; // neither, so the first pass sets them
+#endif
 uint16_t sin_mode_min_s_d = 120;
 char bemf_timeout = 10;
 
@@ -870,6 +874,7 @@ void getBemfState()
 
 void commutate()
 {
+    demag_comp_commutate();
     if (forward == 1) {
         step++;
         if (step > 6) {
@@ -918,16 +923,16 @@ void commutate()
  */
 void PeriodElapsedCallback()
 {
+    if (demag_comp_timer()) { // a demag scan or timeout event, not a commutation
+        return;
+    }
     DISABLE_COM_TIMER_INT(); // disable interrupt
     commutate();
     commutation_interval = ((commutation_interval)+((lastzctime + thiszctime) >> 1))>>1;
-  	if (!eepromBuffer.auto_advance) {
-	  advance = (commutation_interval * temp_advance) >> 6; // 60 divde 64 0.9375 degree increments
-	} else {
-	  advance = (commutation_interval * auto_advance_level) >> 6; // 60 divde 64 0.9375 degree increments
-    }
+    // 60 divde 64 0.9375 degree increments, raised while demag is detected
+    advance = (commutation_interval * demag_comp_advance(eepromBuffer.auto_advance ? auto_advance_level : temp_advance)) >> 6;
     waitTime = (commutation_interval >> 1) - advance;
-    if (!old_routine) {
+    if (!old_routine && !demag_comp_scan()) { // the demag scan enables the comparator itself
         enableCompInterrupts(); // enable comp interrupt
     }
     if (zero_crosses < 10000) {
@@ -954,21 +959,27 @@ void interruptRoutine()
 //            return;
 //        }
 //    }
+        const char expect = demag_comp_expect(rising); // inverted while a demag clamp is awaited
         for (int i = 0; i < filter_level; i++) {
 #if defined(MCU_F031) || defined(MCU_G031)
-            if (((current_GPIO_PORT->IDR & current_GPIO_PIN) == !(rising))) {
+            if (((current_GPIO_PORT->IDR & current_GPIO_PIN) == !(expect))) {
 #else
-            if (getCompOutputLevel() == rising) {
+            if (getCompOutputLevel() == expect) {
 #endif
                 return;
             }
         }
+    if (demag_comp_clamp_end()) { // the end of a demag clamp, not a crossing
+        return;
+    }
     __disable_irq();
     maskPhaseInterrupts();
     lastzctime = thiszctime;
     thiszctime = INTERVAL_TIMER_COUNT;  
     SET_INTERVAL_TIMER_COUNT(0);
+    demag_comp_disarm();
     SET_AND_ENABLE_COM_INT(waitTime+1); // enable COM_TIMER interrupt
+    demag_comp_zc();
     __enable_irq();
 }
 
@@ -1142,8 +1153,10 @@ void setInput()
     }
 #ifndef BRUSHED_MODE
     if ((bemf_timeout_happened > bemf_timeout) && eepromBuffer.stuck_rotor_protection) {
-        allOff();
         maskPhaseInterrupts();
+        DISABLE_COM_TIMER_INT(); // a queued commutation would power the bridge again
+        COM_TIMER_CLEAR_PENDING();
+        allOff(); // last: undoes a commutation taken before the disable
         input = 0;
         bemf_timeout_happened = 102;
 #ifdef USE_RGB_LED
@@ -1205,6 +1218,8 @@ if (!stepper_sine && armed) {
         if (input >= 47 + (80 * eepromBuffer.use_sine_start)) {
             if (running == 0) {
                 allOff();
+                SET_DUTY_CYCLE_ALL(0); // not the last brake compare for the first commutation:
+                generatePwmTimerEvent(); // the compares are preloaded, so make the zeros active now, outputs still off
                 if (!old_routine) {
                     startMotor();
                 }
@@ -2069,8 +2084,9 @@ if(zero_crosses < 5){
         }
 #endif
         average_interval = e_com_time / 3;
-        if (desync_check && zero_crosses > 10) {
-            if ((getAbsDif(last_average_interval, average_interval) > average_interval >> 1) && (average_interval < 2000)) { // throttle resitricted before zc 20.
+        if (demag_comp_desync_pending() || (desync_check && zero_crosses > 10)) {
+            if (demag_comp_desync_pending() || ((getAbsDif(last_average_interval, average_interval) > average_interval >> 1) && (average_interval < 2000))) { // throttle resitricted before zc 20.
+                demag_comp_desync_clear();
                 zero_crosses = 0;
                 desync_happened++;
                 if ((!eepromBuffer.bi_direction && (input > 47)) || commutation_interval > 1000) {
@@ -2088,29 +2104,24 @@ if(zero_crosses < 5){
         }
 
 #if !defined(MCU_G031) && !defined(NEED_INPUT_READY)
+        // the comparator and COM timer interrupts must never preempt each
+        // other: change their priorities together, and only on a change
+        const uint8_t dshot_first = dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD);
+        if (dshot_first != dshot_priority) {
+            dshot_priority = dshot_first;
+            __disable_irq();
 #ifdef NXP
-	if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD)) {
-		NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
-		NVIC_SetPriority(COM_TIMER_IRQ, 1);
-		NVIC_SetPriority(COMP0_IRQ, 1);
-		NVIC_SetPriority(COMP1_IRQ, 1);
-	} else {
-		NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
-		NVIC_SetPriority(COM_TIMER_IRQ, 0);
-		NVIC_SetPriority(COMP0_IRQ, 0);
-		NVIC_SetPriority(COMP1_IRQ, 0);
-	}
+            NVIC_SetPriority(IC_DMA_IRQ_NAME, !dshot_first);
+            NVIC_SetPriority(COM_TIMER_IRQ, dshot_first);
+            NVIC_SetPriority(COMP0_IRQ, dshot_first);
+            NVIC_SetPriority(COMP1_IRQ, dshot_first);
 #else
-        if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD)) {
-             NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
-             NVIC_SetPriority(COM_TIMER_IRQ, 1);
-             NVIC_SetPriority(COMPARATOR_IRQ, 1);
-         } else {
-             NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
-             NVIC_SetPriority(COM_TIMER_IRQ, 0);
-             NVIC_SetPriority(COMPARATOR_IRQ, 0);
-         }
+            NVIC_SetPriority(IC_DMA_IRQ_NAME, !dshot_first);
+            NVIC_SetPriority(COM_TIMER_IRQ, dshot_first);
+            NVIC_SetPriority(COMPARATOR_IRQ, dshot_first);
 #endif
+            __enable_irq();
+        }
 #endif
         if (send_telemetry) {
 #ifdef USE_SERIAL_TELEMETRY

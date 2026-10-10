@@ -7,6 +7,7 @@
 #include "phaseouts.h"
 #include "common.h"
 #include "targets.h"
+#include "demag_comp.h"
 
 extern char prop_brake_active;
 
@@ -364,3 +365,17 @@ void twoChannelReverse()
     phaseBPWM();
     phaseCLOW();
 }
+
+#if DEMAG_COMP_ENABLED
+// the demag power cut: the PWM phase of step s off until the next comStep()
+void floatPwmPhase(char s)
+{
+    if (s == 1 || s == 6) {
+        phaseAFLOAT();
+    } else if (s == 2 || s == 3) {
+        phaseCFLOAT();
+    } else {
+        phaseBFLOAT();
+    }
+}
+#endif // DEMAG_COMP_ENABLED

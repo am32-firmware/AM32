@@ -230,6 +230,7 @@ an settings option)
 #include "signal.h"
 #include "sounds.h"
 #include "targets.h"
+#include "demag_comp.h"
 #include <stdint.h>
 #include <string.h>
 #include <assert.h>
@@ -873,6 +874,7 @@ void getBemfState()
 
 void commutate()
 {
+    demag_comp_commutate();
     if (forward == 1) {
         step++;
         if (step > 6) {
@@ -921,16 +923,16 @@ void commutate()
  */
 void PeriodElapsedCallback()
 {
+    if (demag_comp_timer()) { // a demag scan or timeout event, not a commutation
+        return;
+    }
     DISABLE_COM_TIMER_INT(); // disable interrupt
     commutate();
     commutation_interval = ((commutation_interval)+((lastzctime + thiszctime) >> 1))>>1;
-  	if (!eepromBuffer.auto_advance) {
-	  advance = (commutation_interval * temp_advance) >> 6; // 60 divde 64 0.9375 degree increments
-	} else {
-	  advance = (commutation_interval * auto_advance_level) >> 6; // 60 divde 64 0.9375 degree increments
-    }
+    // 60 divde 64 0.9375 degree increments, raised while demag is detected
+    advance = (commutation_interval * demag_comp_advance(eepromBuffer.auto_advance ? auto_advance_level : temp_advance)) >> 6;
     waitTime = (commutation_interval >> 1) - advance;
-    if (!old_routine) {
+    if (!old_routine && !demag_comp_scan()) { // the demag scan enables the comparator itself
         enableCompInterrupts(); // enable comp interrupt
     }
     if (zero_crosses < 10000) {
@@ -957,21 +959,27 @@ void interruptRoutine()
 //            return;
 //        }
 //    }
+        const char expect = demag_comp_expect(rising); // inverted while a demag clamp is awaited
         for (int i = 0; i < filter_level; i++) {
 #if defined(MCU_F031) || defined(MCU_G031)
-            if (((current_GPIO_PORT->IDR & current_GPIO_PIN) == !(rising))) {
+            if (((current_GPIO_PORT->IDR & current_GPIO_PIN) == !(expect))) {
 #else
-            if (getCompOutputLevel() == rising) {
+            if (getCompOutputLevel() == expect) {
 #endif
                 return;
             }
         }
+    if (demag_comp_clamp_end()) { // the end of a demag clamp, not a crossing
+        return;
+    }
     __disable_irq();
     maskPhaseInterrupts();
     lastzctime = thiszctime;
     thiszctime = INTERVAL_TIMER_COUNT;  
     SET_INTERVAL_TIMER_COUNT(0);
+    demag_comp_disarm();
     SET_AND_ENABLE_COM_INT(waitTime+1); // enable COM_TIMER interrupt
+    demag_comp_zc();
     __enable_irq();
 }
 
@@ -2074,8 +2082,9 @@ if(zero_crosses < 5){
         }
 #endif
         average_interval = e_com_time / 3;
-        if (desync_check && zero_crosses > 10) {
-            if ((getAbsDif(last_average_interval, average_interval) > average_interval >> 1) && (average_interval < 2000)) { // throttle resitricted before zc 20.
+        if (demag_comp_desync_pending() || (desync_check && zero_crosses > 10)) {
+            if (demag_comp_desync_pending() || ((getAbsDif(last_average_interval, average_interval) > average_interval >> 1) && (average_interval < 2000))) { // throttle resitricted before zc 20.
+                demag_comp_desync_clear();
                 zero_crosses = 0;
                 desync_happened++;
                 if ((!eepromBuffer.bi_direction && (input > 47)) || commutation_interval > 1000) {

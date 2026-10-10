@@ -26,6 +26,9 @@ void ADC_DMA_Callback(void)
     if (pin_mv_current < 0) {
         pin_mv_current = 0;
     }
+    if (pin_mv_current > 3300) {
+        pin_mv_current = 3300;
+    }
     ADC_raw_current = (uint16_t)(pin_mv_current * 4095.0f / 3300.0f + 0.5f);
 
     // __LL_ADC_CALC_TEMPERATURE is a pass through in SITL

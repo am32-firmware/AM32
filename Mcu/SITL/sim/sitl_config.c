@@ -57,6 +57,28 @@ sitl_config_t sitl_cfg = {
         .comparator_phase_rc_ns = 800,
         .comparator_neutral_rc_ns = 800,
         .comparator_min_toggle_ns = 2000,
+        .comparator_pwm_glitch_mv = 0.0f,
+        .comparator_pwm_glitch_ns = 1000,
+        .dead_time_ns = 0,
+        .comparator_offset_mv = 0.0f,
+        .comparator_on_ramp_mv_per_us = 0.0f,
+        .comparator_on_ramp_delay_ns = 1000,
+        .comparator_on_ramp_max_mv = 0.0f,
+        .comparator_off_lobe_mv = 0.0f,
+        .comparator_off_lobe_delay_ns = 5000,
+        .comparator_off_lobe_width_ns = 6000,
+        .comparator_off_lobe_ref_rpm = 0,
+        .comparator_off_lobe_rpm_exp = 1.0f,
+        .comparator_off_notch_mv = 0.0f,
+        .comparator_ring_mv = 0.0f,
+        .comparator_ring_hz = 700000,
+        .comparator_ring_tau_ns = 2500,
+        .irq_latency_ns = 0,
+        .comparator_hold_pending = false,
+        .interval_timer_bits = 32,
+        .demag_max_advance_level = 24,
+        .demag_min_wait_ticks = 8,
+        .demag_deadline_margin_ticks = 4,
         .fw_lag_max_ns = 20000,
         .watchdog_enabled = true,
     },
@@ -115,6 +137,28 @@ static const struct cfg_entry cfg_table[] = {
     { "sim", "comparator_phase_rc_ns", CFG_U32, &sitl_cfg.sim.comparator_phase_rc_ns },
     { "sim", "comparator_neutral_rc_ns", CFG_U32, &sitl_cfg.sim.comparator_neutral_rc_ns },
     { "sim", "comparator_min_toggle_ns", CFG_U32, &sitl_cfg.sim.comparator_min_toggle_ns },
+    { "sim", "dead_time_ns", CFG_U32, &sitl_cfg.sim.dead_time_ns },
+    { "sim", "comparator_offset_mv", CFG_FLOAT, &sitl_cfg.sim.comparator_offset_mv },
+    { "sim", "comparator_on_ramp_mv_per_us", CFG_FLOAT, &sitl_cfg.sim.comparator_on_ramp_mv_per_us },
+    { "sim", "comparator_on_ramp_delay_ns", CFG_U32, &sitl_cfg.sim.comparator_on_ramp_delay_ns },
+    { "sim", "comparator_on_ramp_max_mv", CFG_FLOAT, &sitl_cfg.sim.comparator_on_ramp_max_mv },
+    { "sim", "comparator_off_lobe_mv", CFG_FLOAT, &sitl_cfg.sim.comparator_off_lobe_mv },
+    { "sim", "comparator_off_lobe_delay_ns", CFG_U32, &sitl_cfg.sim.comparator_off_lobe_delay_ns },
+    { "sim", "comparator_off_lobe_width_ns", CFG_U32, &sitl_cfg.sim.comparator_off_lobe_width_ns },
+    { "sim", "comparator_off_lobe_ref_rpm", CFG_U32, &sitl_cfg.sim.comparator_off_lobe_ref_rpm },
+    { "sim", "comparator_off_lobe_rpm_exp", CFG_FLOAT, &sitl_cfg.sim.comparator_off_lobe_rpm_exp },
+    { "sim", "comparator_off_notch_mv", CFG_FLOAT, &sitl_cfg.sim.comparator_off_notch_mv },
+    { "sim", "comparator_ring_mv", CFG_FLOAT, &sitl_cfg.sim.comparator_ring_mv },
+    { "sim", "comparator_ring_hz", CFG_U32, &sitl_cfg.sim.comparator_ring_hz },
+    { "sim", "comparator_ring_tau_ns", CFG_U32, &sitl_cfg.sim.comparator_ring_tau_ns },
+    { "sim", "comparator_pwm_glitch_mv", CFG_FLOAT, &sitl_cfg.sim.comparator_pwm_glitch_mv },
+    { "sim", "comparator_pwm_glitch_ns", CFG_U32, &sitl_cfg.sim.comparator_pwm_glitch_ns },
+    { "sim", "irq_latency_ns", CFG_U32, &sitl_cfg.sim.irq_latency_ns },
+    { "sim", "comparator_hold_pending", CFG_BOOL, &sitl_cfg.sim.comparator_hold_pending },
+    { "sim", "interval_timer_bits", CFG_U32, &sitl_cfg.sim.interval_timer_bits },
+    { "sim", "demag_max_advance_level", CFG_U32, &sitl_cfg.sim.demag_max_advance_level },
+    { "sim", "demag_min_wait_ticks", CFG_U32, &sitl_cfg.sim.demag_min_wait_ticks },
+    { "sim", "demag_deadline_margin_ticks", CFG_U32, &sitl_cfg.sim.demag_deadline_margin_ticks },
     { "sim", "fw_lag_max_ns", CFG_U32, &sitl_cfg.sim.fw_lag_max_ns },
     { "sim", "watchdog_enabled", CFG_BOOL, &sitl_cfg.sim.watchdog_enabled },
 };
@@ -443,4 +487,19 @@ void sitl_config_init(int argc, char** argv)
         load_json_ex(env_model, true);
     }
     config_sanitise();
+}
+
+uint8_t sitl_demag_max_advance_level(void)
+{
+    return (uint8_t)sitl_cfg.sim.demag_max_advance_level;
+}
+
+uint8_t sitl_demag_min_wait_ticks(void)
+{
+    return (uint8_t)sitl_cfg.sim.demag_min_wait_ticks;
+}
+
+uint8_t sitl_demag_deadline_margin_ticks(void)
+{
+    return (uint8_t)sitl_cfg.sim.demag_deadline_margin_ticks;
 }

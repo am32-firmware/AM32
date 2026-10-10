@@ -4,8 +4,10 @@
 #include "IO.h"
 #include "WS2812.h"
 #include "main.h"
+#include "demag_guard.h"
 #include "targets.h"
 
+extern uint32_t current_EXTI_LINE;
 extern void transfercomplete();
 extern void PeriodElapsedCallback();
 extern void interruptRoutine();
@@ -97,23 +99,25 @@ void DMA1_Channel1_IRQHandler(void)
 
 void COMP1_2_3_IRQHandler(void)
 {
-	if(INTERVAL_TIMER->CNT > (commutation_interval>>1)){
-    interrupt++;
-    if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_22)) {
-        LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_22);
-        interruptRoutine();
+    // only the comparator the firmware is listening to is an observation;
+    // a flag on the other line, or on a masked line (an NVIC invocation that
+    // was already pending when the mask was applied), is discarded
+    const uint32_t line = current_EXTI_LINE;
+    LL_EXTI_ClearFlag_0_31(line == LL_EXTI_LINE_21 ? LL_EXTI_LINE_22 : LL_EXTI_LINE_21);
+    if (!LL_EXTI_IsActiveFlag_0_31(line)) {
         return;
     }
-
-    if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_21)) {
-        LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_21);
-        interruptRoutine();
+    LL_EXTI_ClearFlag_0_31(line);
+    if (!(EXTI->IMR1 & line)) {
         return;
     }
-	}else{
-		LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_21);
-		LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_22);
-	}
+    if (INTERVAL_TIMER->CNT > (commutation_interval >> 1)) {
+        interrupt++;
+        interruptRoutine();
+    }
+    // the guard observes after the handler's own blanking and crossing
+    // filter: code ahead of the filter changes which short glitches it accepts
+    demag_guard_edge();
 }
 
 void TIM6_DAC_IRQHandler(void)
@@ -126,8 +130,10 @@ void TIM6_DAC_IRQHandler(void)
 
 void TIM1_UP_TIM16_IRQHandler(void)
 {
-    PeriodElapsedCallback();
+    // acknowledge first: the callback may re-arm a short delay whose update
+    // would otherwise be erased by a clear after it
     LL_TIM_ClearFlag_UPDATE(TIM16);
+    PeriodElapsedCallback();
 }
 
 void EXTI15_10_IRQHandler(void)

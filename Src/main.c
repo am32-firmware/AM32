@@ -1153,8 +1153,10 @@ void setInput()
     }
 #ifndef BRUSHED_MODE
     if ((bemf_timeout_happened > bemf_timeout) && eepromBuffer.stuck_rotor_protection) {
-        allOff();
         maskPhaseInterrupts();
+        DISABLE_COM_TIMER_INT(); // a queued commutation would power the bridge again
+        COM_TIMER_CLEAR_PENDING();
+        allOff(); // last: undoes a commutation taken before the disable
         input = 0;
         bemf_timeout_happened = 102;
 #ifdef USE_RGB_LED

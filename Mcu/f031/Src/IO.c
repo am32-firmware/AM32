@@ -12,7 +12,7 @@
 #include "functions.h"
 #include "targets.h"
 
-char ic_timer_prescaler = (CPU_FREQUENCY_MHZ / 5);
+char ic_timer_prescaler = (CPU_FREQUENCY_MHZ / 6);
 // char output_timer_prescaler;
 // int buffersize = 32;
 // int smallestnumber = 20000;

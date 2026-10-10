@@ -16,6 +16,7 @@
 #define RELOAD_WATCHDOG_COUNTER() (LL_IWDG_ReloadCounter(IWDG))
 #define DISABLE_COM_TIMER_INT() (COM_TIMER->DIER &= ~((0x1UL << (0U))))
 #define ENABLE_COM_TIMER_INT() (COM_TIMER->DIER |= (0x1UL << (0U)))
+#define COM_TIMER_CLEAR_PENDING() NVIC_ClearPendingIRQ(TIM14_IRQn)
 #define SET_AND_ENABLE_COM_INT(time)                                  \
     (COM_TIMER->CNT = 0, COM_TIMER->ARR = time, COM_TIMER->SR = 0x00, \
         COM_TIMER->DIER |= (0x1UL << (0U)))

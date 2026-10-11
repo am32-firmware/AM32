@@ -285,6 +285,11 @@ void sitl_irq_pend(int irq)
     }
 }
 
+void sitl_irq_unpend(int irq)
+{
+    __atomic_fetch_and(&irq_pending, ~(1U << irq), __ATOMIC_SEQ_CST);
+}
+
 void sitl_primask_set(void)
 {
     // plain atomic store: the dispatcher re-checks primask after parking

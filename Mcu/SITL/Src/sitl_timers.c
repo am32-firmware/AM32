@@ -199,6 +199,35 @@ void sitl_com_int_enable(void)
     tims[SITL_TIM16_IDX].DIER |= 1;
 }
 
+uint32_t sitl_com_reload(void)
+{
+    return tims[SITL_TIM16_IDX].ARR;
+}
+
+/*
+  free running COM_TIMER for sine mode, the sim thread already reloads
+  the counter on each update while DIER is set
+ */
+void sitl_com_periodic_start(uint32_t time)
+{
+    SITL_TIM_TypeDef* t = &tims[SITL_TIM16_IDX];
+    t->DIER &= ~1U;
+    tim16.base_ns = sitl_time_ns();
+    tim16.cnt_base = 0;
+    t->ARR = time;
+    t->SR = 0;
+    t->DIER |= 1;
+}
+
+void sitl_com_periodic_stop(uint32_t time)
+{
+    SITL_TIM_TypeDef* t = &tims[SITL_TIM16_IDX];
+    t->DIER &= ~1U;
+    t->ARR = time;
+    t->SR = 0;
+    sitl_irq_unpend(SITL_IRQ_COM);
+}
+
 void sitl_tenkhz_enable(void)
 {
     tim6.next_due_ns = sitl_time_ns() + (tims[SITL_TIM6_IDX].ARR + 1) * 1000ULL;

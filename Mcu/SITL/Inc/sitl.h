@@ -80,6 +80,7 @@ void sitl_nvic_set_priority(int irq, uint32_t prio);
 void sitl_nvic_enable_irq(int irq);
 void sitl_nvic_disable_irq(int irq);
 void sitl_irq_pend(int irq);
+void sitl_irq_unpend(int irq);
 void sitl_exec_bootloader(const char* cause) __attribute__((noreturn));
 void sitl_reset_with_cause(const char* cause) __attribute__((noreturn));
 void sitl_primask_set(void); // __disable_irq
@@ -124,6 +125,9 @@ void sitl_interval_timer_set(uint32_t cnt);
 void sitl_com_int_arm(uint32_t time);
 void sitl_com_int_disable(void);
 void sitl_com_int_enable(void);
+uint32_t sitl_com_reload(void);
+void sitl_com_periodic_start(uint32_t time);
+void sitl_com_periodic_stop(uint32_t time);
 void sitl_tim1_set_duty_all(uint16_t duty);
 void sitl_tim1_set_duty(int chan, uint16_t duty);
 void sitl_tim1_set_psc(uint16_t psc);

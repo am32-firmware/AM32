@@ -61,6 +61,27 @@
 }
 
 /*
+ * @brief 	Periodic COM_TIMER interrupt for sine mode.
+ * 			CTIMER1 already resets on match0, so loading the period and restarting the count is enough
+ */
+#define COM_TIMER_RELOAD_VALUE (CTIMER1->MR[0])
+
+#define START_COM_TIMER_PERIODIC(time) { \
+	modifyReg32(&CTIMER1->MCR, CTIMER_MCR_MR0I_MASK, 0); \
+	CTIMER1->MR[0] = time; \
+	CTIMER1->TC = 0; \
+	CTIMER1->IR = CTIMER_IR_MR0INT(1); \
+	modifyReg32(&CTIMER1->MCR, CTIMER_MCR_MR0I_MASK, CTIMER_MCR_MR0I(1)); \
+}
+
+#define STOP_COM_TIMER_PERIODIC(time) { \
+	modifyReg32(&CTIMER1->MCR, CTIMER_MCR_MR0I_MASK, 0); \
+	CTIMER1->MR[0] = time; \
+	CTIMER1->IR = CTIMER_IR_MR0INT(1); \
+	NVIC_ClearPendingIRQ(COM_TIMER_IRQ); \
+}
+
+/*
  * @brief 	Sets the interval timer count
  */
 #define SET_INTERVAL_TIMER_COUNT(intertime) { \

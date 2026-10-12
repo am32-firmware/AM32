@@ -58,9 +58,9 @@ static uint8_t command_count;
 static uint8_t last_command;
 static uint8_t high_pin_count;
 uint32_t gcr[37];
-static uint16_t dshot_frametime;
-static uint16_t dshot_goodcounts;
-static uint16_t dshot_badcounts;
+uint16_t dshot_frametime;
+uint16_t dshot_goodcounts;
+uint16_t dshot_badcounts;
 static uint8_t dshot_extended_telemetry;
 static uint16_t halfpulsetime;
 

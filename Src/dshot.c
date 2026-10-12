@@ -73,9 +73,12 @@ void computeDshotDMA()
     dshot_frametime = dma_buffer[31] - dma_buffer[0];
     halfpulsetime = dshot_frametime >> 5;
     if ((dshot_frametime > dshot_frametime_low) && (dshot_frametime < dshot_frametime_high)) {
+        // about 0.18T to 0.96T, Betaflight bitbang sends 0 bits of T/3
+        const uint16_t min_width = (halfpulsetime * 3) >> 3;
+        const uint16_t max_width = halfpulsetime << 1;
         for (int i = 0; i < 16; i++) {
             const uint16_t pwidth = dma_buffer[(i << 1) + 1] - dma_buffer[(i << 1)];
-            if (pwidth < (halfpulsetime >> 1) || pwidth > (halfpulsetime << 1)) {
+            if (pwidth < min_width || pwidth > max_width) {
                 // pulse width way off, bad frame
                 dshot_badcounts++;
                 programming_mode = 0;

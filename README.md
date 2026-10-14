@@ -38,7 +38,7 @@ Alternately you can use the [Online-ESC Configurator](https://esc-configurator.c
 
 
 ## Hardware
-AM32 currently has support for STSPIN32F0, STM32F051, STM32G071, GD32E230, AT32F415 and AT32F421.
+AM32 currently has support for STSPIN32F0, STM32F051, STM32G071, GD32E230, AT32F415, AT32F421 and MCXA133.
 The CKS32F051 is not recommended due to too many random issues.
 Target compatibility List can be found [here](https://github.com/am32-firmware/AM32/blob/main/Inc/targets.h)
 

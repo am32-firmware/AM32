@@ -6,8 +6,9 @@
 /* Bluejay-style demag compensation: see Src/demag_comp.c. DEMAG_COMP_ENABLED
  * comes from targets.h. */
 
-/* demag metric at which the PWM phase is switched off from the crossing to
- * the commutation: 160 is Bluejay's "low" setting, 130 "high", 256 never */
+/* demag metric at which the PWM phase is switched off until commutation,
+ * starting at a clamped scan or at the crossing: 160 is Bluejay's "low"
+ * setting, 130 "high", 256 never */
 #ifndef DEMAG_COMP_POWER_OFF
 #define DEMAG_COMP_POWER_OFF 160
 #endif // DEMAG_COMP_POWER_OFF

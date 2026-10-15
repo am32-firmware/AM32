@@ -69,6 +69,15 @@ uint8_t programming_mode;
 uint16_t position;
 uint8_t  new_byte;
 
+/**
+ * Decode and process DShot protocol data from DMA buffer.
+ *
+ * Programming mode (4-step command sequence):
+ * - Step 0: Receive DShot command 36 to activate programming mode
+ * - Step 1: Receive EEPROM buffer position (0-191)
+ * - Step 2: Receive new byte value to write
+ * - Step 3: Receive confirmation value 37 to commit
+ */
 void computeDshotDMA()
 {
     dshot_frametime = dma_buffer[31] - dma_buffer[0];
@@ -107,10 +116,16 @@ void computeDshotDMA()
             if (dpulse[11] == 1) {
                 send_telemetry = 1;
             }
-            if(programming_mode > 0){  
-                if(programming_mode == 1){ // begin programming mode
-                    position = tocheck;    // eepromBuffer position
-                    programming_mode = 2;
+            if (programming_mode > 0) {
+                if (programming_mode == 1) { // begin programming mode
+                    if (tocheck < sizeof(eepromBuffer.buffer)) {
+                        position = tocheck;    // eepromBuffer position
+                        programming_mode = 2;
+                    } else {
+                        // Invalid position - reset to safe state and signal error
+                        programming_mode = 0;
+                        playBeaconTune3();  // Signal error with beep
+                    }
                     return;
                 }
                if(programming_mode == 2){
@@ -120,8 +135,11 @@ void computeDshotDMA()
                 }
                 if(programming_mode == 3){
                     if(tocheck == 37){  // commit new values to eeprom. must use save settings to make permanent.
-                    eepromBuffer.buffer[position] = new_byte;
-                    programming_mode = 0;
+                        // Safety check: verify position is still in bounds before write
+                        if (position < sizeof(eepromBuffer.buffer)) {
+                            eepromBuffer.buffer[position] = new_byte;
+                        }
+                        programming_mode = 0;
                   }
                 }
                 return; // don't process dshot signal when in programming mode

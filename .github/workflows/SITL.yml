@@ -28,6 +28,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Test demag controller and shutdown interrupt ordering
+        run: |
+          python3 tests/test_demag_comp.py
+          python3 tests/test_irq_shutdown.py
+
       - name: Check out ESCSim
         uses: actions/checkout@v4
         with:

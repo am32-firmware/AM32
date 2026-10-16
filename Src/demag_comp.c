@@ -17,7 +17,9 @@
  * During acceleration, waiting for the metric to rise can lose measured
  * crossings before power relief starts. Cut a clamped scan immediately
  * while duty rises beyond a small noise margin, and retain that relief until
- * 24 measured crossings have no such rise or large interval contraction.
+ * 24 measured crossings have no such rise or contraction of the measured
+ * electrical period. Compare complete cycles so sector asymmetry cannot
+ * repeatedly request acceleration relief at steady speed.
  * This also covers acceleration after duty has reached its requested value,
  * without making the extra relief or advance boost permanent at steady load.
  *
@@ -68,6 +70,7 @@ extern void interruptRoutine(void);
 #define MAX_EVENT_TICKS 40000 /* below the stock 45000 tick back-EMF timeout */
 #define RELIEF_CROSSINGS 24 /* four electrical revolutions of recovered feedback */
 #define RELIEF_DUTY_RISE 8 /* minimum noise margin on the 0..2000 duty scale */
+#define RELIEF_PERIOD_MARGIN 24 /* four timer ticks per sector, six sectors */
 
 enum { ST_IDLE, ST_SCAN, ST_WAIT_PRE, ST_LISTEN };
 
@@ -82,6 +85,8 @@ static uint16_t event_start, event_ticks; /* interval timer count when the event
 static uint16_t run_interval; /* commutation_interval as the blind run started */
 static uint16_t last_zc_duty; /* duty at the last measured crossing */
 static uint8_t ramp_relief; /* measured crossings until transient relief expires */
+static uint32_t relief_period, relief_reference; /* sums of six measured sectors */
+static uint8_t relief_samples;
 
 static bool duty_rising(void)
 {
@@ -92,6 +97,39 @@ static bool duty_rising(void)
         margin = RELIEF_DUTY_RISE;
     }
     return duty_cycle > last_zc_duty + margin;
+}
+
+static void reset_period(void)
+{
+    relief_period = relief_reference = 0;
+    relief_samples = 0;
+}
+
+static bool accelerating(void)
+{
+    /* Blind predictions break the sequence of measured sectors. Do not mix
+     * them, or the first crossing after one, into an electrical-period sample. */
+    if (blind_run) {
+        reset_period();
+        return false;
+    }
+    relief_period += thiszctime;
+    if (++relief_samples < 6) {
+        return false;
+    }
+    uint32_t margin = relief_reference >> 5;
+    if (margin < RELIEF_PERIOD_MARGIN) {
+        margin = RELIEF_PERIOD_MARGIN;
+    }
+    const bool faster = relief_reference && relief_period + margin < relief_reference;
+    /* Hold the reference through small contractions to detect gradual
+     * acceleration too. Follow deceleration so a later ramp can rearm. */
+    if (faster || relief_period > relief_reference) {
+        relief_reference = relief_period;
+    }
+    relief_period = 0;
+    relief_samples = 0;
+    return faster;
 }
 
 static bool eligible(void)
@@ -169,6 +207,7 @@ static void quit(void)
     DISABLE_COM_TIMER_INT();
     demag_comp_state = ST_IDLE;
     blind_run = 0;
+    reset_period();
     if (demag_comp_invert) {
         demag_comp_invert = 0;
         setCompEdge(rising);
@@ -363,6 +402,7 @@ void demag_comp_commutate(void)
         blind_run = 0;
         last_zc_duty = duty_cycle;
         ramp_relief = 0;
+        reset_period();
     }
 }
 
@@ -370,6 +410,7 @@ bool demag_comp_scan(void)
 {
     if (!eligible()) {
         blind_run = 0;
+        reset_period();
         return false;
     }
     /* just after the handler's gate, which some ports take from average_interval */
@@ -422,12 +463,12 @@ void demag_comp_disarm_event(void)
 
 void demag_comp_zc(void)
 {
-    /* Ignore duty jitter: repeatedly cutting for tiny changes costs steady
-     * torque. Duty can stop rising while the rotor is still accelerating. An interval
-     * contraction over 1/32 keeps relief active through that transition.
+    /* Duty can stop rising while the rotor is still accelerating. Compare
+     * complete measured cycles, with a relative and an absolute noise margin.
      * Only measured crossings age this latch; blind predictions cannot prove
      * recovery and must still reach the existing blind-run shutdown limit. */
-    if (duty_rising() || thiszctime < lastzctime - (lastzctime >> 5)) {
+    const bool faster = accelerating(); /* collect before clearing blind_run */
+    if (duty_rising() || faster) {
         ramp_relief = RELIEF_CROSSINGS;
     } else if (ramp_relief) {
         ramp_relief--;

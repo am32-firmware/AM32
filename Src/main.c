@@ -1153,12 +1153,16 @@ void setInput()
     }
 #ifndef BRUSHED_MODE
     if ((bemf_timeout_happened > bemf_timeout) && eepromBuffer.stuck_rotor_protection) {
+        /* A COM callback between masking the comparator and disabling its
+         * timer can re-enable the comparator and undo this stop. */
+        const uint32_t irq_state = irq_save();
         maskPhaseInterrupts();
         DISABLE_COM_TIMER_INT(); // a queued commutation would power the bridge again
         COM_TIMER_CLEAR_PENDING();
-        allOff(); // last: undoes a commutation taken before the disable
+        allOff();
         input = 0;
         bemf_timeout_happened = 102;
+        irq_restore(irq_state);
 #ifdef USE_RGB_LED
         setIndividualRGBLed(1, 0, 0);
 #endif

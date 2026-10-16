@@ -66,6 +66,44 @@ static void blind(unsigned lateness) {
     commutation_interval = (commutation_interval + ((lastzctime + thiszctime) >> 1)) >> 1;
     assert(commutation_interval == 400);
 }
+#ifndef TEST_CUT_DISABLED
+/* A clamped scan followed by clamp release and a measured crossing. Run the
+ * main.c filter too: alternate sector times must not masquerade as speed. */
+static void measured_sector(unsigned ticks) {
+    demag_comp_commutate();
+    commutation_interval = (commutation_interval + ((lastzctime + thiszctime) >> 1)) >> 1;
+    average_interval = commutation_interval;
+    waitTime = commutation_interval * 3 / 8;
+    timer_count = waitTime;
+    comp = !rising;
+    assert(demag_comp_scan());
+    timer_count += com_delay;
+    assert(demag_comp_timer());
+    comp = rising;
+    assert(demag_comp_clamp_end());
+    lastzctime = thiszctime;
+    thiszctime = ticks;
+    timer_count = 0;
+    demag_comp_disarm();
+    demag_comp_zc();
+    rising = !rising;
+    assert(demag_comp_metric == 120 && !demag_comp_desync_pending());
+}
+static void steady_alternation(unsigned center, unsigned spread) {
+    reset();
+    thiszctime = lastzctime = center;
+    commutation_interval = average_interval = center;
+    for (unsigned i = 0; i < 1000; i++) {
+        measured_sector((i & 1) ? center - spread : center + spread);
+    }
+    assert(!cuts);
+    duty_cycle = 1400;
+    for (unsigned i = 0; i < 60; i++) {
+        measured_sector((i & 1) ? center - spread : center + spread);
+    }
+    assert(cuts && cuts <= 25); /* finite duty relief despite steady asymmetry */
+}
+#endif
 int main(void) {
 #ifdef TEST_CUT_DISABLED
     reset(); duty_cycle = 1400; thiszctime = lastzctime = 400;
@@ -135,7 +173,10 @@ int main(void) {
     assert(cuts == 24 && demag_comp_metric == 120);
     puts("PASS relief survives the duty plateau and expires after recovered feedback");
 
-    reset(); thiszctime = 380; lastzctime = 400; demag_comp_zc();
+    reset(); thiszctime = lastzctime = 400;
+    for (unsigned i = 0; i < 6; i++) { demag_comp_zc(); }
+    thiszctime = 380;
+    for (unsigned i = 0; i < 6; i++) { demag_comp_zc(); }
     demag_comp_commutate(); scan(); assert(cuts == 1);
     for (unsigned i = 0; i < 23; i++) {
         blind(0);
@@ -171,6 +212,68 @@ int main(void) {
     old_routine = 1; demag_comp_commutate(); old_routine = 0;
     scan(); assert(!cuts);
     puts("PASS restart clears transient relief and rebases its duty reference");
+
+    steady_alternation(400, 7);
+    steady_alternation(100, 2);
+    steady_alternation(40, 1);
+    puts("PASS steady alternating sectors do not trigger or retain acceleration relief");
+
+    reset(); thiszctime = lastzctime = 400;
+    const unsigned pattern[] = {300, 520, 280, 470, 330, 500};
+    for (unsigned i = 0; i < 600; i++) { measured_sector(pattern[i % 6]); }
+    assert(!cuts);
+    puts("PASS six-sector asymmetry cancels over a complete measured cycle");
+
+    reset(); thiszctime = lastzctime = 100;
+    commutation_interval = average_interval = 100;
+    uint32_t random = 1;
+    for (unsigned i = 0; i < 6000; i++) {
+        random = random * 1664525u + 1013904223u;
+        measured_sector(98 + (random >> 16) % 5);
+    }
+    assert(!cuts);
+    puts("PASS random two-tick period jitter cannot ratchet relief on at steady duty");
+
+    reset(); thiszctime = lastzctime = 400;
+    for (unsigned i = 0; i < 12; i++) { measured_sector(400); }
+    for (unsigned i = 0; i < 120; i++) { measured_sector(400 - i / 6); }
+    assert(cuts); /* cumulative acceleration, no single sector drops by 1/32 */
+    for (unsigned i = 0; i < 60; i++) { measured_sector(381); }
+    unsigned before = cuts;
+    for (unsigned i = 0; i < 30; i++) { measured_sector(381); }
+    assert(cuts == before);
+    for (unsigned i = 0; i < 12; i++) { measured_sector(500); }
+    for (unsigned i = 0; i < 18; i++) { measured_sector(470); }
+    assert(cuts > before);
+    puts("PASS gradual acceleration, expiry and acceleration after deceleration");
+
+    reset(); thiszctime = lastzctime = 100;
+    commutation_interval = average_interval = 100;
+    for (unsigned i = 0; i < 12; i++) { measured_sector(100); }
+    for (unsigned i = 0; i < 60; i++) { measured_sector(96); }
+    assert(!cuts); /* four-tick absolute floor, even though this is over 1/32 */
+    for (unsigned i = 0; i < 12; i++) { measured_sector(95); }
+    assert(cuts);
+    puts("PASS absolute timing margin rejects quantization near the speed boundary");
+
+    reset(); thiszctime = lastzctime = 400;
+    for (unsigned i = 0; i < 6; i++) { demag_comp_zc(); }
+    thiszctime = 380;
+    for (unsigned i = 0; i < 5; i++) { demag_comp_zc(); }
+    demag_comp_commutate(); scan(); blind(0);
+    thiszctime = 380; demag_comp_zc();
+    demag_comp_commutate(); scan(); assert(!cuts);
+    puts("PASS blind gaps discard partial measured periods without inventing acceleration");
+
+    reset(); thiszctime = lastzctime = 400;
+    for (unsigned i = 0; i < 6; i++) { demag_comp_zc(); }
+    thiszctime = 380;
+    for (unsigned i = 0; i < 5; i++) { demag_comp_zc(); }
+    demag_comp_commutate(); scan(); blind(0);
+    input = 0; demag_comp_commutate(); assert(!demag_comp_scan());
+    input = 1000; thiszctime = 380; demag_comp_zc();
+    demag_comp_commutate(); scan(); assert(!cuts);
+    puts("PASS a commanded stop discards the period even after a blind gap");
 #endif
     return 0;
 }

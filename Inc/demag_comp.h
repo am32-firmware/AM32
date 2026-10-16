@@ -6,9 +6,10 @@
 /* Bluejay-style demag compensation: see Src/demag_comp.c. DEMAG_COMP_ENABLED
  * comes from targets.h. */
 
-/* demag metric at which the PWM phase is switched off until commutation,
+/* demag metric at which all three phases are floated until commutation,
  * starting at a clamped scan or at the crossing: 160 is Bluejay's "low"
- * setting, 130 "high", 256 never */
+ * setting, 130 "high", 256 disables power cuts. Unless disabled, transient
+ * acceleration relief also cuts at a clamped scan. */
 #ifndef DEMAG_COMP_POWER_OFF
 #define DEMAG_COMP_POWER_OFF 160
 #endif // DEMAG_COMP_POWER_OFF
@@ -46,7 +47,6 @@ static inline bool demag_comp_scanned(void) { return demag_comp_state >= 2; }
 static inline bool demag_comp_desync_pending(void) { return demag_comp_desync != 0; }
 static inline void demag_comp_desync_clear(void) { demag_comp_desync = 0; }
 /* port functions */
-void floatPwmPhase(char s); /* the PWM phase of step s off until the next comStep() */
 void setCompEdge(char r); /* the comparator edge changeCompInput() selects for rising == r */
 #else
 static inline bool demag_comp_timer(void) { return false; }

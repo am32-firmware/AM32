@@ -9,11 +9,17 @@
  * a clamp that outlasts the first timeout is commutated blind. Blind
  * sectors feed a metric, a sliding average of 256 per blind sector floored
  * at 120: 130 adds 7.5 degrees of advance and 160 adds 15 (not at high
- * speed). At the power-off threshold, cut the PWM phase as soon as a
+ * speed). At the power-off threshold, float all three phases as soon as a
  * clamp is observed at scan start, keeping it off until commutation.
  * This gives the outgoing current more time to decay before the predicted
  * crossing. A metric that reaches the threshold at the crossing also cuts
  * power for the remainder of that sector.
+ * During acceleration, waiting for the metric to rise can lose measured
+ * crossings before power relief starts. Cut a clamped scan immediately
+ * while duty rises beyond a small noise margin, and retain that relief until
+ * 24 measured crossings have no such rise or large interval contraction.
+ * This also covers acceleration after duty has reached its requested value,
+ * without making the extra relief or advance boost permanent at steady load.
  *
  * Here the scan is a COM timer event as the comparator handler's blanking
  * gate opens, half an interval after the last crossing (Bluejay scans at
@@ -43,7 +49,7 @@
 #endif // COM_TIMER_CLEAR_PENDING
 
 extern volatile char rising;
-extern char step, old_routine, prop_brake_active, stepper_sine;
+extern char old_routine, prop_brake_active, stepper_sine;
 extern uint8_t running, filter_level;
 extern volatile uint16_t duty_cycle;
 extern uint16_t input;
@@ -60,6 +66,8 @@ extern void interruptRoutine(void);
 #define MIN_ZERO_CROSSES 50
 #define MAX_BLIND_RUN 24 /* four electrical turns without a crossing */
 #define MAX_EVENT_TICKS 40000 /* below the stock 45000 tick back-EMF timeout */
+#define RELIEF_CROSSINGS 24 /* four electrical revolutions of recovered feedback */
+#define RELIEF_DUTY_RISE 8 /* minimum noise margin on the 0..2000 duty scale */
 
 enum { ST_IDLE, ST_SCAN, ST_WAIT_PRE, ST_LISTEN };
 
@@ -72,6 +80,19 @@ static uint16_t armed_wait; /* its delay, against which a COM invocation is due 
 static uint8_t used_timer; /* this sector armed a COM event, so a stale invocation may be pending */
 static uint16_t event_start, event_ticks; /* interval timer count when the event was armed, and its delay */
 static uint16_t run_interval; /* commutation_interval as the blind run started */
+static uint16_t last_zc_duty; /* duty at the last measured crossing */
+static uint8_t ramp_relief; /* measured crossings until transient relief expires */
+
+static bool duty_rising(void)
+{
+    /* Small command variations at high duty should not keep relief latched.
+     * Use a relative margin so a fast ramp from low duty still acts early. */
+    uint16_t margin = last_zc_duty >> 4;
+    if (margin < RELIEF_DUTY_RISE) {
+        margin = RELIEF_DUTY_RISE;
+    }
+    return duty_cycle > last_zc_duty + margin;
+}
 
 static bool eligible(void)
 {
@@ -158,17 +179,19 @@ static void quit(void)
     }
 }
 
-/* The PWM phase is restored by the next comStep(). Count each cut sector
- * once, even when both the scan and crossing request a cut. */
+/* Release the grounded phase too: otherwise current can keep circulating
+ * through its low FET and the PWM phase's body diode. With all six FETs off,
+ * the diodes can return winding energy to the bus. The next comStep()
+ * restores all three phases. Count each cut sector only once. */
 static void cut_power(void)
 {
-#ifndef PWM_ENABLE_BRIDGE /* phaseXPWM() restores no enable without complementary PWM */
+#if !defined(PWM_ENABLE_BRIDGE) && DEMAG_COMP_POWER_OFF < 256 /* phaseXPWM() restores no enable without complementary PWM */
     if (!power_cut) {
-        floatPwmPhase(step);
+        allOff();
         power_cut = 1;
         demag_comp_cuts++;
     }
-#endif // PWM_ENABLE_BRIDGE
+#endif
 }
 
 static void sector_end(bool blind)
@@ -208,9 +231,11 @@ static void scan_event(void)
     demag_comp_sectors++;
     if (level(true)) {
         demag_comp_flagged++;
-        if (demag_comp_metric >= DEMAG_COMP_POWER_OFF) {
+#if DEMAG_COMP_POWER_OFF < 256
+        if (demag_comp_metric >= DEMAG_COMP_POWER_OFF || duty_rising() || ramp_relief) {
             cut_power();
         }
+#endif
         demag_comp_state = ST_WAIT_PRE;
         edge(true);
         if (!level(false)) {
@@ -336,6 +361,8 @@ void demag_comp_commutate(void)
     if (!running || old_routine || zero_crosses <= MIN_ZERO_CROSSES) {
         demag_comp_metric = METRIC_FLOOR;
         blind_run = 0;
+        last_zc_duty = duty_cycle;
+        ramp_relief = 0;
     }
 }
 
@@ -395,6 +422,17 @@ void demag_comp_disarm_event(void)
 
 void demag_comp_zc(void)
 {
+    /* Ignore duty jitter: repeatedly cutting for tiny changes costs steady
+     * torque. Duty can stop rising while the rotor is still accelerating. An interval
+     * contraction over 1/32 keeps relief active through that transition.
+     * Only measured crossings age this latch; blind predictions cannot prove
+     * recovery and must still reach the existing blind-run shutdown limit. */
+    if (duty_rising() || thiszctime < lastzctime - (lastzctime >> 5)) {
+        ramp_relief = RELIEF_CROSSINGS;
+    } else if (ramp_relief) {
+        ramp_relief--;
+    }
+    last_zc_duty = duty_cycle;
     armed = 1;
     armed_wait = waitTime;
     blind_run = 0;

@@ -114,11 +114,3 @@ void twoChannelReverse(void)
     phasePWM(1);
     phaseLOW(2);
 }
-
-#if DEMAG_COMP_ENABLED
-// the demag power cut: the PWM phase of step s off until the next comStep()
-void floatPwmPhase(char s)
-{
-    phaseFLOAT((s == 1 || s == 6) ? 0 : ((s == 2 || s == 3) ? 2 : 1));
-}
-#endif // DEMAG_COMP_ENABLED

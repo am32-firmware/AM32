@@ -23,6 +23,7 @@
 #include "stm32l4xx_it.h"
 #include "ADC.h"
 #include "targets.h"
+#include "demag_comp.h"
 #include "IO.h"
 #include "common.h"
 #include "comparator.h"
@@ -265,9 +266,10 @@ void TIM1_UP_TIM16_IRQHandler(void)
 
 	  if(LL_TIM_IsActiveFlag_UPDATE(TIM16) == 1)
 	  {
-
-		PeriodElapsedCallback();
+	    // acknowledge first: the callback may re-arm a short delay whose
+	    // update would otherwise be erased by a clear after it
 	    LL_TIM_ClearFlag_UPDATE(TIM16);
+		PeriodElapsedCallback();
 
 	  }
 
@@ -275,18 +277,23 @@ void TIM1_UP_TIM16_IRQHandler(void)
 
 void COMP_IRQHandler(void)
 {
-
-    if (LL_EXTI_IsActiveFlag_0_31(EXTI_LINE) != RESET) {
-      if((INTERVAL_TIMER->CNT) > ((average_interval>>1))){
-       LL_EXTI_ClearFlag_0_31(EXTI_LINE);
-      interruptRoutine();
-  }else{ 
-      if (getCompOutputLevel() == rising){
-      LL_EXTI_ClearFlag_0_31(EXTI_LINE);
-  }
-}
-}
-  
+    if (LL_EXTI_IsActiveFlag_0_31(EXTI_LINE) == RESET) {
+        return;
+    }
+    if (!(EXTI->IMR1 & EXTI_LINE)) {
+        // a flag latched while the line was masked, serviced by an NVIC
+        // invocation that was already pending: not an observation
+        LL_EXTI_ClearFlag_0_31(EXTI_LINE);
+        return;
+    }
+    if ((INTERVAL_TIMER->CNT) > (average_interval >> 1) || demag_comp_scanned()) {
+        LL_EXTI_ClearFlag_0_31(EXTI_LINE);
+        interruptRoutine();
+    } else if (getCompOutputLevel() == rising) {
+        // in the blanking window with the pre-crossing level: a glitch
+        LL_EXTI_ClearFlag_0_31(EXTI_LINE);
+    }
+    // otherwise the edge stays pending until the window ends, as before
 }
 
 void EXTI15_10_IRQHandler(void)

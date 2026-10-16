@@ -7,6 +7,7 @@
 #include "phaseouts.h"
 #include "common.h"
 #include "targets.h"
+#include "demag_comp.h"
 
 extern char prop_brake_active;
 

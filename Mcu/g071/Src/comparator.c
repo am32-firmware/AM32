@@ -9,6 +9,7 @@
 
 #include "common.h"
 #include "targets.h"
+#include "demag_comp.h"
 
 COMP_TypeDef* active_COMP = COMP2;
 uint32_t current_EXTI_LINE = LL_EXTI_LINE_18;
@@ -85,6 +86,23 @@ medium_speed_set = 1;
         LL_EXTI_DisableFallingTrig_0_31(LL_EXTI_LINE_18);
     }
 }
+
+#if DEMAG_COMP_ENABLED
+// the edge changeCompInput() selects for rising == r, inputs unchanged
+void setCompEdge(char r)
+{
+    if (r) {
+        LL_EXTI_DisableRisingTrig_0_31(LL_EXTI_LINE_18);
+        LL_EXTI_DisableRisingTrig_0_31(LL_EXTI_LINE_17);
+        LL_EXTI_EnableFallingTrig_0_31(current_EXTI_LINE);
+    } else { // falling bemf
+        LL_EXTI_EnableRisingTrig_0_31(current_EXTI_LINE);
+        LL_EXTI_DisableFallingTrig_0_31(LL_EXTI_LINE_17);
+        LL_EXTI_DisableFallingTrig_0_31(LL_EXTI_LINE_18);
+    }
+}
+#endif // DEMAG_COMP_ENABLED
+
 
 // void changeCompInput() {
 //	if (step == 1 || step == 4) {   // c floating

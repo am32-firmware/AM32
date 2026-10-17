@@ -1716,7 +1716,7 @@ void runBrushedLoop()
 
     if (use_current_limit) {
         use_current_limit_adjust -= (int16_t)(doPidCalculations(&currentPid, actual_current,
-                                                  CURRENT_LIMIT * 100)
+                                                  eepromBuffer.limits.current * 100)
             / 10000);
         if (use_current_limit_adjust < minimum_duty_cycle) {
             use_current_limit_adjust = minimum_duty_cycle;
@@ -2136,8 +2136,12 @@ if(zero_crosses < 5){
             LL_ADC_REG_StartConversion(ADC1);
 #ifdef USE_ADC_1_2
           LL_ADC_REG_StartConversion(ADC2);
-#endif          
+#endif
+        #ifdef HAVE_CONVERT_TEMPERATURE
+            converted_degrees = convertTemperature(ADC_raw_ntc);
+        #else
             converted_degrees = __LL_ADC_CALC_TEMPERATURE(3300, ADC_raw_temp, LL_ADC_RESOLUTION_12B);
+        #endif
 #endif
 #ifdef MCU_GDE23
             // converted_degrees = (1.43 - ADC_raw_temp * 3.3 / 4096) * 1000 / 4.3 + 25;
@@ -2162,7 +2166,7 @@ if(zero_crosses < 5){
             startADCConversion( );
             converted_degrees = getConvertedDegrees(ADC_raw_temp);
 #endif
-            degrees_celsius = converted_degrees;
+	        degrees_celsius = converted_degrees;
 #ifdef NXP
             //MCXA has 16-bit ADC data
             battery_voltage = ((7 * battery_voltage) + ((ADC_raw_volts * 3300 / 65535 * VOLTAGE_DIVIDER) / 100)) / 8;

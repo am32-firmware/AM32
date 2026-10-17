@@ -13,7 +13,7 @@
 #include "main.h"
 
 #define INTERVAL_TIMER_COUNT (TIMER_CNT(INTERVAL_TIMER))
-#define RELOAD_WATCHDOG_COUNTER() (fwdgt_counter_reload())
+#define RELOAD_WATCHDOG_COUNTER() FWDGT_RELOAD()
 #define DISABLE_COM_TIMER_INT() \
     (TIMER_DMAINTEN(COM_TIMER) &= (~(uint32_t)TIMER_INT_UP))
 #define ENABLE_COM_TIMER_INT() \

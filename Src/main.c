@@ -2239,7 +2239,7 @@ if(zero_crosses < 5){
 #ifdef MCU_GDE23
             // converted_degrees = (1.43 - ADC_raw_temp * 3.3 / 4096) * 1000 / 4.3 + 25;
             converted_degrees = ((int32_t)(357.5581395348837f * (1 << 16)) - ADC_raw_temp * (int32_t)(0.18736373546511628f * (1 << 16))) >> 16;
-            adc_software_trigger_enable(ADC_REGULAR_CHANNEL);
+            ADC_CTL1 |= ADC_CTL1_SWRCST; // software trigger the regular group
 #endif
 #ifdef ARTERY            
             adc_ordinary_software_trigger_enable(ADC1, TRUE);

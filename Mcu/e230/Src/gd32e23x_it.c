@@ -74,16 +74,11 @@ void SysTick_Handler(void) { delay_decrement(); }
 void DMA_Channel3_4_IRQHandler(void)
 {
     #ifdef USE_LED_STRIP
-        // Check transfer complete for WS2812
-        if (dma_interrupt_flag_get(LED_DMA_CHANNEL, DMA_INT_FLAG_FTF)) {
-            dma_interrupt_flag_clear(LED_DMA_CHANNEL, DMA_INT_FLAG_G);
-            dma_channel_disable(LED_DMA_CHANNEL);
-            dma_busy = 0;  // Ready for next LED update
-            return;
-        }
-        if (dma_interrupt_flag_get(LED_DMA_CHANNEL, DMA_INT_FLAG_ERR)) {
-            dma_interrupt_flag_clear(LED_DMA_CHANNEL, DMA_INT_FLAG_G);
-            dma_channel_disable(LED_DMA_CHANNEL);
+        // Check transfer complete or error for WS2812
+        if (DMA_INT_FLAG_ACTIVE(LED_DMA_CHANNEL, DMA_INT_FLAG_FTF, DMA_CHXCTL_FTFIE)
+            || DMA_INT_FLAG_ACTIVE(LED_DMA_CHANNEL, DMA_INT_FLAG_ERR, DMA_CHXCTL_ERRIE)) {
+            DMA_INT_FLAG_CLEAR(LED_DMA_CHANNEL, DMA_INT_FLAG_G);
+            DMA_CHCTL(LED_DMA_CHANNEL) &= ~DMA_CHXCTL_CHEN;
             dma_busy = 0;  // Ready for next LED update
             return;
         }
@@ -103,19 +98,19 @@ void DMA_Channel3_4_IRQHandler(void)
         return;
     }
 
-    if (dma_interrupt_flag_get(INPUT_DMA_CHANNEL, DMA_INT_FLAG_HTF)) {
+    if (DMA_INT_FLAG_ACTIVE(INPUT_DMA_CHANNEL, DMA_INT_FLAG_HTF, DMA_CHXCTL_HTFIE)) {
         if (servoPwm) {
             TIMER_CHCTL2(TIMER2) |= (uint32_t)(TIMER_IC_POLARITY_FALLING);
-            dma_interrupt_flag_clear(INPUT_DMA_CHANNEL, DMA_INT_FLAG_HTF);
+            DMA_INT_FLAG_CLEAR(INPUT_DMA_CHANNEL, DMA_INT_FLAG_HTF);
         }
     }
-    if (dma_interrupt_flag_get(INPUT_DMA_CHANNEL, DMA_INT_FLAG_FTF) == 1) {
-        dma_interrupt_flag_clear(INPUT_DMA_CHANNEL, DMA_INT_FLAG_G);
-        dma_channel_disable(INPUT_DMA_CHANNEL);
+    if (DMA_INT_FLAG_ACTIVE(INPUT_DMA_CHANNEL, DMA_INT_FLAG_FTF, DMA_CHXCTL_FTFIE)) {
+        DMA_INT_FLAG_CLEAR(INPUT_DMA_CHANNEL, DMA_INT_FLAG_G);
+        DMA_CHCTL(INPUT_DMA_CHANNEL) &= ~DMA_CHXCTL_CHEN;
         transfercomplete();
         EXTI_SWIEV |= (uint32_t)EXTI_15;
-    } else if (dma_interrupt_flag_get(INPUT_DMA_CHANNEL, DMA_INT_FLAG_ERR) == 1) {
-        dma_interrupt_flag_clear(INPUT_DMA_CHANNEL, DMA_INT_FLAG_G);
+    } else if (DMA_INT_FLAG_ACTIVE(INPUT_DMA_CHANNEL, DMA_INT_FLAG_ERR, DMA_CHXCTL_ERRIE)) {
+        DMA_INT_FLAG_CLEAR(INPUT_DMA_CHANNEL, DMA_INT_FLAG_G);
     }
 }
 
@@ -125,8 +120,8 @@ void DMA_Channel3_4_IRQHandler(void)
  */
 void ADC_CMP_IRQHandler(void)
 {
-    if (exti_interrupt_flag_get(EXTI_21)) {
-        exti_flag_clear(EXTI_21);
+    if (EXTI_PD & (uint32_t)EXTI_21) {
+        EXTI_PD = (uint32_t)EXTI_21;
         interruptRoutine();
     }
 }
@@ -136,7 +131,7 @@ void ADC_CMP_IRQHandler(void)
  */
 void TIMER13_IRQHandler(void)
 {
-    timer_interrupt_flag_clear(TIMER13, TIMER_INT_FLAG_UP);
+    TIMER_INTF(TIMER13) = ~(uint32_t)TIMER_INT_FLAG_UP;
     tenKhzRoutine();
 }
 
@@ -146,12 +141,12 @@ void TIMER13_IRQHandler(void)
 void TIMER15_IRQHandler(void)
 {
     interrupt_time = TIMER_CNT(UTILITY_TIMER);
-    timer_interrupt_flag_clear(TIMER15, TIMER_INT_FLAG_UP);
+    TIMER_INTF(TIMER15) = ~(uint32_t)TIMER_INT_FLAG_UP;
     PeriodElapsedCallback();
     interrupt_time = ((uint16_t)TIMER_CNT(UTILITY_TIMER)) - interrupt_time;
 }
 
-void TIMER14_IRQHandler(void) { timer_flag_clear(TIMER14, TIMER_FLAG_UP); }
+void TIMER14_IRQHandler(void) { TIMER_INTF(TIMER14) = ~(uint32_t)TIMER_FLAG_UP; }
 
 /**
  * @brief This function handles USART1 global interrupt / USART1 wake-up
@@ -166,7 +161,7 @@ void TIMER2_IRQHandler(void)
 
 void EXTI4_15_IRQHandler(void)
 {
-    exti_flag_clear(EXTI_15);
+    EXTI_PD = (uint32_t)EXTI_15;
 
     processDshot();
 }

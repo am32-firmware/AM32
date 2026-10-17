@@ -118,9 +118,11 @@ void SystemInit(void)
     system_clock_config();
 
 #ifdef VECT_TAB_SRAM
-    nvic_vector_table_set(NVIC_VECTTAB_RAM, VECT_TAB_OFFSET);
+    SCB->VTOR = NVIC_VECTTAB_RAM | (VECT_TAB_OFFSET & NVIC_VECTTAB_OFFSET_MASK);
+    __DSB();
 #else
-    nvic_vector_table_set(NVIC_VECTTAB_FLASH, VECT_TAB_OFFSET);
+    SCB->VTOR = NVIC_VECTTAB_FLASH | (VECT_TAB_OFFSET & NVIC_VECTTAB_OFFSET_MASK);
+    __DSB();
 #endif
 }
 

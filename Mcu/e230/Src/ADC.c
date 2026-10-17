@@ -40,67 +40,68 @@ void ADC_DMA_Callback()
 #endif
 }
 
+// same as adc_regular_channel_config() for ranks 0-5 with 55.5 cycle sample time
+static inline void adcRegularChannel(uint32_t rank, uint32_t channel)
+{
+    ADC_RSQ2 = (ADC_RSQ2 & ~(ADC_RSQX_RSQN << (5U * rank))) | (channel << (5U * rank));
+    if (channel < 10U) {
+        ADC_SAMPT1 = (ADC_SAMPT1 & ~(ADC_SAMPTX_SPTN << (3U * channel)))
+            | (ADC_SAMPLETIME_55POINT5 << (3U * channel));
+    } else {
+        ADC_SAMPT0 = (ADC_SAMPT0 & ~(ADC_SAMPTX_SPTN << (3U * (channel - 10U))))
+            | (ADC_SAMPLETIME_55POINT5 << (3U * (channel - 10U)));
+    }
+}
+
 void ADC_Init(void)
 {
-    rcu_periph_clock_enable(RCU_GPIOA);
-    rcu_periph_clock_enable(RCU_ADC);
-    rcu_periph_clock_enable(RCU_DMA);
-    rcu_adc_clock_config(RCU_ADCCK_APB2_DIV6);
+    RCU_CLOCK_ENABLE(RCU_GPIOA);
+    RCU_CLOCK_ENABLE(RCU_ADC);
+    RCU_CLOCK_ENABLE(RCU_DMA);
+    /* ADC clock from APB2 / 6 */
+    RCU_CFG0 = (RCU_CFG0 & ~RCU_CFG0_ADCPSC) | RCU_ADC_CKAPB2_DIV6;
+    RCU_CFG2 = (RCU_CFG2 & ~(RCU_CFG2_IRC28MDIV | RCU_CFG2_ADCPSC2)) | RCU_CFG2_ADCSEL;
 
     /* config the GPIO as analog mode */
-    gpio_mode_set(GPIOA, GPIO_MODE_ANALOG, GPIO_PUPD_NONE,
+    gpioSetMode(GPIOA, GPIO_MODE_ANALOG, GPIO_PUPD_NONE,
         VOLTAGE_ADC_PIN | CURRENT_ADC_PIN);
 
-    dma_parameter_struct dma_data_parameter;
+    /* ADC DMA channel: circular, 3 half words from ADC_RDATA, memory increment, low priority */
+    dmaDeinit(DMA_CH0);
+    DMA_CHPADDR(DMA_CH0) = (uint32_t)(&ADC_RDATA);
+    DMA_CHMADDR(DMA_CH0) = (uint32_t)(&ADCDataDMA);
+    DMA_CHCNT(DMA_CH0) = 3U;
+    DMA_CHCTL(DMA_CH0) = DMA_PERIPHERAL_WIDTH_16BIT | DMA_MEMORY_WIDTH_16BIT | DMA_PRIORITY_LOW
+        | DMA_CHXCTL_MNAGA | DMA_CHXCTL_CMEN;
+    DMA_CHCTL(DMA_CH0) |= DMA_CHXCTL_CHEN;
 
-    /* ADC DMA_channel configuration */
-    dma_deinit(DMA_CH0);
-
-    /* initialize DMA single data mode */
-    dma_data_parameter.periph_addr = (uint32_t)(&ADC_RDATA);
-    dma_data_parameter.periph_inc = DMA_PERIPH_INCREASE_DISABLE;
-    dma_data_parameter.memory_addr = (uint32_t)(&ADCDataDMA);
-    dma_data_parameter.memory_inc = DMA_MEMORY_INCREASE_ENABLE;
-    dma_data_parameter.periph_width = DMA_PERIPHERAL_WIDTH_16BIT;
-    dma_data_parameter.memory_width = DMA_MEMORY_WIDTH_16BIT;
-    dma_data_parameter.direction = DMA_PERIPHERAL_TO_MEMORY;
-    dma_data_parameter.number = 3U;
-    dma_data_parameter.priority = DMA_PRIORITY_LOW;
-    dma_init(DMA_CH0, &dma_data_parameter);
-
-    dma_circulation_enable(DMA_CH0);
-
-    /* enable DMA channel */
-    dma_channel_enable(DMA_CH0);
-
-    adc_special_function_config(ADC_CONTINUOUS_MODE, DISABLE);
-    /* ADC scan function enable */
-    adc_special_function_config(ADC_SCAN_MODE, ENABLE);
-    /* ADC data alignment config */
-    adc_data_alignment_config(ADC_DATAALIGN_RIGHT);
-    /* ADC channel length config */
-    adc_channel_length_config(ADC_REGULAR_CHANNEL, 3U);
-
-    adc_tempsensor_vrefint_enable(); // enable the temp sensor
+    /* single scan of the regular group, right aligned, temp sensor on */
+    ADC_CTL1 &= ~(ADC_CONTINUOUS_MODE | ADC_CTL1_DAL);
+    ADC_CTL0 |= ADC_SCAN_MODE;
+    ADC_RSQ0 = (ADC_RSQ0 & ~ADC_RSQ0_RL) | RSQ0_RL(3U - 1U);
+    ADC_CTL1 |= ADC_CTL1_TSVREN;
 
     /* ADC regular channel config */
-    adc_regular_channel_config(0, VOLTAGE_ADC_CHANNEL, ADC_SAMPLETIME_55POINT5);
-    adc_regular_channel_config(1, CURRENT_ADC_CHANNEL, ADC_SAMPLETIME_55POINT5);
-    adc_regular_channel_config(2, ADC_CHANNEL_16, ADC_SAMPLETIME_55POINT5);
+    adcRegularChannel(0, VOLTAGE_ADC_CHANNEL);
+    adcRegularChannel(1, CURRENT_ADC_CHANNEL);
+    adcRegularChannel(2, ADC_CHANNEL_16);
 
-    /* ADC trigger config */
-    adc_external_trigger_source_config(ADC_REGULAR_CHANNEL,
-        ADC_EXTTRIG_REGULAR_NONE);
-    adc_external_trigger_config(ADC_REGULAR_CHANNEL, ENABLE);
+    /* software trigger for the regular group */
+    ADC_CTL1 = (ADC_CTL1 & ~ADC_CTL1_ETSRC) | ADC_EXTTRIG_REGULAR_NONE | ADC_CTL1_ETERC;
 
     /* enable ADC interface */
-    adc_enable();
+    ADC_CTL1 |= ADC_CTL1_ADCON;
     delayMicros(1000);
     /* ADC calibration and reset calibration */
-    adc_calibration_enable();
+    ADC_CTL1 |= ADC_CTL1_RSTCLB;
+    while (ADC_CTL1 & ADC_CTL1_RSTCLB) {
+    }
+    ADC_CTL1 |= ADC_CTL1_CLB;
+    while (ADC_CTL1 & ADC_CTL1_CLB) {
+    }
 
     /* ADC DMA function enable */
-    adc_dma_mode_enable();
+    ADC_CTL1 |= ADC_CTL1_DMA;
     /* ADC software trigger enable */
-    adc_software_trigger_enable(ADC_REGULAR_CHANNEL);
+    ADC_CTL1 |= ADC_CTL1_SWRCST;
 }

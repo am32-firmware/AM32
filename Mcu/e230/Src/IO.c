@@ -81,16 +81,16 @@ void setInputPolarityRising()
 
 void setInputPullDown()
 {
-    gpio_mode_set(INPUT_PIN_PORT, GPIO_MODE_AF, GPIO_PUPD_PULLDOWN, INPUT_PIN);
+    gpioSetMode(INPUT_PIN_PORT, GPIO_MODE_AF, GPIO_PUPD_PULLDOWN, INPUT_PIN);
 }
 
 void setInputPullUp()
 {
-    gpio_mode_set(INPUT_PIN_PORT, GPIO_MODE_AF, GPIO_PUPD_PULLUP, INPUT_PIN);
+    gpioSetMode(INPUT_PIN_PORT, GPIO_MODE_AF, GPIO_PUPD_PULLUP, INPUT_PIN);
 }
 
 void enableHalfTransferInt() { DMA_CHCTL(INPUT_DMA_CHANNEL) |= DMA_INT_HTF; }
 void setInputPullNone()
 {
-    gpio_mode_set(INPUT_PIN_PORT, GPIO_MODE_AF, GPIO_PUPD_NONE, INPUT_PIN);
+    gpioSetMode(INPUT_PIN_PORT, GPIO_MODE_AF, GPIO_PUPD_NONE, INPUT_PIN);
 }

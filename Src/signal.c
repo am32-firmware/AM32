@@ -139,7 +139,7 @@ void transfercomplete()
 
         if (dshot_telemetry) {
             if (out_put) {
-                make_dshot_package(e_com_time);
+                make_dshot_package(e_com_time > 65535 ? 65535 : e_com_time);
                 computeDshotDMA();
                 receiveDshotDma();
                 return;

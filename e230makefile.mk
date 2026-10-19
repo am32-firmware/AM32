@@ -8,9 +8,9 @@ HAL_FOLDER_$(MCU) := $(HAL_FOLDER)/$(call lc,$(MCU))
 MCU_$(MCU) := -mfloat-abi=soft -mthumb -mcpu=cortex-m23
 LDSCRIPT_$(MCU) := $(wildcard $(HAL_FOLDER_$(MCU))/*.ld)
 
+# only the GD32 headers are used, the standard peripheral library sources are not built
 SRC_BASE_DIR_$(MCU) := \
 	$(HAL_FOLDER_$(MCU))/Drivers/CMSIS/Source \
-	$(HAL_FOLDER_$(MCU))/Drivers/GD32E23x_standard_peripheral/Source \
 	$(HAL_FOLDER_$(MCU))/Startup 
 
 SRC_DIR_$(MCU) := $(SRC_BASE_DIR_$(MCU)) \

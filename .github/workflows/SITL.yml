@@ -26,10 +26,10 @@ jobs:
   sitl-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Check out ESCSim
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: am32-firmware/ESCSim
           ref: ${{ env.ESCSIM_REF }}
@@ -53,7 +53,7 @@ jobs:
 
       - name: Upload SITL log on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sitl-test-log
           path: sitl_test_run/sitl_ci.log
@@ -61,10 +61,10 @@ jobs:
   asan-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Check out ESCSim
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: am32-firmware/ESCSim
           ref: ${{ env.ESCSIM_REF }}
@@ -86,7 +86,7 @@ jobs:
 
       - name: Upload SITL log on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: asan-test-log
           path: sitl_test_run/sitl_ci.log
@@ -94,10 +94,10 @@ jobs:
   ubsan-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Check out ESCSim
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: am32-firmware/ESCSim
           ref: ${{ env.ESCSIM_REF }}
@@ -119,7 +119,7 @@ jobs:
 
       - name: Upload SITL log on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ubsan-test-log
           path: sitl_test_run/sitl_ci.log
@@ -127,10 +127,10 @@ jobs:
   coverage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Check out ESCSim
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: am32-firmware/ESCSim
           ref: ${{ env.ESCSIM_REF }}
@@ -151,7 +151,7 @@ jobs:
 
       - name: Upload HTML coverage report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-report
           path: sitl_test_run/coverage/
@@ -159,10 +159,10 @@ jobs:
   gui-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Check out ESCSim
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: am32-firmware/ESCSim
           ref: ${{ env.ESCSIM_REF }}
@@ -187,7 +187,7 @@ jobs:
 
       - name: Upload SITL log on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: gui-test-log
           path: gui_test_run/sitl_ci.log
@@ -195,10 +195,10 @@ jobs:
   macos-tests:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Check out ESCSim
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: am32-firmware/ESCSim
           ref: ${{ env.ESCSIM_REF }}
@@ -238,7 +238,7 @@ jobs:
 
       - name: Upload SITL log on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sitl-test-log-macos
           path: |
@@ -250,7 +250,7 @@ jobs:
   windows-cross-build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install MinGW-w64
         run: |
@@ -263,7 +263,7 @@ jobs:
           mkdir -p sitl-windows
           cp obj/AM32_AM32_SITL_CAN_*.elf sitl-windows/AM32_SITL_CAN.exe
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: sitl-windows-exe
           path: sitl-windows/AM32_SITL_CAN.exe
@@ -271,7 +271,7 @@ jobs:
   windows-build:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install Cygwin
         uses: cygwin/cygwin-install-action@v4
@@ -318,7 +318,7 @@ jobs:
           cp build/sitl/AM32_SITL_CAN.exe build/sitl/cygwin1.dll sitl-windows/
 
       - name: Upload Windows SITL binary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sitl-windows
           path: sitl-windows/

@@ -59,7 +59,7 @@ uint8_t last_command = 0;
 uint8_t high_pin_count = 0;
 uint32_t gcr[37] = { 0 };
 uint16_t dshot_frametime;
-uint16_t dshot_goodcounts;
+volatile uint16_t dshot_goodcounts;
 uint16_t dshot_badcounts;
 uint8_t dshot_extended_telemetry = 0;
 uint16_t processtime = 0;
@@ -107,6 +107,17 @@ void computeDshotDMA()
             if (dpulse[11] == 1) {
                 send_telemetry = 1;
             }
+#if DRONECAN_SUPPORT
+            /*
+              A fresh CAN RawCommand owns throttle deterministically while
+              DShot remains monitored as a hot standby. When CAN commands
+              time out, the next valid DShot frame takes over without a
+              zero-throttle re-arm cycle.
+             */
+            if (DroneCAN_active()) {
+                return;
+            }
+#endif
             if(programming_mode > 0){  
                 if(programming_mode == 1){ // begin programming mode
                     position = tocheck;    // eepromBuffer position
@@ -143,12 +154,6 @@ void computeDshotDMA()
                 if (EDT_ARM_ENABLE == 1) {
                     EDT_ARMED = 0;
                 }
-#if DRONECAN_SUPPORT
-                if (DroneCAN_active()) {
-                    // allow DroneCAN to override DShot input
-                    return;
-                }
-#endif
                 newinput = 0;
                 dshotcommand = 0;
                 command_count = 0;

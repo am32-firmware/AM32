@@ -285,6 +285,21 @@ void sitl_irq_pend(int irq)
     }
 }
 
+// NVIC_ClearPendingIRQ equivalent: drop a pending but undelivered interrupt
+void sitl_irq_clear(int irq)
+{
+    __atomic_fetch_and(&irq_pending, ~(1U << irq), __ATOMIC_SEQ_CST);
+}
+
+// a handler leaving its flag set re-enters as soon as it returns: pend again
+// without restarting the modelled entry latency
+void sitl_irq_repend(int irq)
+{
+    __atomic_fetch_or(&irq_pending, 1U << irq, __ATOMIC_SEQ_CST);
+    // deliverable at once, and the latency diagnostic measures from now
+    irq_pend_ns[irq] = sim_time_ns_v > sitl_cfg.sim.irq_latency_ns ? sim_time_ns_v - sitl_cfg.sim.irq_latency_ns : 0;
+}
+
 void sitl_primask_set(void)
 {
     // plain atomic store: the dispatcher re-checks primask after parking
@@ -399,9 +414,16 @@ static void run_pending_irqs(void)
             if ((active & (1U << irq)) == 0) {
                 continue;
             }
+            // modelled interrupt entry latency: not deliverable yet
+            if (sitl_cfg.sim.irq_latency_ns && sim_time_ns_v - irq_pend_ns[irq] < sitl_cfg.sim.irq_latency_ns) {
+                continue;
+            }
             if (best < 0 || irq_prio[irq] < irq_prio[best]) {
                 best = irq;
             }
+        }
+        if (best < 0) {
+            return;
         }
         if (irq_prio[best] >= active_irq_prio) {
             // equal or lower priority does not preempt
@@ -461,6 +483,18 @@ static void sitl_dispatch(void)
 {
     if ((irq_pending & irq_enabled) == 0 || primask) {
         return;
+    }
+    if (sitl_cfg.sim.irq_latency_ns) {
+        // nothing deliverable until the modelled entry latency has elapsed
+        bool ready = false;
+        for (int irq = 0; irq < SITL_IRQ_MAX; irq++) {
+            if ((irq_pending & irq_enabled & (1U << irq)) && sim_time_ns_v - irq_pend_ns[irq] >= sitl_cfg.sim.irq_latency_ns) {
+                ready = true;
+            }
+        }
+        if (!ready) {
+            return;
+        }
     }
     if (!suspend_firmware()) {
         return;

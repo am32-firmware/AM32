@@ -20,6 +20,11 @@
 #include "sys_can.h"
 #include <canard.h>
 #include "phaseouts.h"
+#include "comparator.h"
+#include "demag_guard.h"
+
+extern void setInput(void);
+extern char prop_brake_active;
 #include "functions.h"
 #include "filter.h"
 
@@ -280,7 +285,42 @@ static struct uavcan_protocol_NodeStatus node_status;
 
 static bool safe_to_write_settings(void)
 {
-    return !running || newinput == 0;
+    // a flash erase stalls the core for tens of milliseconds: only with the
+    // motor stopped and the command zero
+    return !running && newinput == 0;
+}
+
+// drive inhibit held through a flash write: a stopped motor can still be
+// braking or finishing a commutation, and the loop or an input interrupt
+// would otherwise re-apply the brake meanwhile. Interrupts stay off until
+// flash_write_end(), which re-applies the configured stop state.
+static bool flash_write_begin(void)
+{
+    __disable_irq();
+    if (!safe_to_write_settings()) {
+        // an input could have started the motor since the caller's check
+        __enable_irq();
+        return false;
+    }
+    RELOAD_WATCHDOG_COUNTER(); // the whole watchdog period is available for the write
+    DISABLE_COM_TIMER_INT();
+#ifdef COM_TIMER_CLEAR_PENDING
+    COM_TIMER_CLEAR_PENDING();
+#endif // COM_TIMER_CLEAR_PENDING
+    maskPhaseInterrupts();
+    demag_guard_off();
+    allOff();
+    return true;
+}
+
+static void flash_write_end(void)
+{
+    // the stop state as setInput() applies it for a zero command, without
+    // touching the input decoder; a brake mode just changed by the write
+    // must not keep the old mode's proportional flag
+    prop_brake_active = 0;
+    setInput();
+    __enable_irq();
 }
 
 /*
@@ -581,7 +621,7 @@ static void handle_param_ExecuteOpcode(CanardInstance* ins, CanardRxTransfer* tr
     pkt.ok = false;
 
     if (req.opcode == UAVCAN_PROTOCOL_PARAM_EXECUTEOPCODE_REQUEST_OPCODE_ERASE) {
-        if (!safe_to_write_settings()) {
+        if (!flash_write_begin()) {
 	    can_printf("No erase while running");
 	} else {
 	    can_printf("resetting to defaults");
@@ -590,14 +630,16 @@ static void handle_param_ExecuteOpcode(CanardInstance* ins, CanardRxTransfer* tr
             save_flash_nolib(eepromBuffer.buffer, sizeof(eepromBuffer.buffer), eeprom_address);
             loadEEpromSettings();
             load_settings();
+            flash_write_end();
 	    pkt.ok = true;
 	}
     }
     if (req.opcode == UAVCAN_PROTOCOL_PARAM_EXECUTEOPCODE_REQUEST_OPCODE_SAVE) {
-        if (!safe_to_write_settings()) {
+        if (!flash_write_begin()) {
 	    can_printf("No save while running");
 	} else {
 	    save_settings();
+	    flash_write_end();
 	    pkt.ok = true;
 	}
     }
@@ -674,7 +716,6 @@ static void handle_GetNodeInfo(CanardInstance *ins, CanardRxTransfer *transfer)
 }
 
 extern void transfercomplete();
-extern void setInput();
 
 
 /*
@@ -773,13 +814,12 @@ static void handle_ArmingStatus(CanardInstance *ins, CanardRxTransfer *transfer)
  */
 static void handle_begin_firmware_update(CanardInstance* ins, CanardRxTransfer* transfer)
 {
-    if (!safe_to_write_settings()) {
-        can_printf("No update while running");
-        return;
-    }
-
     struct uavcan_protocol_file_BeginFirmwareUpdateRequest req;
     if (uavcan_protocol_file_BeginFirmwareUpdateRequest_decode(transfer, &req)) {
+        return;
+    }
+    if (!flash_write_begin()) { // nothing drives the bridge from here to the reset
+        can_printf("No update while running");
         return;
     }
 
@@ -1192,6 +1232,46 @@ static void send_FlexDebug(void)
                     CANARD_TRANSFER_PRIORITY_LOW,
                     buffer,
                     len);
+#if DEMAG_GUARD_ENABLED
+    // demag guard counters as a second message, same rate
+    static struct PACKED {
+        uint8_t version;
+        uint32_t valid, predicted, warnings, faults;
+        uint32_t late, late_max, commutation_late, commutation_late_max, switch_delay_max;
+        uint16_t cap;
+        uint8_t level, adv_offset, advance_level, flags;
+        int16_t current;
+        uint32_t desync;
+    } demag;
+    demag.version = 1;
+    demag.valid = demag_valid;
+    demag.predicted = demag_predicted;
+    demag.warnings = demag_warnings;
+    demag.faults = demag_faults;
+    demag.late = demag_late;
+    demag.late_max = demag_late_max;
+    demag.commutation_late = demag_commutation_late;
+    demag.commutation_late_max = demag_commutation_late_max;
+    demag.switch_delay_max = demag_switch_delay_max;
+    demag.cap = demag_cap;
+    demag.level = demag_level;
+    demag.adv_offset = demag_adv_offset;
+    demag.advance_level = demag_advance_level;
+    demag.flags = (demag_guard_loaded() ? 1 : 0) | (demag_active ? 2 : 0) | (demag_guard_compensate() ? 4 : 0) | (demag_latched ? 8 : 0);
+    demag.current = actual_current;
+    demag.desync = desync_happened;
+    pkt.id = DRONECAN_PROTOCOL_FLEXDEBUG_AM32_RESERVE_START+1;
+    pkt.u8.len = sizeof(demag);
+    memcpy(pkt.u8.data, (const uint8_t *)&demag, sizeof(demag));
+    len = dronecan_protocol_FlexDebug_encode(&pkt, buffer);
+    canardBroadcast(&canard,
+                    DRONECAN_PROTOCOL_FLEXDEBUG_SIGNATURE,
+                    DRONECAN_PROTOCOL_FLEXDEBUG_ID,
+                    &transfer_id,
+                    CANARD_TRANSFER_PRIORITY_LOW,
+                    buffer,
+                    len);
+#endif // DEMAG_GUARD_ENABLED
 }
 
 
@@ -1331,9 +1411,10 @@ void DroneCAN_update()
     // quiet long enough, and it is safe to write flash
     if (pending_save.dirty &&
         (millis32() - pending_save.last_change_ms) >= SETTINGS_SAVE_QUIET_MS &&
-        safe_to_write_settings()) {
+        flash_write_begin()) {
         pending_save.dirty = false;
         save_settings();
+        flash_write_end();
     }
 
     if (canstats.last_raw_command_us != 0 && ts - canstats.last_raw_command_us > 250000ULL) {

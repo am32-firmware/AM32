@@ -230,6 +230,7 @@ an settings option)
 #include "signal.h"
 #include "sounds.h"
 #include "targets.h"
+#include "demag_guard.h"
 #include <stdint.h>
 #include <string.h>
 #include <assert.h>
@@ -918,21 +919,28 @@ void commutate()
  */
 void PeriodElapsedCallback()
 {
+    if (demag_guard_timer()) { // sub-sector demag check or deadline, not a commutation
+        return;
+    }
     DISABLE_COM_TIMER_INT(); // disable interrupt
     commutate();
+    demag_guard_switched(); // lateness at the switch, then the deferred demag response
     commutation_interval = ((commutation_interval)+((lastzctime + thiszctime) >> 1))>>1;
-  	if (!eepromBuffer.auto_advance) {
-	  advance = (commutation_interval * temp_advance) >> 6; // 60 divde 64 0.9375 degree increments
-	} else {
-	  advance = (commutation_interval * auto_advance_level) >> 6; // 60 divde 64 0.9375 degree increments
-    }
+    // 60 divde 64 0.9375 degree increments, demag guard may add a bounded offset
+    advance = (commutation_interval * demag_guard_advance(eepromBuffer.auto_advance ? auto_advance_level : temp_advance)) >> 6;
     waitTime = (commutation_interval >> 1) - advance;
+#if DEMAG_GUARD_ENABLED // comparator delay compensation belongs to the guard; without it the timing is unchanged
+    if (COMP_DELAY_TICKS && demag_guard_compensate()) { // keep comparator compensation through a loaded recovery
+        waitTime -= waitTime > COMP_DELAY_TICKS + 4 ? COMP_DELAY_TICKS : (waitTime > 4 ? waitTime - 4 : 0);
+    }
+#endif // DEMAG_GUARD_ENABLED
     if (!old_routine) {
         enableCompInterrupts(); // enable comp interrupt
     }
     if (zero_crosses < 10000) {
         zero_crosses++;
     }
+    demag_guard_commutated();
 }
 
 /*
@@ -969,6 +977,7 @@ void interruptRoutine()
     thiszctime = INTERVAL_TIMER_COUNT;  
     SET_INTERVAL_TIMER_COUNT(0);
     SET_AND_ENABLE_COM_INT(waitTime+1); // enable COM_TIMER interrupt
+    demag_guard_zc();
     __enable_irq();
 }
 
@@ -1205,6 +1214,8 @@ if (!stepper_sine && armed) {
         if (input >= 47 + (80 * eepromBuffer.use_sine_start)) {
             if (running == 0) {
                 allOff();
+                SET_DUTY_CYCLE_ALL(0); // not the last brake compare for the first commutation:
+                generatePwmTimerEvent(); // the compares are preloaded, so make the zeros active now, outputs still off
                 if (!old_routine) {
                     startMotor();
                 }
@@ -1352,6 +1363,7 @@ if (!stepper_sine && armed) {
 
 void tenKhzRoutine()
 { // 20khz as of 2.00 to be renamed
+    demag_guard_housekeeping();
     duty_cycle = duty_cycle_setpoint;
     tenkhzcounter++;
     ledcounter++;
@@ -1509,6 +1521,8 @@ void tenKhzRoutine()
              duty_cycle = last_duty_cycle;
             }
 
+        duty_cycle = demag_guard_duty(duty_cycle);
+        char brake_compare = 0; // a brake compare is not motoring duty: outside the demag cap
         if ((armed && running) && input > 47) {
           if(zero_throttle_brake_active){
             zero_throttle_brake_active = 0;
@@ -1541,10 +1555,12 @@ void tenKhzRoutine()
           } else{  // input less than 47 and not running, normal brake on stop behavior
             if (prop_brake_active) {
               adjusted_duty_cycle =  tim1_arr - ((prop_brake_duty_cycle * tim1_arr) / 2000);
+              brake_compare = 1;
             } else {
               if((eepromBuffer.brake_on_stop == 2) && armed){  // require arming for active brake
                 comStep(2);
                 adjusted_duty_cycle = DEAD_TIME + ((eepromBuffer.active_brake_power * tim1_arr) / 2000)* 10;
+                brake_compare = 1;
             }else{
                 adjusted_duty_cycle = ((duty_cycle * tim1_arr) / 2000);
             }
@@ -1552,8 +1568,14 @@ void tenKhzRoutine()
           }
         }
         last_duty_cycle = duty_cycle;
+        demag_guard_pwm_period(tim1_arr); // a shorter period lowers the demag cap scale before the write
         SET_AUTO_RELOAD_PWM(tim1_arr);
+#if DEMAG_GUARD_ENABLED
+        demag_guard_pwm_commit(adjusted_duty_cycle, brake_compare); // the compare write, bounded by the demag cap unless braking
+#else
+        (void)brake_compare;
         SET_DUTY_CYCLE_ALL(adjusted_duty_cycle);
+#endif // DEMAG_GUARD_ENABLED
     }
 #endif // ndef brushed_mode
 #if defined(FIXED_DUTY_MODE) || defined(FIXED_SPEED_MODE)
@@ -1618,18 +1640,23 @@ void advanceincrement()
             phase_C_position = 359;
         }
     }
+    uint16_t compare[3];
+    uint32_t waveform_peak; // the table's maximum (360) through the same arithmetic
 #ifdef GIMBAL_MODE
-    setPWMCompare1(((2 * pwmSin[phase_A_position]) + gate_drive_offset) * TIMER1_MAX_ARR / 2000);
-    setPWMCompare2(((2 * pwmSin[phase_B_position]) + gate_drive_offset) * TIMER1_MAX_ARR / 2000);
-    setPWMCompare3(((2 * pwmSin[phase_C_position]) + gate_drive_offset) * TIMER1_MAX_ARR / 2000);
+    compare[0] = ((2 * pwmSin[phase_A_position]) + gate_drive_offset) * TIMER1_MAX_ARR / 2000;
+    compare[1] = ((2 * pwmSin[phase_B_position]) + gate_drive_offset) * TIMER1_MAX_ARR / 2000;
+    compare[2] = ((2 * pwmSin[phase_C_position]) + gate_drive_offset) * TIMER1_MAX_ARR / 2000;
+    waveform_peak = ((2 * 360) + gate_drive_offset) * TIMER1_MAX_ARR / 2000;
 #else
-    setPWMCompare1(
-        (((2 * pwmSin[phase_A_position] / SINE_DIVIDER) + gate_drive_offset) * TIMER1_MAX_ARR / 2000) * eepromBuffer.sine_mode_power / 10);
-    setPWMCompare2(
-        (((2 * pwmSin[phase_B_position] / SINE_DIVIDER) + gate_drive_offset) * TIMER1_MAX_ARR / 2000) * eepromBuffer.sine_mode_power / 10);
-    setPWMCompare3(
-        (((2 * pwmSin[phase_C_position] / SINE_DIVIDER) + gate_drive_offset) * TIMER1_MAX_ARR / 2000) * eepromBuffer.sine_mode_power / 10);
+    compare[0] = (((2 * pwmSin[phase_A_position] / SINE_DIVIDER) + gate_drive_offset) * TIMER1_MAX_ARR / 2000) * eepromBuffer.sine_mode_power / 10;
+    compare[1] = (((2 * pwmSin[phase_B_position] / SINE_DIVIDER) + gate_drive_offset) * TIMER1_MAX_ARR / 2000) * eepromBuffer.sine_mode_power / 10;
+    compare[2] = (((2 * pwmSin[phase_C_position] / SINE_DIVIDER) + gate_drive_offset) * TIMER1_MAX_ARR / 2000) * eepromBuffer.sine_mode_power / 10;
+    waveform_peak = (((2 * 360 / SINE_DIVIDER) + gate_drive_offset) * TIMER1_MAX_ARR / 2000) * eepromBuffer.sine_mode_power / 10;
 #endif
+    demag_guard_bound_sine(compare, waveform_peak); // a retained demag cap derates the three together
+    setPWMCompare1(compare[0]);
+    setPWMCompare2(compare[1]);
+    setPWMCompare3(compare[2]);
 }
 
 void zcfoundroutine()
@@ -2069,8 +2096,9 @@ if(zero_crosses < 5){
         }
 #endif
         average_interval = e_com_time / 3;
-        if (desync_check && zero_crosses > 10) {
-            if ((getAbsDif(last_average_interval, average_interval) > average_interval >> 1) && (average_interval < 2000)) { // throttle resitricted before zc 20.
+        if (demag_desync_pending() || (desync_check && zero_crosses > 10)) {
+            if (demag_desync_pending() || ((getAbsDif(last_average_interval, average_interval) > average_interval >> 1) && (average_interval < 2000))) { // throttle resitricted before zc 20.
+                demag_desync_clear();
                 zero_crosses = 0;
                 desync_happened++;
                 if ((!eepromBuffer.bi_direction && (input > 47)) || commutation_interval > 1000) {
@@ -2132,6 +2160,7 @@ if(zero_crosses < 5){
 #ifdef NO_VOLTAGE_SENSE
           ADC_raw_volts = 0;
 #endif          
+          demag_guard_current_sample();
 #if defined(STMICRO)
             LL_ADC_REG_StartConversion(ADC1);
 #ifdef USE_ADC_1_2

@@ -498,7 +498,7 @@ void MX_TIM16_Init(void)
   TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
   TIM_InitStruct.RepetitionCounter = 0;
   LL_TIM_Init(TIM16, &TIM_InitStruct);
-  LL_TIM_EnableARRPreload(TIM16);
+  LL_TIM_DisableARRPreload(TIM16);
 
 }
 

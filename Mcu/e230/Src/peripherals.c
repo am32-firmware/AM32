@@ -222,7 +222,7 @@ void TIMER15_Init(void)
     rcu_periph_clock_enable(RCU_TIMER15);
     TIMER_CAR(TIMER15) = 0xFFFF;
     TIMER_PSC(TIMER15) = 35;
-    timer_auto_reload_shadow_enable(TIMER15);
+    timer_auto_reload_shadow_disable(TIMER15);
     timer_enable(TIMER15);
 
     NVIC_SetPriority(TIMER15_IRQn, 1);

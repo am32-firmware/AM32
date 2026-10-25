@@ -310,7 +310,7 @@ void MX_TIM14_Init(void)
     TIM14->ARR = 4000;
     NVIC_SetPriority(TIM14_IRQn, 0);
     NVIC_EnableIRQ(TIM14_IRQn);
-    LL_TIM_EnableARRPreload(TIM14);
+    LL_TIM_DisableARRPreload(TIM14);
 }
 
 void MX_TIM16_Init(void)

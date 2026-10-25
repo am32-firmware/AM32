@@ -572,7 +572,7 @@ volatile uint16_t waitTime = 0;
 
 // demag protection: COM_TIMER is armed as a zero cross watchdog after each commutation
 #define DEMAG_NONE 0
-#define DEMAG_COASTING 1      // no zero cross by expected commutation, all phases off
+#define DEMAG_COASTING 1      // one blind step taken, all phases off while waiting for zero cross
 #define DEMAG_RECOVERY_START 2 // zero cross found while coasting, commutating at 30 degrees
 #define DEMAG_RECOVERY_STEP 3  // first step after recovery, reduced power and 30 degree timing
 volatile uint8_t demag_watch = 0; // set when the pending COM_TIMER interrupt is the watchdog
@@ -628,6 +628,7 @@ void loadEEpromSettings()
       eepromBuffer.reserved_eeprom_3[0] = 0; //15-16  for crsf input
       eepromBuffer.reserved_eeprom_3[1] = 0;
     }
+    eepromBuffer.demag_comp = 1;
     if (eepromBuffer.demag_comp > 4) { // blank or out of range, demag protection off
       eepromBuffer.demag_comp = 0;
     }
@@ -906,7 +907,7 @@ void commutate()
     rising = !rising;
 #endif
     __disable_irq(); // don't let dshot interrupt
-    if (!prop_brake_active) {
+    if (!prop_brake_active && demag_state != DEMAG_COASTING) {
         comStep(step);
     }
     __enable_irq();
@@ -939,12 +940,15 @@ void PeriodElapsedCallback()
     if (demag_watch) { // watchdog expired, no zero cross by the expected commutation time
         demag_watch = 0;
         if (running && !old_routine) {
-            allOff(); // coast with all 6 fets off, comparator stays enabled on the same step
+            maskPhaseInterrupts();
+            allOff();
             demag_state = DEMAG_COASTING;
+            commutate(); // advance once without power and watch the next phase
+            enableCompInterrupts();
         } else {
             demag_state = DEMAG_NONE;
         }
-        return;
+        return; // stay coasting until a zero cross; do not arm another blind step
     }
     if (demag_state == DEMAG_RECOVERY_START) { // set reduced power before the next step is energized
         demag_state = DEMAG_RECOVERY_STEP;
@@ -1007,7 +1011,7 @@ void interruptRoutine()
     __disable_irq();
     maskPhaseInterrupts();
     lastzctime = thiszctime;
-    thiszctime = INTERVAL_TIMER_COUNT;  
+    thiszctime = INTERVAL_TIMER_COUNT;
     SET_INTERVAL_TIMER_COUNT(0);
     demag_watch = 0;
     if (demag_state == DEMAG_COASTING) { // zero cross found while coasting, commutate now at 30 degrees

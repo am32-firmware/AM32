@@ -969,9 +969,19 @@ void PeriodElapsedCallback()
     waitTime = (commutation_interval >> 1) - advance;
     if (!old_routine) {
         if (eepromBuffer.demag_comp) {
-            // arm zero cross watchdog for the next expected commutation, a zero cross re-arms COM_TIMER first
+            // Allow 2 intervals during recovery, otherwise 1.25; a zero cross re-arms COM_TIMER first.
+            uint32_t timeout;
+            if (demag_state == DEMAG_RECOVERY_STEP) {
+                timeout = commutation_interval * 2;
+            } else {
+                timeout = commutation_interval + (commutation_interval >> 2);
+            }
             demag_watch = 1;
-            SET_AND_ENABLE_COM_INT(commutation_interval > 0xFFFF ? 0xFFFF : commutation_interval);
+            if (timeout > 0xFFFF) {
+                SET_AND_ENABLE_COM_INT(0xFFFF);
+            } else {
+                SET_AND_ENABLE_COM_INT(timeout);
+            }
         }
         enableCompInterrupts(); // enable comp interrupt
     }
@@ -1015,6 +1025,7 @@ void interruptRoutine()
     SET_INTERVAL_TIMER_COUNT(0);
     demag_watch = 0;
     if (demag_state == DEMAG_COASTING) { // zero cross found while coasting, commutate now at 30 degrees
+        thiszctime >>= 1; // one missed crossing: measured span covers two sectors
         demag_state = DEMAG_RECOVERY_START;
         SET_AND_ENABLE_COM_INT(1);
     } else {

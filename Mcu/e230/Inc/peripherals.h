@@ -18,6 +18,7 @@
     (TIMER_DMAINTEN(COM_TIMER) &= (~(uint32_t)TIMER_INT_UP))
 #define ENABLE_COM_TIMER_INT() \
     (TIMER_DMAINTEN(COM_TIMER) |= (uint32_t)TIMER_INT_UP)
+#define COM_TIMER_CLEAR_PENDING() NVIC_ClearPendingIRQ(TIMER15_IRQn)
 #define SET_AND_ENABLE_COM_INT(time)                        \
     (TIMER_CNT(COM_TIMER) = 0, TIMER_CAR(COM_TIMER) = time, \
         TIMER_INTF(COM_TIMER) = 0x00,                       \

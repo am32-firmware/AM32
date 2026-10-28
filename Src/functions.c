@@ -144,7 +144,7 @@ void gpio_mode_set(gpio_type* gpio_periph, uint32_t mode, uint32_t pull_up_down,
 void gpio_mode_QUICK(gpio_type* gpio_periph, uint32_t mode,
     uint32_t pull_up_down, uint32_t pin)
 {
-    __disable_irq();
+    const uint32_t irq_state = irq_save();
     gpio_init_type gpio_init_struct;
     gpio_default_para_init(&gpio_init_struct);
 
@@ -157,6 +157,6 @@ void gpio_mode_QUICK(gpio_type* gpio_periph, uint32_t mode,
 
     gpio_init(gpio_periph, &gpio_init_struct);
 
-    __enable_irq();
+    irq_restore(irq_state);
 }
 #endif

@@ -6188,3 +6188,15 @@
 #ifndef POLLING_MODE_THRESHOLD
 #define POLLING_MODE_THRESHOLD 2000
 #endif
+
+/* Bluejay-style demag compensation (Src/demag_comp.c): requires a PWM-phase
+ * cut that comStep() restores. PWM_ENABLE_BRIDGE has no such cut/restore
+ * path; blind timing alone is insufficient. A target may override it, but
+ * enabling it on these bridges still provides no demag power cut. */
+#ifndef DEMAG_COMP_ENABLED
+#if (defined(MCU_L431) || defined(MCU_G431) || defined(MCU_G071) || defined(MCU_SITL)) && !defined(BRUSHED_MODE) && !defined(PWM_ENABLE_BRIDGE)
+#define DEMAG_COMP_ENABLED 1
+#else
+#define DEMAG_COMP_ENABLED 0
+#endif // MCUs with a demag compensation port
+#endif // DEMAG_COMP_ENABLED

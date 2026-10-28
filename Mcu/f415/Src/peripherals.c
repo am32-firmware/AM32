@@ -218,7 +218,7 @@ void TIM11_Init(void)
     crm_periph_clock_enable(CRM_TMR11_PERIPH_CLOCK, TRUE);
     TMR11->pr = 500;
     TMR11->div = 75;
-    TMR11->ctrl1_bit.prben = TRUE;
+    TMR11->ctrl1_bit.prben = FALSE;
 
     NVIC_SetPriority(TMR1_TRG_HALL_TMR11_IRQn, 0);
     NVIC_EnableIRQ(TMR1_TRG_HALL_TMR11_IRQn);

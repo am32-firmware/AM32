@@ -569,6 +569,15 @@ volatile uint16_t duty_cycle = 0;
 char step = 1;
 volatile uint32_t commutation_interval = 12500;
 volatile uint16_t waitTime = 0;
+
+// demag protection: COM_TIMER is armed as a zero cross watchdog after each commutation
+#define DEMAG_NONE 0
+#define DEMAG_COASTING 1      // one blind step taken, all phases off while waiting for zero cross
+#define DEMAG_RECOVERY_START 2 // zero cross found while coasting, commutating at 30 degrees
+#define DEMAG_RECOVERY_STEP 3  // first step after recovery, reduced power and 30 degree timing
+volatile uint8_t demag_watch = 0; // set when the pending COM_TIMER interrupt is the watchdog
+volatile uint8_t demag_state = DEMAG_NONE;
+uint8_t demag_cut_shift = 16; // power cut is duty >> shift, set from eepromBuffer.demag_comp
 uint16_t signaltimeout = 0;
 uint8_t ubAnalogWatchdogStatus = RESET;
 
@@ -615,9 +624,17 @@ void loadEEpromSettings()
       eepromBuffer.current_D = 100; // 0-255
       eepromBuffer.active_brake_power = 0; // 1-5 percent duty cycle
       eepromBuffer.brake_on_zero_throttle = 0;
-      eepromBuffer.reserved_eeprom_3[0] = 0; //14-16  for crsf input
+      eepromBuffer.demag_comp = 0; // 14
+      eepromBuffer.reserved_eeprom_3[0] = 0; //15-16  for crsf input
       eepromBuffer.reserved_eeprom_3[1] = 0;
-      eepromBuffer.reserved_eeprom_3[2] = 0;
+    }
+    if (eepromBuffer.demag_comp > 4) { // blank or out of range, demag protection off
+      eepromBuffer.demag_comp = 0;
+    }
+    if (eepromBuffer.demag_comp > 1) {
+      demag_cut_shift = 7 - eepromBuffer.demag_comp; // 2 = 1/32, 3 = 1/16, 4 = 1/8
+    } else {
+      demag_cut_shift = 16; // 1 = coast only, duty >> 16 is no power cut
     }
     if(eepromBuffer.brake_on_zero_throttle > 9){ // byte 13 held a firmware name character (0x30 or similar) before eeprom version 4
       eepromBuffer.brake_on_zero_throttle = 0;
@@ -889,7 +906,7 @@ void commutate()
     rising = !rising;
 #endif
     __disable_irq(); // don't let dshot interrupt
-    if (!prop_brake_active) {
+    if (!prop_brake_active && demag_state != DEMAG_COASTING) {
         comStep(step);
     }
     __enable_irq();
@@ -919,15 +936,52 @@ void commutate()
 void PeriodElapsedCallback()
 {
     DISABLE_COM_TIMER_INT(); // disable interrupt
+    if (demag_watch) { // watchdog expired, no zero cross by the expected commutation time
+        demag_watch = 0;
+        if (running && !old_routine) {
+            maskPhaseInterrupts();
+            allOff();
+            demag_state = DEMAG_COASTING;
+            commutate(); // advance once without power and watch the next phase
+            enableCompInterrupts();
+        } else {
+            demag_state = DEMAG_NONE;
+        }
+        return; // stay coasting until a zero cross; do not arm another blind step
+    }
+    if (demag_state == DEMAG_RECOVERY_START) { // set reduced power before the next step is energized
+        demag_state = DEMAG_RECOVERY_STEP;
+        SET_DUTY_CYCLE_ALL(adjusted_duty_cycle - (adjusted_duty_cycle >> demag_cut_shift));
+    } else if (demag_state == DEMAG_RECOVERY_STEP) {
+        demag_state = DEMAG_NONE;
+        SET_DUTY_CYCLE_ALL(adjusted_duty_cycle);
+    }
     commutate();
     commutation_interval = ((commutation_interval)+((lastzctime + thiszctime) >> 1))>>1;
-  	if (!eepromBuffer.auto_advance) {
+    if (demag_state == DEMAG_RECOVERY_STEP) {
+      advance = commutation_interval >> 1; // 30 degrees
+    } else if (!eepromBuffer.auto_advance) {
 	  advance = (commutation_interval * temp_advance) >> 6; // 60 divde 64 0.9375 degree increments
 	} else {
 	  advance = (commutation_interval * auto_advance_level) >> 6; // 60 divde 64 0.9375 degree increments
     }
     waitTime = (commutation_interval >> 1) - advance;
     if (!old_routine) {
+        if (eepromBuffer.demag_comp) {
+            // Allow 2 intervals during recovery, otherwise 1.25; a zero cross re-arms COM_TIMER first.
+            uint32_t timeout;
+            if (demag_state == DEMAG_RECOVERY_STEP) {
+                timeout = commutation_interval * 2;
+            } else {
+                timeout = commutation_interval + (commutation_interval >> 2);
+            }
+            demag_watch = 1;
+            if (timeout > 0xFFFF) {
+                SET_AND_ENABLE_COM_INT(0xFFFF);
+            } else {
+                SET_AND_ENABLE_COM_INT(timeout);
+            }
+        }
         enableCompInterrupts(); // enable comp interrupt
     }
     if (zero_crosses < 10000) {
@@ -966,14 +1020,23 @@ void interruptRoutine()
     __disable_irq();
     maskPhaseInterrupts();
     lastzctime = thiszctime;
-    thiszctime = INTERVAL_TIMER_COUNT;  
+    thiszctime = INTERVAL_TIMER_COUNT;
     SET_INTERVAL_TIMER_COUNT(0);
-    SET_AND_ENABLE_COM_INT(waitTime+1); // enable COM_TIMER interrupt
+    demag_watch = 0;
+    if (demag_state == DEMAG_COASTING) { // zero cross found while coasting, commutate now at 30 degrees
+        thiszctime >>= 1; // one missed crossing: measured span covers two sectors
+        demag_state = DEMAG_RECOVERY_START;
+        SET_AND_ENABLE_COM_INT(1);
+    } else {
+        SET_AND_ENABLE_COM_INT(waitTime+1); // enable COM_TIMER interrupt
+    }
     __enable_irq();
 }
 
 void startMotor()
 {
+    demag_watch = 0;
+    demag_state = DEMAG_NONE;
     if (running == 0) {
         commutate();
         commutation_interval = 10000;
@@ -1553,7 +1616,11 @@ void tenKhzRoutine()
         }
         last_duty_cycle = duty_cycle;
         SET_AUTO_RELOAD_PWM(tim1_arr);
-        SET_DUTY_CYCLE_ALL(adjusted_duty_cycle);
+        if (demag_state == DEMAG_RECOVERY_STEP) { // hold reduced power for the step after demag recovery
+            SET_DUTY_CYCLE_ALL(adjusted_duty_cycle - (adjusted_duty_cycle >> demag_cut_shift));
+        } else {
+            SET_DUTY_CYCLE_ALL(adjusted_duty_cycle);
+        }
     }
 #endif // ndef brushed_mode
 #if defined(FIXED_DUTY_MODE) || defined(FIXED_SPEED_MODE)
@@ -1634,6 +1701,9 @@ void advanceincrement()
 
 void zcfoundroutine()
 { // only used in polling mode, blocking routine.
+    DISABLE_COM_TIMER_INT(); // cancel any pending demag watchdog, polling commutates directly
+    demag_watch = 0;
+    demag_state = DEMAG_NONE;
     thiszctime = INTERVAL_TIMER_COUNT;
     SET_INTERVAL_TIMER_COUNT(0);
     commutation_interval = (thiszctime + (3 * commutation_interval)) / 4;

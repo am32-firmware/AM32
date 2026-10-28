@@ -7,6 +7,9 @@
 #include "phaseouts.h"
 #include "common.h"
 #include "targets.h"
+#include "demag_guard.h"
+
+extern volatile char rising;
 
 extern char prop_brake_active;
 
@@ -360,3 +363,11 @@ void twoChannelReverse()
     phaseBPWM();
     phaseCLOW();
 }
+
+#if DEMAG_GUARD_ENABLED
+bool demag_comparator_pending(void)
+{
+    return (EXTI->PR1 & EXTI_LINE) != 0;
+}
+
+#endif // DEMAG_GUARD_ENABLED

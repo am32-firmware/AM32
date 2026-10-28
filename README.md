@@ -45,7 +45,7 @@ Target compatibility List can be found [here](https://github.com/am32-firmware/A
 
 ## Installation & Bootloader
 
-To use AM32 firmware on a blank ESC, a bootloader must first be installed using an ST-LINK, GD-LINK , CMIS-DAP or AT-LINK.  THe bootloader will be dependant on the MCU used ont he esc . Choose the bootloader that matches the MCU type and signal input pin of the ESC.
+To use AM32 firmware on a blank ESC, a bootloader must first be installed using an ST-LINK, GD-LINK , CMIS-DAP or AT-LINK.  THe bootloader will be dependant on the MCU used on the esc. Choose the bootloader that matches the MCU type and signal input pin of the ESC.
 The compatibility chart has the bootloader pinouts listed.
 Current bootloaders can be found [here](https://github.com/am32-firmware/AM32-bootloader).
 

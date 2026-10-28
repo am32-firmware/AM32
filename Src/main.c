@@ -628,7 +628,6 @@ void loadEEpromSettings()
       eepromBuffer.reserved_eeprom_3[0] = 0; //15-16  for crsf input
       eepromBuffer.reserved_eeprom_3[1] = 0;
     }
-    eepromBuffer.demag_comp = 1;
     if (eepromBuffer.demag_comp > 4) { // blank or out of range, demag protection off
       eepromBuffer.demag_comp = 0;
     }

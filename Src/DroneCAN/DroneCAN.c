@@ -206,6 +206,8 @@ static const struct parameter {
         { "CAN_TERM_ENABLE",        T_BOOL,  0, 1,   0, &eepromBuffer.can.term_enable},
 #endif
         { "STARTUP_TUNE",           T_STRING,0, 4,   0, &eepromBuffer.tune},
+        // 0 = off, 1 = coast only, 2/3/4 = 1/32, 1/16, 1/8 recovery power cut
+        { "DEMAG_COMP",             T_UINT8, 0, 4,   0, &eepromBuffer.demag_comp},
 };
 
 /*

@@ -25,6 +25,9 @@ static int16_t getLMT87Degrees(uint16_t adc_raw);
 #ifdef USE_NTC
 static int16_t getNTCDegrees(uint16_t ntcrawtemp);
 #endif
+#ifdef USE_MCP9700
+int16_t getMCP9700Degrees(uint16_t adcrawtemp);
+#endif
  extern uint16_t ADC_raw_temp;
  extern uint16_t ADC_raw_volts;
  extern uint16_t ADC_raw_current;
@@ -481,6 +484,8 @@ int16_t convertTemperature(uint16_t adcrawtemp)
     return getLMT87Degrees(adcrawtemp);
   #elif defined(USE_NTC)
     return getNTCDegrees(adcrawtemp);
+  #elif defined(USE_MCP9700)
+    return getMCP9700Degrees(adcrawtemp);
   #else
     return 0;
   #endif
@@ -594,5 +599,29 @@ static int16_t getNTCDegrees(uint16_t ntcrawtemp){
   p1 = NTC_table[ (ntcrawtemp >> 6)  ];
   p2 = NTC_table[ (ntcrawtemp >> 6)+1];
   return p1 - ( (p1-p2) * (ntcrawtemp & 0x003F) ) / 64;
+}
+#endif
+
+#ifdef USE_MCP9700
+#define NUMERATOR_FIXED_POINT_APPROX 165
+#define BITWISE_RSHIFT_2048 11
+#define TEMPERATURE_COEFFICIENT_PLUS_CALIBRATED_OFFSET  52
+int16_t getMCP9700Degrees(uint16_t adcrawtemp)
+{
+  // MCP9700 temperature sensor:
+    // VOUT = 500 mV + (10 mV/°C * Temperature)
+    //
+    // Calibrated VOUT at 0°C = 520 mV
+    // ADC resolution = 12-bit (0-4095), VREF = 3300 mV
+    //
+    // Temperature (°C) = (ADC_raw * 3300 / 4095) - 520
+    //
+    // Fixed-point approximation:
+    // 330 / 4095 ≈ 165 / 2048
+    // Division by 2048 is replaced with an 11-bit right shift.
+    //
+    // Uses integer arithmetic to avoid floating-point operations.
+    // Returns temperature in whole degrees Celsius (truncated)
+    return (int16_t)((((int32_t)adcrawtemp * NUMERATOR_FIXED_POINT_APPROX) >> BITWISE_RSHIFT_2048) - TEMPERATURE_COEFFICIENT_PLUS_CALIBRATED_OFFSET);
 }
 #endif

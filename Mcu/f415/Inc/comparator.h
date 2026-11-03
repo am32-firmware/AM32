@@ -20,5 +20,5 @@ void changeCompInput();
 void enableCompInterrupts();
 uint8_t getCompOutputLevel();
 
-extern char rising;
+extern volatile char rising;
 extern char step;

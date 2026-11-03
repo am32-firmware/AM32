@@ -39,7 +39,7 @@ _Min_Stack_Size = 0x400 ;	/* required amount of stack */
 
 MEMORY
 {
-  RAM          (xrw) : ORIGIN = 0x20000000, LENGTH = 36K
+  RAM          (xrw) : ORIGIN = 0x20000000, LENGTH = 16K
   FLASH_VECTAB  (rx)  : ORIGIN = 0x08001000, LENGTH = 192
   FLASH         (rx)  : ORIGIN = ORIGIN(FLASH_VECTAB) + LENGTH(FLASH_VECTAB), LENGTH = 62K - 32 - LENGTH(FLASH_VECTAB)
   EEPROM        (rx)  : ORIGIN = 0x0800F800, LENGTH = 2K

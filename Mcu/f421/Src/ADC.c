@@ -84,7 +84,7 @@ void ADC_Init(void)
 
     adc_base_default_para_init(&adc_base_struct);
     adc_base_struct.sequence_mode = TRUE;
-    adc_base_struct.repeat_mode = TRUE;
+    adc_base_struct.repeat_mode = FALSE;
     adc_base_struct.data_align = ADC_RIGHT_ALIGNMENT;
 #ifdef USE_NTC
     adc_base_struct.ordinary_channel_length = 5;

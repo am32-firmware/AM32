@@ -15,7 +15,7 @@
 
 char ic_timer_prescaler = CPU_FREQUENCY_MHZ / 5 - 2;
 uint32_t dma_buffer[64] = { 0 };
-char out_put = 0;
+volatile char out_put = 0;
 uint8_t buffer_padding = 0;
 uint8_t buffer_size = 32;
 uint16_t change_time = 0;

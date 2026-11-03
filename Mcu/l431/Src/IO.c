@@ -13,9 +13,9 @@
 #include "serial_telemetry.h"
 #include "targets.h"
 
-char ic_timer_prescaler = (CPU_FREQUENCY_MHZ / 4);
+char ic_timer_prescaler = (CPU_FREQUENCY_MHZ / 6);
 uint32_t dma_buffer[64] = { 0 };
-char out_put = 0;
+volatile char out_put = 0;
 uint8_t buffer_padding = 0;
 
 void receiveDshotDma()

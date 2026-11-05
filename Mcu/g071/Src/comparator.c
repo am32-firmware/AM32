@@ -30,14 +30,26 @@ void maskPhaseInterrupts()
 
 void enableCompInterrupts() { EXTI->IMR1 |= current_EXTI_LINE; }
 
+static void setCompSpeed(uint32_t mode)
+{
+#ifdef N_VARIANT
+    // both comparators take turns; a per-sector switch on only the active
+    // one left the other in the old mode
+    LL_COMP_SetPowerMode(COMP1, mode);
+    LL_COMP_SetPowerMode(COMP2, mode);
+#else
+    LL_COMP_SetPowerMode(active_COMP, mode);
+#endif // N_VARIANT
+}
+
 void changeCompInput()
 {
 if((average_interval < 400) && medium_speed_set){
-LL_COMP_SetPowerMode(active_COMP, LL_COMP_POWERMODE_HIGHSPEED);
+setCompSpeed(LL_COMP_POWERMODE_HIGHSPEED);
 medium_speed_set = 0;
 }
 if((average_interval > 600) && !medium_speed_set){
-LL_COMP_SetPowerMode(active_COMP, LL_COMP_POWERMODE_MEDIUMSPEED);
+setCompSpeed(LL_COMP_POWERMODE_MEDIUMSPEED);
 medium_speed_set = 1;
 }
     if (step == 1 || step == 4) { // c floating

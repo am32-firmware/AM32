@@ -1602,6 +1602,21 @@
 #define THREE_CELL_MAX
 #endif
 
+#ifdef  TBS_MINI3D_F421
+#define FIRMWARE_NAME           "TBS Mini3d"
+#define FILE_NAME                "TBS_MINI3D_F421"
+#define DEAD_TIME               120
+#define HARDWARE_GROUP_AT_045
+#define HARDWARE_GROUP_AT_B
+#define USE_INVERTED_HIGH
+#define TARGET_MIN_BEMF_COUNTS 3
+#define NO_POLLING_STARTUP
+#define USE_STARTUP_BOOST
+#define THREE_CELL_MAX
+#define RAMP_SPEED_LOW_RPM 8
+#define RAMP_SPEED_HIGH_RPM 16
+#endif
+
 #ifdef TBS_12S_F421
 #define FIRMWARE_NAME "TBS 12S"
 #define FILE_NAME "TBS_12S_F421"

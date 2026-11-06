@@ -80,6 +80,8 @@ void sitl_nvic_set_priority(int irq, uint32_t prio);
 void sitl_nvic_enable_irq(int irq);
 void sitl_nvic_disable_irq(int irq);
 void sitl_irq_pend(int irq);
+void sitl_irq_clear(int irq);
+void sitl_irq_repend(int irq);
 void sitl_exec_bootloader(const char* cause) __attribute__((noreturn));
 void sitl_reset_with_cause(const char* cause) __attribute__((noreturn));
 void sitl_primask_set(void); // __disable_irq

@@ -12,6 +12,7 @@
  */
 
 #include "sitl.h"
+#include "../sim/sitl_config.h"
 #include <stdio.h>
 
 static SITL_TIM_TypeDef tims[SITL_NUM_TIMS];
@@ -88,6 +89,9 @@ bool sitl_tim1_pwm_out(int chan, uint64_t now_ns)
  */
 uint32_t sitl_tim1_dead_time_ns(void)
 {
+    if (sitl_cfg.sim.dead_time_ns) {
+        return sitl_cfg.sim.dead_time_ns; // the modelled board's dead time
+    }
     static uint32_t last_bdtr = 0xffffffff;
     static uint32_t dead_ns;
     const uint32_t bdtr = tims[SITL_TIM1_IDX].BDTR;
@@ -164,7 +168,9 @@ uint32_t sitl_interval_timer_count(void)
     } else {
         sitl_fw_read_tick();
     }
-    return tim2.cnt_base + interval_ticks_since(sitl_time_ns(), tim2.base_ns);
+    const uint32_t cnt = tim2.cnt_base + interval_ticks_since(sitl_time_ns(), tim2.base_ns);
+    // most ports run this timer with a 16-bit reload
+    return sitl_cfg.sim.interval_timer_bits == 16 ? (cnt & 0xffffU) : cnt;
 }
 
 void sitl_interval_timer_set(uint32_t cnt)

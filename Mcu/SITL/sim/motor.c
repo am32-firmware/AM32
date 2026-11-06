@@ -80,6 +80,7 @@ static struct {
     // current both-off window
     bool pwm_last[3];
     uint64_t dead_until[3];
+    uint8_t mode_last[3]; // for dead time on forced-state transitions
     // driven set of the previous step, for commutation detection
     bool driven_last[3];
     // last terminal voltages for the state stream
@@ -394,16 +395,23 @@ void motor_step(uint64_t now_ns, uint32_t dt_ns)
     bool hi[3], lo[3];
     for (int p = 0; p < 3; p++) {
         const bool pwm = sitl_tim1_pwm_out(p, now_ns);
-        switch (sitl_phase_mode[p]) {
+        const uint8_t mode = sitl_phase_mode[p];
+        if (mode != m.mode_last[p]) {
+            // a forced output-compare state change passes through the dead
+            // time generator like a PWM edge; any other driven-to-driven
+            // transition gets the same both-off window
+            const bool was_driven = m.mode_last[p] != SITL_PHASE_FLOAT;
+            if (was_driven && mode != SITL_PHASE_FLOAT) {
+                m.dead_until[p] = now_ns + dead_ns;
+            }
+            m.mode_last[p] = mode;
+            m.pwm_last[p] = pwm;
+        }
+        switch (mode) {
         case SITL_PHASE_PWM:
             if (pwm != m.pwm_last[p]) {
                 m.pwm_last[p] = pwm;
                 m.dead_until[p] = now_ns + dead_ns;
-            }
-            if (now_ns < m.dead_until[p]) {
-                hi[p] = false;
-                lo[p] = false;
-                break;
             }
             hi[p] = pwm;
             lo[p] = !pwm;
@@ -426,9 +434,12 @@ void motor_step(uint64_t now_ns, uint32_t dt_ns)
             lo[p] = false;
             break;
         }
-        if (sitl_phase_mode[p] != SITL_PHASE_PWM) {
+        if (mode != SITL_PHASE_PWM) {
             m.pwm_last[p] = pwm;
-            m.dead_until[p] = 0;
+        }
+        if (mode != SITL_PHASE_FLOAT && now_ns < m.dead_until[p]) {
+            hi[p] = false;
+            lo[p] = false;
         }
     }
 
@@ -829,7 +840,99 @@ void motor_step(uint64_t now_ns, uint32_t dt_ns)
     // floating phase terminal
     const double v_neutral = m.vn_cmp;
     const double v_float = m.v_cmp[sitl_comp_phase];
-    double diff_mv = (v_neutral - v_float) * 1000.0;
+    double diff_mv = (v_neutral - v_float) * 1000.0 + sitl_cfg.sim.comparator_offset_mv;
+    if (sitl_cfg.sim.comparator_pwm_glitch_mv > 0) {
+        // switching edges of the driven legs couple into the divider and
+        // neutral networks unequally on a real board; model that as a pulse
+        // on the comparator difference, signed by the edge direction
+        static double glitch_mv;
+        static bool hi_last[3];
+        for (int p = 0; p < 3; p++) {
+            if (hi[p] != hi_last[p]) {
+                hi_last[p] = hi[p];
+                glitch_mv += (hi[p] ? 1.0 : -1.0) * sitl_cfg.sim.comparator_pwm_glitch_mv;
+            }
+        }
+        double a = (double)dt_ns / (double)(sitl_cfg.sim.comparator_pwm_glitch_ns ? sitl_cfg.sim.comparator_pwm_glitch_ns : 1);
+        if (a > 1) {
+            a = 1;
+        }
+        glitch_mv -= a * glitch_mv;
+        diff_mv += glitch_mv;
+    }
+    if (sitl_cfg.sim.comparator_ring_mv > 0) {
+        // each driven-leg edge also starts a damped oscillation at the
+        // comparator input (the divider and neutral networks ringing), signed
+        // by the edge direction; near the crossing it toggles the comparator
+        // several times per edge, as the bench capture shows
+        static double ring_a;
+        static uint64_t ring_t0_ns;
+        static bool ring_last[3];
+        for (int p = 0; p < 3; p++) {
+            if (hi[p] != ring_last[p]) {
+                ring_last[p] = hi[p];
+                ring_a = (hi[p] ? 1.0 : -1.0) * sitl_cfg.sim.comparator_ring_mv;
+                ring_t0_ns = now_ns;
+            }
+        }
+        if (ring_a != 0.0) {
+            const double ts = (double)(now_ns - ring_t0_ns);
+            const double env = exp(-ts / (double)(sitl_cfg.sim.comparator_ring_tau_ns ? sitl_cfg.sim.comparator_ring_tau_ns : 1));
+            if (env < 1e-3) {
+                ring_a = 0.0;
+            } else {
+                diff_mv += ring_a * env * cos(TWO_PI * (double)sitl_cfg.sim.comparator_ring_hz * ts * 1e-9);
+            }
+        }
+    }
+    if (sitl_cfg.sim.comparator_on_ramp_mv_per_us > 0 || sitl_cfg.sim.comparator_off_lobe_mv > 0) {
+        // bench capture (TBS 12S L431, unloaded): the comparator reads the
+        // floating phase below the neutral in two unipolar excursions per
+        // PWM period, a ramp through the high-side on-time and a lobe some
+        // microseconds after the turn-off, so the stock path accepts the
+        // falling-sector crossing early and the interval alternates
+        static bool ex_hi_last[3];
+        static uint64_t on_t0_ns, off_t0_ns;
+        static int on_leg = -1;
+        for (int p = 0; p < 3; p++) {
+            if (hi[p] != ex_hi_last[p]) {
+                ex_hi_last[p] = hi[p];
+                if (hi[p]) {
+                    on_leg = p;
+                    on_t0_ns = now_ns;
+                } else {
+                    on_leg = -1;
+                    off_t0_ns = now_ns;
+                }
+            }
+        }
+        if (on_leg >= 0 && sitl_cfg.sim.comparator_on_ramp_mv_per_us > 0
+            && now_ns > on_t0_ns + sitl_cfg.sim.comparator_on_ramp_delay_ns) {
+            double ramp = sitl_cfg.sim.comparator_on_ramp_mv_per_us
+                * (double)(now_ns - on_t0_ns - sitl_cfg.sim.comparator_on_ramp_delay_ns) * 1e-3;
+            if (sitl_cfg.sim.comparator_on_ramp_max_mv > 0 && ramp > sitl_cfg.sim.comparator_on_ramp_max_mv) {
+                ramp = sitl_cfg.sim.comparator_on_ramp_max_mv;
+            }
+            diff_mv += ramp;
+        }
+        if (off_t0_ns && sitl_cfg.sim.comparator_off_lobe_mv > 0) {
+            const int64_t t = (int64_t)(now_ns - off_t0_ns) - (int64_t)sitl_cfg.sim.comparator_off_lobe_delay_ns;
+            const double w = sitl_cfg.sim.comparator_off_lobe_width_ns ? (double)sitl_cfg.sim.comparator_off_lobe_width_ns : 1.0;
+            if (t >= 0 && (double)t < w) {
+                double amp = sitl_cfg.sim.comparator_off_lobe_mv;
+                if (sitl_cfg.sim.comparator_off_lobe_ref_rpm) {
+                    double rpm = fabs(m.omega) * 60.0 / TWO_PI;
+                    if (rpm < 100.0) {
+                        rpm = 100.0;
+                    }
+                    amp *= pow((double)sitl_cfg.sim.comparator_off_lobe_ref_rpm / rpm, (double)sitl_cfg.sim.comparator_off_lobe_rpm_exp);
+                }
+                diff_mv += amp * sin(M_PI * (double)t / w);
+            } else if (t < 0 && (double)-t < w / 4.0) {
+                diff_mv -= sitl_cfg.sim.comparator_off_notch_mv * sin(M_PI * (double)-t / (w / 4.0));
+            }
+        }
+    }
     if (sitl_cfg.sim.comparator_noise_mv > 0) {
         const double r = (double)rand_r(&m.rand_seed) / RAND_MAX - 0.5;
         const double white = r * 2.0 * sitl_cfg.sim.comparator_noise_mv;

@@ -2493,6 +2493,8 @@ if(zero_crosses < 5){
                 }
                 if (input < 137) { // sine wave stepper
                     if (do_once_sinemode) {
+                        // a cancelled changeover leaves the sine timer running, stop it so it restarts below
+                        stopSineTimer();
                         // disable commutation interrupt in case set
                         DISABLE_COM_TIMER_INT();
                         maskPhaseInterrupts();

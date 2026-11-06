@@ -24,7 +24,7 @@ include $(ROOT)/make/tools.mk
 
 # supported MCU types
 
-MCU_TYPES := E230 F031 F051 F415 F421 G071 L431 G431 V203 G031 A153
+MCU_TYPES := E230 F031 F051 F415 F421 G071 L431 G431 V203 G031 A153 SITL
 
 MCU_TYPE := NONE
 
@@ -69,6 +69,7 @@ $(foreach MCU,$(MCU_TYPES),$(eval SVD_$(MCU) := $(wildcard $(HAL_FOLDER_$(MCU))/
 
 .PHONY : clean all binary $(foreach MCU,$(MCU_TYPES),$(call lc,$(MCU)))
 ALL_TARGETS := $(foreach MCU,$(MCU_TYPES),$(TARGETS_$(MCU)))
+.PHONY: $(ALL_TARGETS) targets arm_sdk_install
 all : $(ALL_TARGETS)
 
 # create targets for compiling one mcu type, eg "make f421"
@@ -86,7 +87,8 @@ clean :
 define CREATE_BUILD_TARGET
 $(2)_BASENAME = $(BIN_DIR)/$(IDENTIFIER)_$(2)_$(FIRMWARE_VERSION)
 
-$(2) : $$($(2)_BASENAME).bin
+# native (SITL) targets build to an executable elf, no bin/hex conversion
+$(2) : $$($(2)_BASENAME).$(if $(NATIVE_$(1)),elf,bin)
 
 # get MCU specific compiler, objcopy and link script or use the ARM SDK one
 $(eval xCC := $(if $($(MCU)_CC), $($(MCU)_CC), $(CC)))
@@ -106,23 +108,36 @@ $(eval xLDSCRIPT := $$(if $$(call has_can_suffix,$$(2)),$(LDSCRIPT_CAN_$(1)),$(L
 $(eval xCFLAGS := $$(if $$(call has_can_suffix,$$(2)),$(CFLAGS_CAN_$(1))))
 $(eval xSRC := $$(if $$(call has_can_suffix,$$(2)),$(SRC_CAN_$(1))))
 
-CFLAGS_$(2) = -DAM32_MCU=\"$(MCU)\" $(MCU_$(1)) -D$(2) $(CFLAGS_$(1)) $(CFLAGS_COMMON) $(xCFLAGS)
-LDFLAGS_$(2) = $(LDFLAGS_COMMON) $(LDFLAGS_$(1)) -T$(xLDSCRIPT)
+# allow an MCU type to override the common compiler/linker flags (used by SITL
+# for a native build) and to have no linker script
+$(eval xCFLAGS_COMMON := $(if $(CFLAGS_COMMON_$(1)),$(CFLAGS_COMMON_$(1)),$(CFLAGS_COMMON)))
+$(eval xLDFLAGS_COMMON := $(if $(LDFLAGS_COMMON_$(1)),$(LDFLAGS_COMMON_$(1)),$(LDFLAGS_COMMON)))
+
+CFLAGS_$(2) = -DAM32_MCU=\"$(MCU)\" $(MCU_$(1)) -D$(2) $(CFLAGS_$(1)) $(xCFLAGS_COMMON) $(xCFLAGS)
+LDFLAGS_$(2) = $(xLDFLAGS_COMMON) $(LDFLAGS_$(1)) $(if $(xLDSCRIPT),-T$(xLDSCRIPT))
 
 -include $$($(2)_BASENAME).d
 
 $$($(2)_BASENAME).elf: $(SRC_COMMON) $$(SRC_$(1)) $(xSRC)
 	@$(ECHO) Compiling $$(notdir $$@)
 	$(QUIET)$(MKDIR) -p $(OBJ)
-	$(QUIET)$(xCC) $$(CFLAGS_$(2)) $$(LDFLAGS_$(2)) -MMD -MP -MF $$(@:.elf=.d) -o $$(@) $(SRC_COMMON) $$(SRC_$(1)) $(xSRC)
+	$(QUIET)$(xCC) $$(CFLAGS_$(2)) $$(LDFLAGS_$(2)) -MMD -MP -MF $$(@:.elf=.d) -o $$(@) $(SRC_COMMON) $$(SRC_$(1)) $(xSRC) $(LDLIBS_$(1))
 # we copy debug.elf to give us a constant debug target for vscode
 # this means the debug button will always debug the last target built
-	$(QUIET)$(CP) -f $$(SVD_$(1)) $(OBJ)/debug.svd
+	$(if $(SVD_$(1)),$(QUIET)$(CP) -f $$(SVD_$(1)) $(OBJ)/debug.svd)
 # also copy the openocd.cfg from the MCU directory to obj/openocd.cfg for auto config of Cortex-Debug
 # in vscode
-	$(QUIET)$(CP) -f Mcu$(DSEP)$(call lc,$(1))$(DSEP)openocd.cfg $(OBJ)$(DSEP)openocd.cfg > $(NUL)
+	$(if $(NATIVE_$(1)),,$(QUIET)$(CP) -f Mcu$(DSEP)$(call lc,$(1))$(DSEP)openocd.cfg $(OBJ)$(DSEP)openocd.cfg > $(NUL))
 endef
-$(foreach MCU,$(MCU_TYPES),$(foreach TARGET,$(TARGETS_$(MCU)), $(eval $(call CREATE_BUILD_TARGET,$(MCU),$(TARGET)))))
+
+# The Windows board workflow uses native Make and the ARM SDK. Keep SITL
+# selectable there too, with its host compiler supplied by the Cygwin setup.
+# A database query or dry run only lists the command; it never starts a build.
+define CREATE_WINDOWS_SITL_TARGET
+$(2):
+	@powershell.exe -NoProfile -ExecutionPolicy Bypass -File env_setup_scripts/sitl_windows.ps1 -Action Build
+endef
+$(foreach MCU,$(MCU_TYPES),$(foreach TARGET,$(TARGETS_$(MCU)), $(eval $(call $(if $(and $(WIN_CMD_FLOW),$(NATIVE_$(MCU))),CREATE_WINDOWS_SITL_TARGET,CREATE_BUILD_TARGET),$(MCU),$(TARGET)))))
 
 # include the targets for installing tools
 include $(ROOT)/make/tools_install.mk
@@ -132,4 +147,3 @@ include $(ROOT)/make/tools_install.mk
 targets:
 	$(QUIET)echo List of targets. To build a target use 'make TARGETNAME'
 	$(QUIET)echo $(ALL_TARGETS)
-

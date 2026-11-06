@@ -1,0 +1,18 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "AM32 SITL: Build for Run",
+            "type": "process",
+            "command": "bash",
+            "args": ["${workspaceFolder}/env_setup_scripts/sitl_build.sh"],
+            "windows": {
+                "command": "powershell.exe",
+                "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/env_setup_scripts/sitl_windows.ps1", "-Action", "Build"]
+            },
+            "options": { "cwd": "${workspaceFolder}" },
+            "problemMatcher": [{ "base": "$gcc", "fileLocation": ["relative", "${workspaceFolder}"] }],
+            "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+        }
+    ]
+}

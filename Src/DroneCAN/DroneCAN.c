@@ -10,10 +10,10 @@
 
 #include "peripherals.h"
 #include "serial_telemetry.h"
-#include <common.h>
-#include <signal.h>
-#include <version.h>
-#include <eeprom.h>
+#include "common.h"
+#include "signal.h"
+#include "version.h"
+#include "eeprom.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
@@ -60,7 +60,7 @@ const struct {
     uint32_t crc2; // crc32 from end of app_signature to end of fw
     char mcu[16];
     uint32_t unused[2];
-} app_signature __attribute__((section(".app_signature"))) = {
+} app_signature AM32_FLASH_SECTION(".app_signature") = {
         .magic1 = APP_SIGNATURE_MAGIC1,
         .magic2 = APP_SIGNATURE_MAGIC2,
         .fwlen = 0,
@@ -90,6 +90,13 @@ static struct PACKED {
     uint16_t rxframe_error;
     int32_t  rx_ecode;
     uint8_t auto_advance_level;
+    // version 2 fields
+    uint16_t duty_cycle;         // demanded duty, 0..2000
+    uint16_t duty_cycle_maximum; // low-rpm/temperature duty clamp
+    uint16_t adjusted_input;     // input after mode mapping, 0..2047
+    uint16_t adc_raw_current;    // current sense ADC counts
+    uint16_t adc_raw_volts;      // voltage sense ADC counts
+    uint8_t flags;               // bit0 armed, bit1 running, bit2 stepper_sine
 } debug1;
 
 static void can_printf(const char *fmt, ...);
@@ -108,8 +115,15 @@ extern volatile uint32_t commutation_interval;
 extern uint8_t auto_advance_level;
 extern uint16_t low_cell_volt_cutoff;
 extern uint32_t desync_happened;
+extern volatile uint16_t duty_cycle;
+extern uint16_t duty_cycle_maximum;
+extern uint16_t adjusted_input;
+extern uint16_t ADC_raw_current;
+extern uint16_t ADC_raw_volts;
+extern char stepper_sine;
 
 static uint16_t last_can_input;
+static uint64_t last_heartbeat_us;
 static struct {
     uint32_t sum;
     uint32_t count;
@@ -118,6 +132,7 @@ static struct {
 extern void saveEEpromSettings(void);
 extern void loadEEpromSettings(void);
 static void set_input(uint16_t input);
+static uint32_t millis32(void);
 
 /*
   the set of parameters to present to the user over DroneCAN
@@ -155,19 +170,36 @@ static const struct parameter {
         { "PWM_FREQUENCY",          T_UINT8, 8, 144, 24, &eepromBuffer.pwm_frequency},
         { "MAX_RAMP",               T_UINT8, 1, 200, 160, &eepromBuffer.max_ramp},
         { "MIN_DUTY_CYCLE",         T_UINT8, 0, 50,  4, &eepromBuffer.minimum_duty_cycle},
-        { "USE_SIN_START",          T_BOOL,  0, 1,   0, &eepromBuffer.use_sine_start},
         { "COMP_PWM",               T_BOOL,  0, 1,   1, &eepromBuffer.comp_pwm},
-        { "STUCK_ROTOR_PROTECTION", T_BOOL,  0, 1,   1, &eepromBuffer.stuck_rotor_protection},
         { "ADVANCE_LEVEL",          T_UINT8, 0, 30,  26, &eepromBuffer.advance_level},
         { "AUTO_ADVANCE",           T_BOOL,  0, 1,   0, &eepromBuffer.auto_advance},
-        { "STARTUP_POWER",          T_UINT8, 50,150, 10, &eepromBuffer.startup_power},
-        { "CURRENT_LIMIT",          T_UINT8, 0, 200, 0, &eepromBuffer.limits.current},
-        { "TEMPERATURE_LIMIT",      T_UINT8, 70,255, 255,&eepromBuffer.limits.temperature},
-        { "LOW_VOLTAGE_CUTOFF",     T_BOOL,  0, 1,   0,  &eepromBuffer.low_voltage_cut_off},
+        { "STARTUP_POWER",          T_UINT8, 50,150, 100, &eepromBuffer.startup_power},
+        { "STALL_PROTECTION",       T_UINT8, 0, 3,   0, &eepromBuffer.stall_protection},
+        { "STUCK_ROTOR_PROTECTION", T_BOOL,  0, 1,   1, &eepromBuffer.stuck_rotor_protection},
+        { "DISABLE_STICK_CALIBRATION", T_BOOL,  0, 1,   0, &eepromBuffer.disable_stick_calibration},
+        { "SERVO_LOW_THRESHOLD",    T_UINT8, 0, 250, 128, &eepromBuffer.servo.low_threshold},
+        { "SERVO_HIGH_THRESHOLD",   T_UINT8, 0, 250, 128, &eepromBuffer.servo.high_threshold},
+        { "SERVO_NEUTRAL",          T_UINT8, 0, 250, 128, &eepromBuffer.servo.neutral},
+        { "SERVO_DEAD_BAND",        T_UINT8, 0, 250, 50, &eepromBuffer.servo.dead_band},
+        { "LOW_VOLTAGE_CUTOFF",     T_UINT8, 0, 2,   0,  &eepromBuffer.low_voltage_cut_off},
         { "CELL_VOLTAGE_THRESHOLD", T_UINT16, 250, 350, 300, &low_cell_volt_cutoff},
-        { "BRAKE_ON_STOP",          T_BOOL,  0, 1,   1, &eepromBuffer.brake_on_stop},
+        { "ABSOLUTE_VOLTAGE_CUTOFF",   T_UINT8, 1, 100, 10, &eepromBuffer.absolute_voltage_cutoff},
+        { "CURRENT_LIMIT",          T_UINT8, 0, 200, 0, &eepromBuffer.limits.current},
+        { "CURRENT_P",              T_UINT8, 0, 510, 200, &eepromBuffer.current_P},
+        { "CURRENT_I",              T_UINT8, 0, 255, 0, &eepromBuffer.current_I},
+        { "CURRENT_D",              T_UINT8, 0, 510, 100, &eepromBuffer.current_D},
+        { "TEMPERATURE_LIMIT",      T_UINT8, 70,255, 255,&eepromBuffer.limits.temperature},
+        { "BRAKE_ON_STOP",          T_UINT8, 0, 2,   0, &eepromBuffer.brake_on_stop},
+        { "BRAKE_ON_ZERO_THROTTLE", T_UINT8, 0, 9,   0, &eepromBuffer.brake_on_zero_throttle},
         { "DRIVING_BRAKE_STRENGTH", T_UINT8, 1, 10,  10, &eepromBuffer.driving_brake_strength},
         { "DRAG_BRAKE_STRENGTH",    T_UINT8, 1, 10,  10, &eepromBuffer.drag_brake_strength},
+        { "ACTIVE_BRAKE_POWER",     T_UINT8, 0, 5,   2, &eepromBuffer.active_brake_power},
+        { "RC_CAR_REVERSE",         T_BOOL,  0, 1,   0, &eepromBuffer.rc_car_reverse},
+        { "USE_SIN_START",          T_BOOL,  0, 1,   0, &eepromBuffer.use_sine_start},
+        { "SINE_MODE_CHANGEOVER_THROTTLE", T_UINT8, 5, 25, 15, &eepromBuffer.sine_mode_changeover_thottle_level},
+        { "SINE_MODE_POWER",        T_UINT8, 1, 10,  6, &eepromBuffer.sine_mode_power},
+        { "USE_HALL_SENSORS",       T_BOOL,  0, 1,   0, &eepromBuffer.use_hall_sensors},
+        { "SERIAL_TELEM_INTERVAL",  T_UINT8, 0, 255, 0, &eepromBuffer.telemetry_on_interval},
         { "INPUT_SIGNAL_TYPE",      T_UINT8, 0, 5,   5, &eepromBuffer.input_type},
         { "INPUT_FILTER_HZ",        T_UINT8, 0, 100, 0, &eepromBuffer.can.filter_hz},
 #ifdef CAN_TERM_PIN
@@ -196,7 +228,7 @@ static void load_settings(void)
             case T_BOOL:
             case T_UINT8: {
                 uint8_t *pvalue = (uint8_t *)p->ptr;
-                uint8_t max_value = p->max_value;
+                uint16_t max_value = p->max_value;
                 if (pvalue == &eepromBuffer.limits.current) {
                     max_value = max_value / 2;
                 }
@@ -222,6 +254,23 @@ static void save_settings(void)
 {
     saveEEpromSettings();
     can_printf("saved settings");
+}
+
+/*
+  pending deferred save state. Param sets only mark settings dirty;
+  the main DroneCAN_update loop coalesces bursts into a single flash
+  write once the bus has been quiet for SETTINGS_SAVE_QUIET_MS.
+ */
+#define SETTINGS_SAVE_QUIET_MS 500
+static struct {
+    bool dirty;
+    uint32_t last_change_ms;
+} pending_save;
+
+static void mark_settings_dirty(void)
+{
+    pending_save.dirty = true;
+    pending_save.last_change_ms = millis32();
 }
 
 /*
@@ -256,6 +305,11 @@ static uint64_t micros64(void)
 {
     static uint64_t base_us;
     static uint16_t last_cnt;
+    // the static state must be updated atomically, this is called from
+    // both interrupt handlers and the main loop. Save and restore
+    // PRIMASK so a caller's critical section is not ended early
+    const uint32_t primask = __get_PRIMASK();
+    __disable_irq();
 #ifdef ARTERY
     uint16_t cnt = UTILITY_TIMER->cval;
 #else
@@ -265,7 +319,11 @@ static uint64_t micros64(void)
 	base_us += 0x10000;
     }
     last_cnt = cnt;
-    return base_us + cnt;
+    const uint64_t ret = base_us + cnt;
+    if (!primask) {
+        __enable_irq();
+    }
+    return ret;
 }
 
 /*
@@ -281,10 +339,20 @@ static uint32_t millis32(void)
   update to 2.19 default 
  */
 static const uint8_t default_settings[] = {
-    0x01, 0x03, 0x01, 0x01, 0x23, 0xa0, 0x04, 0x00, 0x0a, 0x64, 0x00, 0x32, 0x02, 0x30, 0x35, 0x31,
+    0x01, 0x03, 0x01, 0x01, 0x23, 0xa0, 0x04, 0x00, 0x0a, 0x64, 0x00, 0x32, 0x02, 0x00, 0x35, 0x31,
     0x20, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x1a, 0x18, 0x64, 0x37, 0x0e, 0x00, 0x00, 0x05, 0x00,
     0x80, 0x80, 0x80, 0x32, 0x00, 0x32, 0x00, 0x00, 0x0f, 0x0a, 0x0a, 0x8d, 0x66, 0x06, 0x01, 0x00
 };
+
+#ifdef MCU_SITL
+// let the SITL eeprom emulation seed a missing eeprom file with defaults
+const uint8_t* DroneCAN_default_settings(unsigned* len);
+const uint8_t* DroneCAN_default_settings(unsigned* len)
+{
+    *len = sizeof(default_settings);
+    return default_settings;
+}
+#endif
 
 static const uint8_t advance_level_v3_remap[] = {
   0x00, 0x08, 0x10, 0x16 // old values 0-3 map to new values 0,8,16,22 
@@ -346,7 +414,9 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
 	switch (p->vtype) {
             case T_UINT8: {
                 uint8_t *ptr8 = (uint8_t *)p->ptr;
-                if (ptr8 == &eepromBuffer.limits.current) {
+                if (ptr8 == &eepromBuffer.limits.current ||
+                    ptr8 == &eepromBuffer.current_P ||
+                    ptr8 == &eepromBuffer.current_D) {
                     *ptr8 = req.value.integer_value / 2;
                 } else {
                     *ptr8 = req.value.integer_value;
@@ -395,6 +465,11 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
             armed = 0;
             set_input(0);
         }
+
+        // mark settings dirty; the actual flash write is deferred and
+        // coalesced in DroneCAN_update so a burst of param sets does
+        // not block the CAN stack with repeated slow flash writes
+        mark_settings_dirty();
     }
 
     /*
@@ -421,13 +496,15 @@ static void handle_param_GetSet(CanardInstance* ins, CanardRxTransfer* transfer)
             pkt.min_value.integer_value = p->min_value;
 
             // special case scaling
-            if ((uint8_t *)p->ptr == &eepromBuffer.limits.current) {
+            if ((uint8_t *)p->ptr == &eepromBuffer.limits.current ||
+                (uint8_t *)p->ptr == &eepromBuffer.current_P ||
+                (uint8_t *)p->ptr == &eepromBuffer.current_D) {
                 pkt.default_value.integer_value *= 2;
                 pkt.value.integer_value *= 2;
             }
             if ((uint8_t *)p->ptr == &eepromBuffer.advance_level) {
               // automatically remap old values
-              if (pkt.value.integer_value < sizeof(advance_level_v3_remap)) {
+              if ((uint64_t)pkt.value.integer_value < sizeof(advance_level_v3_remap)) {
                 pkt.value.integer_value = advance_level_v3_remap[pkt.value.integer_value];
               }
               // adjust for advance level offset for eeprom v3
@@ -1080,7 +1157,7 @@ static void send_FlexDebug(void)
     /*
       popupate debug1
      */
-    debug1.version = 1;
+    debug1.version = 2;
     debug1.commutation_interval = commutation_interval;
     debug1.auto_advance_level = auto_advance_level;
     debug1.num_commands = canstats.total_commands - last.total_commands;
@@ -1088,6 +1165,12 @@ static void send_FlexDebug(void)
     debug1.rx_errors = canstats.rx_errors;
     debug1.rxframe_error = canstats.rxframe_error;
     debug1.rx_ecode = canstats.rx_ecode;
+    debug1.duty_cycle = duty_cycle;
+    debug1.duty_cycle_maximum = duty_cycle_maximum;
+    debug1.adjusted_input = adjusted_input;
+    debug1.adc_raw_current = ADC_raw_current;
+    debug1.adc_raw_volts = ADC_raw_volts;
+    debug1.flags = (armed ? 1 : 0) | (running ? 2 : 0) | (stepper_sine ? 4 : 0);
 
     last.num_input = canstats.num_input;
     last.total_commands = canstats.total_commands;
@@ -1187,6 +1270,9 @@ static void DroneCAN_Startup(void)
         NVIC_DisableIRQ(DMA1_Channel6_IRQn);
         NVIC_DisableIRQ(EXINT15_10_IRQn);
         EXINT->inten &= ~EXINT_LINE_15;
+#elif defined(MCU_SITL)
+        NVIC_DisableIRQ(SITL_IRQ_DMA);
+        NVIC_DisableIRQ(SITL_IRQ_EXTI15);
 #else
         #error "unsupported MCU"
 #endif
@@ -1241,17 +1327,40 @@ void DroneCAN_update()
 
     DroneCAN_processTxQueue();
 
+    // perform a deferred settings save once the param bus has been
+    // quiet long enough, and it is safe to write flash
+    if (pending_save.dirty &&
+        (millis32() - pending_save.last_change_ms) >= SETTINGS_SAVE_QUIET_MS &&
+        safe_to_write_settings()) {
+        pending_save.dirty = false;
+        save_settings();
+    }
+
     if (canstats.last_raw_command_us != 0 && ts - canstats.last_raw_command_us > 250000ULL) {
         /*
-          we have stopped getting CAN RawCommand, zero input
+          we have stopped getting CAN RawCommand, zero input.
+
+          The input filter has to be forced to zero as well, not just
+          fed a zero sample: this is the only zero the failsafe gets
+          (the 1kHz re-injection below is disabled once
+          last_raw_command_us is cleared), and one sample through a
+          slow filter leaves nearly all of the previous throttle
+          applied - with INPUT_FILTER_HZ=10 over 99% of it. The motor
+          would keep running at the last commanded throttle for as
+          long as any other accepted DroneCAN transfer kept the main
+          loop's signal watchdog fed.
          */
         canstats.last_raw_command_us = 0;
+        Filter2P_reset(0);
         set_input(0);
     }
-    if (ts - canstats.last_raw_command_us > TARGET_PERIOD_US) {
-        // ensure at least 1kHz signal is seen by main code
+    if (canstats.last_raw_command_us != 0 && ts - last_heartbeat_us > TARGET_PERIOD_US) {
+        /*
+          ensure at least 1kHz signal is seen by main code, but only
+          once we have received a RawCommand
+         */
         set_input(last_can_input);
-        canstats.last_raw_command_us = ts;
+        last_heartbeat_us = ts;
     }
 
     sys_can_enable_IRQ();

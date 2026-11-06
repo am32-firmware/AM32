@@ -820,7 +820,6 @@ void loadEEpromSettings()
             high_rpm_level = 0;
         }
     }
-    reverse_speed_threshold = map(motor_kv, 300, 3000, 1000, 500);
     if (eepromBuffer.bi_direction){
       polling_mode_changeover = POLLING_MODE_THRESHOLD / 2;
     }else{
@@ -2131,7 +2130,7 @@ if(zero_crosses < 5){
                 bemf_timeout_happened = 0;
             }
         } else {
-            if (adjusted_input < 150) { // startup duty cycle should be low enough to not burn motor
+            if (adjusted_input < 300) { // startup duty cycle should be low enough to not burn motor
                 bemf_timeout = 100;
             } else {
                 bemf_timeout = 10;

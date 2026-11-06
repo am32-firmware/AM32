@@ -470,6 +470,11 @@
               <FilePath>..\Src\main.c</FilePath>
             </File>
             <File>
+              <FileName>demag_comp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\demag_comp.c</FilePath>
+            </File>
+            <File>
               <FileName>signal.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\signal.c</FilePath>
@@ -1005,6 +1010,11 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>demag_comp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\demag_comp.c</FilePath>
             </File>
             <File>
               <FileName>signal.c</FileName>
@@ -1544,6 +1554,11 @@
               <FilePath>..\Src\main.c</FilePath>
             </File>
             <File>
+              <FileName>demag_comp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\demag_comp.c</FilePath>
+            </File>
+            <File>
               <FileName>signal.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\signal.c</FilePath>
@@ -2079,6 +2094,11 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>demag_comp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\demag_comp.c</FilePath>
             </File>
             <File>
               <FileName>signal.c</FileName>
@@ -2618,6 +2638,11 @@
               <FilePath>..\Src\main.c</FilePath>
             </File>
             <File>
+              <FileName>demag_comp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\demag_comp.c</FilePath>
+            </File>
+            <File>
               <FileName>signal.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\signal.c</FilePath>
@@ -3153,6 +3178,11 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>demag_comp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\demag_comp.c</FilePath>
             </File>
             <File>
               <FileName>signal.c</FileName>
@@ -3692,6 +3722,11 @@
               <FilePath>..\Src\main.c</FilePath>
             </File>
             <File>
+              <FileName>demag_comp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\demag_comp.c</FilePath>
+            </File>
+            <File>
               <FileName>signal.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\signal.c</FilePath>
@@ -4227,6 +4262,11 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>demag_comp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\demag_comp.c</FilePath>
             </File>
             <File>
               <FileName>signal.c</FileName>
@@ -4766,6 +4806,11 @@
               <FilePath>..\Src\main.c</FilePath>
             </File>
             <File>
+              <FileName>demag_comp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\demag_comp.c</FilePath>
+            </File>
+            <File>
               <FileName>signal.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\signal.c</FilePath>
@@ -5301,6 +5346,11 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>demag_comp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\demag_comp.c</FilePath>
             </File>
             <File>
               <FileName>signal.c</FileName>
@@ -5840,6 +5890,11 @@
               <FilePath>..\Src\main.c</FilePath>
             </File>
             <File>
+              <FileName>demag_comp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\demag_comp.c</FilePath>
+            </File>
+            <File>
               <FileName>signal.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\signal.c</FilePath>
@@ -6375,6 +6430,11 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>demag_comp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\demag_comp.c</FilePath>
             </File>
             <File>
               <FileName>signal.c</FileName>
@@ -6914,6 +6974,11 @@
               <FilePath>..\Src\main.c</FilePath>
             </File>
             <File>
+              <FileName>demag_comp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\demag_comp.c</FilePath>
+            </File>
+            <File>
               <FileName>signal.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\signal.c</FilePath>
@@ -7449,6 +7514,11 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>demag_comp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\demag_comp.c</FilePath>
             </File>
             <File>
               <FileName>signal.c</FileName>
@@ -7988,6 +8058,11 @@
               <FilePath>..\Src\main.c</FilePath>
             </File>
             <File>
+              <FileName>demag_comp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\demag_comp.c</FilePath>
+            </File>
+            <File>
               <FileName>signal.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\signal.c</FilePath>
@@ -8523,6 +8598,11 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>demag_comp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\demag_comp.c</FilePath>
             </File>
             <File>
               <FileName>signal.c</FileName>
@@ -9062,6 +9142,11 @@
               <FilePath>..\Src\main.c</FilePath>
             </File>
             <File>
+              <FileName>demag_comp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\demag_comp.c</FilePath>
+            </File>
+            <File>
               <FileName>signal.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\signal.c</FilePath>
@@ -9597,6 +9682,11 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>demag_comp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\demag_comp.c</FilePath>
             </File>
             <File>
               <FileName>signal.c</FileName>
@@ -10136,6 +10226,11 @@
               <FilePath>..\Src\main.c</FilePath>
             </File>
             <File>
+              <FileName>demag_comp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\demag_comp.c</FilePath>
+            </File>
+            <File>
               <FileName>signal.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\signal.c</FilePath>
@@ -10671,6 +10766,11 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>demag_comp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\demag_comp.c</FilePath>
             </File>
             <File>
               <FileName>signal.c</FileName>
@@ -11210,6 +11310,11 @@
               <FilePath>..\Src\main.c</FilePath>
             </File>
             <File>
+              <FileName>demag_comp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\demag_comp.c</FilePath>
+            </File>
+            <File>
               <FileName>signal.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\signal.c</FilePath>
@@ -11745,6 +11850,11 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>demag_comp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\demag_comp.c</FilePath>
             </File>
             <File>
               <FileName>signal.c</FileName>

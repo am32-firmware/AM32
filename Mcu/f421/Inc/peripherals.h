@@ -15,6 +15,7 @@
 #define RELOAD_WATCHDOG_COUNTER() (WDT->cmd = WDT_CMD_RELOAD)
 #define DISABLE_COM_TIMER_INT() (COM_TIMER->iden &= ~TMR_OVF_INT)
 #define ENABLE_COM_TIMER_INT() (COM_TIMER->iden |= TMR_OVF_INT)
+#define COM_TIMER_CLEAR_PENDING() NVIC_ClearPendingIRQ(TMR16_GLOBAL_IRQn)
 #define SET_AND_ENABLE_COM_INT(time)                                    \
     (COM_TIMER->cval = 0, COM_TIMER->pr = time, COM_TIMER->ists = 0x00, \
         COM_TIMER->iden |= TMR_OVF_INT)

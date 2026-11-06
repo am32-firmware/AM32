@@ -17,6 +17,7 @@
 #define RELOAD_WATCHDOG_COUNTER() ( IWDG->CTLR = 0xAAAA)
 #define DISABLE_COM_TIMER_INT() (COM_TIMER->DMAINTENR &= ~TIM_IT_Update)
 #define ENABLE_COM_TIMER_INT() (COM_TIMER->DMAINTENR |= TIM_IT_Update)
+#define COM_TIMER_CLEAR_PENDING() NVIC_ClearPendingIRQ(TIM3_IRQn)
 #define SET_AND_ENABLE_COM_INT(time)                                    \
     (COM_TIMER->CNT = 0, COM_TIMER->ATRLR = time, COM_TIMER->INTFR = 0x00, \
         COM_TIMER->DMAINTENR |= TIM_IT_Update)

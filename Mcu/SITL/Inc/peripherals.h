@@ -16,6 +16,7 @@
 #define ENABLE_COM_TIMER_INT() sitl_com_int_enable()
 #define SET_AND_ENABLE_COM_INT(time) sitl_com_int_arm(time)
 #define SET_INTERVAL_TIMER_COUNT(intertime) sitl_interval_timer_set(intertime)
+#define COM_TIMER_CLEAR_PENDING() sitl_irq_clear(SITL_IRQ_COM)
 #define SET_PRESCALER_PWM(presc) sitl_tim1_set_psc(presc)
 #define SET_AUTO_RELOAD_PWM(relval) sitl_tim1_set_arr(relval)
 #define SET_DUTY_CYCLE_ALL(newdc) sitl_tim1_set_duty_all(newdc)

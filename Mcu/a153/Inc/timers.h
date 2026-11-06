@@ -61,6 +61,14 @@
 }
 
 /*
+ * @brief 	Drops a pending COM_TIMER interrupt: the match flag holds the request
+ */
+#define COM_TIMER_CLEAR_PENDING() { \
+	CTIMER1->IR = CTIMER_IR_MR0INT_MASK; \
+	NVIC_ClearPendingIRQ(CTIMER1_IRQn); \
+}
+
+/*
  * @brief 	Sets the interval timer count
  */
 #define SET_INTERVAL_TIMER_COUNT(intertime) { \

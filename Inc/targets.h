@@ -6130,7 +6130,7 @@
 #ifdef MCU_CH32V203
 #define WCH
 #define NEED_INPUT_READY
-#define ERASED_FLASH_BYTE    0x39
+// #define ERASED_FLASH_BYTE    0x39
 #define CPU_FREQUENCY_MHZ    48                     //PWM freq is 48MHz, CPU freq is 96MHz
 #define EEPROM_START_ADD     (uint32_t)0x0800f800
 #define INTERVAL_TIMER       TIM4

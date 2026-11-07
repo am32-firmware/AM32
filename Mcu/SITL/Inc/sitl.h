@@ -125,7 +125,7 @@ void sitl_interval_timer_set(uint32_t cnt);
 void sitl_com_int_arm(uint32_t time);
 void sitl_com_int_disable(void);
 void sitl_com_int_enable(void);
-uint32_t sitl_com_reload(void);
+volatile uint32_t* sitl_com_reload(void);
 void sitl_com_periodic_start(uint32_t time);
 void sitl_com_periodic_stop(uint32_t time);
 void sitl_tim1_set_duty_all(uint16_t duty);

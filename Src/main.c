@@ -965,73 +965,58 @@ static void sineStepPosition(void)
 #ifdef USE_TIMER_SINE
 /*
  * Sine startup driven by the COM_TIMER interrupt (unused while in sine mode).
- * The timer fires every SINE_TIMER_PERIOD_US and a 16.16 fixed point
- * accumulator advances the sine angle by sine_phase_inc each tick, so the
- * electrical speed no longer depends on how long the main loop takes.
+ * The timer period is the step delay and each interrupt moves the sine angle
+ * one degree with advanceincrement(), so the electrical speed no longer
+ * depends on how long the main loop takes. COM_TIMER has no reload preload,
+ * so its period is only written right after an update: in the interrupt, or
+ * together with the forced update in START_COM_TIMER_PERIODIC.
  */
-#define SINE_TIMER_PERIOD_US 50
 #define COM_TIMER_TICKS_PER_US 2 // COM_TIMER runs at 2mhz on all mcus
-#define SINE_TIMER_ARR (SINE_TIMER_PERIOD_US * COM_TIMER_TICKS_PER_US)
 
-volatile uint32_t sine_phase_inc = 0; // degrees per timer tick, 16.16 fixed point
-uint32_t sine_phase_acc = 0;
+void advanceincrement(void);
+
+volatile uint16_t sine_step_ticks = 100 * COM_TIMER_TICKS_PER_US; // COM_TIMER period of one degree, step_delay default
 volatile uint8_t sine_timer_active = 0;
 volatile uint8_t sine_changeover_request = 0; // stop the timer when phase A reaches 0
 uint32_t sine_ccr_scale; // pwmSin to compare value, 16.16 fixed point
 uint16_t sine_ccr_offset; // gate drive offset as compare value
-uint32_t sine_saved_com_arr;
 
-static void sineWritePwm(void)
-{
-    setPWMCompare1(sine_ccr_offset + ((pwmSin[phase_A_position] * sine_ccr_scale) >> 16));
-    setPWMCompare2(sine_ccr_offset + ((pwmSin[phase_B_position] * sine_ccr_scale) >> 16));
-    setPWMCompare3(sine_ccr_offset + ((pwmSin[phase_C_position] * sine_ccr_scale) >> 16));
-}
-
-static void stopSineTimer(void)
+static void __attribute__((noinline)) stopSineTimer(void)
 {
     if (sine_timer_active) {
         sine_timer_active = 0;
-        // put back the previous period; with reload preload off SET_AND_ENABLE_COM_INT() replaces it anyway
-        STOP_COM_TIMER_PERIODIC(sine_saved_com_arr);
+        // longest period, SET_AND_ENABLE_COM_INT() sets the next commutation period
+        STOP_COM_TIMER_PERIODIC(0xFFFF);
     }
+}
+
+static void __attribute__((noinline)) sineTimerRoutine(void)
+{
+    // the counter has just restarted, so the next period can be written without reload preload
+    COM_TIMER_RELOAD_VALUE = sine_step_ticks;
+    if (armed && input > 48) {
+        advanceincrement();
+        if (!sine_changeover_request || phase_A_position != 0) {
+            return;
+        }
+    }
+    // throttle off, disarmed, or phase A reached 0 for the main loop changeover to bemf commutation
+    stopSineTimer();
 }
 
 static void startSineTimer(void)
 {
-    // same result as the advanceincrement() formula, with the divides done once here
+    // the advanceincrement() compare formula with its divides done once here
     sine_ccr_offset = (uint32_t)gate_drive_offset * TIMER1_MAX_ARR * eepromBuffer.sine_mode_power / 20000;
     // (2 * arr * power << 16) / (divider * 20000), reduced by 8 to stay inside 32 bits
     sine_ccr_scale = ((uint32_t)2 * TIMER1_MAX_ARR * eepromBuffer.sine_mode_power * 8192) / (SINE_DIVIDER * 2500);
-    sineWritePwm();
 
     DISABLE_COM_TIMER_INT();
-    sine_saved_com_arr = COM_TIMER_RELOAD_VALUE;
-    sine_phase_acc = 0;
     sine_timer_active = 1;
-    START_COM_TIMER_PERIODIC(SINE_TIMER_ARR);
-}
-
-static void sineTimerRoutine(void)
-{
-    if (!armed || input <= 48) {
-        stopSineTimer();
-        return;
+    sineTimerRoutine(); // first step now, as the blocking loop did
+    if (sine_timer_active) {
+        START_COM_TIMER_PERIODIC(sine_step_ticks);
     }
-    sine_phase_acc += sine_phase_inc;
-    uint16_t degrees = sine_phase_acc >> 16;
-    sine_phase_acc &= 0xFFFF;
-    if (!degrees) {
-        return;
-    }
-    while (degrees--) {
-        sineStepPosition();
-        if (sine_changeover_request && phase_A_position == 0) {
-            stopSineTimer(); // main loop does the changeover to bemf commutation
-            break;
-        }
-    }
-    sineWritePwm();
 }
 #endif
 
@@ -1782,12 +1767,10 @@ void advanceincrement()
     setPWMCompare2(((2 * pwmSin[phase_B_position]) + gate_drive_offset) * TIMER1_MAX_ARR / 2000);
     setPWMCompare3(((2 * pwmSin[phase_C_position]) + gate_drive_offset) * TIMER1_MAX_ARR / 2000);
 #else
-    setPWMCompare1(
-        (((2 * pwmSin[phase_A_position] / SINE_DIVIDER) + gate_drive_offset) * TIMER1_MAX_ARR / 2000) * eepromBuffer.sine_mode_power / 10);
-    setPWMCompare2(
-        (((2 * pwmSin[phase_B_position] / SINE_DIVIDER) + gate_drive_offset) * TIMER1_MAX_ARR / 2000) * eepromBuffer.sine_mode_power / 10);
-    setPWMCompare3(
-        (((2 * pwmSin[phase_C_position] / SINE_DIVIDER) + gate_drive_offset) * TIMER1_MAX_ARR / 2000) * eepromBuffer.sine_mode_power / 10);
+    // scale and offset are set in startSineTimer()
+    setPWMCompare1(sine_ccr_offset + ((pwmSin[phase_A_position] * sine_ccr_scale) >> 16));
+    setPWMCompare2(sine_ccr_offset + ((pwmSin[phase_B_position] * sine_ccr_scale) >> 16));
+    setPWMCompare3(sine_ccr_offset + ((pwmSin[phase_C_position] * sine_ccr_scale) >> 16));
 #endif
 }
 
@@ -2486,7 +2469,6 @@ if(zero_crosses < 5){
 #else
 
             if (input > 48 && armed) {
-#ifdef USE_TIMER_SINE
                 if (one_khz_loop_counter > PID_LOOP_DIVIDER) { // loop is no longer paced by the step delay, keep adc at 1khz
                     one_khz_loop_counter = 0;
                     PROCESS_ADC_FLAG = 1;
@@ -2507,7 +2489,7 @@ if(zero_crosses < 5){
                         do_once_sinemode = 0;
                     }
                     step_delay = map(input, 48, 120, 7000 / eepromBuffer.motor_poles, 810 / eepromBuffer.motor_poles);
-                    sine_phase_inc = ((uint32_t)SINE_TIMER_PERIOD_US << 16) / step_delay;
+                    sine_step_ticks = step_delay * COM_TIMER_TICKS_PER_US; // the interrupt applies it from the next step
                     sine_changeover_request = 0;
                     if (!sine_timer_active) {
                         startSineTimer();
@@ -2523,7 +2505,6 @@ if(zero_crosses < 5){
                         // keep stepping at the last speed until phase A reaches 0
                         sine_changeover_request = 1;
                         if (!sine_timer_active && phase_A_position != 0) {
-                            sine_phase_inc = ((uint32_t)SINE_TIMER_PERIOD_US << 16) / step_delay;
                             startSineTimer();
                         }
                     }
@@ -2548,59 +2529,10 @@ if(zero_crosses < 5){
                         generatePwmTimerEvent();
                     }
                 }
-#else
-                PROCESS_ADC_FLAG = 1;
-                if (input > 48 && input < 137) { // sine wave stepper
-
-                    if (do_once_sinemode) {
-                        // disable commutation interrupt in case set
-                        DISABLE_COM_TIMER_INT();
-                        maskPhaseInterrupts();
-                        SET_DUTY_CYCLE_ALL(0);
-                        allpwm();
-                        do_once_sinemode = 0;
-                    }
-                    advanceincrement();
-                    step_delay = map(input, 48, 120, 7000 / eepromBuffer.motor_poles, 810 / eepromBuffer.motor_poles);
-                    delayMicros(step_delay);
-                    e_rpm = 600 / step_delay; // in hundreds so 33 e_rpm is 3300 actual erpm
-                    e_com_time = step_delay * 360; 
-
-                } else {
-                    do_once_sinemode = 1;
-                    advanceincrement();
-                    if (input > 200) {
-                        phase_A_position = 0;
-                        step_delay = 80;
-                    }
-
-                    delayMicros(step_delay);
-                    if (phase_A_position == 0) {
-                        stepper_sine = 0;
-                        running = 1;
-                        old_routine = 1;
-                        commutation_interval = 9000;
-                        average_interval = 9000;
-                        last_average_interval = average_interval;
-                        SET_INTERVAL_TIMER_COUNT(9000);
-                        zero_crosses = 20;
-                        prop_brake_active = 0;
-                        step = changeover_step;
-                        // comStep(step);// rising bemf on a same as position 0.
-                        if (eepromBuffer.stall_protection) {
-                            last_duty_cycle = stall_protect_minimum_duty;
-                        }
-                        commutate();
-                        generatePwmTimerEvent();
-                    }
-                }
-#endif // USE_TIMER_SINE
 
             } else {
-#ifdef USE_TIMER_SINE
                 stopSineTimer();
                 sine_changeover_request = 0;
-#endif
                 running = 0;
                 do_once_sinemode = 1;
                 if (eepromBuffer.brake_on_stop == 1) {

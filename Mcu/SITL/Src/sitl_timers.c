@@ -199,9 +199,10 @@ void sitl_com_int_enable(void)
     tims[SITL_TIM16_IDX].DIER |= 1;
 }
 
-uint32_t sitl_com_reload(void)
+// the COM_TIMER reload register, written by the sine interrupt; the sim thread reads ARR at each update
+volatile uint32_t* sitl_com_reload(void)
 {
-    return tims[SITL_TIM16_IDX].ARR;
+    return &tims[SITL_TIM16_IDX].ARR;
 }
 
 /*

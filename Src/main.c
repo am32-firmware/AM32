@@ -992,7 +992,7 @@ static void stopSineTimer(void)
 {
     if (sine_timer_active) {
         sine_timer_active = 0;
-        // put back the commutation wait time so the first interrupt commutation is unchanged
+        // put back the previous period; with reload preload off SET_AND_ENABLE_COM_INT() replaces it anyway
         STOP_COM_TIMER_PERIODIC(sine_saved_com_arr);
     }
 }
@@ -2498,6 +2498,10 @@ if(zero_crosses < 5){
                         // disable commutation interrupt in case set
                         DISABLE_COM_TIMER_INT();
                         maskPhaseInterrupts();
+                        // drop any demag watchdog or coasting state from six step, a coasting
+                        // state would make the changeover commutate() skip comStep()
+                        demag_watch = 0;
+                        demag_state = DEMAG_NONE;
                         SET_DUTY_CYCLE_ALL(0);
                         allpwm();
                         do_once_sinemode = 0;
@@ -2534,6 +2538,8 @@ if(zero_crosses < 5){
                         SET_INTERVAL_TIMER_COUNT(9000);
                         zero_crosses = 20;
                         prop_brake_active = 0;
+                        demag_watch = 0;
+                        demag_state = DEMAG_NONE; // commutate() must energize the changeover step
                         step = changeover_step;
                         if (eepromBuffer.stall_protection) {
                             last_duty_cycle = stall_protect_minimum_duty;

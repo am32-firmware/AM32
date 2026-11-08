@@ -848,7 +848,7 @@ uint16_t getSmoothedCurrent()
 
 void getBemfState()
 {
-    uint8_t current_state = 0;
+    uint32_t current_state = 0;
 #if defined(MCU_F031) || defined(MCU_G031)
     if (step == 1 || step == 4) {
         current_state = PHASE_C_EXTI_PORT->IDR & PHASE_C_EXTI_PIN;
@@ -1113,7 +1113,7 @@ void interruptRoutine()
 //    }
         for (int i = 0; i < filter_level; i++) {
 #if defined(MCU_F031) || defined(MCU_G031)
-            if (((current_GPIO_PORT->IDR & current_GPIO_PIN) == !(rising))) {
+            if (((current_GPIO_PORT->IDR & current_GPIO_PIN) != 0) == !rising) {
 #else
             if (getCompOutputLevel() == rising) {
 #endif
@@ -2232,7 +2232,7 @@ if(zero_crosses < 5){
             last_average_interval = average_interval;
         }
 
-#if !defined(MCU_G031) && !defined(NEED_INPUT_READY)
+#if !defined(NEED_INPUT_READY)
 #ifdef NXP
 	if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD)) {
 		NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
@@ -2245,6 +2245,18 @@ if(zero_crosses < 5){
 		NVIC_SetPriority(COMP0_IRQ, 0);
 		NVIC_SetPriority(COMP1_IRQ, 0);
 	}
+#elif defined(MCU_G031)
+        if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD)) {
+            NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
+            NVIC_SetPriority(COM_TIMER_IRQ, 1);
+            NVIC_SetPriority(EXTI_IRQ1_NAME, 1);
+            NVIC_SetPriority(EXTI_IRQ2_NAME, 1);
+        } else {
+            NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
+            NVIC_SetPriority(COM_TIMER_IRQ, 0);
+            NVIC_SetPriority(EXTI_IRQ1_NAME, 0);
+            NVIC_SetPriority(EXTI_IRQ2_NAME, 0);
+        }
 #else
         if (dshot_telemetry && (commutation_interval > DSHOT_PRIORITY_THRESHOLD)) {
              NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);

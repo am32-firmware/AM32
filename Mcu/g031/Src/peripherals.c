@@ -534,21 +534,21 @@ void MX_GPIO_Init(void)
 
     /**/
     EXTI_InitStruct.Line_0_31 = PHASE_B_LL_EXTI_LINE;
-    EXTI_InitStruct.LineCommand = ENABLE;
+    EXTI_InitStruct.LineCommand = DISABLE;
     EXTI_InitStruct.Mode = LL_EXTI_MODE_IT;
     EXTI_InitStruct.Trigger = LL_EXTI_TRIGGER_RISING;
     LL_EXTI_Init(&EXTI_InitStruct);
 
     /**/
     EXTI_InitStruct.Line_0_31 = PHASE_A_LL_EXTI_LINE;
-    EXTI_InitStruct.LineCommand = ENABLE;
+    EXTI_InitStruct.LineCommand = DISABLE;
     EXTI_InitStruct.Mode = LL_EXTI_MODE_IT;
     EXTI_InitStruct.Trigger = LL_EXTI_TRIGGER_RISING;
     LL_EXTI_Init(&EXTI_InitStruct);
 
     /**/
     EXTI_InitStruct.Line_0_31 = PHASE_C_LL_EXTI_LINE;
-    EXTI_InitStruct.LineCommand = ENABLE;
+    EXTI_InitStruct.LineCommand = DISABLE;
     EXTI_InitStruct.Mode = LL_EXTI_MODE_IT;
     EXTI_InitStruct.Trigger = LL_EXTI_TRIGGER_RISING;
     LL_EXTI_Init(&EXTI_InitStruct);

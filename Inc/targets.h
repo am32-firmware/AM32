@@ -3589,7 +3589,7 @@
 #define CURRENT_OFFSET 0
 #define HARDWARE_GROUP_G031_A
 #define USE_SERIAL_TELEMETRY
-#define NO_POLLING_START
+//#define NO_POLLING_START
 #endif
 
 #ifdef AIRHEART_SINGLE_G031
@@ -3601,7 +3601,7 @@
 #define TARGET_VOLTAGE_DIVIDER 230
 #define HARDWARE_GROUP_G031_A
 #define USE_SERIAL_TELEMETRY
-#define NO_POLLING_START
+//#define NO_POLLING_START
 #endif
 
 /*****************************************************CH32V203 targets

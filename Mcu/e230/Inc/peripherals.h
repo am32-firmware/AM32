@@ -13,7 +13,7 @@
 #include "main.h"
 
 #define INTERVAL_TIMER_COUNT (TIMER_CNT(INTERVAL_TIMER))
-#define RELOAD_WATCHDOG_COUNTER() (fwdgt_counter_reload())
+#define RELOAD_WATCHDOG_COUNTER() FWDGT_RELOAD()
 #define DISABLE_COM_TIMER_INT() \
     (TIMER_DMAINTEN(COM_TIMER) &= (~(uint32_t)TIMER_INT_UP))
 #define ENABLE_COM_TIMER_INT() \
@@ -22,6 +22,16 @@
     (TIMER_CNT(COM_TIMER) = 0, TIMER_CAR(COM_TIMER) = time, \
         TIMER_INTF(COM_TIMER) = 0x00,                       \
         TIMER_DMAINTEN(COM_TIMER) |= (uint32_t)TIMER_INT_UP)
+// periodic COM_TIMER interrupt for sine mode, period loaded and count restarted immediately
+#define COM_TIMER_RELOAD_VALUE (TIMER_CAR(COM_TIMER))
+#define START_COM_TIMER_PERIODIC(time)                                     \
+    (DISABLE_COM_TIMER_INT(), TIMER_CAR(COM_TIMER) = time,                 \
+        TIMER_SWEVG(COM_TIMER) = TIMER_SWEVG_UPG, TIMER_INTF(COM_TIMER) = 0x00, \
+        ENABLE_COM_TIMER_INT())
+#define STOP_COM_TIMER_PERIODIC(time)                                      \
+    (DISABLE_COM_TIMER_INT(), TIMER_CAR(COM_TIMER) = time,                 \
+        TIMER_SWEVG(COM_TIMER) = TIMER_SWEVG_UPG, TIMER_INTF(COM_TIMER) = 0x00, \
+        NVIC_ClearPendingIRQ(COM_TIMER_IRQ))
 #define SET_INTERVAL_TIMER_COUNT(intertime) \
     (TIMER_CNT(INTERVAL_TIMER) = intertime)
 #define SET_PRESCALER_PWM(presc) (TIMER_PSC(TIMER0) = presc)

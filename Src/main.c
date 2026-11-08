@@ -569,6 +569,15 @@ volatile uint16_t duty_cycle = 0;
 char step = 1;
 volatile uint32_t commutation_interval = 12500;
 volatile uint16_t waitTime = 0;
+
+// demag protection: COM_TIMER is armed as a zero cross watchdog after each commutation
+#define DEMAG_NONE 0
+#define DEMAG_COASTING 1      // one blind step taken, all phases off while waiting for zero cross
+#define DEMAG_RECOVERY_START 2 // zero cross found while coasting, commutating at 30 degrees
+#define DEMAG_RECOVERY_STEP 3  // first step after recovery, reduced power and 30 degree timing
+volatile uint8_t demag_watch = 0; // set when the pending COM_TIMER interrupt is the watchdog
+volatile uint8_t demag_state = DEMAG_NONE;
+uint8_t demag_cut_shift = 16; // power cut is duty >> shift, set from eepromBuffer.demag_comp
 uint16_t signaltimeout = 0;
 uint8_t ubAnalogWatchdogStatus = RESET;
 
@@ -615,9 +624,17 @@ void loadEEpromSettings()
       eepromBuffer.current_D = 100; // 0-255
       eepromBuffer.active_brake_power = 0; // 1-5 percent duty cycle
       eepromBuffer.brake_on_zero_throttle = 0;
-      eepromBuffer.reserved_eeprom_3[0] = 0; //14-16  for crsf input
+      eepromBuffer.demag_comp = 0; // 14
+      eepromBuffer.reserved_eeprom_3[0] = 0; //15-16  for crsf input
       eepromBuffer.reserved_eeprom_3[1] = 0;
-      eepromBuffer.reserved_eeprom_3[2] = 0;
+    }
+    if (eepromBuffer.demag_comp > 4) { // blank or out of range, demag protection off
+      eepromBuffer.demag_comp = 0;
+    }
+    if (eepromBuffer.demag_comp > 1) {
+      demag_cut_shift = 7 - eepromBuffer.demag_comp; // 2 = 1/32, 3 = 1/16, 4 = 1/8
+    } else {
+      demag_cut_shift = 16; // 1 = coast only, duty >> 16 is no power cut
     }
     if(eepromBuffer.brake_on_zero_throttle > 9){ // byte 13 held a firmware name character (0x30 or similar) before eeprom version 4
       eepromBuffer.brake_on_zero_throttle = 0;
@@ -803,7 +820,6 @@ void loadEEpromSettings()
             high_rpm_level = 0;
         }
     }
-    reverse_speed_threshold = map(motor_kv, 300, 3000, 1000, 500);
     if (eepromBuffer.bi_direction){
       polling_mode_changeover = POLLING_MODE_THRESHOLD / 2;
     }else{
@@ -889,7 +905,7 @@ void commutate()
     rising = !rising;
 #endif
     __disable_irq(); // don't let dshot interrupt
-    if (!prop_brake_active) {
+    if (!prop_brake_active && demag_state != DEMAG_COASTING) {
         comStep(step);
     }
     __enable_irq();
@@ -910,6 +926,100 @@ void commutate()
 #endif
 }
 
+// move the sine table positions one electrical degree in the current direction
+static void sineStepPosition(void)
+{
+    if (!forward) {
+        phase_A_position++;
+        if (phase_A_position > 359) {
+            phase_A_position = 0;
+        }
+        phase_B_position++;
+        if (phase_B_position > 359) {
+            phase_B_position = 0;
+        }
+        phase_C_position++;
+        if (phase_C_position > 359) {
+            phase_C_position = 0;
+        }
+    } else {
+        phase_A_position--;
+        if (phase_A_position < 0) {
+            phase_A_position = 359;
+        }
+        phase_B_position--;
+        if (phase_B_position < 0) {
+            phase_B_position = 359;
+        }
+        phase_C_position--;
+        if (phase_C_position < 0) {
+            phase_C_position = 359;
+        }
+    }
+}
+
+#ifndef GIMBAL_MODE // gimbal mode positions the motor from the main loop
+#define USE_TIMER_SINE
+#endif
+
+#ifdef USE_TIMER_SINE
+/*
+ * Sine startup driven by the COM_TIMER interrupt (unused while in sine mode).
+ * The timer period is the step delay and each interrupt moves the sine angle
+ * one degree with advanceincrement(), so the electrical speed no longer
+ * depends on how long the main loop takes. COM_TIMER has no reload preload,
+ * so its period is only written right after an update: in the interrupt, or
+ * together with the forced update in START_COM_TIMER_PERIODIC.
+ */
+#define COM_TIMER_TICKS_PER_US 2 // COM_TIMER runs at 2mhz on all mcus
+
+void advanceincrement(void);
+
+volatile uint16_t sine_step_ticks = 100 * COM_TIMER_TICKS_PER_US; // COM_TIMER period of one degree, step_delay default
+volatile uint8_t sine_timer_active = 0;
+volatile uint8_t sine_changeover_request = 0; // stop the timer when phase A reaches 0
+uint32_t sine_ccr_scale; // pwmSin to compare value, 16.16 fixed point
+uint16_t sine_ccr_offset; // gate drive offset as compare value
+
+static void __attribute__((noinline)) stopSineTimer(void)
+{
+    if (sine_timer_active) {
+        sine_timer_active = 0;
+        // longest period, SET_AND_ENABLE_COM_INT() sets the next commutation period
+        STOP_COM_TIMER_PERIODIC(0xFFFF);
+    }
+}
+
+static void __attribute__((noinline)) sineTimerRoutine(void)
+{
+    // the counter has just restarted, so the next period can be written without reload preload
+    COM_TIMER_RELOAD_VALUE = sine_step_ticks;
+    if (armed && input > 48) {
+        advanceincrement();
+        if (!sine_changeover_request || phase_A_position != 0) {
+            return;
+        }
+    }
+    // throttle off, disarmed, or phase A reached 0 for the main loop changeover to bemf commutation
+    stopSineTimer();
+}
+
+static void startSineTimer(void)
+{
+    // the advanceincrement() compare formula with its divides done once here
+    sine_ccr_offset = (uint32_t)gate_drive_offset * TIMER1_MAX_ARR * eepromBuffer.sine_mode_power / 20000;
+    // (2 * arr * power << 16) / (divider * 20000), reduced by 8 to stay inside 32 bits
+    sine_ccr_scale = ((uint32_t)2 * TIMER1_MAX_ARR * eepromBuffer.sine_mode_power * 8192) / (SINE_DIVIDER * 2500);
+
+    DISABLE_COM_TIMER_INT();
+    sine_timer_active = 1;
+    sineTimerRoutine(); // first step now, as the blocking loop did
+    if (sine_timer_active) {
+        START_COM_TIMER_PERIODIC(sine_step_ticks);
+    }
+}
+#endif
+
 /*
  * @brief 	Called by the COM_TIMER interrupt handler after the set wait time
  * 			This computes how much to advance in a commutation step.
@@ -918,16 +1028,63 @@ void commutate()
  */
 void PeriodElapsedCallback()
 {
+#ifdef USE_TIMER_SINE
+    if (stepper_sine) {
+        if (sine_timer_active) {
+            sineTimerRoutine();
+        } else {
+            DISABLE_COM_TIMER_INT(); // stale interrupt, never commutate while in sine mode
+        }
+        return;
+    }
+#endif
     DISABLE_COM_TIMER_INT(); // disable interrupt
+    if (demag_watch) { // watchdog expired, no zero cross by the expected commutation time
+        demag_watch = 0;
+        if (running && !old_routine) {
+            maskPhaseInterrupts();
+            allOff();
+            demag_state = DEMAG_COASTING;
+            commutate(); // advance once without power and watch the next phase
+            enableCompInterrupts();
+        } else {
+            demag_state = DEMAG_NONE;
+        }
+        return; // stay coasting until a zero cross; do not arm another blind step
+    }
+    if (demag_state == DEMAG_RECOVERY_START) { // set reduced power before the next step is energized
+        demag_state = DEMAG_RECOVERY_STEP;
+        SET_DUTY_CYCLE_ALL(adjusted_duty_cycle - (adjusted_duty_cycle >> demag_cut_shift));
+    } else if (demag_state == DEMAG_RECOVERY_STEP) {
+        demag_state = DEMAG_NONE;
+        SET_DUTY_CYCLE_ALL(adjusted_duty_cycle);
+    }
     commutate();
     commutation_interval = ((commutation_interval)+((lastzctime + thiszctime) >> 1))>>1;
-  	if (!eepromBuffer.auto_advance) {
+    if (demag_state == DEMAG_RECOVERY_STEP) {
+      advance = commutation_interval >> 1; // 30 degrees
+    } else if (!eepromBuffer.auto_advance) {
 	  advance = (commutation_interval * temp_advance) >> 6; // 60 divde 64 0.9375 degree increments
 	} else {
 	  advance = (commutation_interval * auto_advance_level) >> 6; // 60 divde 64 0.9375 degree increments
     }
     waitTime = (commutation_interval >> 1) - advance;
     if (!old_routine) {
+        if (eepromBuffer.demag_comp) {
+            // Allow 2 intervals during recovery, otherwise 1.25; a zero cross re-arms COM_TIMER first.
+            uint32_t timeout;
+            if (demag_state == DEMAG_RECOVERY_STEP) {
+                timeout = commutation_interval * 2;
+            } else {
+                timeout = commutation_interval + (commutation_interval >> 2);
+            }
+            demag_watch = 1;
+            if (timeout > 0xFFFF) {
+                SET_AND_ENABLE_COM_INT(0xFFFF);
+            } else {
+                SET_AND_ENABLE_COM_INT(timeout);
+            }
+        }
         enableCompInterrupts(); // enable comp interrupt
     }
     if (zero_crosses < 10000) {
@@ -966,14 +1123,23 @@ void interruptRoutine()
     __disable_irq();
     maskPhaseInterrupts();
     lastzctime = thiszctime;
-    thiszctime = INTERVAL_TIMER_COUNT;  
+    thiszctime = INTERVAL_TIMER_COUNT;
     SET_INTERVAL_TIMER_COUNT(0);
-    SET_AND_ENABLE_COM_INT(waitTime+1); // enable COM_TIMER interrupt
+    demag_watch = 0;
+    if (demag_state == DEMAG_COASTING) { // zero cross found while coasting, commutate now at 30 degrees
+        thiszctime >>= 1; // one missed crossing: measured span covers two sectors
+        demag_state = DEMAG_RECOVERY_START;
+        SET_AND_ENABLE_COM_INT(1);
+    } else {
+        SET_AND_ENABLE_COM_INT(waitTime+1); // enable COM_TIMER interrupt
+    }
     __enable_irq();
 }
 
 void startMotor()
 {
+    demag_watch = 0;
+    demag_state = DEMAG_NONE;
     if (running == 0) {
         commutate();
         commutation_interval = 10000;
@@ -1553,7 +1719,11 @@ void tenKhzRoutine()
         }
         last_duty_cycle = duty_cycle;
         SET_AUTO_RELOAD_PWM(tim1_arr);
-        SET_DUTY_CYCLE_ALL(adjusted_duty_cycle);
+        if (demag_state == DEMAG_RECOVERY_STEP) { // hold reduced power for the step after demag recovery
+            SET_DUTY_CYCLE_ALL(adjusted_duty_cycle - (adjusted_duty_cycle >> demag_cut_shift));
+        } else {
+            SET_DUTY_CYCLE_ALL(adjusted_duty_cycle);
+        }
     }
 #endif // ndef brushed_mode
 #if defined(FIXED_DUTY_MODE) || defined(FIXED_SPEED_MODE)
@@ -1591,49 +1761,24 @@ void processDshot()
 
 void advanceincrement()
 {
-    if (!forward) {
-        phase_A_position++;
-        if (phase_A_position > 359) {
-            phase_A_position = 0;
-        }
-        phase_B_position++;
-        if (phase_B_position > 359) {
-            phase_B_position = 0;
-        }
-        phase_C_position++;
-        if (phase_C_position > 359) {
-            phase_C_position = 0;
-        }
-    } else {
-        phase_A_position--;
-        if (phase_A_position < 0) {
-            phase_A_position = 359;
-        }
-        phase_B_position--;
-        if (phase_B_position < 0) {
-            phase_B_position = 359;
-        }
-        phase_C_position--;
-        if (phase_C_position < 0) {
-            phase_C_position = 359;
-        }
-    }
+    sineStepPosition();
 #ifdef GIMBAL_MODE
     setPWMCompare1(((2 * pwmSin[phase_A_position]) + gate_drive_offset) * TIMER1_MAX_ARR / 2000);
     setPWMCompare2(((2 * pwmSin[phase_B_position]) + gate_drive_offset) * TIMER1_MAX_ARR / 2000);
     setPWMCompare3(((2 * pwmSin[phase_C_position]) + gate_drive_offset) * TIMER1_MAX_ARR / 2000);
 #else
-    setPWMCompare1(
-        (((2 * pwmSin[phase_A_position] / SINE_DIVIDER) + gate_drive_offset) * TIMER1_MAX_ARR / 2000) * eepromBuffer.sine_mode_power / 10);
-    setPWMCompare2(
-        (((2 * pwmSin[phase_B_position] / SINE_DIVIDER) + gate_drive_offset) * TIMER1_MAX_ARR / 2000) * eepromBuffer.sine_mode_power / 10);
-    setPWMCompare3(
-        (((2 * pwmSin[phase_C_position] / SINE_DIVIDER) + gate_drive_offset) * TIMER1_MAX_ARR / 2000) * eepromBuffer.sine_mode_power / 10);
+    // scale and offset are set in startSineTimer()
+    setPWMCompare1(sine_ccr_offset + ((pwmSin[phase_A_position] * sine_ccr_scale) >> 16));
+    setPWMCompare2(sine_ccr_offset + ((pwmSin[phase_B_position] * sine_ccr_scale) >> 16));
+    setPWMCompare3(sine_ccr_offset + ((pwmSin[phase_C_position] * sine_ccr_scale) >> 16));
 #endif
 }
 
 void zcfoundroutine()
 { // only used in polling mode, blocking routine.
+    DISABLE_COM_TIMER_INT(); // cancel any pending demag watchdog, polling commutates directly
+    demag_watch = 0;
+    demag_state = DEMAG_NONE;
     thiszctime = INTERVAL_TIMER_COUNT;
     SET_INTERVAL_TIMER_COUNT(0);
     commutation_interval = (thiszctime + (3 * commutation_interval)) / 4;
@@ -2061,7 +2206,7 @@ if(zero_crosses < 5){
                 bemf_timeout_happened = 0;
             }
         } else {
-            if (adjusted_input < 150) { // startup duty cycle should be low enough to not burn motor
+            if (adjusted_input < 300) { // startup duty cycle should be low enough to not burn motor
                 bemf_timeout = 100;
             } else {
                 bemf_timeout = 10;
@@ -2146,7 +2291,7 @@ if(zero_crosses < 5){
 #ifdef MCU_GDE23
             // converted_degrees = (1.43 - ADC_raw_temp * 3.3 / 4096) * 1000 / 4.3 + 25;
             converted_degrees = ((int32_t)(357.5581395348837f * (1 << 16)) - ADC_raw_temp * (int32_t)(0.18736373546511628f * (1 << 16))) >> 16;
-            adc_software_trigger_enable(ADC_REGULAR_CHANNEL);
+            ADC_CTL1 |= ADC_CTL1_SWRCST; // software trigger the regular group
 #endif
 #ifdef ARTERY            
             adc_ordinary_software_trigger_enable(ADC1, TRUE);
@@ -2324,33 +2469,47 @@ if(zero_crosses < 5){
 #else
 
             if (input > 48 && armed) {
-                PROCESS_ADC_FLAG = 1;
-                if (input > 48 && input < 137) { // sine wave stepper
-
+                if (one_khz_loop_counter > PID_LOOP_DIVIDER) { // loop is no longer paced by the step delay, keep adc at 1khz
+                    one_khz_loop_counter = 0;
+                    PROCESS_ADC_FLAG = 1;
+                }
+                if (input < 137) { // sine wave stepper
                     if (do_once_sinemode) {
+                        // a cancelled changeover leaves the sine timer running, stop it so it restarts below
+                        stopSineTimer();
                         // disable commutation interrupt in case set
                         DISABLE_COM_TIMER_INT();
                         maskPhaseInterrupts();
+                        // drop any demag watchdog or coasting state from six step, a coasting
+                        // state would make the changeover commutate() skip comStep()
+                        demag_watch = 0;
+                        demag_state = DEMAG_NONE;
                         SET_DUTY_CYCLE_ALL(0);
                         allpwm();
                         do_once_sinemode = 0;
                     }
-                    advanceincrement();
                     step_delay = map(input, 48, 120, 7000 / eepromBuffer.motor_poles, 810 / eepromBuffer.motor_poles);
-                    delayMicros(step_delay);
+                    sine_step_ticks = step_delay * COM_TIMER_TICKS_PER_US; // the interrupt applies it from the next step
+                    sine_changeover_request = 0;
+                    if (!sine_timer_active) {
+                        startSineTimer();
+                    }
                     e_rpm = 600 / step_delay; // in hundreds so 33 e_rpm is 3300 actual erpm
-                    e_com_time = step_delay * 360; 
-
+                    e_com_time = step_delay * 360;
                 } else {
                     do_once_sinemode = 1;
-                    advanceincrement();
                     if (input > 200) {
+                        stopSineTimer();
                         phase_A_position = 0;
-                        step_delay = 80;
+                    } else {
+                        // keep stepping at the last speed until phase A reaches 0
+                        sine_changeover_request = 1;
+                        if (!sine_timer_active && phase_A_position != 0) {
+                            startSineTimer();
+                        }
                     }
-
-                    delayMicros(step_delay);
-                    if (phase_A_position == 0) {
+                    if (!sine_timer_active && phase_A_position == 0) {
+                        sine_changeover_request = 0;
                         stepper_sine = 0;
                         running = 1;
                         old_routine = 1;
@@ -2360,8 +2519,9 @@ if(zero_crosses < 5){
                         SET_INTERVAL_TIMER_COUNT(9000);
                         zero_crosses = 20;
                         prop_brake_active = 0;
+                        demag_watch = 0;
+                        demag_state = DEMAG_NONE; // commutate() must energize the changeover step
                         step = changeover_step;
-                        // comStep(step);// rising bemf on a same as position 0.
                         if (eepromBuffer.stall_protection) {
                             last_duty_cycle = stall_protect_minimum_duty;
                         }
@@ -2371,6 +2531,8 @@ if(zero_crosses < 5){
                 }
 
             } else {
+                stopSineTimer();
+                sine_changeover_request = 0;
                 running = 0;
                 do_once_sinemode = 1;
                 if (eepromBuffer.brake_on_stop == 1) {

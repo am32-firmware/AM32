@@ -102,7 +102,12 @@ void activateADC(void)
         LL_ADC_Enable(ADC1);
         while (LL_ADC_IsActiveFlag_ADRDY(ADC1) == 0) {
         }
-        ADC->CCR |= ADC_CCR_TSEN;
+        // Allow at least 120 us for the internal temperature sensor to settle.
+        // Use a conservative CPU-cycle count (the loop takes multiple cycles).
+        wait_loop_index = 120u * (SystemCoreClock / 1000000u);
+        while (wait_loop_index != 0) {
+            wait_loop_index--;
+        }
     }
 }
 void ADC_Init(void)
@@ -156,7 +161,7 @@ void ADC_Init(void)
     /** Configure Regular Channel
      */
     LL_ADC_SetCommonPathInternalCh(__LL_ADC_COMMON_INSTANCE(ADC1),
-        LL_ADC_CHANNEL_TEMPSENSOR);
+        LL_ADC_PATH_INTERNAL_TEMPSENSOR);
     /** Configure the global features of the ADC (Clock, Resolution, Data
      * Alignment and number of conversion)
      */
@@ -168,10 +173,16 @@ void ADC_Init(void)
     ADC_REG_InitStruct.Overrun = LL_ADC_REG_OVR_DATA_PRESERVED;
     LL_ADC_REG_Init(ADC1, &ADC_REG_InitStruct);
     // LL_ADC_REG_SetTriggerEdge(ADC1, LL_ADC_REG_TRIG_EXT_FALLING);
-    LL_ADC_SetOverSamplingScope(ADC1, LL_ADC_OVS_DISABLE);
-    LL_ADC_SetTriggerFrequencyMode(ADC1, LL_ADC_CLOCK_FREQ_MODE_LOW);
+    // Average 16 conversions in hardware, preserving the 12-bit result scale.
+    LL_ADC_ConfigOverSamplingRatioShift(ADC1, LL_ADC_OVS_RATIO_16, LL_ADC_OVS_SHIFT_RIGHT_4);
+    LL_ADC_SetOverSamplingDiscont(ADC1, LL_ADC_OVS_REG_CONT);
+    LL_ADC_SetOverSamplingScope(ADC1, LL_ADC_OVS_GRP_REGULAR_CONTINUED);
+    // Software-triggered scans are about 1 ms apart, exceeding tIdle (100 us).
+    LL_ADC_SetTriggerFrequencyMode(ADC1, LL_ADC_TRIGGER_FREQ_LOW);
     LL_ADC_REG_SetSequencerConfigurable(ADC1, LL_ADC_REG_SEQ_CONFIGURABLE);
-    LL_ADC_SetClock(ADC1, LL_ADC_CLOCK_ASYNC_DIV4);
+    // SYSCLK is 64 MHz; the asynchronous prescaler is in the common CCR.
+    LL_ADC_SetCommonClock(__LL_ADC_COMMON_INSTANCE(ADC1), LL_ADC_CLOCK_ASYNC_DIV4);
+    LL_ADC_SetCommonFrequencyMode(__LL_ADC_COMMON_INSTANCE(ADC1), LL_ADC_CLOCK_FREQ_MODE_HIGH);
     LL_ADC_SetSamplingTimeCommonChannels(ADC1, LL_ADC_SAMPLINGTIME_COMMON_1,
         LL_ADC_SAMPLINGTIME_19CYCLES_5);
     LL_ADC_SetSamplingTimeCommonChannels(ADC1, LL_ADC_SAMPLINGTIME_COMMON_2,
@@ -179,6 +190,7 @@ void ADC_Init(void)
     LL_ADC_DisableIT_EOC(ADC1);
     LL_ADC_DisableIT_EOS(ADC1);
 
+    ADC_InitStruct.Clock = LL_ADC_CLOCK_ASYNC_DIV1; // asynchronous source; CCR supplies /4
     ADC_InitStruct.Resolution = LL_ADC_RESOLUTION_12B;
     ADC_InitStruct.DataAlignment = LL_ADC_DATA_ALIGN_RIGHT;
     ADC_InitStruct.LowPowerMode = LL_ADC_LP_MODE_NONE;

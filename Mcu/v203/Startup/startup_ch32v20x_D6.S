@@ -15,8 +15,9 @@
 	.global	_start
 	.align	1
 _start:
-	j	handle_reset
-
+    lui ra, %Hi(handle_reset)
+    jr  %Lo(handle_reset)(ra)
+    
     .section    .vector,"ax",@progbits
     .align  1
 _vector_base:

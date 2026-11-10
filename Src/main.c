@@ -305,6 +305,7 @@ fastPID stallPid = { // 1khz loop time
 };
 
 EEprom_t eepromBuffer;
+volatile uint8_t ranonce = 0;
 volatile uint32_t polling_mode_changeover;
 volatile uint8_t ramp_divider;
 volatile uint8_t max_ramp_startup = RAMP_SPEED_STARTUP;
@@ -636,8 +637,11 @@ void loadEEpromSettings()
     } else {
       demag_cut_shift = 16; // 1 = coast only, duty >> 16 is no power cut
     }
-    if(eepromBuffer.brake_on_zero_throttle > 9){ // byte 13 held a firmware name character (0x30 or similar) before eeprom version 4
+    if(eepromBuffer.brake_on_zero_throttle > 9){ // byte 13 held a firmware name character (0x30 or similar) before eeprom version 3
       eepromBuffer.brake_on_zero_throttle = 0;
+    }
+    if(eepromBuffer.active_brake_power > 5){ // byte 12 held a firmware name character (0x30 or similar) before eeprom version 3
+      eepromBuffer.active_brake_power = 0;
     }
     // eepromBuffer.advance_level can either be set to 0-3 with config tools less than 1.90 or 10-42 with 1.90 or above 
     if (eepromBuffer.advance_level > 42 || (eepromBuffer.advance_level < 10 && eepromBuffer.advance_level > 3)){
@@ -1145,6 +1149,7 @@ void startMotor()
         commutation_interval = 10000;
         SET_INTERVAL_TIMER_COUNT(5000);
         running = 1;
+        ranonce = 1;
     }
     enableCompInterrupts();
 }
@@ -1375,6 +1380,7 @@ if (!stepper_sine && armed) {
                     startMotor();
                 }
                 running = 1;
+                ranonce = 1;
                 last_duty_cycle = min_startup_duty;
             }
 
@@ -1417,7 +1423,7 @@ if (!stepper_sine && armed) {
                 if (!running) {
                     old_routine = 1;
                     zero_crosses = 0;
-                    if (eepromBuffer.brake_on_stop) {
+                    if (eepromBuffer.brake_on_stop == 1) {
                         fullBrake();
                     } else {
                         if (!prop_brake_active) {
@@ -1708,7 +1714,7 @@ void tenKhzRoutine()
             if (prop_brake_active) {
               adjusted_duty_cycle =  tim1_arr - ((prop_brake_duty_cycle * tim1_arr) / 2000);
             } else {
-              if((eepromBuffer.brake_on_stop == 2) && armed){  // require arming for active brake
+              if (((eepromBuffer.brake_on_stop == 2) && armed) || ((eepromBuffer.brake_on_stop == 3) && ranonce)) {  // require arming for active brake
                 comStep(2);
                 adjusted_duty_cycle = DEAD_TIME + ((eepromBuffer.active_brake_power * tim1_arr) / 2000)* 10;
             }else{
@@ -2512,6 +2518,7 @@ if(zero_crosses < 5){
                         sine_changeover_request = 0;
                         stepper_sine = 0;
                         running = 1;
+                        ranonce = 1;
                         old_routine = 1;
                         commutation_interval = 9000;
                         average_interval = 9000;
@@ -2549,7 +2556,7 @@ if(zero_crosses < 5){
 #else
                     // todo add braking for PWM /enable style bridges.
 #endif
-                } else if (eepromBuffer.brake_on_stop == 2){
+                } else if (((eepromBuffer.brake_on_stop == 2) && armed) || ((eepromBuffer.brake_on_stop == 3) && ranonce)){
                   comStep(2);
                   SET_DUTY_CYCLE_ALL(DEAD_TIME + ((eepromBuffer.active_brake_power * tim1_arr) / 2000)* 10);
                 }else{

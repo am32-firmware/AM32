@@ -11,6 +11,7 @@
 #include "main.h"
 
 void playStartupTune(void);
+void playBJNote(uint16_t freq, uint16_t bduration);
 void playInputTune(void);
 void playBrushedStartupTune(void);
 void playInputTune2(void);

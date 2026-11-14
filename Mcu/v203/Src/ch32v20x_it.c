@@ -49,6 +49,8 @@ void EXTI4_IRQHandler(void)  __attribute__((interrupt("WCH-Interrupt-fast")));
 #endif
 //for tele DMA
 void DMA1_Channel7_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
+//for USART2
+void USART2_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 //for com
 void TIM3_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 //dor dshot
@@ -134,10 +136,15 @@ void DMA1_Channel7_IRQHandler(void)
 {
     if(DMA_GetITStatus(DMA1_IT_TC7))
     {
-        USART_DMACmd(USART2,USART_DMAReq_Tx,DISABLE);
+        /* DMA transfer complete: stop DMA requests and channel, then
+         * enable USART Transmission Complete (TC) interrupt so we wait
+         * for the actual end of frame on the UART before disabling TX/DE.
+         */
+        USART_DMACmd(USART2, USART_DMAReq_Tx, DISABLE);
         DMA_Cmd(DMA1_Channel7, DISABLE);
-        MODIFY_REG(USART2->CTLR1, 0x3<<2, 0x0<<3);  //disable send
         DMA_ClearFlag(DMA1_IT_TC7);
+        USART_ClearFlag(USART2, USART_FLAG_TC);
+        USART_ITConfig(USART2, USART_IT_TC, ENABLE);
     }
     /* Check whether DMA transfer error caused the DMA interruption */
     if(DMA_GetITStatus(DMA1_IT_TE7))
@@ -146,6 +153,23 @@ void DMA1_Channel7_IRQHandler(void)
         MODIFY_REG(USART2->CTLR1, 0x3<<2, 0x0<<3);  //disable send
         DMA_Cmd(DMA1_Channel7, DISABLE);
         DMA_ClearFlag(DMA1_IT_TE7);
+    }
+}
+
+void USART2_IRQHandler(void)
+{
+    if(USART_GetITStatus(USART2, USART_IT_TC))
+    {
+        /* Clear TC pending and disable transmitter/DE here */
+        USART_ClearFlag(USART2, USART_FLAG_TC);
+        /* Disable transmitter (clear TE). Leave RE unchanged. */
+        MODIFY_REG(USART2->CTLR1, USART_CTLR1_TE, 0x0);
+        USART_ITConfig(USART2, USART_IT_TC, DISABLE);
+        GPIO_InitTypeDef  GPIO_InitStruct = {0};
+        GPIO_InitStruct.GPIO_Pin = GPIO_Pin_2;
+        GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+        GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPU;
+        GPIO_Init(GPIOA, &GPIO_InitStruct);
     }
 }
 

@@ -811,7 +811,14 @@ void loadEEpromSettings()
         uint8_t rpm_level_div = 0;
         if (eepromBuffer.motor_poles != 0) {
             rpm_level_div = 32 / eepromBuffer.motor_poles;
+            if (rpm_level_div == 0) {
+                // poles above 32 truncate 32/poles to zero, which would pin
+                // low/high_rpm_level at 0 and silently disable the low rpm
+                // throttle limiter (map() then always returns out_max).
+                rpm_level_div = 1;
+            }
         }
+
         if (rpm_level_div != 0) {
             low_rpm_level = motor_kv / 100 / rpm_level_div;
             high_rpm_level = motor_kv / 12 / rpm_level_div;

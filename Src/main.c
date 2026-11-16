@@ -447,6 +447,7 @@ uint16_t ADC_raw_volts;
 uint16_t ADC_raw_current;
 uint16_t ADC_raw_input;
 uint16_t ADC_raw_ntc;
+uint16_t ADC_raw_pa2;
 uint8_t PROCESS_ADC_FLAG = 0;
 volatile char send_telemetry = 0;
 char telemetry_done = 0;

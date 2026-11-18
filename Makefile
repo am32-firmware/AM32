@@ -24,7 +24,7 @@ include $(ROOT)/make/tools.mk
 
 # supported MCU types
 
-MCU_TYPES := E230 F031 F051 F415 F421 G071 L431 G431 V203 G031 A153 SITL
+MCU_TYPES := E230 F031 F051 F415 F421 G071 L431 G431 V203 G031 A13X SITL
 
 MCU_TYPE := NONE
 
@@ -127,7 +127,7 @@ $$($(2)_BASENAME).elf: $(SRC_COMMON) $$(SRC_$(1)) $(xSRC)
 	$(if $(SVD_$(1)),$(QUIET)$(CP) -f $$(SVD_$(1)) $(OBJ)/debug.svd)
 # also copy the openocd.cfg from the MCU directory to obj/openocd.cfg for auto config of Cortex-Debug
 # in vscode
-	$(if $(NATIVE_$(1)),,$(QUIET)$(CP) -f Mcu$(DSEP)$(call lc,$(1))$(DSEP)openocd.cfg $(OBJ)$(DSEP)openocd.cfg > $(NUL))
+	$(if $(or $(NATIVE_$(1)),$(NO_OPENOCD_$(1))),,$(QUIET)$(CP) -f Mcu$(DSEP)$(call lc,$(1))$(DSEP)openocd.cfg $(OBJ)$(DSEP)openocd.cfg > $(NUL))
 endef
 
 # The Windows board workflow uses native Make and the ARM SDK. Keep SITL

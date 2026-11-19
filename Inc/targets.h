@@ -48,6 +48,8 @@
 // #define EPROPELLED_G431_CAN
 // #define EPROPELLED_4in1_G431_CAN
 
+//#define QUADDRIVE_G071
+
 #endif
 
 // used to hold a port/pin in a single 16 bit integer
@@ -56,6 +58,34 @@
 // GLOBAL
 // #define USE_ADC_INPUT
 // #define USE_ALKAS_DEBUG_LED
+
+
+#ifdef QUADDRIVE_G071
+
+#define FILE_NAME "QUADDRIVE_G071"
+#define FIRMWARE_NAME "QuadDrive G0"
+
+// STM32G071GBU6: 128 KB flash
+// Do not define SIXTY_FOUR_KB_MEMORY.
+
+// Gate-drive, back-EMF and DShot pin assignments
+#define HARDWARE_GROUP_G0_A
+
+// Baseline from the existing generic G071 target.
+// Must be validated on the NSG6288Q/MOSFET hardware.
+#define DEAD_TIME 60
+
+// UART ESC telemetry on PB6
+#define USE_SERIAL_TELEMETRY
+
+// No current or voltage ADC measurements on ESC MCU
+#define NO_CURRENT_SENSE
+#define NO_VOLTAGE_SENSE
+
+// QuadDrive samples only the internal MCU temperature.
+
+#endif
+
 
 #ifdef EPROPELLED_G431_CAN
 #define FIRMWARE_NAME "EPROPG4_40A"

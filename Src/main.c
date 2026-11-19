@@ -614,6 +614,12 @@ int32_t doPidCalculations(struct fastPID* pidnow, int actual, int target)
 void loadEEpromSettings()
 {
     read_flash_bin(eepromBuffer.buffer, eeprom_address, sizeof(eepromBuffer.buffer));
+#ifdef NO_VOLTAGE_SENSE
+    // This ESC MCU has no connected battery voltage ADC. Do not arm
+    // voltage-based shutdowns using the absent measurement.
+    // The flight controller must provide battery-voltage protection.
+    eepromBuffer.low_voltage_cut_off = 0;
+#endif
     if(eepromBuffer.eeprom_version < 3){ // eeprom versions less than 3 had a firmware name string in these bytes 
       eepromBuffer.max_ramp = 160;    // 0.1% per ms to 25% per ms 
       eepromBuffer.minimum_duty_cycle = 1; // 0.2% to 51 percent
@@ -744,9 +750,15 @@ void loadEEpromSettings()
             eepromBuffer.limits.temperature = 255;
         }
 
+#ifndef NO_CURRENT_SENSE
         if (eepromBuffer.limits.current > 0 && eepromBuffer.limits.current <= 100) {
             use_current_limit = 1;
         }
+#else
+        // The MCU has no per-ESC current measurement; never enable a
+        // current-control PID based on a nonexistent measurement.
+        use_current_limit = 0;
+#endif
         
         currentPid.Kp = eepromBuffer.current_P*2;
         currentPid.Ki = eepromBuffer.current_I;

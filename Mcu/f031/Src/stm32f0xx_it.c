@@ -40,6 +40,7 @@ int update_interupt = 0;
 uint8_t update_count = 0;
 uint16_t interrupt_time = 0;
 
+
 /******************************************************************************/
 /*           Cortex-M0 Processor Interruption and Exception Handlers */
 /******************************************************************************/
@@ -260,15 +261,18 @@ void TIM16_IRQHandler(void)
 
 void EXTI4_15_IRQHandler(void)
 {
-        EXTI->PR = current_EXTI_LINE;
-        interruptRoutine();
+    if ((EXTI->PR & EXTI->IMR & (1 << current_EXTI_LINE))){
+      EXTI->PR = phase_lines;
+      interruptRoutine();
+    }
 }
 
-// #ifdef BLUE_BOARD
 void EXTI0_1_IRQHandler(void)
-{ 
-        EXTI->PR = current_EXTI_LINE;
-        interruptRoutine();
+{   
+   if ((EXTI->PR & EXTI->IMR & (1 << current_EXTI_LINE))){
+      EXTI->PR = phase_lines;
+      interruptRoutine();
+    }
 }
 
 void EXTI2_3_IRQHandler(void)

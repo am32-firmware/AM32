@@ -32,6 +32,7 @@
 #include "comparator.h"
 #include "common.h"
 
+
 /* USER CODE END Includes */
 
 /* Private typedef
@@ -375,18 +376,17 @@ void TIM14_IRQHandler(void)
 //    }
 //}
 
-void EXTI0_1_IRQHandler(){
-    if (LL_EXTI_IsActiveRisingFlag_0_31(LL_EXTI_LINE_1) != RESET) {
-        LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_1);
-        interruptRoutine();
-        return;
-    }
-    if (LL_EXTI_IsActiveFallingFlag_0_31(LL_EXTI_LINE_1) != RESET) {
-        LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_1);
-        interruptRoutine();
-        return;
-    }
+void EXTI0_1_IRQHandler(void)
+{
+    uint32_t active = (rising ? EXTI->RPR1 : EXTI->FPR1)
+        & EXTI->IMR1 & (1u << current_EXTI_LINE);
 
+    EXTI->RPR1 = phase_lines;
+    EXTI->FPR1 = phase_lines;
+
+    if (active) {
+        interruptRoutine();
+    }
 }
 
 void EXTI2_3_IRQHandler(){
@@ -399,25 +399,13 @@ void EXTI2_3_IRQHandler(){
 
 void EXTI4_15_IRQHandler(void)
 {
+    uint32_t active = (rising ? EXTI->RPR1 : EXTI->FPR1)
+        & EXTI->IMR1 & (1u << current_EXTI_LINE);
 
-    if (LL_EXTI_IsActiveRisingFlag_0_31(LL_EXTI_LINE_7) != RESET) {
-        LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_7);
+    EXTI->RPR1 = phase_lines;
+    EXTI->FPR1 = phase_lines;
+
+    if (active) {
         interruptRoutine();
-        return;
-    }
-    if (LL_EXTI_IsActiveFallingFlag_0_31(LL_EXTI_LINE_7) != RESET) {
-        LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_7);
-        interruptRoutine();
-        return;
-    }
-    if (LL_EXTI_IsActiveRisingFlag_0_31(LL_EXTI_LINE_14) != RESET) {
-        LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_14);
-        interruptRoutine();
-        return;
-    }
-    if (LL_EXTI_IsActiveFallingFlag_0_31(LL_EXTI_LINE_14) != RESET) {
-        LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_14);
-        interruptRoutine();
-        return;
     }
 }

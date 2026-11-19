@@ -19,6 +19,16 @@
 #define SET_AND_ENABLE_COM_INT(time)                                    \
     (COM_TIMER->cval = 0, COM_TIMER->pr = time, COM_TIMER->ists = 0x00, \
         COM_TIMER->iden |= TMR_OVF_INT)
+// periodic COM_TIMER interrupt for sine mode, period loaded and count restarted immediately
+#define COM_TIMER_RELOAD_VALUE (COM_TIMER->pr)
+#define START_COM_TIMER_PERIODIC(time)                                     \
+    (DISABLE_COM_TIMER_INT(), COM_TIMER->pr = time,                        \
+        COM_TIMER->swevt = TMR_OVERFLOW_SWTRIG, COM_TIMER->ists = 0x00,    \
+        ENABLE_COM_TIMER_INT())
+#define STOP_COM_TIMER_PERIODIC(time)                                      \
+    (DISABLE_COM_TIMER_INT(), COM_TIMER->pr = time,                        \
+        COM_TIMER->swevt = TMR_OVERFLOW_SWTRIG, COM_TIMER->ists = 0x00,    \
+        NVIC_ClearPendingIRQ(COM_TIMER_IRQ))
 #define SET_INTERVAL_TIMER_COUNT(intertime) (INTERVAL_TIMER->cval = intertime)
 #define SET_PRESCALER_PWM(presc) (TMR1->div = presc)
 #define SET_AUTO_RELOAD_PWM(relval) (TMR1->pr = relval)

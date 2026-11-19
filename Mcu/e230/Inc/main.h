@@ -39,4 +39,5 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdint.h>
 
 #include "gd32e23x.h"
+#include "e230_regs.h"
 #endif

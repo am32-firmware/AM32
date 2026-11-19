@@ -44,10 +44,10 @@ jobs:
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             make arm_sdk_install
-            make -j8 QUADDRIVE_G071
+            make -j8
           elif [ "$RUNNER_OS" == "Windows" ]; then
             make arm_sdk_install
-            tools/windows/make/bin/make QUADDRIVE_G071
+            tools/windows/make/bin/make
           fi
 
       - name: Archive build

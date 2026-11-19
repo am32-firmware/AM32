@@ -82,8 +82,7 @@
 #define NO_CURRENT_SENSE
 #define NO_VOLTAGE_SENSE
 
-// Additional G071 ADC.c changes are needed for these flags
-// to completely disable unused ADC sampling.
+// QuadDrive samples only the internal MCU temperature.
 
 #endif
 

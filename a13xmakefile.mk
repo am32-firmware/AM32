@@ -1,0 +1,33 @@
+MCU := A13X
+PART := MCXA13X
+
+MCU_LC := $(call lc,$(MCU))
+
+# OpenOCD has no MCXA13X support, so there is no openocd.cfg to copy.
+# Debug with pyOCD, J-Link or NXP LinkServer instead.
+NO_OPENOCD_$(MCU) := 1
+
+TARGETS_$(MCU) := $(call get_targets,$(MCU))
+
+HAL_FOLDER_$(MCU) := $(HAL_FOLDER)/$(MCU_LC)
+
+MCU_$(MCU) := -mcpu=cortex-m33+nodsp -mthumb
+LDSCRIPT_$(MCU) := $(wildcard $(HAL_FOLDER_$(MCU))/*.ld)
+
+SRC_BASE_DIR_$(MCU) := \
+	$(HAL_FOLDER_$(MCU))/Startup \
+	$(HAL_FOLDER_$(MCU))/Drivers/src
+
+SRC_DIR_$(MCU) := $(SRC_BASE_DIR_$(MCU)) \
+	$(HAL_FOLDER_$(MCU))/Src
+
+CFLAGS_$(MCU) := \
+	-I$(HAL_FOLDER_$(MCU))/Inc \
+	-I$(HAL_FOLDER_$(MCU))/Drivers/inc \
+	-I$(HAL_FOLDER_$(MCU))/CMSIS
+
+CFLAGS_$(MCU) += \
+	 -D$(PART) \
+	 -DCPU_MCXA133VFM
+
+SRC_$(MCU) := $(foreach dir,$(SRC_DIR_$(MCU)),$(wildcard $(dir)/*.[cs]))

@@ -3529,13 +3529,13 @@
 #define VOLTAGE_ADC_CHANNEL LL_ADC_CHANNEL_7
 #endif
 
-//FRDM_MCXA153
-#ifdef FRDM_A153
-#define FILE_NAME				"FRDM_A153"
-#define FIRMWARE_NAME           "FRDM_MCXA153"
+//MR_ESC_SINGLE_A13X
+#ifdef MR_ESC_SINGLE_A13X
+#define FILE_NAME				        "MR_ESC_SINGLE_A13X"
+#define FIRMWARE_NAME           "MR A13X"
 #define NEED_INPUT_READY
 #define DEAD_TIME               70
-#define HARDWARE_GROUP_NXP_MCXA153
+#define HARDWARE_GROUP_NXP_MCXA13X
 #define TARGET_VOLTAGE_DIVIDER  100	//10k and 100k, but end voltage is in centivolts
 #define CURRENT_OFFSET          0 	//millivolts
 #define MILLIVOLT_PER_AMP       20
@@ -5635,10 +5635,10 @@
 
 #endif
 
-//NXP hardware group of the MCXA153
-#ifdef     HARDWARE_GROUP_NXP_MCXA153
+//NXP hardware group of the MCXA13X
+#ifdef     HARDWARE_GROUP_NXP_MCXA13X
 
-#define    MCU_A153
+#define    MCU_A13X
 
 //This is the Dshot/PWM input pin
 #define    INPUT_PIN            	2		//P1.2
@@ -6091,8 +6091,8 @@
 #define USE_ADC
 #endif
 
-//NXP MCXA153/133
-#ifdef MCU_A153
+//NXP MCXA13X
+#ifdef MCU_A13X
 //#define STMICRO
 #define NXP
 #define CPU_FREQUENCY_MHZ   96		//Is the CPU/System clock, main_clk is 192MHz

@@ -21,15 +21,16 @@ void enableCompInterrupts() { EXINT->inten |= EXTI_LINE; }
 
 void changeCompInput()
 {
-//    if (step == 1 || step == 4) { // c floating
-//        CMP->ctrlsts = PHASE_C_COMP;
-//    }
-//    if (step == 2 || step == 5) { // a floating
-//        CMP->ctrlsts = PHASE_A_COMP;
-//    }
-//    if (step == 3 || step == 6) { // b floating
-//        CMP->ctrlsts = PHASE_B_COMP;
-//    }
+    // A coasting blind step skips comStep(), but must still select its sense phase.
+    if (step == 1 || step == 4) { // c floating
+        CMP->ctrlsts = PHASE_C_COMP;
+    }
+    if (step == 2 || step == 5) { // a floating
+        CMP->ctrlsts = PHASE_A_COMP;
+    }
+    if (step == 3 || step == 6) { // b floating
+        CMP->ctrlsts = PHASE_B_COMP;
+    }
 //    if (rising) {
 
 //        EXINT->polcfg1 = 0;

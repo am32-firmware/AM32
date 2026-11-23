@@ -1,7 +1,12 @@
 #include <stdint.h>
 #include "eeprom.h"
+#include "targets.h"
 
 #pragma once
+
+#if defined(MCU_F031) || defined(MCU_G031)
+#define phase_lines ((1u << PHASE_A_EXTI_LINE) | (1u << PHASE_B_EXTI_LINE) | (1u << PHASE_C_EXTI_LINE))
+#endif
 
 extern EEprom_t eepromBuffer;
 extern uint32_t eeprom_address;

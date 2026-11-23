@@ -10,6 +10,15 @@
 // uint32_t FLASH_FKEY1 =0x45670123;
 // uint32_t FLASH_FKEY2 =0xCDEF89AB;
 
+// wait for the flash controller, returns 1 when ready without errors (as fmc_ready_wait())
+static uint8_t flashReady(void)
+{
+    uint32_t timeout = FMC_TIMEOUT_COUNT;
+    while ((FMC_STAT & FMC_STAT_BUSY) && --timeout) {
+    }
+    return !(FMC_STAT & (FMC_STAT_BUSY | FMC_STAT_WPERR | FMC_STAT_PGERR));
+}
+
 void save_flash_nolib(uint8_t* data, int length, uint32_t add)
 { /// todo
     uint32_t data_to_FLASH[length / 4];
@@ -21,20 +30,34 @@ void save_flash_nolib(uint8_t* data, int length, uint32_t add)
 
     // unlock flash
 
-    fmc_unlock();
+    if (FMC_CTL & FMC_CTL_LK) {
+        FMC_KEY = UNLOCK_KEY0;
+        FMC_KEY = UNLOCK_KEY1;
+    }
 
     // erase page if address even divisable by 1024
     if ((add % 1024) == 0) {
-        fmc_page_erase(add);
+        if (flashReady()) {
+            FMC_CTL |= FMC_CTL_PER;
+            FMC_ADDR = add;
+            FMC_CTL |= FMC_CTL_START;
+            flashReady();
+            FMC_CTL &= ~FMC_CTL_PER;
+        }
     }
 
     volatile uint32_t index = 0;
     while (index < data_length) {
-        fmc_word_program(add + (index * 4), data_to_FLASH[index]);
-        fmc_flag_clear(FMC_FLAG_END | FMC_FLAG_WPERR | FMC_FLAG_PGERR);
+        if (flashReady()) {
+            FMC_CTL |= FMC_CTL_PG;
+            REG32(add + (index * 4)) = data_to_FLASH[index];
+            flashReady();
+            FMC_CTL &= ~FMC_CTL_PG;
+        }
+        FMC_STAT = FMC_FLAG_END | FMC_FLAG_WPERR | FMC_FLAG_PGERR;
         index++;
     }
-    fmc_lock();
+    FMC_CTL |= FMC_CTL_LK;
 }
 
 void read_flash_bin(uint8_t* data, uint32_t add, int out_buff_len)

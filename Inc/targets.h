@@ -601,6 +601,9 @@
 #define FILE_NAME "SEQURE_G431_CAN"
 #define DRONECAN_SUPPORT 1
 #define DRONECAN_NODE_NAME "com.sequre.esc"
+// CAN termination pin on PB7, active high
+#define CAN_TERM_PIN GPIO_PORT_PIN(1, 7) // PB7
+#define CAN_TERM_POLARITY 1
 #define DEAD_TIME 80
 
 #define HARDWARE_GROUP_G4_D
@@ -1078,7 +1081,7 @@
 
 #ifdef NEUTRON_2_6S_AIO_F421
 #define FIRMWARE_NAME "Neutron AIO"
-#define FILE_NAME "NEUTRON_2_6S_AIO"
+#define FILE_NAME "NEUTRON_2_6S_AIO_F421"
 #define DEAD_TIME 40
 #define HARDWARE_GROUP_AT_B
 #define HARDWARE_GROUP_AT_045
@@ -1342,7 +1345,7 @@
 
 #ifdef  MAXKGO_V1_F421
 #define FIRMWARE_NAME "MAXKGO_F4 "
-#define FILE_NAME "MAXKGO_F421"
+#define FILE_NAME "MAXKGO_V1_F421"
 #define DEAD_TIME 130
 #define HARDWARE_GROUP_AT_B
 #define HARDWARE_GROUP_AT_540
@@ -1358,7 +1361,7 @@
 
 #ifdef  FLIPSKY_V1_F421
 #define FIRMWARE_NAME "FLIPSKY_F4 "
-#define FILE_NAME "FLIPSKY_F421"
+#define FILE_NAME "FLIPSKY_V1_F421"
 #define DEAD_TIME 130
 #define HARDWARE_GROUP_AT_B
 #define HARDWARE_GROUP_AT_540
@@ -1597,6 +1600,21 @@
 #define TARGET_MIN_BEMF_COUNTS 1
 #define USE_STARTUP_BOOST
 #define THREE_CELL_MAX
+#endif
+
+#ifdef  TBS_MINI3D_F421
+#define FIRMWARE_NAME           "TBS Mini3d"
+#define FILE_NAME                "TBS_MINI3D_F421"
+#define DEAD_TIME               120
+#define HARDWARE_GROUP_AT_045
+#define HARDWARE_GROUP_AT_B
+#define USE_INVERTED_HIGH
+#define TARGET_MIN_BEMF_COUNTS 3
+#define NO_POLLING_STARTUP
+#define USE_STARTUP_BOOST
+#define THREE_CELL_MAX
+#define RAMP_SPEED_LOW_RPM 8
+#define RAMP_SPEED_HIGH_RPM 16
 #endif
 
 #ifdef TBS_12S_F421
@@ -3150,9 +3168,9 @@
 #define RPM_PULSE_PIN LL_GPIO_PIN_5
 #endif
 
-#ifdef  FT_12S_100A 
+#ifdef  FT_12S_100A_G071 
 #define FILE_NAME "FT_12S_100A "
-#define FIRMWARE_NAME "FT_12S_100A "
+#define FIRMWARE_NAME "FT_12S_100A_G071"
 #define DEAD_TIME 60
 #define MILLIVOLT_PER_AMP 11
 #define TARGET_STALL_PROTECTION_INTERVAL 9000
@@ -3571,7 +3589,7 @@
 #define CURRENT_OFFSET 0
 #define HARDWARE_GROUP_G031_A
 #define USE_SERIAL_TELEMETRY
-#define NO_POLLING_START
+//#define NO_POLLING_START
 #endif
 
 #ifdef AIRHEART_SINGLE_G031
@@ -3583,7 +3601,7 @@
 #define TARGET_VOLTAGE_DIVIDER 230
 #define HARDWARE_GROUP_G031_A
 #define USE_SERIAL_TELEMETRY
-#define NO_POLLING_START
+//#define NO_POLLING_START
 #endif
 
 /*****************************************************CH32V203 targets

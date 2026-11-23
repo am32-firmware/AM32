@@ -48,10 +48,10 @@ uint16_t led_Buffer[RGB_BUFFER_SIZE] = {
 void send_LED_DMA()
 {
     dma_busy = 1;
-    dma_channel_disable(LED_DMA_CHANNEL); 
-    dma_memory_address_config(LED_DMA_CHANNEL, (uint32_t)led_Buffer);
-    dma_transfer_number_config(LED_DMA_CHANNEL, RGB_BUFFER_SIZE);
-    dma_channel_enable(LED_DMA_CHANNEL);
+    DMA_CHCTL(LED_DMA_CHANNEL) &= ~DMA_CHXCTL_CHEN;
+    DMA_CHMADDR(LED_DMA_CHANNEL) = (uint32_t)led_Buffer;
+    DMA_CHCNT(LED_DMA_CHANNEL) = RGB_BUFFER_SIZE & DMA_CHANNEL_CNT_MASK;
+    DMA_CHCTL(LED_DMA_CHANNEL) |= DMA_CHXCTL_CHEN;
 }
 
 void send_LED_RGB(uint8_t red, uint8_t green, uint8_t blue)
@@ -70,85 +70,75 @@ void send_LED_RGB(uint8_t red, uint8_t green, uint8_t blue)
 
 void WS2812_Init(void)
 {
-    // Init Timer&DMA config structures
-    timer_oc_parameter_struct timer_ocinitpara;
-    timer_parameter_struct timer_initpara;
-    dma_parameter_struct dma_initpara;
-
     // NVIC Settings
     NVIC_SetPriority(DMA_Channel3_4_IRQn, 1);
     NVIC_EnableIRQ(DMA_Channel3_4_IRQn);
 
     // Periph Clocks settings
-    rcu_periph_clock_enable(RCU_DMA);
+    RCU_CLOCK_ENABLE(RCU_DMA);
 
     #ifdef LED_USES_PB4
-    rcu_periph_clock_enable(RCU_TIMER2);
-    rcu_periph_clock_enable(RCU_GPIOB);
+    RCU_CLOCK_ENABLE(RCU_TIMER2);
+    RCU_CLOCK_ENABLE(RCU_GPIOB);
     #endif
     #ifdef LED_USES_PA2
-    rcu_periph_clock_enable(RCU_TIMER14);
-    rcu_periph_clock_enable(RCU_GPIOA);
+    RCU_CLOCK_ENABLE(RCU_TIMER14);
+    RCU_CLOCK_ENABLE(RCU_GPIOA);
     #endif
 
     // Configure GPIO
     //PA2 --> TIM14
     //PB4 --> TIM2
     #ifdef LED_USES_PB4// that means the esc is using PA2 as signal pin, so we configure PB4 as ws2812 data pin
-    gpio_mode_set(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO_PIN_4);
-    gpio_output_options_set(GPIOB, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ, GPIO_PIN_4);
-    gpio_af_set(GPIOB, GPIO_AF_1, GPIO_PIN_4);
+    gpioSetMode(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO_PIN_4);
+    gpioSetOutputOptions(GPIOB, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ, GPIO_PIN_4);
+    gpioSetAf(GPIOB, GPIO_AF_1, GPIO_PIN_4);
     #endif
     #ifdef LED_USES_PA2 // same as above
-    gpio_mode_set(GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO_PIN_2);
-    gpio_output_options_set(GPIOA, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ, GPIO_PIN_2);
-    gpio_af_set(GPIOA, GPIO_AF_0, GPIO_PIN_2);
+    gpioSetMode(GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO_PIN_2);
+    gpioSetOutputOptions(GPIOA, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ, GPIO_PIN_2);
+    gpioSetAf(GPIOA, GPIO_AF_0, GPIO_PIN_2);
     #endif
 
-    // Configure Timer
-    timer_deinit(LED_TIMER_REGISTER);
-    timer_initpara.prescaler = 0;
-    timer_initpara.alignedmode = TIMER_COUNTER_EDGE;
-    timer_initpara.counterdirection = TIMER_COUNTER_UP;  
-    timer_initpara.period = 89; // 800KHz
-    timer_initpara.clockdivision = TIMER_CKDIV_DIV1;
-    timer_initpara.repetitioncounter = 0;
-    timer_init(LED_TIMER_REGISTER, &timer_initpara);
+    // Configure Timer: reset, then edge aligned up counting at 72mhz / 90 = 800khz
+    if (LED_TIMER_REGISTER == TIMER2) {
+        RCU_RESET_PULSE(RCU_TIMER2RST);
+    } else {
+        RCU_RESET_PULSE(RCU_TIMER14RST);
+    }
+    TIMER_PSC(LED_TIMER_REGISTER) = 0;
+    TIMER_CAR(LED_TIMER_REGISTER) = 89; // 800KHz
+    if (LED_TIMER_REGISTER == TIMER14) {
+        TIMER_CREP(LED_TIMER_REGISTER) = 0;
+    }
+    TIMER_SWEVG(LED_TIMER_REGISTER) |= (uint32_t)TIMER_SWEVG_UPG;
 
-    // Configure Timer Channel
-    timer_ocinitpara.outputstate = TIMER_CCX_ENABLE;  
-    timer_ocinitpara.outputnstate = TIMER_CCXN_DISABLE;
-    timer_ocinitpara.ocpolarity = TIMER_OC_POLARITY_HIGH;
-    timer_ocinitpara.ocnpolarity = TIMER_OCN_POLARITY_HIGH;
-    timer_ocinitpara.ocidlestate = TIMER_OC_IDLE_STATE_HIGH;  
-    timer_ocinitpara.ocnidlestate = TIMER_OC_IDLE_STATE_LOW;
+    // CH0 pwm0 output enabled, high polarity, no compare shadow, idle high (TIMER14 only has idle state)
+    TIMER_CH0CV(LED_TIMER_REGISTER) = 0;
+    TIMER_CHCTL0(LED_TIMER_REGISTER) = (TIMER_CHCTL0(LED_TIMER_REGISTER)
+        & ~(uint32_t)(TIMER_CHCTL0_CH0MS | TIMER_CHCTL0_CH0COMCTL | TIMER_CHCTL0_CH0COMSEN)) | TIMER_OC_MODE_PWM0;
+    TIMER_CHCTL2(LED_TIMER_REGISTER) = (TIMER_CHCTL2(LED_TIMER_REGISTER)
+        & ~(uint32_t)(TIMER_CHCTL2_CH0P | TIMER_CHCTL2_CH0NEN | TIMER_CHCTL2_CH0NP)) | TIMER_CHCTL2_CH0EN;
+    if (LED_TIMER_REGISTER == TIMER14) {
+        TIMER_CTL1(LED_TIMER_REGISTER) = (TIMER_CTL1(LED_TIMER_REGISTER)
+            & ~(uint32_t)(TIMER_CTL1_ISO0 | TIMER_CTL1_ISO0N)) | TIMER_OC_IDLE_STATE_HIGH;
+    }
+    TIMER_CCHP(LED_TIMER_REGISTER) |= (uint32_t)TIMER_CCHP_POEN;
+    // one DMA transfer to CH0CV on each update
+    TIMER_DMACFG(LED_TIMER_REGISTER) = (TIMER_DMACFG(LED_TIMER_REGISTER) & ~(uint32_t)(TIMER_DMACFG_DMATA | TIMER_DMACFG_DMATC))
+        | TIMER_DMACFG_DMATA_CH0CV | TIMER_DMACFG_DMATC_1TRANSFER;
+    TIMER_DMAINTEN(LED_TIMER_REGISTER) |= (uint32_t)TIMER_DMA_UPD;
+    TIMER_CTL0(LED_TIMER_REGISTER) |= (uint32_t)(TIMER_CTL0_ARSE | TIMER_CTL0_CEN);
 
-    timer_channel_output_config(LED_TIMER_REGISTER, TIMER_CH_0, &timer_ocinitpara);
-    timer_channel_output_pulse_value_config(LED_TIMER_REGISTER, TIMER_CH_0, 0);
-    timer_channel_output_mode_config(LED_TIMER_REGISTER, TIMER_CH_0, TIMER_OC_MODE_PWM0);
-    timer_channel_output_shadow_config(LED_TIMER_REGISTER, TIMER_CH_0, TIMER_OC_SHADOW_DISABLE);
-    timer_primary_output_config(LED_TIMER_REGISTER, ENABLE);
-    timer_dma_transfer_config(LED_TIMER_REGISTER, TIMER_DMACFG_DMATA_CH0CV, TIMER_DMACFG_DMATC_1TRANSFER);
-    timer_dma_enable(LED_TIMER_REGISTER, TIMER_DMA_UPD);
-    timer_auto_reload_shadow_enable(LED_TIMER_REGISTER);
-    timer_enable(LED_TIMER_REGISTER);
-
-    dma_deinit(LED_DMA_CHANNEL);
-    dma_initpara.periph_addr = (uint32_t)&TIMER_CH0CV(LED_TIMER_REGISTER);
-    dma_initpara.periph_inc = DMA_PERIPH_INCREASE_DISABLE;
-    dma_initpara.memory_addr = (uint32_t)&led_Buffer;
-    dma_initpara.memory_inc = DMA_MEMORY_INCREASE_ENABLE;
-    dma_initpara.periph_width = DMA_PERIPHERAL_WIDTH_16BIT;
-    dma_initpara.memory_width = DMA_MEMORY_WIDTH_16BIT;
-    dma_initpara.direction = DMA_MEMORY_TO_PERIPHERAL;
-    dma_initpara.number = RGB_BUFFER_SIZE;
-    dma_initpara.priority = DMA_PRIORITY_HIGH;
-    dma_init(LED_DMA_CHANNEL, &dma_initpara);
-    dma_circulation_disable(LED_DMA_CHANNEL);  // Normal mode, not circular
-    dma_memory_to_memory_disable(LED_DMA_CHANNEL);
-    dma_interrupt_enable(LED_DMA_CHANNEL, DMA_INT_FTF);  // Enable interrupts in init
-    dma_interrupt_enable(LED_DMA_CHANNEL, DMA_INT_ERR);
-    dma_channel_enable(LED_DMA_CHANNEL);
+    // DMA: led_Buffer half words to CH0CV, memory increment, high priority, not circular,
+    // transfer complete and error interrupts
+    dmaDeinit(LED_DMA_CHANNEL);
+    DMA_CHPADDR(LED_DMA_CHANNEL) = (uint32_t)&TIMER_CH0CV(LED_TIMER_REGISTER);
+    DMA_CHMADDR(LED_DMA_CHANNEL) = (uint32_t)&led_Buffer;
+    DMA_CHCNT(LED_DMA_CHANNEL) = RGB_BUFFER_SIZE & DMA_CHANNEL_CNT_MASK;
+    DMA_CHCTL(LED_DMA_CHANNEL) = DMA_PERIPHERAL_WIDTH_16BIT | DMA_MEMORY_WIDTH_16BIT | DMA_PRIORITY_HIGH
+        | DMA_CHXCTL_MNAGA | DMA_CHXCTL_DIR | DMA_INT_FTF | DMA_INT_ERR;
+    DMA_CHCTL(LED_DMA_CHANNEL) |= DMA_CHXCTL_CHEN;
 
 }
 

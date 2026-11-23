@@ -2,7 +2,7 @@
 ENTRY(Reset_Handler)
 
 /* Highest address of the user mode stack */
-_estack = 0x20002000;    /* end of RAM */
+_estack = 0x20001800;    /* end of RAM */
 
 
 /* Generate a link error if heap and stack don't fit into RAM */
@@ -14,7 +14,7 @@ MEMORY
 FLASH (rx)      : ORIGIN = 0x08001000, LENGTH = 27K
 EEPROM        (rx)  : ORIGIN = 0x08007C00, LENGTH = 1K
 FILE_NAME     (rx)  : ORIGIN = ORIGIN(EEPROM) - 32, LENGTH = 32
-RAM (xrw)       : ORIGIN = 0x20000000, LENGTH = 16K
+RAM (xrw)       : ORIGIN = 0x20000000, LENGTH = 6K
 
 }
 

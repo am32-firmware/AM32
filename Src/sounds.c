@@ -119,7 +119,8 @@ void playStartupTune()
 {
     __disable_irq();
 comStep(3);
-  if (eepromBuffer.tune[0] != ERASED_FLASH_BYTE) {
+  // no custom tune if the tune area is erased or was cleared to 0xFF by the configurator
+  if (eepromBuffer.tune[0] != ERASED_FLASH_BYTE && eepromBuffer.tune[0] != 0xFF) {
     playBlueJayTune();
     } else {
         SET_AUTO_RELOAD_PWM(TIM1_AUTORELOAD);

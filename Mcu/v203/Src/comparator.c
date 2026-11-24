@@ -18,9 +18,9 @@ uint16_t current_Gpio_Pin = GPIO_Pin_3;
 uint8_t getCompOutputLevel()
 {
 #ifdef USE_PA2_AS_COMP
-    return (GPIOA->INDR & GPIO_Pin_2);
+    return (GPIOA->INDR & GPIO_Pin_2) != 0;
 #else
-    return (GPIOA->INDR & current_Gpio_Pin);
+    return (GPIOA->INDR & current_Gpio_Pin) != 0;
 #endif
 }
 

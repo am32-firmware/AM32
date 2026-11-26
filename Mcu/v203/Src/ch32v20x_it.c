@@ -28,6 +28,9 @@ extern volatile char send_telemetry;
 extern char telemetry_done;
 extern volatile char servoPwm;
 extern char dshot;
+#ifndef USE_PA2_AS_COMP
+extern uint8_t current_exti_line;
+#endif
 int recieved_ints = 0;
 
 void NMI_Handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
@@ -104,27 +107,20 @@ void DMA1_Channel1_IRQHandler(void)
 //for ic timer
 void DMA1_Channel5_IRQHandler(void)
 {
-    if(DMA1->INTFR & DMA1_IT_HT5) 
+    // snapshot and clear before handling: transfercomplete() re-arms the DMA,
+    // so clearing TC afterwards could erase the next capture's completion
+    uint32_t flags = DMA1->INTFR & (DMA1_IT_TC5 | DMA1_IT_HT5 | DMA1_IT_TE5);
+    DMA1->INTFCR = flags;
+
+    if ((flags & DMA1_IT_HT5) && servoPwm)
     {
-        if(servoPwm)
-        {
-            IC_TIMER_REGISTER->CCER = 0x03;  
-        }
-        DMA1->INTFCR = DMA1_IT_HT5;
+        IC_TIMER_REGISTER->CCER = 0x03;
     }
-    if( DMA1->INTFR & DMA1_IT_TC5)
+    // transfer complete or transfer error: handle once
+    if (flags & (DMA1_IT_TC5 | DMA1_IT_TE5))
     {
         CLEAR_BIT(INPUT_DMA_CHANNEL->CFGR,0x1);  //disable DMA1_CH5
         transfercomplete();
-        DMA1->INTFCR = DMA1_IT_TC5;
-        input_ready = 1;
-    }
-    /* Check whether DMA transfer error caused the DMA interruption */
-    if( DMA1->INTFR & DMA1_IT_TE5)
-    {
-        CLEAR_BIT(INPUT_DMA_CHANNEL->CFGR,0x1);  //disable DMA1_CH5
-        DMA_ClearFlag(DMA1_IT_TE5);
-        transfercomplete( );
         input_ready = 1;
     }
 }
@@ -166,6 +162,11 @@ void EXTI2_IRQHandler(void)
 #else
 void EXTI3_IRQHandler(void)
 {
+    // ignore a stale entry: line 3 must be pending, unmasked and the active comparator line
+    if (!(EXTI->INTFR & EXTI->INTENR & (1u << current_exti_line) & EXTI_Line3)) {
+        EXTI->INTFR = EXTI_Line3;
+        return;
+    }
     if((INTERVAL_TIMER->CNT) > ((average_interval>>1))){
         EXTI->INTFR = EXTI_Line3;
         interruptRoutine();
@@ -178,6 +179,11 @@ void EXTI3_IRQHandler(void)
 
 void EXTI4_IRQHandler(void)
 {
+    // ignore a stale entry: line 4 must be pending, unmasked and the active comparator line
+    if (!(EXTI->INTFR & EXTI->INTENR & (1u << current_exti_line) & EXTI_Line4)) {
+        EXTI->INTFR = EXTI_Line4;
+        return;
+    }
     if((INTERVAL_TIMER->CNT) > ((average_interval>>1))){
         EXTI->INTFR = EXTI_Line4;
         interruptRoutine();
